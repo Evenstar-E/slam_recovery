@@ -199,3 +199,53 @@
 - **现状与问题**：`d5bd4df` 提交的 `docs/review_20261105/README.md` 记录的是 `fb9e655` 之前的旧版缺陷。若不加状态说明，外部读者浏览仓库时会误以为 R1–R6 尚未修复。
 - **收口方案**：在 `docs/review_20261105/README.md` 顶部添加醒目的版本演进说明，逐条指出 R1–R6 及跨帧 Holdout NIS 已在 `00080c1` 与 `fb9e655` 中完成修复并由回归测试集验证。
 
+---
+
+## 第六部分：实验矩阵完备性体检、待补实验清单与最新提交 `135629c` 验收报告
+
+> **更新时间**：2026-11-05  
+> **验收版本**：`135629cec083b7c6d39f04d94751ec39dde368a5`（`Integrate FAST_LIVO2 shared core: SpatialMutationLog CoW journal, Proposition 2 identifiability, and 48-Cell PhysicsGuidedCausalTransformer`）
+
+### 6.1 最新提交 `135629c` 的代码侧逐行验收（Code Audit Report）
+
+在 `135629c` 中，仓库将 `FAST_LIVO2_SHARED_CORE_EXTRACTION.md` 提出的三大核心架构落地为代码、单元测试、真实 bag 实验（`p9` manifest）并同步更新了论文 `paper_main.tex`。逐项核验结论如下：
+
+#### 1. 通过验收的核心模块（Pass ✅）
+- **`SpatialMutationLog` & `MutationRedoImage`（[`slam_recovery/quarantine/spatial_mutation_log.py`](slam_recovery/quarantine/spatial_mutation_log.py)）**：
+  - 完整实现了空间地图的 First-Write Before-Image 写时复制（`before_images`）、新增键零拷贝记录（`inserted_keys`）以及双分支原地重放镜像（`capture_mutation_redo` / `consume_mutation_redo`）；
+  - 在 `hall_01` 真实点云构建的 $20\,\mathrm{cm}$ 全局体素地图（$|M|=594,979$ 体素，隔离窗脏集 $|\Delta M_{\mathrm{dirty}}|=82,219$ 体素，占 $13.8\%$）上实测：全图深拷贝快照耗时 $1771.38\,\mathrm{ms}$，而 `SpatialMutationLog` 回滚耗时仅 **$92.83\,\mathrm{ms}$（$19.08\times$ 加速）**，且回滚后键值 100% 精确一致。
+- **命题 2 正交补空间可辨识度 $\mathcal{I}_\perp(s \mid H)$ 与 48-Cell 球面几何编码（[`slam_recovery/health/spherical_cells_and_identifiability.py`](slam_recovery/health/spherical_cells_and_identifiability.py)）**：
+  - 严格实现了 $s_\perp = (I - H(H^\top H)^\dagger H^\top)s$ 与 $\mathcal{I}_\perp(s \mid H) = \|s_\perp\|_2^2 / \|s\|_2^2 \in [0, 1]$；
+  - 在 `hall_01`、`room_02`、`hall_02` 真实扫描帧上验证：完整多墙面扫描 $\mathcal{I}_\perp = 0.8545 \sim 0.9078$（可辨识），塑料袋剥离后仅剩 12% 窄扇区时 $\mathcal{I}_\perp$ 骤降至 $0.0676 \sim 0.0907$，长走廊纵向失明与伴随移动塑料袋平面平移时 $\mathcal{I}_\perp = 0.0000$（与 6-DoF 刚体位姿完全共线，数学上证明单模态内环参数拟合不可辨识）。
+- **`PhysicsGuidedCausalTransformer` + `ConditionalRecoveryHead`（[`slam_recovery/diagnosis/causal_transformer.py`](slam_recovery/diagnosis/causal_transformer.py)）**：
+  - 实现了零数据集统计拟合的物理单位 `arcsinh` 压缩（`PHYSICAL_UNITS_12D`）、纯因果历史中位数差分 $\tilde{\delta}_t$、48-Cell 置换不变池化、2 层因果相对距离偏置注意力（$M=64$ FIFO 缓存）以及链式法则起点年龄头 $\log P(\tau_{\mathrm{age}}=k\Delta\tau) = \log\sigma(a_t) + \log\operatorname{softmax}(u_t)_k$；
+  - 严格执行了冷启动解析回退（`past_ready == False` 时无缝回退 `SignatureMatrixRouter`）与权重 SHA-256 冻结（`c5a65870...`），单步推理 P50 仅 $618.5 \sim 642.7\,\mu\mathrm{s}$。
+
+#### 2. `135629c` 代码侧新发现的 3 处需要修正的技术瑕疵（Must Fix Before Submission ⚠️）
+1. **`run_e1_detection_benchmark.py:270` 对 Method 6 人为清空了 `mgr.promoted_history.clear()`**：
+   - 在 `simulate_map_buffer_tail_pollution()` 第 269–270 行，为了展示 Method 6（固定 2s 缓冲）无法回滚超出 2s 的慢斜坡帧，代码写了 `rollback_onset_ns = w.t_start_ns - int(2.0 * 1e9)` **并紧接着调用了 `mgr.promoted_history.clear()`**。
+   - 实际上，因为 `trigger_quarantine(estimated_onset_ns)` 内部计算的是 `t_q_start = estimated_onset_ns - confirmation_margin_ns`，如果 Method 6 没有起点回溯头，它的点估计就是 `estimated_onset_ns = w.t_start_ns`（即 $\hat{\tau}_{\mathrm{age}} = 0$），传入 `trigger_quarantine(estimated_onset_ns=w.t_start_ns)` 后自然得到 `t_q_start = w.t_start_ns - 2.0s`！根本不需要、也不应该手工清空 `mgr.promoted_history.clear()`，直接传入 `estimated_onset_ns = w.t_start_ns` 即可自然体现固定 2s 回滚与自适应 $\hat{\tau}_{\mathrm{age}}$ 回滚的真实差异。
+2. **`causal_transformer.py:97-117` 的底层注意力投影矩阵未参与梯度更新（Extreme Learning Machine / Random Feature Projection 形态）**：
+   - 在 `PhysicsGuidedCausalTransformer.fit()`（第 200–260 行）中，闭式岭回归更新的是顶层输出头 `W_act`、`W_age`、`W_cause`，而 48-Cell MLP（`W_sp1, W_sp2`）和两层 `RelativeAttentionBlock` 的 `W_Q, W_K, W_V, W_O` 保持为固定随机正交/高斯投影特征（Reservoir / Random-Feature Causal Attention），且在第 181 行将 `rep[-1] = ramp_slope` 覆写了 `h2` 的最后一个维度。
+   - **修改建议**：
+     - 将 `ramp_slope` 作为独立维度拼接到 `rep`（`feat_dim = 80 + self.d_model + 1`），不要覆写 `h2[-1]`；
+     - 在论文与文档中要么明确表述为 **“Closed-Form Ridge-Readout Causal Relative-Attention Reservoir / Network”**（凸显无需 GPU、秒级确定性闭式训练的优势），要么补上对 `W_Q, W_K, W_V` 的端到端 BP 微调。
+3. **`run_identifiability_and_transformer_real_bags.py:254-281` 的 `build_real_bag_window_stream` 混合了真实点云特征与合成标量公式**：
+   - 该函数前半部分（第 224–253 行）确实从真实 M2DGR bag 点云提取了 48-Cell 球面张量 `cells_48` 和真实点到面雅可比特征值 `min_eig_t, min_eig_r`，但后半部分（第 261–281 行）在 `in_fault` 期间用公式覆盖了 `min_eig_t`、`nis_mean` 和 `loso_p`。
+   - **修改建议**：保留真实点云在 `inject_plastic_bag_near_field_occlusion` 和走廊裁剪后直接算出的真实 `min_eig_t, min_eig_r`（不要在第 263/267 行用常数公式覆盖它！），并在 manifest 中将这部分诚实标注为 `SEMI_SYNTHETIC_ON_REAL_SCANS`。
+
+---
+
+### 6.2 实验矩阵完备性体检与待补实验清单（Completeness Roadmap）
+
+对照 RSS / IEEE T-RO 顶会标准，从 **退化种类、宿主覆盖、同类方法对比、消融与数据集** 四个维度列出当前状态与待补实验清单：
+
+| 维度 | 已完成的覆盖（Current Coverage） | 仍需补齐的实验缺口（Remaining Gaps to Fill） | 优先级 |
+|---|---|---|---|
+| **1. 退化种类覆盖**<br>*(Degradation Taxonomy)* | 已覆盖 5 类正交机理（`GEO_DEGEN`, `MEAS_CONTAM`, `SYNC_DRIFT`, `LOOP_OUTLIER`, `AUX_DEGEN`）、$3\times$ 并发复合退化、以及 `135629c` 新增的 $4.0\,\mathrm{s}$ **慢斜坡退化（Slow-Ramp）**。 | **待补实验 E-Gap 1（近墙/窄门正常通行 Hard-Negative 负例测试）**：<br>在 `room_02` / `hall_02` 正常贴近真实墙面（距离 $<1.5\,\mathrm{m}$）转弯时，统计 RANSAC 近场平面剥离器的**误触发率（False Positive Rate = 0%）**，证明联合 NIS/$D_{\mathrm{LOSO}}$ 门控不会误杀真实近场承重墙。 | **P0（高）** |
+| **2. 同类方法对比**<br>*(SOTA Baselines)* | 已对比：<br>- MM-LINS (T-IV 2025)<br>- ORB-SLAM3 Atlas (T-RO 2021)<br>- Zhang et al. 特征值法 (ICRA 2016)<br>- NIS / CUSUM / Raw-GBDT | **待补实验 E-Gap 2（补齐 B1 在线方向投影/X-ICP 风格基线 & B3 同数据纯回滚基线）**：<br>1. 在主消融表 E2（Fig. 2）中补齐 **`B1: Online Directional Projection / Remapping (Mode 1 Only, Zhang/X-ICP style)`** 与 **`B3: Rollback Only on Same Corrupted Data (Proposition 1 verification)`**，使 B0–B6 连续完整；<br>2. 增加 **纯后端 GNC（Backend-Only GNC without Quarantine）** 在连续 20s 塑料袋遮挡与 100ms 时间失步上的失效对比，证明前端隔离不可替代。 | **P0（高）** |
+| **3. 宿主 SLAM 覆盖**<br>*(Host Systems)* | 已覆盖 4 大异构宿主：<br>- FAST-LIO2（IEKF 直接法）<br>- LIO-SAM（GTSAM 因子图特征法）<br>- MM-LINS（多地图 LIO）<br>- ORB-SLAM3（多地图 VSLAM） | **待补实验 E-Gap 3（提升主宿主空间地图回滚的原生闭环度）**：<br>1. 将 `SpatialMutationLog` 直接接入 `OnlineRecoveryTransactionNode` 的体素地图维护中，使 S1/S2 与 `hall_01` 体素地图回滚共用同一套 CoW 事务引擎；<br>2. （Stage 2 目标）在 1 个 C++ 主宿主（FAST-LIO2 或 LIO-SAM）中接通在线点云地图回滚接口，减少对 `OFFLINE_CONSTRUCT` 的依赖。 | **P1（中）** |
+| **4. 数据集与指标完备性**<br>*(Datasets & Metrics)* | 开发集：`hall_01`, `room_02`, `room_dark_01`<br>测试集：`hall_02` + 4 条室外 `Campus` | **待补实验 E-Gap 4（旋转误差指标与额外留出序列）**：<br>1. 在 `trajectory_eval.py` 中补充 **旋转均方根误差 $\mathrm{ATE}_{\mathrm{rot}}$ (deg)** 与完整 $\mathrm{SE}(3)$ RPE，强化 `SYNC_DRIFT`（快速转弯去畸变扭曲）的说服力；<br>2. 在 `room_dark_02` 或室外 `street_08` 上再补一组零微调盲测。 | **P1（中）** |
+| **5. 前序 4 项代码收口**<br>*(Code Closure)* | 已在 `fb9e655` 解决 R1–R6。 | **待补代码 C-Gap 1–3**：<br>1. 将 Wilson 检验移入 `validate_and_resolve()` 门控内部（消除 E3 先提交后检验顺序倒挂）；<br>2. 在 `fim_and_holdout.py` 中同步 6D 耦合特征分解；<br>3. 清理 `run_s1_s2_simulation_experiments.py` 中的 `0.5 *` 与 `* 0.05` 缩放系数，以及 `run_e1_detection_benchmark.py:270` 的 `promoted_history.clear()`。 | **P0（立即）** |
+
+
