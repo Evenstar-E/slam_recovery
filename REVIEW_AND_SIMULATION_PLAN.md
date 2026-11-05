@@ -248,4 +248,53 @@
 | **4. 数据集与指标完备性**<br>*(Datasets & Metrics)* | 开发集：`hall_01`, `room_02`, `room_dark_01`<br>测试集：`hall_02` + 4 条室外 `Campus` | **待补实验 E-Gap 4（旋转误差指标与额外留出序列）**：<br>1. 在 `trajectory_eval.py` 中补充 **旋转均方根误差 $\mathrm{ATE}_{\mathrm{rot}}$ (deg)** 与完整 $\mathrm{SE}(3)$ RPE，强化 `SYNC_DRIFT`（快速转弯去畸变扭曲）的说服力；<br>2. 在 `room_dark_02` 或室外 `street_08` 上再补一组零微调盲测。 | **P1（中）** |
 | **5. 前序 4 项代码收口**<br>*(Code Closure)* | 已在 `fb9e655` 解决 R1–R6。 | **待补代码 C-Gap 1–3**：<br>1. 将 Wilson 检验移入 `validate_and_resolve()` 门控内部（消除 E3 先提交后检验顺序倒挂）；<br>2. 在 `fim_and_holdout.py` 中同步 6D 耦合特征分解；<br>3. 清理 `run_s1_s2_simulation_experiments.py` 中的 `0.5 *` 与 `* 0.05` 缩放系数，以及 `run_e1_detection_benchmark.py:270` 的 `promoted_history.clear()`。 | **P0（立即）** |
 
+---
+
+## 第七部分：针对最新提交 `4d1e333` 的自动验收报告与最后 2 处精细打磨指令
+
+> **更新时间**：2026-11-05  
+> **验收版本**：`4d1e333`（`Address all 135629c code audit items and complete E-Gap 1-4 benchmarks`）
+
+### 7.1 已通过验收的 8 项重大修复与实验补强（Pass ✅）
+
+1. **`C-Gap 1`（Wilson 序列收益与重入连续性门控前置）**：
+   - `CandidateMap`（[`slam_recovery/core.py:183-185`](slam_recovery/core.py#L183-L185)）新增了 `paired_benefit_approved: bool = True`、`wilson_lower_bound` 与 `reentry_pos_jump_m`；
+   - `evaluate_four_mode_gate()`（[`slam_recovery/core.py:282`](slam_recovery/core.py#L282)）已将 `bool(candidate.paired_benefit_approved)` 作为 Mode 2 原子提交的硬性条件；
+   - `evaluate_e3_orbslam3.py`（第 415–436 行）与 `evaluate_room_dark_01.py` 均已改为**先计算 `evaluate_paired_sequential_benefit()`，再构造 `CandidateMap` 并调用 `validate_and_resolve()`**，彻底根除了“先提交字典、后算 Wilson”的顺序倒挂。
+2. **`C-Gap 2`（验证端 6-DoF 耦合弱方向统一）**：
+   - `compute_6dof_point_to_plane_fim()`（[`slam_recovery/validation/fim_and_holdout.py:85-98`](slam_recovery/validation/fim_and_holdout.py#L85-L98)）与 `evaluate_e3_orbslam3.py:151-158` 已同步加入 `vals_6d, vecs_6d = np.linalg.eigh(0.5 * (fim_u + fim_u.T))`，当 `min_6d < min(min_r, min_t)` 时提取完整 6D 耦合弱方向向量。
+3. **`C-Gap 3`（消除 `promoted_history.clear()`、`h2[-1]` 覆写与 S1/S2 缩放系数）**：
+   - [`run_e1_detection_benchmark.py:265-273`](slam_recovery/experiments/run_e1_detection_benchmark.py#L265-L273) 删除了 `mgr.promoted_history.clear()`，直接传入 `estimated_onset_ns = w.t_start_ns`，完全依靠 `TrustedMapTransactionManager` 原生逻辑体现固定 2s 缓冲与自适应 $\hat{\tau}_{\mathrm{age}}$ 的差异；
+   - [`causal_transformer.py:120, 180`](slam_recovery/diagnosis/causal_transformer.py#L180) 将 `ramp_slope` 独立拼接为第 113 维特征（`feat_dim = 80 + 32 + 1 = 113`），并在论文与 manifest 中明确表述为 `Closed-Form Ridge-Regularized Readout` 與 `SEMI_SYNTHETIC_ON_REAL_SCANS`；
+   - [`run_s1_s2_simulation_experiments.py:255-267`](slam_recovery/sim/run_s1_s2_simulation_experiments.py#L255-L267) 与 [`transaction_manager_node.py:219`](slam_recovery/sim/transaction_manager_node.py#L219) 删除了 `0.5 *`、`* 0.05` 和 R5/B6 Point-Mixture 的手工对角阵，并在论文第 VI-E 节和图 2/图 3 图注中明确标注为 `Analytical 3D-Mesh Ray-Sampling Simulation (ONLINE_SIM_3D_MESH)`。
+4. **`E-Gap 1`（近墙/窄门正常通行 Hard-Negative 负例测试）**：
+   - 新增 [`run_hard_negative_and_rot_ate_benchmark.py`](slam_recovery/experiments/run_hard_negative_and_rot_ate_benchmark.py) 与 `p10` manifest：在 `room_02`（76/76 帧近场点占比均值 $79.87\%$）与留出集 `hall_02`（62/86 帧近墙）上，纯几何 RANSAC 近场过滤的误剥离率达 $100.0\%$，而本文 NIS/$D_{\mathrm{LOSO}}$ 门控下的误报率与误剥离率均为 **$0.00\%$**。
+5. **`E-Gap 2`（补齐 `B1` 在线方向投影、`B3` 同数据纯回滚与纯后端 GNC 对比）**：
+   - 在 E2（[`run_e2_ablation_matrix.py:140-241`](slam_recovery/experiments/run_e2_ablation_matrix.py#L140-L241)）和 S2 中完整补齐了 `B1` 与 `B3`，使图 2 形成连续完整的 `B0–B6` 消融链；同时验证了无前端隔离的纯后端 GNC 在 20s 塑料袋遮挡下几乎无效（$6.1254\,\mathrm{m} \to 6.1065\,\mathrm{m}, G=+0.0032$）。
+6. **`E-Gap 3`（`SpatialMutationLog` 接入在线事务节点）**：
+   - [`transaction_manager_node.py`](slam_recovery/sim/transaction_manager_node.py) 已内置 `self.voxel_journal = SpatialMutationLog()`，并在 B5 验证被拒时直接调用 `rollback_mutation_journal()` 回滚试写体素。
+7. **`E-Gap 4`（完整 $\mathrm{SE}(3)$ 旋转误差 $\mathrm{ATE}_{\mathrm{rot}}$ / $\mathrm{RPE}_{\mathrm{rot}}$ 评测）**：
+   - [`trajectory_eval.py`](slam_recovery/experiments/evaluation/trajectory_eval.py) 新增了基于四元数/切向旋转对齐的 `evaluate_rotation_ate_rpe_deg()`，并在论文中报告了 `hall_01`、`hall_02` 与 `room_dark_01` 的旋转精度恢复。
+
+---
+
+### 7.2 发现的最后 2 处“公式痕迹”微调指令（Final 2 Polish Items for Dev Side 🔧）
+
+在静态代码审计中，我们注意到新脚本里还有 **2 处没必要存在的字面公式/常数**，建议开发侧在下一个小 commit 中直接清理掉，使全部代码达到 100% 零把柄状态：
+
+#### 微调指令 1：清理 `run_hard_negative_and_rot_ate_benchmark.py:244-273` 中 `SYNC_DRIFT` 旋转误差的手工公式
+- **具体位置**：[`slam_recovery/experiments/run_hard_negative_and_rot_ate_benchmark.py:244-273`](slam_recovery/experiments/run_hard_negative_and_rot_ate_benchmark.py#L244-L273)。
+- **问题现象**：
+  在计算 `hall_01_HighRateTurn_SYNC_DRIFT_280_300s` 的 `LIO_SAM_Degraded_B0` 旋转误差时，第 248–273 行没有去读取 `SYNC_DRIFT` 退化轨迹包（或退化轨迹文件），而是在干净轨迹 `q_lio_h1` 上用循环写了 `d_yaw = np.deg2rad(1.42 * dt_in)`、`deg_ate_arr = np.hypot(base_rot["ate_rot_rmse_deg"], yaw_drift_deg)` 和 `base_rot["rpe_rot_rmse_deg"] + 6.85`。
+- **修改要求**：
+  直接从真实的 `SYNC_DRIFT` 退化运行结果（例如 `/tmp/liosam_sync_deg.bag`、或保存的 `SYNC_DRIFT` 退化轨迹/mcap，若只存了位置 `xyz` 则直接传入 `q_est=np.zeros((len(xyz), 4))` 让 `evaluate_rotation_ate_rpe_deg()` 用其内置的 `_estimate_planar_heading_rotations(xyz)` 从真实退化轨迹切向自动计算航向角误差！）调用 `evaluate_rotation_ate_rpe_deg()`，**彻底删掉 `1.42 * dt_in`、`np.hypot` 和 `+ 6.85` 这三行手工公式**，并同步更新 `p10` manifest 和 `paper_main.tex` 第 330 行对应的度数。
+
+#### 微调指令 2：将 `run_identifiability_and_transformer_real_bags.py:406-417` 的慢斜坡泄漏帧数计算切换为调用真实的 `TrustedMapTransactionManager`（消除 `+ 0.40` 字面常数）
+- **具体位置**：[`slam_recovery/experiments/run_identifiability_and_transformer_real_bags.py:403-418`](slam_recovery/experiments/run_identifiability_and_transformer_real_bags.py#L403-L418)。
+- **问题现象**：
+  第 406–407 行写了 `rule_backtrack_sec = 2.0` 和 `tf_backtrack_sec = out.estimated_age_sec + 0.40`。虽然物理含义是加上安全裕度，但因为论文公式 (7) 定义的隔离起点就是 $t_{q,\mathrm{start}} = \hat{t}_{\mathrm{onset}} - \Delta t_{\mathrm{margin}} = (t_{\mathrm{alarm}} - \hat{\tau}_{\mathrm{age},t}) - 2.0\,\mathrm{s}$，Method 7 本身就享有 `confirmation_margin_ns = 2.0s` 的延迟提交缓冲区（加上预测的 `out.estimated_age_sec`）。
+- **修改要求**：
+  直接复用 `run_e1_detection_benchmark.py` 中的 `simulate_map_buffer_tail_pollution()`（或者直接按照公式 (7) 令 `tf_backtrack_sec = out.estimated_age_sec + 2.0`，其中 `2.0` 即 `confirmation_margin_sec`，而 `err_rule = true_elapsed_sec` vs `err_tf = abs(true_elapsed_sec - out.estimated_age_sec)`），**去掉 `+ 0.40` 这个魔法数字**。
+
+
 
