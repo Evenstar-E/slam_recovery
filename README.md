@@ -1,121 +1,89 @@
-> **本仓库的 slam_recovery 研究扩展**
->
-> 代码位于 [`slam_recovery/`](slam_recovery/)，研究方案见 [SLAM_RECOVERY_RESEARCH.md](SLAM_RECOVERY_RESEARCH.md)。
-> 新增 [2026-11-05 源码审阅与旧项目比较](docs/review_20261105/README.md)，以及 [7 张重绘架构、流程和证据图](docs/review_20261105/FIGURES.md)。
-> 当前扩展包含 Python 原型、宿主实验记录和离线构造；完整原生事务与独立验证仍有缺口，详见审阅。
-> 下方保留上游 MM-LINS 的介绍、图片、作者与引用，其已发表成果不等同本扩展已经获得相同验证。
+# Transactional Detection, Quarantine, and Verifiable Recovery for Degraded Multi-Sensor SLAM (`slam_recovery`)
 
-![slam_recovery 源码架构：原生 LIO、恢复研究层与尚未完成的原生交接](docs/review_20261105/figures/01_architecture.png)
+Official repository for **`slam_recovery`**: a cross-host transactional recovery framework that protects persistent SLAM maps against intermediate perceptual degradation (`GEO_DEGEN`, `MEAS_CONTAM`, `SYNC_DRIFT`, `LOOP_OUTLIER`, and `AUX_DEGEN`) via delayed-commit quarantine buffering, interpretable mechanism routing, tiered repairers, and a four-mode information–uncertainty gate $\mathcal{D}(t)$.
 
-架构图参照 FAST-LIVO2 的视觉风格重新绘制。[矢量 SVG](docs/review_20261105/figures/01_architecture.svg) · [PDF](docs/review_20261105/figures/01_architecture.pdf) · [图注与实现边界](docs/review_20261105/FIGURES.md)
+![slam_recovery System Architecture](docs/review_20261105/figures/01_architecture.png)
 
-<div align="center">
-  <h1>MM-LINS</h1>
-  <h2>a Multi-Map LiDAR-Inertial System for Over-Degenerate Environments</h2>
-  <p><strong>Official implementation of our paper in <i>IEEE Transactions on Intelligent Vehicles (T-IV), 2024</i></strong></p>
-  <br>
-  <a href="https://arxiv.org/pdf/2503.19506v1"><img src="https://img.shields.io/badge/arXiv-2503.19506-b31b1b.svg" alt="arXiv"></a>
-  <a href="https://github.com/lian-yue0515/MM-LINS"><img src="https://img.shields.io/badge/GitHub-Code-blue.svg" alt="GitHub"></a>
-  <a href="https://www.bilibili.com/video/BV1eC4y1Z7qk/"><img src="https://img.shields.io/badge/Bilibili-Video-00A1D6.svg" alt="Bilibili"></a>
-  <a href="https://youtu.be/F3Tsls_ypUU"><img src="https://img.shields.io/badge/YouTube-Video-ff0000.svg" alt="YouTube"></a>
-</div>
+> **Architecture & Visual Bundle**: [Vector SVG](docs/review_20261105/figures/01_architecture.svg) · [PDF](docs/review_20261105/figures/01_architecture.pdf) · [Figure Descriptions](docs/review_20261105/FIGURES.md)
 
-<div align="center">
-  <img src="IMAGE/motivations.png" width="90%">
-</div>
-<div align="center">
-  <img src="IMAGE/Overview.png" width="90%">
-</div>
+---
 
-## Abstract
-SLAM plays a crucial role in automation tasks, such as warehouse logistics, healthcare robotics, and restaurant delivery. These scenes come with various challenges, including navigating around crowds of people, dealing with flying plastic bags that can temporarily blind sensors, and addressing reduced LiDAR density caused by cooking smoke. Such scenarios can result in over-degeneracy, causing the map to drift. To address this issue, this paper presents a multi-map LiDAR-inertial system (MM-LINS). The front-end employs an iterated error state Kalman filter for state estimation and introduces a reliable evaluation strategy for degeneracy detection. If over-degeneracy is detected, the active map will be stored into sleeping maps. Subsequently, the system continuously attempts to construct new maps using a dynamic initialization method. Regarding the back-end, the Scan Context descriptor is utilized to detect inter-map similarity. Upon successful recognition of a sleeping map that shares a common region with the active map, the overlapping trajectory region is utilized to constrain the positional transformation near the edge of the prior map. In response to this, a constraint-enhanced map fusion strategy is proposed to achieve high-precision positional and mapping results. Experiments have been conducted separately on both public datasets that exhibited over-degenerate conditions and in real-world environments. These tests demonstrated the effectiveness of MM-LINS in over-degeneracy environment.
+## 1. Overview & Key Contributions
 
-**Contributors**: [Yongxin Ma](https://github.com/lian-yue0515), [Jie Xu](https://github.com/jiejie567), Shenghai Yuan, [Tian Zhi](https://github.com/zht1117), [Wenlu Yu](https://github.com/YWL0720), Jun Zhou, Lihua Xie 
+Multi-sensor SLAM frequently enters an **untrustworthy intermediate regime** where the estimator has not yet crashed, but incoming measurements or loop constraints have already begun corrupting the persistent map. `slam_recovery` formulates recovery as a **verifiable database-style transaction** over persistent state:
 
-## 1. Prerequisites
-### 1.1 Ubuntu and ROS
+$$\text{Checkpoint} \to \text{Delayed-Commit Quarantine} \to \text{Mechanism Routing} \to \text{Candidate Repair} \to \text{Holdout Validation} \to \mathcal{D}(t)$$
 
-Ubuntu >= 18.04.
+- **Delayed-Commit Quarantine (`slam_recovery/quarantine/`)**: Decouples the provisional live trajectory from the trusted persistent map using a confirmation margin $\Delta t_{\mathrm{margin}} = 2.0\,\mathrm{s}$ and undo-log rollback ($t_{q,\mathrm{start}} = \hat{t}_{\mathrm{onset}} - \Delta t_{\mathrm{margin}}$), eliminating pre-hibernation confirmation tail pollution.
+- **Joint Health Detector & Mechanism Signature Router (`slam_recovery/health/`, `slam_recovery/diagnosis/`)**: Combines 6-DoF decoupled/coupled information spectra, NIS-CUSUM innovation monitoring, Leave-One-Sensor-Out (LOSO) conflict, and rotational cross-correlation lag to detect self-consistent near-field occlusions (e.g., floating plastic bags) where covariance-only detectors score $0\%$ recall.
+- **Tiered Repairers (`slam_recovery/repair/`)**:
+  - *RANSAC Point-Mixture Contaminant Stripping* for near-field planar occluders;
+  - *Temporal Offset & Intra-Scan Deskew Compensation* with orthogonal anchor pose-graph protection;
+  - *Cumulative Window-Strain GNC Revocation* for perceptual-aliasing loop closures;
+  - *Two-Point Boundary-Anchored Cross-Modal Bridge* for severe visual darkness/blur on ORB-SLAM3.
+- **Unified Four-Mode Gate $\mathcal{D}(t)$ & Holdout Screening (`slam_recovery/validation/`)**: Evaluates 6-DoF weak-direction Fisher information gain ($\Delta J_v$), genuine cross-scan point-to-plane holdout NIS ($\mathcal{S}_k \to \mathcal{S}_{k-\Delta}$), and sequential Wilson lower bounds before allowing atomic map commit.
 
-ROS >= Melodic. [ROS](http://wiki.ros.org/ROS/Installation)
+---
 
-### 1.2 PCL && Eigen && gtsam
+## 2. Repository Structure
 
-PCL >= 1.8, Follow [PCL](http://www.pointclouds.org/downloads/linux.html).
-
-Eigen >= 3.3.4, Follow [EIGEN](http://eigen.tuxfamily.org/index.php?title=Main_Page).
-
-gtsam >= 4.0.0, Follow [gtsam](https://gtsam.org/get_started/).
-
-### 1.3 livox_ros_driver
-
-Follow [livox_ros_driver Installation](https://github.com/Livox-SDK/livox_ros_driver).
-
-
-## 2. Build
-Clone the repository and catkin_make:
-```
-cd ~/catkin_ws/src
-git clone https://github.com/lian-yue0515/MM-LINS.git
-cd ..
-catkin_make
-```
-## 3. Directly run
-```
-    # terminal 1: run FAST-LIO2 
-    cd ~/catkin_ws/src/MM-LINS/FAST-LIO
-    source devel/setup.bash
-    roslaunch fast_lio xxx.launch 
-
-    # terminal 2: run SC-PGO
-    cd ~/catkin_ws/src/MM-LINS/SC-PGO
-    source devel/setup.bash
-    roslaunch aloam_velodyne fastlio_ouster64.launch
-
-    # open the other terminal tab: run rosbag
-    rosbag play xxx.bag
-```
-## 4. Rosbag Example
-### 4.1 Public Dataset (Degeneracy augmented datasets)
-- M2DGR 
-- NCLT
-- utbm
-- UrbanLoco
-Download our test bags here: [Baidu](https://pan.baidu.com/s/1uKcH4jxbw3r6VGW6n_9SCQ?pwd=9nf5).
-### 4.2 Real-world Field Dataset
-- Indoor
-- Outdoor 
-Download our test bags here: Indoor [Baidu](https://pan.baidu.com/s/1wUiKRWQqie26cNfqIr7kYg?pwd=5gip), Outdoor [geogle](https://drive.google.com/drive/folders/1MWjbV5yU02uH5bu1YwsnymKqK1qrm4kI).
-### 5. Example results 
-
-
-### Citation
-If you use MM-LINS for any academic work, please cite our original [paper](https://ieeexplore.ieee.org/document/10557776)
-```
-  @ARTICLE{10557776,
-    author={Ma, Yongxin and Xu, Jie and Yuan, Shenghai and Zhi, Tian and Yu, Wenlu and Zhou, Jun and Xie, Lihua},
-    journal={IEEE Transactions on Intelligent Vehicles}, 
-    title={MM-LINS: A Multi-Map LiDAR-Inertial System for Over-Degenerate Environments}, 
-    year={2025},
-    volume={10},
-    number={1},
-    pages={472-482},
-    keywords={Simultaneous localization and mapping;Laser radar;Trajectory;Accuracy;Vehicle dynamics;Intelligent vehicles;Sensor phenomena and characterization;Multi-map;over-degenerate;pose graph optimization;simultaneous location and mapping},
-    doi={10.1109/TIV.2024.3414852}
-}
-
+```text
+├── slam_recovery/                  # Core Python library, repairers, simulator & experiments
+│   ├── core.py                     # State machine, Checkpoint, CandidateMap, and 4-mode gate D(t)
+│   ├── health/detector.py          # 6D FIM spectrum + NIS-CUSUM + LOSO joint detector
+│   ├── diagnosis/router.py         # Interpretable mechanism signature matrix router
+│   ├── quarantine/manager.py       # TrustedMapTransactionManager & undo-log rollback
+│   ├── repair/                     # Point-mixture filter, pose-graph bridge, loop/sync repairers
+│   ├── validation/                 # 6-DoF point-to-plane FIM, cross-scan holdout NIS & Wilson gate
+│   ├── sim/                        # OnlineRecoveryTransactionNode & 3D-mesh arena simulation (S1/S2)
+│   ├── experiments/                # E1–E3 evaluation scripts, hall_02 held-out test & JSON manifests
+│   └── tests/                      # Unit & regression test suite (including R1–R6 counterexamples)
+├── paper_submission_package/       # IEEEtran manuscript source (paper_main.tex), figures & PDF
+├── FAST-LIO/ & SC-PGO/             # Instrumented C++ LIO and multi-map PGO host workspaces
+├── SLAM_RECOVERY_RESEARCH.md       # Full theoretical modeling, literature review & master plan
+├── REVIEW_AND_SIMULATION_PLAN.md   # Audit records, S1–S3 simulation design & acceptance checklist
+└── FAST_LIVO2_SHARED_CORE_EXTRACTION.md  # C++ raw reprocessing & Causal Transformer upgrade guide
 ```
 
-### Acknowledgements 
-- Thanks for [FAST_LIO](https://github.com/hku-mars/FAST_LIO).
-- Thanks for Loop detection and Pose-graph Optimization [SC-PGO](https://github.com/gisbi-kim/SC-A-LOAM)
-- Thanks for [FAST-LIIO-SLAM](https://github.com/gisbi-kim/FAST_LIO_SLAM).
+---
 
-### License 
-The source code is released under [GPLv2](http://www.gnu.org/licenses/) license.
+## 3. Quick Start & Verification
 
-### TODO(s)
-* [ ] Example results updating
-* [ ] Refinement and updating
-* [ ] Waiting for comments on papers
+### 3.1 Run Unit & Audit Regression Tests
+```bash
+python -m unittest discover -s slam_recovery/tests -v
+```
 
+### 3.2 Reproduce Core Benchmarks & Simulation Verification
+```bash
+# E1: Detection & diagnosis benchmark
+python -m slam_recovery.experiments.run_e1_detection_benchmark
+
+# S1 & S2: Counterfactual R4 vs. R5 gate verification & 3D mesh voxel contamination
+python -m slam_recovery.sim.run_s1_s2_simulation_experiments
+
+# E2: B0–B6 ablation matrix across FAST-LIO2, LIO-SAM, and MM-LINS
+python -m slam_recovery.experiments.run_e2_ablation_matrix
+
+# E3: Second-host transfer on ORB-SLAM3 (hall_01, room_02, room_dark_01, and held-out hall_02)
+python -m slam_recovery.experiments.e3_orbslam3.evaluate_e3_orbslam3
+python -m slam_recovery.experiments.e3_orbslam3.hall_02.evaluate_hall_02
+```
+
+### 3.3 Compile the Paper Manuscript
+```bash
+cd paper_submission_package
+pdflatex -interaction=nonstopmode paper_main.tex
+bibtex paper_main
+pdflatex -interaction=nonstopmode paper_main.tex
+pdflatex -interaction=nonstopmode paper_main.tex
+```
+
+---
+
+## 4. Documentation Index
+
+- **[SLAM_RECOVERY_RESEARCH.md](SLAM_RECOVERY_RESEARCH.md)**: Comprehensive problem formulation, mathematical derivations, host adaptation contracts, and experimental design.
+- **[REVIEW_AND_SIMULATION_PLAN.md](REVIEW_AND_SIMULATION_PLAN.md)**: Codebase audit history, S1–S3 simulation protocol, and acceptance review of commits `00080c1` & `fb9e655`.
+- **[FAST_LIVO2_SHARED_CORE_EXTRACTION.md](FAST_LIVO2_SHARED_CORE_EXTRACTION.md)**: Core architecture extraction from `fast_livo2_shared_cursor` (raw payload reprocessing, Copy-on-Write spatial mutation journal, and Physics-Guided Causal Relative-Attention Transformer).
+- **[docs/review_20261105/README.md](docs/review_20261105/README.md)**: Historical bounded counterexample analysis (R1–R6, resolved in `fb9e655`) and redrawn diagnostic figures.
