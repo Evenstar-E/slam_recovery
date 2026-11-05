@@ -87,3 +87,4 @@ pdflatex -interaction=nonstopmode paper_main.tex
 - **[REVIEW_AND_SIMULATION_PLAN.md](REVIEW_AND_SIMULATION_PLAN.md)**: Codebase audit history, S1–S3 simulation protocol, and acceptance review of commits `00080c1` & `fb9e655`.
 - **[FAST_LIVO2_SHARED_CORE_EXTRACTION.md](FAST_LIVO2_SHARED_CORE_EXTRACTION.md)**: Core architecture extraction from `fast_livo2_shared_cursor` (raw payload reprocessing, Copy-on-Write spatial mutation journal, and Physics-Guided Causal Relative-Attention Transformer).
 - **[docs/review_20261105/README.md](docs/review_20261105/README.md)**: Historical bounded counterexample analysis (R1–R6, resolved in `fb9e655`) and redrawn diagnostic figures.
+- **[docs/review_20261105_followup/README.md](docs/review_20261105_followup/README.md)**: Follow-up review of `23fbe6d`: 17 upstream tests pass, but nine bounded probes reproduce remaining correctness and evaluation issues. Includes source-pinned findings and reproduction evidence.

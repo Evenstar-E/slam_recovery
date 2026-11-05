@@ -1,0 +1,91 @@
+{
+  "head": "23fbe6d2b42c3068f98d037144ad5c98be91458e",
+  "scope": "local bounded review probes, not a physical SLAM experiment",
+  "upstream_returncode": 0,
+  "probes": {
+    "late_same_key": {
+      "defect_reproduced": true,
+      "expected_healthy_pose_x": 1.0,
+      "actual_pose_present": false
+    },
+    "all_revoked_bias": {
+      "defect_reproduced": true,
+      "remaining_pose_count": 0,
+      "expected_bias": [
+        0,
+        0,
+        0
+      ],
+      "actual_bias": [
+        0.7,
+        0.7,
+        0.7
+      ]
+    },
+    "unsafe_candidate_fields": {
+      "defect_reproduced": true,
+      "nonfinite_bias_committed": true,
+      "invalid_pose_shape_committed": [
+        2,
+        2
+      ]
+    },
+    "absent_validation_defaults": {
+      "defect_reproduced": true,
+      "accepted": true,
+      "paired_benefit_approved_default": true,
+      "wilson_lower_bound": 0.0,
+      "reentry_pos_jump_m": 99.0,
+      "claimed_reason": "Passed weak-direction information gain, holdout consistency, and paired Wilson sequential checks"
+    },
+    "voxel_rollback_divergence": {
+      "defect_reproduced": true,
+      "revoked_pose_present": false,
+      "revoked_voxels_still_present": 1,
+      "revoked_points_in_validation_reference": true
+    },
+    "incomplete_model_hash": {
+      "defect_reproduced": true,
+      "hash_unchanged": true,
+      "probability_before": 2.0611536181902037e-09,
+      "probability_after": 0.9999999979388463,
+      "hash": "b3b1f9b0c9a4d53233275f7f27678eab25c6df32b64a0f301e1309472a5b8368"
+    },
+    "missing_orientation_fabricates_zero": {
+      "defect_reproduced": true,
+      "expected": "UNAVAILABLE: neither estimate nor reference orientation exists",
+      "actual": {
+        "ate_rot_rmse_deg": 0.0,
+        "ate_rot_mean_deg": 0.0,
+        "ate_rot_max_deg": 0.0,
+        "rpe_rot_rmse_deg": 0.0
+      }
+    },
+    "mesh_outside_bounds": {
+      "defect_reproduced": true,
+      "point": [
+        1000.0,
+        3.0,
+        1000.0
+      ],
+      "reported_distance_m": 0.0,
+      "declared_arena_size_m": [
+        40,
+        25
+      ],
+      "expected": "point outside finite arena cannot lie on its wall"
+    },
+    "p9_no_alarm_still_perfect_recall": {
+      "defect_reproduced": true,
+      "fixture": "synthetic 40 windows; actual evaluation function; inference forced to UNKNOWN/0 probability",
+      "model_calls": 600,
+      "actual_model_alarms": 0,
+      "reported_recall": {
+        "hall_02_heldout_test": 1.0,
+        "room_02_compact_room": 1.0,
+        "room_dark_01_natural_dark": 1.0
+      }
+    }
+  },
+  "reproduced_count": 9
+}

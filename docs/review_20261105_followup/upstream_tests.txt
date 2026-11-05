@@ -1,0 +1,50 @@
+<repo>/slam_recovery\core.py:219: SyntaxWarning: invalid escape sequence '\D'
+  - Mode 1 (Online Reweight): brief anomaly (\Delta t < \Delta t_min) and ||P_prop|| << \Sigma_bridge
+<repo>/slam_recovery\quarantine\manager.py:117: SyntaxWarning: invalid escape sequence '\h'
+  Roll back provisional updates starting at t_{q,start} = \hat{t}_{onset} - \Delta t_{margin},
+<repo>/slam_recovery\validation\fim_and_holdout.py:19: SyntaxWarning: invalid escape sequence '\L'
+  Compute the 6x6 Fisher Information Matrix \Lambda_{6x6} on SE(3) tangent space [rot(3), trans(3)]
+<repo>/slam_recovery\tests\test_checkpoint_restore.py:27: SyntaxWarning: invalid escape sequence '\D'
+  leaves v^T \Delta \Lambda_D v \approx 0, so the four-mode gate must refuse
+<repo>/slam_recovery\diagnosis\causal_transformer.py:8: SyntaxWarning: invalid escape sequence '\s'
+  log P(nominal) = log \sigma(-a_t)
+<repo>/slam_recovery\diagnosis\causal_transformer.py:64: SyntaxWarning: invalid escape sequence '\D'
+  paired with `ConditionalRecoveryHead` (K=25 age bins of width \Delta\tau=0.20s covering [0, 5.0]s)
+<repo>/slam_recovery\health\spherical_cells_and_identifiability.py:2: SyntaxWarning: invalid escape sequence '\m'
+  1. Nuisance-Projected Identifiability \mathcal{I}_\perp(s | H) = ||(I - H(H^T H)^\dagger H^T) s||_2^2 / ||s||_2^2
+<repo>/slam_recovery\health\spherical_cells_and_identifiability.py:22: SyntaxWarning: invalid escape sequence '\m'
+  Compute the nuisance-projected identifiability \mathcal{I}_\perp(s | H) in [0, 1] (Section 4.5):
+<repo>/slam_recovery\health\spherical_cells_and_identifiability.py:162: SyntaxWarning: invalid escape sequence '\m'
+  Maintains the causal sliding history buffer \mathcal{H}_{<t} of healthy tokens
+<repo>/slam_recovery\diagnosis\signature_router.py:15: SyntaxWarning: invalid escape sequence '\l'
+  1. GEO_DEGEN:    \lambda_min(\Lambda_u) collapsed, NIS normal
+test_checkpoint_hash_and_restore (test_atomic_commit.TestCheckpointAndAtomicCommit.test_checkpoint_hash_and_restore) ... ok
+test_delayed_commit_prevents_n_kappa_tail_pollution (test_atomic_commit.TestCheckpointAndAtomicCommit.test_delayed_commit_prevents_n_kappa_tail_pollution)
+Verify Section 5.2: If degeneracy starts at t=10s and alarm triggers at t=11.5s, ... ok
+test_four_mode_gate_rejects_bad_merge_and_accepts_verified_repair (test_atomic_commit.TestCheckpointAndAtomicCommit.test_four_mode_gate_rejects_bad_merge_and_accepts_verified_repair)
+Verify Section 4.8 & 4.9: ... ok
+test_nuisance_projected_identifiability_and_spherical_cells (test_atomic_commit.TestCheckpointAndAtomicCommit.test_nuisance_projected_identifiability_and_spherical_cells)
+Verify Proposition 2 identifiability I_perp(s | H) and 48-cell spherical point cloud encoding. ... ok
+test_physics_guided_causal_transformer_fallback_and_onset_age (test_atomic_commit.TestCheckpointAndAtomicCommit.test_physics_guided_causal_transformer_fallback_and_onset_age)
+Verify cold-start analytical fallback and trained causal transformer onset-age prediction. ... ok
+test_r1_to_r6_audit_counterexamples_resolved (test_atomic_commit.TestCheckpointAndAtomicCommit.test_r1_to_r6_audit_counterexamples_resolved)
+Verify that all 6 bounded counterexamples (R1-R6) in docs/review_20261105/audit_review.py are resolved. ... ok
+test_spatial_mutation_log_cow_and_redo_replay (test_atomic_commit.TestCheckpointAndAtomicCommit.test_spatial_mutation_log_cow_and_redo_replay)
+Verify O(|Delta M_dirty|) copy-on-write mutation log and zero-copy dual-branch redo replay. ... ok
+test_wilson_sequential_benefit_and_reentry_continuity (test_atomic_commit.TestCheckpointAndAtomicCommit.test_wilson_sequential_benefit_and_reentry_continuity)
+Verify Section 4.9: ... ok
+test_corrupted_checkpoint_hash_rejected (test_checkpoint_restore.TestCheckpointRestoreAndRollbackTheory.test_corrupted_checkpoint_hash_rejected) ... ok
+test_rollback_plus_same_data_reoptimization_cannot_pass_mode2_gate (test_checkpoint_restore.TestCheckpointRestoreAndRollbackTheory.test_rollback_plus_same_data_reoptimization_cannot_pass_mode2_gate)
+Verify Section 4.2 (B3 baseline theorem): ... ok
+test_lidar_attenuation_bit_exact_determinism (test_injection_determinism.TestInjectionDeterminism.test_lidar_attenuation_bit_exact_determinism) ... ok
+test_plastic_bag_blinds_covariance_only_but_caught_by_signature_matrix (test_injection_determinism.TestInjectionDeterminism.test_plastic_bag_blinds_covariance_only_but_caught_by_signature_matrix) ... ok
+test_visual_exposure_determinism (test_injection_determinism.TestInjectionDeterminism.test_visual_exposure_determinism) ... ok
+test_standard_frame_monotonicity (test_timestamp.TestTimestampConventions.test_standard_frame_monotonicity) ... ok
+test_timestamp_offset_injection_window_only (test_timestamp.TestTimestampConventions.test_timestamp_offset_injection_window_only) ... ok
+test_recovery_ratio_G_captures_campus2_degradation (test_trusted_map_invariance.TestTrustedMapInvariance.test_recovery_ratio_G_captures_campus2_degradation) ... ok
+test_trusted_map_invariant_during_mode3_and_archived_on_mode4 (test_trusted_map_invariance.TestTrustedMapInvariance.test_trusted_map_invariant_during_mode3_and_archived_on_mode4) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.156s
+
+OK
