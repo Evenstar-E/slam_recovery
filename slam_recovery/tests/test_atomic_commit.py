@@ -157,6 +157,60 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
         self.assertTrue(rep_ok.approved)
         self.assertGreaterEqual(rep_ok.wilson_lower_bound, 0.55)
 
+    def test_r1_to_r6_audit_counterexamples_resolved(self) -> None:
+        """Verify that all 6 bounded counterexamples (R1-R6) in docs/review_20261105/audit_review.py are resolved."""
+        import copy
+        from slam_recovery.health.detector import analyze_decoupled_information
+        from slam_recovery.validation import compute_disjoint_holdout_point_to_plane_nis
+
+        # R1: Checkpoint key identity is hashed
+        m = TrustedMapTransactionManager()
+        m.trusted_poses[1] = np.eye(4)
+        ck = m.create_checkpoint(100)
+        changed = copy.deepcopy(ck)
+        changed.keyframe_poses[99] = changed.keyframe_poses.pop(1)
+        self.assertNotEqual(ck.compute_hash(), changed.compute_hash())
+
+        # R2: Late onset revokes already-promoted poses >= t_{q,start} via undo log
+        m = TrustedMapTransactionManager()
+        for t in range(8, 15):
+            m.step_healthy(_make_delta(t, t, t if t < 10 else 100 + t))
+        m.trigger_quarantine(int(10e9), int(14e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6), 1.0)
+        self.assertEqual([k for k in m.trusted_poses if k >= 10], [])
+
+        # R3: Non-finite (NaN/Inf) candidate pose is rejected by the gate
+        m = TrustedMapTransactionManager()
+        m.trigger_quarantine(int(10e9), int(14e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6), 1.0)
+        bad_pose = np.eye(4)
+        bad_pose[0, 3] = np.nan
+        c_nan = CandidateMap("nonfinite_pose", m.trusted_version, {42: bad_pose}, np.eye(6) * 100, np.eye(6) * 0.01, 0.1)
+        rep_nan = m.validate_and_resolve(c_nan)
+        self.assertFalse(rep_nan.accepted)
+
+        # R4: Coupled rotation-translation weak direction is caught by full 6D eigenspectrum
+        fim = np.block([[np.eye(3) * 50, np.eye(3) * 49.999], [np.eye(3) * 49.999, np.eye(3) * 50]])
+        mr, mt, _, _, v = analyze_decoupled_information(fim, np.linalg.inv(fim))
+        self.assertLess(min(mr, mt), 0.01)
+        self.assertLess(float(v @ fim @ v), 0.01)
+
+        # R5: Holdout large residuals are not hidden when >30% points exceed truncation bound
+        rng = np.random.default_rng(17)
+        train = np.column_stack([rng.uniform(-1, 1, (120, 2)), np.zeros(120)])
+        hold = np.column_stack([rng.uniform(-0.5, 0.5, (160, 2)), np.r_[np.full(40, 0.001), np.full(120, 3.0)]])
+        nis = compute_disjoint_holdout_point_to_plane_nis(train, hold)
+        self.assertGreater(nis, 2.5)
+
+        # R6: Atomic commit updates both trusted_poses and trusted_factors
+        m = TrustedMapTransactionManager()
+        m.trusted_poses[1] = np.eye(4)
+        m.trusted_factors = [10]
+        m.trigger_quarantine(int(10e9), int(14e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6), 1.0)
+        c_ok = CandidateMap("pose_and_factor", m.trusted_version, {2: np.eye(4)}, np.eye(6) * 100, np.eye(6) * 0.01, 0.1)
+        rep_ok = m.validate_and_resolve(c_ok)
+        self.assertTrue(rep_ok.accepted)
+        self.assertIn(20, m.trusted_factors)
+
+
 
 if __name__ == "__main__":
     unittest.main()

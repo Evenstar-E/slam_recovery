@@ -126,7 +126,9 @@ class Checkpoint:
         h = hashlib.sha256()
         h.update(f"{self.checkpoint_id}:{self.timestamp_ns}:{self.map_version}".encode())
         for k in sorted(self.keyframe_poses.keys()):
-            h.update(np.ascontiguousarray(self.keyframe_poses[k], dtype=np.float64).tobytes())
+            arr = np.ascontiguousarray(self.keyframe_poses[k], dtype=np.float64)
+            h.update(f"kf:{int(k)}:shape:{arr.shape}:".encode())
+            h.update(arr.tobytes())
         h.update(np.asarray(sorted(self.factor_ids), dtype=np.int64).tobytes())
         h.update(np.ascontiguousarray(self.imu_bias_acc, dtype=np.float64).tobytes())
         h.update(np.ascontiguousarray(self.imu_bias_gyr, dtype=np.float64).tobytes())
@@ -175,6 +177,9 @@ class CandidateMap:
     holdout_nis: float
     used_evidence_refs: List[str] = field(default_factory=list)
     repairer_name: str = ""
+    repaired_factor_ids: Optional[List[int]] = None
+    repaired_bias_acc: Optional[np.ndarray] = None
+    repaired_bias_gyr: Optional[np.ndarray] = None
 
 
 @dataclass
@@ -238,6 +243,29 @@ def evaluate_four_mode_gate(
         )
 
     if candidate is not None:
+        # Reject any candidate containing non-finite (NaN / Inf) poses, covariances, or information matrices (R3 fix)
+        poses_finite = bool(
+            candidate.repaired_poses
+            and all(np.isfinite(p).all() for p in candidate.repaired_poses.values())
+        )
+        mats_finite = bool(
+            np.isfinite(candidate.info_after_6x6).all()
+            and np.isfinite(candidate.cov_after_6x6).all()
+            and np.isfinite(candidate.holdout_nis)
+        )
+        if not (poses_finite and mats_finite):
+            return ValidationReport(
+                accepted=False,
+                mode=RecoveryMode.MODE3_SOFT_BRIDGE_WAIT if p_prop < thresholds.sigma_bridge else RecoveryMode.MODE4_HARD_SLEEP_SPLIT,
+                weak_dir_info_before=info_before,
+                weak_dir_info_after=0.0,
+                weak_dir_info_gain=-info_before,
+                holdout_nis=float("inf"),
+                posterior_cov_norm=float("inf"),
+                propagated_cov_norm=p_prop,
+                reason="Rejected candidate due to non-finite (NaN/Inf) state or covariance values",
+            )
+
         info_after = float(v.T @ candidate.info_after_6x6 @ v)
         info_gain = info_after - info_before
         p_after = float(np.linalg.norm(candidate.cov_after_6x6, ord=2))

@@ -131,6 +131,9 @@ def compute_disjoint_holdout_point_to_plane_nis(
 
     residuals = np.abs(np.sum(normals * (h_sub - mean_nn), axis=1))
     valid_res = residuals[residuals < 2.0]
-    if len(valid_res) == 0:
-        return float("inf")
+    inlier_coverage = float(len(valid_res)) / float(max(len(residuals), 1))
+    # Coverage gate (R5 fix): if >30% of holdout points exceed the 2.0m truncation bound,
+    # do not hide large residuals by dropping them from the denominator!
+    if len(valid_res) == 0 or inlier_coverage < 0.70:
+        return float(np.mean((residuals / sigma_meas_m) ** 2))
     return float(np.mean((valid_res / sigma_meas_m) ** 2))

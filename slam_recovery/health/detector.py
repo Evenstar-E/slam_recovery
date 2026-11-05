@@ -56,6 +56,7 @@ def analyze_decoupled_information(
 
     vals_r, vecs_r = np.linalg.eigh(0.5 * (info_u[:3, :3] + info_u[:3, :3].T))
     vals_t, vecs_t = np.linalg.eigh(0.5 * (info_u[3:, 3:] + info_u[3:, 3:].T))
+    vals_6d, vecs_6d = np.linalg.eigh(0.5 * (info_u + info_u.T))
 
     cov_r = 0.5 * (cov_6x6[:3, :3] + cov_6x6[:3, :3].T)
     cov_t = 0.5 * (cov_6x6[3:, 3:] + cov_6x6[3:, 3:].T)
@@ -64,8 +65,16 @@ def analyze_decoupled_information(
 
     min_r = float(vals_r[0])
     min_t = float(vals_t[0])
+    min_6d = float(vals_6d[0])
     weak_6d = np.zeros(6, dtype=np.float64)
-    if min_r < min_t:
+    # Catch coupled rotation-translation weak directions (R4 fix)
+    if min_6d < min(min_r, min_t):
+        weak_6d = vecs_6d[:, 0].copy()
+        if np.linalg.norm(weak_6d[:3]) >= np.linalg.norm(weak_6d[3:]):
+            min_r = min_6d
+        else:
+            min_t = min_6d
+    elif min_r < min_t:
         weak_6d[:3] = vecs_r[:, 0]
     else:
         weak_6d[3:] = vecs_t[:, 0]

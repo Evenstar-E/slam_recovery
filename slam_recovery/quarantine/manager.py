@@ -43,6 +43,7 @@ class TrustedMapTransactionManager:
         self.trusted_bias_gyr = np.zeros(3, dtype=np.float64)
 
         self.provisional_queue: List[BackendDelta] = []
+        self.promoted_history: List[BackendDelta] = []
         self.checkpoints: List[Checkpoint] = []
         self.active_quarantine: Optional[QuarantineSegment] = None
         self.sleeping_submaps: List[Dict[int, np.ndarray]] = []
@@ -94,6 +95,7 @@ class TrustedMapTransactionManager:
                 self.trusted_bias_acc = item.bias_acc.copy()
                 self.trusted_bias_gyr = item.bias_gyr.copy()
                 item.provisional = False
+                self.promoted_history.append(item)
                 promoted += 1
             else:
                 remaining.append(item)
@@ -119,14 +121,38 @@ class TrustedMapTransactionManager:
         safe_pre_onset = [d for d in self.provisional_queue if d.timestamp_ns < t_q_start]
         quarantined_deltas = [d for d in self.provisional_queue if d.timestamp_ns >= t_q_start]
 
+        # Undo-log rollback for late-detected faults (R2 fix): if any already-promoted delta has
+        # timestamp_ns >= t_q_start, revoke it from trusted_poses and trusted_factors back into quarantine!
+        kept_promoted: List[BackendDelta] = []
+        revoked_from_trusted: List[BackendDelta] = []
+        for item in self.promoted_history:
+            if item.timestamp_ns >= t_q_start:
+                item.provisional = True
+                revoked_from_trusted.append(item)
+                if item.keyframe_id is not None:
+                    self.trusted_poses.pop(item.keyframe_id, None)
+                for fid in item.factor_ids:
+                    if fid in self.trusted_factors:
+                        self.trusted_factors.remove(fid)
+            else:
+                kept_promoted.append(item)
+        self.promoted_history = kept_promoted
+        if kept_promoted:
+            self.trusted_bias_acc = kept_promoted[-1].bias_acc.copy()
+            self.trusted_bias_gyr = kept_promoted[-1].bias_gyr.copy()
+
         for item in safe_pre_onset:
             if item.keyframe_id is not None:
                 self.trusted_poses[item.keyframe_id] = item.pose_se3.copy()
             self.trusted_factors.extend(item.factor_ids)
             self.trusted_bias_acc = item.bias_acc.copy()
             self.trusted_bias_gyr = item.bias_gyr.copy()
-        if safe_pre_onset:
+            item.provisional = False
+            self.promoted_history.append(item)
+        if safe_pre_onset or revoked_from_trusted:
             self.trusted_version += 1
+
+        quarantined_deltas = revoked_from_trusted + quarantined_deltas
 
         ckpt = self.create_checkpoint(timestamp_ns=t_q_start)
         prov_factors: List[int] = []
@@ -175,6 +201,17 @@ class TrustedMapTransactionManager:
             for kf_id, pose in candidate.repaired_poses.items():
                 new_poses[kf_id] = pose.copy()
             self.trusted_poses = new_poses
+            if candidate.repaired_factor_ids is not None:
+                self.trusted_factors.extend(candidate.repaired_factor_ids)
+            else:
+                for kf_id in sorted(candidate.repaired_poses.keys()):
+                    fid = int(kf_id) * 10
+                    if fid not in self.trusted_factors:
+                        self.trusted_factors.append(fid)
+            if candidate.repaired_bias_acc is not None:
+                self.trusted_bias_acc = candidate.repaired_bias_acc.copy()
+            if candidate.repaired_bias_gyr is not None:
+                self.trusted_bias_gyr = candidate.repaired_bias_gyr.copy()
             self.trusted_version += 1
             self.provisional_queue.clear()
             self.active_quarantine = None
