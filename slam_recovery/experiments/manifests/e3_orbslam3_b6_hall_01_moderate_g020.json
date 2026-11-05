@@ -32,11 +32,11 @@
     "window_recovery_ratio_G_vs_B2_Atlas": 39.0115,
     "gate_decision": "MODE2_ATOMIC_COMMIT",
     "atomic_commit_accepted": true,
-    "holdout_nis": 2.0421,
-    "wilson_sequential_lower_bound": 0.9944,
+    "holdout_nis": 2.1792,
+    "wilson_sequential_lower_bound": 0.6242,
     "reentry_position_jump_m": 0.0468,
-    "weak_dir_info_after": 128.18,
+    "weak_dir_info_after": 123.01,
     "trusted_map_pollution_ratio": 0.0
   },
-  "created_utc": "2026-11-05T06:17:17.557278+00:00"
+  "created_utc": "2026-11-05T07:03:11.567021+00:00"
 }

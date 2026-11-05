@@ -1,0 +1,25 @@
+{
+  "run_id": "test_orbslam3_b0_hall_02_clean",
+  "host_system": "ORB-SLAM3",
+  "baseline_variant": "B0",
+  "sequence_name": "hall_02",
+  "input_bag_path": "/home/R26534/M2DGR/raw/hall_02.bag",
+  "input_bag_hash": "47cacd21444879bfe028b4beb03dc18f74e50eab2210bb12c45328590d37088b",
+  "provenance": "REAL_HOST",
+  "gt_source": "Leica",
+  "seed": 42,
+  "injection_type": "clean",
+  "injection_params": {
+    "split": "held_out_test_zero_tuning"
+  },
+  "metrics": {
+    "num_matched_poses": 1184,
+    "path_length_m": 85.3795,
+    "ate_rmse_m": 0.268,
+    "ate_mean_m": 0.2466,
+    "ate_max_m": 0.5221,
+    "rpe_trans_rmse_m": 0.1338,
+    "false_quarantine_triggers": 0
+  },
+  "created_utc": "2026-11-05T07:33:27.356645+00:00"
+}

@@ -27,9 +27,9 @@
     "rpe_trans_rmse_m": 0.2446,
     "window_118_152s_rmse_m": 0.5316,
     "window_118_152s_max_m": 1.2245,
-    "holdout_nis_unrepaired": 2.0787,
+    "holdout_nis_unrepaired": 2.327,
     "recovery_ratio_G_vs_B0": 0.9799,
     "trusted_map_pollution_ratio": 0.045
   },
-  "created_utc": "2026-11-05T06:17:17.544634+00:00"
+  "created_utc": "2026-11-05T07:03:11.553827+00:00"
 }

@@ -1,0 +1,25 @@
+{
+  "run_id": "test_fastlio2_b0_hall_02_clean",
+  "host_system": "FAST-LIO2",
+  "baseline_variant": "B0",
+  "sequence_name": "hall_02",
+  "input_bag_path": "/home/R26534/M2DGR/extracted/hall_02_fl.bag",
+  "input_bag_hash": "f373ae7b9be858cf01cc82aafaaab4f4b3127ff66ca6ae2d8aeed87a3fffef4c",
+  "provenance": "REAL_HOST",
+  "gt_source": "Leica",
+  "seed": 42,
+  "injection_type": "clean",
+  "injection_params": {
+    "split": "held_out_test_zero_tuning"
+  },
+  "metrics": {
+    "num_matched_poses": 838,
+    "path_length_m": 86.8206,
+    "ate_rmse_m": 0.2774,
+    "ate_mean_m": 0.2572,
+    "ate_max_m": 0.5079,
+    "rpe_trans_rmse_m": 0.1685,
+    "false_quarantine_triggers": 0
+  },
+  "created_utc": "2026-11-05T07:33:27.312712+00:00"
+}

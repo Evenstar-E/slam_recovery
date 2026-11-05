@@ -1,0 +1,80 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="recovery_arena">
+    <!-- 40m x 25m Figure-8 Multi-Zone SLAM Recovery Arena (Section 3.1 of REVIEW_AND_SIMULATION_PLAN.md) -->
+    <physics type="ode">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- Zone A: High-Information Orthogonal Anchor Zone (x in [-5, 10], y in [-6, 6], t in [0, 15]s) -->
+    <model name="zone_a_west_wall">
+      <static>true</static>
+      <pose>-5.0 0.0 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.2 12.0 3.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.2 12.0 3.0</size></box></geometry></visual>
+      </link>
+    </model>
+    <model name="zone_a_pillar_1">
+      <static>true</static>
+      <pose>2.5 2.2 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>1.2 1.2 3.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>1.2 1.2 3.0</size></box></geometry></visual>
+      </link>
+    </model>
+    <model name="zone_a_pillar_2">
+      <static>true</static>
+      <pose>6.5 -2.2 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>1.2 1.2 3.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>1.2 1.2 3.0</size></box></geometry></visual>
+      </link>
+    </model>
+
+    <!-- Zone B: Parameterized Degenerate Corridor (x in [10, 30], y = +-3.0, t in [15, 35]s) -->
+    <model name="zone_b_north_wall">
+      <static>true</static>
+      <pose>20.0 3.0 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>22.0 0.2 3.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>22.0 0.2 3.0</size></box></geometry></visual>
+      </link>
+    </model>
+    <model name="zone_b_south_wall">
+      <static>true</static>
+      <pose>20.0 -3.0 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>22.0 0.2 3.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>22.0 0.2 3.0</size></box></geometry></visual>
+      </link>
+    </model>
+
+    <!-- Zone C & D: Recovery Transition & Counterfactual Fork (x in [30, 40], t in [35, 70]s) -->
+    <model name="zone_c_east_endwall">
+      <static>true</static>
+      <pose>36.0 0.0 1.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.2 14.0 3.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.2 14.0 3.0</size></box></geometry></visual>
+      </link>
+    </model>
+    <model name="zone_c_baffle">
+      <static>true</static>
+      <pose>32.5 1.8 1.5 0 0 0.4</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>2.0 0.4 3.0</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>2.0 0.4 3.0</size></box></geometry></visual>
+      </link>
+    </model>
+  </world>
+</sdf>

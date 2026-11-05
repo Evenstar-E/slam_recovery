@@ -7,7 +7,7 @@
       "FAST_LIO2_G": 0.0,
       "LIO_SAM_G": 0.0,
       "trusted_map_pollution_ratio": 0.6548,
-      "false_commit_rate": 1.0
+      "true_3d_voxel_contamination_ratio": 0.4348
     },
     "B2_MultiMap_HardSleep_MMLINS": {
       "provenance": "INJECTION",
@@ -16,7 +16,7 @@
       "FAST_LIO2_G": 0.1881,
       "LIO_SAM_G": 0.0004,
       "trusted_map_pollution_ratio": 0.7063,
-      "false_commit_rate": 1.0
+      "true_3d_voxel_contamination_ratio": 0.1817
     },
     "B4_DelayedCommit_Quarantine_NoRepair": {
       "provenance": "OFFLINE_CONSTRUCT",
@@ -25,7 +25,7 @@
       "FAST_LIO2_G": 0.2667,
       "LIO_SAM_G": -0.0555,
       "trusted_map_pollution_ratio": 0.0,
-      "false_commit_rate": 0.0
+      "true_3d_voxel_contamination_ratio": 0.0
     },
     "B5_Repair_Without_Validation": {
       "provenance": "INJECTION",
@@ -33,8 +33,8 @@
       "LIO_SAM_ate_rmse_m": 5.9954,
       "FAST_LIO2_G": 0.9949,
       "LIO_SAM_G": -0.0055,
-      "trusted_map_pollution_ratio": 0.5,
-      "false_commit_rate": 0.5
+      "trusted_map_pollution_ratio": 0.3252,
+      "true_3d_voxel_contamination_ratio": 0.2628
     },
     "B6_Ours_Full_Verifiable_Recovery": {
       "provenance": "FAST-LIO2: INJECTION, LIO-SAM: OFFLINE_CONSTRUCT",
@@ -43,35 +43,44 @@
       "FAST_LIO2_G": 0.9949,
       "LIO_SAM_G": 0.7883,
       "trusted_map_pollution_ratio": 0.0,
-      "false_commit_rate": 0.0
+      "true_3d_voxel_contamination_ratio": 0.0
     }
   },
   "gate_verification_cases": {
     "R4_Dual_Blind_No_Evidence": {
-      "weak_dir_info_after": 0.0,
-      "holdout_nis": 6.038,
+      "weak_dir_info_after": 18.2,
+      "holdout_nis": 5.689,
       "mode": "MODE3_SOFT_BRIDGE_WAIT"
     },
     "B5_Narrow_FoV_Filter_LIOSAM": {
-      "weak_dir_info_after": 8.42,
-      "holdout_nis": 12.94,
-      "mode": "Rejected (NIS>2.5)"
+      "weak_dir_info_after": 34.39,
+      "holdout_nis": 4.004,
+      "mode": "MODE3_SOFT_BRIDGE_WAIT"
     },
     "R5_Delayed_Revisit_Loop": {
-      "weak_dir_info_after": 38.32,
-      "holdout_nis": 0.508,
+      "weak_dir_info_after": 55.23,
+      "holdout_nis": 1.099,
       "mode": "MODE2_ATOMIC_COMMIT"
     },
     "B6_Ours_Point_Mixture_FASTLIO2": {
-      "weak_dir_info_after": 44.06,
-      "holdout_nis": 0.432,
+      "weak_dir_info_after": 53.32,
+      "holdout_nis": 0.909,
       "mode": "MODE2_ATOMIC_COMMIT"
     },
     "B6_Ours_Aux_PoseGraph_LIOSAM": {
-      "weak_dir_info_after": 65.0,
-      "holdout_nis": 0.086,
+      "weak_dir_info_after": 67.23,
+      "holdout_nis": 1.171,
       "mode": "MODE2_ATOMIC_COMMIT"
     }
+  },
+  "s2_true_3d_voxel_contamination": {
+    "voxel_resolution_m": 0.1,
+    "surface_tolerance_tau_map_m": 0.15,
+    "B0_Original_Host_Unprotected": 0.4348,
+    "B2_MMLINS_ConfirmationDelay_ZeroMargin": 0.1817,
+    "B4_Ours_2s_DelayedCommit_QuarantineOnly": 0.0,
+    "B5_Unvalidated_SingleModality_Commit": 0.2628,
+    "B6_Ours_2s_DelayedCommit_VerifiedCommit": 0.0
   },
   "loop_outlier_revocation_results": {
     "provenance": "OFFLINE_CONSTRUCT",
@@ -82,13 +91,13 @@
     "hall_01_holdout_nis_after": 0.0076
   },
   "r4_r5_information_budget_verification": {
-    "provenance": "OFFLINE_CONSTRUCT",
+    "provenance": "ONLINE_SIM_3D_MESH",
     "R4_no_evidence_mode": "MODE3_SOFT_BRIDGE_WAIT",
     "R4_accepted": false,
     "R5_delayed_revisit_mode": "MODE2_ATOMIC_COMMIT",
     "R5_accepted": true,
-    "R5_weak_dir_info_before": 0.0,
-    "R5_weak_dir_info_after": 38.32,
-    "R5_weak_dir_info_gain": 38.31
+    "R5_weak_dir_info_before": 18.2,
+    "R5_weak_dir_info_after": 55.23,
+    "R5_weak_dir_info_gain": 37.03
   }
 }

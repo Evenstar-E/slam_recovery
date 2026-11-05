@@ -115,12 +115,13 @@ def fig2_b0_to_b6_ablation_and_recovery_ratio() -> str:
     labels = [label_map[k] for k in keys]
     fl_ate = [data[k]["FAST_LIO2_ate_rmse_m"] for k in keys]
     lio_ate = [data[k]["LIO_SAM_ate_rmse_m"] for k in keys]
-    poll = [data[k]["trusted_map_pollution_ratio"] * 100.0 for k in keys]
+    poll_kf = [data[k]["trusted_map_pollution_ratio"] * 100.0 for k in keys]
+    poll_vox = [data[k]["true_3d_voxel_contamination_ratio"] * 100.0 for k in keys]
 
     y = np.arange(len(labels))
     h = 0.36
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10.5, 4.4), sharey=True, constrained_layout=True)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10.8, 4.5), sharey=True, constrained_layout=True)
 
     b1 = ax1.barh(y - h / 2, fl_ate, height=h, color=BLUE, label="FAST-LIO2 Host ATE (m)")
     b2 = ax1.barh(y + h / 2, lio_ate, height=h, color=ORANGE, label="LIO-SAM Host ATE (m)")
@@ -140,13 +141,18 @@ def fig2_b0_to_b6_ablation_and_recovery_ratio() -> str:
     ax1.legend(loc="lower right", frameon=True, fontsize=8.5)
     style_ax(ax1, "x")
 
-    b3 = ax2.barh(y, poll, height=0.52, color=AQUA, label="Trusted Map Pollution (%)")
+    b3 = ax2.barh(y - h / 2, poll_kf, height=h, color=AQUA, label="KeyFrame Pose Pollution (hall_01)")
+    b4 = ax2.barh(y + h / 2, poll_vox, height=h, color=BLUE, label="True 3D Mesh Voxel Contam. (Sim S2)")
     for bar in b3:
         w = bar.get_width()
-        ax2.text(w + 1.2, bar.get_y() + bar.get_height() / 2, f"{w:.1f}%", va="center", fontsize=8.5)
-    ax2.set_xlabel("Trusted Map Pollution Ratio (%)")
-    ax2.set_xlim(0, 82)
-    ax2.set_title("Fig. 2(b) Trusted Map Contamination Control")
+        ax2.text(w + 1.0, bar.get_y() + bar.get_height() / 2, f"{w:.1f}%", va="center", fontsize=7.8)
+    for bar in b4:
+        w = bar.get_width()
+        ax2.text(w + 1.0, bar.get_y() + bar.get_height() / 2, f"{w:.1f}%", va="center", fontsize=7.8, fontweight="bold")
+    ax2.set_xlabel("Trusted Map Contamination Ratio (%)")
+    ax2.set_xlim(0, 84)
+    ax2.set_title("Fig. 2(b) KeyFrame & 3D Voxel Map Contamination")
+    ax2.legend(loc="lower right", frameon=True, fontsize=8.0)
     style_ax(ax2, "x")
 
     out_png = os.path.join(FIG_DIR, "fig2_b0_b7_ablation_matrix.png")
@@ -182,7 +188,8 @@ def fig3_weak_direction_information_gain_and_4mode_gate() -> str:
     for b, m_str in zip(bars1, modes):
         h = b.get_height()
         short_m = "Mode 2: Commit" if "MODE2" in m_str else ("Mode 3: Wait" if "MODE3" in m_str else m_str)
-        ax1.text(b.get_x() + b.get_width() / 2, h + 1.8, f"{h:.1f}\n({short_m})", ha="center", fontsize=8)
+        y_txt = 26.5 if (16.0 <= h <= 24.5) else (h + 1.8)
+        ax1.text(b.get_x() + b.get_width() / 2, y_txt, f"{h:.1f}\n({short_m})", ha="center", fontsize=8)
     ax1.set_ylabel("Weak-Dir Info v^T Lambda v")
     ax1.set_ylim(0, 78)
     ax1.set_title("Fig. 3(a) Target Weak-Direction Information Gain Verification (From 6-DoF FIM)")

@@ -12,6 +12,8 @@ slam_recovery/experiments/e3_orbslam3/room_02/depth/
 slam_recovery/experiments/e3_orbslam3/room_02/rgb_*/
 slam_recovery/experiments/e3_orbslam3/room_dark_01/depth/
 slam_recovery/experiments/e3_orbslam3/room_dark_01/rgb_*/
+slam_recovery/experiments/e3_orbslam3/hall_02/depth/
+slam_recovery/experiments/e3_orbslam3/hall_02/rgb_*/
 
 # Large ROS bags & archives
 *.bag

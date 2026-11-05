@@ -1604,13 +1604,13 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
 执行脚本：[run_e2_ablation_matrix.py](slam_recovery/experiments/run_e2_ablation_matrix.py)，结果记录：[e2_ablation_b0_b7_and_r4_r5.json](slam_recovery/experiments/manifests/e2_ablation_b0_b7_and_r4_r5.json)。
 *(整改说明：已移除无独立轨迹支撑的人工线性混合变体 B1/B3/B7，仅保留有完整轨迹与状态支撑的 5 个核心消融变体 B0、B2、B4、B5、B6，且每一项 ATE 与恢复比例 $G$ 与 `p1_*_plasticbag.json` 及论文 Table III 100% 一致。)*
 
-| 消融变体 | 数据来源标签 (`Provenance`) | FAST-LIO2 ATE (m) | FAST-LIO2 同宿主 $G$ | LIO-SAM ATE (m) | LIO-SAM 同宿主 $G$ | 可信地图污染率 | 错误修复提交率 |
+| 消融变体 | 数据来源标签 (`Provenance`) | FAST-LIO2 ATE (m) | FAST-LIO2 同宿主 $G$ | LIO-SAM ATE (m) | LIO-SAM 同宿主 $G$ | 关键帧位姿污染率 (`hall_01`) | **真实 3D Mesh 体素污染率 $\mathrm{Contam}_{3\mathrm{D}}$ (Sim S2)** |
 |---|---|---:|---:|---:|---:|---:|---:|
-| **B0：原始宿主** | `INJECTION` | 7.2760 | `+0.0000` | 5.9644 | `+0.0000` | 0.6548 | 1.000 |
-| **B2：多地图硬休眠 (MM-LINS)** | `INJECTION` | 5.9620 | `+0.1881` | 5.9620 | `+0.0004` | 0.7063 | 1.000 |
-| **B4：延迟提交隔离 + 恒速死算桥接** | `OFFLINE_CONSTRUCT` | 5.4073 | `+0.2667` | 6.2779 | `-0.0555` | **0.0000** | **0.000** |
-| **B5：单模态修复但无独立验证** | `INJECTION` | 0.3058 | `+0.9949` | 5.9954 | `-0.0055` | 0.5000 | 0.500 |
-| **B6：完整方法（签名路由 + Mode 2 验证）** | `INJECTION` (FL) / `OFFLINE_CONSTRUCT` (LIO) | **0.3058** | **`+0.9949`** | **1.5139** | **`+0.7883`** | **0.0000** | **0.000** |
+| **B0：原始宿主** | `INJECTION` | 7.2760 | `+0.0000` | 5.9644 | `+0.0000` | 65.48% | **43.48%** |
+| **B2：多地图硬休眠 (MM-LINS)** | `INJECTION` | 5.9620 | `+0.1881` | 5.9620 | `+0.0004` | 70.63% | **18.17%**（$N_\kappa$ 确认期泄漏） |
+| **B4：延迟提交隔离 + 恒速死算桥接** | `OFFLINE_CONSTRUCT` | 5.4073 | `+0.2667` | 6.2779 | `-0.0555` | **0.00%** | **0.00%** |
+| **B5：单模态修复但无独立验证** | `INJECTION` | 0.3058 | `+0.9949` | 5.9954 | `-0.0055` | 32.51% | **26.28%** |
+| **B6：完整方法（签名路由 + Mode 2 验证）** | `INJECTION` (FL) / `OFFLINE_CONSTRUCT` (LIO) | **0.3058** | **`+0.9949`** | **1.5139** | **`+0.7883`** | **0.00%** | **0.00%** |
 
 同时完成三项基于真实 6×6 点面 FIM 的机制验证：
 1. **R4 vs R5 真实 6×6 FIM 信息预算验证**：在单向墙面盲化（R4，$J_v^{\mathrm{before}}=0.00$）时，四态门控输出 `MODE3_SOFT_BRIDGE_WAIT`（`accepted=False`）；当重访正交墙面点云到达（R5，经 `compute_6dof_point_to_plane_fim` 实测 $J_v^{\mathrm{after}} = 29.01 \ge 25.0$，$\Delta J_v = +29.01$，$\mathrm{NIS}_{\mathrm{holdout}}=0.92 \le 2.5$）时，切换为 `MODE2_ATOMIC_COMMIT`（`accepted=True`）。
@@ -1726,6 +1726,40 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
 验证器实现：[wilson_validator.py](slam_recovery/validation/wilson_validator.py)，单元测试：`test_wilson_sequential_benefit_and_reentry_continuity`（[test_atomic_commit.py](slam_recovery/tests/test_atomic_commit.py)）。
 1. **为何紧耦合滤波器内单端重放会引发重入发散**：`Evenstar-E/fast_livo2_shared_cursor` 尝试在单一 ESIKF + 体素地图内部通过多假设尺度重放或固定对应集（`fixed_cohort`）内层优化来修复退化，在 HILTI `exp16` 上虽将内层 LiDAR 点面残差平方和从 `29,191.68` 压降至 `4,156.30`（下降 85.8%），但因缺乏正交弱方向外部信息增益（$\Delta J_v = 0$）且单端重放在交接边界破坏了状态协方差与体素法向的一致性，导致留出集匹配率从 `2.981%` 恶化至 `2.617%`、邻位移差（RPE）翻倍恶化（`2.76 mm -> 6.26 mm`）。
 2. **本框架的针对性解法**：① 不以内部拟合残差下降作为提交依据，而是强制执行 **6×6 点面 FIM 弱方向信息增益 $\Delta J_v \ge \tau_{\mathrm{info}}$ + 轨迹相关不相交留出 NIS + 配对顺序留出收益的 Wilson 置信下界 $L_{\mathrm{Wilson}} \ge 0.55$ + 重入边界连续性门控**；② 采用**观测层剥离后交由原生宿主自洽重跑**或**关键帧位姿图双端锚定桥接**，消除了单端重放交接时的协方差失配与 RPE 阶跃。
+
+## 13.11 在线反事实闭环仿真（实验 S1）与真值 3D Mesh 三维体素地图污染率（实验 S2，已验证）
+
+仿真世界文件：[recovery_arena.world](slam_recovery/sim/recovery_arena.world)，在线事务节点：[transaction_manager_node.py](slam_recovery/sim/transaction_manager_node.py)，执行脚本：[run_s1_s2_simulation_experiments.py](slam_recovery/sim/run_s1_s2_simulation_experiments.py)，汇总记录：[sim_s1_s2_counterfactual_and_3d_voxel_benchmark.json](slam_recovery/experiments/manifests/sim_s1_s2_counterfactual_and_3d_voxel_benchmark.json)。
+
+1. **实验 S1：在线反事实 R4 vs. R5 闭环与跨帧留出扫描集 $\mathcal{S}_{\mathrm{hold}}$（每第 $5k$ 帧）验证（5 随机种子）**
+   - **R4（直行不重访 Zone A）**：弱方向 6D-FIM $J_v^{\mathrm{after}} = 18.20 < 25.0$，跨帧留出扫描点面配准 $\mathrm{NIS} = 5.689 > 2.5$ $\rightarrow$ 输出 `MODE3_SOFT_BRIDGE_WAIT`（`accepted=False`）；
+   - **B5（窄扇区 LIO-SAM 单模态滤波）**：虽 $J_v^{\mathrm{after}} = 34.39 \ge 25.0$，但因 $43^\circ$ 窄扇区偏航角漂移导致跨帧留出扫描 $\mathrm{NIS} = 4.004 > 2.5$ $\rightarrow$ 被 Mode 2 门控准确拦截；
+   - **R5（第 55 秒绕回 Zone A 闭环重访）**：$J_v^{\mathrm{after}} = 55.23 \ge 25.0$，跨帧留出扫描 $\mathrm{NIS} = 1.099 \le 2.5$ $\rightarrow$ 唤醒事务并完成 `MODE2_ATOMIC_COMMIT`（`accepted=True`）。
+2. **实验 S2：基于精确 Ground-Truth 3D Mesh $\mathcal{G}_{\mathrm{GT}}$ 的真实三维体素地图污染率 $\mathrm{Contam}_{3\mathrm{D}}(t)$（体素分辨率 $0.10\,\mathrm{m}$，表面容差 $\tau_{\mathrm{map}} = 0.15\,\mathrm{m}$）**
+   - `B0`（原始宿主，无隔离）：**`43.48%`** 地图体素偏离真实墙面 $> 0.15\,\mathrm{m}$；
+   - `B2`（MM-LINS 确认延迟后休眠，$\Delta t_{\mathrm{margin}} = 0\,\mathrm{s}$）：确认期 $N_\kappa$ 帧漂移点云永久写入睡眠子地图，导致 **`18.17%`** 三维体素污染；
+   - `B5`（无验证单模态提交）：**`26.28%`** 三维体素污染；
+   - `B4` & `B6`（本文 $\Delta t_{\mathrm{margin}} = 2.0\,\mathrm{s}$ 延迟提交缓冲 + Mode 2 验证）：全程保持 **`0.00%`** 三维体素污染。
+
+## 13.12 独立冻结测试集（Held-Out Test Split）零调参盲测：M2DGR `hall_02`（128.7 s，Leica 真值）四宿主全量验证（已验证）
+
+执行脚本：[evaluate_hall_02.py](slam_recovery/experiments/e3_orbslam3/hall_02/evaluate_hall_02.py)，汇总记录：[test_hall_02_heldout_benchmark.json](slam_recovery/experiments/manifests/test_hall_02_heldout_benchmark.json)。
+在**完全冻结开发集超参数（Zero-Tuning：$\tau_{\mathrm{info}}=25.0, \tau_{\mathrm{val}}=2.5, \Delta t_{\mathrm{margin}}=2.0\,\mathrm{s}, \Sigma_{\mathrm{bridge}}=4.0$）**下，对独立盲测集 `hall_02.bag`（1284 帧 LiDAR + 18327 帧 IMU + 1875 帧 RGB-D）执行四大宿主端到端评测：
+
+### 1. E0 干净序列基准（`REAL_HOST`，Leica GT）
+- **MM-LINS (B2)**：ATE RMSE = **`0.1886 m`**（RPE = `0.1845 m`）— [test_mmlins_b2_hall_02_clean.json](slam_recovery/experiments/manifests/test_mmlins_b2_hall_02_clean.json)
+- **LIO-SAM (B0)**：ATE RMSE = **`0.2339 m`**（RPE = `0.2195 m`）— [test_liosam_b0_hall_02_clean.json](slam_recovery/experiments/manifests/test_liosam_b0_hall_02_clean.json)
+- **ORB-SLAM3 (B0)**：ATE RMSE = **`0.2680 m`**（RPE = `0.1338 m`）— [test_orbslam3_b0_hall_02_clean.json](slam_recovery/experiments/manifests/test_orbslam3_b0_hall_02_clean.json)
+- **FAST-LIO2 (B0)**：ATE RMSE = **`0.2774 m`**（RPE = `0.1685 m`）— [test_fastlio2_b0_hall_02_clean.json](slam_recovery/experiments/manifests/test_fastlio2_b0_hall_02_clean.json)
+
+### 2. 盲测镜像实验 A & B（`[45s, 65s]` 88% 塑料袋遮挡 vs. 相机重度暗光 `gain=0.05`）
+
+| 退化场景 | 宿主系统 | **Clean ATE (m)** | **B0/B2 退化 ATE (m)** | **B5 无验证修复 ATE (m)** | **Ours B6 修复后 ATE (m)** | **同宿主恢复比例 $G$** | 零调参盲测结论 |
+|---|---|---:|---:|---:|---:|---:|---|
+| **LiDAR 88% 塑料袋遮挡 `[45-65s]`** | **FAST-LIO2** | 0.2774 | 4.5275 (Max 8.99m) | 0.2796 | **0.2796** (`INJECTION`) | **`+0.9995`** | 零调参实现 **99.95% 恢复** |
+| **LiDAR 88% 塑料袋遮挡 `[45-65s]`** | **MM-LINS** | 0.1886 | 4.0331 (`/Issleeping=0`) | — | **0.2410** (`INJECTION`) | **`+0.9864`** | **第 4 条序列复现 `/Issleeping=0` 100% 漏报**；B6 恢复 98.6% |
+| **LiDAR 88% 塑料袋遮挡 `[45-65s]`** | **LIO-SAM** | 0.2339 | 3.4168 | **237.4878**（发散被拒） | **0.2430** (`OFFLINE_CONSTRUCT`) | **`+0.9971`** | Mode 2 准确拦截发散的 B5 并路由至位姿图修复，恢复 **99.71%** |
+| **相机重度暗光 (`g=0.05`) `[45-65s]`** | **ORB-SLAM3** | 0.2680 | B0: `1.3287` (丢 295 帧)<br>B2: `0.9739` (丢 168 帧, Win `1.8409`) | — | **0.6024** (Win **0.6057**, 0 丢帧) | **`+0.6847` (vs B0)**<br>**`+0.7782` (Win vs B2)** | 真跨帧 `CrossScan_NIS = 2.1586 <= 2.5`（B2 为 `3.0392`），无偏 `Wilson_LB = 0.7902 >= 0.55` 通过 Mode 2 提交 |
 
 ---
 

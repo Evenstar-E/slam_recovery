@@ -1,0 +1,116 @@
+{
+  "run_id": "test_hall_02_heldout_benchmark",
+  "host_system": "FAST-LIO2 / MM-LINS / LIO-SAM / ORB-SLAM3",
+  "baseline_variant": "B0_B2_B5_B6",
+  "sequence_name": "hall_02",
+  "input_bag_path": "/home/R26534/M2DGR/raw/hall_02.bag",
+  "input_bag_hash": "47cacd21444879bfe028b4beb03dc18f74e50eab2210bb12c45328590d37088b",
+  "provenance": "INJECTION",
+  "gt_source": "Leica",
+  "seed": 42,
+  "injection_type": "held_out_test_zero_tuning_mirror_45_65s",
+  "injection_params": {
+    "window_sec": [
+      45.0,
+      65.0
+    ],
+    "protocol": "frozen_hyperparameters_zero_tuning"
+  },
+  "metrics": {
+    "E0_Clean_Baselines_REAL_HOST": {
+      "FAST_LIO2_B0": {
+        "ate_rmse_m": 0.2774,
+        "rpe_rmse_m": 0.1685,
+        "path_length_m": 86.82
+      },
+      "MM_LINS_B2": {
+        "ate_rmse_m": 0.1886,
+        "rpe_rmse_m": 0.1845,
+        "path_length_m": 40.56
+      },
+      "LIO_SAM_B0": {
+        "ate_rmse_m": 0.2339,
+        "rpe_rmse_m": 0.2195,
+        "path_length_m": 85.67
+      },
+      "ORB_SLAM3_B0": {
+        "raw_with_false_loop_ate_m": 1.3146,
+        "gnc_loop_filtered_ate_rmse_m": 0.268,
+        "rpe_rmse_m": 0.1338,
+        "tracked_frames": 1825,
+        "keyframes": 394
+      }
+    },
+    "Mirror_A_LiDAR_PlasticBag_45_65s": {
+      "FAST_LIO2": {
+        "provenance_B0_B6": "INJECTION",
+        "clean_ate_m": 0.2774,
+        "B0_degraded_ate_m": 4.5275,
+        "B0_degraded_max_m": 8.987,
+        "B6_repaired_ate_m": 0.2796,
+        "B6_repaired_rpe_m": 0.1934,
+        "recovery_ratio_G": 0.9995
+      },
+      "MM_LINS": {
+        "provenance_B2_B6": "INJECTION",
+        "clean_ate_m": 0.1886,
+        "B2_degraded_ate_m": 4.0331,
+        "B2_degraded_max_m": 8.952,
+        "B2_sleep_triggers": 0,
+        "B6_repaired_ate_m": 0.241,
+        "recovery_ratio_G": 0.9864
+      },
+      "LIO_SAM": {
+        "provenance_B0_B5": "INJECTION",
+        "provenance_B6": "OFFLINE_CONSTRUCT",
+        "clean_ate_m": 0.2339,
+        "B0_degraded_ate_m": 3.4168,
+        "B0_degraded_max_m": 7.6929,
+        "B5_point_filter_only_ate_m": 237.4878,
+        "B5_rejected_by_mode2": true,
+        "B6_repaired_ate_m": 0.243,
+        "B6_repaired_rpe_m": 0.2542,
+        "recovery_ratio_G": 0.9971
+      }
+    },
+    "Mirror_B_Visual_Severe_Dark_g005_45_65s": {
+      "ORB_SLAM3": {
+        "clean_ate_m": 0.268,
+        "clean_window_43_75s_rmse_m": 0.2536,
+        "B0_SingleMap_INJECTION": {
+          "tracked_frames": 1570,
+          "dropped_frames_in_45_65s": 295,
+          "full_seq_hold_ate_rmse_m": 1.3287,
+          "ate_max_m": 4.2234,
+          "window_43_75s_rmse_m": 2.3376
+        },
+        "B2_Native_Atlas_INJECTION": {
+          "tracked_frames": 1697,
+          "dropped_frames_in_45_65s": 168,
+          "ate_rmse_m": 0.9739,
+          "ate_max_m": 4.8333,
+          "window_43_75s_rmse_m": 1.8409,
+          "cross_scan_holdout_nis": 3.0392
+        },
+        "B6_Ours_Validated_OFFLINE_CONSTRUCT": {
+          "tracked_frames": 1825,
+          "dropped_frames_in_45_65s": 0,
+          "ate_rmse_m": 0.6024,
+          "ate_max_m": 1.3361,
+          "rpe_trans_rmse_m": 0.2613,
+          "window_43_75s_rmse_m": 0.6057,
+          "recovery_ratio_G_vs_B0": 0.6847,
+          "recovery_ratio_G_vs_B2": 0.5262,
+          "window_recovery_ratio_G_vs_B2": 0.7782,
+          "weak_dir_info_after": 116.84,
+          "cross_scan_holdout_nis": 2.1586,
+          "wilson_sequential_lower_bound": 0.7902,
+          "reentry_position_jump_m": 0.0436,
+          "gate_decision": "MODE2_ATOMIC_COMMIT",
+          "atomic_commit_accepted": true
+        }
+      }
+    }
+  },
+  "created_utc": "2026-11-05T07:33:32.339833+00:00"
+}

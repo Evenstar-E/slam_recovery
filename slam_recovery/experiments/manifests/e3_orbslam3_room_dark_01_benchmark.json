@@ -44,7 +44,7 @@
       "all_submaps_ate_max_m": 1.9964,
       "all_submaps_rpe_rmse_m": 0.3875,
       "active_map3_only_ate_rmse_m": 0.3694,
-      "holdout_nis_unrepaired": 1.1774,
+      "holdout_nis_unrepaired": 1.4511,
       "recovery_ratio_G_vs_B0_full": 0.6823,
       "trusted_map_pollution_ratio": 0.248
     },
@@ -64,18 +64,18 @@
       "recovery_ratio_G_vs_B2_Atlas_samehost_ref": 1.0882,
       "recovery_ratio_G_vs_B2_Atlas_lidar_ref": 0.8601,
       "b5_unvalidated_concat_ate_rmse_m": 0.6338,
-      "b5_holdout_nis": 1.1774,
+      "b5_holdout_nis": 1.4511,
       "b5_reentry_position_jump_m": 0.0898,
       "b5_rejected_by_mode2": true,
       "b5_rejection_reason": "wilson_sequential_benefit_lower_bound_failed",
       "gate_decision": "MODE2_ATOMIC_COMMIT",
       "atomic_commit_accepted": true,
-      "holdout_nis": 1.1585,
-      "wilson_sequential_lower_bound": 0.9966,
+      "holdout_nis": 1.1051,
+      "wilson_sequential_lower_bound": 0.6919,
       "reentry_position_jump_m": 0.0363,
-      "weak_dir_info_after": 143.54,
+      "weak_dir_info_after": 142.34,
       "trusted_map_pollution_ratio": 0.0
     }
   },
-  "created_utc": "2026-11-05T06:17:21.679750+00:00"
+  "created_utc": "2026-11-05T07:03:23.651572+00:00"
 }

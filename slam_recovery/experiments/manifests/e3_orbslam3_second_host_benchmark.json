@@ -55,6 +55,7 @@
           "rpe_trans_rmse_m": 0.403,
           "window_118_152s_rmse_m": 1.1396,
           "window_118_152s_max_m": 1.812,
+          "cross_scan_holdout_nis": 2.3603,
           "recovery_ratio_G": 0.0,
           "trusted_map_pollution_ratio": 0.625
         },
@@ -69,7 +70,7 @@
           "rpe_trans_rmse_m": 1.0461,
           "window_118_152s_rmse_m": 6.8941,
           "window_118_152s_max_m": 14.7115,
-          "holdout_nis_unrepaired": 2.8697,
+          "holdout_nis_unrepaired": 3.2854,
           "recovery_ratio_G_vs_B0": -0.9429,
           "trusted_map_pollution_ratio": 0.312
         },
@@ -83,11 +84,11 @@
           "provenance": "OFFLINE_CONSTRUCT",
           "ate_rmse_m": 6.5554,
           "recovery_ratio_G_vs_B0": -6.0539,
-          "holdout_nis": 2.1582,
-          "reentry_position_jump_m": 0.188,
-          "wilson_lower_bound": 0.0,
+          "holdout_nis": 2.3723,
+          "reentry_position_jump_m": 4.519,
+          "wilson_lower_bound": 0.8061,
           "rejected_by_mode2_anchor_check": true,
-          "rejection_reason": "wilson_sequential_benefit_lower_bound_failed"
+          "rejection_reason": "reentry_position_discontinuity_exceeded"
         },
         "B6_Ours_GrayBox_LiDAR_Aux_Repair": {
           "provenance": "OFFLINE_CONSTRUCT",
@@ -105,10 +106,10 @@
           "window_recovery_ratio_G_vs_B2_Atlas": 0.9673,
           "gate_decision": "MODE2_ATOMIC_COMMIT",
           "atomic_commit_accepted": true,
-          "holdout_nis": 2.0405,
-          "wilson_sequential_lower_bound": 0.9944,
+          "holdout_nis": 2.1806,
+          "wilson_sequential_lower_bound": 0.8162,
           "reentry_position_jump_m": 0.0476,
-          "weak_dir_info_after": 121.68,
+          "weak_dir_info_after": 116.51,
           "trusted_map_pollution_ratio": 0.0
         }
       },
@@ -133,6 +134,7 @@
           "rpe_trans_rmse_m": 0.45,
           "window_118_152s_rmse_m": 0.57,
           "window_118_152s_max_m": 0.972,
+          "cross_scan_holdout_nis": 2.3949,
           "recovery_ratio_G": 0.0,
           "trusted_map_pollution_ratio": 0.625
         },
@@ -147,7 +149,7 @@
           "rpe_trans_rmse_m": 0.2446,
           "window_118_152s_rmse_m": 0.5316,
           "window_118_152s_max_m": 1.2245,
-          "holdout_nis_unrepaired": 2.0787,
+          "holdout_nis_unrepaired": 2.327,
           "recovery_ratio_G_vs_B0": 0.9799,
           "trusted_map_pollution_ratio": 0.045
         },
@@ -161,9 +163,9 @@
           "provenance": "OFFLINE_CONSTRUCT",
           "ate_rmse_m": 2.1762,
           "recovery_ratio_G_vs_B0": -0.7346,
-          "holdout_nis": 2.0242,
-          "reentry_position_jump_m": 0.4048,
-          "wilson_lower_bound": 0.0,
+          "holdout_nis": 2.176,
+          "reentry_position_jump_m": 3.6932,
+          "wilson_lower_bound": 0.6334,
           "rejected_by_mode2_anchor_check": true,
           "rejection_reason": "reentry_position_discontinuity_exceeded"
         },
@@ -183,14 +185,14 @@
           "window_recovery_ratio_G_vs_B2_Atlas": 39.0115,
           "gate_decision": "MODE2_ATOMIC_COMMIT",
           "atomic_commit_accepted": true,
-          "holdout_nis": 2.0421,
-          "wilson_sequential_lower_bound": 0.9944,
+          "holdout_nis": 2.1792,
+          "wilson_sequential_lower_bound": 0.6242,
           "reentry_position_jump_m": 0.0468,
-          "weak_dir_info_after": 128.18,
+          "weak_dir_info_after": 123.01,
           "trusted_map_pollution_ratio": 0.0
         }
       }
     }
   },
-  "created_utc": "2026-11-05T06:17:17.569490+00:00"
+  "created_utc": "2026-11-05T07:03:11.580201+00:00"
 }

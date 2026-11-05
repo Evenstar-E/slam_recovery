@@ -1,0 +1,25 @@
+{
+  "run_id": "test_mmlins_b2_hall_02_clean",
+  "host_system": "MM-LINS",
+  "baseline_variant": "B2",
+  "sequence_name": "hall_02",
+  "input_bag_path": "/home/R26534/M2DGR/extracted/hall_02_fl.bag",
+  "input_bag_hash": "f373ae7b9be858cf01cc82aafaaab4f4b3127ff66ca6ae2d8aeed87a3fffef4c",
+  "provenance": "REAL_HOST",
+  "gt_source": "Leica",
+  "seed": 42,
+  "injection_type": "clean",
+  "injection_params": {
+    "split": "held_out_test_zero_tuning"
+  },
+  "metrics": {
+    "num_matched_poses": 252,
+    "path_length_m": 40.5592,
+    "ate_rmse_m": 0.1886,
+    "ate_mean_m": 0.1436,
+    "ate_max_m": 0.6248,
+    "rpe_trans_rmse_m": 0.1845,
+    "false_quarantine_triggers": 0
+  },
+  "created_utc": "2026-11-05T07:33:27.327066+00:00"
+}
