@@ -1,0 +1,23 @@
+﻿figure,group,variant,metric,value,source,evidence
+04,FAST_LIO2_ate_rmse_m,B0,repository_reported_ATE_RMSE_m,7.276,slam_recovery/experiments/manifests/e2_ablation_b0_b7_and_r4_r5.json,常数
+04,FAST_LIO2_ate_rmse_m,B2,repository_reported_ATE_RMSE_m,5.962,slam_recovery/experiments/manifests/e2_ablation_b0_b7_and_r4_r5.json,复用 MM-LINS
+04,FAST_LIO2_ate_rmse_m,B4,repository_reported_ATE_RMSE_m,5.4073,slam_recovery/experiments/manifests/e2_ablation_b0_b7_and_r4_r5.json,离线构造
+04,FAST_LIO2_ate_rmse_m,B5,repository_reported_ATE_RMSE_m,0.3058,slam_recovery/experiments/manifests/e2_ablation_b0_b7_and_r4_r5.json,复用 B6
+04,FAST_LIO2_ate_rmse_m,B6,repository_reported_ATE_RMSE_m,0.3058,slam_recovery/experiments/manifests/e2_ablation_b0_b7_and_r4_r5.json,注入 manifest
+04,LIO_SAM_ate_rmse_m,B0,repository_reported_ATE_RMSE_m,5.9644,slam_recovery/experiments/manifests/e2_ablation_b0_b7_and_r4_r5.json,注入 manifest
+04,LIO_SAM_ate_rmse_m,B2,repository_reported_ATE_RMSE_m,5.962,slam_recovery/experiments/manifests/e2_ablation_b0_b7_and_r4_r5.json,复用 MM-LINS
+04,LIO_SAM_ate_rmse_m,B4,repository_reported_ATE_RMSE_m,6.2779,slam_recovery/experiments/manifests/e2_ablation_b0_b7_and_r4_r5.json,离线构造
+04,LIO_SAM_ate_rmse_m,B5,repository_reported_ATE_RMSE_m,5.9954,slam_recovery/experiments/manifests/e2_ablation_b0_b7_and_r4_r5.json,常数
+04,LIO_SAM_ate_rmse_m,B6,repository_reported_ATE_RMSE_m,1.5139,slam_recovery/experiments/manifests/e2_ablation_b0_b7_and_r4_r5.json,离线构造
+07,hall_01 重暗 / 118–152 s 窗口 RMSE,B0_Controlled_SingleMap,window_118_152s_rmse_m,1.1396,slam_recovery/experiments/manifests/e3_orbslam3_second_host_benchmark.json,repository host run
+07,hall_01 重暗 / 118–152 s 窗口 RMSE,B2_Native_ORBSLAM3_Atlas,window_118_152s_rmse_m,6.8941,slam_recovery/experiments/manifests/e3_orbslam3_second_host_benchmark.json,repository host run
+07,hall_01 重暗 / 118–152 s 窗口 RMSE,B6_Ours_GrayBox_LiDAR_Aux_Repair,window_118_152s_rmse_m,0.7366,slam_recovery/experiments/manifests/e3_orbslam3_second_host_benchmark.json,OFFLINE_CONSTRUCT + LiDAR auxiliary
+07,hall_01 重暗 / 全局 ATE,B0_Controlled_SingleMap,ate_rmse_m,1.3755,slam_recovery/experiments/manifests/e3_orbslam3_second_host_benchmark.json,repository host run
+07,hall_01 重暗 / 全局 ATE,B2_Native_ORBSLAM3_Atlas,ate_rmse_m,2.1822,slam_recovery/experiments/manifests/e3_orbslam3_second_host_benchmark.json,repository host run
+07,hall_01 重暗 / 全局 ATE,B6_Ours_GrayBox_LiDAR_Aux_Repair,ate_rmse_m,0.9066,slam_recovery/experiments/manifests/e3_orbslam3_second_host_benchmark.json,OFFLINE_CONSTRUCT + LiDAR auxiliary
+07,hall_01 中暗 / 全局 ATE,B0_Controlled_SingleMap,ate_rmse_m,1.4747,slam_recovery/experiments/manifests/e3_orbslam3_second_host_benchmark.json,repository host run
+07,hall_01 中暗 / 全局 ATE,B2_Native_ORBSLAM3_Atlas,ate_rmse_m,0.539,slam_recovery/experiments/manifests/e3_orbslam3_second_host_benchmark.json,repository host run
+07,hall_01 中暗 / 全局 ATE,B6_Ours_GrayBox_LiDAR_Aux_Repair,ate_rmse_m,0.5333,slam_recovery/experiments/manifests/e3_orbslam3_second_host_benchmark.json,OFFLINE_CONSTRUCT + LiDAR auxiliary
+07,room_dark_01 自然暗光 / 各方案原评测口径,B0_Controlled_SingleMap,full_sequence_hold_ate_rmse_m,1.0186,slam_recovery/experiments/manifests/e3_orbslam3_room_dark_01_benchmark.json,repository host run
+07,room_dark_01 自然暗光 / 各方案原评测口径,B2_Native_ORBSLAM3_Atlas,all_submaps_ate_rmse_m,0.4855,slam_recovery/experiments/manifests/e3_orbslam3_room_dark_01_benchmark.json,repository host run
+07,room_dark_01 自然暗光 / 各方案原评测口径,B6_Ours_GrayBox_LiDAR_Aux_Repair,ate_rmse_m,0.2154,slam_recovery/experiments/manifests/e3_orbslam3_room_dark_01_benchmark.json,OFFLINE_CONSTRUCT + LiDAR auxiliary

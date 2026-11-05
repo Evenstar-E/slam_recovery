@@ -1,0 +1,15 @@
+{
+  "seed": 42,
+  "synthetic": true,
+  "n_original": 2700,
+  "occluded": 2031,
+  "kept": 1909,
+  "params": {
+    "alpha_extinct": 0.03,
+    "sigma_range_m": 0.03,
+    "target_drop_ratio": 0.3,
+    "seed": 42
+  },
+  "range_scale": 1.1,
+  "image_gain": 0.2
+}

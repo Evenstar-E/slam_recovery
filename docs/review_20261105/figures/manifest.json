@@ -1,0 +1,197 @@
+{
+  "reviewed_commit": "4b140b949d217de56aaf992f6684e23ad2355a30",
+  "python": "3.12.14",
+  "numpy": "2.5.4",
+  "matplotlib": "3.10.7",
+  "font": "Microsoft YaHei",
+  "script_sha256": "eba0460a5d13afa7c0361d4461a52fdae422bd7ed50263827bfe428d8462e290",
+  "transformations": "No original metrics changed; figure 04/07 transcribe manifests; 06 deterministic synthetic inputs; others code/schematic.",
+  "figures": [
+    {
+      "name": "01_architecture",
+      "kind": "CODE_DERIVED",
+      "caption": "Original vector overview inspired by FAST-LIVO2 visual grammar; separates native LIO, Python research dependencies, pose-only commit and pending native handoff.",
+      "source_sha256": {
+        "slam_recovery/core.py": "4342faa81772e46c083d6e6ff49d1bc9b59964ade8e3a58140a8aa101336fd6d",
+        "slam_recovery/quarantine/manager.py": "4dbadb0b8eadd544edd66462be813a40c3f93a969bbb8ba59846a81535cebf11",
+        "slam_recovery/health/detector.py": "7b2e3205b22c53e8914a0e19f152e301834ccc142e3d8ae4730eded81998fc86",
+        "slam_recovery/diagnosis/signature_router.py": "e207a9ece340ea22e0365e0e9ba1ec5eee698769806aca94988079741870eaee",
+        "docs/review_20261105/architecture_paper.py": "78f7b46c0fe6d0d7df4b6f437032daf2e7142cdeb330d7d3ebc26188d6ed94ca"
+      },
+      "outputs": [
+        {
+          "path": "docs/review_20261105/figures/01_architecture.svg",
+          "sha256": "397d8579b25560cc91dd591607847b0d300cd0ee02d5a1e39c0bbedda241095e",
+          "bytes": 40211
+        },
+        {
+          "path": "docs/review_20261105/figures/01_architecture.pdf",
+          "sha256": "a8820e896ac2ae45f193cba870e838dcabd04beb0fd8005a141910bfa8de18b0",
+          "bytes": 36487
+        },
+        {
+          "path": "docs/review_20261105/figures/01_architecture.png",
+          "sha256": "e2f364e8f3df0f235b5ad83904e0994c371c50f860763df06a3f1017c9b920f5",
+          "bytes": 382060
+        }
+      ]
+    },
+    {
+      "name": "02_gate_logic",
+      "kind": "CODE_DERIVED",
+      "caption": "Four-mode gate in actual precedence, with implemented scope and missing checks explicitly labeled.",
+      "source_sha256": {
+        "slam_recovery/core.py": "4342faa81772e46c083d6e6ff49d1bc9b59964ade8e3a58140a8aa101336fd6d",
+        "slam_recovery/quarantine/manager.py": "4dbadb0b8eadd544edd66462be813a40c3f93a969bbb8ba59846a81535cebf11",
+        "slam_recovery/validation/wilson_validator.py": "cb261181770f54f2c1ac2137f4d083dd12adb9af09b90d3a1344a6396eb8d747"
+      },
+      "outputs": [
+        {
+          "path": "docs/review_20261105/figures/02_gate_logic.svg",
+          "sha256": "ae505ea25b92a7ecfb78adc59a2e8193310e43b6a8ab3edc851ae8913223a55e",
+          "bytes": 13777
+        },
+        {
+          "path": "docs/review_20261105/figures/02_gate_logic.pdf",
+          "sha256": "684ecf74a73159cc073f220db48ec371411c5a61cb6ee3fbabe3531cf4c21113",
+          "bytes": 93083
+        },
+        {
+          "path": "docs/review_20261105/figures/02_gate_logic.png",
+          "sha256": "c0498e7a61da87e4a491544a4aceb3a47aced3d718e4ff4d8706b8989d229902",
+          "bytes": 241681
+        }
+      ]
+    },
+    {
+      "name": "03_delay_boundary",
+      "kind": "SCHEMATIC_AND_REPRODUCTION",
+      "caption": "Timely alarm schematic and reproduced late-alarm failure; no invented measured time series.",
+      "source_sha256": {
+        "docs/review_20261105/audit_results.json": "1309092b0a0fb1556856ae25f65875dea49dc871df31eb0abf68d2e289f8e58f",
+        "slam_recovery/quarantine/manager.py": "4dbadb0b8eadd544edd66462be813a40c3f93a969bbb8ba59846a81535cebf11"
+      },
+      "outputs": [
+        {
+          "path": "docs/review_20261105/figures/03_delay_boundary.svg",
+          "sha256": "530c76768d1728c703e57bca7426d56193bba6fbe529deb1996352dda7711747",
+          "bytes": 16973
+        },
+        {
+          "path": "docs/review_20261105/figures/03_delay_boundary.pdf",
+          "sha256": "3f8bafcc7329072d36526186e0fb02a8b60c1cc3e73d5dbe32c970df6c38aa2f",
+          "bytes": 70921
+        },
+        {
+          "path": "docs/review_20261105/figures/03_delay_boundary.png",
+          "sha256": "b0162f2763c2511ec660c77b3693eb666822661d6a2a23f456e83c642d6df264",
+          "bytes": 199702
+        }
+      ]
+    },
+    {
+      "name": "04_ablation_provenance",
+      "kind": "REPOSITORY_REPORTED",
+      "caption": "Original ATE values with explicit provenance; proxy pollution not relabeled as voxel-map quality.",
+      "source_sha256": {
+        "slam_recovery/experiments/manifests/e2_ablation_b0_b7_and_r4_r5.json": "d7ee449f17cef2088cca6a51f9e498bd25ce8185caf6c068e211ce0621d4a095",
+        "slam_recovery/experiments/run_e2_ablation_matrix.py": "e0a8ad3d7b72ec2f6e6d6a66172ad97b9dcd8d0a848083ec060de815d3093f88"
+      },
+      "outputs": [
+        {
+          "path": "docs/review_20261105/figures/04_ablation_provenance.svg",
+          "sha256": "0c1f38a54a9b69663946f6497ec2703908113d8ec0c34784a9da067e5bbe3aef",
+          "bytes": 25084
+        },
+        {
+          "path": "docs/review_20261105/figures/04_ablation_provenance.pdf",
+          "sha256": "e3e20f494da96c78b1e5fd1d3c197732876be24e10d5143b4ca6130c9bfaa17b",
+          "bytes": 74906
+        },
+        {
+          "path": "docs/review_20261105/figures/04_ablation_provenance.png",
+          "sha256": "77c38f0b593e60263b385bb14cf08a4e442d5e59c0c9fc39d0737df7709b66cd",
+          "bytes": 198086
+        }
+      ]
+    },
+    {
+      "name": "05_evidence_split",
+      "kind": "CODE_DERIVED_AND_PROPOSED",
+      "caption": "Current shared auxiliary evidence versus a proposed fit/validation/final-evaluation split.",
+      "source_sha256": {
+        "slam_recovery/experiments/e3_orbslam3/evaluate_e3_orbslam3.py": "5d19194deceb21080b591f54232508095a8b2ff1c0460b043a28c62f8a77244b",
+        "slam_recovery/validation/fim_and_holdout.py": "1ec9a907e4dba99f051cdafc316692aed6edfc8a0175e0df8307ca20e101ec93"
+      },
+      "outputs": [
+        {
+          "path": "docs/review_20261105/figures/05_evidence_split.svg",
+          "sha256": "78483c59eca44672e78bc89ac6319b136dcb02e79a6e4f2d526e079737005a80",
+          "bytes": 12508
+        },
+        {
+          "path": "docs/review_20261105/figures/05_evidence_split.pdf",
+          "sha256": "bc61345aef82adc85aa1f5ccb9125a1b8d385dcd02f2f72362feb49067e092a0",
+          "bytes": 91483
+        },
+        {
+          "path": "docs/review_20261105/figures/05_evidence_split.png",
+          "sha256": "5de0da761a14ef02d9a80bf470df0638ce1db9e50e266db409c4239f64da97a8",
+          "bytes": 234518
+        }
+      ]
+    },
+    {
+      "name": "06_fault_mechanisms",
+      "kind": "SYNTHETIC_DEMONSTRATION",
+      "caption": "Deterministic synthetic inputs show distinct measurement changes; neither real sensor validation nor recovery demonstration.",
+      "source_sha256": {
+        "slam_recovery/experiments/injection/injectors.py": "a229c8a7cccf9651cfe0e50fe354754f8fda714043894aeb15094f8ecc665742"
+      },
+      "outputs": [
+        {
+          "path": "docs/review_20261105/figures/06_fault_mechanisms.svg",
+          "sha256": "bfb0561101ee65483c528cee222e11a38a4e59a73df90424c4522508f2b11453",
+          "bytes": 828609
+        },
+        {
+          "path": "docs/review_20261105/figures/06_fault_mechanisms.pdf",
+          "sha256": "39993fc16ed5de13f675477fc51c19e30ef5d8a8d12481cd23e09fafbdd352b8",
+          "bytes": 546025
+        },
+        {
+          "path": "docs/review_20261105/figures/06_fault_mechanisms.png",
+          "sha256": "42a9b6152847bf5cc50b89a33ce6c9e45fefb79be02d11d7d5e9272cf5f2a04b",
+          "bytes": 1107061
+        }
+      ]
+    },
+    {
+      "name": "07_visual_transfer",
+      "kind": "REPOSITORY_REPORTED",
+      "caption": "Four reported evaluation groups; B6 offline auxiliary construction hatched; coverage/alignment caveats retained.",
+      "source_sha256": {
+        "slam_recovery/experiments/manifests/e3_orbslam3_second_host_benchmark.json": "2721c71ec8fd425d1c5bdf1f5aec9de82f614d32f974a7a6085b1e0613b41413",
+        "slam_recovery/experiments/manifests/e3_orbslam3_room_dark_01_benchmark.json": "0f129d01af04a6774ebf6b4646c5ea1abcd5064c1f7a1239105bd9c785c15cd6"
+      },
+      "outputs": [
+        {
+          "path": "docs/review_20261105/figures/07_visual_transfer.svg",
+          "sha256": "9c943f1539d1c079137e876e306c8c730246615e9b46d868f9f45c627be2a7fe",
+          "bytes": 39997
+        },
+        {
+          "path": "docs/review_20261105/figures/07_visual_transfer.pdf",
+          "sha256": "ffc866350f97ff3782a15ac006c44fb809474615f87ddcf2a2843e0e57cfc5e7",
+          "bytes": 82656
+        },
+        {
+          "path": "docs/review_20261105/figures/07_visual_transfer.png",
+          "sha256": "2b8079a163f8c56e6f25e101b4613d22a6678832aab792efa7841e83653f9be0",
+          "bytes": 241908
+        }
+      ]
+    }
+  ],
+  "source_hash_policy": "SHA256 of source text with CRLF normalized to LF; output hashes use exact bytes."
+}

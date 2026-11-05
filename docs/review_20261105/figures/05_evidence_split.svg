@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1152pt" height="648pt" viewBox="0 0 1152 648" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-11-05T15:23:02.283265</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.7, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 648
+L 1152 648
+L 1152 0
+L 0 0
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 60.67584 266.652
+L 319.94496 266.652
+Q 331.72992 266.652 331.72992 261.306
+L 331.72992 158.274
+Q 331.72992 152.928 319.94496 152.928
+L 60.67584 152.928
+Q 48.89088 152.928 48.89088 158.274
+L 48.89088 261.306
+Q 48.89088 266.652 60.67584 266.652
+z
+" clip-path="url(#pec395cf6d6)" style="fill: #e8f2f8; stroke: #17638c; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 446.36544 266.652
+L 705.63456 266.652
+Q 717.41952 266.652 717.41952 261.306
+L 717.41952 158.274
+Q 717.41952 152.928 705.63456 152.928
+L 446.36544 152.928
+Q 434.58048 152.928 434.58048 158.274
+L 434.58048 261.306
+Q 434.58048 266.652 446.36544 266.652
+z
+" clip-path="url(#pec395cf6d6)" style="fill: #e8f2f8; stroke: #17638c; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 832.05504 266.652
+L 1091.32416 266.652
+Q 1103.10912 266.652 1103.10912 261.306
+L 1103.10912 158.274
+Q 1103.10912 152.928 1091.32416 152.928
+L 832.05504 152.928
+Q 820.27008 152.928 820.27008 158.274
+L 820.27008 261.306
+Q 820.27008 266.652 832.05504 266.652
+z
+" clip-path="url(#pec395cf6d6)" style="fill: #fff1e3; stroke: #a84c16; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 331.584884 207.36
+Q 383.154573 207.36 433.047212 207.36
+" clip-path="url(#pec395cf6d6)" style="fill: none; stroke: #526476; stroke-width: 1.5; stroke-linecap: round"/>
+    <path d="M 427.847212 204.76
+L 433.047212 207.36
+L 427.847212 209.96
+z
+" clip-path="url(#pec395cf6d6)" style="fill: #526476; stroke: #526476; stroke-width: 1.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 717.274484 207.36
+Q 768.844173 207.36 818.736812 207.36
+" clip-path="url(#pec395cf6d6)" style="fill: none; stroke: #526476; stroke-width: 1.5; stroke-linecap: round"/>
+    <path d="M 813.536812 204.76
+L 818.736812 207.36
+L 813.536812 209.96
+z
+" clip-path="url(#pec395cf6d6)" style="fill: #526476; stroke: #526476; stroke-width: 1.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 961.6896 297.702488
+Q 961.6896 282.689992 961.6896 269.354547
+" clip-path="url(#pec395cf6d6)" style="fill: none; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #a84c16; stroke-width: 1.5; stroke-linecap: round"/>
+    <path d="M 959.0896 274.554547
+L 961.6896 269.354547
+L 964.2896 274.554547
+z
+" clip-path="url(#pec395cf6d6)" style="fill: #a84c16; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #a84c16; stroke-width: 1.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 60.67584 548.532
+L 319.94496 548.532
+Q 331.72992 548.532 331.72992 543.186
+L 331.72992 435.294
+Q 331.72992 429.948 319.94496 429.948
+L 60.67584 429.948
+Q 48.89088 429.948 48.89088 435.294
+L 48.89088 543.186
+Q 48.89088 548.532 60.67584 548.532
+z
+" clip-path="url(#pec395cf6d6)" style="fill: #e9f3ee; stroke-dasharray: 4.81,2.08; stroke-dashoffset: 0; stroke: #176c60; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 446.36544 548.532
+L 705.63456 548.532
+Q 717.41952 548.532 717.41952 543.186
+L 717.41952 435.294
+Q 717.41952 429.948 705.63456 429.948
+L 446.36544 429.948
+Q 434.58048 429.948 434.58048 435.294
+L 434.58048 543.186
+Q 434.58048 548.532 446.36544 548.532
+z
+" clip-path="url(#pec395cf6d6)" style="fill: #e9f3ee; stroke-dasharray: 4.81,2.08; stroke-dashoffset: 0; stroke: #176c60; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 832.05504 548.532
+L 1091.32416 548.532
+Q 1103.10912 548.532 1103.10912 543.186
+L 1103.10912 435.294
+Q 1103.10912 429.948 1091.32416 429.948
+L 832.05504 429.948
+Q 820.27008 429.948 820.27008 435.294
+L 820.27008 543.186
+Q 820.27008 548.532 832.05504 548.532
+z
+" clip-path="url(#pec395cf6d6)" style="fill: #e9f3ee; stroke-dasharray: 4.81,2.08; stroke-dashoffset: 0; stroke: #176c60; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 331.584884 489.24
+Q 383.154573 489.24 433.047212 489.24
+" clip-path="url(#pec395cf6d6)" style="fill: none; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #176c60; stroke-width: 1.5; stroke-linecap: round"/>
+    <path d="M 427.847212 486.64
+L 433.047212 489.24
+L 427.847212 491.84
+z
+" clip-path="url(#pec395cf6d6)" style="fill: #176c60; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #176c60; stroke-width: 1.5; stroke-linecap: round"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 717.274484 489.24
+Q 768.844173 489.24 818.736812 489.24
+" clip-path="url(#pec395cf6d6)" style="fill: none; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #176c60; stroke-width: 1.5; stroke-linecap: round"/>
+    <path d="M 813.536812 486.64
+L 818.736812 489.24
+L 813.536812 491.84
+z
+" clip-path="url(#pec395cf6d6)" style="fill: #176c60; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #176c60; stroke-width: 1.5; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 190.3104 265.68
+L 190.3104 299.7
+L 961.6896 299.7
+" clip-path="url(#pec395cf6d6)" style="fill: none; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #a84c16; stroke-width: 1.5"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: start; fill: #172d43" x="51.0336" y="110.16" transform="rotate(-0 51.0336 110.16)">当前 E3 的主要依赖</text>
+   </g>
+   <g id="text_2">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #17638c" x="190.3104" y="187.385288" transform="rotate(-0 190.3104 187.385288)">辅助 LiDAR 轨迹</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 10.2px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #172d43" x="190.3104" y="232.719384" transform="rotate(-0 190.3104 232.719384)">用于构造视觉候选</text>
+   </g>
+   <g id="text_4">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #17638c" x="576" y="187.385288" transform="rotate(-0 576 187.385288)">桥接后的候选</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 10.2px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #172d43" x="576" y="232.719384" transform="rotate(-0 576 232.719384)">增量接近辅助轨迹</text>
+   </g>
+   <g id="text_6">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #a84c16" x="961.6896" y="187.385288" transform="rotate(-0 961.6896 187.385288)">候选 − 辅助增量</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 10.2px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #172d43" x="961.6896" y="232.719384" transform="rotate(-0 961.6896 232.719384)">再扰动同帧奇偶点求分数</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 10px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #a84c16" x="576" y="289.98" transform="rotate(-0 576 289.98)">同一辅助源再次进入评分</text>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #a84c16" x="576" y="353.16" transform="rotate(-0 576 353.16)">点 ID 不重合，并不等于约束来源独立。</text>
+   </g>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 13px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: start; fill: #176c60" x="51.0336" y="387.18" transform="rotate(-0 51.0336 387.18)">建议的最小修正</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #176c60" x="190.3104" y="465.717488" transform="rotate(-0 190.3104 465.717488)">拟合集 A</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 10.2px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; fill: #172d43" transform="translate(139.115963 505.661137)">求起点 / 修正量 / 候选</text>
+    <text style="font-size: 10.2px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; fill: #172d43" transform="translate(149.5104 520.427231)">只记录已到达数据</text>
+   </g>
+   <g id="text_13">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #176c60" x="576" y="465.717488" transform="rotate(-0 576 465.717488)">验证集 B</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 10.2px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; fill: #172d43" transform="translate(519.705563 505.661137)">独立时段 / 子地图 / 观测</text>
+    <text style="font-size: 10.2px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; fill: #172d43" transform="translate(530.1 520.427231)">固定对应与失配分母</text>
+   </g>
+   <g id="text_15">
+    <text style="font-weight: 700; font-size: 12px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #176c60" x="961.6896" y="465.717488" transform="rotate(-0 961.6896 465.717488)">最终评测 C</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 10.2px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; fill: #172d43" transform="translate(924.288272 505.661137)">全图距离 + 覆盖</text>
+    <text style="font-size: 10.2px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; fill: #172d43" transform="translate(910.009069 520.427231)">轨迹误差 + clean 干预</text>
+   </g>
+   <g id="text_17">
+    <g id="patch_13">
+     <path d="M 364.1652 482.747344
+L 402.1452 482.747344
+L 402.1452 471.335625
+L 364.1652 471.335625
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 9px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #176c60" x="383.1552" y="479.52" transform="rotate(-0 383.1552 479.52)">冻结候选</text>
+   </g>
+   <g id="text_18">
+    <g id="patch_14">
+     <path d="M 749.8548 482.747344
+L 787.8348 482.747344
+L 787.8348 471.335625
+L 749.8548 471.335625
+z
+" style="fill: #ffffff"/>
+    </g>
+    <text style="font-size: 9px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #176c60" x="768.8448" y="479.52" transform="rotate(-0 768.8448 479.52)">只验一次</text>
+   </g>
+  </g>
+  <g id="text_19">
+   <text style="font-weight: 700; font-size: 22px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: start; fill: #172d43" x="40.32" y="29.808" transform="rotate(-0 40.32 29.808)">05  /  如何避免“用同一份证据修，再用它证明修得好”</text>
+  </g>
+  <g id="text_20">
+   <text style="font-size: 10.6px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: start; fill: #526476" x="40.32" y="56.376" transform="rotate(-0 40.32 56.376)">审阅启发  /  下排为建议的验证设计，尚未实现</text>
+  </g>
+  <g id="text_21">
+   <text style="font-size: 10px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: start; fill: #526476" x="40.32" y="625.32" transform="rotate(-0 40.32 625.32)">验证时保留失配率、方向 / 时间覆盖与尾段坏点。独立验证仍需检查共同地图、共同 IMU 或辅助估计带来的相关性。</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pec395cf6d6">
+   <rect x="40.32" y="90.72" width="1071.36" height="486"/>
+  </clipPath>
+ </defs>
+</svg>

@@ -1,0 +1,10 @@
+# Preserve the bytes of generated text artifacts used by the SHA manifest.
+*.md text eol=lf
+*.py text eol=lf
+*.mmd text eol=lf
+*.json text eol=lf
+*.csv text eol=lf
+*.txt text eol=lf
+*.svg text eol=lf
+*.png binary
+*.pdf binary

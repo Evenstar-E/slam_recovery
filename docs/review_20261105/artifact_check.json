@@ -1,0 +1,169 @@
+{
+  "passed": true,
+  "verified_exports": 21,
+  "figures": 7,
+  "checks": [
+    {
+      "path": "docs/review_20261105/figures/01_architecture.svg",
+      "bytes": 40211,
+      "sha256_verified": true,
+      "text_elements": 54
+    },
+    {
+      "path": "docs/review_20261105/figures/01_architecture.pdf",
+      "bytes": 36487,
+      "sha256_verified": true,
+      "pages": 1
+    },
+    {
+      "path": "docs/review_20261105/figures/01_architecture.png",
+      "bytes": 382060,
+      "sha256_verified": true,
+      "size": [
+        3400,
+        1309
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "docs/review_20261105/figures/02_gate_logic.svg",
+      "bytes": 13777,
+      "sha256_verified": true,
+      "text_elements": 25
+    },
+    {
+      "path": "docs/review_20261105/figures/02_gate_logic.pdf",
+      "bytes": 93083,
+      "sha256_verified": true,
+      "pages": 1
+    },
+    {
+      "path": "docs/review_20261105/figures/02_gate_logic.png",
+      "bytes": 241681,
+      "sha256_verified": true,
+      "size": [
+        2720,
+        1530
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "docs/review_20261105/figures/03_delay_boundary.svg",
+      "bytes": 16973,
+      "sha256_verified": true,
+      "text_elements": 36
+    },
+    {
+      "path": "docs/review_20261105/figures/03_delay_boundary.pdf",
+      "bytes": 70921,
+      "sha256_verified": true,
+      "pages": 1
+    },
+    {
+      "path": "docs/review_20261105/figures/03_delay_boundary.png",
+      "bytes": 199702,
+      "sha256_verified": true,
+      "size": [
+        2720,
+        1360
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "docs/review_20261105/figures/04_ablation_provenance.svg",
+      "bytes": 25084,
+      "sha256_verified": true,
+      "text_elements": 43
+    },
+    {
+      "path": "docs/review_20261105/figures/04_ablation_provenance.pdf",
+      "bytes": 74906,
+      "sha256_verified": true,
+      "pages": 1
+    },
+    {
+      "path": "docs/review_20261105/figures/04_ablation_provenance.png",
+      "bytes": 198086,
+      "sha256_verified": true,
+      "size": [
+        2720,
+        1530
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "docs/review_20261105/figures/05_evidence_split.svg",
+      "bytes": 12508,
+      "sha256_verified": true,
+      "text_elements": 24
+    },
+    {
+      "path": "docs/review_20261105/figures/05_evidence_split.pdf",
+      "bytes": 91483,
+      "sha256_verified": true,
+      "pages": 1
+    },
+    {
+      "path": "docs/review_20261105/figures/05_evidence_split.png",
+      "bytes": 234518,
+      "sha256_verified": true,
+      "size": [
+        2720,
+        1530
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "docs/review_20261105/figures/06_fault_mechanisms.svg",
+      "bytes": 828609,
+      "sha256_verified": true,
+      "text_elements": 90
+    },
+    {
+      "path": "docs/review_20261105/figures/06_fault_mechanisms.pdf",
+      "bytes": 546025,
+      "sha256_verified": true,
+      "pages": 1
+    },
+    {
+      "path": "docs/review_20261105/figures/06_fault_mechanisms.png",
+      "bytes": 1107061,
+      "sha256_verified": true,
+      "size": [
+        2720,
+        1870
+      ],
+      "mode": "RGBA"
+    },
+    {
+      "path": "docs/review_20261105/figures/07_visual_transfer.svg",
+      "bytes": 39997,
+      "sha256_verified": true,
+      "text_elements": 80
+    },
+    {
+      "path": "docs/review_20261105/figures/07_visual_transfer.pdf",
+      "bytes": 82656,
+      "sha256_verified": true,
+      "pages": 1
+    },
+    {
+      "path": "docs/review_20261105/figures/07_visual_transfer.png",
+      "bytes": 241908,
+      "sha256_verified": true,
+      "size": [
+        2720,
+        1445
+      ],
+      "mode": "RGBA"
+    }
+  ],
+  "relative_links_checked": 49,
+  "reviewed_commit": "4b140b949d217de56aaf992f6684e23ad2355a30",
+  "original_tracked_files_modified": [
+    "README.md"
+  ],
+  "original_figures_and_algorithms_unchanged": true,
+  "visual_review": "All seven inspected; architecture redrawn in FAST-LIVO2 visual style, routing and text checked at full size.",
+  "scope": "Artifact and provenance checks only; no scientific efficacy certification."
+}

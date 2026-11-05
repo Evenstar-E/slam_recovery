@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="1152pt" height="576pt" viewBox="0 0 1152 576" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-11-05T15:23:01.324790</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.7, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 576
+L 1152 576
+L 1152 0
+L 0 0
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 138.24 253.44
+L 1036.8 253.44
+L 1036.8 109.44
+L 138.24 109.44
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 475.2 253.44
+L 643.68 253.44
+L 643.68 109.44
+L 475.2 109.44
+z
+" clip-path="url(#p056be3748c)" style="fill: #fff1e3; stroke: #fff1e3; stroke-linejoin: miter"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <defs>
+       <path id="m366c724e69" d="M 0 0
+L 0 3.5
+" style="stroke: #526476; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#m366c724e69" x="138.24" y="253.44" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_1">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="138.24" y="269.233125" transform="rotate(-0 138.24 269.233125)">7</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_2">
+      <g>
+       <use xlink:href="#m366c724e69" x="250.56" y="253.44" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_2">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="250.56" y="269.233125" transform="rotate(-0 250.56 269.233125)">8</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_3">
+      <g>
+       <use xlink:href="#m366c724e69" x="362.88" y="253.44" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_3">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="362.88" y="269.233125" transform="rotate(-0 362.88 269.233125)">9</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_4">
+      <g>
+       <use xlink:href="#m366c724e69" x="475.2" y="253.44" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_4">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="475.2" y="269.233125" transform="rotate(-0 475.2 269.233125)">10</text>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_5">
+      <g>
+       <use xlink:href="#m366c724e69" x="587.52" y="253.44" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_5">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="587.52" y="269.233125" transform="rotate(-0 587.52 269.233125)">11</text>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_6">
+      <g>
+       <use xlink:href="#m366c724e69" x="699.84" y="253.44" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_6">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="699.84" y="269.233125" transform="rotate(-0 699.84 269.233125)">12</text>
+     </g>
+    </g>
+    <g id="xtick_7">
+     <g id="line2d_7">
+      <g>
+       <use xlink:href="#m366c724e69" x="812.16" y="253.44" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_7">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="812.16" y="269.233125" transform="rotate(-0 812.16 269.233125)">13</text>
+     </g>
+    </g>
+    <g id="xtick_8">
+     <g id="line2d_8">
+      <g>
+       <use xlink:href="#m366c724e69" x="924.48" y="253.44" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_8">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="924.48" y="269.233125" transform="rotate(-0 924.48 269.233125)">14</text>
+     </g>
+    </g>
+    <g id="xtick_9">
+     <g id="line2d_9">
+      <g>
+       <use xlink:href="#m366c724e69" x="1036.8" y="253.44" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_9">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="1036.8" y="269.233125" transform="rotate(-0 1036.8 269.233125)">15</text>
+     </g>
+    </g>
+    <g id="text_10">
+     <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #172d43" x="587.52" y="284.760781" transform="rotate(-0 587.52 284.760781)">时间 / s</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2"/>
+   <g id="line2d_10">
+    <path d="M 138.24 197.44
+L 419.04 197.44
+" clip-path="url(#p056be3748c)" style="fill: none; stroke: #17638c; stroke-width: 14"/>
+   </g>
+   <g id="line2d_11">
+    <path d="M 419.04 197.44
+L 643.68 197.44
+" clip-path="url(#p056be3748c)" style="fill: none; stroke: #176c60; stroke-width: 14"/>
+   </g>
+   <g id="line2d_12">
+    <path d="M 475.2 253.44
+L 475.2 109.44
+" clip-path="url(#p056be3748c)" style="fill: none; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #a84c16; stroke-width: 1.5"/>
+   </g>
+   <g id="line2d_13">
+    <path d="M 643.68 253.44
+L 643.68 109.44
+" clip-path="url(#p056be3748c)" style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #172d43; stroke-width: 1.5"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 138.24 253.44
+L 1036.8 253.44
+" style="fill: none; stroke: #b6c5d0; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #a84c16" x="475.2" y="145.44" transform="rotate(-0 475.2 145.44)">真实起点</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #172d43" x="643.68" y="145.44" transform="rotate(-0 643.68 145.44)">报警</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #17638c" x="278.64" y="231.04" transform="rotate(-0 278.64 231.04)">已提交</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #176c60" x="531.36" y="231.04" transform="rotate(-0 531.36 231.04)">仍在缓存</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: start; fill: #526476" x="149.472" y="171.84" transform="rotate(-0 149.472 171.84)">报警前停止晋升，缓存可覆盖故障尾段</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 13px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: start; fill: #172d43" x="138.24" y="94.44" transform="rotate(-0 138.24 94.44)">A  及时报警：延迟 1.5 s，小于 2 s 缓冲</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_5">
+    <path d="M 138.24 460.8
+L 1036.8 460.8
+L 1036.8 316.8
+L 138.24 316.8
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 475.2 460.8
+L 924.48 460.8
+L 924.48 316.8
+L 475.2 316.8
+z
+" clip-path="url(#p91efd151c5)" style="fill: #fff1e3; stroke: #fff1e3; stroke-linejoin: miter"/>
+   </g>
+   <g id="matplotlib.axis_3">
+    <g id="xtick_10">
+     <g id="line2d_14">
+      <g>
+       <use xlink:href="#m366c724e69" x="138.24" y="460.8" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_17">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="138.24" y="476.593125" transform="rotate(-0 138.24 476.593125)">7</text>
+     </g>
+    </g>
+    <g id="xtick_11">
+     <g id="line2d_15">
+      <g>
+       <use xlink:href="#m366c724e69" x="250.56" y="460.8" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_18">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="250.56" y="476.593125" transform="rotate(-0 250.56 476.593125)">8</text>
+     </g>
+    </g>
+    <g id="xtick_12">
+     <g id="line2d_16">
+      <g>
+       <use xlink:href="#m366c724e69" x="362.88" y="460.8" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_19">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="362.88" y="476.593125" transform="rotate(-0 362.88 476.593125)">9</text>
+     </g>
+    </g>
+    <g id="xtick_13">
+     <g id="line2d_17">
+      <g>
+       <use xlink:href="#m366c724e69" x="475.2" y="460.8" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_20">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="475.2" y="476.593125" transform="rotate(-0 475.2 476.593125)">10</text>
+     </g>
+    </g>
+    <g id="xtick_14">
+     <g id="line2d_18">
+      <g>
+       <use xlink:href="#m366c724e69" x="587.52" y="460.8" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_21">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="587.52" y="476.593125" transform="rotate(-0 587.52 476.593125)">11</text>
+     </g>
+    </g>
+    <g id="xtick_15">
+     <g id="line2d_19">
+      <g>
+       <use xlink:href="#m366c724e69" x="699.84" y="460.8" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_22">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="699.84" y="476.593125" transform="rotate(-0 699.84 476.593125)">12</text>
+     </g>
+    </g>
+    <g id="xtick_16">
+     <g id="line2d_20">
+      <g>
+       <use xlink:href="#m366c724e69" x="812.16" y="460.8" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_23">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="812.16" y="476.593125" transform="rotate(-0 812.16 476.593125)">13</text>
+     </g>
+    </g>
+    <g id="xtick_17">
+     <g id="line2d_21">
+      <g>
+       <use xlink:href="#m366c724e69" x="924.48" y="460.8" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_24">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="924.48" y="476.593125" transform="rotate(-0 924.48 476.593125)">14</text>
+     </g>
+    </g>
+    <g id="xtick_18">
+     <g id="line2d_22">
+      <g>
+       <use xlink:href="#m366c724e69" x="1036.8" y="460.8" style="fill: #526476; stroke: #526476; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_25">
+      <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #526476" x="1036.8" y="476.593125" transform="rotate(-0 1036.8 476.593125)">15</text>
+     </g>
+    </g>
+    <g id="text_26">
+     <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #172d43" x="587.52" y="492.120781" transform="rotate(-0 587.52 492.120781)">时间 / s</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_4"/>
+   <g id="line2d_23">
+    <path d="M 138.24 404.8
+L 699.84 404.8
+" clip-path="url(#p91efd151c5)" style="fill: none; stroke: #17638c; stroke-width: 14"/>
+   </g>
+   <g id="line2d_24">
+    <path d="M 699.84 404.8
+L 924.48 404.8
+" clip-path="url(#p91efd151c5)" style="fill: none; stroke: #176c60; stroke-width: 14"/>
+   </g>
+   <g id="line2d_25">
+    <path d="M 475.2 460.8
+L 475.2 316.8
+" clip-path="url(#p91efd151c5)" style="fill: none; stroke-dasharray: 5.55,2.4; stroke-dashoffset: 0; stroke: #a84c16; stroke-width: 1.5"/>
+   </g>
+   <g id="line2d_26">
+    <path d="M 924.48 460.8
+L 924.48 316.8
+" clip-path="url(#p91efd151c5)" style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #172d43; stroke-width: 1.5"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 138.24 460.8
+L 1036.8 460.8
+" style="fill: none; stroke: #b6c5d0; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="text_27">
+    <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #a84c16" x="475.2" y="352.8" transform="rotate(-0 475.2 352.8)">真实起点</text>
+   </g>
+   <g id="text_28">
+    <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #172d43" x="924.48" y="352.8" transform="rotate(-0 924.48 352.8)">报警</text>
+   </g>
+   <g id="text_29">
+    <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #17638c" x="419.04" y="438.4" transform="rotate(-0 419.04 438.4)">已提交</text>
+   </g>
+   <g id="text_30">
+    <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #176c60" x="812.16" y="438.4" transform="rotate(-0 812.16 438.4)">仍在缓存</text>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: middle; fill: #a13f43" x="587.52" y="380.8" transform="rotate(-0 587.52 380.8)">10 / 11 / 12 s 坏位姿仍在 trusted_poses</text>
+   </g>
+   <g id="text_32">
+    <text style="font-size: 13px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: start; fill: #172d43" x="138.24" y="301.8" transform="rotate(-0 138.24 301.8)">B  迟到报警：延迟 4 s，超过 2 s 缓冲</text>
+   </g>
+   <g id="PathCollection_1">
+    <defs>
+     <path id="m52846223d8" d="M -3.162278 6.324555
+L 0 3.162278
+L 3.162278 6.324555
+L 6.324555 3.162278
+L 3.162278 0
+L 6.324555 -3.162278
+L 3.162278 -6.324555
+L 0 -3.162278
+L -3.162278 -6.324555
+L -6.324555 -3.162278
+L -3.162278 0
+L -6.324555 3.162278
+z
+" style="stroke: #ffffff"/>
+    </defs>
+    <g clip-path="url(#p91efd151c5)">
+     <use xlink:href="#m52846223d8" x="475.2" y="404.8" style="fill: #a13f43; stroke: #ffffff"/>
+     <use xlink:href="#m52846223d8" x="587.52" y="404.8" style="fill: #a13f43; stroke: #ffffff"/>
+     <use xlink:href="#m52846223d8" x="699.84" y="404.8" style="fill: #a13f43; stroke: #ffffff"/>
+    </g>
+   </g>
+  </g>
+  <g id="text_33">
+   <text style="font-weight: 700; font-size: 22px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: start; fill: #172d43" x="40.32" y="26.496" transform="rotate(-0 40.32 26.496)">03  /  延迟提交能保护多长时间？</text>
+  </g>
+  <g id="text_34">
+   <text style="font-size: 10.6px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; text-anchor: start; fill: #526476" x="40.32" y="50.112" transform="rotate(-0 40.32 50.112)">替换原 Fig. 1 的随机信号曲线；这里是逻辑示意与可复现反例，不是 hall_01 实测</text>
+  </g>
+  <g id="text_35">
+   <text style="font-size: 10px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; fill: #526476" transform="translate(40.32 540.763438)">反例 R2：调用当前管理器，真实起点 10 s、14 s 报警、2 s 缓冲；创建的“8 s checkpoint”仍含 9–12 s 状态。</text>
+   <text style="font-size: 10px; font-family: 'Microsoft YaHei', 'DejaVu Sans'; fill: #526476" transform="translate(40.32 555.84)">结论：缓存只在有限检测延迟下防止新污染；更早的污染必须依赖真实历史 checkpoint 与可撤销日志。</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p056be3748c">
+   <rect x="138.24" y="109.44" width="898.56" height="144"/>
+  </clipPath>
+  <clipPath id="p91efd151c5">
+   <rect x="138.24" y="316.8" width="898.56" height="144"/>
+  </clipPath>
+ </defs>
+</svg>

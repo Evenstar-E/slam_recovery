@@ -1,3 +1,14 @@
+> **本仓库的 slam_recovery 研究扩展**
+>
+> 代码位于 [`slam_recovery/`](slam_recovery/)，研究方案见 [SLAM_RECOVERY_RESEARCH.md](SLAM_RECOVERY_RESEARCH.md)。
+> 新增 [2026-11-05 源码审阅与旧项目比较](docs/review_20261105/README.md)，以及 [7 张重绘架构、流程和证据图](docs/review_20261105/FIGURES.md)。
+> 当前扩展包含 Python 原型、宿主实验记录和离线构造；完整原生事务与独立验证仍有缺口，详见审阅。
+> 下方保留上游 MM-LINS 的介绍、图片、作者与引用，其已发表成果不等同本扩展已经获得相同验证。
+
+![slam_recovery 源码架构：原生 LIO、恢复研究层与尚未完成的原生交接](docs/review_20261105/figures/01_architecture.png)
+
+架构图参照 FAST-LIVO2 的视觉风格重新绘制。[矢量 SVG](docs/review_20261105/figures/01_architecture.svg) · [PDF](docs/review_20261105/figures/01_architecture.pdf) · [图注与实现边界](docs/review_20261105/FIGURES.md)
+
 <div align="center">
   <h1>MM-LINS</h1>
   <h2>a Multi-Map LiDAR-Inertial System for Over-Degenerate Environments</h2>
