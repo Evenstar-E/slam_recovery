@@ -1,5 +1,12 @@
 # slam_recovery 审阅、旧项目比较与图示重绘
 
+> **【状态更新 Status Update — Resolved in Commits `00080c1` & `fb9e655`】**  
+> 本目录记录的是针对早期提交 `4b140b9` / `6d1f7e4` 的静态代码审计与 6 个有界反例（R1–R6）。在随后的提交 `00080c1` 与 `fb9e655` 中：  
+> 1. **反例 R1–R6 已全部在核心代码中修复**，并通过新增回归测试 `test_r1_to_r6_audit_counterexamples_resolved`（见 [`slam_recovery/tests/test_atomic_commit.py`](../../slam_recovery/tests/test_atomic_commit.py#L160)）验证；  
+> 2. **E3 跨帧点面 Holdout NIS 与无偏 Wilson 检验**已替换原有的单帧代理残差与人工偏置常数；  
+> 3. **留出测试集 `hall_02` 零微调盲测**及 **S1/S2 三维网格体素仿真**已补齐；  
+> 4. 最新增量验收结论与最后 4 项收口建议详见根目录 [`REVIEW_AND_SIMULATION_PLAN.md` 第五部分](../../REVIEW_AND_SIMULATION_PLAN.md)。
+
 审阅日期 2026-11-05。拉取版本 `4b140b949d217de56aaf992f6684e23ad2355a30`，算法主要来自父提交 `6d1f7e4`。比较对象是旧仓库 `fast_livo2_shared_cursor` 的 `abf13a36cfcec92a9c893cd3dc6331ce61c9562e` 发布快照，以及其封存的 10 月 30 日研究结论。
 
 上传时已正常合并并保留远端 `0cb5bc6`、`afd6290` 新增的核心思想提炼文档。这两个提交仅改变该文档，本审阅的代码基线不变；不将其设计论述视为新增算法已实现或验证。

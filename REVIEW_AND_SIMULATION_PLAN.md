@@ -151,3 +151,51 @@
    - 跑通实验 S1（R4 vs. R5 反事实闭环）与实验 S2（基于真值 3D Mesh 的体素污染率），将生成的真实 manifest 和点云污染对比图增补进论文第 VII 节。
 3. **补齐 M2DGR 冻结测试集（2～3 天完成）**
    - 在未调参的测试集序列（至少 `hall_02`、`room_dark_02`、`street_08`）上跑通 B0、B2、B6，彻底满足研究方案中的开发/测试隔离协议。
+
+---
+
+## 第五部分：针对最新提交（`00080c1` & `fb9e655`）的增量验收结论与 4 条最终收口意见
+
+> **验收日期**：2026-11-05  
+> **验收对象**：`00080c1`（S1/S2 三维网格体素仿真、跨帧点面 Holdout NIS、零字面常数 E2、留出测试集 `hall_02` 盲测）与 `fb9e655`（6 个有界反例 R1–R6 完整修复与回归测试集）。
+
+### 5.1 已通过验收的里程碑（Pass ✅）
+
+1. **6 项有界反例（R1–R6）100% 闭环并固化为单元测试**（`slam_recovery/tests/test_atomic_commit.py:160-212`）：
+   - **R1（Checkpoint Keyframe ID 与 Shape 哈希绑定）**：`Checkpoint.compute_hash()` 已将 `f"kf:{int(k)}:shape:{arr.shape}:"` 纳入 SHA-256，消除篡改关键帧 ID 的哈希碰撞；
+   - **R2（迟检 $\Delta t_{\mathrm{det}} > \Delta t_{\mathrm{margin}}$ 的 Undo-Log 撤销回滚）**：`TrustedMapTransactionManager` 新增 `promoted_history` 撤销日志，当 `t_q_start` 早于已晋升帧时，自动从 `trusted_poses` 与 `trusted_factors` 中剥离污染帧并退回隔离队列，同时恢复 IMU 零偏；
+   - **R3（非有限值 `NaN/Inf` 拦截）**：`evaluate_four_mode_gate()` 入口强制检查 `repaired_poses`、`info_after_6x6`、`cov_after_6x6` 与 `holdout_nis` 的 `np.isfinite()`，含 `NaN/Inf` 的候选分支一律打回 Mode 3/4；
+   - **R4（旋转-平移 6D 耦合弱方向检测）**：`analyze_decoupled_information()` 增加了完整 $6\times 6$ 矩阵特征分解，当 $\lambda_{\min}(\Lambda_{6\times 6}) < \min(\lambda_{\min}^r, \lambda_{\min}^t)$ 时准确捕获跨块耦合退化方向；
+   - **R5（Holdout 残差截断与内点覆盖率联锁门控）**：`compute_disjoint_holdout_point_to_plane_nis()` 新增 `inlier_coverage < 0.70` 约束，若超过 $30\%$ 的留出点残差达到或超过 $2.0\,\mathrm{m}$ 截断阈值，则禁止截断分母，直接返回全量未截断均方残差；
+   - **R6（Mode 2 原子提交同步更新因子与偏置）**：`CandidateMap` 新增 `repaired_factor_ids` 与 `repaired_bias_acc/gyr`，Mode 2 提交时同步更新 `trusted_poses`、`trusted_factors` 和 IMU 零偏。
+2. **E3 跨帧点面 Holdout NIS 与无偏 Wilson 检验落地**（`evaluate_e3_orbslam3.py:117-162, 414-433`）：
+   - 彻底移除了单帧奇偶点 + `aux_in_host` 代理残差，改用相隔 5 帧的真实点云对 $(\mathcal{S}_{k-5}, \mathcal{S}_k)$ 仅按候选轨迹相对位移 $\Delta p_{\mathrm{cand}}$ 变换后的点到面配准 NIS，并删除了 `+0.04`/`+0.05` 与 `*1.15`/`*1.25` 人工偏置常数。
+3. **留出测试集 `hall_02` 零微调盲测补齐**（`evaluate_hall_02.py` & 论文表 II、表 III）：
+   - 在冻结开发集超参数下完成了 `hall_02` 四宿主清洁基线、88% 塑料袋遮挡（FAST-LIO2 $4.53\to 0.28\,\mathrm{m}$、MM-LINS $4.03\to 0.24\,\mathrm{m}$、LIO-SAM $3.42\to 0.24\,\mathrm{m}$）与 ORB-SLAM3 严重暗光（窗口 RMSE $1.84\to 0.61\,\mathrm{m}$）评测。
+
+---
+
+### 5.2 截稿前需收口的 4 条具体改进意见（Action Required ⚠️）
+
+#### 意见 1：将 Wilson 序列收益与重入连续性检查正式并入 `validate_and_resolve()` 门控内部（消除“先提交字典、后算 Wilson”的顺序倒挂）
+- **现状与问题**：在 `evaluate_e3_orbslam3.py:412-432` 中，脚本先调用了 `val_report = tx_mgr.validate_and_resolve(candidate=cand)`（此时若满足 FIM 与 Holdout NIS，`trusted_poses` 字典已被原地修改且状态已置为 `HEALTHY`），随后在第 421–432 行才计算 `evaluate_paired_sequential_benefit()`。后验 Wilson 拒绝无法撤销已发生的字典合入。
+- **收口方案**：在 `CandidateMap`（`slam_recovery/core.py:171`）中增加可选字段 `paired_benefit_approved: bool = True`（或 `wilson_lower_bound` 与 `reentry_pos_jump_m`），并在调用 `validate_and_resolve()` **之前**完成 `evaluate_paired_sequential_benefit()`，将其作为 Mode 2 原子提交的前置必要条件。
+
+#### 意见 2：在 `compute_6dof_point_to_plane_fim()` 中同步应用 R4 的 6D 耦合弱方向逻辑
+- **现状与问题**：虽然 `slam_recovery/health/detector.py:59-81` 的 `analyze_decoupled_information()` 已经修复了 R4（同时检查 $6\times 6$ 全矩阵最小特征值），但 `slam_recovery/validation/fim_and_holdout.py:83-94` 中的 `compute_6dof_point_to_plane_fim()` 仍只计算 `fim_u[:3, :3]` 与 `fim_u[3:, 3:]` 两个 $3\times 3$ 对角块，并将 `weak_6d` 仅填入前 3 维或后 3 维。
+- **收口方案**：在 `compute_6dof_point_to_plane_fim()` 和 `evaluate_e3_orbslam3.py:152-159` 中统一加入 `vals_6d, vecs_6d = np.linalg.eigh(0.5 * (fim_u + fim_u.T))` 判断，确保检测端与验证端的 6D 弱方向定义完全一致。
+
+#### 意见 3：清理 `run_s1_s2_simulation_experiments.py` 中的 3 处人为缩放系数，并在论文中精准界定 `ONLINE_SIM_3D_MESH` 的物理性质
+- **现状与问题**：
+  1. `run_s1_s2_simulation_experiments.py:231` 对 B5 的三维体素污染率硬乘了 `0.5 *`（`0.5 * arena.compute_3d_voxel_contamination_ratio(voxels_b5)`），理由是“一半宿主污染、一半宿主不污染”，容易被审稿人视为人为系数；
+  2. `run_s1_s2_simulation_experiments.py:240, 257, 271` 在 R5 与 B6 中手工传入了对角矩阵 `aux_or_loop_info_6x6=np.diag([30, 30, 30, 22.0, 22.0, 22.0])`；
+  3. `transaction_manager_node.py:213` 将 `cov_after_6x6` 乘了 `0.05`（`cov_after * 0.05`）以匹配均值归一化 FIM 的尺度。
+- **收口方案**：
+  - 分别独立报告 `B5_FAST_LIO2` 与 `B5_LIO_SAM` 的三维体素污染率（或直接报告未乘 `0.5` 的原始单模态盲目提交污染率），去掉 `0.5 *`；
+  - 将 `compute_6dof_point_to_plane_fim` 的信息矩阵尺度与 `sigma_tol` 物理对齐，使 R5 在重访 Zone A 柱面与端墙时完全依靠真实点面雅可比 $\sum J_i^\top R_i^{-1} J_i$ 自然跨过 $\tau_{\mathrm{info}}=25.0$ 和 $\Sigma_{\mathrm{tol}}=0.50$，无需手工传入对角矩阵和 `* 0.05`；
+  - 在 `paper_main.tex` 第 VI-E 节和图 2/图 3 图注中明确标注 S1/S2 为 **解析三维网格光线采样仿真（Analytical 3D-Mesh Ray-Sampling Simulation, Provenance: `ONLINE_SIM_3D_MESH`）**，与真实宿主 rosbag 实验（`REAL_HOST` / `INJECTION`）严格区分。
+
+#### 意见 4：在 `docs/review_20261105/README.md` 顶部标注 R1–R6 已解决状态
+- **现状与问题**：`d5bd4df` 提交的 `docs/review_20261105/README.md` 记录的是 `fb9e655` 之前的旧版缺陷。若不加状态说明，外部读者浏览仓库时会误以为 R1–R6 尚未修复。
+- **收口方案**：在 `docs/review_20261105/README.md` 顶部添加醒目的版本演进说明，逐条指出 R1–R6 及跨帧 Holdout NIS 已在 `00080c1` 与 `fb9e655` 中完成修复并由回归测试集验证。
+
