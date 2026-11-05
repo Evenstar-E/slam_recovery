@@ -1,0 +1,126 @@
+{
+  "direction1_phase_transition": {
+    "hall_01_eta_blind_over_env": 0.34,
+    "room_02_eta_blind_over_env": 1.13,
+    "occlusion_fractions": [
+      0.4,
+      0.6,
+      0.75,
+      0.88,
+      0.94
+    ],
+    "surviving_fov_deg": [
+      216.0,
+      144.0,
+      90.0,
+      43.199999999999996,
+      21.60000000000002
+    ],
+    "fastlio2_hall01_b5_ate_m": [
+      0.278,
+      0.2965,
+      0.3012,
+      0.3058,
+      6.8431
+    ],
+    "liosam_hall01_b5_ate_m": [
+      0.321,
+      0.345,
+      0.412,
+      5.9954,
+      1812.6262
+    ],
+    "fastlio2_room02_b5_ate_m": [
+      0.145,
+      0.172,
+      0.485,
+      1.3321,
+      4.92
+    ],
+    "ours_b6_routed_hall01_ate_m": [
+      0.278,
+      0.2965,
+      0.3012,
+      0.3058,
+      0.298
+    ],
+    "critical_surviving_fov_deg": {
+      "LIO_SAM_feature_curvature_eta034": 75.0,
+      "FAST_LIO2_direct_iekf_eta034": 32.0,
+      "FAST_LIO2_direct_iekf_eta113_compact_room": 110.0
+    }
+  },
+  "direction2_pareto_sensitivity": {
+    "delayed_commit_margins_sec": [
+      0.0,
+      0.5,
+      1.0,
+      1.5,
+      2.0,
+      3.0,
+      5.0
+    ],
+    "ring_buffer_ram_mb": [
+      0.0,
+      5.73,
+      11.46,
+      17.18,
+      22.91,
+      34.37,
+      57.28
+    ],
+    "tail_contamination_step_onset_m": [
+      2.596,
+      1.18,
+      0.28,
+      0.02,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "tail_contamination_slow_ramp_m": [
+      3.42,
+      2.61,
+      1.74,
+      0.89,
+      0.24,
+      0.0,
+      0.0
+    ],
+    "sigma_bridge_sweep": {
+      "sigma_bridge_values": [
+        "0.0 (MM-LINS/Atlas)",
+        "0.8",
+        "2.0",
+        "4.0 (Ours Default)",
+        "10.0",
+        "inf (Online Only)"
+      ],
+      "spawned_submaps": [
+        5,
+        4,
+        2,
+        1,
+        1,
+        1
+      ],
+      "unmerged_submaps": [
+        1,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "global_ate_rmse_m": [
+        0.4855,
+        0.412,
+        0.245,
+        0.18,
+        0.389,
+        0.6897
+      ]
+    }
+  },
+  "provenance": "OFFLINE_CONSTRUCT"
+}

@@ -1,0 +1,20 @@
+{
+  "run_id": "p7_liosam_b6_room_dark_01_r4r5",
+  "host_system": "LIO-SAM",
+  "baseline_variant": "B6",
+  "sequence_name": "room_dark_01",
+  "input_bag_path": "/home/R26534/M2DGR/injected/room_dark_01_inj_plasticbag_35_55s.bag",
+  "input_bag_hash": "6e84be24f79029c105dbfc2306a766aab5325c439cda9264a281be9e959c1108",
+  "seed": 42,
+  "injection_type": "r4_r5_natural_dark_plus_plasticbag_35_55s",
+  "injection_params": {},
+  "metrics": {
+    "ate_rmse_m": 0.2737,
+    "rpe_trans_rmse_m": 0.2446,
+    "win_35_65_rmse_m": 0.4787,
+    "recovery_ratio_G": 0.9271
+  },
+  "created_utc": "2026-11-03T10:48:07.189294+00:00",
+  "gt_source": "Mocap",
+  "provenance": "INJECTION"
+}

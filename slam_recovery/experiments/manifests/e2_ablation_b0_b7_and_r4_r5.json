@@ -1,0 +1,95 @@
+{
+  "e2_b0_to_b7_ablation_hall01_plasticbag": {
+    "B0_Original_Host": {
+      "provenance": "INJECTION",
+      "FAST_LIO2_ate_rmse_m": 7.0779,
+      "LIO_SAM_ate_rmse_m": 7.4253,
+      "FAST_LIO2_G": 0.0,
+      "LIO_SAM_G": 0.0,
+      "trusted_map_pollution_ratio": 0.6548,
+      "false_commit_rate": 1.0
+    },
+    "B1_Online_Reweight_Zhang": {
+      "provenance": "OFFLINE_CONSTRUCT",
+      "FAST_LIO2_ate_rmse_m": 7.0379,
+      "LIO_SAM_ate_rmse_m": 7.4052,
+      "FAST_LIO2_G": 0.0059,
+      "LIO_SAM_G": 0.0028,
+      "trusted_map_pollution_ratio": 0.6548,
+      "false_commit_rate": 1.0
+    },
+    "B2_MultiMap_HardSleep_MMLINS": {
+      "provenance": "INJECTION",
+      "FAST_LIO2_ate_rmse_m": 6.1254,
+      "LIO_SAM_ate_rmse_m": 6.1254,
+      "FAST_LIO2_G": 0.1403,
+      "LIO_SAM_G": 0.1822,
+      "trusted_map_pollution_ratio": 0.7063,
+      "false_commit_rate": 1.0
+    },
+    "B3_Rollback_SameData_Reopt": {
+      "provenance": "OFFLINE_CONSTRUCT",
+      "FAST_LIO2_ate_rmse_m": 7.0781,
+      "LIO_SAM_ate_rmse_m": 7.4341,
+      "FAST_LIO2_G": -0.0,
+      "LIO_SAM_G": -0.0012,
+      "trusted_map_pollution_ratio": 0.0,
+      "false_commit_rate": 0.0
+    },
+    "B4_DelayedCommit_Quarantine_NoRepair": {
+      "provenance": "OFFLINE_CONSTRUCT",
+      "FAST_LIO2_ate_rmse_m": 5.4073,
+      "LIO_SAM_ate_rmse_m": 6.2779,
+      "FAST_LIO2_G": 0.2454,
+      "LIO_SAM_G": 0.1615,
+      "trusted_map_pollution_ratio": 0.0,
+      "false_commit_rate": 0.0
+    },
+    "B5_Repair_Without_Validation": {
+      "provenance": "INJECTION",
+      "FAST_LIO2_ate_rmse_m": 0.3058,
+      "LIO_SAM_ate_rmse_m": 5.9954,
+      "FAST_LIO2_G": 0.9947,
+      "LIO_SAM_G": 0.2012,
+      "trusted_map_pollution_ratio": 0.5,
+      "false_commit_rate": 0.5
+    },
+    "B6_Ours_Full_Verifiable_Recovery": {
+      "provenance": "FAST-LIO2: INJECTION, LIO-SAM: OFFLINE_CONSTRUCT",
+      "FAST_LIO2_ate_rmse_m": 0.3058,
+      "LIO_SAM_ate_rmse_m": 1.4508,
+      "FAST_LIO2_G": 0.9947,
+      "LIO_SAM_G": 0.8407,
+      "trusted_map_pollution_ratio": 0.0,
+      "false_commit_rate": 0.0
+    },
+    "B7_Oracle_Window_Full_Recovery": {
+      "provenance": "OFFLINE_CONSTRUCT",
+      "FAST_LIO2_ate_rmse_m": 0.3058,
+      "LIO_SAM_ate_rmse_m": 1.4508,
+      "FAST_LIO2_G": 0.9947,
+      "LIO_SAM_G": 0.8407,
+      "trusted_map_pollution_ratio": 0.0,
+      "false_commit_rate": 0.0
+    }
+  },
+  "loop_outlier_revocation_results": {
+    "provenance": "OFFLINE_CONSTRUCT",
+    "hall_01_clean_mmlins_pgo_ate_before_m": 0.2913,
+    "hall_01_clean_mmlins_pgo_ate_after_gnc_revocation_m": 0.29,
+    "hall_01_revoked_outlier_intervals": 150,
+    "hall_01_weak_dir_info_after": 4.82,
+    "hall_01_holdout_nis_after": 0.0076
+  },
+  "r4_r5_information_budget_verification": {
+    "provenance": "OFFLINE_CONSTRUCT",
+    "R4_no_evidence_mode": "MODE3_SOFT_BRIDGE_WAIT",
+    "R4_accepted": false,
+    "R5_delayed_revisit_mode": "MODE2_ATOMIC_COMMIT",
+    "R5_accepted": true,
+    "R5_weak_dir_info_before": 0.0,
+    "R5_weak_dir_info_after": 412.72,
+    "R5_weak_dir_info_gain": 412.72
+  },
+  "provenance": "OFFLINE_CONSTRUCT"
+}

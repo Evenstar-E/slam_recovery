@@ -1,0 +1,19 @@
+# Python bytecode & caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Extracted raw image & depth frame dumps (hundreds of MBs of PNGs)
+slam_recovery/experiments/e3_orbslam3/depth/
+slam_recovery/experiments/e3_orbslam3/rgb_*/
+slam_recovery/experiments/e3_orbslam3/rgbd_*/
+slam_recovery/experiments/e3_orbslam3/room_02/depth/
+slam_recovery/experiments/e3_orbslam3/room_02/rgb_*/
+slam_recovery/experiments/e3_orbslam3/room_dark_01/depth/
+slam_recovery/experiments/e3_orbslam3/room_dark_01/rgb_*/
+
+# Large ROS bags & archives
+*.bag
+*.zip
+FAST-LIO/doc/

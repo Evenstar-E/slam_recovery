@@ -1,0 +1,24 @@
+{
+  "run_id": "p0_mmlins_b2_hall_01_clean",
+  "host_system": "MM-LINS",
+  "baseline_variant": "B2",
+  "sequence_name": "hall_01",
+  "input_bag_path": "/home/R26534/M2DGR/extracted/hall_01_fl.bag",
+  "input_bag_hash": "ba1d8be61f33e9f1d4709710fbf5dbd5be6198bb0f8734d0d9d36be57389f02f",
+  "seed": 42,
+  "injection_type": "clean",
+  "injection_params": {},
+  "metrics": {
+    "num_matched_poses": 2524,
+    "path_length_m": 203.6878,
+    "ate_rmse_m": 0.2913,
+    "ate_mean_m": 0.2344,
+    "ate_max_m": 1.0495,
+    "rpe_trans_rmse_m": 0.2381,
+    "end_to_end_error_m": 4.2921,
+    "false_hibernation_triggers": 0
+  },
+  "created_utc": "2026-11-03T06:37:57.446947+00:00",
+  "gt_source": "Leica",
+  "provenance": "REAL_HOST"
+}

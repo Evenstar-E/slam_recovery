@@ -1,0 +1,19 @@
+{
+  "run_id": "p1_mmlins_b2_hall_01_plasticbag",
+  "host_system": "MM-LINS",
+  "baseline_variant": "B2",
+  "sequence_name": "hall_01",
+  "input_bag_path": "/home/R26534/M2DGR/injected/hall_01_inj_plasticbag_120_140s.bag",
+  "input_bag_hash": "b9f943550af5cab5983bdfcf36f164570583a35976d9c8e62b74605beacaf133",
+  "seed": 42,
+  "injection_type": "plastic_bag_occlusion_120_140s",
+  "injection_params": {},
+  "metrics": {
+    "ate_rmse_m": 5.962,
+    "rpe_trans_rmse_m": 1.3491,
+    "recovery_ratio_G": 0.1875
+  },
+  "created_utc": "2026-11-03T07:36:38.979474+00:00",
+  "gt_source": "Leica",
+  "provenance": "INJECTION"
+}

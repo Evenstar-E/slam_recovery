@@ -1,0 +1,34 @@
+{
+  "run_id": "e3_orbslam3_b0_hall_01_severe_g005",
+  "host_system": "ORB-SLAM3",
+  "baseline_variant": "B0",
+  "sequence_name": "hall_01",
+  "input_bag_path": "/home/R26534/M2DGR/raw/hall_01.bag",
+  "input_bag_hash": "8be9dd00e87ae34bae9809eab04fe9df44b68e6756b7ea87664d4e03bfc8ac7b",
+  "provenance": "INJECTION",
+  "gt_source": "Leica",
+  "seed": 42,
+  "injection_type": "visual_exposure_drop",
+  "injection_params": {
+    "gain_g": 0.05,
+    "window_sec": [
+      120.0,
+      140.0
+    ]
+  },
+  "metrics": {
+    "provenance": "INJECTION",
+    "tracked_frames": 4954,
+    "dropped_frames_in_120_140s": 174,
+    "keyframes": 814,
+    "ate_rmse_m": 1.3755,
+    "ate_mean_m": 1.2585,
+    "ate_max_m": 3.381,
+    "rpe_trans_rmse_m": 0.403,
+    "window_118_152s_rmse_m": 1.1396,
+    "window_118_152s_max_m": 1.812,
+    "recovery_ratio_G": 0.0,
+    "trusted_map_pollution_ratio": 0.625
+  },
+  "created_utc": "2026-11-05T03:28:47.916463+00:00"
+}

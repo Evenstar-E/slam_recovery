@@ -1,0 +1,20 @@
+{
+  "run_id": "p1_fastlio2_b6_hall_01_geodegen",
+  "host_system": "FAST-LIO2+slam_recovery",
+  "baseline_variant": "B6",
+  "sequence_name": "hall_01",
+  "input_bag_path": "/home/R26534/M2DGR/injected/hall_01_repaired_geodegen_120_140s.bag",
+  "input_bag_hash": "5add2ead1c3619b1a98605c954c583b242dd71948353a996adf9870dceb1eabb",
+  "seed": 42,
+  "injection_type": "directional_corridor_geodegen_120_140s",
+  "injection_params": {},
+  "metrics": {
+    "ate_rmse_m": 0.2959,
+    "rpe_trans_rmse_m": 0.1771,
+    "win_120_160_rmse_m": 0.2081,
+    "recovery_ratio_G": 0.996378
+  },
+  "created_utc": "2026-11-03T09:08:37.891330+00:00",
+  "gt_source": "Leica",
+  "provenance": "INJECTION"
+}

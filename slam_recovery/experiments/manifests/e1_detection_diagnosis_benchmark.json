@@ -1,0 +1,60 @@
+{
+  "provenance": "SYNTHETIC",
+  "note": "6-DoF point-to-plane FIM + real sklearn HistGBDT/IsolationForest + TrustedMapTransactionManager execution",
+  "methods": {
+    "1_MMLINS_Cov_ODD": {
+      "event_recall": 0.1667,
+      "plastic_bag_recall": 0.0,
+      "segment_iou": 0.1667,
+      "mean_latency_sec": 0.0,
+      "mean_tail_pollution_frames": 16.67,
+      "diagnosis_accuracy": null,
+      "unseen_ood_safe_rate": null
+    },
+    "2_Zhang_MinEig": {
+      "event_recall": 0.1667,
+      "plastic_bag_recall": 0.0,
+      "segment_iou": 0.1667,
+      "mean_latency_sec": 0.0,
+      "mean_tail_pollution_frames": 16.67,
+      "diagnosis_accuracy": null,
+      "unseen_ood_safe_rate": null
+    },
+    "3_NIS_Fixed": {
+      "event_recall": 0.7667,
+      "plastic_bag_recall": 1.0,
+      "segment_iou": 0.6283,
+      "mean_latency_sec": 0.1913,
+      "mean_tail_pollution_frames": 5.4,
+      "diagnosis_accuracy": null,
+      "unseen_ood_safe_rate": null
+    },
+    "4_NIS_CUSUM": {
+      "event_recall": 0.8333,
+      "plastic_bag_recall": 1.0,
+      "segment_iou": 0.654,
+      "mean_latency_sec": 0.624,
+      "mean_tail_pollution_frames": 5.93,
+      "diagnosis_accuracy": null,
+      "unseen_ood_safe_rate": null
+    },
+    "5_Trained_HistGBDT_IForest": {
+      "event_recall": 1.0,
+      "plastic_bag_recall": 1.0,
+      "segment_iou": 0.7971,
+      "mean_latency_sec": 0.0,
+      "mean_tail_pollution_frames": 0.0,
+      "diagnosis_accuracy": 0.4,
+      "unseen_ood_safe_rate": 0.0
+    },
+    "6_Ours_Joint_SignatureMatrix": {
+      "event_recall": 1.0,
+      "plastic_bag_recall": 1.0,
+      "segment_iou": 0.9511,
+      "mean_latency_sec": 0.0,
+      "mean_tail_pollution_frames": 0.0,
+      "diagnosis_accuracy": 1.0,
+      "unseen_ood_safe_rate": 1.0
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "run_id": "p1_mmlins_b2_hall_01_geodegen",
+  "host_system": "MM-LINS",
+  "baseline_variant": "B2",
+  "sequence_name": "hall_01",
+  "input_bag_path": "/home/R26534/M2DGR/injected/hall_01_inj_geodegen_120_140s.bag",
+  "input_bag_hash": "93fca17d4f3acff04ba946230553079d2dcd14b5ff3e11b3b701cda53068a19d",
+  "seed": 42,
+  "injection_type": "directional_corridor_geodegen_120_140s",
+  "injection_params": {},
+  "metrics": {
+    "ate_rmse_m": 7.3747,
+    "rpe_trans_rmse_m": 3.1125,
+    "win_120_160_rmse_m": 0.7515,
+    "recovery_ratio_G": 0.0
+  },
+  "created_utc": "2026-11-03T08:51:18.129725+00:00",
+  "gt_source": "Leica",
+  "provenance": "INJECTION"
+}

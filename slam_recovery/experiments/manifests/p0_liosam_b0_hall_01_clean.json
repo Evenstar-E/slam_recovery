@@ -1,0 +1,23 @@
+{
+  "run_id": "p0_liosam_b0_hall_01_clean",
+  "host_system": "LIO-SAM",
+  "baseline_variant": "B0",
+  "sequence_name": "hall_01",
+  "input_bag_path": "/home/R26534/M2DGR/raw/hall_01.bag",
+  "input_bag_hash": "8be9dd00e87ae34bae9809eab04fe9df44b68e6756b7ea87664d4e03bfc8ac7b",
+  "seed": 42,
+  "injection_type": "clean",
+  "injection_params": {},
+  "metrics": {
+    "num_matched_poses": 1695,
+    "path_length_m": 216.2916,
+    "ate_rmse_m": 0.3189,
+    "ate_mean_m": 0.2733,
+    "ate_max_m": 0.9969,
+    "rpe_trans_rmse_m": 0.251,
+    "end_to_end_error_m": 9.859
+  },
+  "created_utc": "2026-11-03T06:14:42.474772+00:00",
+  "gt_source": "Leica",
+  "provenance": "REAL_HOST"
+}

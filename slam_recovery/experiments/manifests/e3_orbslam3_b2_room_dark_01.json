@@ -1,0 +1,35 @@
+{
+  "run_id": "e3_orbslam3_b2_room_dark_01",
+  "host_system": "ORB-SLAM3",
+  "baseline_variant": "B2",
+  "sequence_name": "room_dark_01",
+  "input_bag_path": "/home/R26534/M2DGR/raw/room_dark_01.bag",
+  "input_bag_hash": "b2bcb632c27ec1d507c133af24bff7eea4d3f304968beedf896e9d74e04fa13c",
+  "provenance": "REAL_HOST",
+  "gt_source": "Mocap",
+  "seed": 42,
+  "injection_type": "real_world_natural_low_light",
+  "injection_params": {
+    "mean_pixel_intensity_p5_p50": [
+      14.12,
+      21.83
+    ]
+  },
+  "metrics": {
+    "provenance": "REAL_HOST",
+    "total_sequence_frames": 1545,
+    "tracked_frames_all_submaps": 1364,
+    "tracked_frames_active_map3": 1290,
+    "lost_frames": 181,
+    "unmerged_tail_frames_map4": 74,
+    "num_spawned_submaps": 5,
+    "num_final_unmerged_maps_in_atlas": 2,
+    "all_submaps_ate_rmse_m": 0.4855,
+    "all_submaps_ate_max_m": 1.9964,
+    "all_submaps_rpe_rmse_m": 0.3875,
+    "active_map3_only_ate_rmse_m": 0.3694,
+    "recovery_ratio_G_vs_B0_full": 0.6823,
+    "trusted_map_pollution_ratio": 0.248
+  },
+  "created_utc": "2026-11-05T03:28:51.448311+00:00"
+}

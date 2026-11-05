@@ -1,0 +1,20 @@
+{
+  "run_id": "p1_fastlio2_b0_hall_01_turnsync",
+  "host_system": "FAST-LIO2",
+  "baseline_variant": "B0",
+  "sequence_name": "hall_01",
+  "input_bag_path": "/home/R26534/M2DGR/injected/hall_01_inj_turn_sync_280_300s.bag",
+  "input_bag_hash": "b9f943550af5cab5983bdfcf36f164570583a35976d9c8e62b74605beacaf133",
+  "seed": 42,
+  "injection_type": "turn_sync_drift_280_300s",
+  "injection_params": {},
+  "metrics": {
+    "ate_rmse_m": 0.2871,
+    "rpe_trans_rmse_m": 0.1712,
+    "win_280_315_rmse_m": 0.4754,
+    "win_max_m": 1.0409
+  },
+  "created_utc": "2026-11-03T09:37:35.479299+00:00",
+  "gt_source": "Leica",
+  "provenance": "INJECTION"
+}

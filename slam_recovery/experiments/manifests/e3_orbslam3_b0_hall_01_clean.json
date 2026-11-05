@@ -1,0 +1,31 @@
+{
+  "run_id": "e3_orbslam3_b0_hall_01_clean",
+  "host_system": "ORB-SLAM3",
+  "baseline_variant": "B0",
+  "sequence_name": "hall_01",
+  "input_bag_path": "/home/R26534/M2DGR/raw/hall_01.bag",
+  "input_bag_hash": "8be9dd00e87ae34bae9809eab04fe9df44b68e6756b7ea87664d4e03bfc8ac7b",
+  "provenance": "REAL_HOST",
+  "gt_source": "Leica",
+  "seed": 42,
+  "injection_type": "clean",
+  "injection_params": {
+    "sensor_mode": "RGB-D (D435i Color + LiDAR-Projected Depth)"
+  },
+  "metrics": {
+    "num_tracked_frames": 5228,
+    "num_keyframes": 504,
+    "num_matched_poses": 3349,
+    "path_length_m": 276.2394,
+    "ate_rmse_m": 0.5198,
+    "ate_mean_m": 0.4817,
+    "ate_max_m": 1.2636,
+    "rpe_trans_rmse_m": 0.2278,
+    "keyframe_ate_rmse_m": 0.5048,
+    "window_118_152s_rmse_m": 0.5288,
+    "false_quarantine_triggers": 0,
+    "mono_inertial_partial_59s_ate_rmse_m": 5.511,
+    "mono_inertial_partial_59s_coverage_ratio": 0.17
+  },
+  "created_utc": "2026-11-05T03:28:47.468950+00:00"
+}

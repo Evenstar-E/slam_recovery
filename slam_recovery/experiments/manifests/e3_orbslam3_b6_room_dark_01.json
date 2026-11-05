@@ -1,0 +1,46 @@
+{
+  "run_id": "e3_orbslam3_b6_room_dark_01",
+  "host_system": "ORB-SLAM3",
+  "baseline_variant": "B6",
+  "sequence_name": "room_dark_01",
+  "input_bag_path": "/home/R26534/M2DGR/raw/room_dark_01.bag",
+  "input_bag_hash": "b2bcb632c27ec1d507c133af24bff7eea4d3f304968beedf896e9d74e04fa13c",
+  "provenance": "OFFLINE_CONSTRUCT",
+  "gt_source": "Mocap",
+  "seed": 42,
+  "injection_type": "real_world_natural_low_light",
+  "injection_params": {
+    "mean_pixel_intensity_p5_p50": [
+      14.12,
+      21.83
+    ]
+  },
+  "metrics": {
+    "provenance": "OFFLINE_CONSTRUCT",
+    "total_sequence_frames": 1545,
+    "tracked_frames": 1545,
+    "lost_frames": 0,
+    "unmerged_maps": 0,
+    "ate_rmse_m": 0.2113,
+    "ate_mean_m": 0.1946,
+    "ate_max_m": 0.5298,
+    "rpe_trans_rmse_m": 0.0709,
+    "path_length_m": 44.4602,
+    "same_host_clean_ref_room02_ate_m": 0.2373,
+    "recovery_ratio_G_vs_B0_full": 1.0332,
+    "recovery_ratio_G_vs_B2_Atlas_samehost_ref": 1.1046,
+    "recovery_ratio_G_vs_B2_Atlas_lidar_ref": 0.8682,
+    "b5_unvalidated_concat_ate_rmse_m": 0.6338,
+    "b5_reentry_position_jump_m": 0.0898,
+    "b5_rejected_by_mode2": true,
+    "b5_rejection_reason": "wilson_sequential_benefit_lower_bound_failed",
+    "gate_decision": "MODE3_SOFT_BRIDGE_WAIT",
+    "atomic_commit_accepted": false,
+    "holdout_nis": 1.7815,
+    "wilson_sequential_lower_bound": 0.9966,
+    "reentry_position_jump_m": 0.0349,
+    "weak_dir_info_after": 17.66,
+    "trusted_map_pollution_ratio": 0.0
+  },
+  "created_utc": "2026-11-05T03:28:51.461724+00:00"
+}

@@ -1,0 +1,19 @@
+{
+  "run_id": "p1_liosam_b0_hall_01_plasticbag",
+  "host_system": "LIO-SAM",
+  "baseline_variant": "B0",
+  "sequence_name": "hall_01",
+  "input_bag_path": "/home/R26534/M2DGR/injected/hall_01_inj_plasticbag_120_140s.bag",
+  "input_bag_hash": "b9f943550af5cab5983bdfcf36f164570583a35976d9c8e62b74605beacaf133",
+  "seed": 42,
+  "injection_type": "plastic_bag_occlusion_120_140s",
+  "injection_params": {},
+  "metrics": {
+    "ate_rmse_m": 5.9644,
+    "rpe_trans_rmse_m": 1.2943,
+    "recovery_ratio_G": 0.0
+  },
+  "created_utc": "2026-11-03T07:36:38.970622+00:00",
+  "gt_source": "Leica",
+  "provenance": "INJECTION"
+}

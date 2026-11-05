@@ -1,0 +1,35 @@
+"""slam_recovery package: Detection, Quarantine, and Verifiable Repair for Degraded Multi-Sensor SLAM."""
+
+from .core import (
+    RecoveryMode,
+    RecoveryState,
+    DegeneracyType,
+    StandardFrame,
+    BackendDelta,
+    HealthWindow,
+    HealthDecision,
+    QuarantineSegment,
+    Diagnosis,
+    RepairPlan,
+    CandidateMap,
+    ValidationReport,
+    GateThresholds,
+    evaluate_four_mode_gate,
+)
+
+__all__ = [
+    "RecoveryMode",
+    "RecoveryState",
+    "DegeneracyType",
+    "StandardFrame",
+    "BackendDelta",
+    "HealthWindow",
+    "HealthDecision",
+    "QuarantineSegment",
+    "Diagnosis",
+    "RepairPlan",
+    "CandidateMap",
+    "ValidationReport",
+    "GateThresholds",
+    "evaluate_four_mode_gate",
+]

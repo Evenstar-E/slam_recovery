@@ -1,0 +1,42 @@
+{
+  "run_id": "e3_orbslam3_b6_hall_01_moderate_g020",
+  "host_system": "ORB-SLAM3",
+  "baseline_variant": "B6",
+  "sequence_name": "hall_01",
+  "input_bag_path": "/home/R26534/M2DGR/raw/hall_01.bag",
+  "input_bag_hash": "8be9dd00e87ae34bae9809eab04fe9df44b68e6756b7ea87664d4e03bfc8ac7b",
+  "provenance": "OFFLINE_CONSTRUCT",
+  "gt_source": "Leica",
+  "seed": 42,
+  "injection_type": "visual_exposure_drop",
+  "injection_params": {
+    "gain_g": 0.2,
+    "window_sec": [
+      120.0,
+      140.0
+    ]
+  },
+  "metrics": {
+    "provenance": "OFFLINE_CONSTRUCT",
+    "tracked_frames": 5228,
+    "dropped_frames_in_120_140s": 0,
+    "ate_rmse_m": 0.5333,
+    "ate_mean_m": 0.4738,
+    "ate_max_m": 1.3982,
+    "rpe_trans_rmse_m": 0.2335,
+    "window_118_152s_rmse_m": 0.421,
+    "window_118_152s_max_m": 0.7658,
+    "recovery_ratio_G_vs_B0": 0.9858,
+    "recovery_ratio_G_vs_B2_Atlas": 0.2942,
+    "window_recovery_ratio_G_vs_B0": 3.6187,
+    "window_recovery_ratio_G_vs_B2_Atlas": 39.0115,
+    "gate_decision": "MODE2_ATOMIC_COMMIT",
+    "atomic_commit_accepted": true,
+    "holdout_nis": 2.493,
+    "wilson_sequential_lower_bound": 0.9944,
+    "reentry_position_jump_m": 0.0468,
+    "weak_dir_info_after": 50.92,
+    "trusted_map_pollution_ratio": 0.0
+  },
+  "created_utc": "2026-11-05T03:28:47.970445+00:00"
+}

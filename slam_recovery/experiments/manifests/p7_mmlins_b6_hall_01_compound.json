@@ -1,0 +1,20 @@
+{
+  "run_id": "p7_mmlins_b6_hall_01_compound",
+  "host_system": "MM-LINS",
+  "baseline_variant": "B6",
+  "sequence_name": "hall_01",
+  "input_bag_path": "/home/R26534/M2DGR/injected/hall_01_inj_compound_120_140s.bag",
+  "input_bag_hash": "199ff09fa139d4ca31ddd7d035c6d3bc8b64bef8838bc49d930cbf23188c11fb",
+  "seed": 42,
+  "injection_type": "compound_geo_plastic_sync_120_140s",
+  "injection_params": {},
+  "metrics": {
+    "ate_rmse_m": 0.3117,
+    "rpe_trans_rmse_m": 0.1749,
+    "win_120_160_rmse_m": 0.2656,
+    "recovery_ratio_G": 0.998
+  },
+  "created_utc": "2026-11-03T10:00:28.689746+00:00",
+  "gt_source": "Leica",
+  "provenance": "INJECTION"
+}

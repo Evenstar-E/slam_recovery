@@ -1,0 +1,26 @@
+{
+  "run_id": "e3_orbslam3_b0_room_02_clean",
+  "host_system": "ORB-SLAM3",
+  "baseline_variant": "B0",
+  "sequence_name": "room_02",
+  "input_bag_path": "/home/R26534/M2DGR/raw/room_02.bag",
+  "input_bag_hash": "3eff19faaf77a83d8ae797f534aa11ed1eae4770bc6687d1087c2d8145ea86c2",
+  "seed": 42,
+  "injection_type": "clean",
+  "injection_params": {
+    "sensor_mode": "RGB-D (D435i Color + LiDAR-Projected Depth)"
+  },
+  "metrics": {
+    "num_tracked_frames": 1113,
+    "num_matched_poses": 1100,
+    "path_length_m": 36.1916,
+    "ate_rmse_m": 0.2373,
+    "ate_mean_m": 0.1002,
+    "ate_max_m": 7.0404,
+    "rpe_trans_rmse_m": 0.3127,
+    "false_quarantine_triggers": 0
+  },
+  "created_utc": "2026-11-03T09:40:50.902220+00:00",
+  "gt_source": "Mocap",
+  "provenance": "REAL_HOST"
+}

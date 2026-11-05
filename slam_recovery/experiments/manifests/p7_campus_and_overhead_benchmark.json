@@ -1,0 +1,81 @@
+{
+  "campus_real_world_series": {
+    "Campus-1_2 (Single Event)": {
+      "provenance": "REAL_HOST",
+      "num_keyframes_pgo": 632,
+      "path_length_m": 351.4,
+      "frontend_raw_drift_e2e_m": 69.3988,
+      "paper_reported_wo_pgo_e2e_m": 0.126,
+      "paper_reported_ce_pgo_e2e_m": 0.092,
+      "paper_mode2_gated_e2e_m": 0.092,
+      "local_reproduced_ce_pgo_final_e2e_m": 0.2444,
+      "local_mode2_snapshot_gated_e2e_m": 0.2444,
+      "flagged_high_strain_intervals": 495,
+      "holdout_nis": 0.0
+    },
+    "Campus-2 (Two Events, CE-PGO Failure Case)": {
+      "provenance": "REAL_HOST",
+      "num_keyframes_pgo": 621,
+      "path_length_m": 355.07,
+      "frontend_raw_drift_e2e_m": 115.7607,
+      "paper_reported_wo_pgo_e2e_m": 0.603,
+      "paper_reported_ce_pgo_e2e_m": 1.295,
+      "paper_mode2_gated_e2e_m": 0.603,
+      "local_reproduced_ce_pgo_final_e2e_m": 0.4471,
+      "local_mode2_snapshot_gated_e2e_m": 0.4305,
+      "flagged_high_strain_intervals": 346,
+      "holdout_nis": 0.0029
+    },
+    "Campus-3 (Single Event)": {
+      "provenance": "REAL_HOST",
+      "num_keyframes_pgo": 620,
+      "path_length_m": 348.18,
+      "frontend_raw_drift_e2e_m": 67.125,
+      "paper_reported_wo_pgo_e2e_m": 0.137,
+      "paper_reported_ce_pgo_e2e_m": 0.093,
+      "paper_mode2_gated_e2e_m": 0.093,
+      "local_reproduced_ce_pgo_final_e2e_m": 0.2618,
+      "local_mode2_snapshot_gated_e2e_m": 0.2618,
+      "flagged_high_strain_intervals": 555,
+      "holdout_nis": 0.0
+    },
+    "Campus-12 (Multi-Event)": {
+      "provenance": "REAL_HOST",
+      "num_keyframes_pgo": 644,
+      "path_length_m": 349.48,
+      "frontend_raw_drift_e2e_m": 118.0289,
+      "paper_reported_wo_pgo_e2e_m": 0.159,
+      "paper_reported_ce_pgo_e2e_m": 0.132,
+      "paper_mode2_gated_e2e_m": 0.132,
+      "local_reproduced_ce_pgo_final_e2e_m": 0.1758,
+      "local_mode2_snapshot_gated_e2e_m": 0.1758,
+      "flagged_high_strain_intervals": 589,
+      "holdout_nis": 0.0
+    }
+  },
+  "system_overhead": {
+    "provenance": "REAL_HOST",
+    "health_detection_and_signature_router_ms": {
+      "p50_ms": 0.0474,
+      "p95_ms": 0.0647,
+      "mean_ms": 0.0504,
+      "percentage_of_10hz_frame_budget": 0.0504
+    },
+    "delayed_commit_and_checkpoint_tx_ms": {
+      "p50_ms": 0.0024,
+      "p95_ms": 0.3373
+    },
+    "point_mixture_repairer_per_scan_ms": {
+      "p50_ms": 194.36,
+      "p95_ms": 232.81
+    },
+    "ring_buffer_memory_footprint": {
+      "window_duration_sec": 30.0,
+      "lidar_24b_30s_buffer_mb": 343.32,
+      "imu_200hz_30s_buffer_mb": 0.366,
+      "checkpoint_pose_graph_snapshot_kb": 48.5
+    }
+  },
+  "gt_source": "Start_End_Closure",
+  "provenance": "INJECTION"
+}

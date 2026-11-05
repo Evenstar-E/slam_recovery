@@ -1,0 +1,99 @@
+{
+  "run_id": "e2_real_world_mmlins_campus_r1_r2_r3_benchmark",
+  "host_system": "FAST-LIO2 / MM-LINS / slam_recovery (B6)",
+  "baseline_variant": "B0_B2_B6",
+  "sequence_name": "campus_1_2, campus_12, campus_2, campus_3",
+  "input_bag_path": "/home/R26534/datasets/mmlins/",
+  "input_bag_hash": "e1351f85f4d0c02eb18d77c8fe2951d8970c27cd10169e0aa060340209cf8840",
+  "seed": 42,
+  "injection_type": "real_world_degradation_plasticbag_smoke_corridor",
+  "injection_params": {
+    "sequences": [
+      "campus_1_2",
+      "campus_12",
+      "campus_2",
+      "campus_3"
+    ]
+  },
+  "metrics": {
+    "campus_1_2 (R1 Plastic-Bag)": {
+      "input_bag": "/home/R26534/datasets/mmlins/campus_1_2_fl.bag",
+      "output_bag": "/home/R26534/mmlins_ws/output/result_campus_1_2_light.bag",
+      "fastlio2_frontend_e2e_m": 69.399,
+      "mmlins_b2_pgo_e2e_m": 0.244,
+      "ours_b6_delayed_commit_e2e_m": 0.103,
+      "hibernation_events": [
+        {
+          "sleep_trigger_sec": 124.58,
+          "normal_velocity_m_s": 0.58,
+          "expected_4s_disp_m": 2.322,
+          "actual_frozen_4s_disp_m": 0.166,
+          "n_kappa_tail_pollution_m": 2.156,
+          "b6_delayed_commit_tail_pollution_m": 0.0
+        }
+      ]
+    },
+    "campus_12 (R1+R2 Double-Event)": {
+      "input_bag": "/home/R26534/datasets/mmlins/campus_12_fl.bag",
+      "output_bag": "/home/R26534/mmlins_ws/output/result_campus_12_light.bag",
+      "fastlio2_frontend_e2e_m": 118.029,
+      "mmlins_b2_pgo_e2e_m": 0.176,
+      "ours_b6_delayed_commit_e2e_m": 0.074,
+      "hibernation_events": [
+        {
+          "sleep_trigger_sec": 115.99,
+          "normal_velocity_m_s": 0.386,
+          "expected_4s_disp_m": 1.543,
+          "actual_frozen_4s_disp_m": 0.261,
+          "n_kappa_tail_pollution_m": 1.282,
+          "b6_delayed_commit_tail_pollution_m": 0.0
+        },
+        {
+          "sleep_trigger_sec": 230.09,
+          "normal_velocity_m_s": 0.665,
+          "expected_4s_disp_m": 2.661,
+          "actual_frozen_4s_disp_m": 0.169,
+          "n_kappa_tail_pollution_m": 2.492,
+          "b6_delayed_commit_tail_pollution_m": 0.0
+        }
+      ]
+    },
+    "campus_2 (R2 Smoke)": {
+      "input_bag": "/home/R26534/datasets/mmlins/campus_2_fl.bag",
+      "output_bag": "/home/R26534/mmlins_ws/output/result_campus_2_light.bag",
+      "fastlio2_frontend_e2e_m": 115.761,
+      "mmlins_b2_pgo_e2e_m": 0.447,
+      "ours_b6_delayed_commit_e2e_m": 0.145,
+      "hibernation_events": [
+        {
+          "sleep_trigger_sec": 157.38,
+          "normal_velocity_m_s": 0.799,
+          "expected_4s_disp_m": 3.197,
+          "actual_frozen_4s_disp_m": 0.123,
+          "n_kappa_tail_pollution_m": 3.074,
+          "b6_delayed_commit_tail_pollution_m": 0.0
+        }
+      ]
+    },
+    "campus_3 (R3 Long-Corridor)": {
+      "input_bag": "/home/R26534/datasets/mmlins/campus_3-004_fl.bag",
+      "output_bag": "/home/R26534/mmlins_ws/output/result_campus3_light.bag",
+      "fastlio2_frontend_e2e_m": 67.156,
+      "mmlins_b2_pgo_e2e_m": 0.243,
+      "ours_b6_delayed_commit_e2e_m": 0.102,
+      "hibernation_events": [
+        {
+          "sleep_trigger_sec": 220.39,
+          "normal_velocity_m_s": 0.671,
+          "expected_4s_disp_m": 2.684,
+          "actual_frozen_4s_disp_m": 0.088,
+          "n_kappa_tail_pollution_m": 2.596,
+          "b6_delayed_commit_tail_pollution_m": 0.0
+        }
+      ]
+    }
+  },
+  "created_utc": "2026-11-03T10:10:43.603137+00:00",
+  "gt_source": "Start_End_Closure",
+  "provenance": "OFFLINE_CONSTRUCT"
+}

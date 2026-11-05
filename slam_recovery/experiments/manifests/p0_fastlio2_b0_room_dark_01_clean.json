@@ -1,0 +1,22 @@
+{
+  "run_id": "p0_fastlio2_b0_room_dark_01_clean",
+  "host_system": "FAST-LIO2",
+  "baseline_variant": "B0",
+  "sequence_name": "room_dark_01",
+  "input_bag_path": "/home/R26534/M2DGR/extracted/room_dark_01_fl.bag",
+  "input_bag_hash": "04bea9571eddcd3bedf0ee7bf22826d2d6ec8f789069064cf87440cbbe07fc32",
+  "seed": 42,
+  "injection_type": "natural_dark_clean_lidar",
+  "injection_params": {},
+  "metrics": {
+    "num_matched_poses": 1052,
+    "path_length_m": 37.745,
+    "ate_rmse_m": 0.1701,
+    "ate_mean_m": 0.1476,
+    "ate_max_m": 0.3604,
+    "rpe_trans_rmse_m": 0.0873
+  },
+  "created_utc": "2026-11-03T10:41:30.186230+00:00",
+  "gt_source": "Mocap",
+  "provenance": "REAL_HOST"
+}

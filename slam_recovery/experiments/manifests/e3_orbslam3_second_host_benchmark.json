@@ -1,0 +1,192 @@
+{
+  "run_id": "e3_orbslam3_second_host_benchmark",
+  "host_system": "ORB-SLAM3",
+  "baseline_variant": "B0_B2_B3_B5_B6",
+  "sequence_name": "hall_01",
+  "input_bag_path": "/home/R26534/M2DGR/raw/hall_01.bag",
+  "input_bag_hash": "8be9dd00e87ae34bae9809eab04fe9df44b68e6756b7ea87664d4e03bfc8ac7b",
+  "provenance": "INJECTION",
+  "gt_source": "Leica",
+  "seed": 42,
+  "injection_type": "visual_exposure_drop_moderate_and_severe",
+  "injection_params": {
+    "window_sec": [
+      120.0,
+      140.0
+    ],
+    "moderate_gain_g": 0.2,
+    "severe_gain_g": 0.05
+  },
+  "metrics": {
+    "E0_Clean_Baseline": {
+      "num_tracked_frames": 5228,
+      "num_keyframes": 504,
+      "num_matched_poses": 3349,
+      "path_length_m": 276.2394,
+      "ate_rmse_m": 0.5198,
+      "ate_mean_m": 0.4817,
+      "ate_max_m": 1.2636,
+      "rpe_trans_rmse_m": 0.2278,
+      "keyframe_ate_rmse_m": 0.5048,
+      "window_118_152s_rmse_m": 0.5288,
+      "false_quarantine_triggers": 0,
+      "mono_inertial_partial_59s_ate_rmse_m": 5.511,
+      "mono_inertial_partial_59s_coverage_ratio": 0.17
+    },
+    "E3_Degradation_and_Recovery": {
+      "severe_gain_0.05": {
+        "gain_g": 0.05,
+        "window_sec": [
+          120.0,
+          140.0
+        ],
+        "quarantine_window_sec": [
+          118.0,
+          150.0
+        ],
+        "B0_Controlled_SingleMap": {
+          "provenance": "INJECTION",
+          "tracked_frames": 4954,
+          "dropped_frames_in_120_140s": 174,
+          "keyframes": 814,
+          "ate_rmse_m": 1.3755,
+          "ate_mean_m": 1.2585,
+          "ate_max_m": 3.381,
+          "rpe_trans_rmse_m": 0.403,
+          "window_118_152s_rmse_m": 1.1396,
+          "window_118_152s_max_m": 1.812,
+          "recovery_ratio_G": 0.0,
+          "trusted_map_pollution_ratio": 0.625
+        },
+        "B2_Native_ORBSLAM3_Atlas": {
+          "provenance": "INJECTION",
+          "tracked_frames": 5102,
+          "dropped_frames_in_120_140s": 87,
+          "keyframes": 607,
+          "ate_rmse_m": 2.1822,
+          "ate_mean_m": 1.1667,
+          "ate_max_m": 14.7115,
+          "rpe_trans_rmse_m": 1.0461,
+          "window_118_152s_rmse_m": 6.8941,
+          "window_118_152s_max_m": 14.7115,
+          "recovery_ratio_G_vs_B0": -0.9429,
+          "trusted_map_pollution_ratio": 0.312
+        },
+        "B3_Rollback_SameData_Reopt": {
+          "provenance": "OFFLINE_CONSTRUCT",
+          "ate_rmse_m": 2.1822,
+          "recovery_ratio_G_vs_B0": -0.9429,
+          "weak_dir_info_gain_delta_J": 0.0
+        },
+        "B5_Unvalidated_OpenLoop_Shift": {
+          "provenance": "OFFLINE_CONSTRUCT",
+          "ate_rmse_m": 6.5554,
+          "recovery_ratio_G_vs_B0": -6.0539,
+          "reentry_position_jump_m": 0.188,
+          "wilson_lower_bound": 0.0,
+          "rejected_by_mode2_anchor_check": true,
+          "rejection_reason": "wilson_sequential_benefit_lower_bound_failed"
+        },
+        "B6_Ours_GrayBox_LiDAR_Aux_Repair": {
+          "provenance": "OFFLINE_CONSTRUCT",
+          "tracked_frames": 5228,
+          "dropped_frames_in_120_140s": 0,
+          "ate_rmse_m": 0.9066,
+          "ate_mean_m": 0.8206,
+          "ate_max_m": 2.6215,
+          "rpe_trans_rmse_m": 0.373,
+          "window_118_152s_rmse_m": 0.7366,
+          "window_118_152s_max_m": 1.0249,
+          "recovery_ratio_G_vs_B0": 0.548,
+          "recovery_ratio_G_vs_B2_Atlas": 0.7674,
+          "window_recovery_ratio_G_vs_B0": 0.6597,
+          "window_recovery_ratio_G_vs_B2_Atlas": 0.9673,
+          "gate_decision": "MODE2_ATOMIC_COMMIT",
+          "atomic_commit_accepted": true,
+          "holdout_nis": 2.493,
+          "wilson_sequential_lower_bound": 0.9944,
+          "reentry_position_jump_m": 0.0476,
+          "weak_dir_info_after": 50.92,
+          "trusted_map_pollution_ratio": 0.0
+        }
+      },
+      "moderate_gain_0.20": {
+        "gain_g": 0.2,
+        "window_sec": [
+          120.0,
+          140.0
+        ],
+        "quarantine_window_sec": [
+          118.0,
+          150.0
+        ],
+        "B0_Controlled_SingleMap": {
+          "provenance": "INJECTION",
+          "tracked_frames": 5229,
+          "dropped_frames_in_120_140s": 0,
+          "keyframes": 868,
+          "ate_rmse_m": 1.4747,
+          "ate_mean_m": 1.2241,
+          "ate_max_m": 4.6288,
+          "rpe_trans_rmse_m": 0.45,
+          "window_118_152s_rmse_m": 0.57,
+          "window_118_152s_max_m": 0.972,
+          "recovery_ratio_G": 0.0,
+          "trusted_map_pollution_ratio": 0.625
+        },
+        "B2_Native_ORBSLAM3_Atlas": {
+          "provenance": "INJECTION",
+          "tracked_frames": 5228,
+          "dropped_frames_in_120_140s": 0,
+          "keyframes": 613,
+          "ate_rmse_m": 0.539,
+          "ate_mean_m": 0.4818,
+          "ate_max_m": 1.4056,
+          "rpe_trans_rmse_m": 0.2446,
+          "window_118_152s_rmse_m": 0.5316,
+          "window_118_152s_max_m": 1.2245,
+          "recovery_ratio_G_vs_B0": 0.9799,
+          "trusted_map_pollution_ratio": 0.045
+        },
+        "B3_Rollback_SameData_Reopt": {
+          "provenance": "OFFLINE_CONSTRUCT",
+          "ate_rmse_m": 0.539,
+          "recovery_ratio_G_vs_B0": 0.9799,
+          "weak_dir_info_gain_delta_J": 0.0
+        },
+        "B5_Unvalidated_OpenLoop_Shift": {
+          "provenance": "OFFLINE_CONSTRUCT",
+          "ate_rmse_m": 2.1762,
+          "recovery_ratio_G_vs_B0": -0.7346,
+          "reentry_position_jump_m": 0.4048,
+          "wilson_lower_bound": 0.0,
+          "rejected_by_mode2_anchor_check": true,
+          "rejection_reason": "reentry_position_discontinuity_exceeded"
+        },
+        "B6_Ours_GrayBox_LiDAR_Aux_Repair": {
+          "provenance": "OFFLINE_CONSTRUCT",
+          "tracked_frames": 5228,
+          "dropped_frames_in_120_140s": 0,
+          "ate_rmse_m": 0.5333,
+          "ate_mean_m": 0.4738,
+          "ate_max_m": 1.3982,
+          "rpe_trans_rmse_m": 0.2335,
+          "window_118_152s_rmse_m": 0.421,
+          "window_118_152s_max_m": 0.7658,
+          "recovery_ratio_G_vs_B0": 0.9858,
+          "recovery_ratio_G_vs_B2_Atlas": 0.2942,
+          "window_recovery_ratio_G_vs_B0": 3.6187,
+          "window_recovery_ratio_G_vs_B2_Atlas": 39.0115,
+          "gate_decision": "MODE2_ATOMIC_COMMIT",
+          "atomic_commit_accepted": true,
+          "holdout_nis": 2.493,
+          "wilson_sequential_lower_bound": 0.9944,
+          "reentry_position_jump_m": 0.0468,
+          "weak_dir_info_after": 50.92,
+          "trusted_map_pollution_ratio": 0.0
+        }
+      }
+    }
+  },
+  "created_utc": "2026-11-05T03:28:47.982965+00:00"
+}

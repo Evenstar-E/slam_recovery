@@ -1,0 +1,74 @@
+{
+  "run_id": "e2_e3_room_02_mirror_benchmark",
+  "host_system": "FAST-LIO2 / MM-LINS / LIO-SAM / ORB-SLAM3",
+  "baseline_variant": "B0_B2_B5_B6",
+  "sequence_name": "room_02",
+  "input_bag_path": "/home/R26534/M2DGR/raw/room_02.bag",
+  "input_bag_hash": "3eff19faaf77a83d8ae797f534aa11ed1eae4770bc6687d1087c2d8145ea86c2",
+  "seed": 42,
+  "injection_type": "mirror_lidar_plasticbag_and_visual_dark_blur_25_40s",
+  "injection_params": {
+    "window_sec": [
+      25.0,
+      40.0
+    ]
+  },
+  "metrics": {
+    "E0_Clean_ATE_RMSE_m": {
+      "MM_LINS_B2": 0.1019,
+      "LIO_SAM_B0": 0.1212,
+      "FAST_LIO2_B0": 0.1372,
+      "ORB_SLAM3_B0": 0.2373
+    },
+    "Mirror_A_LiDAR_PlasticBag_25_40s": {
+      "FAST_LIO2": {
+        "B0_degraded_ate_m": 1.1864,
+        "B5_point_filter_unvalidated_ate_m": 1.3321,
+        "B5_G": -0.1389,
+        "B5_rejected_by_mode2": true,
+        "B6_ours_ate_m": 0.1928,
+        "B6_G": 0.9471
+      },
+      "MM_LINS": {
+        "B2_degraded_ate_m": 0.9436,
+        "B2_sleep_triggers": 0,
+        "B6_ours_ate_m": 0.1147,
+        "B6_G": 0.9847
+      },
+      "LIO_SAM": {
+        "B0_degraded_ate_m": 1.612,
+        "B5_point_filter_unvalidated_ate_m": 846.1461,
+        "B5_rejected_by_mode2": true,
+        "B6_ours_ate_m": 0.1625,
+        "B6_G": 0.9723
+      }
+    },
+    "Mirror_B_Visual_Dark_Blur_25_40s": {
+      "mod_g015_blur": {
+        "gain_g": 0.15,
+        "blur_kernel": 9,
+        "B2_Atlas_ate_rmse_m": 0.5662,
+        "B2_Atlas_ate_max_m": 7.4584,
+        "B2_Atlas_lost_frames": 75,
+        "B6_Ours_ate_rmse_m": 0.2881,
+        "B6_Ours_ate_max_m": 7.1307,
+        "B6_Ours_lost_frames": 0,
+        "recovery_ratio_G_vs_B2": 0.8453
+      },
+      "sev_g003_blur": {
+        "gain_g": 0.03,
+        "blur_kernel": 15,
+        "B2_Atlas_ate_rmse_m": 0.5902,
+        "B2_Atlas_ate_max_m": 7.478,
+        "B2_Atlas_lost_frames": 80,
+        "B6_Ours_ate_rmse_m": 0.2854,
+        "B6_Ours_ate_max_m": 7.1224,
+        "B6_Ours_lost_frames": 0,
+        "recovery_ratio_G_vs_B2": 0.8637
+      }
+    }
+  },
+  "created_utc": "2026-11-03T09:53:55.177379+00:00",
+  "gt_source": "Mocap",
+  "provenance": "INJECTION"
+}

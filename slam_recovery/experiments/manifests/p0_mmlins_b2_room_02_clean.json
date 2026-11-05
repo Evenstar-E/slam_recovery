@@ -1,0 +1,24 @@
+{
+  "run_id": "p0_mmlins_b2_room_02_clean",
+  "host_system": "MM-LINS",
+  "baseline_variant": "B2",
+  "sequence_name": "room_02",
+  "input_bag_path": "/home/R26534/M2DGR/extracted/room_02_fl.bag",
+  "input_bag_hash": "9a886005468ce3b149d313095a47b3d774e28c8d084b37d02106431623e31d88",
+  "seed": 42,
+  "injection_type": "clean",
+  "injection_params": {},
+  "metrics": {
+    "num_matched_poses": 291,
+    "path_length_m": 21.1434,
+    "ate_rmse_m": 0.1019,
+    "ate_mean_m": 0.0898,
+    "ate_max_m": 0.2098,
+    "rpe_trans_rmse_m": 0.1134,
+    "end_to_end_error_m": 0.2124,
+    "false_hibernation_triggers": 0
+  },
+  "created_utc": "2026-11-03T09:40:50.876438+00:00",
+  "gt_source": "Mocap",
+  "provenance": "REAL_HOST"
+}
