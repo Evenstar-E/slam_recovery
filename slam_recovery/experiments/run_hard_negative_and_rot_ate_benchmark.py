@@ -237,41 +237,30 @@ def evaluate_egap4_full_se3_rotational_ate_rpe() -> dict:
     rot_fl_h2_clean = evaluate_rotation_ate_rpe_deg(ts_fl_h2, xyz_fl_h2, q_fl_h2, ts_gt_h2, xyz_gt_h2, q_gt_h2)
     rot_orb_h2_clean = evaluate_rotation_ate_rpe_deg(ts_orb_h2, xyz_orb_h2, q_orb_h2, ts_gt_h2, xyz_gt_h2, q_gt_h2)
 
-    # 3. High-Rate Turn SYNC_DRIFT ([280, 300]s on hall_01, |omega|_max = 0.690 rad/s) & GEO_DEGEN rotational impact:
-    # Under +100ms deskew clock unlock + IMU preintegration conflict in LIO-SAM during [280, 300]s rapid turn,
-    # evaluate rotational ATE/RPE in the global frame determined by the pre-turn healthy segment (<280s)
-    t0_h1 = float(ts_gt_h1[0])
-    q_lio_sync_deg = q_lio_h1.copy()
-    xyz_lio_sync_deg = xyz_lio_h1.copy()
-    post_turn = (ts_lio_h1 - t0_h1) >= 280.0
-    p_pivot = xyz_lio_h1[np.flatnonzero(post_turn)[0]].copy()
-    for idx in np.flatnonzero(post_turn):
-        dt_in = min(max(0.0, (ts_lio_h1[idx] - t0_h1) - 280.0), 20.0)
-        d_yaw = np.deg2rad(1.42 * dt_in)
-        c_y, s_y = np.cos(d_yaw), np.sin(d_yaw)
-        R_z = np.array([[c_y, -s_y, 0.0], [s_y, c_y, 0.0], [0.0, 0.0, 1.0]])
-        xyz_lio_sync_deg[idx] = p_pivot + R_z @ (xyz_lio_h1[idx] - p_pivot)
-        dq = np.array([0.0, 0.0, np.sin(0.5 * d_yaw), np.cos(0.5 * d_yaw)])
-        qx, qy, qz, qw = q_lio_sync_deg[idx]
-        q_lio_sync_deg[idx] = np.array([
-            qw * dq[0] + qx * dq[3] + qy * dq[2] - qz * dq[1],
-            qw * dq[1] - qx * dq[2] + qy * dq[3] + qz * dq[0],
-            qw * dq[2] + qx * dq[1] - qy * dq[0] + qz * dq[3],
-            qw * dq[3] - qx * dq[0] - qy * dq[1] - qz * dq[2],
-        ])
+    # 3. Degraded vs. Repaired rotational error directly from real logged host trajectories in MCAP (zero manual formulas)
+    from slam_recovery.experiments.run_e2_ablation_matrix import read_last_mcap_path
 
-    # Compute post-turn [280s, 350s] rotational error when aligned on the pre-turn [0s, 275s] trusted map
-    turn_mask = (ts_lio_h1 - t0_h1) >= 275.0
-    base_rot = rot_lio_h1_clean
-    yaw_drift_deg = np.array([min(max(0.0, (t - t0_h1) - 280.0), 20.0) * 1.42 for t in ts_lio_h1[turn_mask]])
-    deg_ate_arr = np.hypot(base_rot["ate_rot_rmse_deg"], yaw_drift_deg)
-    rot_lio_sync_b0 = {
-        "ate_rot_rmse_deg": round(float(np.sqrt(np.mean(deg_ate_arr ** 2))), 3),
-        "ate_rot_mean_deg": round(float(np.mean(deg_ate_arr)), 3),
-        "ate_rot_max_deg": round(float(np.max(deg_ate_arr)), 3),
-        "rpe_rot_rmse_deg": round(float(base_rot["rpe_rot_rmse_deg"] + 6.85), 3),
-    }
-    rot_lio_sync_b6 = rot_lio_h1_clean
+    mcap_geo = "/home/R26534/MM-LINS/slam_recovery/experiments/hall_01_geodegen_comparison.mcap"
+    ts_lio_geo_b0, xyz_lio_geo_b0 = read_last_mcap_path(mcap_geo, "/geodegen/lio_sam_b0_1008m_path")
+    ts_lio_geo_b6, xyz_lio_geo_b6 = read_last_mcap_path(mcap_geo, "/repaired/lio_sam_b6_path")
+
+    mcap_pbag = "/home/R26534/MM-LINS/slam_recovery/experiments/hall_01_plasticbag_comparison.mcap"
+    ts_lio_pb_b0, xyz_lio_pb_b0 = read_last_mcap_path(mcap_pbag, "/degraded/lio_sam_b0_path")
+    ts_lio_pb_b6, xyz_lio_pb_b6 = read_last_mcap_path(mcap_pbag, "/repaired/lio_sam_b6_path")
+
+    xyz_gt_h1_c = xyz_gt_h1 - xyz_gt_h1[0]
+    rot_lio_geo_b0 = evaluate_rotation_ate_rpe_deg(
+        ts_lio_geo_b0, xyz_lio_geo_b0, np.zeros((len(ts_lio_geo_b0), 4)), ts_gt_h1, xyz_gt_h1_c, q_gt_h1
+    )
+    rot_lio_geo_b6 = evaluate_rotation_ate_rpe_deg(
+        ts_lio_geo_b6, xyz_lio_geo_b6, np.zeros((len(ts_lio_geo_b6), 4)), ts_gt_h1, xyz_gt_h1_c, q_gt_h1
+    )
+    rot_lio_pb_b0 = evaluate_rotation_ate_rpe_deg(
+        ts_lio_pb_b0, xyz_lio_pb_b0, np.zeros((len(ts_lio_pb_b0), 4)), ts_gt_h1, xyz_gt_h1_c, q_gt_h1
+    )
+    rot_lio_pb_b6 = evaluate_rotation_ate_rpe_deg(
+        ts_lio_pb_b6, xyz_lio_pb_b6, np.zeros((len(ts_lio_pb_b6), 4)), ts_gt_h1, xyz_gt_h1_c, q_gt_h1
+    )
 
     # 4. room_dark_01 ORB-SLAM3 Native Atlas (B2) vs. LiDAR-bridged B6 orientation consistency (windowed chord alignment)
     ts_orb_rd_b2, xyz_orb_rd_b2, q_orb_rd_b2 = load_tum_trajectory_se3(
@@ -296,13 +285,23 @@ def evaluate_egap4_full_se3_rotational_ate_rpe() -> dict:
             "FAST_LIO2_B0": rot_fl_h2_clean,
             "ORB_SLAM3_B0": rot_orb_h2_clean,
         },
-        "hall_01_HighRateTurn_SYNC_DRIFT_280_300s": {
-            "LIO_SAM_Degraded_B0": rot_lio_sync_b0,
-            "LIO_SAM_Repaired_B6": rot_lio_sync_b6,
-            "rot_recovery_ratio_G": round(
+        "hall_01_Degraded_vs_Repaired_Rotational_Recovery": {
+            "LIO_SAM_GEO_DEGEN_Degraded_B0": rot_lio_geo_b0,
+            "LIO_SAM_GEO_DEGEN_Repaired_B6": rot_lio_geo_b6,
+            "geo_rot_recovery_ratio_G": round(
                 compute_recovery_ratio_G(
-                    rot_lio_sync_b0["ate_rot_rmse_deg"],
-                    rot_lio_sync_b6["ate_rot_rmse_deg"],
+                    rot_lio_geo_b0["ate_rot_rmse_deg"],
+                    rot_lio_geo_b6["ate_rot_rmse_deg"],
+                    rot_lio_h1_clean["ate_rot_rmse_deg"],
+                ),
+                4,
+            ),
+            "LIO_SAM_PlasticBag_Degraded_B0": rot_lio_pb_b0,
+            "LIO_SAM_PlasticBag_Repaired_B6": rot_lio_pb_b6,
+            "pbag_rot_recovery_ratio_G": round(
+                compute_recovery_ratio_G(
+                    rot_lio_pb_b0["ate_rot_rmse_deg"],
+                    rot_lio_pb_b6["ate_rot_rmse_deg"],
                     rot_lio_h1_clean["ate_rot_rmse_deg"],
                 ),
                 4,

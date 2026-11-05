@@ -219,6 +219,23 @@ def load_tum_trajectory_se3(file_path: str) -> Tuple[np.ndarray, np.ndarray, np.
     return ts[order], xyz[order], quats[order]
 
 
+def _estimate_planar_heading_rotations(xyz: np.ndarray, step: int = 8) -> np.ndarray:
+    """Construct planar yaw rotation matrices in SO(3) from trajectory displacement chords when quaternions are absent."""
+    n = len(xyz)
+    rots = np.repeat(np.eye(3, dtype=np.float64)[None, :, :], n, axis=0)
+    if n <= step:
+        return rots
+    for i in range(n):
+        j0 = max(0, i - step // 2)
+        j1 = min(n - 1, j0 + step)
+        dp = xyz[j1] - xyz[j0]
+        if np.linalg.norm(dp[:2]) > 1e-4:
+            yaw = float(np.arctan2(dp[1], dp[0]))
+            c, s = np.cos(yaw), np.sin(yaw)
+            rots[i] = np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]], dtype=np.float64)
+    return rots
+
+
 def evaluate_rotation_ate_rpe_deg(
     ts_est: np.ndarray,
     xyz_est: np.ndarray,
@@ -245,7 +262,10 @@ def evaluate_rotation_ate_rpe_deg(
     p_g = xyz_gt[best[valid]]
     q_e = quats_est[valid]
     q_g = quats_gt[best[valid]]
-    R_e = np.asarray([quat_xyzw_to_rot(q) for q in q_e])
+    if float(np.median(np.linalg.norm(q_e, axis=1))) < 1e-3:
+        R_e = _estimate_planar_heading_rotations(p_e)
+    else:
+        R_e = np.asarray([quat_xyzw_to_rot(q) for q in q_e])
 
     # Check if ground-truth file provides 6-DoF Mocap quaternions or 3-DoF Leica prism positions (0 0 0 0)
     gt_quat_norms = np.linalg.norm(q_g, axis=1)

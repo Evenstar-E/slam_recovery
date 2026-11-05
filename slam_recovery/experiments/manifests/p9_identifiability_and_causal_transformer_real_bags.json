@@ -99,30 +99,30 @@
           "multi_cause_routing_accuracy": 1.0,
           "slow_ramp_4s_onset_mae_rule_fixed2s_sec": 0.8,
           "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.1789,
-          "slow_ramp_leaked_frames_rule_fixed2s": 4.0,
+          "slow_ramp_leaked_frames_rule_fixed2s": 2.0,
           "slow_ramp_leaked_frames_causal_transformer": 0.0,
-          "step_inference_p50_us": 627.19,
-          "step_inference_p95_us": 668.21
+          "step_inference_p50_us": 653.74,
+          "step_inference_p95_us": 961.96
         },
         "room_02_compact_room": {
           "event_detection_recall": 1.0,
           "multi_cause_routing_accuracy": 1.0,
           "slow_ramp_4s_onset_mae_rule_fixed2s_sec": 0.8,
           "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.2678,
-          "slow_ramp_leaked_frames_rule_fixed2s": 4.0,
+          "slow_ramp_leaked_frames_rule_fixed2s": 2.0,
           "slow_ramp_leaked_frames_causal_transformer": 0.0,
-          "step_inference_p50_us": 632.52,
-          "step_inference_p95_us": 663.9
+          "step_inference_p50_us": 640.77,
+          "step_inference_p95_us": 701.24
         },
         "room_dark_01_natural_dark": {
           "event_detection_recall": 1.0,
           "multi_cause_routing_accuracy": 1.0,
           "slow_ramp_4s_onset_mae_rule_fixed2s_sec": 0.8,
           "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.2462,
-          "slow_ramp_leaked_frames_rule_fixed2s": 4.0,
+          "slow_ramp_leaked_frames_rule_fixed2s": 2.0,
           "slow_ramp_leaked_frames_causal_transformer": 0.0,
-          "step_inference_p50_us": 631.76,
-          "step_inference_p95_us": 675.76
+          "step_inference_p50_us": 639.4,
+          "step_inference_p95_us": 1082.54
         }
       }
     },
@@ -132,14 +132,14 @@
       "dirty_fraction_of_global_map": 0.1382,
       "first_write_cloned_voxels": 37351,
       "zero_copy_inserted_keys": 44868,
-      "full_map_deepcopy_snapshot_ms": 1762.539,
-      "cow_rollback_mutation_journal_ms": 84.623,
-      "cow_capture_redo_image_ms": 137.448,
-      "cow_consume_redo_image_ms": 132.411,
-      "rollback_speedup_vs_full_copy": 20.83,
+      "full_map_deepcopy_snapshot_ms": 2045.448,
+      "cow_rollback_mutation_journal_ms": 135.495,
+      "cow_capture_redo_image_ms": 188.322,
+      "cow_consume_redo_image_ms": 173.135,
+      "rollback_speedup_vs_full_copy": 15.1,
       "reverted_keys_verified": 82219,
       "restored_keys_verified": 82219
     }
   },
-  "created_utc": "2026-11-05T10:05:14.146410+00:00"
+  "created_utc": "2026-11-05T10:36:41.061137+00:00"
 }

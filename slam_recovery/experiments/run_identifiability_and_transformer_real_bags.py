@@ -411,19 +411,56 @@ def evaluate_cross_sequence_causal_transformer() -> dict:
                 # Under a 4.0s Slow-Ramp onset, conventional NIS/eigenvalue threshold crosses around 2.8s..3.2s into the ramp
                 if g_act[t_i] and not alarm_fired and g_age[t_i] >= 2.80:
                     alarm_fired = True
-                    true_elapsed_sec = g_age[t_i]
-                    rule_backtrack_sec = 2.0
-                    tf_backtrack_sec = out.estimated_age_sec + 0.40
+                    from slam_recovery.core import BackendDelta
+                    from slam_recovery.quarantine import TrustedMapTransactionManager
 
-                    err_rule = abs(true_elapsed_sec - rule_backtrack_sec)
-                    err_tf = abs(true_elapsed_sec - out.estimated_age_sec)
+                    gt_indices = np.flatnonzero(g_act)
+                    true_onset_ns = w_seq[int(gt_indices[0])].t_start_ns
+
+                    def _eval_mgr_pollution(est_age_s: float) -> tuple[int, float]:
+                        mgr = TrustedMapTransactionManager(confirmation_margin_ns=int(2.0 * 1e9))
+                        for k_i in range(t_i):
+                            wk = w_seq[k_i]
+                            mgr.step_healthy(
+                                BackendDelta(
+                                    timestamp_ns=wk.t_end_ns,
+                                    frame_id="map",
+                                    pose_se3=np.eye(4),
+                                    velocity=np.zeros(3),
+                                    bias_acc=np.zeros(3),
+                                    bias_gyr=np.zeros(3),
+                                    cov_6x6=np.eye(6) * wk.max_eig_trans_cov,
+                                    info_6x6=np.eye(6) * wk.min_eig_trans,
+                                    nis_value=wk.nis_mean,
+                                    nis_dof=6,
+                                    factor_ids=[k_i],
+                                    keyframe_id=k_i,
+                                )
+                            )
+                        w_al = w_seq[t_i]
+                        est_onset_ns = (
+                            w_al.t_end_ns - int(est_age_s * 1e9)
+                            if est_age_s > 0.0
+                            else w_al.t_start_ns
+                        )
+                        mgr.trigger_quarantine(
+                            estimated_onset_ns=est_onset_ns,
+                            current_ns=w_al.t_end_ns,
+                            weak_direction_6d=w_al.weak_dir_6d,
+                            info_before_6x6=np.eye(6) * w_al.min_eig_trans,
+                            propagated_cov_norm=1.0,
+                        )
+                        leaked = len(set(gt_indices.tolist()).intersection(set(mgr.trusted_poses.keys())))
+                        mae_s = abs(est_onset_ns - true_onset_ns) * 1e-9
+                        return leaked, float(mae_s)
+
+                    leaked_rule, _ = _eval_mgr_pollution(0.0)
+                    leaked_tf, err_tf = _eval_mgr_pollution(float(out.estimated_age_sec))
+                    err_rule = abs(float(g_age[t_i]) - 2.0)
                     onset_maes_rule_fixed2s.append(err_rule)
                     onset_maes_transformer.append(err_tf)
-
-                    leaked_rule = max(0.0, (true_elapsed_sec - rule_backtrack_sec) / 0.20)
-                    leaked_tf = max(0.0, (true_elapsed_sec - tf_backtrack_sec) / 0.20)
-                    polluted_frames_rule.append(leaked_rule)
-                    polluted_frames_transformer.append(leaked_tf)
+                    polluted_frames_rule.append(float(leaked_rule))
+                    polluted_frames_transformer.append(float(leaked_tf))
 
                 if g_act[t_i] and g_age[t_i] >= 3.20:
                     for pt in out.diagnosis.active_types:

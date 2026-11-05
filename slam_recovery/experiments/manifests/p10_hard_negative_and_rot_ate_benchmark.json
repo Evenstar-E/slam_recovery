@@ -71,20 +71,33 @@
         "rpe_rot_rmse_deg": 10.746
       }
     },
-    "hall_01_HighRateTurn_SYNC_DRIFT_280_300s": {
-      "LIO_SAM_Degraded_B0": {
-        "ate_rot_rmse_deg": 25.312,
-        "ate_rot_mean_deg": 23.813,
-        "ate_rot_max_deg": 28.653,
-        "rpe_rot_rmse_deg": 28.594
+    "hall_01_Degraded_vs_Repaired_Rotational_Recovery": {
+      "LIO_SAM_GEO_DEGEN_Degraded_B0": {
+        "ate_rot_rmse_deg": 75.449,
+        "ate_rot_mean_deg": 62.887,
+        "ate_rot_max_deg": 157.354,
+        "rpe_rot_rmse_deg": 66.173
       },
-      "LIO_SAM_Repaired_B6": {
-        "ate_rot_rmse_deg": 3.803,
-        "ate_rot_mean_deg": 2.903,
-        "ate_rot_max_deg": 12.104,
-        "rpe_rot_rmse_deg": 21.744
+      "LIO_SAM_GEO_DEGEN_Repaired_B6": {
+        "ate_rot_rmse_deg": 4.653,
+        "ate_rot_mean_deg": 3.658,
+        "ate_rot_max_deg": 12.989,
+        "rpe_rot_rmse_deg": 55.652
       },
-      "rot_recovery_ratio_G": 1.0
+      "geo_rot_recovery_ratio_G": 0.9881,
+      "LIO_SAM_PlasticBag_Degraded_B0": {
+        "ate_rot_rmse_deg": 86.233,
+        "ate_rot_mean_deg": 68.569,
+        "ate_rot_max_deg": 148.323,
+        "rpe_rot_rmse_deg": 62.964
+      },
+      "LIO_SAM_PlasticBag_Repaired_B6": {
+        "ate_rot_rmse_deg": 3.716,
+        "ate_rot_mean_deg": 2.845,
+        "ate_rot_max_deg": 10.876,
+        "rpe_rot_rmse_deg": 59.901
+      },
+      "pbag_rot_recovery_ratio_G": 1.0011
     },
     "room_dark_01_NaturalDark_Orientation": {
       "ORB_SLAM3_Native_Atlas_B2": {
