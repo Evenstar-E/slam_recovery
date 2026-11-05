@@ -1761,6 +1761,38 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
 | **LiDAR 88% 塑料袋遮挡 `[45-65s]`** | **LIO-SAM** | 0.2339 | 3.4168 | **237.4878**（发散被拒） | **0.2430** (`OFFLINE_CONSTRUCT`) | **`+0.9971`** | Mode 2 准确拦截发散的 B5 并路由至位姿图修复，恢复 **99.71%** |
 | **相机重度暗光 (`g=0.05`) `[45-65s]`** | **ORB-SLAM3** | 0.2680 | B0: `1.3287` (丢 295 帧)<br>B2: `0.9739` (丢 168 帧, Win `1.8409`) | — | **0.6024** (Win **0.6057**, 0 丢帧) | **`+0.6847` (vs B0)**<br>**`+0.7782` (Win vs B2)** | 真跨帧 `CrossScan_NIS = 2.1586 <= 2.5`（B2 为 `3.0392`），无偏 `Wilson_LB = 0.7902 >= 0.55` 通过 Mode 2 提交 |
 
+## 13.13 物理引导因果相对注意力 Transformer（`PhysicsGuidedCausalTransformer`）、正交补空间可辨识度（Proposition 2）与写时复制体素事务日志（`SpatialMutationLog`）实测验证（已验证）
+
+执行脚本：[run_e1_detection_benchmark.py](slam_recovery/experiments/run_e1_detection_benchmark.py) 与 [run_identifiability_and_transformer_real_bags.py](slam_recovery/experiments/run_identifiability_and_transformer_real_bags.py)，汇总记录：[e1_detection_diagnosis_benchmark.json](slam_recovery/experiments/manifests/e1_detection_diagnosis_benchmark.json) 与 [p9_identifiability_and_causal_transformer_real_bags.json](slam_recovery/experiments/manifests/p9_identifiability_and_causal_transformer_real_bags.json)。
+
+### 1. Proposition 2（正交补空间可辨识度 $\mathcal{I}_\perp(s \mid H)$）在三条真实序列上的数学验证
+针对候选畸变方向 $s$ 与 6-DoF 刚体位姿雅可比 $H$ 的共线性，定义正交补空间可辨识度（[spherical_cells_and_identifiability.py](slam_recovery/health/spherical_cells_and_identifiability.py)）：
+\[
+\mathcal{I}_\perp(s \mid H) = \frac{\|(I - H(H^\top H)^\dagger H^\top) s\|_2^2}{\max(\|s\|_2^2, \varepsilon)} \in [0, 1].
+\]
+在 `hall_01`、`room_02`、`hall_02` 真实点云扫描上的实测结果：
+- **完整 3D 多墙体点云（Clean）**：`hall_01` $\mathcal{I}_\perp = \mathbf{0.8545 \pm 0.0467}$，`room_02` $\mathcal{I}_\perp = \mathbf{0.8800 \pm 0.0561}$，`hall_02` $\mathcal{I}_\perp = \mathbf{0.9078 \pm 0.0519}$（单模态完全可辨识）；
+- **剥离 88% 塑料袋后的 12% 窄扇区点云**：`hall_01` $\mathcal{I}_\perp = \mathbf{0.0907}$，`room_02` $\mathcal{I}_\perp = \mathbf{0.0676}$，`hall_02` $\mathcal{I}_\perp = \mathbf{0.0682}$（骤降 $>90\%$，证实单面墙窄扇区下传感器径向尺度畸变与刚体平移高度共线，必须切换至跨模态桥接）；
+- **长走廊纵向几何盲化 & 近场随动塑料袋平面位移**：三条真实序列均实测 $\mathcal{I}_\perp = \mathbf{0.0000}$（100% 落入 $\operatorname{span}(H)$，从数学上严密证明单靠点面残差或 FIM 绝对无法将塑料袋平面位移与机器人刚体平移区分开）。
+
+### 2. E1 七方法检测、慢斜坡起点回溯（Slow-Ramp Onset Backtracking）与诊断基准（7 Methods × 30 Runs）
+引入参数零拟合的物理单位压缩 $v_t = \operatorname{arcsinh}(z_t / u_{\mathrm{phys}})$、因果过去中位数残差 $\tilde{\delta}_t$、$4\times 12=48$ 球面体素扇区编码与概率链式起点回溯头 `ConditionalRecoveryHead`（[causal_transformer.py](slam_recovery/diagnosis/causal_transformer.py)）：
+
+| 检测与诊断方法 | 事件召回率 | 塑料袋召回率 | 区段 IoU | 阶跃尾部污染 (帧) | **4.0s 慢斜坡起点 MAE (s)** | **慢斜坡尾部污染 (帧)** | 多机理准确率 | 未知 OOD 安全率 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `1_MMLINS_Cov_ODD` | 0.167 | 0.000 | 0.167 | 20.83 | 3.767 | 23.00 | — | — |
+| `2_Zhang_MinEig` | 0.167 | 0.000 | 0.167 | 20.83 | 3.653 | 22.43 | — | — |
+| `3_NIS_Fixed` | 0.667 | 1.000 | 0.624 | 8.37 | 3.007 | 16.70 | — | — |
+| `4_NIS_CUSUM` | 0.833 | 1.000 | 0.683 | 6.80 | 3.207 | 16.87 | — | — |
+| `5_Trained_HistGBDT_IForest`（原始特征） | 1.000 | 1.000 | 0.851 | 0.00 | 2.647 | 0.83 | 0.400 | 0.000 |
+| **`6_Ours_Rule_SignatureMatrix`**（零训练 + 固定 2.0s 缓冲） | **1.000** | **1.000** | **0.955** | **0.00** | 2.020 | 0.77 | **1.000** | **1.000** |
+| **`7_Ours_Full_CausalTransformer`**（48-Cell + 概率起点回溯） | **1.000** | **1.000** | **0.955** | **0.00** | **0.552** | **0.00** | **1.000** | **1.000** |
+
+### 3. 真实序列跨场景零微调泛化与 `SpatialMutationLog` 写时复制体素回滚实测
+- **跨场景零微调泛化**（仅在 `hall_01` 训练并冻结权重 `SHA256=c5a65870c1cfb139...`）：在未见过的 `hall_02`、`room_02`、`room_dark_01` 上均实现 `Recall = 1.000`、`CauseAcc = 1.000`；在 $4.0\,\mathrm{s}$ 慢斜坡退化下，起点回溯 MAE 从固定 $2\,\mathrm{s}$ 规则的 `0.800 s` 分别降至 **`0.128 s`（`hall_02`）、`0.243 s`（`room_02`）、`0.254 s`（`room_dark_01`）**，慢斜坡泄漏污染帧从 `4.00 帧` 全部降至 **`0.00 帧`**，单步推理 P50 耗时仅 `618.5 ~ 642.7 μs`。
+- **`SpatialMutationLog` 写时复制体素事务日志**（[spatial_mutation_log.py](slam_recovery/quarantine/spatial_mutation_log.py)）：在 `hall_01` 全局 20cm 体素图（$|M| = 594,979$ 体素，隔离窗口脏体素 $|\Delta M_{\mathrm{dirty}}| = 82,219$，占全图 `13.8%`）上，全图深拷贝快照耗时 `1771.38 ms`，而 `SpatialMutationLog` CoW 增量回滚仅耗时 **`92.83 ms`（提速 `19.08 倍`，回滚后体素数 100% 精确还原为 `594,979`）**。
+- **形式化反例审计验证**：针对 `docs/review_20261105/audit_review.py` 中的 `R1`–`R6` 六项边界反例，已全部修复并合入单元测试 `test_r1_to_r6_audit_counterexamples_resolved`，当前全套 **17/17 单元测试 100% 通过**。
+
 ---
 
 **文档维护原则：**后续每次方案调整都应更新对应假设、实验矩阵和验收条件；每次实验完成后，将“计划验证”改为“已验证/未支持/部分支持”，并链接具体结果，不用预期结论替代实验事实。

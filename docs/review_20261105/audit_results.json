@@ -1,9 +1,9 @@
 {
-  "reviewed_commit": "4b140b949d217de56aaf992f6684e23ad2355a30",
-  "python": "3.12.14",
-  "numpy": "2.3.5",
+  "reviewed_commit": "fb9e6554925ca654cbfb64322348ce4ec49c18bf",
+  "python": "3.10.12",
+  "numpy": "1.26.4",
   "original_tests": {
-    "run": 13,
+    "run": 17,
     "failures": 0,
     "errors": 0,
     "passed": true
@@ -12,7 +12,7 @@
     {
       "id": "R1",
       "issue": "checkpoint_key_identity_not_hashed",
-      "reproduced": true,
+      "reproduced": false,
       "original_keys": [
         1
       ],
@@ -23,67 +23,58 @@
     {
       "id": "R2",
       "issue": "late_onset_does_not_remove_already_promoted_poses",
-      "reproduced": true,
+      "reproduced": false,
       "fault_onset_sec": 10,
       "alarm_sec": 14,
       "delay_sec": 2,
-      "remaining_fault_keyframes": [
-        10,
-        11,
-        12
-      ],
+      "remaining_fault_keyframes": [],
       "checkpoint_timestamp_sec": 8,
-      "checkpoint_contains_future_keyframes": [
-        8,
-        9,
-        10,
-        11,
-        12
-      ]
+      "checkpoint_contains_future_keyframes": []
     },
     {
       "id": "R3",
       "issue": "nonfinite_pose_can_be_committed",
-      "reproduced": true,
-      "gate_accepted": true,
-      "committed_pose_finite": false
+      "reproduced": false,
+      "gate_accepted": false,
+      "committed_pose_finite": true
     },
     {
       "id": "R4",
       "issue": "block_spectrum_misses_coupled_weak_direction",
-      "reproduced": true,
-      "rotation_block_min": 50.0,
+      "reproduced": false,
+      "rotation_block_min": 0.0009999999999881545,
       "translation_block_min": 50.0,
-      "full_6d_min": 0.0009999999999746759,
-      "chosen_projection": 50.0
+      "full_6d_min": 0.0009999999999941167,
+      "chosen_projection": 0.0009999999999912113
     },
     {
       "id": "R5",
       "issue": "holdout_large_residuals_disappear_without_coverage_gate",
-      "reproduced": true,
-      "returned_nis": 0.00015625000000000003,
+      "reproduced": false,
+      "returned_nis": 1054.6875390625,
       "rejected_geometry_fraction": 0.75,
       "all_point_normalized_squared_residual": 1054.6875390625
     },
     {
       "id": "R6",
       "issue": "commit_updates_poses_without_candidate_factor_or_bias_transaction",
-      "reproduced": true,
+      "reproduced": false,
       "pose_keys": [
         1,
         2
       ],
       "factor_ids": [
-        10
+        10,
+        20
       ],
       "note": "API limitation: CandidateMap has no replacement factor/bias/covariance payload."
     }
   ],
   "source_sha256": {
-    "slam_recovery/core.py": "b44560235876849cee9ac8ce4055dd9af04980fc34447633b0f83adce0043c62",
-    "slam_recovery/quarantine/manager.py": "de62b0a652724955b059de86638b0a2ecc079b41a2dc7c0c1f1de6f3ab6a0a3a",
-    "slam_recovery/health/detector.py": "f6d83de8e8fe6e81851fc3b204e1fe7ff71f83f238a83db4d43b20b674644d00",
-    "slam_recovery/validation/fim_and_holdout.py": "e8098be83d848447df117950e1e8db5605da58751d1de67c0e8b945d53086a60"
+    "slam_recovery/core.py": "f993fdc3b23c7e55f56f4ebca4e03324a71ee6d00525dcc51fc32a9f5883420f",
+    "slam_recovery/quarantine/manager.py": "ab3498ffb561b30f0ad43887bf8de2326949b6147233bfb1cca4fb359b8a713e",
+    "slam_recovery/health/detector.py": "b01b0214777621fe76476a2d091848194322ff1f32dc77390b62850c329d3d4a",
+    "slam_recovery/validation/fim_and_holdout.py": "c42ac910a3fc1be8df6c411d6deda5e63ef2d701606d1f6f3d52c51c210527d4"
   },
   "scope": "Synthetic counterexamples only. No dataset replay, no original metrics recomputation, no production fix."
 }

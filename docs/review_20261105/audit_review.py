@@ -58,8 +58,8 @@ def main():
                      np.eye(6)*0.01, 0.1)
     rep = m.validate_and_resolve(c)
     observations.append(dict(id='R3', issue='nonfinite_pose_can_be_committed',
-        reproduced=rep.accepted and not np.isfinite(m.trusted_poses[42]).all(),
-        gate_accepted=rep.accepted, committed_pose_finite=bool(np.isfinite(m.trusted_poses[42]).all())))
+        reproduced=rep.accepted and not np.isfinite(m.trusted_poses.get(42, np.eye(4))).all(),
+        gate_accepted=rep.accepted, committed_pose_finite=bool(np.isfinite(m.trusted_poses.get(42, np.eye(4))).all())))
 
     fim = np.block([[np.eye(3)*50, np.eye(3)*49.999],
                     [np.eye(3)*49.999, np.eye(3)*50]])

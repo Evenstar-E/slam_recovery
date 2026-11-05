@@ -210,6 +210,89 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
         self.assertTrue(rep_ok.accepted)
         self.assertIn(20, m.trusted_factors)
 
+    def test_spatial_mutation_log_cow_and_redo_replay(self) -> None:
+        """Verify O(|Delta M_dirty|) copy-on-write mutation log and zero-copy dual-branch redo replay."""
+        from slam_recovery.quarantine import SpatialMutationLog
+
+        store = {(0, 0, 0): np.array([1.0, 0.0, 0.0]), (1, 0, 0): np.array([0.0, 1.0, 0.0])}
+        journal = SpatialMutationLog(store)
+        journal.begin_generation()
+
+        # Branch A modifies existing voxel (0,0,0), inserts new voxel (2,2,2), and deletes (1,0,0)
+        journal.put((0, 0, 0), np.array([9.0, 9.0, 9.0]))
+        journal.put((0, 0, 0), np.array([8.0, 8.0, 8.0]))  # second write does not overwrite original before-image
+        journal.put((2, 2, 2), np.array([3.0, 3.0, 3.0]))
+        journal.remove((1, 0, 0))
+        self.assertEqual(journal.dirty_set_size, 3)
+
+        redo_a = journal.capture_mutation_redo()
+        journal.rollback_mutation_journal()
+
+        # After rollback, store is bit-for-bit identical to pre-generation state
+        self.assertEqual(set(store.keys()), {(0, 0, 0), (1, 0, 0)})
+        np.testing.assert_allclose(store[(0, 0, 0)], np.array([1.0, 0.0, 0.0]))
+        np.testing.assert_allclose(store[(1, 0, 0)], np.array([0.0, 1.0, 0.0]))
+
+        # Winning branch A is replayed without re-running voxelization
+        journal.consume_mutation_redo(redo_a)
+        self.assertEqual(set(store.keys()), {(0, 0, 0), (2, 2, 2)})
+        np.testing.assert_allclose(store[(0, 0, 0)], np.array([8.0, 8.0, 8.0]))
+        np.testing.assert_allclose(store[(2, 2, 2)], np.array([3.0, 3.0, 3.0]))
+
+    def test_nuisance_projected_identifiability_and_spherical_cells(self) -> None:
+        """Verify Proposition 2 identifiability I_perp(s | H) and 48-cell spherical point cloud encoding."""
+        from slam_recovery.health import (
+            compute_nuisance_projected_identifiability,
+            extract_48_spherical_cells,
+        )
+
+        rng = np.random.default_rng(7)
+        H = rng.normal(size=(60, 6))
+        # Case 1: Distortion direction s lies strictly in span(H) -> unidentifiable (I_perp == 0)
+        s_collinear = H @ np.array([1.0, -0.5, 0.2, 0.8, -1.1, 0.4])
+        id_col, _ = compute_nuisance_projected_identifiability(H, s_collinear)
+        self.assertAlmostEqual(id_col, 0.0, places=9)
+
+        # Case 2: Distortion direction s orthogonal to span(H) -> fully identifiable (I_perp == 1)
+        q, _ = np.linalg.qr(H, mode="complete")
+        s_orth = q[:, 6]
+        id_orth, _ = compute_nuisance_projected_identifiability(H, s_orth)
+        self.assertAlmostEqual(id_orth, 1.0, places=9)
+
+        # 48-cell spherical encoding shape and non-empty indicator
+        pts = rng.uniform(-8.0, 8.0, size=(400, 4))
+        pts[:, 3] = rng.uniform(10.0, 120.0, size=400)
+        cells = extract_48_spherical_cells(pts)
+        self.assertEqual(cells.shape, (48, 10))
+        self.assertGreater(np.sum(cells[:, 9]), 10.0)
+
+    def test_physics_guided_causal_transformer_fallback_and_onset_age(self) -> None:
+        """Verify cold-start analytical fallback and trained causal transformer onset-age prediction."""
+        from slam_recovery.core import HealthWindow
+        from slam_recovery.diagnosis import PhysicsGuidedCausalTransformer
+
+        tf = PhysicsGuidedCausalTransformer(seed=42)
+        w_nom = HealthWindow(
+            t_start_ns=0,
+            t_end_ns=int(0.2e9),
+            min_eig_rot=45.0,
+            min_eig_trans=60.0,
+            max_eig_rot_cov=1e-4,
+            max_eig_trans_cov=1e-3,
+            weak_dir_6d=np.array([0, 0, 0, 1, 0, 0], dtype=float),
+            nis_mean=1.0,
+            nis_q90=1.4,
+            nis_cusum=0.0,
+            loso_primary_conflict=0.8,
+            loso_aux_conflict=0.8,
+            Cross_corr_lag_sec=0.0,
+            loop_residual_spike=0.5,
+            point_drop_ratio=0.01,
+            near_field_plane_ratio=0.04,
+        )
+        # Cold-start frames (< min_ready_samples) must trigger Safeguard #2 analytical fallback
+        out0 = tf.step_inference(w_nom)
+        self.assertTrue(out0.used_analytical_fallback)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,143 @@
+{
+  "run_id": "p9_identifiability_and_causal_transformer_real_bags",
+  "host_system": "FAST-LIO2 / LIO-SAM / MM-LINS / ORB-SLAM3",
+  "baseline_variant": "PhysicsGuidedCausalTransformer_and_SpatialMutationLog",
+  "sequence_name": "hall_01 (dev), hall_02 (test), room_02, room_dark_01",
+  "input_bag_path": "/home/R26534/M2DGR/extracted/hall_02_fl.bag",
+  "input_bag_hash": "f373ae7b9be858cf01cc82aafaaab4f4b3127ff66ca6ae2d8aeed87a3fffef4c",
+  "provenance": "OFFLINE_CONSTRUCT",
+  "gt_source": "Leica_and_Mocap",
+  "seed": 42,
+  "injection_type": "proposition2_identifiability_and_slow_ramp_causal_transformer",
+  "injection_params": {
+    "spherical_cells": 48,
+    "attention_layers": 2,
+    "cache_len": 64
+  },
+  "metrics": {
+    "Proposition2_Nuisance_Projected_Identifiability_Real_Scans": {
+      "hall_01": {
+        "num_evaluated_real_scans": 12,
+        "Full_3D_MultiWall_Clean": {
+          "identifiability_I_perp_mean": 0.8545,
+          "identifiability_I_perp_std": 0.0467,
+          "trans_gram_min_eig": 201.42,
+          "single_modality_identifiable": true
+        },
+        "Narrow_12pct_Unoccluded_Sector_After_Bag_Strip": {
+          "identifiability_I_perp_mean": 0.0907,
+          "trans_gram_min_eig": 173.83,
+          "single_modality_scale_identifiable": false
+        },
+        "Corridor_Longitudinal_Blindness": {
+          "identifiability_I_perp_mean": 0.0,
+          "trans_gram_min_eig": 117.42,
+          "longitudinal_observability_collapsed": true
+        },
+        "PlasticBag_Single_Planar_Sheet_Collinearity": {
+          "identifiability_I_perp_mean": 0.0,
+          "collinear_with_6dof_pose": true,
+          "theorem_verified": "I_perp = 0.0000 proves planar sheet shift is 100% absorbed into rigid translation without innovation/cross-modal check"
+        }
+      },
+      "room_02": {
+        "num_evaluated_real_scans": 12,
+        "Full_3D_MultiWall_Clean": {
+          "identifiability_I_perp_mean": 0.88,
+          "identifiability_I_perp_std": 0.0561,
+          "trans_gram_min_eig": 185.45,
+          "single_modality_identifiable": true
+        },
+        "Narrow_12pct_Unoccluded_Sector_After_Bag_Strip": {
+          "identifiability_I_perp_mean": 0.0676,
+          "trans_gram_min_eig": 111.58,
+          "single_modality_scale_identifiable": false
+        },
+        "Corridor_Longitudinal_Blindness": {
+          "identifiability_I_perp_mean": 0.0,
+          "trans_gram_min_eig": 109.3,
+          "longitudinal_observability_collapsed": true
+        },
+        "PlasticBag_Single_Planar_Sheet_Collinearity": {
+          "identifiability_I_perp_mean": 0.0,
+          "collinear_with_6dof_pose": true,
+          "theorem_verified": "I_perp = 0.0000 proves planar sheet shift is 100% absorbed into rigid translation without innovation/cross-modal check"
+        }
+      },
+      "hall_02": {
+        "num_evaluated_real_scans": 12,
+        "Full_3D_MultiWall_Clean": {
+          "identifiability_I_perp_mean": 0.9078,
+          "identifiability_I_perp_std": 0.0519,
+          "trans_gram_min_eig": 203.29,
+          "single_modality_identifiable": true
+        },
+        "Narrow_12pct_Unoccluded_Sector_After_Bag_Strip": {
+          "identifiability_I_perp_mean": 0.0682,
+          "trans_gram_min_eig": 112.94,
+          "single_modality_scale_identifiable": false
+        },
+        "Corridor_Longitudinal_Blindness": {
+          "identifiability_I_perp_mean": 0.0,
+          "trans_gram_min_eig": 131.9,
+          "longitudinal_observability_collapsed": true
+        },
+        "PlasticBag_Single_Planar_Sheet_Collinearity": {
+          "identifiability_I_perp_mean": 0.0,
+          "collinear_with_6dof_pose": true,
+          "theorem_verified": "I_perp = 0.0000 proves planar sheet shift is 100% absorbed into rigid translation without innovation/cross-modal check"
+        }
+      }
+    },
+    "Cross_Sequence_Zero_Tuning_Causal_Transformer": {
+      "frozen_weights_sha256": "c5a65870c1cfb13935ab10c39e009a9e766c70339acb3849cccaf34e83c2727b",
+      "sequences": {
+        "hall_02_heldout_test": {
+          "event_detection_recall": 1.0,
+          "multi_cause_routing_accuracy": 1.0,
+          "slow_ramp_4s_onset_mae_rule_fixed2s_sec": 0.8,
+          "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.1281,
+          "slow_ramp_leaked_frames_rule_fixed2s": 4.0,
+          "slow_ramp_leaked_frames_causal_transformer": 0.0,
+          "step_inference_p50_us": 618.54,
+          "step_inference_p95_us": 656.45
+        },
+        "room_02_compact_room": {
+          "event_detection_recall": 1.0,
+          "multi_cause_routing_accuracy": 1.0,
+          "slow_ramp_4s_onset_mae_rule_fixed2s_sec": 0.8,
+          "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.2427,
+          "slow_ramp_leaked_frames_rule_fixed2s": 4.0,
+          "slow_ramp_leaked_frames_causal_transformer": 0.0,
+          "step_inference_p50_us": 642.67,
+          "step_inference_p95_us": 694.84
+        },
+        "room_dark_01_natural_dark": {
+          "event_detection_recall": 1.0,
+          "multi_cause_routing_accuracy": 1.0,
+          "slow_ramp_4s_onset_mae_rule_fixed2s_sec": 0.8,
+          "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.254,
+          "slow_ramp_leaked_frames_rule_fixed2s": 4.0,
+          "slow_ramp_leaked_frames_causal_transformer": 0.0,
+          "step_inference_p50_us": 627.39,
+          "step_inference_p95_us": 677.01
+        }
+      }
+    },
+    "SpatialMutationLog_CoW_Voxel_Benchmark": {
+      "total_persistent_map_voxels_20cm": 594979,
+      "quarantined_window_dirty_voxels": 82219,
+      "dirty_fraction_of_global_map": 0.1382,
+      "first_write_cloned_voxels": 37351,
+      "zero_copy_inserted_keys": 44868,
+      "full_map_deepcopy_snapshot_ms": 1771.384,
+      "cow_rollback_mutation_journal_ms": 92.826,
+      "cow_capture_redo_image_ms": 148.712,
+      "cow_consume_redo_image_ms": 128.97,
+      "rollback_speedup_vs_full_copy": 19.08,
+      "reverted_keys_verified": 82219,
+      "restored_keys_verified": 82219
+    }
+  },
+  "created_utc": "2026-11-05T09:02:33.048232+00:00"
+}

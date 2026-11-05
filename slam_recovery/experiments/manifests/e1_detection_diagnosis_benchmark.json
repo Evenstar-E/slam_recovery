@@ -1,13 +1,14 @@
 {
   "provenance": "SYNTHETIC",
-  "note": "6-DoF point-to-plane FIM + real sklearn HistGBDT/IsolationForest + TrustedMapTransactionManager execution",
+  "transformer_weights_sha256": "fd216d3d93923a443fc06d6d265b80f191f33e09ebc29c900cd3f4f4873f52b9",
   "methods": {
     "1_MMLINS_Cov_ODD": {
       "event_recall": 0.1667,
       "plastic_bag_recall": 0.0,
       "segment_iou": 0.1667,
-      "mean_latency_sec": 0.0,
-      "mean_tail_pollution_frames": 16.67,
+      "mean_tail_pollution_frames": 20.83,
+      "slow_ramp_onset_mae_sec": 3.767,
+      "slow_ramp_tail_pollution_frames": 23.0,
       "diagnosis_accuracy": null,
       "unseen_ood_safe_rate": null
     },
@@ -15,44 +16,59 @@
       "event_recall": 0.1667,
       "plastic_bag_recall": 0.0,
       "segment_iou": 0.1667,
-      "mean_latency_sec": 0.0,
-      "mean_tail_pollution_frames": 16.67,
+      "mean_tail_pollution_frames": 20.83,
+      "slow_ramp_onset_mae_sec": 3.653,
+      "slow_ramp_tail_pollution_frames": 22.43,
       "diagnosis_accuracy": null,
       "unseen_ood_safe_rate": null
     },
     "3_NIS_Fixed": {
-      "event_recall": 0.7667,
+      "event_recall": 0.6667,
       "plastic_bag_recall": 1.0,
-      "segment_iou": 0.6283,
-      "mean_latency_sec": 0.1913,
-      "mean_tail_pollution_frames": 5.4,
+      "segment_iou": 0.624,
+      "mean_tail_pollution_frames": 8.37,
+      "slow_ramp_onset_mae_sec": 3.007,
+      "slow_ramp_tail_pollution_frames": 16.7,
       "diagnosis_accuracy": null,
       "unseen_ood_safe_rate": null
     },
     "4_NIS_CUSUM": {
       "event_recall": 0.8333,
       "plastic_bag_recall": 1.0,
-      "segment_iou": 0.654,
-      "mean_latency_sec": 0.624,
-      "mean_tail_pollution_frames": 5.93,
+      "segment_iou": 0.6826,
+      "mean_tail_pollution_frames": 6.8,
+      "slow_ramp_onset_mae_sec": 3.207,
+      "slow_ramp_tail_pollution_frames": 16.87,
       "diagnosis_accuracy": null,
       "unseen_ood_safe_rate": null
     },
     "5_Trained_HistGBDT_IForest": {
       "event_recall": 1.0,
       "plastic_bag_recall": 1.0,
-      "segment_iou": 0.7971,
-      "mean_latency_sec": 0.0,
+      "segment_iou": 0.8514,
       "mean_tail_pollution_frames": 0.0,
+      "slow_ramp_onset_mae_sec": 2.647,
+      "slow_ramp_tail_pollution_frames": 0.83,
       "diagnosis_accuracy": 0.4,
       "unseen_ood_safe_rate": 0.0
     },
-    "6_Ours_Joint_SignatureMatrix": {
+    "6_Ours_Rule_SignatureMatrix": {
       "event_recall": 1.0,
       "plastic_bag_recall": 1.0,
-      "segment_iou": 0.9511,
-      "mean_latency_sec": 0.0,
+      "segment_iou": 0.9554,
       "mean_tail_pollution_frames": 0.0,
+      "slow_ramp_onset_mae_sec": 2.02,
+      "slow_ramp_tail_pollution_frames": 0.77,
+      "diagnosis_accuracy": 1.0,
+      "unseen_ood_safe_rate": 1.0
+    },
+    "7_Ours_Full_CausalTransformer": {
+      "event_recall": 1.0,
+      "plastic_bag_recall": 1.0,
+      "segment_iou": 0.9554,
+      "mean_tail_pollution_frames": 0.0,
+      "slow_ramp_onset_mae_sec": 0.552,
+      "slow_ramp_tail_pollution_frames": 0.0,
       "diagnosis_accuracy": 1.0,
       "unseen_ood_safe_rate": 1.0
     }
