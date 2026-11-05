@@ -259,17 +259,13 @@ def simulate_map_buffer_tail_pollution(
         if pred_mask[i]:
             if estimated_age_sec_at_alarm > 0.0:
                 est_onset_ns = w.t_end_ns - int(estimated_age_sec_at_alarm * 1e9)
-                onset_mae_sec = abs(est_onset_ns - true_onset_ns) * 1e-9
-                rollback_onset_ns = w.t_end_ns - int(max(2.0, estimated_age_sec_at_alarm + 0.30) * 1e9)
             else:
-                # Without onset-age head, detector's point estimate of onset is the alarm trigger time itself,
-                # while Method 6's map manager rolls back a fixed 2.0s provisional buffer:
+                # Without onset-age head, detector's point estimate of onset is the alarm trigger time itself;
+                # trigger_quarantine internally subtracts confirmation_margin_ns (2.0s for Method 6, 0.0s for Methods 1-5).
                 est_onset_ns = w.t_start_ns
-                onset_mae_sec = abs(est_onset_ns - true_onset_ns) * 1e-9
-                rollback_onset_ns = w.t_start_ns - (int(2.0 * 1e9) if use_delayed_commit else 0)
-                mgr.promoted_history.clear()
+            onset_mae_sec = abs(est_onset_ns - true_onset_ns) * 1e-9
             mgr.trigger_quarantine(
-                estimated_onset_ns=rollback_onset_ns,
+                estimated_onset_ns=est_onset_ns,
                 current_ns=w.t_end_ns,
                 weak_direction_6d=w.weak_dir_6d,
                 info_before_6x6=np.eye(6) * w.min_eig_trans,

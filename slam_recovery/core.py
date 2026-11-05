@@ -180,6 +180,9 @@ class CandidateMap:
     repaired_factor_ids: Optional[List[int]] = None
     repaired_bias_acc: Optional[np.ndarray] = None
     repaired_bias_gyr: Optional[np.ndarray] = None
+    paired_benefit_approved: bool = True
+    wilson_lower_bound: float = 1.0
+    reentry_pos_jump_m: float = 0.0
 
 
 @dataclass
@@ -276,6 +279,7 @@ def evaluate_four_mode_gate(
             and info_gain > 0.0
             and d_hold <= thresholds.tau_val_nis
             and p_after <= thresholds.sigma_tol
+            and bool(candidate.paired_benefit_approved)
         ):
             return ValidationReport(
                 accepted=True,
@@ -286,7 +290,7 @@ def evaluate_four_mode_gate(
                 holdout_nis=d_hold,
                 posterior_cov_norm=p_after,
                 propagated_cov_norm=p_prop,
-                reason="Passed weak-direction information gain and holdout consistency checks",
+                reason="Passed weak-direction information gain, holdout consistency, and paired Wilson sequential checks",
             )
     else:
         info_after = info_before

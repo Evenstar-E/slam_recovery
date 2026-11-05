@@ -1,5 +1,5 @@
 {
-  "reviewed_commit": "fb9e6554925ca654cbfb64322348ce4ec49c18bf",
+  "reviewed_commit": "545ef5fc8f54890b98fe81f38e3a85654a3a4a7a",
   "python": "3.10.12",
   "numpy": "1.26.4",
   "original_tests": {
@@ -71,10 +71,10 @@
     }
   ],
   "source_sha256": {
-    "slam_recovery/core.py": "f993fdc3b23c7e55f56f4ebca4e03324a71ee6d00525dcc51fc32a9f5883420f",
+    "slam_recovery/core.py": "ac527af88345c32471ed37edf0d1863f1920824f40a58e0cea8311d51b924136",
     "slam_recovery/quarantine/manager.py": "ab3498ffb561b30f0ad43887bf8de2326949b6147233bfb1cca4fb359b8a713e",
     "slam_recovery/health/detector.py": "b01b0214777621fe76476a2d091848194322ff1f32dc77390b62850c329d3d4a",
-    "slam_recovery/validation/fim_and_holdout.py": "c42ac910a3fc1be8df6c411d6deda5e63ef2d701606d1f6f3d52c51c210527d4"
+    "slam_recovery/validation/fim_and_holdout.py": "bf973084342ddeacdd47484c591755f6e2aae52c387763a01e545b14e62543c6"
   },
   "scope": "Synthetic counterexamples only. No dataset replay, no original metrics recomputation, no production fix."
 }

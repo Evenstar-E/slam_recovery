@@ -106,7 +106,9 @@ def fig2_b0_to_b6_ablation_and_recovery_ratio() -> str:
 
     label_map = {
         "B0_Original_Host": "B0: Orig Host",
+        "B1_Online_Directional_Projection_Mode1Only": "B1: Online Proj.",
         "B2_MultiMap_HardSleep_MMLINS": "B2: MM-LINS",
+        "B3_Rollback_Only_Same_Data": "B3: Rollback Same-D",
         "B4_DelayedCommit_Quarantine_NoRepair": "B4: Quarantine Only",
         "B5_Repair_Without_Validation": "B5: Repair No-Val",
         "B6_Ours_Full_Verifiable_Recovery": "B6: Ours (Full)",
@@ -121,7 +123,7 @@ def fig2_b0_to_b6_ablation_and_recovery_ratio() -> str:
     y = np.arange(len(labels))
     h = 0.36
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10.8, 4.5), sharey=True, constrained_layout=True)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10.8, 5.2), sharey=True, constrained_layout=True)
 
     b1 = ax1.barh(y - h / 2, fl_ate, height=h, color=BLUE, label="FAST-LIO2 Host ATE (m)")
     b2 = ax1.barh(y + h / 2, lio_ate, height=h, color=ORANGE, label="LIO-SAM Host ATE (m)")

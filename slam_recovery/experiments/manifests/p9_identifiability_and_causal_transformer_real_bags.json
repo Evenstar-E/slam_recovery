@@ -90,37 +90,39 @@
       }
     },
     "Cross_Sequence_Zero_Tuning_Causal_Transformer": {
-      "frozen_weights_sha256": "c5a65870c1cfb13935ab10c39e009a9e766c70339acb3849cccaf34e83c2727b",
+      "feature_provenance": "SEMI_SYNTHETIC_ON_REAL_SCANS (real 48-cell spherical tensors & real scan-derived 6D FIM eigenvalues + controlled residual/conflict profiles)",
+      "readout_training_method": "Closed-Form Ridge-Regularized Readout over Frozen Causal Relative-Attention Representation (113-D)",
+      "frozen_weights_sha256": "3fd6e3cfac2c972a2b1cc565b415e0423098ed98b17c491a976984bb7d498785",
       "sequences": {
         "hall_02_heldout_test": {
           "event_detection_recall": 1.0,
           "multi_cause_routing_accuracy": 1.0,
           "slow_ramp_4s_onset_mae_rule_fixed2s_sec": 0.8,
-          "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.1281,
+          "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.1789,
           "slow_ramp_leaked_frames_rule_fixed2s": 4.0,
           "slow_ramp_leaked_frames_causal_transformer": 0.0,
-          "step_inference_p50_us": 618.54,
-          "step_inference_p95_us": 656.45
+          "step_inference_p50_us": 627.19,
+          "step_inference_p95_us": 668.21
         },
         "room_02_compact_room": {
           "event_detection_recall": 1.0,
           "multi_cause_routing_accuracy": 1.0,
           "slow_ramp_4s_onset_mae_rule_fixed2s_sec": 0.8,
-          "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.2427,
+          "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.2678,
           "slow_ramp_leaked_frames_rule_fixed2s": 4.0,
           "slow_ramp_leaked_frames_causal_transformer": 0.0,
-          "step_inference_p50_us": 642.67,
-          "step_inference_p95_us": 694.84
+          "step_inference_p50_us": 632.52,
+          "step_inference_p95_us": 663.9
         },
         "room_dark_01_natural_dark": {
           "event_detection_recall": 1.0,
           "multi_cause_routing_accuracy": 1.0,
           "slow_ramp_4s_onset_mae_rule_fixed2s_sec": 0.8,
-          "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.254,
+          "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.2462,
           "slow_ramp_leaked_frames_rule_fixed2s": 4.0,
           "slow_ramp_leaked_frames_causal_transformer": 0.0,
-          "step_inference_p50_us": 627.39,
-          "step_inference_p95_us": 677.01
+          "step_inference_p50_us": 631.76,
+          "step_inference_p95_us": 675.76
         }
       }
     },
@@ -130,14 +132,14 @@
       "dirty_fraction_of_global_map": 0.1382,
       "first_write_cloned_voxels": 37351,
       "zero_copy_inserted_keys": 44868,
-      "full_map_deepcopy_snapshot_ms": 1771.384,
-      "cow_rollback_mutation_journal_ms": 92.826,
-      "cow_capture_redo_image_ms": 148.712,
-      "cow_consume_redo_image_ms": 128.97,
-      "rollback_speedup_vs_full_copy": 19.08,
+      "full_map_deepcopy_snapshot_ms": 1762.539,
+      "cow_rollback_mutation_journal_ms": 84.623,
+      "cow_capture_redo_image_ms": 137.448,
+      "cow_consume_redo_image_ms": 132.411,
+      "rollback_speedup_vs_full_copy": 20.83,
       "reverted_keys_verified": 82219,
       "restored_keys_verified": 82219
     }
   },
-  "created_utc": "2026-11-05T09:02:33.048232+00:00"
+  "created_utc": "2026-11-05T10:05:14.146410+00:00"
 }

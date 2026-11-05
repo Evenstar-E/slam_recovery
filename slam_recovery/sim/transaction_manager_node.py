@@ -29,7 +29,7 @@ from ..core import (
 )
 from ..diagnosis import SignatureMatrixRouter
 from ..health import DetectorConfig, JointHealthDetector
-from ..quarantine import TrustedMapTransactionManager
+from ..quarantine import SpatialMutationLog, TrustedMapTransactionManager
 from ..validation import (
     compute_6dof_point_to_plane_fim,
     compute_disjoint_holdout_point_to_plane_nis,
@@ -62,8 +62,13 @@ class OnlineRecoveryTransactionNode:
 
         # Raw scan buffer indexed by keyframe_id for cross-scan holdout validation and 3D map commit
         self.scan_buffer_body: Dict[int, np.ndarray] = {}
-        self.committed_voxel_set: set[Tuple[int, int, int]] = set()
+        self.voxel_store: Dict[Tuple[int, int, int], int] = {}
+        self.voxel_journal: SpatialMutationLog[Tuple[int, int, int], int] = SpatialMutationLog(self.voxel_store)
         self.committed_map_points: List[np.ndarray] = []
+
+    @property
+    def committed_voxel_set(self) -> set[Tuple[int, int, int]]:
+        return set(self.voxel_store.keys())
 
     def _quantize_voxels(self, pts_world: np.ndarray) -> set[Tuple[int, int, int]]:
         q = np.floor(pts_world[:, :3] / self.voxel_size_m).astype(np.int32)
@@ -75,7 +80,8 @@ class OnlineRecoveryTransactionNode:
                 T_w_b = self.tx_mgr.trusted_poses[kf_id]
                 pts_b = self.scan_buffer_body[kf_id][:, :3]
                 pts_w = (pts_b @ T_w_b[:3, :3].T) + T_w_b[:3, 3]
-                self.committed_voxel_set.update(self._quantize_voxels(pts_w))
+                for v_key in self._quantize_voxels(pts_w):
+                    self.voxel_journal.put(v_key, int(kf_id))
                 self.committed_map_points.append(pts_w[::4])
 
     def get_trusted_map_points(self, max_pts: int = 2000) -> np.ndarray:
@@ -193,7 +199,7 @@ class OnlineRecoveryTransactionNode:
                 )
                 holdout_nis_list.append(nis_k)
                 fim_k, _, _, _, _ = compute_6dof_point_to_plane_fim(
-                    pts_w, sigma_meas_m=0.10, aux_odom_info_6x6=aux_or_loop_info_6x6
+                    pts_w, sigma_meas_m=0.075, aux_odom_info_6x6=aux_or_loop_info_6x6
                 )
                 fims_after.append(fim_k)
 
@@ -210,7 +216,7 @@ class OnlineRecoveryTransactionNode:
             parent_map_version=self.tx_mgr.trusted_version,
             repaired_poses=repaired_poses,
             info_after_6x6=info_after,
-            cov_after_6x6=cov_after * 0.05,
+            cov_after_6x6=cov_after,
             holdout_nis=mean_holdout_nis,
         )
         prev_keys = set(self.tx_mgr.trusted_poses.keys())
@@ -218,4 +224,5 @@ class OnlineRecoveryTransactionNode:
         if report.accepted:
             new_keys = list(set(self.tx_mgr.trusted_poses.keys()) - prev_keys)
             self._promote_voxels_from_trusted_poses(new_keys)
+            self.voxel_journal.commit_generation()
         return report

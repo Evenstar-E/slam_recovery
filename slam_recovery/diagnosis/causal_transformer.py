@@ -116,8 +116,8 @@ class PhysicsGuidedCausalTransformer:
                 "rel_bias": rel_bias,  # (H, M+1)
             })
 
-        # Output heads (fitted via ridge/logistic regression on causal representations h_t^{(L)} + skip connection)
-        feat_dim = 80 + self.d_model
+        # Output heads (fitted via closed-form ridge-regularized readout on causal representation [x_t, h_t^{(L)}, ramp_slope])
+        feat_dim = 80 + self.d_model + 1
         self.W_act = np.zeros(feat_dim)
         self.b_act = -2.0
         self.W_age = np.zeros((feat_dim, self.n_age_bins))
@@ -176,9 +176,8 @@ class PhysicsGuidedCausalTransformer:
         h2 = self._attend_step(h1, self.cache_l1, layer_idx=1)
 
         recent_deltas = np.asarray([c[:16] for c in self.cache_l0[-15:]])
-        ramp_slope = np.mean(recent_deltas[-1] - recent_deltas[0]) if len(recent_deltas) > 1 else 0.0
-        rep = np.concatenate([x_t, h2], axis=0)
-        rep[-1] = ramp_slope
+        ramp_slope = float(np.mean(recent_deltas[-1] - recent_deltas[0])) if len(recent_deltas) > 1 else 0.0
+        rep = np.concatenate([x_t, h2, np.array([ramp_slope], dtype=np.float64)], axis=0)
         return rep, past_ready
 
     def extract_sequence_representations(

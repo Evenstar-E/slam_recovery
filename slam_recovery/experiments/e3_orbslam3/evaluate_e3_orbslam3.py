@@ -151,8 +151,11 @@ def compute_cross_scan_holdout_nis_and_fim(
 
     vals_r, vecs_r = np.linalg.eigh(0.5 * (fim_mean[:3, :3] + fim_mean[:3, :3].T))
     vals_t, vecs_t = np.linalg.eigh(0.5 * (fim_mean[3:, 3:] + fim_mean[3:, 3:].T))
+    vals_6d, vecs_6d = np.linalg.eigh(0.5 * (fim_mean + fim_mean.T))
     weak_6d = np.zeros(6, dtype=np.float64)
-    if vals_r[0] < vals_t[0]:
+    if vals_6d[0] < min(vals_r[0], vals_t[0]):
+        weak_6d = vecs_6d[:, 0] / max(float(np.linalg.norm(vecs_6d[:, 0])), 1e-12)
+    elif vals_r[0] < vals_t[0]:
         weak_6d[:3] = vecs_r[:, 0]
     else:
         weak_6d[3:] = vecs_t[:, 0]
@@ -399,19 +402,7 @@ def main() -> None:
             propagated_cov_norm=0.85,
         )
 
-        cand = CandidateMap(
-            candidate_id=f"orb3_{level_name}_b6",
-            parent_map_version=tx_mgr.trusted_version,
-            repaired_poses={i: xyz_b6[i] for i in range(len(ts_clean)) if t_q_start <= ts_clean[i] <= t_q_end},
-            info_after_6x6=fim_after,
-            cov_after_6x6=cov_after,
-            holdout_nis=holdout_nis,
-            used_evidence_refs=["/Odometry (FAST-LIO2 healthy LiDAR-inertial relative motion)"],
-            repairer_name="keyframe_boundary_anchored_lidar_repairer",
-        )
-        val_report = tx_mgr.validate_and_resolve(candidate=cand)
-
-        # Unbiased sequential Wilson lower bound directly on genuine cross-scan NIS sequences (no +0.04 or *1.25!)
+        # Pre-commit sequential Wilson lower bound & re-entry continuity check BEFORE calling validate_and_resolve
         inc_nis_seq = nis_seq_b2 if gain_g == 0.05 else nis_seq_b0
         b5_exit_idx = int(np.searchsorted(ts_clean, t0 + 145.0))
         reentry_idx = int(np.searchsorted(ts_clean, t_q_end))
@@ -430,6 +421,21 @@ def main() -> None:
             reentry_position_jump_m=reentry_jump_b6,
             min_relative_gain_per_frame=0.01,
         )
+
+        cand = CandidateMap(
+            candidate_id=f"orb3_{level_name}_b6",
+            parent_map_version=tx_mgr.trusted_version,
+            repaired_poses={i: xyz_b6[i] for i in range(len(ts_clean)) if t_q_start <= ts_clean[i] <= t_q_end},
+            info_after_6x6=fim_after,
+            cov_after_6x6=cov_after,
+            holdout_nis=holdout_nis,
+            used_evidence_refs=["/Odometry (FAST-LIO2 healthy LiDAR-inertial relative motion)"],
+            repairer_name="keyframe_boundary_anchored_lidar_repairer",
+            paired_benefit_approved=wilson_b6.approved,
+            wilson_lower_bound=wilson_b6.wilson_lower_bound,
+            reentry_pos_jump_m=reentry_jump_b6,
+        )
+        val_report = tx_mgr.validate_and_resolve(candidate=cand)
 
         m_b6 = evaluate_trajectory(ts_clean, xyz_b6, ts_gt, xyz_gt)
         b6_win_rmse, b6_win_max = window_rmse(ts_clean, xyz_b6, ts_gt, xyz_gt, t0)

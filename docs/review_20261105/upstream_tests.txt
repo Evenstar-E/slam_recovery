@@ -25,6 +25,6 @@ test_recovery_ratio_G_captures_campus2_degradation (slam_recovery.tests.test_tru
 test_trusted_map_invariant_during_mode3_and_archived_on_mode4 (slam_recovery.tests.test_trusted_map_invariance.TestTrustedMapInvariance) ... ok
 
 ----------------------------------------------------------------------
-Ran 17 tests in 0.058s
+Ran 17 tests in 0.060s
 
 OK

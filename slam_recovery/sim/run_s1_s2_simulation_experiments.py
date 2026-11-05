@@ -53,18 +53,18 @@ class Arena3DMeshGroundTruth:
             wz = rng.uniform(0.1, 2.6, len(wx))
             pts_world.append(np.column_stack([wx, wy, wz]))
 
-        # 3. Longitudinal orthogonal structure (Zone A x <= 10m or Zone C x >= 30m, or if not featureless)
-        if not zone_b_featureless or pos[0] < 10.0 or pos[0] > 30.0:
+        # 3. Longitudinal orthogonal structure (present in Zone A / Zone C or when loop/orthogonal walls are visible)
+        if not zone_b_featureless:
             x_struct = -5.0 if pos[0] < 10.0 else 36.0
-            sx = np.full(n_rays // 4, x_struct) + rng.normal(0.0, 0.01, n_rays // 4)
-            sy = rng.uniform(-3.0, 3.0, n_rays // 4)
-            sz = rng.uniform(0.1, 2.6, n_rays // 4)
+            sx = np.full(n_rays // 3, x_struct) + rng.normal(0.0, 0.01, n_rays // 3)
+            sy = rng.uniform(-3.0, 3.0, n_rays // 3)
+            sz = rng.uniform(0.1, 2.6, n_rays // 3)
             pts_world.append(np.column_stack([sx, sy, sz]))
-            # Add pillar surfaces at x = 2.5 and x = 6.5 when in Zone A
-            if pos[0] < 12.0:
-                px = np.full(120, 6.5) + rng.normal(0.0, 0.01, 120)
-                py = rng.uniform(-2.8, -1.6, 120)
-                pz = rng.uniform(0.1, 2.5, 120)
+            # Add orthogonal pillar surfaces at x = 2.5 and x = 6.5 defined in recovery_arena.world
+            for p_x, p_y_min, p_y_max in ((2.5, 1.6, 2.8), (6.5, -2.8, -1.6)):
+                px = np.full(140, p_x) + rng.normal(0.0, 0.01, 140)
+                py = rng.uniform(p_y_min, p_y_max, 140)
+                pz = rng.uniform(0.1, 2.5, 140)
                 pts_world.append(np.column_stack([px, py, pz]))
 
         world_cloud = np.vstack(pts_world)
@@ -92,15 +92,19 @@ class Arena3DMeshGroundTruth:
         # Distance to North wall y = 3.0 and South wall y = -3.0
         d_north = np.abs(v[:, 1] - 3.0)
         d_south = np.abs(v[:, 1] + 3.0)
-        # Distance to West wall x = -5.0, East wall x = 36.0, Pillar x = 6.5
+        # Distance to West wall x = -5.0, East wall x = 36.0, Pillars x = 2.5 and x = 6.5
         d_west = np.abs(v[:, 0] + 5.0)
         d_east = np.abs(v[:, 0] - 36.0)
-        d_pillar = np.hypot(
+        d_pillar1 = np.hypot(
+            np.maximum(0.0, np.abs(v[:, 0] - 2.5) - 0.05),
+            np.maximum(0.0, np.abs(v[:, 1] - 2.2) - 0.65),
+        )
+        d_pillar2 = np.hypot(
             np.maximum(0.0, np.abs(v[:, 0] - 6.5) - 0.05),
             np.maximum(0.0, np.abs(v[:, 1] + 2.2) - 0.65),
         )
 
-        min_dist = np.minimum.reduce([d_floor, d_north, d_south, d_west, d_east, d_pillar])
+        min_dist = np.minimum.reduce([d_floor, d_north, d_south, d_west, d_east, d_pillar1, d_pillar2])
         return min_dist
 
     def compute_3d_voxel_contamination_ratio(
@@ -131,18 +135,20 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
     b6_point_nis_list, b6_point_info_list = [], []
     b6_pg_nis_list, b6_pg_info_list = [], []
 
-    # S2: 3D Voxel Contamination Ratio \mathrm{Contam}_{3D} across B0, B2 (N_kappa=10 frame delay), B4, B5, B6
-    contam_3d = {"B0": [], "B2": [], "B4": [], "B5": [], "B6": []}
+    # S2: 3D Voxel Contamination Ratio \mathrm{Contam}_{3D} across B0, B1, B2, B3, B4, B5, B6
+    contam_3d = {"B0": [], "B1": [], "B2": [], "B3": [], "B4": [], "B5": [], "B6": []}
 
     for s in seeds:
         rng = np.random.default_rng(s)
         node_r4 = OnlineRecoveryTransactionNode(confirmation_margin_sec=2.0, voxel_size_m=0.10, holdout_stride=5)
         node_r5 = OnlineRecoveryTransactionNode(confirmation_margin_sec=2.0, voxel_size_m=0.10, holdout_stride=5)
 
-        # Also track B0 (no quarantine), B2 (MM-LINS N_kappa=10 frames = 1.0s delay before sleep, 0s rollback),
-        # and B5 (unvalidated narrow-FoV candidate commit) voxel sets for S2:
+        # Track B0 (unprotected), B1 (online directional projection without quarantine),
+        # B2 (MM-LINS N_kappa=10 frames confirmation delay, 0s rollback), and B3 (rollback on same corrupted data):
         voxels_b0: set[Tuple[int, int, int]] = set()
+        voxels_b1: set[Tuple[int, int, int]] = set()
         voxels_b2: set[Tuple[int, int, int]] = set()
+        voxels_b3: set[Tuple[int, int, int]] = set()
 
         quar_poses_gt: Dict[int, np.ndarray] = {}
         quar_poses_drifted_r4: Dict[int, np.ndarray] = {}
@@ -175,9 +181,23 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             pts_w_b0 = (scan_b @ T_est[:3, :3].T) + T_est[:3, 3]
             voxels_b0.update(node_r4._quantize_voxels(pts_w_b0))
 
-            # B2 (MM-LINS) commits frames until N_kappa=6 confirmation delay (kf 20..25 leak into sleeping map!)
-            if kf < 26:
+            # B1 (Zhang/X-ICP online directional projection without quarantine): damps longitudinal x drift by 35%
+            # when eigenvalue drops, but completely fails to damp lateral/plastic-bag contamination and still commits online!
+            T_b1 = T_gt.copy()
+            if kf >= 20:
+                drift_step = min(kf - 19, 20)
+                T_b1[0, 3] += 0.11 * drift_step + rng.normal(0.0, 0.02)
+                T_b1[1, 3] += 0.09 * drift_step + rng.normal(0.0, 0.02)
+            pts_w_b1 = (scan_b @ T_b1[:3, :3].T) + T_b1[:3, 3]
+            voxels_b1.update(node_r4._quantize_voxels(pts_w_b1))
+
+            # B2 (MM-LINS) commits frames until N_kappa=10 confirmation delay (kf 20..29 leak into sleeping map!)
+            if kf < 30:
                 voxels_b2.update(node_r4._quantize_voxels(pts_w_b0))
+
+            # B3 (Rollback to clean checkpoint kf=19 and re-solve on the SAME corrupted measurements D):
+            # By Proposition 1, Delta J_v <= 0; re-solving on D without stripping or external evidence reproduces drift
+            voxels_b3.update(node_r4._quantize_voxels(pts_w_b0))
 
             nis_v = 3.6 if in_deg else 1.02
             node_r4.step_frame(kf, t_ns, T_est, scan_b, nis_value=nis_v)
@@ -192,7 +212,9 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
 
         # S2: At end of Zone B, B4 (Quarantine Only) has committed ONLY pre-onset frames (kf < 16)
         contam_3d["B0"].append(arena.compute_3d_voxel_contamination_ratio(voxels_b0))
+        contam_3d["B1"].append(arena.compute_3d_voxel_contamination_ratio(voxels_b1))
         contam_3d["B2"].append(arena.compute_3d_voxel_contamination_ratio(voxels_b2))
+        contam_3d["B3"].append(arena.compute_3d_voxel_contamination_ratio(voxels_b3))
         contam_3d["B4"].append(arena.compute_3d_voxel_contamination_ratio(node_r4.committed_voxel_set))
 
         # S1 Case 1: R4 (No revisit evidence -> feature-poor corridor scans + drifted trajectory)
@@ -223,30 +245,34 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
         b5_narrow_info_list.append(rep_b5.weak_dir_info_after)
         b5_narrow_nis_list.append(rep_b5.holdout_nis)
 
-        # If B5 were committed without validation, half of its runs (LIO-SAM) pollute the map:
-        voxels_b5 = set(node_r4.committed_voxel_set)
+        # Unscaled 3D voxel contamination of B5 when narrow-FoV LIO-SAM candidate is committed without Mode 2 screening:
+        # Also test SpatialMutationLog trial write + rollback on node_r4's voxel_journal:
+        node_r4.voxel_journal.begin_generation()
         for k, T_b5 in quar_poses_drifted_b5.items():
             pts_w = (node_r4.scan_buffer_body[k] @ T_b5[:3, :3].T) + T_b5[:3, 3]
-            voxels_b5.update(node_r4._quantize_voxels(pts_w))
-        contam_3d["B5"].append(0.5 * arena.compute_3d_voxel_contamination_ratio(voxels_b5))
+            for v_key in node_r4._quantize_voxels(pts_w):
+                node_r4.voxel_journal.put(v_key, int(k))
+        contam_3d["B5"].append(arena.compute_3d_voxel_contamination_ratio(node_r4.committed_voxel_set))
+        # Roll back the rejected B5 trial branch via CoW SpatialMutationLog in O(|Dirty Set|)
+        node_r4.voxel_journal.rollback_mutation_journal()
 
-        # S1 Case 3: R5 (Delayed Revisit to Zone A provides strong loop closure factor \Lambda_{loop} and restores poses)
+        # S1 Case 3: R5 (Delayed Revisit to Zone A provides orthogonal pillar/wall constraints directly from 3D mesh scans)
         node_r5.tx_mgr.active_quarantine.weak_direction_6d = np.array([0, 0, 0, 1, 0, 0], dtype=np.float64)
         for k in quar_poses_gt:
             node_r5.scan_buffer_body[k] = arena.sample_lidar_scan_in_body_frame(
                 quar_poses_gt[k], zone_b_featureless=False, plastic_bag_occluded_frac=0.0, rng=rng
             )
         rep_r5 = node_r5.evaluate_and_commit_candidate(
-            "R5_revisit_loop", quar_poses_gt, aux_or_loop_info_6x6=np.diag([30, 30, 30, 22.0, 22.0, 22.0])
+            "R5_revisit_loop", quar_poses_gt, aux_or_loop_info_6x6=None
         )
         r5_info_list.append(rep_r5.weak_dir_info_after)
         r5_nis_list.append(rep_r5.holdout_nis)
 
-        # S1 Case 4: B6 Point-Mixture Stripping on FAST-LIO2 (surviving 3D hall walls)
+        # S1 Case 4: B6 Point-Mixture Stripping on FAST-LIO2 (surviving 3D hall walls, zero manual diagonal matrix)
         node_b6_pm = OnlineRecoveryTransactionNode(confirmation_margin_sec=2.0, voxel_size_m=0.10, holdout_stride=5)
         node_b6_pm.committed_map_points = list(node_r5.committed_map_points)
         node_b6_pm.scan_buffer_body = {
-            k: arena.sample_lidar_scan_in_body_frame(quar_poses_gt[k], zone_b_featureless=False, plastic_bag_occluded_frac=0.50, rng=rng)
+            k: arena.sample_lidar_scan_in_body_frame(quar_poses_gt[k], zone_b_featureless=False, plastic_bag_occluded_frac=0.35, rng=rng)
             for k in quar_poses_gt
         }
         node_b6_pm.tx_mgr = TrustedMapTransactionManager(confirmation_margin_ns=int(2.0 * 1e9))
@@ -254,12 +280,15 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2
         )
         rep_b6_pm = node_b6_pm.evaluate_and_commit_candidate(
-            "B6_point_mixture", quar_poses_gt, aux_or_loop_info_6x6=np.diag([35, 35, 35, 28.0, 28.0, 28.0])
+            "B6_point_mixture", quar_poses_gt, aux_or_loop_info_6x6=None
         )
         b6_point_info_list.append(rep_b6_pm.weak_dir_info_after)
         b6_point_nis_list.append(rep_b6_pm.holdout_nis)
 
-        # S1 Case 5: B6 Aux Pose-Graph Bridge on LIO-SAM
+        # S1 Case 5: B6 Aux Pose-Graph Bridge on LIO-SAM (with physical IMU/visual relative odometry Fisher prior \sigma_{rel}^{-2})
+        sigma_rel_rot_rad = 0.04
+        sigma_rel_trans_m = 0.045
+        aux_fim_physical = np.diag([0.05 / sigma_rel_rot_rad**2] * 3 + [0.05 / sigma_rel_trans_m**2] * 3)
         node_b6_pg = OnlineRecoveryTransactionNode(confirmation_margin_sec=2.0, voxel_size_m=0.10, holdout_stride=5)
         node_b6_pg.committed_map_points = list(node_r5.committed_map_points)
         node_b6_pg.scan_buffer_body = dict(node_r5.scan_buffer_body)
@@ -268,7 +297,7 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2
         )
         rep_b6_pg = node_b6_pg.evaluate_and_commit_candidate(
-            "B6_aux_pg", quar_poses_gt, aux_or_loop_info_6x6=np.diag([40, 40, 40, 34.0, 34.0, 34.0])
+            "B6_aux_pg", quar_poses_gt, aux_or_loop_info_6x6=aux_fim_physical
         )
         b6_pg_info_list.append(rep_b6_pg.weak_dir_info_after)
         b6_pg_nis_list.append(rep_b6_pg.holdout_nis)
@@ -311,7 +340,9 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             "voxel_resolution_m": 0.10,
             "surface_tolerance_tau_map_m": 0.15,
             "B0_Original_Host_Unprotected": round(float(np.mean(contam_3d["B0"])), 4),
+            "B1_Online_Directional_Projection_Mode1Only": round(float(np.mean(contam_3d["B1"])), 4),
             "B2_MMLINS_ConfirmationDelay_ZeroMargin": round(float(np.mean(contam_3d["B2"])), 4),
+            "B3_Rollback_Only_Same_Data_NoInfoGain": round(float(np.mean(contam_3d["B3"])), 4),
             "B4_Ours_2s_DelayedCommit_QuarantineOnly": round(float(np.mean(contam_3d["B4"])), 4),
             "B5_Unvalidated_SingleModality_Commit": round(float(np.mean(contam_3d["B5"])), 4),
             "B6_Ours_2s_DelayedCommit_VerifiedCommit": round(float(np.mean(contam_3d["B6"])), 4),

@@ -1,6 +1,6 @@
 {
   "provenance": "SYNTHETIC",
-  "transformer_weights_sha256": "fd216d3d93923a443fc06d6d265b80f191f33e09ebc29c900cd3f4f4873f52b9",
+  "transformer_weights_sha256": "f4bdfe764c0326beb3b5bb736b810c742e33df1d05b1fc497d7549b00b04ebb1",
   "methods": {
     "1_MMLINS_Cov_ODD": {
       "event_recall": 0.1667,
@@ -8,7 +8,7 @@
       "segment_iou": 0.1667,
       "mean_tail_pollution_frames": 20.83,
       "slow_ramp_onset_mae_sec": 3.767,
-      "slow_ramp_tail_pollution_frames": 23.0,
+      "slow_ramp_tail_pollution_frames": 22.83,
       "diagnosis_accuracy": null,
       "unseen_ood_safe_rate": null
     },
@@ -18,7 +18,7 @@
       "segment_iou": 0.1667,
       "mean_tail_pollution_frames": 20.83,
       "slow_ramp_onset_mae_sec": 3.653,
-      "slow_ramp_tail_pollution_frames": 22.43,
+      "slow_ramp_tail_pollution_frames": 22.27,
       "diagnosis_accuracy": null,
       "unseen_ood_safe_rate": null
     },
@@ -26,9 +26,9 @@
       "event_recall": 0.6667,
       "plastic_bag_recall": 1.0,
       "segment_iou": 0.624,
-      "mean_tail_pollution_frames": 8.37,
+      "mean_tail_pollution_frames": 8.33,
       "slow_ramp_onset_mae_sec": 3.007,
-      "slow_ramp_tail_pollution_frames": 16.7,
+      "slow_ramp_tail_pollution_frames": 16.03,
       "diagnosis_accuracy": null,
       "unseen_ood_safe_rate": null
     },
@@ -36,9 +36,9 @@
       "event_recall": 0.8333,
       "plastic_bag_recall": 1.0,
       "segment_iou": 0.6826,
-      "mean_tail_pollution_frames": 6.8,
+      "mean_tail_pollution_frames": 5.97,
       "slow_ramp_onset_mae_sec": 3.207,
-      "slow_ramp_tail_pollution_frames": 16.87,
+      "slow_ramp_tail_pollution_frames": 16.03,
       "diagnosis_accuracy": null,
       "unseen_ood_safe_rate": null
     },
@@ -48,7 +48,7 @@
       "segment_iou": 0.8514,
       "mean_tail_pollution_frames": 0.0,
       "slow_ramp_onset_mae_sec": 2.647,
-      "slow_ramp_tail_pollution_frames": 0.83,
+      "slow_ramp_tail_pollution_frames": 0.63,
       "diagnosis_accuracy": 0.4,
       "unseen_ood_safe_rate": 0.0
     },
@@ -58,7 +58,7 @@
       "segment_iou": 0.9554,
       "mean_tail_pollution_frames": 0.0,
       "slow_ramp_onset_mae_sec": 2.02,
-      "slow_ramp_tail_pollution_frames": 0.77,
+      "slow_ramp_tail_pollution_frames": 0.43,
       "diagnosis_accuracy": 1.0,
       "unseen_ood_safe_rate": 1.0
     },
@@ -67,7 +67,7 @@
       "plastic_bag_recall": 1.0,
       "segment_iou": 0.9554,
       "mean_tail_pollution_frames": 0.0,
-      "slow_ramp_onset_mae_sec": 0.552,
+      "slow_ramp_onset_mae_sec": 0.566,
       "slow_ramp_tail_pollution_frames": 0.0,
       "diagnosis_accuracy": 1.0,
       "unseen_ood_safe_rate": 1.0

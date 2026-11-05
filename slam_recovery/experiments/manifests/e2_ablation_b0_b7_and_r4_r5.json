@@ -7,7 +7,16 @@
       "FAST_LIO2_G": 0.0,
       "LIO_SAM_G": 0.0,
       "trusted_map_pollution_ratio": 0.6548,
-      "true_3d_voxel_contamination_ratio": 0.4348
+      "true_3d_voxel_contamination_ratio": 0.4066
+    },
+    "B1_Online_Directional_Projection_Mode1Only": {
+      "provenance": "OFFLINE_CONSTRUCT",
+      "FAST_LIO2_ate_rmse_m": 7.0637,
+      "LIO_SAM_ate_rmse_m": 7.4117,
+      "FAST_LIO2_G": 0.0303,
+      "LIO_SAM_G": -0.2564,
+      "trusted_map_pollution_ratio": 0.6548,
+      "true_3d_voxel_contamination_ratio": 0.406
     },
     "B2_MultiMap_HardSleep_MMLINS": {
       "provenance": "INJECTION",
@@ -16,7 +25,16 @@
       "FAST_LIO2_G": 0.1881,
       "LIO_SAM_G": 0.0004,
       "trusted_map_pollution_ratio": 0.7063,
-      "true_3d_voxel_contamination_ratio": 0.1817
+      "true_3d_voxel_contamination_ratio": 0.1741
+    },
+    "B3_Rollback_Only_Same_Data": {
+      "provenance": "OFFLINE_CONSTRUCT",
+      "FAST_LIO2_ate_rmse_m": 7.0583,
+      "LIO_SAM_ate_rmse_m": 7.3969,
+      "FAST_LIO2_G": 0.0311,
+      "LIO_SAM_G": -0.2537,
+      "trusted_map_pollution_ratio": 0.6548,
+      "true_3d_voxel_contamination_ratio": 0.4066
     },
     "B4_DelayedCommit_Quarantine_NoRepair": {
       "provenance": "OFFLINE_CONSTRUCT",
@@ -34,7 +52,7 @@
       "FAST_LIO2_G": 0.9949,
       "LIO_SAM_G": -0.0055,
       "trusted_map_pollution_ratio": 0.3252,
-      "true_3d_voxel_contamination_ratio": 0.2628
+      "true_3d_voxel_contamination_ratio": 0.6116
     },
     "B6_Ours_Full_Verifiable_Recovery": {
       "provenance": "FAST-LIO2: INJECTION, LIO-SAM: OFFLINE_CONSTRUCT",
@@ -48,38 +66,40 @@
   },
   "gate_verification_cases": {
     "R4_Dual_Blind_No_Evidence": {
-      "weak_dir_info_after": 18.2,
-      "holdout_nis": 5.689,
+      "weak_dir_info_after": 0.78,
+      "holdout_nis": 5.881,
       "mode": "MODE3_SOFT_BRIDGE_WAIT"
     },
     "B5_Narrow_FoV_Filter_LIOSAM": {
-      "weak_dir_info_after": 34.39,
-      "holdout_nis": 4.004,
+      "weak_dir_info_after": 20.51,
+      "holdout_nis": 3.867,
       "mode": "MODE3_SOFT_BRIDGE_WAIT"
     },
     "R5_Delayed_Revisit_Loop": {
-      "weak_dir_info_after": 55.23,
-      "holdout_nis": 1.099,
+      "weak_dir_info_after": 87.87,
+      "holdout_nis": 1.645,
       "mode": "MODE2_ATOMIC_COMMIT"
     },
     "B6_Ours_Point_Mixture_FASTLIO2": {
-      "weak_dir_info_after": 53.32,
-      "holdout_nis": 0.909,
+      "weak_dir_info_after": 81.24,
+      "holdout_nis": 0.95,
       "mode": "MODE2_ATOMIC_COMMIT"
     },
     "B6_Ours_Aux_PoseGraph_LIOSAM": {
-      "weak_dir_info_after": 67.23,
-      "holdout_nis": 1.171,
+      "weak_dir_info_after": 112.56,
+      "holdout_nis": 1.661,
       "mode": "MODE2_ATOMIC_COMMIT"
     }
   },
   "s2_true_3d_voxel_contamination": {
     "voxel_resolution_m": 0.1,
     "surface_tolerance_tau_map_m": 0.15,
-    "B0_Original_Host_Unprotected": 0.4348,
-    "B2_MMLINS_ConfirmationDelay_ZeroMargin": 0.1817,
+    "B0_Original_Host_Unprotected": 0.4066,
+    "B1_Online_Directional_Projection_Mode1Only": 0.406,
+    "B2_MMLINS_ConfirmationDelay_ZeroMargin": 0.1741,
+    "B3_Rollback_Only_Same_Data_NoInfoGain": 0.4066,
     "B4_Ours_2s_DelayedCommit_QuarantineOnly": 0.0,
-    "B5_Unvalidated_SingleModality_Commit": 0.2628,
+    "B5_Unvalidated_SingleModality_Commit": 0.6116,
     "B6_Ours_2s_DelayedCommit_VerifiedCommit": 0.0
   },
   "loop_outlier_revocation_results": {
@@ -96,8 +116,8 @@
     "R4_accepted": false,
     "R5_delayed_revisit_mode": "MODE2_ATOMIC_COMMIT",
     "R5_accepted": true,
-    "R5_weak_dir_info_before": 18.2,
-    "R5_weak_dir_info_after": 55.23,
-    "R5_weak_dir_info_gain": 37.03
+    "R5_weak_dir_info_before": 0.78,
+    "R5_weak_dir_info_after": 87.87,
+    "R5_weak_dir_info_gain": 87.09
   }
 }

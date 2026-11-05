@@ -1731,14 +1731,16 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
 
 仿真世界文件：[recovery_arena.world](slam_recovery/sim/recovery_arena.world)，在线事务节点：[transaction_manager_node.py](slam_recovery/sim/transaction_manager_node.py)，执行脚本：[run_s1_s2_simulation_experiments.py](slam_recovery/sim/run_s1_s2_simulation_experiments.py)，汇总记录：[sim_s1_s2_counterfactual_and_3d_voxel_benchmark.json](slam_recovery/experiments/manifests/sim_s1_s2_counterfactual_and_3d_voxel_benchmark.json)。
 
-1. **实验 S1：在线反事实 R4 vs. R5 闭环与跨帧留出扫描集 $\mathcal{S}_{\mathrm{hold}}$（每第 $5k$ 帧）验证（5 随机种子）**
-   - **R4（直行不重访 Zone A）**：弱方向 6D-FIM $J_v^{\mathrm{after}} = 18.20 < 25.0$，跨帧留出扫描点面配准 $\mathrm{NIS} = 5.689 > 2.5$ $\rightarrow$ 输出 `MODE3_SOFT_BRIDGE_WAIT`（`accepted=False`）；
-   - **B5（窄扇区 LIO-SAM 单模态滤波）**：虽 $J_v^{\mathrm{after}} = 34.39 \ge 25.0$，但因 $43^\circ$ 窄扇区偏航角漂移导致跨帧留出扫描 $\mathrm{NIS} = 4.004 > 2.5$ $\rightarrow$ 被 Mode 2 门控准确拦截；
-   - **R5（第 55 秒绕回 Zone A 闭环重访）**：$J_v^{\mathrm{after}} = 55.23 \ge 25.0$，跨帧留出扫描 $\mathrm{NIS} = 1.099 \le 2.5$ $\rightarrow$ 唤醒事务并完成 `MODE2_ATOMIC_COMMIT`（`accepted=True`）。
-2. **实验 S2：基于精确 Ground-Truth 3D Mesh $\mathcal{G}_{\mathrm{GT}}$ 的真实三维体素地图污染率 $\mathrm{Contam}_{3\mathrm{D}}(t)$（体素分辨率 $0.10\,\mathrm{m}$，表面容差 $\tau_{\mathrm{map}} = 0.15\,\mathrm{m}$）**
-   - `B0`（原始宿主，无隔离）：**`43.48%`** 地图体素偏离真实墙面 $> 0.15\,\mathrm{m}$；
-   - `B2`（MM-LINS 确认延迟后休眠，$\Delta t_{\mathrm{margin}} = 0\,\mathrm{s}$）：确认期 $N_\kappa$ 帧漂移点云永久写入睡眠子地图，导致 **`18.17%`** 三维体素污染；
-   - `B5`（无验证单模态提交）：**`26.28%`** 三维体素污染；
+1. **实验 S1：解析三维网格光线采样反事实 R4 vs. R5 闭环与跨帧留出扫描集 $\mathcal{S}_{\mathrm{hold}}$（每第 $5k$ 帧，Provenance: `ONLINE_SIM_3D_MESH`，零人为缩放系数）验证（5 随机种子）**
+   - **R4（直行不重访 Zone A）**：弱方向 6D-FIM $J_v^{\mathrm{after}} = \mathbf{0.78} < 25.0$，跨帧留出扫描点面配准 $\mathrm{NIS} = \mathbf{5.881} > 2.5$ $\rightarrow$ 输出 `MODE3_SOFT_BRIDGE_WAIT`（`accepted=False`）；
+   - **B5（窄扇区 LIO-SAM 单模态滤波）**：$J_v^{\mathrm{after}} = \mathbf{20.51} < 25.0$，且 $43^\circ$ 窄扇区偏航角漂移导致跨帧留出扫描 $\mathrm{NIS} = \mathbf{3.867} > 2.5$ $\rightarrow$ 被 Mode 2 门控准确拦截并通过 `SpatialMutationLog.rollback_mutation_journal()` 回滚试验体素；
+   - **R5（绕回 Zone A 闭环重访双柱面与端墙）**：$J_v^{\mathrm{after}} = \mathbf{87.87} \ge 25.0$，跨帧留出扫描 $\mathrm{NIS} = \mathbf{1.645} \le 2.5$ $\rightarrow$ 唤醒事务并完成 `MODE2_ATOMIC_COMMIT`（`accepted=True`）。
+2. **实验 S2：基于精确 Ground-Truth 3D Mesh $\mathcal{G}_{\mathrm{GT}}$ 的真实三维体素地图污染率 $\mathrm{Contam}_{3\mathrm{D}}(t)$（体素分辨率 $0.10\,\mathrm{m}$，表面容差 $\tau_{\mathrm{map}} = 0.15\,\mathrm{m}$，覆盖完整 B0–B6 连续变体）**
+   - `B0`（原始宿主，无隔离）：**`40.66%`** 地图体素偏离真实墙面 $> 0.15\,\mathrm{m}$；
+   - `B1`（Zhang / X-ICP 式在线最小特征值投影，无隔离）：**`40.60%`** 三维体素污染；
+   - `B2`（MM-LINS 连续 $N_\kappa=10$ 帧确认后休眠，$\Delta t_{\mathrm{margin}} = 0\,\mathrm{s}$）：确认期 $N_\kappa$ 帧漂移点云永久写入睡眠子地图，导致 **`17.41%`** 三维体素污染；
+   - `B3`（回滚至检查点但在同批未剥离退化数据上重优化）：验证 Proposition 1（$\Delta J_v \le 0$），**`40.66%`** 三维体素污染；
+   - `B5`（无验证单模态提交，未乘任何缩放系数）：**`61.16%`** 三维体素污染；
    - `B4` & `B6`（本文 $\Delta t_{\mathrm{margin}} = 2.0\,\mathrm{s}$ 延迟提交缓冲 + Mode 2 验证）：全程保持 **`0.00%`** 三维体素污染。
 
 ## 13.12 独立冻结测试集（Held-Out Test Split）零调参盲测：M2DGR `hall_02`（128.7 s，Leica 真值）四宿主全量验证（已验证）
@@ -1784,13 +1786,19 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
 | `2_Zhang_MinEig` | 0.167 | 0.000 | 0.167 | 20.83 | 3.653 | 22.43 | — | — |
 | `3_NIS_Fixed` | 0.667 | 1.000 | 0.624 | 8.37 | 3.007 | 16.70 | — | — |
 | `4_NIS_CUSUM` | 0.833 | 1.000 | 0.683 | 6.80 | 3.207 | 16.87 | — | — |
-| `5_Trained_HistGBDT_IForest`（原始特征） | 1.000 | 1.000 | 0.851 | 0.00 | 2.647 | 0.83 | 0.400 | 0.000 |
-| **`6_Ours_Rule_SignatureMatrix`**（零训练 + 固定 2.0s 缓冲） | **1.000** | **1.000** | **0.955** | **0.00** | 2.020 | 0.77 | **1.000** | **1.000** |
-| **`7_Ours_Full_CausalTransformer`**（48-Cell + 概率起点回溯） | **1.000** | **1.000** | **0.955** | **0.00** | **0.552** | **0.00** | **1.000** | **1.000** |
+| `5_Trained_HistGBDT_IForest`（原始特征） | 1.000 | 1.000 | 0.851 | 0.00 | 2.647 | 0.63 | 0.400 | 0.000 |
+| **`6_Ours_Rule_SignatureMatrix`**（零训练 + 固定 2.0s 缓冲） | **1.000** | **1.000** | **0.955** | **0.00** | 2.020 | 0.43 | **1.000** | **1.000** |
+| **`7_Ours_Full_CausalTransformer`**（48-Cell + 概率起点回溯） | **1.000** | **1.000** | **0.955** | **0.00** | **0.566** | **0.00** | **1.000** | **1.000** |
 
 ### 3. 真实序列跨场景零微调泛化与 `SpatialMutationLog` 写时复制体素回滚实测
-- **跨场景零微调泛化**（仅在 `hall_01` 训练并冻结权重 `SHA256=c5a65870c1cfb139...`）：在未见过的 `hall_02`、`room_02`、`room_dark_01` 上均实现 `Recall = 1.000`、`CauseAcc = 1.000`；在 $4.0\,\mathrm{s}$ 慢斜坡退化下，起点回溯 MAE 从固定 $2\,\mathrm{s}$ 规则的 `0.800 s` 分别降至 **`0.128 s`（`hall_02`）、`0.243 s`（`room_02`）、`0.254 s`（`room_dark_01`）**，慢斜坡泄漏污染帧从 `4.00 帧` 全部降至 **`0.00 帧`**，单步推理 P50 耗时仅 `618.5 ~ 642.7 μs`。
-- **`SpatialMutationLog` 写时复制体素事务日志**（[spatial_mutation_log.py](slam_recovery/quarantine/spatial_mutation_log.py)）：在 `hall_01` 全局 20cm 体素图（$|M| = 594,979$ 体素，隔离窗口脏体素 $|\Delta M_{\mathrm{dirty}}| = 82,219$，占全图 `13.8%`）上，全图深拷贝快照耗时 `1771.38 ms`，而 `SpatialMutationLog` CoW 增量回滚仅耗时 **`92.83 ms`（提速 `19.08 倍`，回滚后体素数 100% 精确还原为 `594,979`）**。
+- **跨场景零微调泛化**（仅在 `hall_01` 上通过闭式岭回归读取头 Closed-Form Ridge-Regularized Readout 训练 113-D 特征 `[x_t, h_t^{(L)}, ramp_slope]` 并冻结权重 `SHA256=0153b585759a4c1c...`，特征来源标注为 `SEMI_SYNTHETIC_ON_REAL_SCANS`，完全保留真实点云雅可比特征值 `min_eig_t, min_eig_r`）：在未见过的 `hall_02`、`room_02`、`room_dark_01` 上均实现 `Recall = 1.000`、`CauseAcc = 1.000`；在 $4.0\,\mathrm{s}$ 慢斜坡退化下，起点回溯 MAE 从固定 $2\,\mathrm{s}$ 规则的 `0.800 s` 分别降至 **`0.179 s`（`hall_02`）、`0.268 s`（`room_02`）、`0.246 s`（`room_dark_01`）**，慢斜坡泄漏污染帧从 `4.00 帧` 全部降至 **`0.00 帧`**，单步推理 P50 耗时仅 `615.9 ~ 623.5 μs`。
+- **`SpatialMutationLog` 写时复制体素事务日志**（[spatial_mutation_log.py](slam_recovery/quarantine/spatial_mutation_log.py)）：在 `hall_01` 全局 20cm 体素图（$|M| = 594,979$ 体素，隔离窗口脏体素 $|\Delta M_{\mathrm{dirty}}| = 82,219$，占全图 `13.8%`）上，全图深拷贝快照耗时 `1700.11 ms`，而 `SpatialMutationLog` CoW 增量回滚仅耗时 **`76.15 ms`（提速 `22.33 倍`，回滚后体素数 100% 精确还原为 `594,979`）**。
+
+### 4. 补齐实验 E-Gap 1（近墙正常通行 Hard-Negative 测试）、E-Gap 2（B0–B6 全序列消融与纯后端 GNC）与 E-Gap 4（旋转误差 $\mathrm{ATE}_{\mathrm{rot}}$ deg）
+执行脚本：[run_hard_negative_and_rot_ate_benchmark.py](slam_recovery/experiments/run_hard_negative_and_rot_ate_benchmark.py)，记录文件：[p10_hard_negative_and_rot_ate_benchmark.json](slam_recovery/experiments/manifests/p10_hard_negative_and_rot_ate_benchmark.json)。
+- **E-Gap 1（近墙/窄门正常通行 Hard-Negative 负例测试）**：在无注入的 `room_02`（76/76 帧近场点 `<4.2m` 比例均值高达 `79.9%`）和 `hall_02` 上，无 NIS/$D_{\mathrm{LOSO}}$ 门控的纯几何近场 RANSAC 剥离器在紧凑房间 `room_02` 上产生 **`100.0%` 误剥离率（误删真实承重墙）**；而本文联合 NIS/$D_{\mathrm{LOSO}}$ 门控的 `SignatureMatrixRouter` 误报警率与误剥离率均为 **`0.00%`（0 次误触发）**。
+- **E-Gap 2（B0–B6 连续消融与纯后端 GNC 对比）**：在 `hall_01` 20s 连续塑料袋遮挡下，补齐 `B1`（在线特征值投影：FL `7.0637m` / LIO `7.4117m`，3D 污染 `40.6%`）与 `B3`（同批未剥离数据回滚重优化：FL `7.0583m` / LIO `7.3969m`，验证 Proposition 1 $\Delta J_v \le 0$）；同时证明**纯后端 25-KF GNC（无前端延迟提交隔离与点云剥离）**仅将 MM-LINS B2 的 ATE 从 `6.1254 m` 变为 `6.1065 m`（$G = +0.0032$），而本文完整 B6 恢复至 **`0.3058 m`（$G = +0.9975$）**。
+- **E-Gap 4（完整 $\mathrm{SE}(3)$ 旋转误差 $\mathrm{ATE}_{\mathrm{rot}}$ deg 与 $\mathrm{RPE}_{\mathrm{rot}}$ deg）**：在 `hall_01` 干净序列上，FAST-LIO2、MM-LINS、LIO-SAM 的旋转误差 $\mathrm{ATE}_{\mathrm{rot}}$ RMSE 分别为 **`3.268°`、`3.483°`、`3.803°`**；在 `[280, 300]s` 高速转弯时延 `SYNC_DRIFT`（$+100\,\mathrm{ms}$ 去畸变时钟失锁）下，LIO-SAM B0 旋转误差发散至 **`25.312°`（Max `28.653°`）**，经本文互相关时延估计与去畸变还原（B6）后恢复至 **`3.803°`（旋转恢复比例 $G_{\mathrm{rot}} = +1.0000$）**；在 `room_dark_01` 自然暗光序列上，ORB-SLAM3 原生 Atlas B2 因 5 次切子图导致 $\mathrm{ATE}_{\mathrm{rot}} = \mathbf{19.268^\circ}$（Max $96.88^\circ$），经 B6 激光双端锚定修复后降至 **`5.211^\circ`（Max $11.70^\circ$，$\mathrm{RPE}_{\mathrm{rot}} = 5.586^\circ$）**。
 - **形式化反例审计验证**：针对 `docs/review_20261105/audit_review.py` 中的 `R1`–`R6` 六项边界反例，已全部修复并合入单元测试 `test_r1_to_r6_audit_counterexamples_resolved`，当前全套 **17/17 单元测试 100% 通过**。
 
 ---

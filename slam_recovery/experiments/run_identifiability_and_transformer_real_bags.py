@@ -237,8 +237,9 @@ def build_real_bag_window_stream(
                     xyzi, occluded_azimuth_fraction=0.88 * alpha, bag_distance_m=4.30, seed=seed + i
                 )
             elif fault_type == DegeneracyType.GEO_DEGEN:
-                keep = np.abs(xyzi[:, 0]) < (4.5 - 3.85 * alpha)
-                cur_xyzi = xyzi[keep] if np.sum(keep) > 20 else xyzi[:50]
+                # Retain parallel side walls/floor while progressively attenuating longitudinal end-wall x-Variation
+                cur_xyzi = xyzi.copy()
+                cur_xyzi[:, 0] = cur_xyzi[:, 0] * (1.0 - 0.85 * alpha)
             else:
                 cur_xyzi = xyzi
 
@@ -246,28 +247,31 @@ def build_real_bag_window_stream(
         cells_list.append(cells_48)
 
         H, _, _, _ = compute_point_to_plane_jacobian_and_distortions(cur_xyzi, max_pts=400)
-        gram_t = H[:, 3:].T @ H[:, 3:] / max(len(H), 1) * 100.0
-        gram_r = H[:, :3].T @ H[:, :3] / max(len(H), 1) * 10.0
+        gram_t = H[:, 3:].T @ H[:, 3:] / max(len(H), 1) * 180.0
+        gram_r = H[:, :3].T @ H[:, :3] / max(len(H), 1) * 15.0
+        if fault_type == DegeneracyType.GEO_DEGEN and in_fault:
+            # Progressive corridor longitudinal conditioning loss directly on the Gram matrix x-axis
+            scale_x = np.diag([max(0.12, 1.0 - 0.92 * alpha), 1.0, 1.0])
+            gram_t = scale_x @ gram_t @ scale_x
         min_eig_t = float(max(0.2, np.min(np.linalg.eigvalsh(gram_t))))
         min_eig_r = float(max(1.0, np.min(np.linalg.eigvalsh(gram_r))))
+
+        ranges_cur = np.linalg.norm(cur_xyzi[:, :3], axis=1)
+        nf_ratio = float(np.mean((ranges_cur > 0.5) & (ranges_cur < 4.55))) if len(ranges_cur) > 0 else 0.04
 
         nis_mean = 1.05 + rng.normal(0.0, 0.05)
         loso_p = 0.45 + rng.normal(0.0, 0.04)
         loso_a = 0.40 + rng.normal(0.0, 0.04)
         lag_s = rng.normal(0.0, 0.002)
         loop_sp = 0.35 + rng.normal(0.0, 0.04)
-        nf_ratio = 0.04
 
         if in_fault:
             if fault_type == DegeneracyType.GEO_DEGEN:
-                min_eig_t = max(0.3, 28.0 * (1.0 - 0.95 * alpha))
                 nis_mean += 2.2 * alpha
                 loso_p += 3.0 * alpha
             elif fault_type == DegeneracyType.MEAS_CONTAM:
-                min_eig_t = 36.0 + 10.0 * alpha
                 nis_mean += 7.2 * alpha
                 loso_p += 5.6 * alpha
-                nf_ratio = 0.88 * alpha
             elif fault_type == DegeneracyType.SYNC_DRIFT:
                 nis_mean += 4.8 * alpha
                 loso_p += 4.2 * alpha
@@ -374,7 +378,12 @@ def evaluate_cross_sequence_causal_transformer() -> dict:
         ("room_02_compact_room", "/home/R26534/M2DGR/extracted/room_02_fl.bag"),
         ("room_dark_01_natural_dark", "/home/R26534/M2DGR/extracted/room_dark_01_fl.bag"),
     ]
-    transfer_summary = {"frozen_weights_sha256": weights_sha256, "sequences": {}}
+    transfer_summary = {
+        "feature_provenance": "SEMI_SYNTHETIC_ON_REAL_SCANS (real 48-cell spherical tensors & real scan-derived 6D FIM eigenvalues + controlled residual/conflict profiles)",
+        "readout_training_method": "Closed-Form Ridge-Regularized Readout over Frozen Causal Relative-Attention Representation (113-D)",
+        "frozen_weights_sha256": weights_sha256,
+        "sequences": {},
+    }
 
     for seq_label, bag_path in unseen_bags:
         scans = load_real_scans_xyzi(bag_path, max_scans=40, step=15)
