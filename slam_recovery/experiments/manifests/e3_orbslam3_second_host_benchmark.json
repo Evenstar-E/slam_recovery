@@ -69,6 +69,7 @@
           "rpe_trans_rmse_m": 1.0461,
           "window_118_152s_rmse_m": 6.8941,
           "window_118_152s_max_m": 14.7115,
+          "holdout_nis_unrepaired": 2.8697,
           "recovery_ratio_G_vs_B0": -0.9429,
           "trusted_map_pollution_ratio": 0.312
         },
@@ -82,6 +83,7 @@
           "provenance": "OFFLINE_CONSTRUCT",
           "ate_rmse_m": 6.5554,
           "recovery_ratio_G_vs_B0": -6.0539,
+          "holdout_nis": 2.1582,
           "reentry_position_jump_m": 0.188,
           "wilson_lower_bound": 0.0,
           "rejected_by_mode2_anchor_check": true,
@@ -103,10 +105,10 @@
           "window_recovery_ratio_G_vs_B2_Atlas": 0.9673,
           "gate_decision": "MODE2_ATOMIC_COMMIT",
           "atomic_commit_accepted": true,
-          "holdout_nis": 2.493,
+          "holdout_nis": 2.0405,
           "wilson_sequential_lower_bound": 0.9944,
           "reentry_position_jump_m": 0.0476,
-          "weak_dir_info_after": 50.92,
+          "weak_dir_info_after": 121.68,
           "trusted_map_pollution_ratio": 0.0
         }
       },
@@ -145,6 +147,7 @@
           "rpe_trans_rmse_m": 0.2446,
           "window_118_152s_rmse_m": 0.5316,
           "window_118_152s_max_m": 1.2245,
+          "holdout_nis_unrepaired": 2.0787,
           "recovery_ratio_G_vs_B0": 0.9799,
           "trusted_map_pollution_ratio": 0.045
         },
@@ -158,6 +161,7 @@
           "provenance": "OFFLINE_CONSTRUCT",
           "ate_rmse_m": 2.1762,
           "recovery_ratio_G_vs_B0": -0.7346,
+          "holdout_nis": 2.0242,
           "reentry_position_jump_m": 0.4048,
           "wilson_lower_bound": 0.0,
           "rejected_by_mode2_anchor_check": true,
@@ -179,14 +183,14 @@
           "window_recovery_ratio_G_vs_B2_Atlas": 39.0115,
           "gate_decision": "MODE2_ATOMIC_COMMIT",
           "atomic_commit_accepted": true,
-          "holdout_nis": 2.493,
+          "holdout_nis": 2.0421,
           "wilson_sequential_lower_bound": 0.9944,
           "reentry_position_jump_m": 0.0468,
-          "weak_dir_info_after": 50.92,
+          "weak_dir_info_after": 128.18,
           "trusted_map_pollution_ratio": 0.0
         }
       }
     }
   },
-  "created_utc": "2026-11-05T03:28:47.982965+00:00"
+  "created_utc": "2026-11-05T06:17:17.569490+00:00"
 }

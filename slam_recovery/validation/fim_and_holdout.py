@@ -1,39 +1,46 @@
-"""6-DoF Point-to-Plane Fisher Information Matrix (FIM) and Holdout Split Evaluator (Fixing Review Issue #5)."""
+"""6-DoF Point-to-Plane Fisher Information Matrix (FIM) and Trajectory-Dependent Holdout Split Evaluator (Fixing Second-Review Issue #2)."""
 
 from __future__ import annotations
 
-from typing import Tuple
+from typing import Optional, Tuple
 import numpy as np
 
 
 def compute_6dof_point_to_plane_fim(
     points_xyz: np.ndarray,
-    sigma_meas_m: float = 0.05,
+    sigma_meas_m: float = 0.10,
     k_neighbors: int = 15,
     max_eval_points: int = 1200,
     rot_scale: float = 1.0,
     trans_scale: float = 1.0,
+    aux_odom_info_6x6: Optional[np.ndarray] = None,
 ) -> Tuple[np.ndarray, np.ndarray, float, float, np.ndarray]:
     """
-    Compute the true 6x6 Fisher Information Matrix \Lambda_{6x6} on SE(3) tangent space [rot(3), trans(3)]
-    from a 3D point cloud by estimating local surface normals n_i and forming the exact point-to-plane
+    Compute the 6x6 Fisher Information Matrix \Lambda_{6x6} on SE(3) tangent space [rot(3), trans(3)]
+    from a 3D point cloud by estimating local surface normals n_i and forming the point-to-plane
     Jacobian J_i = [(p_i x n_i)^T, n_i^T] \in R^{1x6}:
-        \Lambda = (1 / \sigma^2) \sum_i J_i^T J_i
+        \Lambda = \Lambda_{aux} + (1 / \sigma_{meas}^2) * (1 / M) \sum_{i=1}^M J_i^T J_i
 
-    Also supports spatial/scan holdout splitting (even vs. odd indices) so repair and validation
-    use strictly disjoint measurement subsets.
-
-    Returns:
-        (fim_6x6_normalized, cov_6x6, min_eig_rot, min_eig_trans, weak_dir_6d)
+    Notice that `sigma_meas_m` directly scales the Fisher information via `1.0 / (sigma_meas_m ** 2)`.
+    At the default `sigma_meas_m = 0.10 m`, `1 / \sigma^2 = 100.0`, so an isotropic 3D point cloud
+    yields translational eigenvalues ~ 33.3 along each axis, whereas a degenerate corridor missing
+    one axis drops below 1.0.
     """
     pts = np.asarray(points_xyz, dtype=np.float64)[:, :3]
     n_pts = len(pts)
     if n_pts < k_neighbors + 1:
         fim_zero = np.eye(6, dtype=np.float64) * 1e-3
-        cov_inf = np.eye(6, dtype=np.float64) * 1e3
-        return fim_zero, cov_inf, 1e-3, 1e-3, np.array([0.0, 0.0, 0.0, 1.0, 0.0, 0.0])
+        if aux_odom_info_6x6 is not None:
+            fim_zero = fim_zero + np.asarray(aux_odom_info_6x6, dtype=np.float64)
+        cov_inf = np.linalg.inv(fim_zero)
+        return (
+            fim_zero,
+            cov_inf,
+            float(np.min(np.linalg.eigvalsh(fim_zero[:3, :3]))),
+            float(np.min(np.linalg.eigvalsh(fim_zero[3:, 3:]))),
+            np.array([0.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
+        )
 
-    # Deterministic subsample for fast exact k-NN normal estimation
     if n_pts > max_eval_points:
         step = max(1, n_pts // max_eval_points)
         sub_pts = pts[::step][:max_eval_points]
@@ -41,18 +48,16 @@ def compute_6dof_point_to_plane_fim(
         sub_pts = pts
 
     m = len(sub_pts)
-    # Pairwise squared distances (m x m)
     diff = sub_pts[:, None, :] - sub_pts[None, :, :]
     dist_sq = np.sum(diff ** 2, axis=-1)
     nn_idx = np.argpartition(dist_sq, kth=min(k_neighbors, m - 1), axis=1)[:, 1 : k_neighbors + 1]
 
-    neighbors = sub_pts[nn_idx]  # (m, k, 3)
+    neighbors = sub_pts[nn_idx]
     centered = neighbors - np.mean(neighbors, axis=1, keepdims=True)
     covs = np.einsum("mki,mkj->mij", centered, centered) / float(k_neighbors)
     eigvals, eigvecs = np.linalg.eigh(covs)
 
-    # Surface normal is eigenvector corresponding to smallest eigenvalue; filter valid planar patches
-    normals = eigvecs[:, :, 0]  # (m, 3)
+    normals = eigvecs[:, :, 0]
     planarity = (eigvals[:, 1] - eigvals[:, 0]) / np.maximum(eigvals[:, 2], 1e-9)
     valid_planar = planarity > 0.15
     if np.sum(valid_planar) < 10:
@@ -61,12 +66,14 @@ def compute_6dof_point_to_plane_fim(
     p_valid = sub_pts[valid_planar]
     n_valid = normals[valid_planar]
 
-    # Exact 6-DoF point-to-plane Jacobian: J_i = [ (p_i x n_i)^T, n_i^T ]
     p_cross_n = np.cross(p_valid, n_valid)
-    J = np.hstack([p_cross_n, n_valid])  # (M, 6)
+    J = np.hstack([p_cross_n, n_valid])
 
-    # Normalized per 100 effective planar constraints (so isotropic 3D planes give ~33.3 per axis, and a missing corridor axis drops < 1.0)
-    fim_raw = (J.T @ J) / float(len(p_valid)) * 100.0
+    inv_var = 1.0 / max(float(sigma_meas_m) ** 2, 1e-6)
+    fim_raw = inv_var * (J.T @ J) / float(len(p_valid))
+
+    if aux_odom_info_6x6 is not None:
+        fim_raw = fim_raw + np.asarray(aux_odom_info_6x6, dtype=np.float64)
 
     scale_vec = np.array([rot_scale] * 3 + [trans_scale] * 3, dtype=np.float64)
     D = np.diag(scale_vec)
@@ -95,6 +102,7 @@ def compute_disjoint_holdout_point_to_plane_nis(
 ) -> float:
     """
     Compute normalized innovation squared (NIS) exclusively on the disjoint holdout point set
+    transformed by the candidate trajectory's relative pose perturbation `delta_pose_se3`
     against surface planes fitted ONLY on `points_train_xyz`.
     """
     train_xyz = np.asarray(points_train_xyz, dtype=np.float64)[:, :3]
@@ -102,12 +110,10 @@ def compute_disjoint_holdout_point_to_plane_nis(
     if len(train_xyz) < 30 or len(hold_xyz) < 10:
         return float("inf")
 
-    # Transform holdout points by estimated relative pose
     R = delta_pose_se3[:3, :3]
     t = delta_pose_se3[:3, 3]
     hold_trans = (hold_xyz @ R.T) + t
 
-    # Subsample for evaluation
     t_sub = train_xyz[:: max(1, len(train_xyz) // 600)][:600]
     h_sub = hold_trans[:: max(1, len(hold_trans) // 300)][:300]
 
@@ -123,9 +129,8 @@ def compute_disjoint_holdout_point_to_plane_nis(
     _, eigvecs = np.linalg.eigh(covs)
     normals = eigvecs[:, :, 0]
 
-    # Point-to-plane residual r_i = n_i^T (p_hold_i - \mu_train_i)
     residuals = np.abs(np.sum(normals * (h_sub - mean_nn), axis=1))
-    valid_res = residuals[residuals < 1.0]
+    valid_res = residuals[residuals < 2.0]
     if len(valid_res) == 0:
         return float("inf")
     return float(np.mean((valid_res / sigma_meas_m) ** 2))

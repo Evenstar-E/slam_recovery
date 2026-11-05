@@ -28,8 +28,9 @@
     "all_submaps_ate_max_m": 1.9964,
     "all_submaps_rpe_rmse_m": 0.3875,
     "active_map3_only_ate_rmse_m": 0.3694,
+    "holdout_nis_unrepaired": 1.1774,
     "recovery_ratio_G_vs_B0_full": 0.6823,
     "trusted_map_pollution_ratio": 0.248
   },
-  "created_utc": "2026-11-05T03:28:51.448311+00:00"
+  "created_utc": "2026-11-05T06:17:21.652300+00:00"
 }

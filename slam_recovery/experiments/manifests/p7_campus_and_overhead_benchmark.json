@@ -9,6 +9,7 @@
       "paper_reported_ce_pgo_e2e_m": 0.092,
       "paper_mode2_gated_e2e_m": 0.092,
       "local_reproduced_ce_pgo_final_e2e_m": 0.2444,
+      "local_gnc_reoptimized_e2e_m": 69.3776,
       "local_mode2_snapshot_gated_e2e_m": 0.2444,
       "flagged_high_strain_intervals": 495,
       "holdout_nis": 0.0
@@ -22,6 +23,7 @@
       "paper_reported_ce_pgo_e2e_m": 1.295,
       "paper_mode2_gated_e2e_m": 0.603,
       "local_reproduced_ce_pgo_final_e2e_m": 0.4471,
+      "local_gnc_reoptimized_e2e_m": 115.7874,
       "local_mode2_snapshot_gated_e2e_m": 0.4305,
       "flagged_high_strain_intervals": 346,
       "holdout_nis": 0.0029
@@ -35,6 +37,7 @@
       "paper_reported_ce_pgo_e2e_m": 0.093,
       "paper_mode2_gated_e2e_m": 0.093,
       "local_reproduced_ce_pgo_final_e2e_m": 0.2618,
+      "local_gnc_reoptimized_e2e_m": 67.0847,
       "local_mode2_snapshot_gated_e2e_m": 0.2618,
       "flagged_high_strain_intervals": 555,
       "holdout_nis": 0.0
@@ -48,6 +51,7 @@
       "paper_reported_ce_pgo_e2e_m": 0.132,
       "paper_mode2_gated_e2e_m": 0.132,
       "local_reproduced_ce_pgo_final_e2e_m": 0.1758,
+      "local_gnc_reoptimized_e2e_m": 118.0418,
       "local_mode2_snapshot_gated_e2e_m": 0.1758,
       "flagged_high_strain_intervals": 589,
       "holdout_nis": 0.0
@@ -56,18 +60,18 @@
   "system_overhead": {
     "provenance": "REAL_HOST",
     "health_detection_and_signature_router_ms": {
-      "p50_ms": 0.0474,
-      "p95_ms": 0.0647,
-      "mean_ms": 0.0504,
-      "percentage_of_10hz_frame_budget": 0.0504
+      "p50_ms": 0.0493,
+      "p95_ms": 0.0586,
+      "mean_ms": 0.0513,
+      "percentage_of_10hz_frame_budget": 0.0513
     },
     "delayed_commit_and_checkpoint_tx_ms": {
-      "p50_ms": 0.0024,
-      "p95_ms": 0.3373
+      "p50_ms": 0.0025,
+      "p95_ms": 0.351
     },
     "point_mixture_repairer_per_scan_ms": {
-      "p50_ms": 194.36,
-      "p95_ms": 232.81
+      "p50_ms": 110.46,
+      "p95_ms": 115.58
     },
     "ring_buffer_memory_footprint": {
       "window_duration_sec": 30.0,
@@ -75,7 +79,5 @@
       "imu_200hz_30s_buffer_mb": 0.366,
       "checkpoint_pose_graph_snapshot_kb": 48.5
     }
-  },
-  "gt_source": "Start_End_Closure",
-  "provenance": "INJECTION"
+  }
 }

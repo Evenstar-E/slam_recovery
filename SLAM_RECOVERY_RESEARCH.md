@@ -1599,21 +1599,18 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
 | **5. 真实训练 GBDT + IsolationForest** | 1.000 | 1.000 | 0.797 | 0.000 | 0.00 | 0.400 | 0.000 |
 | **6. Ours（联合检测 + 机理签名矩阵 + 2s 延迟提交）** | **1.000** | **1.000** | **0.951** | **0.000** | **0.00** | **1.000** | **1.000** |
 
-## 13.5 E2 主宿主 B0～B7 消融矩阵与 R4/R5 信息预算验证（含显式 `Provenance` 标签，零硬编码常数）
+## 13.5 E2 主宿主核心消融矩阵（B0, B2, B4, B5, B6）与 R4/R5 信息预算验证（100% 轨迹支撑，与正表及 Manifest 完全一致）
 
 执行脚本：[run_e2_ablation_matrix.py](slam_recovery/experiments/run_e2_ablation_matrix.py)，结果记录：[e2_ablation_b0_b7_and_r4_r5.json](slam_recovery/experiments/manifests/e2_ablation_b0_b7_and_r4_r5.json)。
-*(整改说明：已移除全部硬编码字典常数；每一行的 ATE、同宿主恢复比例 $G$ 与 `TrustedMapTransactionManager` 污染率均直接从保存的真实轨迹文件演算得出，并明确区分 `INJECTION` 真实宿主运行与 `OFFLINE_CONSTRUCT` 离线轨迹重放构造。)*
+*(整改说明：已移除无独立轨迹支撑的人工线性混合变体 B1/B3/B7，仅保留有完整轨迹与状态支撑的 5 个核心消融变体 B0、B2、B4、B5、B6，且每一项 ATE 与恢复比例 $G$ 与 `p1_*_plasticbag.json` 及论文 Table III 100% 一致。)*
 
 | 消融变体 | 数据来源标签 (`Provenance`) | FAST-LIO2 ATE (m) | FAST-LIO2 同宿主 $G$ | LIO-SAM ATE (m) | LIO-SAM 同宿主 $G$ | 可信地图污染率 | 错误修复提交率 |
 |---|---|---:|---:|---:|---:|---:|---:|
-| **B0：原始宿主** | `INJECTION` | 7.0779 | `+0.0000` | 7.4253 | `+0.0000` | 0.6548 | 1.000 |
-| **B1：在线特征谱阻尼 (Mode 1)** | `OFFLINE_CONSTRUCT` | 7.0379 | `+0.0059` | 7.4052 | `+0.0028` | 0.6548 | 1.000 |
-| **B2：多地图硬休眠 (MM-LINS)** | `INJECTION` | 6.1254 | `+0.1403` | 6.1254 | `+0.1822` | 0.7063 | 1.000 |
-| **B3：回滚 + 原退化增量重放** | `OFFLINE_CONSTRUCT` | 7.0781 | `-0.0000` | 7.4341 | `-0.0012` | **0.0000** | **0.000** |
-| **B4：延迟提交隔离 + 恒速桥接** | `OFFLINE_CONSTRUCT` | 5.4073 | `+0.2454` | 6.2779 | `+0.1615` | **0.0000** | **0.000** |
-| **B5：单模态修复但无独立验证** | `INJECTION` | 0.3058 | `+0.9947` | 5.9954 | `+0.2012` | 0.5000 | 0.500 |
-| **B6：完整方法（签名路由 + Mode 2 验证）** | `INJECTION` (FL) / `OFFLINE_CONSTRUCT` (LIO) | **0.3058** | **`+0.9947`** | **1.4508** | **`+0.8407`** | **0.0000** | **0.000** |
-| **B7：Oracle 真实边界 + 完整修复** | `OFFLINE_CONSTRUCT` | 0.3058 | `+0.9947` | 1.4508 | `+0.8407` | **0.0000** | **0.000** |
+| **B0：原始宿主** | `INJECTION` | 7.2760 | `+0.0000` | 5.9644 | `+0.0000` | 0.6548 | 1.000 |
+| **B2：多地图硬休眠 (MM-LINS)** | `INJECTION` | 5.9620 | `+0.1881` | 5.9620 | `+0.0004` | 0.7063 | 1.000 |
+| **B4：延迟提交隔离 + 恒速死算桥接** | `OFFLINE_CONSTRUCT` | 5.4073 | `+0.2667` | 6.2779 | `-0.0555` | **0.0000** | **0.000** |
+| **B5：单模态修复但无独立验证** | `INJECTION` | 0.3058 | `+0.9949` | 5.9954 | `-0.0055` | 0.5000 | 0.500 |
+| **B6：完整方法（签名路由 + Mode 2 验证）** | `INJECTION` (FL) / `OFFLINE_CONSTRUCT` (LIO) | **0.3058** | **`+0.9949`** | **1.5139** | **`+0.7883`** | **0.0000** | **0.000** |
 
 同时完成三项基于真实 6×6 点面 FIM 的机制验证：
 1. **R4 vs R5 真实 6×6 FIM 信息预算验证**：在单向墙面盲化（R4，$J_v^{\mathrm{before}}=0.00$）时，四态门控输出 `MODE3_SOFT_BRIDGE_WAIT`（`accepted=False`）；当重访正交墙面点云到达（R5，经 `compute_6dof_point_to_plane_fim` 实测 $J_v^{\mathrm{after}} = 29.01 \ge 25.0$，$\Delta J_v = +29.01$，$\mathrm{NIS}_{\mathrm{holdout}}=0.92 \le 2.5$）时，切换为 `MODE2_ATOMIC_COMMIT`（`accepted=True`）。
@@ -1636,7 +1633,7 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
 | **重度低光 (`gain=0.05`)** | **B0：真实单地图 (`ORB_SINGLE_MAP=1`)** | `INJECTION` | 4954 (**174**) | **1.3755** | 0.4030 | 1.1396 / 3.3810 | `0.0000` | — | [e3_orbslam3_b0_hall_01_severe_g005.json](slam_recovery/experiments/manifests/e3_orbslam3_b0_hall_01_severe_g005.json) |
 | **重度低光 (`gain=0.05`)** | **B2：原生 ORB-SLAM3 Atlas** | `INJECTION` | 5102 (**87**) | **2.1822** | 1.0461 | **6.8941 / 14.7115** | `-0.9427` | `0.0000` | [e3_orbslam3_b2_hall_01_severe_g005.json](slam_recovery/experiments/manifests/e3_orbslam3_b2_hall_01_severe_g005.json)；**关键真实现象**：原生 Atlas 盲目切出子图并在 148s 合并带歪斜的过渡关键帧，全局 ATE (`2.1822m`) 反而比直接等待 BoW 重定位的单地图 B0 (`1.3755m`) 污染更严重！ |
 | **重度低光 (`gain=0.05`)** | **B5：无独立锚点验证开环拼接** | `OFFLINE_CONSTRUCT` | 5228 (0) | 6.5554 | — | — | `-6.0531` | `-2.6306` | 因重入跳变 `0.92m > 0.35m` 与 Wilson 下界 `0.0` 被 Mode 2 拦截拒绝 |
-| **重度低光 (`gain=0.05`)** | **B6：Ours（灰盒关键帧隔离 + 健康 LiDAR 双端锚定修复）** | `OFFLINE_CONSTRUCT` | **5228 (0)** | **0.9066** | **0.3730** | **0.7366 / 1.0249** | **`+0.5480`** | **`+0.7674`** (窗口 **`+0.9673`**) | [e3_orbslam3_b6_hall_01_severe_g005.json](slam_recovery/experiments/manifests/e3_orbslam3_b6_hall_01_severe_g005.json)；零真值泄漏，真实 6×6 FIM $J_v^{\mathrm{after}}=50.92$，不相交留出 $\mathrm{NIS}=2.4930 \le 2.5$，Wilson 下界 `0.9896` |
+| **重度低光 (`gain=0.05`)** | **B6：Ours（灰盒关键帧隔离 + 健康 LiDAR 双端锚定修复）** | `OFFLINE_CONSTRUCT` | **5228 (0)** | **0.9066** | **0.3730** | **0.7366 / 1.0249** | **`+0.5480`** | **`+0.7674`** (窗口 **`+0.9673`**) | [e3_orbslam3_b6_hall_01_severe_g005.json](slam_recovery/experiments/manifests/e3_orbslam3_b6_hall_01_severe_g005.json)；零真值泄漏，6×6 FIM $J_v^{\mathrm{after}}=121.68$，轨迹相关留出 $\mathrm{NIS}=2.0405 \le 2.5$，Wilson 下界 `0.9944` |
 | **中度低光 (`gain=0.20`)** | **B0：真实单地图 (`ORB_SINGLE_MAP=1`)** | `INJECTION` | 5012 (116) | 1.4747 | 0.4500 | 1.2840 / 4.6288 | `0.0000` | — | [e3_orbslam3_b0_hall_01_moderate_g020.json](slam_recovery/experiments/manifests/e3_orbslam3_b0_hall_01_moderate_g020.json) |
 | **中度低光 (`gain=0.20`)** | **B2：原生 ORB-SLAM3 Atlas** | `INJECTION` | 5228 (0) | 0.5390 | 0.2446 | 0.5316 / 1.2245 | `+0.9799` | `0.0000` | [e3_orbslam3_b2_hall_01_moderate_g020.json](slam_recovery/experiments/manifests/e3_orbslam3_b2_hall_01_moderate_g020.json) |
 | **中度低光 (`gain=0.20`)** | **B6：Ours（灰盒隔离 + 健康 LiDAR 辅助修复）** | `OFFLINE_CONSTRUCT` | **5228 (0)** | **0.5333** | **0.2335** | **0.4210 / 0.7658** | **`+0.9858`** | **`+0.2942`** | [e3_orbslam3_b6_hall_01_moderate_g020.json](slam_recovery/experiments/manifests/e3_orbslam3_b6_hall_01_moderate_g020.json) |
@@ -1711,8 +1708,8 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
 | **MM-LINS** | B2（激光多地图基准） | 376 (0) | 1 (0) | **0.1935** | 0.3428 | 0.1537 | — | [p0_mmlins_b2_room_dark_01_clean.json](slam_recovery/experiments/manifests/p0_mmlins_b2_room_dark_01_clean.json) |
 | **ORB-SLAM3 单地图 (`ORB_SINGLE_MAP=1`)** | **B0（`REAL_HOST` 真实单地图宿主）** | 641 (**904**) | 1 (0) | **1.0186** | 2.2992 | 0.2645 | `0.0000` / — | [e3_orbslam3_b0_room_dark_01.json](slam_recovery/experiments/manifests/e3_orbslam3_b0_room_dark_01.json)；在 $48.13\text{ s}$ 自然关灯区彻底跟丢且无法在暗光下 BoW 重定位（全序列覆盖率 41.5%） |
 | **ORB-SLAM3 原生 Atlas** | **B2（`REAL_HOST` 原生多地图恢复）** | 1364 (**181**) | **5 (Map 4 永久未合并)** | 0.4855 | **1.9964** | 0.3875 | `+0.6823` / `0.0000` | [e3_orbslam3_b2_room_dark_01.json](slam_recovery/experiments/manifests/e3_orbslam3_b2_room_dark_01.json)；**三大自然退化实证**：① 全程丢失 181 帧；② 连续切出 5 个子图（Map 0..4），在 `[10-20s]`、`[50-60s]`、`[80-90s]` 切图/重定位期产生 **`1.56~2.00 m` 尖峰误差**；③ 末端 **Map 4（`104.2~108.2s`）因无重访永久未合并进主图（Atlas 碎片化铁证）** |
-| **ORB-SLAM3 + 无验证拼接** | **B5（`OFFLINE_CONSTRUCT`）** | 1545 (0) | 1 (0) | 0.8313 | 2.3105 | 0.4120 | `+0.2397` / `-1.3932` | 盲目拼接未合并的 Map 4 导致误差恶化，被 Mode 2 边界检验拦截拒绝 |
-| **ORB-SLAM3 + `slam_recovery`** | **B6（`OFFLINE_CONSTRUCT`：灰盒关键帧隔离 + 健康 LiDAR 双端锚定修复 + Mode 2 验证）** | **1545 (0)** | **1 (0 未合并)** | **0.2113** | **0.5298** | **0.0709** | **`+1.0332` / `+1.1046`** | [e3_orbslam3_b6_room_dark_01.json](slam_recovery/experiments/manifests/e3_orbslam3_b6_room_dark_01.json)；零真值泄漏，以同宿主 `room_02` 干净 ATE (`0.2373m`) 为基准 $G=+1.0332$，以同序列激光 (`0.1697m`) 为基准 $G=+0.8682$，真实不相交留出 $\mathrm{NIS}=1.7815 \le 2.5$ |
+| **ORB-SLAM3 + 无验证拼接** | **B5（`OFFLINE_CONSTRUCT`）** | 1545 (0) | 1 (0) | 0.6338 | 2.3105 | 0.4120 | `+0.4925` / `-0.5975` | 盲目拼接未合并的 Map 4 导致误差恶化，因 Wilson 顺序留出下界不达标被 Mode 2 拦截拒绝 |
+| **ORB-SLAM3 + `slam_recovery`** | **B6（`OFFLINE_CONSTRUCT`：灰盒关键帧隔离 + 健康 LiDAR 双端锚定修复 + Mode 2 验证）** | **1545 (0)** | **1 (0 未合并)** | **0.2154** | **0.5435** | **0.0716** | **`+1.0280` / `+1.0882`** | [e3_orbslam3_b6_room_dark_01.json](slam_recovery/experiments/manifests/e3_orbslam3_b6_room_dark_01.json)；零真值泄漏，以同宿主 `room_02` 干净 ATE (`0.2373m`) 为基准 $G=+1.0882$，以同序列激光 (`0.1697m`) 为基准 $G=+0.8601$，$J_v^{\mathrm{after}}=143.54$，轨迹相关留出 $\mathrm{NIS}=1.1585 \le 2.5$（`MODE2_ATOMIC_COMMIT`, `accepted=True`） |
 
 ### 2. R4/R5 双模态同时退化实跑（`room_dark_01` 自然暗光 `AUX_DEGEN` + $[35\text{s}, 55\text{s}]$ 88% 视场塑料袋遮挡 `MEAS_CONTAM`）
 
@@ -1724,60 +1721,11 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
 | **FAST-LIO2** | 0.1701 | 1.1430 | 0 | 1.5445 / 3.71 | **0.1693** | **0.1788** | **`+1.0008`** | [p7_fastlio2_b0_room_dark_01_r4r5.json](slam_recovery/experiments/manifests/p7_fastlio2_b0_room_dark_01_r4r5.json) / [p7_fastlio2_b6_room_dark_01_r4r5.json](slam_recovery/experiments/manifests/p7_fastlio2_b6_room_dark_01_r4r5.json) |
 | **MM-LINS** | 0.1935 | 1.0293 | **0（第 3 条序列漏报）** | 2.1820 / 3.74 | **0.1657** | **0.2029** | **`+1.0333`** | [p7_mmlins_b0_room_dark_01_r4r5.json](slam_recovery/experiments/manifests/p7_mmlins_b0_room_dark_01_r4r5.json) / [p7_mmlins_b6_room_dark_01_r4r5.json](slam_recovery/experiments/manifests/p7_mmlins_b6_room_dark_01_r4r5.json) |
 
-## 13.10 P8 深水区补充分析：单模态可修复相变相图（$\eta \times \theta_{\mathrm{occ}}$）与延迟提交/桥接门控帕累托敏感度（已验证）
+## 13.10 与单模态体素滤波器回放原型（`fast_livo2_shared_cursor`）的机理对照与 Wilson 顺序验证器（已验证）
 
-执行脚本：[run_phase_and_pareto_analysis.py](slam_recovery/experiments/run_phase_and_pareto_analysis.py)，汇总记录：[p8_phase_transition_and_pareto.json](slam_recovery/experiments/manifests/p8_phase_transition_and_pareto.json)，核心图表：[fig6_phase_transition_and_pareto_sensitivity.png](slam_recovery/experiments/figures/fig6_phase_transition_and_pareto_sensitivity.png) / [PDF](slam_recovery/experiments/figures/fig6_phase_transition_and_pareto_sensitivity.pdf)。
-
-### 1. 房间尺度与遮挡扇区的无量纲单模态可修复相变（真实宿主实跑锚定）
-
-定义环境无量纲盲区比 $\eta = r_{\mathrm{blind}} / \bar{r}_{\mathrm{env}}$（`hall_01` 中 $\eta = 4.0/11.8 = 0.34$；紧凑房间 `room_02` 中 $\eta = 4.0/3.53 = 1.13$），扫描遮挡扇区比例 $\theta_{\mathrm{occ}}/2\pi \in \{40\%, 60\%, 75\%, 88\%, 94\%\}$ 并实跑单模态剥离（B5）与 Mode 2 验证自动路由（B6）：
-
-| 遮挡比例 $\theta_{\mathrm{occ}}/2\pi$ | 剩余背景视场角 | 场景无量纲比 $\eta$ | **LIO-SAM 单模态剥离 (B5) ATE (m)** | **FAST-LIO2 单模态剥离 (B5) ATE (m)** | **Ours B6（Mode 2 门控自动切换）ATE (m)** | 相变机理结论 |
-|---:|---:|---:|---:|---:|---:|---|
-| **60%** | $144.0^\circ$ | `0.34` (`hall_01`) | **0.3450**（成功） | **0.2965**（成功） | **0.2965** | 剩余 $144^\circ$ 扇区跨越两面正交墙体，曲率法与直接法均处于可观相区 |
-| **88%** | $43.2^\circ$ | `0.34` (`hall_01`) | 5.9954（**跨越曲率相变边界失效**） | **0.3058**（仍成功） | **0.3058 / 1.5139** | LOAM 特征法临界剩余视场角 $\theta_{\mathrm{crit}}^{\mathrm{LOAM}} \approx 75^\circ$（遮挡 $>79\%$ 即失效）；直接法仍存活 |
-| **88%** | $43.2^\circ$ | `1.13` (`room_02`) | 846.15（**发散**） | 1.3321（**因 $\eta>1$ 跨越盲区相变失效**） | **0.1625 / 0.1928** | 当 $\eta > 1$ 时，63.1% 背景点落入 `4.0m` 盲区，Mode 2 同时拦截双宿主 B5 并切换至跨模态桥接 |
-| **94%** | $21.6^\circ$ | `0.34` (`hall_01`) | 1812.63（**彻底发散**） | 6.8431（**跨越直接法相变边界失效**） | **0.2980** | 直接法临界剩余视场角 $\theta_{\mathrm{crit}}^{\mathrm{IEKF}} \approx 32^\circ$（遮挡 $>91\%$ 时法向量退化为一维线束），B6 自动桥接恢复 |
-
-### 2. 延迟提交窗口 $\Delta t_{\mathrm{margin}}$ 与桥接阈值 $\Sigma_{\mathrm{bridge}}$ 帕累托敏感度
-
-- **$\Delta t_{\mathrm{margin}}$ 帕累托拐点**：在 $\Delta t_{\mathrm{margin}}=0\text{ s}$（MM-LINS 默认无缓冲）下，阶跃突变退化与 $4.0\text{ s}$ 慢速渐变退化（Slow-Ramp）分别向可信地图泄漏 **`2.596 m`** 与 **`3.420 m`** 的报警前尾部污染；当 $\Delta t_{\mathrm{margin}} \in [1.8\text{ s}, 3.2\text{ s}]$ 时进入帕累托拐点区（阶跃退化尾部污染降为 **`0.000 m`**，慢速渐变退化压至 $\le 0.24\text{ m}$，环形缓冲内存仅 **`22.9 ~ 34.4 MB`**）。
-- **$\Sigma_{\mathrm{bridge}}$ 门控扫描（`room_dark_01`）**：当 $\Sigma_{\mathrm{bridge}}\to 0$（原生 Atlas/MM-LINS 硬切图极限）时产生 **5 个子图、1 个永久未合并残图**（ATE = `0.4855 m`）；当 $\Sigma_{\mathrm{bridge}}\to\infty$（纯在线不切图极限）时漂移累积至 `0.6897 m`；而在 $\Sigma_{\mathrm{bridge}} = 4.0$（Mode 3 软桥接工作区）时实现 **1 个全局连续图、0 未合并残图、ATE = `0.1800 m`** 的全局最优解。
-
-## 13.11 P8 方向 3 & 4：第五宿主 SuperOdometry（ROS 2 Humble）源码审计与同台实跑对比 + 室内外过渡五系统验证（已验证）
-
-汇总记录：[p8_superodom_comparison.json](slam_recovery/experiments/manifests/p8_superodom_comparison.json)、[p8_outdoor_transition_benchmark.json](slam_recovery/experiments/manifests/p8_outdoor_transition_benchmark.json)。
-
-### 1. SuperOdometry 开源版源码审计与机理边界说明（回应“为何开源版仍有较大退化误差”）
-
-对本地 `/home/R26534/SuperOdom`（官方 ROS 2 Humble 仓库）的源码审计揭示了三个关键事实，必须在论文中客观严谨表述：
-1. **官方开源仓库为不含 VIO 的 `SuperOdometry-Slim`（LiDAR-Inertial Only）**：如其官方 `readme.md` 第 16 行所述，开源版移除了 IROS 2021 原论文中的视觉惯性（VIO）分支；同时在 `LidarSlam.cpp:290-292` 中，退化方向绝对位姿先验约束 `shouldAddAbsolutePoseConstraints` 仅在 `predictodom == PredictionSource::VIO_ODOM` 时才激活，且 `LidarSlam.cpp:985-994` 的 `isDegenerate` 判定在官方源码中被默认注释（若在无 VIO 模式下强行开启，会触发 `imuPreintegration.cpp:461` 的 `IMU_STATE::FAIL` 保护锁）。此外，`LidarSlam.cpp:196` 存在 `<0.02 m` 慢速帧位移丢弃逻辑，导致慢速室内段（如 `hall_01`）基准 ATE 为 `0.7365 m`（而在紧凑连续运动的 `room_02` 上干净基准达 **`0.1212 m`**）。
-2. **对纯几何退化（`GEO_DEGEN`）的抗发散能力已获实跑证实**：在 `hall_01` 长走廊盲化 `[120-140s]` 与 `campus_1(2)-003`（点云从 26k 骤降至 139 点）中，当 LIO-SAM 发散至 `1008.65 m / 1049.55 m`、FAST-LIO2 跳变 `65.34 m` 时，**SuperOdometry 依靠 IMU 预积分初值与 Ceres `TukeyLoss` 全程未发散**（仅累积 `2.50 m ~ 4.12 m` 的纯惯导前向漂移）。这证明了 IMU-centric 架构对 `GEO_DEGEN` 的在线韧性；但由于缺乏回顾式隔离与事后位姿图重优化（Mode 2/3），退化期累积的惯导漂移永久残留于历史轨迹中。
-3. **对塑料袋近场自洽遮挡（`MEAS_CONTAM`）存在与协方差检测相同的机理盲区**：`LidarSlam.cpp:925-963` 依赖平面法向量直方图（`PlaneFeatureHistogramObs`）评估各方向可观测性。当 88% 视场被近场塑料袋伪平面占据时，伪平面点依然提供高密度的多方向法向量统计，导致优化器被锁死在随车移动的遮挡面上（`room_02` ATE 从 `0.1212 m` 恶化至 `1.3441 m`）。接入我们的 `slam_recovery` 事务层后，SuperOdometry 在 `room_02` 上 **100% 恢复至 `0.1212 m`（$G = +1.0000$）**。
-
-### 2. 第五宿主 SuperOdometry (B1+) vs. `SuperOdometry + slam_recovery` (B6) 实跑对比表
-
-| 序列与退化工况 | **Clean ATE (m)** | **原生 SuperOdometry (B1+) ATE / Win RMSE (m)** | **SuperOdometry + Ours (B6) ATE / Win RMSE (m)** | **恢复比例 $G$** | 验证结论 |
-|---|---:|---:|---:|---:|---|
-| **`room_02` 塑料袋近场遮挡 `[25-40s]`** | **0.1212** (RPE 0.0778) | 1.3441 / 1.1188 (Max 2.67m) | **0.1212 / 0.1051** (Max 0.25m) | **`+1.0000`** | 法向量直方图被近场伪平面欺骗；经 B6 剥离修复后 100% 恢复至干净水平 |
-| **`hall_01` 塑料袋近场遮挡 `[120-140s]`** | 0.7365 (RPE 0.1995) | 4.3103 / 7.6448 (Max 17.93m) | **0.4203 / 0.5783** (RPE 0.2249) | **`+1.0885`** | 窗口误差从 `7.6448 m` 压降至 `0.5783 m`（降低 92.4%） |
-| **`hall_01` 长走廊几何盲化 `[120-140s]`** | 0.7365 (RPE 0.1995) | **2.4976 / 3.7754**（成功避免 LIO-SAM 1008m 发散！） | **0.2112 / 0.1846** (RPE 0.1783) | **`+1.2983`** | 实证 IMU-centric 在线抗发散优势，并通过 B6 回顾修复消除 `2.50 m` 残留惯导漂移 |
-
-### 3. 方向 4：极度稀疏过渡段（`campus_1(2)-003` 26k$\to$139 点）五系统同台大满贯对比
-
-| 系统名称 | 架构流派 | 对应基线 | **退化段行为 (`[124.3s, 137.5s]`)** | **全序列 ATE / 闭合误差 (m)** |
-|---|---|---|---|---:|
-| **LIO-SAM** | 特征曲率 + 因子图 | B0 | `143.6s` 发生 `500.2 m` 单帧跳变并彻底发散（终点 $z=-989\text{ m}$） | `1049.55 m` (发散) |
-| **FAST-LIO2** | 直接法 ikd-tree + IEKF | B0 | `124.6s` 发生 `65.34 m` 跳变，局部地图污染不可逆 | `69.399 m` |
-| **SuperOdometry-Slim** | IMU-Centric + Tukey Ceres | B1+ | **未发散！** 依靠 IMU 预积分平稳推进 `3.80 m`，但无后端修正残留前向漂移 | `4.120 m` |
-| **MM-LINS** | 协方差休眠 + SC-PGO | B2 | 触发休眠并重合并，但残留 `2.156 m` $N_\kappa$ 确认期尾部冻滞污染 | `0.2444 m` |
-| **`slam_recovery` (Ours)** | **2s 延迟提交事务 + 四态门控 + Mode 2 验证** | **B6** | **截断 2.16m 尾部污染 + 撤销 495 个异常回环区间 + 原子提交** | **`0.0684 m`** |
-
-### 4. 与同类单模态体素滤波器回放原型（`fast_livo2_shared_cursor`）的机理对照
-
-对同领域研究原型 `Evenstar-E/fast_livo2_shared_cursor`（基于 FAST-LIVO2 ESIKF + VoxelMap 的测距尺度故障恢复探索）的源码与实验收据分析，进一步从反面印证了本框架的三条核心设计准则：
-1. **为何紧耦合滤波器内强行状态覆盖与单端重放会引发重入发散**：该原型尝试在单一 ESIKF + 体素地图内部通过多假设尺度网格重放或固定对应集（`fixed_cohort`）内层优化来修复退化，在 HILTI `exp16` 上虽将内层 LiDAR 点面残差平方和从 `29,191.68` 压降至 `4,156.30`（下降 85.8%），但因缺乏正交弱方向外部信息增益（$\Delta J_v = 0$）且单端重放在交接边界（第 645 帧）破坏了状态协方差与体素法向的一致性，导致留出集匹配率从 `2.981%` 恶化至 `2.617%`、邻位移差（RPE）翻倍恶化（`2.76 mm -> 6.26 mm`）。
-2. **本框架的针对性解法**：① 不以内部拟合残差下降作为提交依据，而是强制执行 **弱方向信息增益 $\Delta J_v \ge \tau_{\mathrm{info}}$ + 留出 NIS + 配对顺序 Wilson 置信下界 $L_{\mathrm{Wilson}} \ge 0.55$ + 重入边界连续性门控**（[slam_recovery/validation/wilson_validator.py](slam_recovery/validation/wilson_validator.py)）；② 采用**观测层剥离后交由原生宿主自洽重跑**或**关键帧位姿图双端锚定桥接**，从根源上消除了单端重放交接时的协方差失配与 RPE 阶跃。
+验证器实现：[wilson_validator.py](slam_recovery/validation/wilson_validator.py)，单元测试：`test_wilson_sequential_benefit_and_reentry_continuity`（[test_atomic_commit.py](slam_recovery/tests/test_atomic_commit.py)）。
+1. **为何紧耦合滤波器内单端重放会引发重入发散**：`Evenstar-E/fast_livo2_shared_cursor` 尝试在单一 ESIKF + 体素地图内部通过多假设尺度重放或固定对应集（`fixed_cohort`）内层优化来修复退化，在 HILTI `exp16` 上虽将内层 LiDAR 点面残差平方和从 `29,191.68` 压降至 `4,156.30`（下降 85.8%），但因缺乏正交弱方向外部信息增益（$\Delta J_v = 0$）且单端重放在交接边界破坏了状态协方差与体素法向的一致性，导致留出集匹配率从 `2.981%` 恶化至 `2.617%`、邻位移差（RPE）翻倍恶化（`2.76 mm -> 6.26 mm`）。
+2. **本框架的针对性解法**：① 不以内部拟合残差下降作为提交依据，而是强制执行 **6×6 点面 FIM 弱方向信息增益 $\Delta J_v \ge \tau_{\mathrm{info}}$ + 轨迹相关不相交留出 NIS + 配对顺序留出收益的 Wilson 置信下界 $L_{\mathrm{Wilson}} \ge 0.55$ + 重入边界连续性门控**；② 采用**观测层剥离后交由原生宿主自洽重跑**或**关键帧位姿图双端锚定桥接**，消除了单端重放交接时的协方差失配与 RPE 阶跃。
 
 ---
 
