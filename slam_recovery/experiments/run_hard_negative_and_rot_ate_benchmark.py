@@ -32,6 +32,7 @@ from slam_recovery.core import DegeneracyType, HealthWindow, RecoveryState
 from slam_recovery.diagnosis import SignatureMatrixRouter
 from slam_recovery.experiments.evaluation import (
     compute_recovery_ratio_G,
+    recovery_ratio_G_rounded,
     evaluate_path_heading_proxy_deg,
     evaluate_rotation_ate_rpe_deg,
     evaluate_trajectory,
@@ -251,9 +252,9 @@ def evaluate_egap2_backend_only_gnc_vs_quarantine() -> dict:
         "scenario": "hall_01 [120s, 140s] 20s Plastic-Bag Occlusion (88% FoV)",
         "Degraded_MMLINS_B2_ate_m": round(ate_mm_b2, 4),
         "Backend_Only_GNC_Without_Quarantine_ate_m": round(ate_gnc_only, 4),
-        "Backend_Only_GNC_recovery_ratio_G": round(compute_recovery_ratio_G(ate_mm_b2, ate_gnc_only, clean_mm), 4),
+        "Backend_Only_GNC_recovery_ratio_G": recovery_ratio_G_rounded(ate_mm_b2, ate_gnc_only, clean_mm),
         "Ours_B6_Frontend_Quarantine_and_Strip_ate_m": round(b6_mm, 4),
-        "Ours_B6_recovery_ratio_G": round(compute_recovery_ratio_G(ate_mm_b2, b6_mm, clean_mm), 4),
+        "Ours_B6_recovery_ratio_G": recovery_ratio_G_rounded(ate_mm_b2, b6_mm, clean_mm),
         "revoked_loop_intervals": int(n_rev),
         "finding": "Backend-only GNC revokes PGO loop edges back toward frontend odometry, but because frontend odometry itself drifted 7.28m without quarantine/stripping, Backend-Only GNC leaves 6.11m ATE (G=+0.0032).",
     }

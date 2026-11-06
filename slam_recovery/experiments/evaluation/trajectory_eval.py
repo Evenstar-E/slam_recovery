@@ -160,18 +160,46 @@ def compute_recovery_ratio_G(
     error_degraded: float,
     error_repaired: float,
     error_clean: float,
-) -> float:
+) -> Optional[float]:
     """
     Compute continuous recovery ratio G (Section 9.2):
         G = (E_degraded - E_repaired) / (E_degraded - E_clean)
     G = 1: full recovery to clean baseline
     G = 0: no improvement
     G < 0: repair degraded the map/trajectory (e.g., MM-LINS Campus-2 CE-PGO)
+
+    Returns ``None`` when G is undefined rather than a numeric sentinel:
+
+      * ``E_degraded == E_clean`` -- nothing was degraded on the measured quantity, so the
+        denominator is zero and there is no recovery to normalise (e.g. ORB-SLAM3 under a
+        LiDAR-only injection, where the vision stream is bit-identical between bags).
+      * ``E_clean > E_degraded`` -- the "clean" reference is worse than the degraded run, so it
+        cannot serve as the 1.0 anchor. Reporting a number here produces a sign-flipped ratio
+        that reads like a catastrophic repair failure.
+
+    Returning 0.0 in these two cases (the previous behaviour) was indistinguishable from a
+    genuine "no improvement" measurement downstream.
     """
     denom = error_degraded - error_clean
-    if abs(denom) < 1e-9:
-        return 0.0
+    if denom <= 1e-9:
+        return None
     return float((error_degraded - error_repaired) / denom)
+
+
+def round_or_none(value: Optional[float], ndigits: int = 4) -> Optional[float]:
+    """Round a possibly-undefined metric without turning ``None`` into a TypeError or a 0.0."""
+    return None if value is None else round(float(value), ndigits)
+
+
+def recovery_ratio_G_rounded(
+    error_degraded: float,
+    error_repaired: float,
+    error_clean: float,
+    ndigits: int = 4,
+) -> Optional[float]:
+    """`compute_recovery_ratio_G` rounded for manifest emission, preserving the None case."""
+    value = compute_recovery_ratio_G(error_degraded, error_repaired, error_clean)
+    return None if value is None else round(value, ndigits)
 
 
 def quat_xyzw_to_rot(q: np.ndarray) -> np.ndarray:

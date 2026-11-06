@@ -29,6 +29,7 @@ from slam_recovery.validation import (
 )
 from slam_recovery.experiments.evaluation.trajectory_eval import (
     compute_recovery_ratio_G,
+    round_or_none,
     evaluate_trajectory,
     load_tum_trajectory,
     umeyama_se3_align,
@@ -392,9 +393,9 @@ def main() -> None:
         "rpe_trans_rmse_m": round(m_b6.rpe_trans_rmse_m, 4),
         "path_length_m": round(m_b6.path_length_m, 4),
         "same_host_clean_ref_room02_ate_m": orb_clean_ref_ate_m,
-        "recovery_ratio_G_vs_B0_full": round(G_b6_vs_b0_full, 4),
-        "recovery_ratio_G_vs_B2_Atlas_samehost_ref": round(G_b6_vs_b2_samehost, 4),
-        "recovery_ratio_G_vs_B2_Atlas_lidar_ref": round(G_b6_vs_b2_lidar_ref, 4),
+        "recovery_ratio_G_vs_B0_full": round_or_none(G_b6_vs_b0_full),
+        "recovery_ratio_G_vs_B2_Atlas_samehost_ref": round_or_none(G_b6_vs_b2_samehost),
+        "recovery_ratio_G_vs_B2_Atlas_lidar_ref": round_or_none(G_b6_vs_b2_lidar_ref),
         "b5_unvalidated_concat_ate_rmse_m": round(m_b5.ate_rmse_m, 4),
         "b5_holdout_nis": round(b5_holdout_nis, 4),
         "b5_reentry_position_jump_m": round(wilson_b5.reentry_position_jump_m, 4),

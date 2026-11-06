@@ -34,6 +34,7 @@ from slam_recovery.validation import (
 from slam_recovery.experiments.evaluation.trajectory_eval import (
     associate_trajectories,
     compute_recovery_ratio_G,
+    recovery_ratio_G_rounded,
     evaluate_trajectory,
     load_tum_trajectory,
     umeyama_se3_align,
@@ -312,7 +313,7 @@ def main() -> None:
                 "B0_degraded_max_m": round(m_fl_d.ate_max_m, 4),
                 "B6_repaired_ate_m": round(m_fl_r.ate_rmse_m, 4),
                 "B6_repaired_rpe_m": round(m_fl_r.rpe_trans_rmse_m, 4),
-                "recovery_ratio_G": round(compute_recovery_ratio_G(m_fl_d.ate_rmse_m, m_fl_r.ate_rmse_m, m_fl_c.ate_rmse_m), 4),
+                "recovery_ratio_G": recovery_ratio_G_rounded(m_fl_d.ate_rmse_m, m_fl_r.ate_rmse_m, m_fl_c.ate_rmse_m),
             },
             "MM_LINS": {
                 "provenance_B2_B6": DataProvenance.INJECTION.value,
@@ -321,7 +322,7 @@ def main() -> None:
                 "B2_degraded_max_m": round(m_mm_d.ate_max_m, 4),
                 "B2_sleep_triggers": sleep_deg,
                 "B6_repaired_ate_m": round(m_mm_r.ate_rmse_m, 4),
-                "recovery_ratio_G": round(compute_recovery_ratio_G(m_mm_d.ate_rmse_m, m_mm_r.ate_rmse_m, m_mm_c.ate_rmse_m), 4),
+                "recovery_ratio_G": recovery_ratio_G_rounded(m_mm_d.ate_rmse_m, m_mm_r.ate_rmse_m, m_mm_c.ate_rmse_m),
             },
             "LIO_SAM": {
                 "provenance_B0_B5": DataProvenance.INJECTION.value,
@@ -333,7 +334,7 @@ def main() -> None:
                 "B5_rejected_by_mode2": True,
                 "B6_repaired_ate_m": round(m_lio_b6.ate_rmse_m, 4),
                 "B6_repaired_rpe_m": round(m_lio_b6.rpe_trans_rmse_m, 4),
-                "recovery_ratio_G": round(compute_recovery_ratio_G(m_lio_d.ate_rmse_m, m_lio_b6.ate_rmse_m, m_lio_c.ate_rmse_m), 4),
+                "recovery_ratio_G": recovery_ratio_G_rounded(m_lio_d.ate_rmse_m, m_lio_b6.ate_rmse_m, m_lio_c.ate_rmse_m),
             },
         },
         "Mirror_B_Visual_Severe_Dark_g005_45_65s": {
@@ -362,9 +363,9 @@ def main() -> None:
                     "ate_max_m": round(m_orb_b6.ate_max_m, 4),
                     "rpe_trans_rmse_m": round(m_orb_b6.rpe_trans_rmse_m, 4),
                     "window_43_75s_rmse_m": round(w_orb_b6, 4),
-                    "recovery_ratio_G_vs_B0": round(compute_recovery_ratio_G(m_orb_b0.ate_rmse_m, m_orb_b6.ate_rmse_m, m_orb_c.ate_rmse_m), 4),
-                    "recovery_ratio_G_vs_B2": round(compute_recovery_ratio_G(m_orb_b2.ate_rmse_m, m_orb_b6.ate_rmse_m, m_orb_c.ate_rmse_m), 4),
-                    "window_recovery_ratio_G_vs_B2": round(compute_recovery_ratio_G(w_orb_b2, w_orb_b6, w_orb_c), 4),
+                    "recovery_ratio_G_vs_B0": recovery_ratio_G_rounded(m_orb_b0.ate_rmse_m, m_orb_b6.ate_rmse_m, m_orb_c.ate_rmse_m),
+                    "recovery_ratio_G_vs_B2": recovery_ratio_G_rounded(m_orb_b2.ate_rmse_m, m_orb_b6.ate_rmse_m, m_orb_c.ate_rmse_m),
+                    "window_recovery_ratio_G_vs_B2": recovery_ratio_G_rounded(w_orb_b2, w_orb_b6, w_orb_c),
                     "weak_dir_info_after": round(weak_info_after, 2),
                     "cross_scan_holdout_nis": round(float(np.mean(nis_b6_arr)), 4),
                     "wilson_sequential_lower_bound": round(wilson_b6.wilson_lower_bound, 4),

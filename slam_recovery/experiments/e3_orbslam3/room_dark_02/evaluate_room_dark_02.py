@@ -30,6 +30,7 @@ from slam_recovery.validation import (
 from slam_recovery.experiments.evaluation import (
     associate_trajectories,
     compute_recovery_ratio_G,
+    recovery_ratio_G_rounded,
     evaluate_rotation_ate_rpe_deg,
     evaluate_trajectory,
     load_tum_trajectory,
@@ -357,7 +358,7 @@ def main() -> None:
         e_clean = lidar_cw[(host, "clean")][0]
         e_deg = lidar_cw[(host, cond_deg)][0]
         e_rep = lidar_cw[(host, cond_rep)][0]
-        return round(compute_recovery_ratio_G(e_deg, e_rep, e_clean), 4)
+        return recovery_ratio_G_rounded(e_deg, e_rep, e_clean)
 
     def _cov(ts_vec):
         return [round(float(ts_vec.min()) - t0, 2), round(float(ts_vec.max()) - t0, 2)]
@@ -493,8 +494,12 @@ def main() -> None:
                 "denominator of G is zero. Earlier manifests reported a full-sequence G computed against a "
                 "different baseline variant (B0 vs B2), which is not a recovery ratio."
             ),
-            "clean_ate_m": round(m_orb_b2.ate_rmse_m, 4),
-            "clean_window_13_40s_rmse_m": round(w_orb_clean, 4),
+            # NOTE: the injection is LiDAR-only, so the RGB-D stream is bit-identical between the
+            # clean and injected bags. ORB-SLAM3 therefore has no separate "clean" run to anchor a
+            # recovery ratio against; the value below is an *Atlas* reference on the unmodified bag,
+            # not a clean baseline, and G is reported as null above.
+            "atlas_on_unmodified_bag_ate_m": round(m_orb_b2.ate_rmse_m, 4),
+            "atlas_on_unmodified_bag_window_13_40s_rmse_m": round(w_orb_clean, 4),
             "B0_SingleMap_INJECTION": {
                 "tracked_frames": int(len(ts_orb_b0)),
                 "frames_in_15_35s": orb_frames_in_window,
@@ -517,6 +522,12 @@ def main() -> None:
                 "tracked_frames": int(len(all_cam_ts)),
                 "frames_in_15_35s": orb_frames_in_window,
                 "dropped_frames_in_15_35s": 0,
+                "dropped_frames_note": (
+                    "Definitional, not a capability: this branch is OFFLINE_CONSTRUCT, its poses are "
+                    "bridged from the healthy LiDAR relative motion, so no ORB tracker is running on "
+                    "these frames and there is nothing to drop. Compare B0 (206/278) and B2 (92/278), "
+                    "which are real tracker runs."
+                ),
                 "ate_rmse_m": round(m_orb_b6.ate_rmse_m, 4),
                 "ate_max_m": round(m_orb_b6.ate_max_m, 4),
                 "rpe_trans_rmse_m": round(m_orb_b6.rpe_trans_rmse_m, 4),

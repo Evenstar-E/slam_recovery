@@ -158,8 +158,8 @@
       "injection_modal_scope": "LiDAR-only; the RGB-D stream is identical across clean and injected bags",
       "recovery_ratio_G": null,
       "recovery_ratio_G_reason": "undefined: ORB-SLAM3 has no vision-side degradation, so E_degraded == E_clean and the denominator of G is zero. Earlier manifests reported a full-sequence G computed against a different baseline variant (B0 vs B2), which is not a recovery ratio.",
-      "clean_ate_m": 0.9513,
-      "clean_window_13_40s_rmse_m": 0.8863,
+      "atlas_on_unmodified_bag_ate_m": 0.9513,
+      "atlas_on_unmodified_bag_window_13_40s_rmse_m": 0.8863,
       "B0_SingleMap_INJECTION": {
         "tracked_frames": 355,
         "frames_in_15_35s": 278,
@@ -182,6 +182,7 @@
         "tracked_frames": 744,
         "frames_in_15_35s": 278,
         "dropped_frames_in_15_35s": 0,
+        "dropped_frames_note": "Definitional, not a capability: this branch is OFFLINE_CONSTRUCT, its poses are bridged from the healthy LiDAR relative motion, so no ORB tracker is running on these frames and there is nothing to drop. Compare B0 (206/278) and B2 (92/278), which are real tracker runs.",
         "ate_rmse_m": 0.5599,
         "ate_max_m": 1.3553,
         "rpe_trans_rmse_m": 0.1748,
@@ -196,5 +197,5 @@
       }
     }
   },
-  "created_utc": "2026-11-06T06:42:54.636337+00:00"
+  "created_utc": "2026-11-06T07:26:56.852337+00:00"
 }

@@ -11,6 +11,8 @@ from .trajectory_eval import (
     load_tum_trajectory,
     load_tum_trajectory_se3,
     quat_xyzw_to_rot,
+    recovery_ratio_G_rounded,
+    round_or_none,
     umeyama_se3_align,
 )
 
@@ -25,5 +27,7 @@ __all__ = [
     "load_tum_trajectory",
     "load_tum_trajectory_se3",
     "quat_xyzw_to_rot",
+    "recovery_ratio_G_rounded",
+    "round_or_none",
     "umeyama_se3_align",
 ]
