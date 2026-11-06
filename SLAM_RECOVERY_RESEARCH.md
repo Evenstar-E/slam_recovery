@@ -1831,7 +1831,7 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
 
 ### 4. 补齐实验 E-Gap 1（近墙正常通行 Hard-Negative 测试）、E-Gap 2（B0–B6 全序列消融与纯后端 GNC）与 E-Gap 4（6-DoF 旋转误差与 3-DoF 路径切向代理）
 执行脚本：[run_hard_negative_and_rot_ate_benchmark.py](slam_recovery/experiments/run_hard_negative_and_rot_ate_benchmark.py)，记录文件：[p10_hard_negative_and_rot_ate_benchmark.json](slam_recovery/experiments/manifests/p10_hard_negative_and_rot_ate_benchmark.json)。
-- **E-Gap 1（近墙/窄门正常通行 Hard-Negative 负例测试，基于真实扫描跨帧点面残差 `REAL_SCAN_FIM_AND_CROSS_SCAN_NIS`）**：在无注入的 `room_02`（76/76 帧近场点 `<4.2m` 比例均值高达 `79.9%`，实测跨帧 NIS 均值 `0.8425`、LOSO 均值 `0.294`）和 `hall_02`（62/86 近墙帧，实测跨帧 NIS 均值 `1.9375`）上，无门控的纯几何近场 RANSAC 在 `room_02` 上真实触发 **`5/76 (6.58%)` 误剥离**；而本文联合 NIS/$D_{\mathrm{LOSO}}$ 门控的 `SignatureMatrixRouter` 误报警率与误剥离率均为 **`0.00%`（0/76 与 0/62）**。
+- **E-Gap 1（近墙/窄门正常通行 Hard-Negative 负例测试，基于真实扫描跨帧点面残差 `REAL_SCAN_FIM_AND_CROSS_SCAN_NIS`）**：在无注入的 `room_02`（76/76 帧近场点 `<4.2m` 比例均值高达 `79.9%`，实测跨帧 NIS 均值 `0.8425`、LOSO 均值 `0.294`）和 `hall_02`（62/86 近墙帧，实测跨帧 NIS 均值 `1.9375`）上，无门控的纯几何近场 RANSAC 在 `room_02` 上真实触发 **`58/76 (76.3%)` 误剥离**（该计数随近场滤波器选面准则修正而更新，见 §13.15）；而本文联合 NIS/$D_{\mathrm{LOSO}}$ 门控的 `SignatureMatrixRouter` 误报警率与误剥离率均为 **`0.00%`（0/76 与 0/62）**。
 - **E-Gap 2（B0–B6 连续消融与纯后端 GNC 对比）**：在 `hall_01` 20s 连续塑料袋遮挡下，补齐 `B1`（在线特征值投影：FL `7.0637m` / LIO `7.4117m`，3D 污染 `43.21%`）与 `B3`（同批未剥离数据回滚重优化：FL `7.0583m` / LIO `7.3969m`，验证 Proposition 1 $\Delta J_v \le 0$）；同时证明**纯后端 25-KF GNC（无前端延迟提交隔离与点云剥离）**仅将 MM-LINS B2 的 ATE 从 `6.1254 m` 变为 `6.1065 m`（$G = +0.0032$），而本文完整 B6 恢复至 **`0.3058 m`（$G = +0.9975$）**。
 - **E-Gap 4（严格区分 6-DoF Mocap 四元数旋转误差 $\mathrm{ATE}_{\mathrm{rot}}$ 与 3-DoF Leica 路径切向航向代理）**：在 3-DoF Leica 全站仪序列（`hall_01`, `hall_02`）上，正式 6-DoF 旋转指标严格标记为 `UNAVAILABLE`，独立报告路径切向航向代理（`hall_01` 走廊退化 LIO-SAM B0 `82.788° -> B6 6.279°`，塑料袋遮挡 B0 `90.582° -> B6 5.247°`）；在 6-DoF Vicon Mocap 序列（仅用前 20% 帧标定固定刚体外参）上，`room_dark_01` 上 ORB-SLAM3 Atlas B2 的平均旋转误差为 `10.073°`（RMSE `12.704°`，Max `67.224°`），而我们的 B6 桥接**所锚定的辅助 FAST-LIO2 激光-惯性姿态**为 **`2.787°`（RMSE `3.088°`，Max `9.755°`）**；由于 B6 桥接只修复并发布平移（`repaired_poses` 为 3 维向量），**B6 自身的旋转指标标记为 `UNAVAILABLE`**，不把辅助宿主的姿态归因于修复本身；`room_02` 的暗光+模糊退化使旋转 RMSE 从 clean 的 `3.839°`（mean `3.586°`）升至 B2 的 `13.582°`（mean `9.994°`）。**注**：Mocap GT 的 `qw` 前置分量序与约 2.3% 的损坏行在此之前未做处理，导致旧值（`24.506°`/`23.656°`、`6.774°`/`12.624°`）被约 7 条 `~170°` 的伪旋转尖峰污染；修正后 B2 与 B6 的旋转差距才真实显现。
 - **形式化反例与复审探针验证**：针对 `docs/review_20261105/audit_review.py`（R1–R6）与 `docs/review_20261105_followup/audit_local.py`（F1–F8 共 9 个有界探针），已全部修复并合入单元测试 `test_r1_to_r6_audit_counterexamples_resolved` 与 `test_f1_to_f8_followup_review_probes_resolved`，当前全套 **18/18 单元测试 100% 通过**。
@@ -1892,3 +1892,41 @@ S2 三维体素污染率不变：B0 43.25%、B1 43.21%、B2 17.79%、B3 43.25%�
 
 - **图 1**：曲线由固定分布参数生成，并非实跑日志。面板标题改为 `Schematic (illustrative parameters, not a logged run)`，图注改为"合成示意"，并把"MM-LINS 零报警"的实测结论移回表 II／第 V 节引用；面板内原写死的 `12.34 m drift` 改为从 `p10_hard_negative_and_rot_ate_benchmark.json` 的 `EGap2.Degraded_MMLINS_B2_ate_m` 读取的实测 `6.1254 m`。
 - **图 0**：宿主栏由"FAST-LIO2 / LIO-SAM / MM-LINS / ORB-SLAM3 / FAST-LIVO2"改为四条已实跑宿主，第五宿主 FAST-LIVO2 要等 Action Item 8.1 真跑出结果后再写入图与正文，避免把计划中的配置画成已执行路径。
+
+## 13.15 近场混合滤波器选面准则修正与真实"注入／剥离／剩余"点云可视化（已验证）
+
+> 产物：`slam_recovery/experiments/hall01_pointcloud_injection_comparison.mcap`（12 帧，4 MB）、
+> `manifests/hall01_pointcloud_injection_comparison.json`、`figures/pointcloud_injection_strip_preview.png`、`figures/pointcloud_injection_range_hist.png`。
+> 复现：`/home/R26534/mm/ros/bin/python -m slam_recovery.experiments.build_pointcloud_injection_mcap`
+
+### 1. 发现的问题：原 MCAP 的点云话题不构成"注入→剥离"证据
+
+`hall_01_plasticbag_comparison.mcap` 里两个 PointCloud2 话题分别用 `subsample_pc2(stride=6)` 与 `subsample_pc2(stride=2)` 写同一批 scan，且写入所依据的两个 bag（`hall_01_inj_plasticbag_120_140s.bag`、`hall_01_repaired_plasticbag_120_140s.bag`）的 `/velodyne_points` payload **sha256 逐一相同**。因此"修复后点云"只是同一份数据降采样得少 3 倍，读者会把它误读为剥离效果。该对比不能作为证据。
+
+### 2. 更深一层：RANSAC 以"平面内点数"选面，在真实室内扫描上会选中地面
+
+`filter_self_consistent_near_field_contaminants` 原先用 `argmax |inliers|` 选平面。用项目自带的 `inject_plastic_bag_near_field_occlusion(occluded_azimuth_fraction=0.88)` 在真实 M2DGR 扫描上注入后实测：
+
+| 场景 | 修正前剥离率 | 修正后剥离率 |
+|---|---:|---:|
+| `room_02` 真实扫描 + 88% 方位注入 | **56.0–58.1%** | **89.4%** |
+| `hall_01` 真实扫描 + 88% 方位注入 | **53.5–56.8%** | **88.8%** |
+| 未注入的干净扫描 | 0%（`contam` 0.18） | 0%（`contam` 0.08） |
+
+原因：注入器对掠射光线把分母截断在 `0.25`，使遮挡面成为带"帽檐"的曲面，真正落在 `n^Tp=0.35` 平面 ±5 cm 内的点只有 42%；而室内地面上千点天然共面，内点数（29,301）超过遮挡面（21,421），于是滤波器剥掉的是地面而不是塑料袋，`bag_points_surviving` 高达 16,600–17,900。
+
+**修正**：RANSAC 假设改为按**近场面覆盖率**打分（`|r_k − d/ max(|u_k·n|,0.25)| ≤ 4·τ_plane` 的命中点数），与后续剥离准则一致。以注入时的真实法向评分可命中 **45,955/45,955 个塑料袋点，仅误伤 9/5,464 个背景点**；干净扫描上覆盖率仅 0.08–0.18，不触发剥离。
+
+修正后与论文长期引用的 **88.8% 剥离率**一致（`hall_01` 均值 0.8884，`room_02` 0.8939）。
+
+### 3. 连带更新：Hard-Negative 误剥离计数由 `6.58%` 变为 `76.3%`
+
+选面准则修正后，滤波器终于能把"近场薄片"选出来——代价是它再也无法区分**近场薄片**与**一堵近墙**：两者都是距离传感器 1–3 m 的平面。`room_02` 无注入近墙帧上，纯几何 RANSAC 的误剥离由 `5/76 (6.58%)` 变为 **`58/76 (76.3%)`**（`hall_02` 仍为 `0/62`）；抽检 4 帧，被剥掉的点距离中位数 `1.96–2.94 m`，即真实墙面。
+
+旧值 `6.58%` 偏低恰恰是因为旧准则选面选不准（选中地面、漏掉薄片），属于"因为看不见所以不误伤"。新数字对方法本身更不利，但它才是当前代码的真实输出，`paper_main.tex`、§13.13 与 `REVIEW_AND_SIMULATION_PLAN.md` 均已同步。结论方向因此更强而非更弱：**纯几何近场过滤不可部署**，必须由 NIS/$D_{\mathrm{LOSO}}$ 门控（实测 `0.00%` 误剥离、`0.00%` 误报警）把关。
+
+### 4. 可视图
+
+- `pointcloud_injection_strip_preview.png`：四联俯视图（干净扫描 / 注入 / 被剥离 / 剩余），剩余点云中塑料袋点残留 **0**。
+- `pointcloud_injection_range_hist.png`：距离直方图（对数纵轴）。注入后在 0.3–1.5 m 出现万点量级尖峰，剥离后该尖峰消失，只剩稀疏背景。
+- MCAP 四话题：`/points/clean`（`REAL_HOST`）、`/points/injected`（`INJECTION`）、`/points/removed`、`/points/background`（均 `OFFLINE_CONSTRUCT`），并附逐帧 `strip_fraction`、`bag_points_surviving`、`background_points_stripped` 于同名 manifest。

@@ -9,8 +9,8 @@
       "max_near_field_ratio": 0.8858,
       "mean_real_cross_scan_nis": 0.8425,
       "mean_real_loso_conflict": 0.294,
-      "naive_geometry_only_ransac_false_strip_count": 5,
-      "naive_geometry_only_ransac_false_strip_rate": 0.0658,
+      "naive_geometry_only_ransac_false_strip_count": 58,
+      "naive_geometry_only_ransac_false_strip_rate": 0.7632,
       "ours_nis_loso_gated_meas_contam_false_strip_count": 0,
       "ours_nis_loso_gated_meas_contam_fpr": 0.0,
       "ours_quarantine_false_alarm_rate": 0.0

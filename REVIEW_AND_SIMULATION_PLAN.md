@@ -325,7 +325,7 @@
 1. **`w/o Physical-Unit & Causal Past-Median Normalization`**（直接输入原始未归一化特征）：验证跨场景泛化诊断准确率从 `1.000` 跌至 `0.400`；
 2. **`w/o 48-Cell Spherical Azimuth-Elevation Encoder`**（仅用全局 12D 标量统计，去掉 32D 球面空间池化特征 $s_t$）：定量展示在局部扇区遮挡（`MEAS_CONTAM`）与走廊退化（`GEO_DEGEN`）早期区分度及起点回溯 MAE 上的退化；
 3. **`w/o Factorized Onset-Age Head (`ConditionalRecoveryHead`)`**（退化为固定 $\Delta t_{\mathrm{margin}}=2.0\,\mathrm{s}$ 回滚）：验证 $4.0\,\mathrm{s}$ 慢斜坡退化下起点 MAE 从 `0.18–0.27 s` 恶化至 `0.80 s`，可信地图泄漏污染帧从 `0.00` 升至 `2.00` 帧；
-4. **`w/o NIS / LOSO Innovation Consistency Gate`**（退化为纯几何 RANSAC 近场过滤）：验证在 `room_02` / `hall_02` 正常近墙通行（Hard-Negative）上产生 `6.58%` 真实墙面误剥离，而加上 NIS/LOSO 门控后误剥离率为 `0.00%`；
+4. **`w/o NIS / LOSO Innovation Consistency Gate`**（退化为纯几何 RANSAC 近场过滤）：验证在 `room_02` / `hall_02` 正常近墙通行（Hard-Negative）上产生 `76.3%`（58/76 帧）真实墙面误剥离，而加上 NIS/LOSO 门控后误剥离率为 `0.00%`；
 5. **`Full Physics-Guided Causal Network + Signature Floor (Ours-Full)`**：全指标最优。
 
 #### 2. 子表 B：四模式验证门 $\mathcal{D}(t)$ 内部三判据消融（Mode 2 Verification Gate Criterion Ablation）
