@@ -1763,6 +1763,29 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
 | **LiDAR 88% 塑料袋遮挡 `[45-65s]`** | **LIO-SAM** | 0.2339 | 3.4168 | **237.4878**（发散被拒） | **0.2430** (`OFFLINE_CONSTRUCT`) | **`+0.9971`** | Mode 2 准确拦截发散的 B5 并路由至位姿图修复，恢复 **99.71%** |
 | **相机重度暗光 (`g=0.05`) `[45-65s]`** | **ORB-SLAM3** | 0.2680 | B0: `1.3287` (丢 295 帧)<br>B2: `0.9739` (丢 168 帧, Win `1.8409`) | — | **0.6024** (Win **0.6057**, 0 丢帧) | **`+0.6847` (vs B0)**<br>**`+0.7782` (Win vs B2)** | 真跨帧 `CrossScan_NIS = 2.1586 <= 2.5`（B2 为 `3.0392`），无偏 `Wilson_LB = 0.7902 >= 0.55` 通过 Mode 2 提交 |
 
+### 3. 室外未见测试序列 `street_08`（130s 窗口，Leica/RTK 真值）零微调盲测（已验证）
+
+执行脚本：`/tmp/unseen_val/run_street08_hosts.sh`（真实 C++ 宿主 FAST-LIO2、MM-LINS、LIO-SAM 以 4x/1.5x 速率实跑），汇总记录：[test_street_08_heldout_benchmark.json](slam_recovery/experiments/manifests/test_street_08_heldout_benchmark.json)。
+
+| 宿主系统 | **Clean ATE (m)** | **B0/B2 退化 ATE (m)** | **B5 无验证修复 ATE (m)** | **Ours B6 修复后 ATE (m)** | **同宿主恢复比例 $G$** | 盲测结论 |
+|---|---:|---:|---:|---:|---:|---|
+| **FAST-LIO2** | 0.1316 | 1.2996 (Max 4.8638m) | — | **0.1346** (`INJECTION`) | **`+0.9974`** | 室外街道 88% 塑料袋遮挡下直接恢复 **99.74%** |
+| **MM-LINS** | 0.3458 | 5.2635 (Max 8.2700m) | — | **0.3294** (`INJECTION`) | **`+1.0033`** | **第 5 条序列复现 `/Issleeping=0` 100% 漏报**；B6 恢复 **100.33%** |
+| **LIO-SAM** | 0.1156 | **333.2876** (Max 1248.15m) | **151.0695**（发散被拒） | 337.0601（B6 桥接后仍发散，Wilson LB `0.4626 < 0.55`，**Mode 2 拒绝提交，转入 Mode 3 软桥接等待**） | **`-0.0113`** | 室外长距离街道无两侧墙约束，LIO-SAM 前端 LOAM 特征提取器在塑料袋遮挡下彻底失效，B6 位姿图桥接无法恢复，**Mode 2 门控正确拒绝合并不可恢复候选** |
+
+### 4. 真实自然暗光未见测试序列 `room_dark_02`（52.0s，Vicon Mocap 6-DoF 真值）零微调盲测（已验证）
+
+执行脚本：`/tmp/unseen_val/`（`r26534-58` 会话实跑），汇总记录：[test_room_dark_02_heldout_benchmark.json](slam_recovery/experiments/manifests/test_room_dark_02_heldout_benchmark.json)。
+
+| 宿主系统 | **Clean ATE (m)** | **退化 ATE (m)** | **Ours B6 修复后 ATE (m)** | **窗口 `[13-40s]` RMSE (m)** | **盲测结论 |
+|---|---:|---:|---:|---:|---|
+| **FAST-LIO2** | 0.1659 | 0.8958 (Max 1.6633m) | 0.9432 | — | 自然暗光下 LiDAR 基本健康，塑料袋遮挡后 B6 未进一步改善（$G=-0.0649$） |
+| **MM-LINS** | 0.1164 | 0.0723 (Max 0.1902m) | **0.0497** | — | **第 6 条序列复现 `/Issleeping=0` 100% 漏报**；B6 恢复 **0.0497m** |
+| **LIO-SAM** | 0.9523 | 1.1310 (Max 2.2638m) | 1.2753（B5 发散至 `166.7975m` 被拒） | — | 自然暗光下 LIO-SAM 本身精度较差，B5 无验证修复发散，Mode 2 拦截 |
+| **ORB-SLAM3 单地图 (`ORB_SINGLE_MAP=1`)** | 0.7614 (丢 228 帧) | — | — | — | 自然暗光下跟丢 228/744 帧 |
+| **ORB-SLAM3 原生 Atlas (B2)** | 0.9513 (丢 114 帧) | — | — | 1.0721 | 原生 Atlas 在暗光下产生窗口 RMSE `1.0721m` |
+| **Ours B6 (`OFFLINE_CONSTRUCT`)** | — | — | **0.5598** | **0.3771** | **Wilson LB `0.9235`，CrossScan NIS `0.6532`，Mode 2 原子提交通过，窗口 `[15-35s]` 零丢帧** |
+
 ## 13.13 物理引导因果相对注意力 Transformer（`PhysicsGuidedCausalTransformer`）、正交补空间可辨识度（Proposition 2）与写时复制体素事务日志（`SpatialMutationLog`）实测验证（已验证）
 
 执行脚本：[run_e1_detection_benchmark.py](slam_recovery/experiments/run_e1_detection_benchmark.py) 与 [run_identifiability_and_transformer_real_bags.py](slam_recovery/experiments/run_identifiability_and_transformer_real_bags.py)，汇总记录：[e1_detection_diagnosis_benchmark.json](slam_recovery/experiments/manifests/e1_detection_diagnosis_benchmark.json) 与 [p9_identifiability_and_causal_transformer_real_bags.json](slam_recovery/experiments/manifests/p9_identifiability_and_causal_transformer_real_bags.json)。

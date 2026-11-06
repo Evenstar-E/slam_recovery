@@ -1,0 +1,25 @@
+{
+  "run_id": "test_mmlins_b2_room_dark_02_clean",
+  "host_system": "MM-LINS",
+  "baseline_variant": "B2",
+  "sequence_name": "room_dark_02",
+  "input_bag_path": "/tmp/unseen_val/room_dark_02_fl.bag",
+  "input_bag_hash": "030e9749006f8814da0a78ee376f9c1e1818894572e8eb36a3077b31fbcdc41c",
+  "provenance": "REAL_HOST",
+  "gt_source": "Mocap",
+  "seed": 42,
+  "injection_type": "natural_dark_clean",
+  "injection_params": {
+    "split": "held_out_test_zero_tuning"
+  },
+  "metrics": {
+    "num_matched_poses": 197,
+    "path_length_m": 10.8639,
+    "ate_rmse_m": 0.1164,
+    "ate_mean_m": 0.0979,
+    "ate_max_m": 0.2273,
+    "rpe_trans_rmse_m": 0.1268,
+    "false_quarantine_triggers": 0
+  },
+  "created_utc": "2026-11-06T05:47:06.730066+00:00"
+}

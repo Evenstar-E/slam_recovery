@@ -1,0 +1,91 @@
+{
+  "sequence": "street_08 (Unseen Outdoor Street Held-Out Test Split, 130s window)",
+  "gt_source": "Leica / RTK (M2DGR/GT/street_08.txt)",
+  "provenance": "REAL_HOST / INJECTION / OFFLINE_CONSTRUCT",
+  "injection_window": "[50s, 70s] 88% FoV plastic-bag occlusion",
+  "results": {
+    "FAST_LIO2_B0": {
+      "ate_rmse_m": 0.1316,
+      "rpe_trans_rmse_m": 0.0872,
+      "ate_max_m": 0.4351,
+      "matched_poses": 1164,
+      "path_length_m": 71.29
+    },
+    "MM_LINS_B2": {
+      "ate_rmse_m": 0.3458,
+      "rpe_trans_rmse_m": 0.2233,
+      "ate_max_m": 0.7163,
+      "matched_poses": 239,
+      "path_length_m": 66.33
+    },
+    "LIO_SAM_B0": {
+      "ate_rmse_m": 0.1156,
+      "rpe_trans_rmse_m": 0.1576,
+      "ate_max_m": 0.2912,
+      "matched_poses": 379,
+      "path_length_m": 82.27
+    },
+    "FAST_LIO2_B0_deg": {
+      "ate_rmse_m": 1.2996,
+      "rpe_trans_rmse_m": 0.5433,
+      "ate_max_m": 4.8638,
+      "matched_poses": 940,
+      "path_length_m": 58.38
+    },
+    "MM_LINS_B2_deg": {
+      "ate_rmse_m": 5.2635,
+      "rpe_trans_rmse_m": 2.8386,
+      "ate_max_m": 8.27,
+      "matched_poses": 237,
+      "path_length_m": 51.63
+    },
+    "LIO_SAM_B0_deg": {
+      "ate_rmse_m": 333.2876,
+      "rpe_trans_rmse_m": 230.6646,
+      "ate_max_m": 1248.1507,
+      "matched_poses": 299,
+      "path_length_m": 3795.81
+    },
+    "FAST_LIO2_B6": {
+      "ate_rmse_m": 0.1346,
+      "rpe_trans_rmse_m": 0.0953,
+      "ate_max_m": 0.4104,
+      "matched_poses": 1207,
+      "path_length_m": 75.79
+    },
+    "MM_LINS_B6": {
+      "ate_rmse_m": 0.3294,
+      "rpe_trans_rmse_m": 0.2633,
+      "ate_max_m": 0.6865,
+      "matched_poses": 236,
+      "path_length_m": 65.73
+    },
+    "LIO_SAM_B5": {
+      "ate_rmse_m": 151.0695,
+      "rpe_trans_rmse_m": 131.1243,
+      "ate_max_m": 772.2204,
+      "matched_poses": 347,
+      "path_length_m": 2652.8
+    },
+    "MM_LINS_Deg_Issleeping_Count": 0,
+    "LIO_SAM_B6_OFFLINE_CONSTRUCT": {
+      "ate_rmse_m": 337.0601,
+      "rpe_trans_rmse_m": 230.4453,
+      "ate_max_m": 1256.2951,
+      "matched_poses": 299,
+      "path_length_m": 3761.57
+    },
+    "recovery_ratios_G": {
+      "FAST_LIO2": 0.9974,
+      "MM_LINS": 1.0033,
+      "LIO_SAM": -0.0113
+    },
+    "LIO_SAM_B6_Holdout_Validation": {
+      "cross_scan_nis_mean_b2": 4.8799,
+      "cross_scan_nis_mean_b6": 4.4145,
+      "wilson_lower_bound": 0.4626,
+      "reentry_pos_jump_m": 0.4042,
+      "approved": false
+    }
+  }
+}

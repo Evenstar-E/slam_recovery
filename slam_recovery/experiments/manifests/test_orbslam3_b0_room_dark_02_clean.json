@@ -1,0 +1,25 @@
+{
+  "run_id": "test_orbslam3_b0_room_dark_02_clean",
+  "host_system": "ORB-SLAM3",
+  "baseline_variant": "B0",
+  "sequence_name": "room_dark_02",
+  "input_bag_path": "/home/R26534/M2DGR/raw/room_dark_02.bag",
+  "input_bag_hash": "8c1863bbf082189669468cef701febe5e6b6c96fe95dcc60e19b0cdf3896ce45",
+  "provenance": "REAL_HOST",
+  "gt_source": "Mocap",
+  "seed": 42,
+  "injection_type": "natural_dark_clean",
+  "injection_params": {
+    "split": "held_out_test_zero_tuning"
+  },
+  "metrics": {
+    "num_matched_poses": 738,
+    "path_length_m": 13.23,
+    "ate_rmse_m": 0.7614,
+    "ate_mean_m": 0.6823,
+    "ate_max_m": 1.6395,
+    "rpe_trans_rmse_m": 0.2382,
+    "false_quarantine_triggers": 0
+  },
+  "created_utc": "2026-11-06T05:47:06.752064+00:00"
+}
