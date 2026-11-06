@@ -251,7 +251,7 @@ def fig0_system_architecture() -> str:
     )
 
     # Three major dashed containers with a wide central inter-layer corridor [43.0 .. 54.2]
-    group(15.2, 54.2, 60.0, 43.0, "Multi-Modal SLAM Host Frontend & Estimator", "FAST-LIO2 / LIO-SAM / MM-LINS / ORB-SLAM3 / FAST-LIVO2")
+    group(15.2, 54.2, 60.0, 43.0, "Multi-Modal SLAM Host Frontend & Estimator", "FAST-LIO2 / LIO-SAM / MM-LINS / ORB-SLAM3")
     group(15.2, 3.5, 60.0, 39.5, "Transactional Recovery Layer", "Delayed-Commit Quarantine & 4-Mode Gate D(t)")
     group(78.5, 3.5, 20.5, 93.7, "Persistent Maps & State")
 
@@ -372,7 +372,12 @@ def fig0_system_architecture() -> str:
 
 
 def fig1_detection_and_quarantine_timeline() -> str:
-    """Fig. 1: Timeline of joint innovation detector & 2.0s delayed-commit quarantine vs. MM-LINS."""
+    """Fig. 1: Schematic of the joint innovation detector & 2.0 s delayed-commit quarantine.
+
+    The curves are drawn from fixed distribution parameters, not from a logged host run; the
+    panel is labelled as a schematic so the reader is not invited to read event timings off it.
+    The measured zero-alarm behaviour of MM-LINS is reported in Table II / Section V, not here.
+    """
     t = np.linspace(110.0, 155.0, 225)
     in_deg = (t >= 120.0) & (t <= 140.0)
 
@@ -387,7 +392,7 @@ def fig1_detection_and_quarantine_timeline() -> str:
         ax_bg,
         (0.015, 0.525, 0.97, 0.455),
         "(a) Joint Innovation Consistency & 2.0 s Delayed-Commit Quarantine",
-        "M2DGR hall_01 [120–140 s]",
+        "Schematic (illustrative parameters, not a logged run)",
         title_size=11.2,
     )
     _draw_dashed_group(
@@ -468,8 +473,11 @@ def fig1_detection_and_quarantine_timeline() -> str:
         zorder=4,
         label="Ours: Stripped Background Info (scaled /15)",
     )
+    with open(MAN_DIR / "p10_hard_negative_and_rot_ate_benchmark.json", encoding="utf-8") as f:
+        _p10 = json.load(f)
+    _mmlins_bag_ate = float(_p10["EGap2_BackendOnly_GNC_Without_Quarantine"]["Degraded_MMLINS_B2_ate_m"])
     ax2.annotate(
-        "Self-consistent planar bag returns shrink $P_{tt}$:\nMM-LINS /Issleeping = 0 (12.34 m drift)",
+        f"Self-consistent planar bag returns shrink $P_{{tt}}$:\nMM-LINS /Issleeping = 0 ({_mmlins_bag_ate:.4f} m ATE)",
         xy=(129.0, 0.85),
         xytext=(124.0, 2.45),
         ha="center",
@@ -859,7 +867,7 @@ def fig4_multi_scenario_host_trajectories_and_campus() -> str:
 
     b_p = ax2.bar(xc - w_c, paper_ce_pgo, width=w_c, color=GATE_FILL, edgecolor=INK, linewidth=1.15, zorder=3, label="Paper Reported CE-PGO")
     b_l = ax2.bar(xc, local_repro, width=w_c, color=PURPLE_FILL, edgecolor=INK, linewidth=1.15, zorder=3, label="Local Repro Final CE-PGO")
-    b_o = ax2.bar(xc + w_c, mode2_gated, width=w_c, color=REPAIR_FILL, edgecolor=INK, linewidth=1.15, zorder=3, label="Ours Mode 2 Snapshot-Gated")
+    b_o = ax2.bar(xc + w_c, mode2_gated, width=w_c, color=REPAIR_FILL, edgecolor=INK, linewidth=1.15, zorder=3, label="Ours Mode 2 Gate (committed map)")
 
     for b in b_p:
         h = b.get_height()
@@ -868,10 +876,16 @@ def fig4_multi_scenario_host_trajectories_and_campus() -> str:
         h = b.get_height()
         ax2.text(b.get_x() + b.get_width() / 2 + 0.03, h + 0.025, f"{h:.2f}", ha="center", va="bottom", fontsize=8.0, fontweight="bold")
 
+    oracle = [campus_m[k].get("local_oracle_best_snapshot_e2e_m") for k in c_keys]
+    for xi, o in enumerate(oracle):
+        if o is not None:
+            ax2.plot([xi - w_c * 1.4, xi + w_c * 1.4], [o, o], color=CORAL_LINE, linestyle=":", linewidth=1.5, zorder=5,
+                     label="Post-hoc best snapshot (oracle only)" if xi == 0 else None)
+
     ax2.annotate(
-        "Unvalidated CE-PGO merge\ndoubles error (1.30 m → 0.43 m)",
+        "CE-PGO doubles error on Campus-2 (0.603→1.295 m);\ngate accepts the host's final graph (0.447 m)",
         xy=(1 - w_c + 0.04, 1.24),
-        xytext=(2.22, 0.88),
+        xytext=(2.35, 0.95),
         ha="center",
         va="center",
         fontsize=8.0,
@@ -885,7 +899,7 @@ def fig4_multi_scenario_host_trajectories_and_campus() -> str:
     ax2.set_xticklabels(campus_names, fontsize=8.5, fontweight="bold")
     ax2.set_ylabel("End-to-End Closure Error (m)", fontweight="bold")
     ax2.set_ylim(0, 1.52)
-    leg2 = ax2.legend(loc="upper right", frameon=True, fontsize=8.0)
+    leg2 = ax2.legend(loc="upper left", frameon=True, fontsize=7.4, ncol=1, borderpad=0.4, labelspacing=0.3)
     leg2.get_frame().set_edgecolor(INK)
     leg2.get_frame().set_linewidth(1.0)
 

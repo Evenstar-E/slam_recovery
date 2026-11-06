@@ -136,6 +136,9 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
     b5_narrow_nis_list, b5_narrow_info_list = [], []
     b6_point_nis_list, b6_point_info_list = [], []
     b6_pg_nis_list, b6_pg_info_list = [], []
+    # Tri-state paired-benefit evidence outcome recorded per branch (P1-1)
+    r4_evidence_list, r5_evidence_list, b5_evidence_list = [], [], []
+    b6_point_evidence_list, b6_pg_evidence_list = [], []
 
     # S2: 3D Voxel Contamination Ratio \mathrm{Contam}_{3D} across B0, B1, B2, B3, B4, B5, B6
     contam_3d = {"B0": [], "B1": [], "B2": [], "B3": [], "B4": [], "B5": [], "B6": []}
@@ -219,11 +222,36 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
         contam_3d["B3"].append(arena.compute_3d_voxel_contamination_ratio(voxels_b3))
         contam_3d["B4"].append(arena.compute_3d_voxel_contamination_ratio(node_r4.committed_voxel_set))
 
-        # S1 Case 1: R4 (No revisit evidence -> feature-poor corridor scans + drifted trajectory)
+        # Pre-onset trusted anchor and measured per-keyframe advance, taken from the trusted
+        # trajectory itself (never from ground truth). These are the only inputs the repair
+        # branch is allowed to use when predicting a pose for a sealed validation scan.
+        max_trusted_kf = max(node_r5.tx_mgr.trusted_poses.keys())
+        anchor_pose = node_r5.tx_mgr.trusted_poses[max_trusted_kf].copy()
+        pre_anchor_x = float(anchor_pose[0, 3])
+        if (max_trusted_kf - 1) in node_r5.tx_mgr.trusted_poses:
+            step_dx_measured = float(node_r5.tx_mgr.trusted_poses[max_trusted_kf][0, 3]
+                                     - node_r5.tx_mgr.trusted_poses[max_trusted_kf - 1][0, 3])
+        else:
+            step_dx_measured = 0.0
+
+        def _bridge_anchor_at(kf: int) -> np.ndarray:
+            """Trusted pre-onset pose carried forward at the measured pre-onset velocity."""
+            T = anchor_pose.copy()
+            T[0, 3] += step_dx_measured * (kf - max_trusted_kf)
+            return T
+
+        # S1 Case 1: R4 (No revisit evidence -> feature-poor corridor scans + drifted trajectory).
+        # The candidate re-publishes the host's own quarantined trajectory, so its paired benefit
+        # is genuinely zero rather than merely unmeasured.
         node_r4.tx_mgr.active_quarantine.weak_direction_6d = np.array([0, 0, 0, 1, 0, 0], dtype=np.float64)
-        rep_r4 = node_r4.evaluate_and_commit_candidate("R4_no_revisit", quar_poses_drifted_r4, aux_or_loop_info_6x6=None)
+        rep_r4 = node_r4.evaluate_and_commit_candidate(
+            "R4_no_revisit", quar_poses_drifted_r4, aux_or_loop_info_6x6=None,
+            incumbent_poses=quar_poses_drifted_r4,
+            reentry_anchor_pose=_bridge_anchor_at(min(quar_poses_drifted_r4)),
+        )
         r4_info_list.append(rep_r4.weak_dir_info_after)
         r4_nis_list.append(rep_r4.holdout_nis)
+        r4_evidence_list.append(rep_r4.evidence_status)
 
         # S1 Case 2: B5 Narrow-FoV LIO-SAM filter (single-modality only: aux_or_loop_info_6x6=None, narrow 12% FoV + yaw/lateral drift)
         for k in quar_poses_drifted_b5:
@@ -242,8 +270,11 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.5
         )
         rep_b5 = node_b5.evaluate_and_commit_candidate(
-            "B5_narrow_fov", quar_poses_drifted_b5, aux_or_loop_info_6x6=None
+            "B5_narrow_fov", quar_poses_drifted_b5, aux_or_loop_info_6x6=None,
+            incumbent_poses={k: quar_poses_drifted_r4[k] for k in sorted(quar_poses_drifted_b5)},
+            reentry_anchor_pose=_bridge_anchor_at(min(quar_poses_drifted_b5)),
         )
+        b5_evidence_list.append(rep_b5.evidence_status)
         b5_narrow_info_list.append(rep_b5.weak_dir_info_after)
         b5_narrow_nis_list.append(rep_b5.holdout_nis)
 
@@ -258,30 +289,49 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
         # Roll back the rejected B5 trial branch via CoW SpatialMutationLog in O(|Dirty Set|)
         node_r4.voxel_journal.rollback_mutation_journal()
 
-        # S1 Case 3: R5 (Delayed Revisit to Zone A/C provides orthogonal pillar/wall constraints; solve candidate poses from scan planes + pre-quarantine anchor without reading GT poses)
+        # S1 Case 3: R5 (Delayed Revisit to Zone A/C provides orthogonal pillar/wall constraints).
+        # Scan-identity sealed split: the candidate pose *model* is fitted on non-validation scans
+        # only, and every validation scan gets a pose predicted from that model. The fit set and
+        # the validation set therefore share no scan id (repair_plan.md Section 2).
         node_r5.tx_mgr.active_quarantine.weak_direction_6d = np.array([0, 0, 0, 1, 0, 0], dtype=np.float64)
-        quar_poses_repaired_r5: Dict[int, np.ndarray] = {}
-        max_trusted_kf = max(node_r5.tx_mgr.trusted_poses.keys())
-        pre_anchor_x = float(node_r5.tx_mgr.trusted_poses[max_trusted_kf][0, 3])
-        for k in sorted(quar_poses_drifted_r4.keys()):
-            scan_revisit = arena.sample_lidar_scan_in_body_frame(
+        scans_revisit = {
+            k: arena.sample_lidar_scan_in_body_frame(
                 quar_poses_gt[k], zone_b_featureless=False, plastic_bag_occluded_frac=0.0, rng=rng
             )
-            node_r5.scan_buffer_body[k] = scan_revisit
-            # Estimate pose from scan wall/floor planes in body frame (y_wall = +-3.0, x_pillar/endwall) + pre-quarantine anchor
+            for k in sorted(quar_poses_gt.keys())
+        }
+        node_r5.scan_buffer_body = {k: v for k, v in scans_revisit.items()}
+        r5_keys = sorted(quar_poses_gt.keys())
+        r5_validation_keys = {k for idx, k in enumerate(r5_keys) if idx % node_r5.holdout_stride == 0}
+        r5_fit_keys = [k for k in r5_keys if k not in r5_validation_keys]
+
+        def _wall_lateral_offset(scan_pts: np.ndarray) -> float:
+            north = scan_pts[(scan_pts[:, 1] > 2.2) & (scan_pts[:, 2] > 0.2)]
+            return 3.0 - float(np.median(north[:, 1])) if len(north) > 5 else 0.0
+
+        y_fit = np.array([_wall_lateral_offset(scans_revisit[k]) for k in r5_fit_keys], dtype=np.float64)
+        if len(r5_fit_keys) >= 2:
+            slope_y, intercept_y = np.polyfit(np.asarray(r5_fit_keys, dtype=np.float64), y_fit, 1)
+        else:
+            slope_y, intercept_y = 0.0, float(y_fit[0]) if len(y_fit) else 0.0
+
+        quar_poses_repaired_r5: Dict[int, np.ndarray] = {}
+        for k in r5_keys:
+            # Validation frames use the fitted model only; the scan itself never informs its own pose.
+            y_est = float(slope_y * k + intercept_y) if k in r5_validation_keys else _wall_lateral_offset(scans_revisit[k])
             T_cand = np.eye(4, dtype=np.float64)
-            north_pts = scan_revisit[(scan_revisit[:, 1] > 2.2) & (scan_revisit[:, 2] > 0.2)]
-            y_est = 3.0 - float(np.median(north_pts[:, 1])) if len(north_pts) > 5 else 0.0
-            x_est = pre_anchor_x + 0.40 * (k - max_trusted_kf)
-            T_cand[0, 3] = x_est
+            T_cand[0, 3] = pre_anchor_x + step_dx_measured * (k - max_trusted_kf)
             T_cand[1, 3] = y_est
             quar_poses_repaired_r5[k] = T_cand
 
         rep_r5 = node_r5.evaluate_and_commit_candidate(
-            "R5_revisit_loop", quar_poses_repaired_r5, aux_or_loop_info_6x6=None
+            "R5_revisit_loop", quar_poses_repaired_r5, aux_or_loop_info_6x6=None,
+            incumbent_poses={k: quar_poses_drifted_r4[k] for k in r5_keys},
+            reentry_anchor_pose=_bridge_anchor_at(r5_keys[0]),
         )
         r5_info_list.append(rep_r5.weak_dir_info_after)
         r5_nis_list.append(rep_r5.holdout_nis)
+        r5_evidence_list.append(rep_r5.evidence_status)
 
         # S1 Case 4: B6 Point-Mixture Stripping on FAST-LIO2 (surviving 3D hall walls, solved candidate poses)
         node_b6_pm = OnlineRecoveryTransactionNode(confirmation_margin_sec=2.0, voxel_size_m=0.10, holdout_stride=5)
@@ -295,10 +345,13 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2
         )
         rep_b6_pm = node_b6_pm.evaluate_and_commit_candidate(
-            "B6_point_mixture", quar_poses_repaired_r5, aux_or_loop_info_6x6=None
+            "B6_point_mixture", quar_poses_repaired_r5, aux_or_loop_info_6x6=None,
+            incumbent_poses={k: quar_poses_drifted_r4[k] for k in r5_keys},
+            reentry_anchor_pose=_bridge_anchor_at(r5_keys[0]),
         )
         b6_point_info_list.append(rep_b6_pm.weak_dir_info_after)
         b6_point_nis_list.append(rep_b6_pm.holdout_nis)
+        b6_point_evidence_list.append(rep_b6_pm.evidence_status)
 
         # S1 Case 5: B6 Aux Pose-Graph Bridge on LIO-SAM (with physical IMU/visual relative odometry Fisher prior \sigma_{rel}^{-2})
         sigma_rel_rot_rad = 0.04
@@ -312,10 +365,13 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2
         )
         rep_b6_pg = node_b6_pg.evaluate_and_commit_candidate(
-            "B6_aux_pg", quar_poses_repaired_r5, aux_or_loop_info_6x6=aux_fim_physical
+            "B6_aux_pg", quar_poses_repaired_r5, aux_or_loop_info_6x6=aux_fim_physical,
+            incumbent_poses={k: quar_poses_drifted_r4[k] for k in r5_keys},
+            reentry_anchor_pose=_bridge_anchor_at(r5_keys[0]),
         )
         b6_pg_info_list.append(rep_b6_pg.weak_dir_info_after)
         b6_pg_nis_list.append(rep_b6_pg.holdout_nis)
+        b6_pg_evidence_list.append(rep_b6_pg.evidence_status)
 
         contam_3d["B6"].append(arena.compute_3d_voxel_contamination_ratio(node_r5.committed_voxel_set))
 
@@ -329,26 +385,33 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
                 "weak_dir_info_after": round(float(np.mean(r4_info_list)), 2),
                 "holdout_nis": round(float(np.mean(r4_nis_list)), 3),
                 "mode": rep_r4.mode.value,
+                "paired_evidence_status": sorted(set(r4_evidence_list)),
             },
             "B5_Narrow_FoV_Filter_LIOSAM": {
                 "weak_dir_info_after": round(float(np.mean(b5_narrow_info_list)), 2),
                 "holdout_nis": round(float(np.mean(b5_narrow_nis_list)), 3),
                 "mode": rep_b5.mode.value,
+                "paired_evidence_status": sorted(set(b5_evidence_list)),
             },
             "R5_Delayed_Revisit_Loop": {
                 "weak_dir_info_after": round(float(np.mean(r5_info_list)), 2),
                 "holdout_nis": round(float(np.mean(r5_nis_list)), 3),
                 "mode": rep_r5.mode.value,
+                "paired_evidence_status": sorted(set(r5_evidence_list)),
+                "paired_evidence_diagnostics": node_r5.last_paired_evidence,
             },
             "B6_Ours_Point_Mixture_FASTLIO2": {
                 "weak_dir_info_after": round(float(np.mean(b6_point_info_list)), 2),
                 "holdout_nis": round(float(np.mean(b6_point_nis_list)), 3),
                 "mode": rep_b6_pm.mode.value,
+                "paired_evidence_status": sorted(set(b6_point_evidence_list)),
+                "paired_evidence_diagnostics": node_b6_pm.last_paired_evidence,
             },
             "B6_Ours_Aux_PoseGraph_LIOSAM": {
                 "weak_dir_info_after": round(float(np.mean(b6_pg_info_list)), 2),
                 "holdout_nis": round(float(np.mean(b6_pg_nis_list)), 3),
                 "mode": rep_b6_pg.mode.value,
+                "paired_evidence_status": sorted(set(b6_pg_evidence_list)),
             },
         },
         "S2_True_3D_Mesh_Voxel_Contamination_Ratio": {
@@ -370,7 +433,7 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
 
     print("=== Simulation S1 (Online Counterfactual R4 vs. R5 with Cross-Scan Holdout S_hold) ===")
     for k, v in out["S1_CrossScan_Holdout_Gate_Verification"].items():
-        print(f"  {k:34s} | 6D-FIM J_v={v['weak_dir_info_after']:6.2f} | Cross-Scan Holdout NIS={v['holdout_nis']:6.3f} | Mode={v['mode']}")
+        print(f"  {k:34s} | 6D-FIM J_v={v['weak_dir_info_after']:6.2f} | Cross-Scan Holdout NIS={v['holdout_nis']:6.3f} | Mode={v['mode']} | Evidence={v['paired_evidence_status']}")
 
     print("\n=== Simulation S2 (True 3D Mesh Voxel Contamination Ratio Contam_3D(t), tau_map=0.15m) ===")
     for k, v in out["S2_True_3D_Mesh_Voxel_Contamination_Ratio"].items():

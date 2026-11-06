@@ -1682,12 +1682,14 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
 
 ### 2. 室外真实物理退化 Campus 四序列审计（移除人为终点缩放，如实报告 `REAL_HOST` 快照门控结果）
 
-| 室外真实序列（路径长） | 前端 `w/o PGO` 原始闭合误差 (m) | **休眠触发前 $N_\kappa$ 确认期尾部冻滞污染 (m)** | **MM-LINS 论文报告 `w/o PGO -> CE-PGO` (m)** | **本地复现最终 `CE-PGO` 闭合误差 (m)** | **本地 Mode 2 快照门控闭合误差 (m, 无缩放)** | 标记高应变回环区间数 |
+| 室外真实序列（路径长） | 前端 `w/o PGO` 原始闭合误差 (m) | **休眠触发前 $N_\kappa$ 确认期尾部冻滞污染 (m)** | **MM-LINS 论文报告 `w/o PGO -> CE-PGO` (m)** | **本地复现最终 `CE-PGO` 闭合误差 (m)** | **本地 Mode 2 门控提交闭合误差 (m, 无缩放)** | 事后最优快照（oracle，仅参照）(m) | 标记高应变回环区间数 |
 |---|---:|---:|---:|---:|---:|---:|
-| **Campus-1_2** (351.4 m，单次遮挡 @ `124.58s`) | 69.3988 | **2.156 m** | `0.126 -> 0.092` | 0.2444 | **0.2444** | 495 |
-| **Campus-2** (355.1 m，遮挡 @ `157.38s`，原版劣例) | 115.7607 | **3.074 m** | **`0.603 -> 1.295`**（翻倍劣化） | **0.4471**（被过约束拉长 4m） | **0.4305**（论文基准选回 `0.603`） | 346 |
-| **Campus-3** (348.2 m，单次遮挡 @ `220.39s`) | 67.1250 | **2.596 m** | `0.137 -> 0.093` | 0.2618 | **0.2618** | 555 |
-| **Campus-12** (349.5 m，双次遮挡 @ `115.99s / 230.09s`) | 118.0289 | **1.282 m / 2.492 m** | `0.159 -> 0.132` | 0.1758 | **0.1758** | 589 |
+| **Campus-1_2** (351.4 m，单次遮挡 @ `124.58s`) | 69.3988 | **2.156 m** | `0.126 -> 0.092` | 0.2444 | **0.2444** | 0.2444 | 495 |
+| **Campus-2** (355.1 m，遮挡 @ `157.38s`，原版劣例) | 115.7607 | **3.074 m** | **`0.603 -> 1.295`**（翻倍劣化） | **0.4471**（被过约束拉长 4m） | **0.4471**（门控接受宿主最终发布图） | 0.4305 | 346 |
+| **Campus-3** (348.2 m，单次遮挡 @ `220.39s`) | 67.1250 | **2.596 m** | `0.137 -> 0.093` | 0.2618 | **0.2618** | 0.2618 | 555 |
+| **Campus-12** (349.5 m，双次遮挡 @ `115.99s / 230.09s`) | 118.0289 | **1.282 m / 2.492 m** | `0.159 -> 0.132` | 0.1758 | **0.1758** | 0.1758 | 589 |
+
+**门控协议说明（撤销"用终点距离挑快照再用终点距离评分"的循环）**：此前实现按每个快照及其 GNC 重优化轨迹的端到端闭合误差取最小值作为"Mode 2 门控"结果，而门控本身又用同一闭合误差挑选快照——选点与评分共用同一指标。现改为：Mode 2 只对**运行结束时宿主最终发布的关键帧图**做判决（留出 NIS ≤ 2.5 则接受，否则维持上一版可信图），不在中间快照中择优；GNC 回环撤销变体单列，不提交（本组数据中其闭合误差 67.08–115.79 m，属于必须被拒绝的分支）。上表"事后最优快照"列保留为 oracle 参照，用来量化"在线可得"与"事后最好"之间的差距——Campus-2 的 0.4305 m 只能出现在这一列，不能写成方法收益。
 
 ### 3. 系统运行开销基准（对标第 9.4 节与 MM-LINS Table V）
 
@@ -1777,14 +1779,23 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
 
 执行脚本：`/tmp/unseen_val/`（`r26534-58` 会话实跑），汇总记录：[test_room_dark_02_heldout_benchmark.json](slam_recovery/experiments/manifests/test_room_dark_02_heldout_benchmark.json)。
 
-| 宿主系统 | **Clean ATE (m)** | **退化 ATE (m)** | **Ours B6 修复后 ATE (m)** | **窗口 `[13-40s]` RMSE (m)** | **盲测结论 |
-|---|---:|---:|---:|---:|---|
-| **FAST-LIO2** | 0.1659 | 0.8958 (Max 1.6633m) | 0.9432 | — | 自然暗光下 LiDAR 基本健康，塑料袋遮挡后 B6 未进一步改善（$G=-0.0649$） |
-| **MM-LINS** | 0.1164 | 0.0723 (Max 0.1902m) | **0.0497** | — | **第 6 条序列复现 `/Issleeping=0` 100% 漏报**；B6 恢复 **0.0497m** |
-| **LIO-SAM** | 0.9523 | 1.1310 (Max 2.2638m) | 1.2753（B5 发散至 `166.7975m` 被拒） | — | 自然暗光下 LIO-SAM 本身精度较差，B5 无验证修复发散，Mode 2 拦截 |
-| **ORB-SLAM3 单地图 (`ORB_SINGLE_MAP=1`)** | 0.7614 (丢 228 帧) | — | — | — | 自然暗光下跟丢 228/744 帧 |
-| **ORB-SLAM3 原生 Atlas (B2)** | 0.9513 (丢 114 帧) | — | — | 1.0721 | 原生 Atlas 在暗光下产生窗口 RMSE `1.0721m` |
-| **Ours B6 (`OFFLINE_CONSTRUCT`)** | — | — | **0.5598** | **0.3771** | **Wilson LB `0.9235`，CrossScan NIS `0.6532`，Mode 2 原子提交通过，窗口 `[15-35s]` 零丢帧** |
+**⚠ 本序列的两处评测缺陷已于 2026-11-06 修正（早期版本的表格数字作废）：**
+
+1. **MM-LINS 覆盖区间不匹配**：`/aft_pgo_odom` 只发布 SC-PGO 实际优化的关键帧，且在三条条件下起始时刻各不相同（clean `[15.23, 48.90]s`、退化 `[34.57, 49.00]s`、点滤波 `[36.27, 49.30]s`），三段**互相不重叠**。此前把各自的 ATE 直接并列，得到的「退化 0.0723m 优于 clean 0.1164m」完全是覆盖区间错位造成的假象。现统一在三跑均覆盖的公共窗口 `[36.27, 48.90]s` 上对比，并以每个宿主** clean 参考跑**拟合一次的刚体对齐（退化条件不再各自拟合，避免在评测窗口上泄漏）。
+2. **Mocap GT 四元数污染**：M2DGR Vicon 文件为 `timestamp x y z qw qx qy qz`，且约 **2.3% 的行存在单分量损坏**（`|q_i|` 最大达 `9.96`）。旧代码既用脆弱的 `median|qw|>0.85` 启发式判序（本序列 `median|qw|=0.834` 判序失败），又把损坏行简单地归一化成近似随机旋转，导致旋转 ATE 被污染到 `93°~111°`。现 evaluator 按**直立性准则**（机身 z 轴相对世界竖直的倾角中位数：`wxyz` 解释 `0.95°` vs `xyzw` 解释 `31.9°`）显式判序，并对 `|‖q‖−1|>0.05` 的行**直接剔除**而非归一化。
+
+| 宿主系统 | **Clean ATE (m)** | **退化 ATE (m)** | **公共窗口 `[36.27,48.90]s` clean / B0 / B6 (m)** | **同宿主 $G$** | **盲测结论** |
+|---|---:|---:|---|---:|---|
+| **FAST-LIO2** | 0.1659 | 0.8959 (Max 1.6633m) | 0.1053 / **2.2022** / **2.0185** | `+0.0876` | 遮挡后尾段偏差达 clean 的 **21 倍**；B6 只回收 `8.8%`。旋转误差同步崩坏：`ATE_rot 3.247° → 110.154°`（见下） |
+| **MM-LINS** | 0.1162（仅覆盖 `[15.2,48.9]s`） | — | 0.0828 / **2.2811** / *n/a* | *n/a* | **第 6 条序列复现 `/Issleeping=0` 100% 漏报**；退化 SC-PGO 自 `+34.6s` 才起跑，隔离窗口内**没有可用的前置可信关键帧**，B6 **不可评**（标注 `NOT_EVALUABLE`，不是零增益） |
+| **LIO-SAM** | 0.9523 | 1.1310 (Max 2.2638m) | 0.5076 / 1.7124 / 2.1120 | `-0.3318` | B5 点滤波发散至 `166.7975m` 被 Mode 2 拦截；B6 桥接仍劣于不修复，**Mode 2 本应继续拒绝** |
+| **ORB-SLAM3 单地图 (`ORB_SINGLE_MAP=1`)** | 0.7614 (跟踪 355/744 帧) | — | — | — | `[15,35]s` 内丢 **206/278** 帧 |
+| **ORB-SLAM3 原生 Atlas (B2)** | 0.9513 (跟踪 651/744 帧) | — | — | — | `[15,35]s` 内丢 **92/278** 帧，窗口 `[13,40]s` RMSE `1.0721m` |
+| **Ours B6 (`OFFLINE_CONSTRUCT`)** | — | — | **0.5599**（全序列） | — | **Wilson LB `0.9235`，CrossScan NIS `0.6532`，Mode 2 原子提交通过，`[15,35]s` 零丢帧；窗口 `[13,40]s` RMSE 由 `1.0721m` 降至 `0.3771m`（相对改善 `57.45%`）** |
+
+**关于 ORB-SLAM3 的 $G$**：本次注入是 **LiDAR-only**，RGB-D 图像流在干净包与注入包之间逐位相同，因此 ORB-SLAM3 不存在视觉侧的退化可恢复，$G=(E_{\deg}-E_{\mathrm{rep}})/(E_{\deg}-E_{\mathrm{clean}})$ 的分母恒为 0，**数学上无定义**。早期版本报告的 `G_vs_B0=-1.0613`、`G_vs_B2=0.0` 实际是拿 B0 与 B2 两个**不同变体**相减，不是恢复比例，已删除，改为报告相对改善率。
+
+**本序列最重要的阴性结论（旋转维度）**：`room_dark_02` 的房间尺度小、位移仅 `~1 m`，塑料袋遮挡引起的偏航发散几乎不体现在**平移** ATE 上（`0.166 → 0.896m`，仅 `5.4×`），但在**旋转**上完全不可恢复——FAST-LIO2 的 `ATE_rot` 从 `3.247°` 升至 `110.154°`，且遮挡结束后继续恶化到 `156.0°`。**只报平移 ATE 会系统性掩盖这类不可逆的姿态污染**，这也是 $\mathrm{ATE}_{\mathrm{rot}}$ 必须与平移指标并列报告的直接证据。
 
 ## 13.13 物理引导因果相对注意力 Transformer（`PhysicsGuidedCausalTransformer`）、正交补空间可辨识度（Proposition 2）与写时复制体素事务日志（`SpatialMutationLog`）实测验证（已验证）
 
@@ -1821,10 +1832,62 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
 执行脚本：[run_hard_negative_and_rot_ate_benchmark.py](slam_recovery/experiments/run_hard_negative_and_rot_ate_benchmark.py)，记录文件：[p10_hard_negative_and_rot_ate_benchmark.json](slam_recovery/experiments/manifests/p10_hard_negative_and_rot_ate_benchmark.json)。
 - **E-Gap 1（近墙/窄门正常通行 Hard-Negative 负例测试，基于真实扫描跨帧点面残差 `REAL_SCAN_FIM_AND_CROSS_SCAN_NIS`）**：在无注入的 `room_02`（76/76 帧近场点 `<4.2m` 比例均值高达 `79.9%`，实测跨帧 NIS 均值 `0.8425`、LOSO 均值 `0.294`）和 `hall_02`（62/86 近墙帧，实测跨帧 NIS 均值 `1.9375`）上，无门控的纯几何近场 RANSAC 在 `room_02` 上真实触发 **`5/76 (6.58%)` 误剥离**；而本文联合 NIS/$D_{\mathrm{LOSO}}$ 门控的 `SignatureMatrixRouter` 误报警率与误剥离率均为 **`0.00%`（0/76 与 0/62）**。
 - **E-Gap 2（B0–B6 连续消融与纯后端 GNC 对比）**：在 `hall_01` 20s 连续塑料袋遮挡下，补齐 `B1`（在线特征值投影：FL `7.0637m` / LIO `7.4117m`，3D 污染 `43.21%`）与 `B3`（同批未剥离数据回滚重优化：FL `7.0583m` / LIO `7.3969m`，验证 Proposition 1 $\Delta J_v \le 0$）；同时证明**纯后端 25-KF GNC（无前端延迟提交隔离与点云剥离）**仅将 MM-LINS B2 的 ATE 从 `6.1254 m` 变为 `6.1065 m`（$G = +0.0032$），而本文完整 B6 恢复至 **`0.3058 m`（$G = +0.9975$）**。
-- **E-Gap 4（严格区分 6-DoF Mocap 四元数旋转误差 $\mathrm{ATE}_{\mathrm{rot}}$ 与 3-DoF Leica 路径切向航向代理）**：在 3-DoF Leica 全站仪序列（`hall_01`, `hall_02`）上，正式 6-DoF 旋转指标严格标记为 `UNAVAILABLE`，独立报告路径切向航向代理（`hall_01` 走廊退化 LIO-SAM B0 `82.788° -> B6 6.279°`，塑料袋遮挡 B0 `90.582° -> B6 5.247°`）；在 6-DoF Vicon Mocap 序列（仅用前 20% 帧标定固定刚体外参）上，`room_dark_01` 平均旋转误差从 ORB-SLAM3 Atlas B2 的 `11.480°`（RMSE `24.506°`）改善至 B6 的 **`9.478°`（RMSE `23.656°`）**。
+- **E-Gap 4（严格区分 6-DoF Mocap 四元数旋转误差 $\mathrm{ATE}_{\mathrm{rot}}$ 与 3-DoF Leica 路径切向航向代理）**：在 3-DoF Leica 全站仪序列（`hall_01`, `hall_02`）上，正式 6-DoF 旋转指标严格标记为 `UNAVAILABLE`，独立报告路径切向航向代理（`hall_01` 走廊退化 LIO-SAM B0 `82.788° -> B6 6.279°`，塑料袋遮挡 B0 `90.582° -> B6 5.247°`）；在 6-DoF Vicon Mocap 序列（仅用前 20% 帧标定固定刚体外参）上，`room_dark_01` 上 ORB-SLAM3 Atlas B2 的平均旋转误差为 `10.073°`（RMSE `12.704°`，Max `67.224°`），而我们的 B6 桥接**所锚定的辅助 FAST-LIO2 激光-惯性姿态**为 **`2.787°`（RMSE `3.088°`，Max `9.755°`）**；由于 B6 桥接只修复并发布平移（`repaired_poses` 为 3 维向量），**B6 自身的旋转指标标记为 `UNAVAILABLE`**，不把辅助宿主的姿态归因于修复本身；`room_02` 的暗光+模糊退化使旋转 RMSE 从 clean 的 `3.839°`（mean `3.586°`）升至 B2 的 `13.582°`（mean `9.994°`）。**注**：Mocap GT 的 `qw` 前置分量序与约 2.3% 的损坏行在此之前未做处理，导致旧值（`24.506°`/`23.656°`、`6.774°`/`12.624°`）被约 7 条 `~170°` 的伪旋转尖峰污染；修正后 B2 与 B6 的旋转差距才真实显现。
 - **形式化反例与复审探针验证**：针对 `docs/review_20261105/audit_review.py`（R1–R6）与 `docs/review_20261105_followup/audit_local.py`（F1–F8 共 9 个有界探针），已全部修复并合入单元测试 `test_r1_to_r6_audit_counterexamples_resolved` 与 `test_f1_to_f8_followup_review_probes_resolved`，当前全套 **18/18 单元测试 100% 通过**。
 - **形式化反例审计验证**：针对 `docs/review_20261105/audit_review.py` 中的 `R1`–`R6` 六项边界反例，已全部修复并合入单元测试 `test_r1_to_r6_audit_counterexamples_resolved`，当前全套 **17/17 单元测试 100% 通过**。
 
 ---
 
 **文档维护原则：**后续每次方案调整都应更新对应假设、实验矩阵和验收条件；每次实验完成后，将“计划验证”改为“已验证/未支持/部分支持”，并链接具体结果，不用预期结论替代实验事实。
+
+## 13.14 复审核验 P1 修复：配对收益证据三态化、空地图撤销语义、O(N) 撤销日志与旋转归因整改（已验证）
+
+> 对应复审：`docs/review_20261106_1846b00/README.md`（4 条 P1）、`docs/review_20261106_a14bc1c/README.md`（图 1 与图 0 的可追溯性）。
+> 复现入口：`python -B docs/dev_probe_20261106/probe_after_p1_fix.py`、`python -B -m unittest discover -s slam_recovery/tests`（21/21 PASS）。
+
+### 1. P1-1「缺测 = 通过」：`CandidateMap` 证据字段三态化
+
+- **原缺陷**：`core.py` 中 `paired_benefit_approved=True` / `wilson_lower_bound=1.0` / `reentry_pos_jump_m=0.0` 三个默认值使 `wilson_ok` 在生产路径上恒为真；唯一的生产入口 `transaction_manager_node.py` 构造候选时三项一个都没传。上一轮"把 Wilson 检验前置到提交之前"的修复因此被默认值架空。
+- **修复**：三字段改为 `Optional[...] = None`；`ValidationReport` 新增 `evidence_status ∈ {PASSED, MISSING, FAILED, NOT_APPLICABLE}`。缺测与显式失败都不得进入 Mode 2，只有实测通过才允许提交：
+  - `MISSING`（候选未报告证据）→ 回落 Mode 3 等待／Mode 4 分区，`reason` 明确指出"候选未报告配对收益证据"；
+  - `FAILED`（显式 `False`、非有限值、或越界）→ 拒绝；
+  - `PASSED` → 才参与 `info_after ≥ τ_info`、`ΔJ > 0`、`D_holdout ≤ τ_val`、`‖P_after‖ ≤ σ_tol` 的联合判决。
+- **在线节点的真实证据来源**：新增 `OnlineRecoveryTransactionNode._measure_paired_evidence()`。
+  - 配对收益：在**同一参考点云**上分别用候选位姿与被隔离的宿主（incumbent）位姿计算每帧点面 NIS，再交给 `evaluate_paired_sequential_benefit` 求 Wilson 下界；`min_paired_observations=4`（n=3 时全票改善的 Wilson 下界为 0.526 < 0.55，n=4 时为 0.596，取最小可判别样本数，非人工放宽）。
+  - 重入连续性：以冻结的前置可信锚点位姿、按**实测**前兆速度外推到首个修复帧时刻，再与候选中该帧的平移比较（`reentry_anchor_pose` 由调用方给出，节点不臆造）。
+  - 任一量无法测量即返回 `None`，门控按 `MISSING` 等待，绝不假定通过。每次测量结果写入 `node.last_paired_evidence` 并落盘进 manifest（帧数、改善帧数、Wilson 下界、incumbent/候选平均残差、重入跳变、判决理由）。
+
+### 2. P1-2 撤销最后一帧后验证仍读到旧点
+
+- **修复**：`_sync_spatial_map_with_trusted_poses()` 去掉 `if self._kf_map_points:` 守卫，空集也写回 `committed_map_points = []`。全撤销后 `get_trusted_map_points()` 返回形状 `(0, 3)`，下一次候选评分不再把已撤销世界点并入参考。
+
+### 3. P1-4 撤销日志 O(N²) → O(N)
+
+- **修复**：`_promoted_before_images` 的第二分量由"因子列表全量拷贝"改为"晋升前长度标记 `prev_factor_len`"，回滚时 `del self.trusted_factors[prev_factor_len:]` 截断。因子列表本身是只追加的，长度标记即精确 before-image。500 次晋升的撤销记录中**存储的因子引用数为 0**（原为 124,750），重复关键帧与偏置的精确回滚语义不变。
+
+### 4. P1-3 `room_dark_01` 旋转归因整改
+
+- **原缺陷**：`run_hard_negative_and_rot_ate_benchmark.py` 把 FAST-LIO2 自身 `/Odometry` 的四元数登记为 `Ours_B6_LiDAR_Anchored_Orientation`，论文据此报告 B6 的旋转改善。
+- **修复**：键名改为 `room_dark_01_Aux_FASTLIO2_LidarInertial_Orientation`，并新增 `room_dark_01_Ours_B6_Orientation = {"orientation_status": "UNAVAILABLE"}`——B6 桥接的 `repaired_poses` 为 3 维向量，只修复并发布平移，不存在可评测的逐帧 B6 四元数。`paper_main.tex` 与本节 §13.13 的第 4 条同步改为"辅助激光-惯性姿态"，不再把辅助宿主的姿态归因于修复本身。
+
+### 5. S1 扫描留出循环（复审要求补行号后确认成立）
+
+- 审阅方查证的是扫描**渲染**调用 `sample_lidar_scan_in_body_frame(quar_poses_gt[k], ...)`（模拟器用真值位姿渲染扫描，属正常仿真渲染）；真正的循环在下游：R5 用 `y_est = 3.0 − median(north_pts[:, 1])` 从该帧扫描拟合横向位姿，同一批扫描又被 `evaluate_and_commit_candidate(holdout_stride=5)` 每 5 帧取一帧当留出集打分，拟合集 ∩ 验证集 ≠ ∅。
+- **修复**：按扫描 ID 封存验证集。候选位姿**模型**只用非留出帧拟合（`y(k)` 的一阶多项式），留出帧的位姿完全由该模型预测，其自身扫描不参与自身位姿估计；同时把原来写死的 `0.40 m/帧` 改为从**前置可信轨迹实测**的每帧推进量，把 `x` 方向的运动先验从"真值速度"降级为"实测速度"。
+
+### 6. 修复后的 S1/S2 结果（5 seeds，`ONLINE_SIM_3D_MESH`）
+
+| 分支 | J_v^after | 扫描留出 NIS | 配对证据 | 判决 |
+|---|---|---|---|---|
+| R4 无双目证据（候选＝自身漂移轨迹） | 0.78 | 5.253 | `FAILED`（20 帧 0 帧改善） | `MODE3_SOFT_BRIDGE_WAIT` |
+| B5 窄 FoV 单模态过滤 | 20.51 | 2.522 | `PASSED` | `MODE3_SOFT_BRIDGE_WAIT`（信息门 `J_v < 25` 未过） |
+| R5 延迟重访闭环 | 87.87 | 1.409 | `PASSED`（20/20 改善，Wilson LB 0.881，重入跳变 0.0074 m） | `MODE2_ATOMIC_COMMIT` |
+| B6 点云混合剥离（FAST-LIO2） | 81.24 | 0.824 | `PASSED`（Wilson LB 0.881，重入跳变 0.0074 m） | `MODE2_ATOMIC_COMMIT` |
+| B6 辅助位姿图桥接（LIO-SAM） | 112.56 | 1.460 | `PASSED` | `MODE2_ATOMIC_COMMIT` |
+
+S2 三维体素污染率不变：B0 43.25%、B1 43.21%、B2 17.79%、B3 43.25%、B4 0.00%、B5 35.35%、B6 0.00%——即门控改为"实测证据才放行"后，正确修复分支仍全部提交，污染率与轨迹结论不变。
+
+### 7. 图表可追溯性整改
+
+- **图 1**：曲线由固定分布参数生成，并非实跑日志。面板标题改为 `Schematic (illustrative parameters, not a logged run)`，图注改为"合成示意"，并把"MM-LINS 零报警"的实测结论移回表 II／第 V 节引用；面板内原写死的 `12.34 m drift` 改为从 `p10_hard_negative_and_rot_ate_benchmark.json` 的 `EGap2.Degraded_MMLINS_B2_ate_m` 读取的实测 `6.1254 m`。
+- **图 0**：宿主栏由"FAST-LIO2 / LIO-SAM / MM-LINS / ORB-SLAM3 / FAST-LIVO2"改为四条已实跑宿主，第五宿主 FAST-LIVO2 要等 Action Item 8.1 真跑出结果后再写入图与正文，避免把计划中的配置画成已执行路径。

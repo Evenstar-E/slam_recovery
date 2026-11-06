@@ -45,34 +45,45 @@
       "room_02_ORB_SLAM3_Clean": {
         "orientation_status": "AVAILABLE_6DOF_QUATERNION",
         "calibration_prefix_frames": 220,
-        "ate_rot_rmse_deg": 24.507,
-        "ate_rot_mean_deg": 6.774,
-        "ate_rot_max_deg": 169.029,
-        "rpe_rot_rmse_deg": 33.65
+        "num_invalid_gt_quaternions_rejected": 0,
+        "ate_rot_rmse_deg": 3.839,
+        "ate_rot_mean_deg": 3.586,
+        "ate_rot_max_deg": 7.399,
+        "rpe_rot_rmse_deg": 1.759
       },
       "room_02_ORB_SLAM3_DarkBlur_Degraded_B2": {
         "orientation_status": "AVAILABLE_6DOF_QUATERNION",
         "calibration_prefix_frames": 202,
-        "ate_rot_rmse_deg": 27.139,
-        "ate_rot_mean_deg": 12.624,
-        "ate_rot_max_deg": 171.103,
-        "rpe_rot_rmse_deg": 33.968
+        "num_invalid_gt_quaternions_rejected": 0,
+        "ate_rot_rmse_deg": 13.582,
+        "ate_rot_mean_deg": 9.994,
+        "ate_rot_max_deg": 84.292,
+        "rpe_rot_rmse_deg": 9.343
       },
       "room_dark_01_ORB_SLAM3_Native_Atlas_B2": {
         "orientation_status": "AVAILABLE_6DOF_QUATERNION",
         "calibration_prefix_frames": 271,
-        "ate_rot_rmse_deg": 24.506,
-        "ate_rot_mean_deg": 11.48,
-        "ate_rot_max_deg": 169.569,
-        "rpe_rot_rmse_deg": 31.712
+        "num_invalid_gt_quaternions_rejected": 0,
+        "ate_rot_rmse_deg": 12.704,
+        "ate_rot_mean_deg": 10.073,
+        "ate_rot_max_deg": 67.224,
+        "rpe_rot_rmse_deg": 8.872
       },
-      "room_dark_01_Ours_B6_LiDAR_Anchored_Orientation": {
+      "room_dark_01_Aux_FASTLIO2_LidarInertial_Orientation": {
         "orientation_status": "AVAILABLE_6DOF_QUATERNION",
         "calibration_prefix_frames": 209,
-        "ate_rot_rmse_deg": 23.656,
-        "ate_rot_mean_deg": 9.478,
-        "ate_rot_max_deg": 172.981,
-        "rpe_rot_rmse_deg": 32.148
+        "num_invalid_gt_quaternions_rejected": 0,
+        "ate_rot_rmse_deg": 3.088,
+        "ate_rot_mean_deg": 2.787,
+        "ate_rot_max_deg": 9.755,
+        "rpe_rot_rmse_deg": 2.69
+      },
+      "room_dark_01_Ours_B6_Orientation": {
+        "orientation_status": "UNAVAILABLE",
+        "reason": "The B6 bridge publishes repaired translation only; no per-frame B6 quaternion exists to evaluate. See room_dark_01_Aux_FASTLIO2_LidarInertial_Orientation for the auxiliary attitude the bridge is anchored to.",
+        "ate_rot_rmse_deg": null,
+        "ate_rot_mean_deg": null,
+        "rpe_rot_rmse_deg": null
       }
     },
     "Leica_3DoF_Prism_Sequences_Path_Heading_Proxy_deg": {

@@ -344,7 +344,23 @@ def evaluate_egap4_full_se3_rotational_ate_rpe() -> dict:
             "room_02_ORB_SLAM3_Clean": rot_orb_r2_clean,
             "room_02_ORB_SLAM3_DarkBlur_Degraded_B2": rot_orb_r2_deg,
             "room_dark_01_ORB_SLAM3_Native_Atlas_B2": rot_orb_rd_b2,
-            "room_dark_01_Ours_B6_LiDAR_Anchored_Orientation": rot_fl_rd_b6,
+            # P1-3: the B6 keyframe-boundary bridge repairs translation only -- its output poses are
+            # 3-vectors and no per-frame B6 quaternion is published. The quaternions read below are
+            # FAST-LIO2's own auxiliary LiDAR-inertial `/Odometry`, i.e. the attitude the bridge is
+            # anchored to, NOT the attitude our method produces. Reporting it as "Ours B6" would
+            # attribute the auxiliary host's orientation to the repair.
+            "room_dark_01_Aux_FASTLIO2_LidarInertial_Orientation": rot_fl_rd_b6,
+            "room_dark_01_Ours_B6_Orientation": {
+                "orientation_status": "UNAVAILABLE",
+                "reason": (
+                    "The B6 bridge publishes repaired translation only; no per-frame B6 quaternion "
+                    "exists to evaluate. See room_dark_01_Aux_FASTLIO2_LidarInertial_Orientation for "
+                    "the auxiliary attitude the bridge is anchored to."
+                ),
+                "ate_rot_rmse_deg": None,
+                "ate_rot_mean_deg": None,
+                "rpe_rot_rmse_deg": None,
+            },
         },
         "Leica_3DoF_Prism_Sequences_Path_Heading_Proxy_deg": {
             "formal_6dof_orientation_status_on_leica_gt": leica_rot_status_h1,

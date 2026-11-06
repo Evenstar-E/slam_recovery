@@ -69,12 +69,27 @@ def evaluate_campus_series() -> dict:
         e2e_mm_final = float(np.linalg.norm(pts_pgo[-1] - pts_pgo[0]))
         plen_mm = float(np.sum(np.linalg.norm(np.diff(pts_pgo, axis=0), axis=1)))
 
-        # Mode 2 Gate across published PGO graph versions and GNC loop revocation (using xyz_rev and path-strain check):
-        best_e2e = e2e_mm_final
+        # Mode 2 gate across published PGO graph versions and GNC loop revocation.
+        #
+        # Selection protocol (repair_plan.md Section 2, "endpoint blind evaluation"): the decision is
+        # made in publication order from evidence available at commit time only -- the holdout NIS of
+        # the snapshot's own GNC-reoptimized graph and its path strain. The first snapshot whose
+        # holdout NIS passes the gate is committed and the loop stops; its end-to-end error is then
+        # reported. The minimum over all snapshots is kept separately as an *oracle* reference so the
+        # gap between "what the gate could pick online" and "the best possible pick" stays visible,
+        # and selection no longer scores itself on the metric it selected with.
         best_nis = float("inf")
         n_rev_total = 0
         last_gnc_e2e = e2e_mm_final
-        for snap in pgo_snapshots:
+        committed_e2e = None
+        committed_snapshot_idx = None
+        committed_at_ts = None
+        final_accepted = False
+        final_e2e = e2e_mm_final
+        final_ts = None
+        oracle_e2e = e2e_mm_final
+        decision_log = []
+        for snap_idx, snap in enumerate(pgo_snapshots):
             pts_s = np.array([[ps.pose.position.x, ps.pose.position.y, ps.pose.position.z] for ps in snap.poses], dtype=np.float64)
             ts_s = np.array([ps.header.stamp.to_sec() for ps in snap.poses], dtype=np.float64)
             xyz_rev, n_rev, _, hold_nis = revoke_corrupted_pgo_constraints_and_reoptimize(
@@ -83,12 +98,35 @@ def evaluate_campus_series() -> dict:
             e2e_s = float(np.linalg.norm(pts_s[-1] - pts_s[0]))
             e2e_rev = float(np.linalg.norm(xyz_rev[-1] - xyz_rev[0]))
             last_gnc_e2e = e2e_rev
-            # Mode 2 accepts the lowest-error candidate among the snapshot and its GNC-reoptimized trajectory `xyz_rev` passing holdout NIS <= 2.5
-            cand_e2e = min(e2e_s, e2e_rev) if hold_nis <= 2.5 else e2e_s
-            if cand_e2e < best_e2e:
-                best_e2e = cand_e2e
-            best_nis = min(best_nis, hold_nis)
             n_rev_total = max(n_rev_total, n_rev)
+            best_nis = min(best_nis, hold_nis)
+            oracle_e2e = min(oracle_e2e, e2e_s, e2e_rev)
+            accepted = bool(hold_nis <= 2.5)
+            decision_log.append({
+                "snapshot_index": snap_idx,
+                "snapshot_ts": float(ts_s[-1]) if len(ts_s) else None,
+                "end_to_end_m": round(e2e_s, 4),
+                "gnc_reoptimized_end_to_end_m": round(e2e_rev, 4),
+                "holdout_nis": round(float(hold_nis), 4),
+                "gate_accepted": accepted,
+                "chosen_pose_source": "published_graph" if accepted else None,
+            })
+            if snap_idx == len(pgo_snapshots) - 1:
+                final_accepted = accepted
+                final_e2e = e2e_s
+                final_ts = float(ts_s[-1]) if len(ts_s) else None
+
+        if final_accepted:
+            # The gate decides whether to accept the host's *final* published map, which is the
+            # version that would actually be committed when the run ends. It does not choose among
+            # intermediate snapshot versions: doing so would pick a graph with the hindsight of the
+            # endpoint metric it is then scored on. The GNC-reoptimized graph is reported separately
+            # and is not committed, because no verified evidence establishes a benefit for it here.
+            committed_e2e = final_e2e
+            committed_snapshot_idx = len(pgo_snapshots) - 1
+            committed_at_ts = final_ts
+        else:
+            committed_e2e = e2e_mm_final
 
         paper_gated_e2e = min(paper_wo_pgo, paper_ce_pgo)
 
@@ -102,12 +140,17 @@ def evaluate_campus_series() -> dict:
             "paper_mode2_gated_e2e_m": paper_gated_e2e,
             "local_reproduced_ce_pgo_final_e2e_m": round(e2e_mm_final, 4),
             "local_gnc_reoptimized_e2e_m": round(last_gnc_e2e, 4),
-            "local_mode2_snapshot_gated_e2e_m": round(best_e2e, 4),
+            "local_mode2_snapshot_gated_e2e_m": round(committed_e2e, 4),
+            "mode2_final_snapshot_accepted": bool(final_accepted),
+            "mode2_committed_snapshot_index": committed_snapshot_idx,
+            "mode2_committed_snapshot_ts": committed_at_ts,
+            "local_oracle_best_snapshot_e2e_m": round(oracle_e2e, 4),
+            "mode2_decision_log": decision_log,
             "flagged_high_strain_intervals": n_rev_total,
             "holdout_nis": round(best_nis, 4),
         }
         print(
-            f"{label:44s} | {m_fe.end_to_end_error_m:11.4f}m | {paper_wo_pgo:.3f}m -> {paper_ce_pgo:.3f}m    | {e2e_mm_final:16.4f}m | {best_e2e:18.4f}m | {n_rev_total:7d}"
+            f"{label:44s} | {m_fe.end_to_end_error_m:11.4f}m | {paper_wo_pgo:.3f}m -> {paper_ce_pgo:.3f}m    | {e2e_mm_final:16.4f}m | {committed_e2e:18.4f}m | {n_rev_total:7d}"
         )
     return out
 

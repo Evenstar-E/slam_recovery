@@ -180,9 +180,12 @@ class CandidateMap:
     repaired_factor_ids: Optional[List[int]] = None
     repaired_bias_acc: Optional[np.ndarray] = None
     repaired_bias_gyr: Optional[np.ndarray] = None
-    paired_benefit_approved: bool = True
-    wilson_lower_bound: float = 1.0
-    reentry_pos_jump_m: float = 0.0
+    # Paired-benefit evidence (Section 4.9). ``None`` means "not measured": a candidate that
+    # merely omits these fields must never be treated as having passed them. Only an explicitly
+    # measured pass may unlock Mode 2 atomic commit.
+    paired_benefit_approved: Optional[bool] = None
+    wilson_lower_bound: Optional[float] = None
+    reentry_pos_jump_m: Optional[float] = None
 
 
 @dataclass
@@ -196,6 +199,12 @@ class ValidationReport:
     posterior_cov_norm: float
     propagated_cov_norm: float
     reason: str
+    # Tri-state outcome of the paired-benefit / re-entry evidence check (Section 4.9):
+    #   "PASSED"  -> measured and satisfied; the only status that can unlock Mode 2
+    #   "MISSING" -> the candidate supplied no measurement; Mode 2 is refused
+    #   "FAILED"  -> measured and violated (or non-finite); Mode 2 is refused
+    #   "NOT_APPLICABLE" -> the gate never reached the candidate branch (Mode 1/3/4)
+    evidence_status: str = "NOT_APPLICABLE"
 
 
 @dataclass(frozen=True)
@@ -247,7 +256,30 @@ def evaluate_four_mode_gate(
             reason="Brief anomaly within online directional reweighting margin",
         )
 
+    evidence_status = "NOT_APPLICABLE"
     if candidate is not None:
+        # Tri-state paired-benefit evidence (Section 4.9). A candidate that simply omits the
+        # evidence is *not* treated as having passed it: "missing" can never reach Mode 2.
+        def _bad_optional(value: Optional[float], bound: float, is_lower_bound: bool) -> bool:
+            if value is None:
+                return False
+            f = float(value)
+            if not np.isfinite(f):
+                return True
+            return f < bound if is_lower_bound else f > bound
+
+        evidence_failed = bool(
+            candidate.paired_benefit_approved is False
+            or _bad_optional(candidate.wilson_lower_bound, thresholds.min_wilson_lower_bound, True)
+            or _bad_optional(candidate.reentry_pos_jump_m, thresholds.max_reentry_jump_m, False)
+        )
+        evidence_missing = bool(
+            candidate.paired_benefit_approved is None
+            or candidate.wilson_lower_bound is None
+            or candidate.reentry_pos_jump_m is None
+        )
+        evidence_status = "FAILED" if evidence_failed else ("MISSING" if evidence_missing else "PASSED")
+
         # Reject any candidate containing non-finite (NaN / Inf) poses, biases, covariances, or invalid pose shapes (R3 & F4 fix)
         def _is_valid_pose_array(p: np.ndarray) -> bool:
             arr = np.asarray(p, dtype=np.float64)
@@ -285,8 +317,6 @@ def evaluate_four_mode_gate(
             and np.isfinite(candidate.info_after_6x6).all()
             and np.isfinite(candidate.cov_after_6x6).all()
             and np.isfinite(candidate.holdout_nis)
-            and np.isfinite(candidate.wilson_lower_bound)
-            and np.isfinite(candidate.reentry_pos_jump_m)
         )
         if not (poses_valid and bias_acc_valid and bias_gyr_valid and mats_finite):
             return ValidationReport(
@@ -299,17 +329,35 @@ def evaluate_four_mode_gate(
                 posterior_cov_norm=float("inf"),
                 propagated_cov_norm=p_prop,
                 reason="Rejected candidate due to non-finite (NaN/Inf) state/bias or invalid SE(3) pose shape",
+                evidence_status=evidence_status,
             )
 
         info_after = float(v.T @ candidate.info_after_6x6 @ v)
         info_gain = info_after - info_before
         p_after = float(np.linalg.norm(candidate.cov_after_6x6, ord=2))
         d_hold = float(candidate.holdout_nis)
-        wilson_ok = (
-            bool(candidate.paired_benefit_approved)
-            and float(candidate.wilson_lower_bound) >= thresholds.min_wilson_lower_bound
-            and float(candidate.reentry_pos_jump_m) <= thresholds.max_reentry_jump_m
-        )
+
+        if evidence_status != "PASSED":
+            return ValidationReport(
+                accepted=False,
+                mode=RecoveryMode.MODE3_SOFT_BRIDGE_WAIT if p_prop < thresholds.sigma_bridge else RecoveryMode.MODE4_HARD_SLEEP_SPLIT,
+                weak_dir_info_before=info_before,
+                weak_dir_info_after=info_after,
+                weak_dir_info_gain=info_gain,
+                holdout_nis=d_hold,
+                posterior_cov_norm=p_after,
+                propagated_cov_norm=p_prop,
+                reason=(
+                    "Refused Mode 2 atomic commit: paired-benefit evidence MISSING "
+                    "(candidate did not report paired_benefit_approved / wilson_lower_bound / reentry_pos_jump_m)"
+                    if evidence_status == "MISSING"
+                    else "Refused Mode 2 atomic commit: paired-benefit evidence FAILED "
+                    "(explicit failure, non-finite value, or threshold violation)"
+                ),
+                evidence_status=evidence_status,
+            )
+
+        wilson_ok = True  # evidence_status == "PASSED" is the only way to reach this point
 
         if (
             info_after >= thresholds.tau_info
@@ -328,6 +376,7 @@ def evaluate_four_mode_gate(
                 posterior_cov_norm=p_after,
                 propagated_cov_norm=p_prop,
                 reason="Passed weak-direction information gain, holdout consistency, and paired Wilson sequential checks",
+                evidence_status="PASSED",
             )
     else:
         info_after = info_before
@@ -346,6 +395,7 @@ def evaluate_four_mode_gate(
             posterior_cov_norm=p_after,
             propagated_cov_norm=p_prop,
             reason="Insufficient verified info; maintaining soft bridge while waiting for new evidence",
+            evidence_status=evidence_status,
         )
 
     return ValidationReport(
@@ -358,4 +408,5 @@ def evaluate_four_mode_gate(
         posterior_cov_norm=p_after,
         propagated_cov_norm=p_prop,
         reason="Propagated uncertainty exceeded bridge bound without verifiable repair; splitting to sleeping submap",
+        evidence_status=evidence_status,
     )

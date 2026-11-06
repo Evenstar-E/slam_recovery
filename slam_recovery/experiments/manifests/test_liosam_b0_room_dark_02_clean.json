@@ -16,10 +16,10 @@
     "num_matched_poses": 229,
     "path_length_m": 23.9296,
     "ate_rmse_m": 0.9523,
-    "ate_mean_m": 0.7067,
-    "ate_max_m": 2.2679,
+    "ate_mean_m": 0.7068,
+    "ate_max_m": 2.268,
     "rpe_trans_rmse_m": 0.7205,
     "false_quarantine_triggers": 0
   },
-  "created_utc": "2026-11-06T05:47:06.742028+00:00"
+  "created_utc": "2026-11-06T06:42:50.873420+00:00"
 }

@@ -120,6 +120,9 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
             info_after_6x6=np.diag([60, 60, 60, 45.0, 60, 60]),
             cov_after_6x6=np.eye(6) * 0.05,
             holdout_nis=1.2,
+            paired_benefit_approved=True,
+            wilson_lower_bound=0.90,
+            reentry_pos_jump_m=0.05,
         )
         rep2 = mgr.validate_and_resolve(good_cand)
         self.assertTrue(rep2.accepted)
@@ -205,10 +208,91 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
         m.trusted_poses[1] = np.eye(4)
         m.trusted_factors = [10]
         m.trigger_quarantine(int(10e9), int(14e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6), 1.0)
-        c_ok = CandidateMap("pose_and_factor", m.trusted_version, {2: np.eye(4)}, np.eye(6) * 100, np.eye(6) * 0.01, 0.1)
+        c_ok = CandidateMap(
+            "pose_and_factor", m.trusted_version, {2: np.eye(4)}, np.eye(6) * 100, np.eye(6) * 0.01, 0.1,
+            paired_benefit_approved=True, wilson_lower_bound=0.90, reentry_pos_jump_m=0.05,
+        )
         rep_ok = m.validate_and_resolve(c_ok)
         self.assertTrue(rep_ok.accepted)
         self.assertIn(20, m.trusted_factors)
+
+    def test_missing_vs_failed_vs_passed_paired_evidence_is_tri_state(self) -> None:
+        """
+        P1-1: a candidate that merely omits the paired-benefit evidence must not be treated as
+        having passed it. Missing evidence waits; explicit failure is rejected; only a measured
+        pass may unlock Mode 2 atomic commit.
+        """
+
+        def resolve(**evidence):
+            m = TrustedMapTransactionManager()
+            m.trigger_quarantine(int(10e9), int(14e9), np.array([0., 0., 0., 1., 0., 0.]), np.eye(6), 1.0)
+            cand = CandidateMap(
+                candidate_id="evidence_probe",
+                parent_map_version=m.trusted_version,
+                repaired_poses={42: np.eye(4)},
+                info_after_6x6=np.eye(6) * 100,
+                cov_after_6x6=np.eye(6) * 0.01,
+                holdout_nis=0.10,
+                **evidence,
+            )
+            return m.validate_and_resolve(cand), m
+
+        rep_missing, m_missing = resolve()
+        self.assertFalse(rep_missing.accepted)
+        self.assertEqual(rep_missing.mode, RecoveryMode.MODE3_SOFT_BRIDGE_WAIT)
+        self.assertEqual(rep_missing.evidence_status, "MISSING")
+        self.assertNotIn(42, m_missing.trusted_poses)
+
+        rep_failed, m_failed = resolve(wilson_lower_bound=0.0, reentry_pos_jump_m=99.0, paired_benefit_approved=True)
+        self.assertFalse(rep_failed.accepted)
+        self.assertEqual(rep_failed.evidence_status, "FAILED")
+        self.assertNotIn(42, m_failed.trusted_poses)
+
+        rep_nan, _ = resolve(wilson_lower_bound=float("nan"), reentry_pos_jump_m=0.0, paired_benefit_approved=True)
+        self.assertFalse(rep_nan.accepted)
+        self.assertEqual(rep_nan.evidence_status, "FAILED")
+
+        rep_passed, m_passed = resolve(wilson_lower_bound=0.90, reentry_pos_jump_m=0.05, paired_benefit_approved=True)
+        self.assertTrue(rep_passed.accepted)
+        self.assertEqual(rep_passed.mode, RecoveryMode.MODE2_ATOMIC_COMMIT)
+        self.assertEqual(rep_passed.evidence_status, "PASSED")
+        self.assertIn(42, m_passed.trusted_poses)
+
+    def test_revoking_last_keyframe_empties_validation_reference(self) -> None:
+        """P1-2: after the last trusted keyframe is revoked the holdout reference must be empty."""
+        from types import SimpleNamespace
+        from unittest.mock import patch
+
+        from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
+
+        node = OnlineRecoveryTransactionNode(confirmation_margin_sec=0.0)
+        decisions = [
+            SimpleNamespace(state=RecoveryState.HEALTHY),
+            SimpleNamespace(state=RecoveryState.QUARANTINED, estimated_onset_ns=0),
+        ]
+        fim = (np.eye(6) * 100, np.eye(6) * 0.01, 100.0, 100.0, np.array([0., 0., 0., 1., 0., 0.]))
+        scan = np.array([[10.0 + i * 0.01, 0.0, 0.0] for i in range(4)])
+        with patch.object(node.detector, "step", side_effect=decisions), patch(
+            "slam_recovery.sim.transaction_manager_node.compute_6dof_point_to_plane_fim", return_value=fim
+        ):
+            for k in (1, 2):
+                node.step_frame(k, k * 10**9, np.eye(4), scan, 1.0)
+        self.assertEqual(len(node.tx_mgr.trusted_poses), 0)
+        self.assertEqual(len(node.voxel_store), 0)
+        self.assertEqual(node.get_trusted_map_points().shape, (0, 3))
+
+    def test_undo_log_grows_linear_in_promotions(self) -> None:
+        """P1-4: the rollback record must not copy the whole factor history on every promotion."""
+        m = TrustedMapTransactionManager(confirmation_margin_ns=0)
+        for k in range(500):
+            m.step_healthy(_make_delta(k, k, k))
+        self.assertEqual(len(m._promoted_before_images), 500)
+        self.assertTrue(all(isinstance(rec[1], int) for rec in m._promoted_before_images))
+        # A full revocation must still restore the exact pre-onset factor set
+        before = list(m.trusted_factors)
+        m.trigger_quarantine(0, 10**15, np.array([0., 0., 0., 1., 0., 0.]), np.eye(6), 1.0)
+        self.assertEqual(m.trusted_factors, [])
+        self.assertTrue(all(isinstance(f, int) for f in before))
 
     def test_spatial_mutation_log_cow_and_redo_replay(self) -> None:
         """Verify O(|Delta M_dirty|) copy-on-write mutation log and zero-copy dual-branch redo replay."""

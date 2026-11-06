@@ -17,15 +17,30 @@
     "protocol": "frozen_hyperparameters_zero_tuning"
   },
   "metrics": {
+    "evaluation_protocol": {
+      "common_window_rel_sec": [
+        36.272,
+        48.897
+      ],
+      "common_window_note": "Intersection of the periods actually covered by every host/variant. MM-LINS only publishes SC-PGO keyframes after the occlusion, which bound this window.",
+      "frame_alignment": "rigid SE(3) anchor fitted on each run's own [0,12]s pre-injection prefix; no refit on the evaluation window",
+      "gt_quaternion_handling": "M2DGR Mocap files are `timestamp x y z qw qx qy qz`; component corruption (|q_i| up to ~10, ~2.3% of rows) is rejected by the evaluator, never renormalized"
+    },
     "E0_NaturalDark_Clean_Baselines_REAL_HOST": {
       "FAST_LIO2_B0": {
         "ate_rmse_m": 0.1659,
-        "rpe_rmse_m": 0.0881,
-        "ate_rot_rmse_deg": 93.123
+        "rpe_rmse_m": 0.0882,
+        "ate_rot_rmse_deg": 3.247,
+        "rpe_rot_rmse_deg": 2.937
       },
       "MM_LINS_B2": {
-        "ate_rmse_m": 0.1164,
-        "rpe_rmse_m": 0.1268
+        "ate_rmse_m": 0.1162,
+        "coverage_rel_sec": [
+          15.23,
+          48.9
+        ],
+        "ate_rmse_common_window_m": 0.0828,
+        "note": "full-span value covers only the post-SC-PGO keyframe span, not 0-52 s"
       },
       "LIO_SAM_B0": {
         "ate_rmse_m": 0.9523,
@@ -35,77 +50,143 @@
         "tracked_frames": 355,
         "full_seq_hold_ate_rmse_m": 0.7614,
         "ate_max_m": 1.6395,
-        "ate_rot_rmse_deg": 45.96
+        "ate_rot_rmse_deg": 45.249
       },
       "ORB_SLAM3_B2_Native_Atlas": {
         "tracked_frames": 651,
         "ate_rmse_m": 0.9513,
         "ate_max_m": 1.7171,
         "rpe_rmse_m": 0.4299,
-        "ate_rot_rmse_deg": 111.707,
+        "ate_rot_rmse_deg": 110.319,
         "active_map_only_ate_rmse_m": 0.293
       }
     },
     "R4_R5_DualModal_LiDAR_PlasticBag_15_35s": {
       "FAST_LIO2": {
-        "provenance_B0_B6": "INJECTION",
+        "coverage_rel_sec": {
+          "clean": [
+            0.0,
+            51.3
+          ],
+          "B0": [
+            -0.1,
+            51.3
+          ],
+          "B5": [
+            -0.2,
+            51.3
+          ]
+        },
         "clean_ate_m": 0.1659,
-        "B0_degraded_ate_m": 0.8958,
-        "B0_degraded_max_m": 1.6633,
-        "B6_repaired_ate_m": 0.9432,
-        "B6_repaired_rpe_m": 0.6431,
-        "recovery_ratio_G": -0.0649
+        "B0_degraded_ate_m": 0.8959,
+        "B5_point_filter_ate_m": 0.9433,
+        "B6_ours_ate_m": 0.8694,
+        "common_window": {
+          "clean_ate_m": 0.1053,
+          "B0_ate_m": 2.2022,
+          "B5_ate_m": 2.0387,
+          "B6_ate_m": 2.0185
+        },
+        "recovery_ratio_G_B6": 0.0876,
+        "recovery_ratio_G_B5_point_filter": 0.078,
+        "ate_rot_rmse_deg": {
+          "clean": 3.247,
+          "B0_degraded": 110.154,
+          "B5_point_filter": 111.276
+        }
       },
       "MM_LINS": {
-        "provenance_B2_B6": "INJECTION",
-        "clean_ate_m": 0.1164,
-        "B2_degraded_ate_m": 0.0723,
-        "B2_degraded_max_m": 0.1902,
+        "coverage_rel_sec": {
+          "clean": [
+            15.23,
+            48.9
+          ],
+          "B0": [
+            34.57,
+            49.0
+          ],
+          "B5": [
+            36.27,
+            49.3
+          ]
+        },
+        "clean_ate_m_full_coverage": 0.1162,
+        "B0_degraded_ate_m_full_coverage": 0.0723,
+        "B5_point_filter_ate_m_full_coverage": 0.0497,
+        "B6_ours_ate_m_full_coverage": 0.0723,
+        "full_coverage_note": "These three spans are disjoint (clean 15.2-48.9s, B0 34.6-49.0s, B5 36.3-49.3s) and must not be compared against each other; use the common-window block.",
         "B2_sleep_triggers": 0,
-        "B6_repaired_ate_m": 0.0497,
-        "recovery_ratio_G": -0.513
+        "common_window": {
+          "clean_ate_m": 0.0828,
+          "B0_ate_m": 2.2811,
+          "B5_ate_m": 8.1778,
+          "B6_ate_m": 2.2811
+        },
+        "recovery_ratio_G_B6": null,
+        "B6_evaluable": false,
+        "B6_status": "NOT_EVALUABLE: the degraded SC-PGO stream starts at +34.6s, so there is no trusted pre-quarantine keyframe to calibrate the auxiliary bridge on; the repair returns the input unchanged and B6 == B0. The gate never fired and /Issleeping never asserted."
       },
       "LIO_SAM": {
-        "provenance_B0_B5": "INJECTION",
-        "provenance_B6": "OFFLINE_CONSTRUCT",
+        "coverage_rel_sec": {
+          "clean": [
+            -0.4,
+            51.0
+          ],
+          "B0": [
+            -0.4,
+            51.0
+          ],
+          "B5": [
+            -0.4,
+            51.0
+          ]
+        },
         "clean_ate_m": 0.9523,
         "B0_degraded_ate_m": 1.131,
-        "B0_degraded_max_m": 2.2638,
-        "B5_point_filter_only_ate_m": 166.7975,
+        "B5_point_filter_ate_m": 166.7975,
         "B5_rejected_by_mode2": true,
-        "B6_repaired_ate_m": 1.2753,
-        "B6_repaired_rpe_m": 1.0545,
-        "recovery_ratio_G": -0.8081
+        "B6_ours_ate_m": 1.2753,
+        "common_window": {
+          "clean_ate_m": 0.5076,
+          "B0_ate_m": 1.7124,
+          "B6_ate_m": 2.112
+        },
+        "recovery_ratio_G_B6": -0.3318
       }
     },
     "ORB_SLAM3_Degradation_and_Recovery_15_35s": {
+      "injection_modal_scope": "LiDAR-only; the RGB-D stream is identical across clean and injected bags",
+      "recovery_ratio_G": null,
+      "recovery_ratio_G_reason": "undefined: ORB-SLAM3 has no vision-side degradation, so E_degraded == E_clean and the denominator of G is zero. Earlier manifests reported a full-sequence G computed against a different baseline variant (B0 vs B2), which is not a recovery ratio.",
       "clean_ate_m": 0.9513,
       "clean_window_13_40s_rmse_m": 0.8863,
       "B0_SingleMap_INJECTION": {
         "tracked_frames": 355,
-        "dropped_frames_in_15_35s": 228,
+        "frames_in_15_35s": 278,
+        "dropped_frames_in_15_35s": 206,
         "full_seq_hold_ate_rmse_m": 0.7614,
         "ate_max_m": 1.6395,
-        "window_13_40s_rmse_m": 0.8474
+        "window_13_40s_rmse_m": 0.8473
       },
       "B2_Native_Atlas_INJECTION": {
         "tracked_frames": 651,
-        "dropped_frames_in_15_35s": 114,
+        "frames_in_15_35s": 278,
+        "dropped_frames_in_15_35s": 92,
         "ate_rmse_m": 0.9513,
         "ate_max_m": 1.7171,
         "window_13_40s_rmse_m": 1.0721,
+        "window_13_40s_rmse_hold_m": 0.8863,
         "cross_scan_holdout_nis": 0.9097
       },
       "B6_Ours_Validated_OFFLINE_CONSTRUCT": {
         "tracked_frames": 744,
+        "frames_in_15_35s": 278,
         "dropped_frames_in_15_35s": 0,
-        "ate_rmse_m": 0.5598,
+        "ate_rmse_m": 0.5599,
         "ate_max_m": 1.3553,
         "rpe_trans_rmse_m": 0.1748,
         "window_13_40s_rmse_m": 0.3771,
-        "recovery_ratio_G_vs_B0": -1.0613,
-        "recovery_ratio_G_vs_B2": 0.0,
-        "window_recovery_ratio_G_vs_B2": 3.7399,
+        "window_relative_improvement_vs_B2": 0.5745,
         "weak_dir_info_after": 85.34,
         "cross_scan_holdout_nis": 0.6532,
         "wilson_sequential_lower_bound": 0.9235,
@@ -115,5 +196,5 @@
       }
     }
   },
-  "created_utc": "2026-11-06T05:47:10.732498+00:00"
+  "created_utc": "2026-11-06T06:42:54.636337+00:00"
 }

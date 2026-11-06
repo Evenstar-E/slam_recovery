@@ -18,8 +18,8 @@
     "ate_rmse_m": 0.1659,
     "ate_mean_m": 0.1436,
     "ate_max_m": 0.2931,
-    "rpe_trans_rmse_m": 0.0881,
+    "rpe_trans_rmse_m": 0.0882,
     "false_quarantine_triggers": 0
   },
-  "created_utc": "2026-11-06T05:47:06.706486+00:00"
+  "created_utc": "2026-11-06T06:42:50.857006+00:00"
 }

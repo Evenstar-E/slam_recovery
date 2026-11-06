@@ -191,10 +191,58 @@ def quat_xyzw_to_rot(q: np.ndarray) -> np.ndarray:
     )
 
 
-def load_tum_trajectory_se3(file_path: str) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def _median_body_z_tilt_deg(q_xyzw: np.ndarray) -> float:
+    """Median angle (deg) between the body z-axis and the world z-axis.
+
+    A ground/handheld platform keeps body-z roughly aligned with gravity, so the *correct*
+    quaternion component ordering yields a small tilt. Used only to disambiguate `xyzw` vs `wxyz`.
     """
-    Load a TUM format trajectory file with full SE(3) poses: `timestamp tx ty tz qx qy qz qw`.
-    Returns (timestamps_sec, positions_xyz, quaternions_xyzw).
+    if len(q_xyzw) == 0:
+        return float("nan")
+    R = np.asarray([quat_xyzw_to_rot(q) for q in q_xyzw])
+    return float(np.median(np.rad2deg(np.arccos(np.clip(np.abs(R[:, 2, 2]), 0.0, 1.0)))))
+
+
+def detect_quat_order(stored: np.ndarray) -> str:
+    """Infer the on-disk quaternion ordering of a 4-column block.
+
+    Returns "xyzw" (TUM / ORB-SLAM3 convention) or "wxyz" (M2DGR Vicon Mocap convention).
+    The decision uses the upright-body criterion rather than an amplitude heuristic, which
+    silently misfires on sequences whose yaw swings far enough that median|qw| drops below 0.85.
+    """
+    if len(stored) == 0:
+        return "xyzw"
+    if float(np.median(np.linalg.norm(stored, axis=1))) < 1e-6:
+        return "xyzw"  # all-zero block (3-DoF prism GT): ordering is irrelevant
+    tilt_xyzw = _median_body_z_tilt_deg(stored)
+    tilt_wxyz = _median_body_z_tilt_deg(stored[:, [1, 2, 3, 0]])
+    # Require a decisive margin: camera-frame trajectories (ORB-SLAM3, body-z = optical axis)
+    # score almost identically under both orderings, and must not be silently re-permuted.
+    if abs(tilt_xyzw - tilt_wxyz) < 5.0:
+        return "xyzw"
+    return "wxyz" if tilt_wxyz < tilt_xyzw else "xyzw"
+
+
+def load_tum_trajectory_se3(
+    file_path: str,
+    quat_order: str = "auto",
+    drop_invalid_quats: bool = True,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Load a TUM format trajectory file with full SE(3) poses: `timestamp tx ty tz q0 q1 q2 q3`.
+
+    Args:
+        quat_order: on-disk component ordering, one of {"xyzw", "wxyz", "auto"}.
+            "xyzw" is the TUM/ORB-SLAM3 convention; "wxyz" is the M2DGR Vicon Mocap convention
+            (`timestamp x y z qw qx qy qz`); "auto" infers it via the upright-body criterion.
+        drop_invalid_quats: drop rows whose quaternion norm deviates from 1 by more than 0.05.
+            The distributed M2DGR Mocap files contain ~2% such rows (a single component is
+            corrupted by up to 10x, e.g. `... 0.9999 -0.0030 -0.0110 -4.3742`); after
+            renormalization they produce near-arbitrary rotations and destroy every rotational
+            metric that touches them.
+
+    Returns (timestamps_sec, positions_xyz, quaternions_xyzw) with quaternions always in xyzw
+    order, unit-normalized, and sign-continuous.
     """
     ts_list, xyz_list, quat_list = [], [], []
     with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -216,7 +264,29 @@ def load_tum_trajectory_se3(file_path: str) -> Tuple[np.ndarray, np.ndarray, np.
     xyz = np.asarray(xyz_list, dtype=np.float64)
     quats = np.asarray(quat_list, dtype=np.float64)
     order = np.argsort(ts)
-    return ts[order], xyz[order], quats[order]
+    ts, xyz, quats = ts[order], xyz[order], quats[order]
+
+    if quat_order == "auto":
+        quat_order = detect_quat_order(quats)
+    if quat_order == "wxyz":
+        quats = quats[:, [1, 2, 3, 0]]
+    elif quat_order != "xyzw":
+        raise ValueError(f"Unsupported quat_order={quat_order!r} (expected 'xyzw', 'wxyz' or 'auto')")
+
+    non_zero = np.linalg.norm(quats, axis=1) > 1e-6
+    if drop_invalid_quats and np.any(non_zero):
+        norms = np.linalg.norm(quats, axis=1)
+        # Rows with an all-zero orientation (3-DoF prism GT) are kept; only corrupt 6-DoF rows drop.
+        keep = (~non_zero) | (np.abs(norms - 1.0) <= 0.05)
+        ts, xyz, quats = ts[keep], xyz[keep], quats[keep]
+
+    norms = np.linalg.norm(quats, axis=1)
+    safe = norms > 1e-6
+    quats[safe] /= norms[safe, None]
+    for i in range(1, len(quats)):
+        if safe[i] and safe[i - 1] and float(quats[i] @ quats[i - 1]) < 0.0:
+            quats[i] = -quats[i]
+    return ts, xyz, quats
 
 
 def evaluate_path_heading_proxy_deg(
@@ -286,6 +356,7 @@ def evaluate_rotation_ate_rpe_deg(
     quats_gt: np.ndarray,
     max_diff_sec: float = 0.08,
     rpe_delta_steps: int = 10,
+    gt_quat_order: str = "xyzw",
 ) -> dict:
     """
     Compute full SE(3) rotational ATE_rot (RMSE / Mean / Max in degrees) and rotational RPE_rot (RMSE in degrees).
@@ -294,6 +365,10 @@ def evaluate_rotation_ate_rpe_deg(
         returns `orientation_status="UNAVAILABLE"` and `None` metrics (never fabricates 0.0 or substitutes path chords).
       - Calibrates rigid world/extrinsic frame alignment `(R_world, R_ext)` strictly on the initial 20% healthy
         prefix of the trajectory, never fitting over the full evaluation horizon.
+      - `gt_quat_order` is "xyzw" by default; pass "wxyz" only if the caller hand-loaded a Mocap file without
+        going through `load_tum_trajectory_se3` (which already normalizes the ordering).
+      - Rows with non-unit norm (corrupt quaternion components) are rejected and reported in
+        `num_invalid_gt_quaternions`; they are never silently renormalized into an arbitrary rotation.
     """
     unavailable = {
         "orientation_status": "UNAVAILABLE",
@@ -323,9 +398,24 @@ def evaluate_rotation_ate_rpe_deg(
     if float(np.median(est_norms)) < 1e-3 or float(np.median(gt_norms)) < 1e-3:
         return unavailable
 
-    # Mocap 6-DoF ground truth: check if GT quaternion is stored as [qw, qx, qy, qz] (M2DGR Vicon convention)
-    if float(np.median(np.abs(q_g[:, 0]))) > 0.85 and float(np.median(np.abs(q_g[:, 3]))) < 0.35:
-        q_g = np.column_stack([q_g[:, 1], q_g[:, 2], q_g[:, 3], q_g[:, 0]])
+    if gt_quat_order == "wxyz":
+        q_g = q_g[:, [1, 2, 3, 0]]
+    elif gt_quat_order != "xyzw":
+        raise ValueError(f"Unsupported gt_quat_order={gt_quat_order!r}")
+
+    # Reject corrupt reference rows instead of renormalizing them into a near-arbitrary rotation.
+    gt_valid = np.abs(gt_norms - 1.0) <= 0.05
+    num_invalid_gt = int(np.sum(~gt_valid))
+    if int(np.sum(gt_valid)) < 5:
+        return unavailable
+    q_e, q_g = q_e[gt_valid], q_g[gt_valid]
+
+    q_e = q_e / np.linalg.norm(q_e, axis=1)[:, None]
+    q_g = q_g / np.linalg.norm(q_g, axis=1)[:, None]
+    for arr in (q_e, q_g):
+        for i in range(1, len(arr)):
+            if float(arr[i] @ arr[i - 1]) < 0.0:
+                arr[i] = -arr[i]
 
     R_e = np.asarray([quat_xyzw_to_rot(q) for q in q_e])
     R_g = np.asarray([quat_xyzw_to_rot(q) for q in q_g])
@@ -378,6 +468,7 @@ def evaluate_rotation_ate_rpe_deg(
     return {
         "orientation_status": "AVAILABLE_6DOF_QUATERNION",
         "calibration_prefix_frames": int(n_cal),
+        "num_invalid_gt_quaternions_rejected": num_invalid_gt,
         "ate_rot_rmse_deg": round(float(np.sqrt(np.mean(ate_arr ** 2))), 3),
         "ate_rot_mean_deg": round(float(np.mean(ate_arr)), 3),
         "ate_rot_max_deg": round(float(np.max(ate_arr)), 3),

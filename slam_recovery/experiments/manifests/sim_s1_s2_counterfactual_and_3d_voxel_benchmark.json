@@ -7,27 +7,64 @@
     "R4_Dual_Blind_No_Evidence": {
       "weak_dir_info_after": 0.78,
       "holdout_nis": 5.253,
-      "mode": "MODE3_SOFT_BRIDGE_WAIT"
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "paired_evidence_status": [
+        "FAILED"
+      ]
     },
     "B5_Narrow_FoV_Filter_LIOSAM": {
       "weak_dir_info_after": 20.51,
       "holdout_nis": 2.522,
-      "mode": "MODE3_SOFT_BRIDGE_WAIT"
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "paired_evidence_status": [
+        "PASSED"
+      ]
     },
     "R5_Delayed_Revisit_Loop": {
       "weak_dir_info_after": 87.87,
-      "holdout_nis": 1.41,
-      "mode": "MODE2_ATOMIC_COMMIT"
+      "holdout_nis": 1.409,
+      "mode": "MODE2_ATOMIC_COMMIT",
+      "paired_evidence_status": [
+        "PASSED"
+      ],
+      "paired_evidence_diagnostics": {
+        "num_paired_frames": 20,
+        "num_improved_frames": 20,
+        "improved_fraction": 1.0,
+        "wilson_lower_bound": 0.8808234818732034,
+        "approved": true,
+        "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+        "incumbent_mean_residual": 105.59748673486638,
+        "candidate_mean_residual": 1.3255402246779924,
+        "reentry_pos_jump_m": 0.007419211926453025
+      }
     },
     "B6_Ours_Point_Mixture_FASTLIO2": {
       "weak_dir_info_after": 81.24,
-      "holdout_nis": 0.825,
-      "mode": "MODE2_ATOMIC_COMMIT"
+      "holdout_nis": 0.824,
+      "mode": "MODE2_ATOMIC_COMMIT",
+      "paired_evidence_status": [
+        "PASSED"
+      ],
+      "paired_evidence_diagnostics": {
+        "num_paired_frames": 20,
+        "num_improved_frames": 20,
+        "improved_fraction": 1.0,
+        "wilson_lower_bound": 0.8808234818732034,
+        "approved": true,
+        "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+        "incumbent_mean_residual": 136.4141957996498,
+        "candidate_mean_residual": 0.8902775607152458,
+        "reentry_pos_jump_m": 0.007419211926453025
+      }
     },
     "B6_Ours_Aux_PoseGraph_LIOSAM": {
       "weak_dir_info_after": 112.56,
-      "holdout_nis": 1.462,
-      "mode": "MODE2_ATOMIC_COMMIT"
+      "holdout_nis": 1.46,
+      "mode": "MODE2_ATOMIC_COMMIT",
+      "paired_evidence_status": [
+        "PASSED"
+      ]
     }
   },
   "S2_True_3D_Mesh_Voxel_Contamination_Ratio": {

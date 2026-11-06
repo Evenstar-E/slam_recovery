@@ -15,11 +15,11 @@
   "metrics": {
     "num_matched_poses": 197,
     "path_length_m": 10.8639,
-    "ate_rmse_m": 0.1164,
-    "ate_mean_m": 0.0979,
-    "ate_max_m": 0.2273,
-    "rpe_trans_rmse_m": 0.1268,
+    "ate_rmse_m": 0.1162,
+    "ate_mean_m": 0.0976,
+    "ate_max_m": 0.227,
+    "rpe_trans_rmse_m": 0.1261,
     "false_quarantine_triggers": 0
   },
-  "created_utc": "2026-11-06T05:47:06.730066+00:00"
+  "created_utc": "2026-11-06T06:42:50.865995+00:00"
 }

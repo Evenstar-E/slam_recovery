@@ -44,8 +44,10 @@ class TrustedMapTransactionManager:
 
         self.provisional_queue: List[BackendDelta] = []
         self.promoted_history: List[BackendDelta] = []
-        # Before-image undo records aligned 1-to-1 with promoted_history for exact rollback (F5 fix)
-        self._promoted_before_images: List[Tuple[Optional[np.ndarray], List[int], np.ndarray, np.ndarray]] = []
+        # Before-image undo records aligned 1-to-1 with promoted_history for exact rollback (F5 fix).
+        # Each entry is (prev_pose, prev_factor_len, prev_bias_acc, prev_bias_gyr); the factor list is
+        # append-only, so a length marker is an exact before-image at O(1) memory (P1-4 fix).
+        self._promoted_before_images: List[Tuple[Optional[np.ndarray], int, np.ndarray, np.ndarray]] = []
         self.checkpoints: List[Checkpoint] = []
         self.active_quarantine: Optional[QuarantineSegment] = None
         self.sleeping_submaps: List[Dict[int, np.ndarray]] = []
@@ -57,10 +59,12 @@ class TrustedMapTransactionManager:
             if (item.keyframe_id is not None and item.keyframe_id in self.trusted_poses)
             else None
         )
-        prev_factors = list(self.trusted_factors)
+        # Append-only factor log: record the pre-promotion length instead of a full history copy,
+        # so rollback is a truncation and the undo log grows O(1) per promotion (P1-4 fix).
+        prev_factor_len = len(self.trusted_factors)
         prev_ba = self.trusted_bias_acc.copy()
         prev_bg = self.trusted_bias_gyr.copy()
-        self._promoted_before_images.append((prev_pose, prev_factors, prev_ba, prev_bg))
+        self._promoted_before_images.append((prev_pose, prev_factor_len, prev_ba, prev_bg))
 
         if item.keyframe_id is not None:
             self.trusted_poses[item.keyframe_id] = item.pose_se3.copy()
@@ -149,13 +153,14 @@ class TrustedMapTransactionManager:
             item.provisional = True
             revoked_from_trusted.append(item)
             if self._promoted_before_images:
-                prev_pose, prev_factors, prev_ba, prev_bg = self._promoted_before_images.pop()
+                prev_pose, prev_factor_len, prev_ba, prev_bg = self._promoted_before_images.pop()
                 if item.keyframe_id is not None:
                     if prev_pose is not None:
                         self.trusted_poses[item.keyframe_id] = prev_pose.copy()
                     else:
                         self.trusted_poses.pop(item.keyframe_id, None)
-                self.trusted_factors = list(prev_factors)
+                # Truncate the append-only factor log back to its pre-promotion length
+                del self.trusted_factors[int(prev_factor_len):]
                 self.trusted_bias_acc = prev_ba.copy()
                 self.trusted_bias_gyr = prev_bg.copy()
             else:

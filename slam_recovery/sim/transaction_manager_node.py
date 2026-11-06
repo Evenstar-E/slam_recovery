@@ -50,9 +50,18 @@ class OnlineRecoveryTransactionNode:
         voxel_size_m: float = 0.10,
         holdout_stride: int = 5,
         gate_thresholds: GateThresholds = GateThresholds(),
+        min_paired_observations: int = 4,
     ) -> None:
         self.voxel_size_m = float(voxel_size_m)
         self.holdout_stride = int(holdout_stride)
+        # Smallest sample size at which a unanimous frame-wise improvement still clears the
+        # 0.55 Wilson lower bound (n=3 -> 0.526, n=4 -> 0.596). Below this the paired test
+        # cannot distinguish a genuine repair from luck, so the node reports MISSING evidence
+        # and the gate refuses Mode 2 instead of assuming a pass (P1-1 fix).
+        self.min_paired_observations = int(min_paired_observations)
+        # Diagnostics of the most recent paired-benefit measurement, recorded verbatim into the
+        # run manifests so every Mode 2 decision can be traced back to its measured evidence.
+        self.last_paired_evidence: Dict[str, object] = {}
         self.tx_mgr = TrustedMapTransactionManager(
             confirmation_margin_ns=int(confirmation_margin_sec * 1e9),
             gate_thresholds=gate_thresholds,
@@ -118,8 +127,10 @@ class OnlineRecoveryTransactionNode:
                 self._kf_applied_poses[kf_id] = T_w_b
                 self._kf_map_points[kf_id] = pts_w[::4]
 
-        if self._kf_map_points:
-            self.committed_map_points = [self._kf_map_points[k] for k in sorted(self._kf_map_points.keys())]
+        # Always rebuild the derived validation reference, including the empty case: after the last
+        # trusted keyframe is revoked, get_trusted_map_points() must return no points, otherwise the
+        # next candidate is scored against a map that no longer exists (P1-2 fix).
+        self.committed_map_points = [self._kf_map_points[k] for k in sorted(self._kf_map_points.keys())]
 
     def get_trusted_map_points(self, max_pts: int = 2000) -> np.ndarray:
         if not self.committed_map_points:
@@ -194,11 +205,104 @@ class OnlineRecoveryTransactionNode:
                 self._sync_spatial_map_with_trusted_poses()
         return None
 
+    def _measure_paired_evidence(
+        self,
+        repaired_poses: Dict[int, np.ndarray],
+        incumbent_poses: Optional[Dict[int, np.ndarray]] = None,
+        reentry_anchor_pose: Optional[np.ndarray] = None,
+        reference_world: Optional[np.ndarray] = None,
+    ) -> Tuple[Optional[bool], Optional[float], Optional[float]]:
+        """
+        Measure the paired-benefit / re-entry evidence of a candidate against its incumbent.
+
+        Returns ``(paired_benefit_approved, wilson_lower_bound, reentry_position_jump_m)``.
+        Every quantity that cannot be measured from data the node actually holds is returned
+        as ``None``; the unified gate treats ``None`` as *missing evidence* and refuses Mode 2
+        atomic commit rather than assuming a pass (P1-1).
+        """
+        keys = sorted(repaired_poses.keys())
+        self.last_paired_evidence = {"num_paired_frames": 0, "reason": "no_repaired_poses"}
+        if not keys:
+            return None, None, None
+
+        # (a) Re-entry continuity: translation jump between the frozen pre-onset anchor pose and
+        #     the candidate pose at the first frame re-entering the trusted timeline.
+        anchor = reentry_anchor_pose
+        seg = self.tx_mgr.active_quarantine
+        if anchor is None and seg is not None and seg.checkpoint.keyframe_poses:
+            anchor = seg.checkpoint.keyframe_poses[max(seg.checkpoint.keyframe_poses.keys())]
+        reentry_jump: Optional[float] = None
+        if anchor is not None:
+            anchor_arr = np.asarray(anchor, dtype=np.float64)
+            first_arr = np.asarray(repaired_poses[keys[0]], dtype=np.float64)
+            if anchor_arr.shape == (4, 4) and first_arr.shape == (4, 4):
+                reentry_jump = float(np.linalg.norm(first_arr[:3, 3] - anchor_arr[:3, 3]))
+
+        # (b) Paired frame-wise benefit on an independent reference: the trusted map built before
+        #     the quarantine opened. The candidate's own scans are deliberately excluded from the
+        #     reference so that both arms are scored against the same independent cloud.
+        if incumbent_poses is None:
+            self.last_paired_evidence = {"num_paired_frames": 0, "reason": "no_incumbent_trajectory",
+                                         "reentry_pos_jump_m": reentry_jump}
+            return None, None, reentry_jump
+        ref_pts = (
+            np.asarray(reference_world, dtype=np.float64)[:, :3]
+            if reference_world is not None and len(reference_world) > 0
+            else self.get_trusted_map_points(max_pts=1500)
+        )
+        paired_keys = [k for k in keys if k in self.scan_buffer_body and k in incumbent_poses]
+        if len(ref_pts) == 0 or len(paired_keys) < self.min_paired_observations:
+            self.last_paired_evidence = {
+                "num_paired_frames": len(paired_keys),
+                "reason": "empty_trusted_reference" if len(ref_pts) == 0 else "insufficient_paired_frames",
+                "min_paired_observations": self.min_paired_observations,
+                "reentry_pos_jump_m": reentry_jump,
+            }
+            return None, None, reentry_jump
+
+        incumbent_res: List[float] = []
+        candidate_res: List[float] = []
+        for k in paired_keys:
+            pts_b = np.asarray(self.scan_buffer_body[k], dtype=np.float64)[:, :3]
+            for pose, sink in ((incumbent_poses[k], incumbent_res), (repaired_poses[k], candidate_res)):
+                T = np.asarray(pose, dtype=np.float64)
+                pts_w = (pts_b @ T[:3, :3].T) + T[:3, 3]
+                sink.append(
+                    float(
+                        compute_disjoint_holdout_point_to_plane_nis(
+                            ref_pts, pts_w, delta_pose_se3=np.eye(4), sigma_meas_m=0.12
+                        )
+                    )
+                )
+
+        # The re-entry jump is judged separately by the gate against GateThresholds.max_reentry_jump_m,
+        # so it is not fed into the benefit test (the two had different internal bounds).
+        report = evaluate_paired_sequential_benefit(
+            np.asarray(incumbent_res, dtype=np.float64),
+            np.asarray(candidate_res, dtype=np.float64),
+            reentry_position_jump_m=0.0,
+            min_observations=self.min_paired_observations,
+        )
+        self.last_paired_evidence = {
+            "num_paired_frames": int(report.num_observations),
+            "num_improved_frames": int(report.num_improved_frames),
+            "improved_fraction": float(report.empirical_improved_fraction),
+            "wilson_lower_bound": float(report.wilson_lower_bound),
+            "approved": bool(report.approved),
+            "reason": report.reason,
+            "incumbent_mean_residual": float(np.mean(incumbent_res)),
+            "candidate_mean_residual": float(np.mean(candidate_res)),
+            "reentry_pos_jump_m": reentry_jump,
+        }
+        return bool(report.approved), float(report.wilson_lower_bound), reentry_jump
+
     def evaluate_and_commit_candidate(
         self,
         candidate_id: str,
         repaired_poses: Dict[int, np.ndarray],
         aux_or_loop_info_6x6: Optional[np.ndarray] = None,
+        incumbent_poses: Optional[Dict[int, np.ndarray]] = None,
+        reentry_anchor_pose: Optional[np.ndarray] = None,
     ) -> ValidationReport:
         """
         Perform true cross-scan holdout validation (Section 3.2 S1):
@@ -244,6 +348,15 @@ class OnlineRecoveryTransactionNode:
             info_after = np.eye(6) * 1e-3
             cov_after = np.eye(6) * 1e3
 
+        # Paired-benefit evidence must be measured, never assumed; unmeasured components stay None
+        # and force the gate to wait (Mode 3/4) instead of committing.
+        paired_ok, wilson_lb, reentry_jump = self._measure_paired_evidence(
+            repaired_poses,
+            incumbent_poses=incumbent_poses,
+            reentry_anchor_pose=reentry_anchor_pose,
+            reference_world=train_world,
+        )
+
         cand = CandidateMap(
             candidate_id=candidate_id,
             parent_map_version=self.tx_mgr.trusted_version,
@@ -251,6 +364,10 @@ class OnlineRecoveryTransactionNode:
             info_after_6x6=info_after,
             cov_after_6x6=cov_after,
             holdout_nis=mean_holdout_nis,
+            repairer_name=candidate_id,
+            paired_benefit_approved=paired_ok,
+            wilson_lower_bound=wilson_lb,
+            reentry_pos_jump_m=reentry_jump,
         )
         report = self.tx_mgr.validate_and_resolve(cand)
         if report.accepted:
