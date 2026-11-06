@@ -289,6 +289,54 @@
    - 已彻底删除 `+ 0.40` 字面常数；
    - 改为直接实例化并运行 `TrustedMapTransactionManager(confirmation_margin_ns=int(2.0 * 1e9))`，通过 `step_healthy()` 与 `trigger_quarantine()` 实测 `trusted_poses` 中残留的慢斜坡污染帧数（固定 2s 规则残留 `2.0` 帧 vs. Causal Transformer `0.0` 帧），并已同步更新 `p9` manifest。
 
+---
+
+## 第八部分：对称多模态架构升级后的最后两项实验扩充任务（Action Items for Dev Side 🚀）
+
+> **更新时间**：2026-11-06  
+> **背景说明**：系统架构图（`fig0_system_architecture`）已升级为 **IMU + LiDAR + Vision 三路平权对称架构**。为使实验部分与该对称多模态架构 100% 呼应，并彻底打消审稿人关于“直接用紧耦合 LIVO（如 FAST-LIVO2）是否就能自体免疫退化”以及“恢复层内部各子组件各自贡献多大”的疑问，请远端开发侧完成以下两项高价值实验扩充并合入仓库与论文。
+
+### 8.1 任务一：新增第 5 宿主 **`FAST-LIVO2`（紧耦合 LiDAR-Inertial-Visual Odometry）** 的退化与可验证恢复对比实验
+
+#### 1. 核心科学问题与实验动机
+审稿人看到我们的多模态架构图后必然会问：*“如果直接使用 SOTA 紧耦合激光-视觉-惯导系统 **FAST-LIVO2**，当单一模态退化时，其 ESIKF 是否已经能靠另一模态自然维持精度，而无需延迟提交隔离（Quarantine）与事务恢复？”*
+我们要通过实测证明：**紧耦合 LIVO 在跨模态污染传导下反而存在独特的脆弱性（Shared-Map & Shared-State Cross-Contamination）**，而接入我们的事务恢复框架后能实现显著救回：
+- **脆弱性机理 A（近场遮挡污染共享体素深度图，`MEAS_CONTAM`）**：在 `FAST-LIVO2` 中，视觉子系统（Sparse Direct Photometric Alignment）依赖 `VoxelMap` 中的激光平面提供像素深度先验。当 88% 塑料袋近场遮挡或局部点云畸变发生时，若无前端隔离，错误的近场平面直接写入 `VoxelMap`，导致视觉跟踪投射到错误深度上，视觉不仅无法拯救激光，反而被污染的 `VoxelMap` 一起带崩！
+- **脆弱性机理 B（剧烈暗光/频闪或时间偏移污染共享 ESIKF 状态，`AUX_DEGEN` / `SYNC_DRIFT`）**：当进入 `room_dark_01`（自然暗光/剧烈明暗切换）或发生传感器时钟失步时，未隔离的异常视觉光度梯度或去畸变残差通过紧耦合卡尔曼增益直接污染共享的 IMU 零偏 $(b_a, b_g)$ 与速度状态。
+
+#### 2. 具体实验要求（落入代码、Manifest 与论文表 II / 表 III / 图 4）
+1. **评测序列与工况（至少覆盖以下 2～3 个代表性工况）**：
+   - **工况 1**：`hall_01` $[120, 140]\,\mathrm{s}$ 88% 塑料袋近场遮挡（`MEAS_CONTAM`）—— 对比 `Native FAST-LIVO2 (B0)` vs. `FAST-LIVO2 + Ours Quarantine & Mixture Strip / VIO Bridge (B6)`；
+   - **工况 2**：`room_dark_01`（真实自然暗光 + 遮挡，`AUX_DEGEN + MEAS_CONTAM`）或 `hall_01` 走廊退化（`GEO_DEGEN`）—— 对比 `Native FAST-LIVO2 (B0)` vs. `FAST-LIVO2 + Ours (B6)`；
+   - **工况 3（可选加分）**：留出测试集 `hall_02` $[45, 65]\,\mathrm{s}$ 上的零微调盲测。
+2. **指标与产物要求**：
+   - 记录 `Clean ATE`、`Degraded B0 ATE`、`Window RMSE`、`Ours B6 Repaired ATE`、同宿主恢复比例 `Same-Host G`、旋转误差 $\mathrm{ATE}_{\mathrm{rot}}$ (deg) 以及明确的 `Provenance Tag`（`REAL_HOST` / `INJECTION` / `OFFLINE_CONSTRUCT`）；
+   - 生成独立可验证的 JSON Manifest（如 `slam_recovery/experiments/manifests/p11_fastlivo2_fifth_host_benchmark.json`）及评测脚本；
+   - 将 **FAST-LIVO2** 正式作为第 5 个宿主写入论文 **Abstract、Introduction 贡献点、Section IV-C、Table II（Main Results）与 Fig. 4**，形成 **FAST-LIO2（滤波 LIO）+ LIO-SAM（因子图 LIO）+ MM-LINS（多地图 LIO）+ ORB-SLAM3（多地图 VSLAM）+ FAST-LIVO2（紧耦合 LIVO）** 的五宿主大满贯矩阵！
+
+---
+
+### 8.2 任务二：整理并新增 **内部细粒度组件消融实验（Component-Level Ablation Study）**
+
+目前我们已经有了事务生命周期级的 **B0–B6 宏消融（Macro-Ablation，图 3）**。为进一步证明检测器、因果网络特征工程与四模式门控 $\mathcal{D}(t)$ 内部每个子设计的必要性，请新增一个专门的细粒度组件消融脚本与汇总表（保存至 `slam_recovery/experiments/manifests/p12_component_level_ablation.json`，并在论文 Section V-C 或新增小节中报告）：
+
+#### 1. 子表 A：检测与诊断层特征/模块消融（Detector & Causal Network Component Ablation）
+在开发集 `hall_01` 与留出集 `hall_02`、`room_02`、`room_dark_01` 上定量对比以下 5 个递进变体：
+1. **`w/o Physical-Unit & Causal Past-Median Normalization`**（直接输入原始未归一化特征）：验证跨场景泛化诊断准确率从 `1.000` 跌至 `0.400`；
+2. **`w/o 48-Cell Spherical Azimuth-Elevation Encoder`**（仅用全局 12D 标量统计，去掉 32D 球面空间池化特征 $s_t$）：定量展示在局部扇区遮挡（`MEAS_CONTAM`）与走廊退化（`GEO_DEGEN`）早期区分度及起点回溯 MAE 上的退化；
+3. **`w/o Factorized Onset-Age Head (`ConditionalRecoveryHead`)`**（退化为固定 $\Delta t_{\mathrm{margin}}=2.0\,\mathrm{s}$ 回滚）：验证 $4.0\,\mathrm{s}$ 慢斜坡退化下起点 MAE 从 `0.18–0.27 s` 恶化至 `0.80 s`，可信地图泄漏污染帧从 `0.00` 升至 `2.00` 帧；
+4. **`w/o NIS / LOSO Innovation Consistency Gate`**（退化为纯几何 RANSAC 近场过滤）：验证在 `room_02` / `hall_02` 正常近墙通行（Hard-Negative）上产生 `6.58%` 真实墙面误剥离，而加上 NIS/LOSO 门控后误剥离率为 `0.00%`；
+5. **`Full Physics-Guided Causal Network + Signature Floor (Ours-Full)`**：全指标最优。
+
+#### 2. 子表 B：四模式验证门 $\mathcal{D}(t)$ 内部三判据消融（Mode 2 Verification Gate Criterion Ablation）
+在候选修复分支集合（包含 `R4` 无证据分支、`LIO-SAM B5` 窄扇区发散分支、`ORB-SLAM3 B5` 开环跳变分支、`R5` 闭环重访分支及各宿主 `B6` 正确修复分支）上，定量对比去掉 $\mathcal{D}(t)$ 中任一子判据时的 **错误提交率（False Commit Rate）** 与 **最终轨迹 ATE 恶化量**：
+1. **`Gate w/o Weak-Direction FIM Gain ($\Delta J_v \ge \tau_{\mathrm{info}}$ removed)`**：仅查残差不查信息增益，导致走廊/盲区欠约束分支被误提交；
+2. **`Gate w/o Cross-Scan Disjoint Holdout NIS ($D_{\mathrm{holdout}} \le \tau_{\mathrm{val}}$ removed, using in-sample training residual only)`**：导致过拟合局部单墙面的跑偏分支（如 LIO-SAM B5 / R4）混过门控；
+3. **`Gate w/o Coverage Lock (`inlier_coverage >= 0.70` removed)`**：验证 R5 反例（75% 留出点漂移 $>2.0\,\mathrm{m}$ 被截断隐藏）导致的漏网风险；
+4. **`Gate w/o Paired Wilson Lower Bound & Re-entry Continuity Gate`**：验证“均值改善但尾部重入位置跳变 $>0.5\,\mathrm{m}$”的候选（如 ORB-SLAM3 B5 开环拼接，ATE $6.56\,\mathrm{m}$）混入可信图；
+5. **`Full Unified Gate $\mathcal{D}(t)$ (All 4 Criteria Enforced)`**：错误提交率 `0.0%`，100% 精准放行真实修复分支并拦截所有退化/伪修复分支。
+
+
 
 
 
