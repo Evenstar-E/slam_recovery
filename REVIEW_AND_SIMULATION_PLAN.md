@@ -537,6 +537,8 @@ IMU 提供相对运动 Δ，不提供绝对位置；误差随间隔二次增长�
 
 ### 9.11 需要开发侧逐条回答的 12 个问题（Answer Required）
 
+**Codex 验收答复（2026-11-06，审阅版本 `5e2cf69`）**：[12 个问题的逐题答复与依据](docs/review_20261106_5e2cf69/README.md) · [验证脚本](docs/review_20261106_5e2cf69/probe.py) · [实测结果](docs/review_20261106_5e2cf69/probe_results.json)。
+
 1. `paper_main.tex:393` 的 "refused on all three measured criteria at once" 是否会在下一次提交中改为 "two of three"？若不改，请说明该句在 `0.4042 ≤ 0.50` 的前提下如何成立。
 2. `SLAM_RECOVERY_RESEARCH.md` 的 1857 行与 540 行矛盾，以哪一版为准？镜像文件是否同步？
 3. TD-03 的两条测试（0.40 m 重入、≥8 关键帧）何时补、补在哪个文件？

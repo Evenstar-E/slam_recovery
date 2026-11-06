@@ -1,0 +1,108 @@
+{
+  "revision": "5e2cf690433d690ab23dc82cdd37231f95047f62",
+  "provenance": "controlled function probes and versioned manifests; no sensor replay",
+  "jump_m": {
+    "0.4": {
+      "approved": true,
+      "reason": "passed_wilson_sequential_benefit_and_boundary_continuity"
+    },
+    "0.5": {
+      "approved": true,
+      "reason": "passed_wilson_sequential_benefit_and_boundary_continuity"
+    },
+    "0.5001": {
+      "approved": false,
+      "reason": "reentry_position_discontinuity_exceeded"
+    }
+  },
+  "pairing": {
+    "7_keys_4_matched_base_4": {
+      "num_paired_frames": 4,
+      "required_paired_frames": 4,
+      "candidate_keyframes": 7,
+      "num_improved_frames": 4,
+      "improved_fraction": 1.0,
+      "wilson_lower_bound": 0.5964785398205344,
+      "approved": true,
+      "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+      "incumbent_mean_residual": 4.340277777777779,
+      "candidate_mean_residual": 0.0,
+      "reentry_pos_jump_m": 0.0
+    },
+    "8_keys_7_matched_base_4": {
+      "num_paired_frames": 7,
+      "reason": "insufficient_paired_frames",
+      "min_paired_observations": 8,
+      "candidate_keyframes": 8,
+      "reentry_pos_jump_m": 0.0
+    },
+    "8_keys_8_matched_base_4": {
+      "num_paired_frames": 8,
+      "required_paired_frames": 8,
+      "candidate_keyframes": 8,
+      "num_improved_frames": 8,
+      "improved_fraction": 1.0,
+      "wilson_lower_bound": 0.7472427908584185,
+      "approved": true,
+      "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+      "incumbent_mean_residual": 4.340277777777779,
+      "candidate_mean_residual": 0.0,
+      "reentry_pos_jump_m": 0.0
+    },
+    "8_keys_8_matched_base_10": {
+      "num_paired_frames": 8,
+      "required_paired_frames": 8,
+      "candidate_keyframes": 8,
+      "num_improved_frames": 8,
+      "improved_fraction": 1.0,
+      "wilson_lower_bound": 0.7472427908584185,
+      "approved": true,
+      "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+      "incumbent_mean_residual": 4.340277777777779,
+      "candidate_mean_residual": 0.0,
+      "reentry_pos_jump_m": 0.0
+    }
+  },
+  "synthetic_cloud": {
+    "0.2": {
+      "known_sheet": 200,
+      "estimated_fraction": 0.202,
+      "dropped_sheet": 0,
+      "dropped_background": 0,
+      "all_outputs_identical_after_changing_intensity": true
+    },
+    "0.4": {
+      "known_sheet": 400,
+      "estimated_fraction": 0.405,
+      "dropped_sheet": 400,
+      "dropped_background": 5,
+      "all_outputs_identical_after_changing_intensity": true
+    }
+  },
+  "B5_hall01_archive": {
+    "75e0ee5": [
+      {
+        "ate_rmse_m": 6.5554,
+        "reentry_position_jump_m": 0.188,
+        "wilson_lower_bound": 0.0,
+        "rejection_reason": "wilson_sequential_benefit_lower_bound_failed"
+      }
+    ],
+    "6d1f7e4": [
+      {
+        "ate_rmse_m": 6.5554,
+        "reentry_position_jump_m": 0.188,
+        "wilson_lower_bound": 0.0,
+        "rejection_reason": "wilson_sequential_benefit_lower_bound_failed"
+      }
+    ],
+    "00080c1": [
+      {
+        "ate_rmse_m": 6.5554,
+        "reentry_position_jump_m": 4.519,
+        "wilson_lower_bound": 0.8061,
+        "rejection_reason": "reentry_position_discontinuity_exceeded"
+      }
+    ]
+  }
+}
