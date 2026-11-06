@@ -88,3 +88,5 @@ pdflatex -interaction=nonstopmode paper_main.tex
 - **[FAST_LIVO2_SHARED_CORE_EXTRACTION.md](FAST_LIVO2_SHARED_CORE_EXTRACTION.md)**: Core architecture extraction from `fast_livo2_shared_cursor` (raw payload reprocessing, Copy-on-Write spatial mutation journal, and Physics-Guided Causal Relative-Attention Transformer).
 - **[docs/review_20261105/README.md](docs/review_20261105/README.md)**: Historical bounded counterexample analysis (R1–R6, resolved in `fb9e655`) and redrawn diagnostic figures.
 - **[docs/review_20261105_followup/README.md](docs/review_20261105_followup/README.md)**: Follow-up review of `23fbe6d`: 17 upstream tests pass, but nine bounded probes reproduce remaining correctness and evaluation issues. Includes source-pinned findings and reproduction evidence.
+- **[Review of `a14bc1c`](docs/review_20261106_a14bc1c/README.md)**: Architecture and paper-figure provenance, transaction boundary probes, and verified fixes following `8a2a541`.
+- **[Review of `357c473`](docs/review_20261106_357c473/README.md)**: Fifth-host experiment controls, ablation gate definitions, metric denominators, and held-out site selection.
