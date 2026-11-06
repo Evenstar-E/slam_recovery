@@ -95,6 +95,11 @@ def window_rmse(
     return float(np.sqrt(np.mean(w_err ** 2))), float(np.max(w_err))
 
 
+def _fmt_g(value) -> str:
+    """Format a recovery ratio that may legitimately be None (undefined G)."""
+    return "n/a" if value is None else f"{value:+.4f}"
+
+
 def main() -> None:
     gt_path = "/home/R26534/M2DGR/GT/hall_02.txt"
     raw_bag = "/home/R26534/M2DGR/raw/hall_02.bag"
@@ -401,15 +406,19 @@ def main() -> None:
     fl = summary["Mirror_A_LiDAR_PlasticBag_45_65s"]["FAST_LIO2"]
     mm = summary["Mirror_A_LiDAR_PlasticBag_45_65s"]["MM_LINS"]
     lio = summary["Mirror_A_LiDAR_PlasticBag_45_65s"]["LIO_SAM"]
-    print(f"   FAST-LIO2 : Clean={fl['clean_ate_m']:.4f}m | B0_Deg={fl['B0_degraded_ate_m']:.4f}m (Max {fl['B0_degraded_max_m']:.2f}m) | B6_Ours={fl['B6_repaired_ate_m']:.4f}m (G={fl['recovery_ratio_G']:+.4f})")
-    print(f"   MM-LINS   : Clean={mm['clean_ate_m']:.4f}m | B2_Deg={mm['B2_degraded_ate_m']:.4f}m (sleep={mm['B2_sleep_triggers']}) | B6_Ours={mm['B6_repaired_ate_m']:.4f}m (G={mm['recovery_ratio_G']:+.4f})")
-    print(f"   LIO-SAM   : Clean={lio['clean_ate_m']:.4f}m | B0_Deg={lio['B0_degraded_ate_m']:.4f}m | B5_PtFilter={lio['B5_point_filter_only_ate_m']:.4f}m (Rejected) | B6_Ours={lio['B6_repaired_ate_m']:.4f}m (G={lio['recovery_ratio_G']:+.4f})")
+    print(f"   FAST-LIO2 : Clean={fl['clean_ate_m']:.4f}m | B0_Deg={fl['B0_degraded_ate_m']:.4f}m (Max {fl['B0_degraded_max_m']:.2f}m) | B6_Ours={fl['B6_repaired_ate_m']:.4f}m (G={_fmt_g(fl['recovery_ratio_G'])})")
+    print(f"   MM-LINS   : Clean={mm['clean_ate_m']:.4f}m | B2_Deg={mm['B2_degraded_ate_m']:.4f}m (sleep={mm['B2_sleep_triggers']}) | B6_Ours={mm['B6_repaired_ate_m']:.4f}m (G={_fmt_g(mm['recovery_ratio_G'])})")
+    print(f"   LIO-SAM   : Clean={lio['clean_ate_m']:.4f}m | B0_Deg={lio['B0_degraded_ate_m']:.4f}m | B5_PtFilter={lio['B5_point_filter_only_ate_m']:.4f}m (Rejected) | B6_Ours={lio['B6_repaired_ate_m']:.4f}m (G={_fmt_g(lio['recovery_ratio_G'])})")
     print("\n3. Mirror B: Visual Severe Low-Light (gain=0.05) [45s, 65s] on ORB-SLAM3:")
     orb = summary["Mirror_B_Visual_Severe_Dark_g005_45_65s"]["ORB_SLAM3"]
     print(f"   Clean     : ATE={orb['clean_ate_m']:.4f}m | Win[43-75s]={orb['clean_window_43_75s_rmse_m']:.4f}m")
     print(f"   B0 Single : ATE={orb['B0_SingleMap_INJECTION']['full_seq_hold_ate_rmse_m']:.4f}m (lost {orb['B0_SingleMap_INJECTION']['dropped_frames_in_45_65s']} frames) | Win={orb['B0_SingleMap_INJECTION']['window_43_75s_rmse_m']:.4f}m")
     print(f"   B2 Atlas  : ATE={orb['B2_Native_Atlas_INJECTION']['ate_rmse_m']:.4f}m (lost {orb['B2_Native_Atlas_INJECTION']['dropped_frames_in_45_65s']} frames) | Win={orb['B2_Native_Atlas_INJECTION']['window_43_75s_rmse_m']:.4f}m | CrossScan_NIS={orb['B2_Native_Atlas_INJECTION']['cross_scan_holdout_nis']}")
-    print(f"   B6 Ours   : ATE={orb['B6_Ours_Validated_OFFLINE_CONSTRUCT']['ate_rmse_m']:.4f}m (0 lost) | Win={orb['B6_Ours_Validated_OFFLINE_CONSTRUCT']['window_43_75s_rmse_m']:.4f}m (G_vs_B0={orb['B6_Ours_Validated_OFFLINE_CONSTRUCT']['recovery_ratio_G_vs_B0']:+.4f}, G_vs_B2={orb['B6_Ours_Validated_OFFLINE_CONSTRUCT']['recovery_ratio_G_vs_B2']:+.4f}, G_win={orb['B6_Ours_Validated_OFFLINE_CONSTRUCT']['window_recovery_ratio_G_vs_B2']:+.4f}, CrossScan_NIS={orb['B6_Ours_Validated_OFFLINE_CONSTRUCT']['cross_scan_holdout_nis']}, Wilson_LB={orb['B6_Ours_Validated_OFFLINE_CONSTRUCT']['wilson_sequential_lower_bound']})")
+    _b6o = orb['B6_Ours_Validated_OFFLINE_CONSTRUCT']
+    print(f"   B6 Ours   : ATE={_b6o['ate_rmse_m']:.4f}m (0 lost) | Win={_b6o['window_43_75s_rmse_m']:.4f}m "
+          f"(G_vs_B0={_fmt_g(_b6o['recovery_ratio_G_vs_B0'])}, G_vs_B2={_fmt_g(_b6o['recovery_ratio_G_vs_B2'])}, "
+          f"G_win={_fmt_g(_b6o['window_recovery_ratio_G_vs_B2'])}, CrossScan_NIS={_b6o['cross_scan_holdout_nis']}, "
+          f"Wilson_LB={_b6o['wilson_sequential_lower_bound']})")
 
 
 if __name__ == "__main__":

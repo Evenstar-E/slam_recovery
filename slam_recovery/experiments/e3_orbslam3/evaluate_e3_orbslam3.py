@@ -466,7 +466,10 @@ def main() -> None:
                 "window_118_152s_rmse_m": round(b0_win_rmse, 4),
                 "window_118_152s_max_m": round(b0_win_max, 4),
                 "cross_scan_holdout_nis": round(b0_holdout_nis, 4),
-                "recovery_ratio_G": 0.0,
+                # B0 is the degraded arm itself, so its recovery ratio is 0 by construction.
+                # Named explicitly so it can never be mistaken for a measured 0.0 (the value the
+                # `compute_recovery_ratio_G` sentinel used to return when G was undefined).
+                "recovery_ratio_G_by_definition": 0.0,
                 "trusted_map_pollution_ratio": 0.625,
             },
             "B2_Native_ORBSLAM3_Atlas": {

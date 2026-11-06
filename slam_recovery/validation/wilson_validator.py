@@ -48,7 +48,13 @@ def evaluate_paired_sequential_benefit(
     min_observations: int = 20,
     min_relative_gain_per_frame: float = 0.05,
     min_wilson_lower_bound: float = 0.55,
-    max_reentry_position_jump_m: float = 0.35,
+    # Keep this numerically equal to `GateThresholds.max_reentry_jump_m` (core.py). These are the
+    # same physical quantity -- the boundary continuity a committed repair must preserve at re-entry
+    # -- and they previously carried two different values (0.35 here, 0.50 in the gate), which meant
+    # a candidate could be refused by the benefit test on a bound the paper never states. 0.50 is the
+    # value the manuscript reports ("re-entry jump 0.4042 m <= 0.50 m" for the refused street_08
+    # candidate), so the validator follows the gate rather than inventing a second, stricter limit.
+    max_reentry_position_jump_m: float = 0.50,
     max_reentry_rotation_jump_deg: float = 5.0,
     confidence_z: float = 1.645,
 ) -> SequentialBenefitReport:

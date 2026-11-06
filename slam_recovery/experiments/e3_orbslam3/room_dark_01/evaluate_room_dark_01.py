@@ -359,7 +359,9 @@ def main() -> None:
         "full_sequence_hold_ate_max_m": round(m_b0_full.ate_max_m, 4),
         "rpe_trans_rmse_m": round(m_b0_full.rpe_trans_rmse_m, 4),
         "path_length_m": round(m_b0_tracked.path_length_m, 4),
-        "recovery_ratio_G": 0.0,
+        # B0 is the degraded arm itself, so its recovery ratio is 0 by construction. Named
+        # explicitly so it cannot be misread as a measured 0.0.
+        "recovery_ratio_G_by_definition": 0.0,
         "trusted_map_pollution_ratio": 0.585,
     }
     b2_metrics = {

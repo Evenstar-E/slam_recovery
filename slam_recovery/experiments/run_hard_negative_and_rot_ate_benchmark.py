@@ -385,6 +385,11 @@ def evaluate_egap4_full_se3_rotational_ate_rpe() -> dict:
     }
 
 
+def _fmt_g(value) -> str:
+    """Format a recovery ratio that may legitimately be None (undefined G)."""
+    return "n/a" if value is None else f"{value:+.4f}"
+
+
 def main() -> None:
     print("=== Running Rectified E-Gap 1 (Real NIS/LOSO Hard-Negative), E-Gap 2 (Backend-Only GNC), and E-Gap 4 (6DoF Rot vs Path Proxy) ===")
     egap1 = evaluate_egap1_hard_negative_near_wall_traversal()
@@ -414,8 +419,10 @@ def main() -> None:
     print("\n2. E-Gap 2 (Backend-Only GNC Without Quarantine on 20s Plastic-Bag Occlusion):")
     print(
         f"   Degraded MM-LINS B2={egap2['Degraded_MMLINS_B2_ate_m']:.4f}m -> "
-        f"Backend-Only GNC={egap2['Backend_Only_GNC_Without_Quarantine_ate_m']:.4f}m (G={egap2['Backend_Only_GNC_recovery_ratio_G']:+.4f}) vs "
-        f"Ours B6={egap2['Ours_B6_Frontend_Quarantine_and_Strip_ate_m']:.4f}m (G={egap2['Ours_B6_recovery_ratio_G']:+.4f})"
+        f"Backend-Only GNC={egap2['Backend_Only_GNC_Without_Quarantine_ate_m']:.4f}m "
+        f"(G={_fmt_g(egap2['Backend_Only_GNC_recovery_ratio_G'])}) vs "
+        f"Ours B6={egap2['Ours_B6_Frontend_Quarantine_and_Strip_ate_m']:.4f}m "
+        f"(G={_fmt_g(egap2['Ours_B6_recovery_ratio_G'])})"
     )
 
     print("\n3. E-Gap 4 (True 6-DoF Quaternion Rotation on Mocap vs. Path-Tangent Heading Proxy on 3-DoF Leica):")

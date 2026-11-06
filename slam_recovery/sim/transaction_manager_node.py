@@ -51,6 +51,8 @@ class OnlineRecoveryTransactionNode:
         holdout_stride: int = 5,
         gate_thresholds: GateThresholds = GateThresholds(),
         min_paired_observations: int = 4,
+        large_candidate_keyframe_threshold: int = 8,
+        min_paired_observations_large_candidate: int = 8,
     ) -> None:
         self.voxel_size_m = float(voxel_size_m)
         self.holdout_stride = int(holdout_stride)
@@ -58,7 +60,16 @@ class OnlineRecoveryTransactionNode:
         # 0.55 Wilson lower bound (n=3 -> 0.526, n=4 -> 0.596). Below this the paired test
         # cannot distinguish a genuine repair from luck, so the node reports MISSING evidence
         # and the gate refuses Mode 2 instead of assuming a pass (P1-1 fix).
+        #
+        # n=4 is a *floor*, not a sufficient sample for a large commit: a unanimous 4/4 window
+        # clears the 0.55 bound by only 0.0465, so four frames of evidence would authorise an
+        # irreversible trusted-map commit. A candidate that touches many keyframes has no excuse
+        # for supplying so little evidence, so the requirement scales with candidate size:
+        #   <8 keyframes  -> 4 paired frames (Wilson 0.5965, +0.0465 over threshold)
+        #  >=8 keyframes  -> 8 paired frames (Wilson 0.7472, +0.1972 over threshold)
         self.min_paired_observations = int(min_paired_observations)
+        self.large_candidate_keyframe_threshold = int(large_candidate_keyframe_threshold)
+        self.min_paired_observations_large_candidate = int(min_paired_observations_large_candidate)
         # Diagnostics of the most recent paired-benefit measurement, recorded verbatim into the
         # run manifests so every Mode 2 decision can be traced back to its measured evidence.
         self.last_paired_evidence: Dict[str, object] = {}
@@ -251,11 +262,18 @@ class OnlineRecoveryTransactionNode:
             else self.get_trusted_map_points(max_pts=1500)
         )
         paired_keys = [k for k in keys if k in self.scan_buffer_body and k in incumbent_poses]
-        if len(ref_pts) == 0 or len(paired_keys) < self.min_paired_observations:
+        # Evidence requirement scales with how much of the map the candidate would commit.
+        required_paired = (
+            self.min_paired_observations_large_candidate
+            if len(keys) >= self.large_candidate_keyframe_threshold
+            else self.min_paired_observations
+        )
+        if len(ref_pts) == 0 or len(paired_keys) < required_paired:
             self.last_paired_evidence = {
                 "num_paired_frames": len(paired_keys),
                 "reason": "empty_trusted_reference" if len(ref_pts) == 0 else "insufficient_paired_frames",
-                "min_paired_observations": self.min_paired_observations,
+                "min_paired_observations": required_paired,
+                "candidate_keyframes": len(keys),
                 "reentry_pos_jump_m": reentry_jump,
             }
             return None, None, reentry_jump
@@ -276,15 +294,18 @@ class OnlineRecoveryTransactionNode:
                 )
 
         # The re-entry jump is judged separately by the gate against GateThresholds.max_reentry_jump_m,
-        # so it is not fed into the benefit test (the two had different internal bounds).
+        # so it is not fed into the benefit test; both now use the same 0.50 m bound rather than
+        # carrying two different internal thresholds.
         report = evaluate_paired_sequential_benefit(
             np.asarray(incumbent_res, dtype=np.float64),
             np.asarray(candidate_res, dtype=np.float64),
             reentry_position_jump_m=0.0,
-            min_observations=self.min_paired_observations,
+            min_observations=required_paired,
         )
         self.last_paired_evidence = {
             "num_paired_frames": int(report.num_observations),
+            "required_paired_frames": required_paired,
+            "candidate_keyframes": len(keys),
             "num_improved_frames": int(report.num_improved_frames),
             "improved_fraction": float(report.empirical_improved_fraction),
             "wilson_lower_bound": float(report.wilson_lower_bound),
