@@ -161,13 +161,13 @@ def _style_inner_ax(ax: plt.Axes, grid_axis: str = "y") -> None:
 
 
 def fig0_system_architecture() -> str:
-    """Generate the full-system vector architecture diagram (`01_architecture` style)."""
-    fig = plt.figure(figsize=(20, 7.5), facecolor="white")
-    ax = fig.add_axes([0.01, 0.06, 0.98, 0.86])
+    """Generate the full-system vector architecture diagram with symmetric LiDAR & Vision peer pipelines."""
+    fig = plt.figure(figsize=(20, 8.2), facecolor="white")
+    ax = fig.add_axes([0.01, 0.055, 0.98, 0.875])
     ax.set(xlim=(0, 100), ylim=(0, 100))
     ax.axis("off")
 
-    def text(x, y, s, size=12.8, bold=False, ha="center", color=INK, **kw):
+    def text(x, y, s, size=12.4, bold=False, ha="center", color=INK, **kw):
         kw.setdefault("va", "center")
         return ax.text(
             x,
@@ -178,7 +178,7 @@ def fig0_system_architecture() -> str:
             ha=ha,
             fontfamily=SERIF,
             color=color,
-            linespacing=1.18,
+            linespacing=1.16,
             zorder=6,
             **kw,
         )
@@ -196,27 +196,27 @@ def fig0_system_architecture() -> str:
                 zorder=0,
             )
         )
-        text(x + 0.9, y + h - 2.3, label, 15.0, True, "left", va="top")
+        text(x + 0.9, y + h - 2.1, label, 14.6, True, "left", va="top")
         if subtitle:
-            text(x + w - 0.8, y + h - 2.5, subtitle, 9.5, False, "right", va="top", color=SUB_INK)
+            text(x + w - 0.8, y + h - 2.3, subtitle, 9.4, False, "right", va="top", color=SUB_INK)
 
-    def node(x, y, w, h, label, fill, sub="", size=13.8, dashed=False):
+    def node(x, y, w, h, label, fill, sub="", size=13.0, dashed=False):
         ax.add_patch(
             FancyBboxPatch(
                 (x, y),
                 w,
                 h,
-                boxstyle="round,pad=0.03,rounding_size=1.2",
+                boxstyle="round,pad=0.03,rounding_size=1.15",
                 fc=fill,
                 ec=INK,
-                lw=1.75,
+                lw=1.7,
                 ls=(0, (4, 3)) if dashed else "-",
                 zorder=3,
             )
         )
-        text(x + w / 2, y + h * (0.66 if sub else 0.5), label, size, True)
+        text(x + w / 2, y + h * (0.65 if sub else 0.5), label, size, True)
         if sub:
-            text(x + w / 2, y + h * 0.23, sub, 9.6, color="#262626")
+            text(x + w / 2, y + h * 0.23, sub, 9.2, color="#262626")
 
     def path(points, color=INK, dashed=False, width=2.0, end=True):
         codes = [MplPath.MOVETO] + [MplPath.LINETO] * (len(points) - 1)
@@ -225,7 +225,7 @@ def fig0_system_architecture() -> str:
             FancyArrowPatch(
                 path=p,
                 arrowstyle="-|>" if end else "-",
-                mutation_scale=14.5,
+                mutation_scale=14.0,
                 lw=width,
                 color=color,
                 linestyle=(0, (4, 3)) if dashed else "-",
@@ -235,47 +235,64 @@ def fig0_system_architecture() -> str:
             )
         )
 
-    def label(x, y, s, color=SUB_INK, size=9.8):
-        text(x, y, s, size, color=color, bbox=dict(fc="white", ec="none", pad=0.8))
+    def label(x, y, s, color=SUB_INK, size=9.3):
+        text(x, y, s, size, color=color, bbox=dict(fc="white", ec="none", pad=0.75))
 
     fig.text(
         0.5,
-        0.965,
-        "Transactional Detection, Quarantine, and Verifiable Recovery — System Overview",
+        0.968,
+        "Transactional Detection, Quarantine, and Verifiable Recovery — Symmetric Multi-Modal Overview",
         ha="center",
         va="top",
-        fontsize=21.5,
+        fontsize=20.8,
         fontweight="bold",
         fontfamily=SERIF,
         color=INK,
     )
 
-    group(15.5, 59, 59.5, 38, "Multi-Sensor SLAM Host", "FAST-LIO2 / LIO-SAM / MM-LINS / ORB-SLAM3")
-    group(15.5, 4, 59.5, 48, "Transactional Recovery Layer", "Delayed-Commit Quarantine & 4-Mode Gate D(t)")
-    group(78.5, 4, 20.5, 93, "Persistent Maps & State")
+    # Three major dashed containers with a wide central inter-layer corridor [43.0 .. 54.2]
+    group(15.2, 54.2, 60.0, 43.0, "Multi-Modal SLAM Host Frontend & Estimator", "FAST-LIO2 / LIO-SAM / MM-LINS / ORB-SLAM3 / FAST-LIVO2")
+    group(15.2, 3.5, 60.0, 39.5, "Transactional Recovery Layer", "Delayed-Commit Quarantine & 4-Mode Gate D(t)")
+    group(78.5, 3.5, 20.5, 93.7, "Persistent Maps & State")
 
-    node(0.7, 79, 11.3, 13, "IMU", IMU_FILL, "accel. / gyro", 17.5)
-    node(0.7, 62.8, 11.3, 13, "LiDAR", LIDAR_FILL, "raw 3D scans", 17.5)
-    node(0.7, 22, 11.3, 16, "Auxiliary", AUX_FILL, "visual / odom cues", 13.8)
-    text(6.35, 18.0, "cross-modal bridge", 9.4, color=SUB_INK)
+    # Three equal-status peer sensor modalities on the left
+    node(0.7, 80.8, 11.5, 8.8, "IMU", IMU_FILL, "accel. / gyro", 15.2)
+    node(0.7, 68.4, 11.5, 9.0, "LiDAR", LIDAR_FILL, "raw 3D scans", 15.2)
+    node(0.7, 56.0, 11.5, 9.0, "Vision", AUX_FILL, "RGB / mono / stereo", 15.2)
 
-    node(18, 79, 16, 11.8, "Forward\npropagation", IMU_FILL, size=13.8)
-    node(18, 63.3, 16, 12, "Deskew &\npreprocessing", LIDAR_FILL, size=13.8)
-    node(39, 63.3, 16, 12, "Point-to-plane /\nfeature residuals", LIDAR_FILL, size=13.5)
-    node(60, 63.3, 12.2, 12, "Iterated IEKF /\nISAM2 update", LIDAR_FILL, size=13.0)
+    # Symmetric parallel frontend pipelines inside Multi-Modal SLAM Host
+    node(17.6, 80.8, 16.2, 8.8, "IMU Preintegration &\nForward Propagation", IMU_FILL, size=11.3)
+    node(17.6, 68.4, 16.2, 9.0, "Intra-Scan Deskew &\nGeometric Extraction", LIDAR_FILL, size=11.3)
+    node(38.2, 68.4, 16.2, 9.0, "Point-to-Plane /\nLOAM Residuals", LIDAR_FILL, size=11.5)
 
-    path([(12, 85.5), (18, 85.5)], "#EAB589", width=2.7)
-    path([(12, 69.3), (18, 69.3)], BLUE_LINE, width=2.7)
-    path([(26, 79), (26, 75.3)], "#EAB589", width=2.7)
-    path([(34, 85), (66, 85), (66, 75.3)], "#EAB589", width=2.4)
-    label(48.5, 85, "predicted state & covariance", AMBER_LINE, 10.0)
-    path([(34, 69.3), (39, 69.3)], BLUE_LINE, width=2.7)
-    path([(55, 69.3), (60, 69.3)], BLUE_LINE, width=2.7)
-    path([(72.2, 69.3), (73.8, 69.3), (73.8, 89.7), (97.2, 89.7), (97.2, 82), (96.0, 82)], BLUE_LINE, width=2.2)
-    label(75.8, 83, "provisional", BLUE_LINE, 9.5)
+    node(17.6, 56.0, 16.2, 9.0, "ORB / Direct Patch &\nExposure Tracking", AUX_FILL, size=11.3)
+    node(38.2, 56.0, 16.2, 9.0, "Reprojection /\nPhotometric Residuals", AUX_FILL, size=11.3)
 
-    # 3D isometric structured local surface planes
-    text(88.8, 86.8, "Local 3D voxel / surf map", 13.5, True)
+    # Coupled state & factor-graph update receiving IMU + LiDAR + Vision symmetrically
+    node(59.2, 59.5, 13.8, 18.0, "Coupled State &\nFactor Update\n(IEKF / ISAM2 / BA)", REPAIR_FILL, "joint or single-host", 11.5)
+
+    # Sensor -> Frontend arrows
+    path([(12.2, 85.2), (17.6, 85.2)], "#EAB589", width=2.5)
+    path([(12.2, 72.9), (17.6, 72.9)], BLUE_LINE, width=2.5)
+    path([(12.2, 60.5), (17.6, 60.5)], CORAL_LINE, width=2.5)
+
+    # IMU -> Deskew & Visual motion prior + Coupled Estimator
+    path([(25.7, 80.8), (25.7, 77.4)], "#EAB589", width=2.2)
+    path([(33.8, 85.2), (66.1, 85.2), (66.1, 77.5)], "#EAB589", width=2.3)
+    label(49.5, 85.2, "motion prior, deskew & preintegration covariance", AMBER_LINE, 9.3)
+
+    # Parallel LiDAR & Vision residual arrows into Coupled Update
+    path([(33.8, 72.9), (38.2, 72.9)], BLUE_LINE, width=2.5)
+    path([(54.4, 72.9), (59.2, 72.9)], BLUE_LINE, width=2.5)
+    path([(33.8, 60.5), (38.2, 60.5)], CORAL_LINE, width=2.5)
+    path([(54.4, 60.5), (59.2, 63.5)], CORAL_LINE, width=2.5)
+
+    # Provisional state -> Local 3D Voxel & Visual Landmark Map
+    path([(73.0, 68.8), (76.2, 68.8), (76.2, 90.2), (97.2, 90.2), (97.2, 82.0), (96.0, 82.0)], BLUE_LINE, width=2.1)
+    label(76.2, 84.0, "provisional", BLUE_LINE, 9.0)
+
+    # 3D isometric structured local surface planes + visual landmarks
+    text(88.8, 86.8, "3D Voxel & Visual Map", 13.0, True)
     plane1 = np.array([[81.8, 76], [87.5, 73.8], [87.5, 82], [81.8, 84.2]])
     plane2 = np.array([[87.5, 73.8], [95.8, 78], [95.8, 86.2], [87.5, 82]])
     floor = np.array([[81.8, 76], [87.5, 73.8], [95.8, 78], [90.1, 80.2]])
@@ -289,11 +306,22 @@ def fig0_system_architecture() -> str:
             p = plane[0] * (1 - u) * (1 - v) + plane[1] * u * (1 - v) + plane[2] * u * v + plane[3] * (1 - u) * v
             ax.plot(p[0], p[1], ".", ms=3.8, color="#333333", zorder=2)
 
-    path([(81.8, 76), (76.8, 76), (76.8, 55.2), (47, 55.2), (47, 63.3)], BLUE_LINE, width=1.9)
-    label(62, 55.2, "retrieve local planes & I_perp(s|H)", BLUE_LINE, 9.8)
+    # Three clean horizontal lanes inside the inter-layer corridor [43.5 .. 53.5]:
+    # Lane 1 (y = 51.8): Map feedback to residuals
+    path([(81.8, 76.0), (77.2, 76.0), (77.2, 51.8), (46.3, 51.8), (46.3, 56.0)], BLUE_LINE, width=1.85)
+    label(62.2, 51.8, "retrieve local planes, visual landmarks & I_perp(s|H)", BLUE_LINE, 9.0)
 
-    node(81.2, 58.3, 15.2, 10.5, "SC-PGO / Atlas", PURPLE_FILL, "loops & submaps", 13.5)
-    path([(88.8, 73), (88.8, 68.8)], PURPLE_LINE, width=2.0)
+    # Lane 2 (y = 48.4): Estimator state & residual tap to Health Detector
+    path([(66.1, 59.5), (66.1, 48.4), (23.8, 48.4), (23.8, 36.2)], "#555555", dashed=True, width=1.5)
+    label(42.5, 48.4, "keyframe deltas, 6D FIM & LiDAR/Visual residuals", "#444444", 9.0)
+
+    # Lane 3 (y = 45.0): Symmetric Cross-Modal Mutual Bridge (LiDAR <-> Vision) to Tiered Repairers
+    path([(14.0, 72.9), (14.0, 45.0), (53.8, 45.0), (53.8, 36.2)], CORAL_LINE, dashed=True, width=1.9)
+    path([(12.2, 60.5), (14.0, 60.5)], CORAL_LINE, dashed=True, width=1.9, end=False)
+    label(34.5, 45.0, "symmetric cross-modal mutual constraints (LiDAR ↔ Vision ↔ IMU)", CORAL_LINE, 9.0)
+
+    node(81.0, 58.3, 15.6, 10.5, "SC-PGO & Atlas", PURPLE_FILL, "LiDAR / DBoW2 loops & submaps", 12.6)
+    path([(88.8, 73.0), (88.8, 68.8)], PURPLE_LINE, width=2.0)
 
     pts = [(82.0, 51.8), (84.8, 49.9), (87.8, 52.0), (90.4, 50.5), (93.8, 53.1), (96.2, 50.3)]
     for a, b in zip(pts[:-1], pts[1:]):
@@ -303,45 +331,40 @@ def fig0_system_architecture() -> str:
         ax.plot(x, y, "o", ms=5.3, mfc="white", mec=PURPLE_LINE, mew=1.15, zorder=2)
     path([(88.8, 58.3), (88.8, 54.5)], PURPLE_LINE, width=1.4)
 
-    node(17.8, 28.2, 12.2, 13.0, "6D FIM & NIS\nhealth detector", LIDAR_FILL, size=13.0)
-    node(32.5, 28.2, 12.5, 13.0, "48-Cell Causal\nTF & Sig. Router", GATE_FILL, size=12.6)
-    node(47.5, 28.2, 12.2, 13.0, "Tiered\nrepairers", REPAIR_FILL, size=13.5)
-    node(62.2, 28.2, 10.8, 13.0, "Four-mode\ngate D(t)", GATE_FILL, size=13.0)
-    path([(30.0, 34.7), (32.5, 34.7)])
-    path([(45.0, 34.7), (47.5, 34.7)])
-    path([(59.7, 34.7), (62.2, 34.7)])
+    # Transactional Recovery Layer (symmetric for LiDAR & Vision)
+    node(17.6, 24.4, 12.4, 11.8, "6D FIM & NIS\nHealth Detector", LIDAR_FILL, size=12.2)
+    node(32.5, 24.4, 12.6, 11.8, "48-Cell Causal\nTF & Sig. Router", GATE_FILL, size=12.0)
+    node(47.6, 24.4, 12.4, 11.8, "Tiered Multi-Modal\nRepairers", REPAIR_FILL, size=12.0)
+    node(62.4, 24.4, 10.8, 11.8, "Four-Mode\nGate D(t)", GATE_FILL, size=12.2)
+    path([(30.0, 30.3), (32.5, 30.3)])
+    path([(45.1, 30.3), (47.6, 30.3)])
+    path([(60.0, 30.3), (62.4, 30.3)])
 
-    text(23.9, 24.5, "6D spectra / CUSUM / LOSO", 8.8)
-    text(38.7, 24.5, "onset age + multi-cause", 8.8)
-    text(53.6, 24.5, "RANSAC / GNC / deskew", 8.8)
-    text(67.6, 24.5, "ΔJ_v / holdout NIS / Wilson", 8.8)
+    text(23.8, 21.3, "6D spectra / CUSUM / LOSO", 8.5)
+    text(38.8, 21.3, "onset age + multi-cause", 8.5)
+    text(53.8, 21.3, "RANSAC / L↔V bridge / GNC", 8.5)
+    text(67.8, 21.3, "ΔJ_v / holdout NIS / Wilson", 8.5)
 
-    path([(60, 63.3), (57.6, 60.8), (14.2, 60.8), (14.2, 44.5), (23.9, 44.5), (23.9, 41.2)], "#555555", dashed=True, width=1.5)
-    label(35.5, 60.0, "keyframe deltas / 6D FIM / raw scan window", size=9.5)
+    node(17.6, 6.2, 27.5, 10.4, "2.0s Delayed-Commit Quarantine", PURPLE_FILL, "SHA-256 checkpoint & Undo-Log rollback", 12.2)
+    path([(18.8, 24.4), (18.8, 16.6)], PURPLE_LINE, width=1.7)
+    path([(45.1, 11.4), (58.8, 11.4), (58.8, 24.4)], PURPLE_LINE, width=1.7)
+    label(51.8, 11.4, "quarantined segment", PURPLE_LINE, 8.8)
 
-    path([(12, 30), (13.4, 30), (13.4, 52.3), (53.6, 52.3), (53.6, 41.2)], CORAL_LINE, dashed=True, width=2.0)
-    label(33.0, 52.3, "independent cross-modal / loop constraints", CORAL_LINE, 9.5)
+    node(62.4, 6.2, 10.8, 10.4, "Mode 3 / 4\nWait or Split", "#DADADA", "soft bridge / sleep", 11.3)
+    path([(67.8, 24.4), (67.8, 16.6)], "#555555", width=1.6)
 
-    node(17.8, 8.0, 27.2, 11.4, "2.0s Delayed-Commit Quarantine", PURPLE_FILL, "SHA-256 checkpoint & Undo-Log rollback", 12.8)
-    path([(18.5, 28.2), (18.5, 19.4)], PURPLE_LINE, width=1.7)
-    path([(45.0, 13.7), (58.8, 13.7), (58.8, 28.2)], PURPLE_LINE, width=1.7)
-    label(51.8, 13.7, "quarantined segment", PURPLE_LINE, 9.0)
+    node(80.5, 24.4, 16.8, 11.8, "Trusted Map State", REPAIR_FILL, "atomic poses / factors / bias", 12.6)
+    path([(73.2, 30.3), (80.5, 30.3)], GREEN_LINE, width=2.4)
+    label(76.8, 32.6, "Mode 2 commit", GREEN_LINE, 9.2)
 
-    node(62.2, 8.0, 10.8, 11.4, "Mode 3 / 4\nWait or Split", "#DADADA", "soft bridge / sleep", 11.8)
-    path([(67.6, 28.2), (67.6, 19.4)], "#555555", width=1.6)
-
-    node(80.5, 28.2, 16.8, 13.0, "Trusted Map State", REPAIR_FILL, "atomic poses / factors / bias", 13.2)
-    path([(73.0, 34.7), (80.5, 34.7)], GREEN_LINE, width=2.4)
-    label(76.7, 37.0, "Mode 2 commit", GREEN_LINE, 9.5)
-
-    node(80.5, 8.0, 16.8, 11.8, "SpatialMutationLog", IMU_FILL, "O(|ΔM_dirty|) CoW & Redo", 12.6, dashed=True)
-    path([(88.9, 19.8), (88.9, 28.2)], AMBER_LINE, dashed=True, width=1.8)
+    node(80.5, 6.2, 16.8, 10.8, "SpatialMutationLog", IMU_FILL, "O(|ΔM_dirty|) CoW & Redo", 12.0, dashed=True)
+    path([(88.9, 17.0), (88.9, 24.4)], AMBER_LINE, dashed=True, width=1.8)
 
     fig.text(
         0.015,
-        0.018,
-        "Solid arrows: online data & transaction flow    Dashed coral/grey: cross-modal evidence & window tapping    Dashed amber: O(|ΔM_dirty|) Copy-on-Write voxel mutation log",
-        fontsize=10.0,
+        0.016,
+        "Solid arrows: parallel IMU / LiDAR / Vision estimation & transaction flow    Dashed coral/grey: symmetric cross-modal (LiDAR ↔ Vision) mutual bridging    Dashed amber: O(|ΔM_dirty|) CoW map log",
+        fontsize=9.8,
         fontfamily=SERIF,
         color=SUB_INK,
     )
