@@ -64,6 +64,8 @@ class OnlineRecoveryTransactionNode:
         self.scan_buffer_body: Dict[int, np.ndarray] = {}
         self.voxel_store: Dict[Tuple[int, int, int], int] = {}
         self.voxel_journal: SpatialMutationLog[Tuple[int, int, int], int] = SpatialMutationLog(self.voxel_store)
+        self._kf_applied_poses: Dict[int, np.ndarray] = {}
+        self._kf_map_points: Dict[int, np.ndarray] = {}
         self.committed_map_points: List[np.ndarray] = []
 
     @property
@@ -74,15 +76,50 @@ class OnlineRecoveryTransactionNode:
         q = np.floor(pts_world[:, :3] / self.voxel_size_m).astype(np.int32)
         return set(map(tuple, q.tolist()))
 
-    def _promote_voxels_from_trusted_poses(self, newly_promoted_kf_ids: List[int]) -> None:
-        for kf_id in newly_promoted_kf_ids:
+    def _sync_spatial_map_with_trusted_poses(self) -> None:
+        """
+        Keep `voxel_store`, `voxel_journal`, and `committed_map_points` strictly synchronized with
+        `tx_mgr.trusted_poses` across promotions, late-onset revocations, and in-place pose updates (F3 fix).
+        """
+        cur_keys = set(self.tx_mgr.trusted_poses.keys())
+        prev_keys = set(self._kf_applied_poses.keys())
+        revoked_keys = prev_keys - cur_keys
+        modified_keys = {
+            k
+            for k in (cur_keys & prev_keys)
+            if not np.allclose(self._kf_applied_poses[k], self.tx_mgr.trusted_poses[k])
+        }
+        added_keys = cur_keys - prev_keys
+
+        if revoked_keys or modified_keys:
+            # Remove revoked or stale keyframe contributions and rebuild clean voxel ownership for surviving keyframes
+            for rk in revoked_keys | modified_keys:
+                self._kf_applied_poses.pop(rk, None)
+                self._kf_map_points.pop(rk, None)
+            to_delete = [v_key for v_key, owner in self.voxel_store.items() if owner in (revoked_keys | modified_keys)]
+            for v_key in to_delete:
+                self.voxel_journal.remove(v_key)
+            # Re-assert surviving keyframes in case they shared any voxel key with a revoked keyframe
+            for sk in sorted(self._kf_applied_poses.keys()):
+                if sk in self.scan_buffer_body:
+                    T_s = self._kf_applied_poses[sk]
+                    pts_b = self.scan_buffer_body[sk][:, :3]
+                    pts_w = (pts_b @ T_s[:3, :3].T) + T_s[:3, 3]
+                    for v_key in self._quantize_voxels(pts_w):
+                        self.voxel_journal.put(v_key, int(sk))
+
+        for kf_id in sorted(added_keys | modified_keys):
             if kf_id in self.tx_mgr.trusted_poses and kf_id in self.scan_buffer_body:
-                T_w_b = self.tx_mgr.trusted_poses[kf_id]
+                T_w_b = self.tx_mgr.trusted_poses[kf_id].copy()
                 pts_b = self.scan_buffer_body[kf_id][:, :3]
                 pts_w = (pts_b @ T_w_b[:3, :3].T) + T_w_b[:3, 3]
                 for v_key in self._quantize_voxels(pts_w):
                     self.voxel_journal.put(v_key, int(kf_id))
-                self.committed_map_points.append(pts_w[::4])
+                self._kf_applied_poses[kf_id] = T_w_b
+                self._kf_map_points[kf_id] = pts_w[::4]
+
+        if self._kf_map_points:
+            self.committed_map_points = [self._kf_map_points[k] for k in sorted(self._kf_map_points.keys())]
 
     def get_trusted_map_points(self, max_pts: int = 2000) -> np.ndarray:
         if not self.committed_map_points:
@@ -107,7 +144,7 @@ class OnlineRecoveryTransactionNode:
     ) -> Optional[ValidationReport]:
         self.scan_buffer_body[kf_id] = np.asarray(scan_body_xyz, dtype=np.float64)[:, :3].copy()
         fim_6x6, cov_6x6, min_r, min_t, weak_dir = compute_6dof_point_to_plane_fim(
-            scan_body_xyz, sigma_meas_m=0.10
+            scan_body_xyz, sigma_meas_m=0.075
         )
 
         win = HealthWindow(
@@ -130,7 +167,6 @@ class OnlineRecoveryTransactionNode:
 
         if self.tx_mgr.state == RecoveryState.HEALTHY:
             if decision.state == RecoveryState.QUARANTINED:
-                prev_keys = set(self.tx_mgr.trusted_poses.keys())
                 self.tx_mgr.trigger_quarantine(
                     estimated_onset_ns=decision.estimated_onset_ns,
                     current_ns=timestamp_ns,
@@ -138,10 +174,8 @@ class OnlineRecoveryTransactionNode:
                     info_before_6x6=fim_6x6,
                     propagated_cov_norm=float(np.linalg.norm(cov_6x6, ord=2)),
                 )
-                new_keys = list(set(self.tx_mgr.trusted_poses.keys()) - prev_keys)
-                self._promote_voxels_from_trusted_poses(new_keys)
+                self._sync_spatial_map_with_trusted_poses()
             else:
-                prev_keys = set(self.tx_mgr.trusted_poses.keys())
                 delta = BackendDelta(
                     timestamp_ns=timestamp_ns,
                     frame_id="map",
@@ -157,8 +191,7 @@ class OnlineRecoveryTransactionNode:
                     keyframe_id=kf_id,
                 )
                 self.tx_mgr.step_healthy(delta)
-                new_keys = list(set(self.tx_mgr.trusted_poses.keys()) - prev_keys)
-                self._promote_voxels_from_trusted_poses(new_keys)
+                self._sync_spatial_map_with_trusted_poses()
         return None
 
     def evaluate_and_commit_candidate(
@@ -219,10 +252,8 @@ class OnlineRecoveryTransactionNode:
             cov_after_6x6=cov_after,
             holdout_nis=mean_holdout_nis,
         )
-        prev_keys = set(self.tx_mgr.trusted_poses.keys())
         report = self.tx_mgr.validate_and_resolve(cand)
         if report.accepted:
-            new_keys = list(set(self.tx_mgr.trusted_poses.keys()) - prev_keys)
-            self._promote_voxels_from_trusted_poses(new_keys)
+            self._sync_spatial_map_with_trusted_poses()
             self.voxel_journal.commit_generation()
         return report

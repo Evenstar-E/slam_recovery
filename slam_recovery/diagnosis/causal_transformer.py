@@ -167,11 +167,20 @@ class PhysicsGuidedCausalTransformer:
 
     def _build_step_rep(self, w: HealthWindow, cells_48x10: Optional[np.ndarray]) -> Tuple[np.ndarray, bool]:
         past_ready = len(self.token_stream.healthy_history) >= self.token_stream.min_ready_samples
-        is_nom = (w.nis_mean < 1.65) and (w.min_eig_trans > 18.0) and (w.loso_primary_conflict < 2.2)
+        is_nom = (
+            (w.nis_mean < 1.65)
+            and (w.min_eig_trans > 12.0)
+            and (w.loso_primary_conflict < 2.0)
+            and (w.loso_aux_conflict < 2.0)
+            and (abs(w.Cross_corr_lag_sec) < 0.015)
+            and (w.loop_residual_spike < 1.8)
+        )
         tok_48 = self.token_stream.step(w, is_currently_trusted_healthy=is_nom)
         sp_32 = self.encode_spherical_cells(cells_48x10)
+        # Zero out static raw scale v_t[0:12] in attention input so h_t^{(L)} is strictly scene-size invariant
+        x_in = np.concatenate([np.zeros(12, dtype=np.float64), tok_48[12:], sp_32 * 0.15], axis=0)
         x_t = np.concatenate([tok_48, sp_32], axis=0)  # (80,)
-        h0 = _layer_norm(x_t @ self.W_in + self.b_in)
+        h0 = _layer_norm(x_in @ self.W_in + self.b_in)
         h1 = self._attend_step(h0, self.cache_l0, layer_idx=0)
         h2 = self._attend_step(h1, self.cache_l1, layer_idx=1)
 
@@ -226,6 +235,10 @@ class PhysicsGuidedCausalTransformer:
         N, D = X.shape
         X_aug = np.hstack([X, np.ones((N, 1))])
         reg_I = np.eye(D + 1) * l2_reg
+        # Penalize static scene-size channels (raw v_t[0:12] and static spherical range [48:80])
+        # so the readout relies primarily on scene-invariant causal past-median residuals \tilde{\delta}_t [12:24]
+        for idx_static in list(range(0, 12)) + list(range(48, 80)):
+            reg_I[idx_static, idx_static] = l2_reg * 120.0
         reg_I[-1, -1] = 1e-4
 
         # 1. Binary activation head a_t
@@ -238,12 +251,14 @@ class PhysicsGuidedCausalTransformer:
         act_mask = np.asarray(y_act_all) > 0.5
         if np.any(act_mask):
             X_act = X_aug[act_mask]
-            Y_age_onehot = np.full((int(np.sum(act_mask)), self.n_age_bins), -2.0)
+            reg_age = np.eye(D + 1) * l2_reg
+            reg_age[-1, -1] = 1e-4
+            Y_age_onehot = np.full((int(np.sum(act_mask)), self.n_age_bins), -2.5)
             for row_i, b_idx in enumerate(np.asarray(y_age_bin_all)[act_mask]):
                 # Smooth Gaussian target over adjacent 0.2s age bins
                 for k in range(self.n_age_bins):
-                    Y_age_onehot[row_i, k] = 4.0 * np.exp(-0.5 * ((k - b_idx) / 1.0) ** 2) - 1.5
-            W_age_aug = np.linalg.solve(X_act.T @ X_act + reg_I, X_act.T @ Y_age_onehot)
+                    Y_age_onehot[row_i, k] = 4.5 * np.exp(-0.5 * ((k - b_idx) / 0.85) ** 2) - 2.0
+            W_age_aug = np.linalg.solve(X_act.T @ X_act + reg_age, X_act.T @ Y_age_onehot)
             self.W_age = W_age_aug[:-1]
             self.b_age = W_age_aug[-1]
 
@@ -259,9 +274,31 @@ class PhysicsGuidedCausalTransformer:
         return self.weights_sha256()
 
     def weights_sha256(self) -> str:
+        """
+        Compute SHA-256 fingerprint over ALL model parameters (48-cell encoder, input projection,
+        relative-attention layers, readout weights AND biases) plus model configuration (F8 fix).
+        """
         h = hashlib.sha256()
-        for arr in (self.W_act, self.W_age, self.W_cause):
+        cfg_str = f"d={self.d_model}:H={self.n_heads}:M={self.max_cache_len}:K={self.n_age_bins}:dt={self.age_bin_width_sec}"
+        h.update(cfg_str.encode("utf-8"))
+        for arr in (
+            self.W_sp1,
+            self.b_sp1,
+            self.W_sp2,
+            self.b_sp2,
+            self.W_in,
+            self.b_in,
+            self.W_act,
+            np.array([self.b_act], dtype=np.float64),
+            self.W_age,
+            self.b_age,
+            self.W_cause,
+            self.b_cause,
+        ):
             h.update(np.ascontiguousarray(arr, dtype=np.float64).tobytes())
+        for layer in self.layers:
+            for k in ("W_Q", "W_K", "W_V", "W_O", "rel_bias"):
+                h.update(np.ascontiguousarray(layer[k], dtype=np.float64).tobytes())
         return h.hexdigest()
 
     def step_inference(
@@ -302,18 +339,18 @@ class PhysicsGuidedCausalTransformer:
         scores: Dict[DegeneracyType, float] = {t: 0.0 for t in DegeneracyType}
         active_types: List[DegeneracyType] = []
 
-        for idx_c, t_enum in enumerate(self.KNOWN_TYPES):
-            p_val = float(c_probs[idx_c])
-            scores[t_enum] = p_val
-            if p_val >= 0.52:
-                active_types.append(t_enum)
+        if act_prob >= 0.50:
+            for idx_c, t_enum in enumerate(self.KNOWN_TYPES):
+                p_val = float(c_probs[idx_c])
+                scores[t_enum] = p_val
+                if p_val >= 0.52:
+                    active_types.append(t_enum)
 
-        # Fuse analytical signature floor for zero false-negative guarantee on known physical invariants,
-        # while preserving OOD `UNKNOWN` detection when an unseen anomaly triggers `act_prob >= 0.5` but max_c p_c < 0.52
-        for t_rule in rule_diag.active_types:
-            if t_rule != DegeneracyType.UNKNOWN and t_rule not in active_types:
-                active_types.append(t_rule)
-                scores[t_rule] = max(scores[t_rule], min(1.0, rule_diag.scores[t_rule] / 2.0))
+            # Fuse analytical signature floor only when anomaly activation is confirmed (F8 contract fix)
+            for t_rule in rule_diag.active_types:
+                if t_rule != DegeneracyType.UNKNOWN and t_rule not in active_types:
+                    active_types.append(t_rule)
+                    scores[t_rule] = max(scores[t_rule], min(1.0, rule_diag.scores[t_rule] / 2.0))
 
         if not active_types:
             active_types.append(DegeneracyType.UNKNOWN)

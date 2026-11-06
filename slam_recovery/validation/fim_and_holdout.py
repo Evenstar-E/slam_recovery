@@ -89,7 +89,7 @@ def compute_6dof_point_to_plane_fim(
     min_6d = float(vals_6d[0])
     weak_6d = np.zeros(6, dtype=np.float64)
 
-    if min_6d < min(min_r, min_t):
+    if min_6d < 0.25 * min(min_r, min_t):
         v6 = vecs_6d[:, 0]
         weak_6d = v6 / max(float(np.linalg.norm(v6)), 1e-12)
         if float(np.linalg.norm(weak_6d[:3])) >= float(np.linalg.norm(weak_6d[3:])):

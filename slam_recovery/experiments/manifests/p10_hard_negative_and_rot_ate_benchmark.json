@@ -2,20 +2,30 @@
   "provenance": "REAL_HOST_AND_INJECTION",
   "EGap1_HardNegative_NearWall_Normal_Traversal": {
     "room_02_compact_room": {
+      "feature_provenance": "REAL_SCAN_FIM_AND_CROSS_SCAN_NIS",
       "total_evaluated_scans": 76,
-      "near_wall_hard_negative_scans_nf_ge_30pct": 76,
-      "mean_near_field_ratio_lt_3p8m": 0.7987,
-      "max_near_field_ratio_lt_3p8m": 0.8858,
-      "naive_geometry_only_ransac_false_strip_rate": 1.0,
+      "near_wall_hard_negative_scans": 76,
+      "mean_near_field_ratio": 0.7987,
+      "max_near_field_ratio": 0.8858,
+      "mean_real_cross_scan_nis": 0.8425,
+      "mean_real_loso_conflict": 0.294,
+      "naive_geometry_only_ransac_false_strip_count": 5,
+      "naive_geometry_only_ransac_false_strip_rate": 0.0658,
+      "ours_nis_loso_gated_meas_contam_false_strip_count": 0,
       "ours_nis_loso_gated_meas_contam_fpr": 0.0,
       "ours_quarantine_false_alarm_rate": 0.0
     },
     "hall_02_heldout_test": {
+      "feature_provenance": "REAL_SCAN_FIM_AND_CROSS_SCAN_NIS",
       "total_evaluated_scans": 86,
-      "near_wall_hard_negative_scans_nf_ge_30pct": 62,
-      "mean_near_field_ratio_lt_3p8m": 0.1755,
-      "max_near_field_ratio_lt_3p8m": 0.3545,
-      "naive_geometry_only_ransac_false_strip_rate": 1.0,
+      "near_wall_hard_negative_scans": 62,
+      "mean_near_field_ratio": 0.1755,
+      "max_near_field_ratio": 0.3545,
+      "mean_real_cross_scan_nis": 1.9375,
+      "mean_real_loso_conflict": 0.3613,
+      "naive_geometry_only_ransac_false_strip_count": 0,
+      "naive_geometry_only_ransac_false_strip_rate": 0.0,
+      "ours_nis_loso_gated_meas_contam_false_strip_count": 0,
       "ours_nis_loso_gated_meas_contam_fpr": 0.0,
       "ours_quarantine_false_alarm_rate": 0.0
     }
@@ -28,89 +38,126 @@
     "Ours_B6_Frontend_Quarantine_and_Strip_ate_m": 0.3058,
     "Ours_B6_recovery_ratio_G": 0.9975,
     "revoked_loop_intervals": 30,
-    "finding": "Backend-only GNC revokes PGO loop edges back toward frontend odometry, but because frontend odometry itself drifted 7.28m without quarantine/stripping, Backend-Only GNC leaves 5.95m ATE (G=+0.002)."
+    "finding": "Backend-only GNC revokes PGO loop edges back toward frontend odometry, but because frontend odometry itself drifted 7.28m without quarantine/stripping, Backend-Only GNC leaves 6.11m ATE (G=+0.0032)."
   },
-  "EGap4_Full_SE3_Rotational_ATE_RPE_deg": {
-    "hall_01_Clean_REAL_HOST": {
-      "LIO_SAM_B0": {
-        "ate_rot_rmse_deg": 3.803,
-        "ate_rot_mean_deg": 2.903,
-        "ate_rot_max_deg": 12.104,
-        "rpe_rot_rmse_deg": 21.744
+  "EGap4_Full_SE3_Rotational_ATE_RPE_and_Heading_Proxy_deg": {
+    "True_6DoF_Quaternion_Rotational_Evaluation_Mocap": {
+      "room_02_ORB_SLAM3_Clean": {
+        "orientation_status": "AVAILABLE_6DOF_QUATERNION",
+        "calibration_prefix_frames": 220,
+        "ate_rot_rmse_deg": 24.507,
+        "ate_rot_mean_deg": 6.774,
+        "ate_rot_max_deg": 169.029,
+        "rpe_rot_rmse_deg": 33.65
       },
-      "FAST_LIO2_B0": {
-        "ate_rot_rmse_deg": 3.268,
-        "ate_rot_mean_deg": 2.51,
-        "ate_rot_max_deg": 9.08,
-        "rpe_rot_rmse_deg": 14.826
+      "room_02_ORB_SLAM3_DarkBlur_Degraded_B2": {
+        "orientation_status": "AVAILABLE_6DOF_QUATERNION",
+        "calibration_prefix_frames": 202,
+        "ate_rot_rmse_deg": 27.139,
+        "ate_rot_mean_deg": 12.624,
+        "ate_rot_max_deg": 171.103,
+        "rpe_rot_rmse_deg": 33.968
       },
-      "MM_LINS_B2": {
-        "ate_rot_rmse_deg": 3.483,
-        "ate_rot_mean_deg": 2.654,
-        "ate_rot_max_deg": 11.565,
-        "rpe_rot_rmse_deg": 15.982
+      "room_dark_01_ORB_SLAM3_Native_Atlas_B2": {
+        "orientation_status": "AVAILABLE_6DOF_QUATERNION",
+        "calibration_prefix_frames": 271,
+        "ate_rot_rmse_deg": 24.506,
+        "ate_rot_mean_deg": 11.48,
+        "ate_rot_max_deg": 169.569,
+        "rpe_rot_rmse_deg": 31.712
+      },
+      "room_dark_01_Ours_B6_LiDAR_Anchored_Orientation": {
+        "orientation_status": "AVAILABLE_6DOF_QUATERNION",
+        "calibration_prefix_frames": 209,
+        "ate_rot_rmse_deg": 23.656,
+        "ate_rot_mean_deg": 9.478,
+        "ate_rot_max_deg": 172.981,
+        "rpe_rot_rmse_deg": 32.148
       }
     },
-    "hall_02_HeldOut_Clean_REAL_HOST": {
-      "LIO_SAM_B0": {
-        "ate_rot_rmse_deg": 4.817,
-        "ate_rot_mean_deg": 3.904,
-        "ate_rot_max_deg": 9.889,
-        "rpe_rot_rmse_deg": 36.243
+    "Leica_3DoF_Prism_Sequences_Path_Heading_Proxy_deg": {
+      "formal_6dof_orientation_status_on_leica_gt": {
+        "orientation_status": "UNAVAILABLE",
+        "ate_rot_rmse_deg": null,
+        "ate_rot_mean_deg": null,
+        "ate_rot_max_deg": null,
+        "rpe_rot_rmse_deg": null
       },
-      "FAST_LIO2_B0": {
-        "ate_rot_rmse_deg": 7.181,
-        "ate_rot_mean_deg": 6.037,
-        "ate_rot_max_deg": 13.773,
-        "rpe_rot_rmse_deg": 16.873
+      "hall_01_Clean_Path_Heading_Proxy": {
+        "LIO_SAM_B0": {
+          "proxy_status": "AVAILABLE_PATH_TANGENT_PROXY",
+          "num_moving_chords": 1482,
+          "heading_proxy_rmse_deg": 5.874,
+          "heading_proxy_mean_deg": 3.723,
+          "heading_proxy_max_deg": 38.002
+        },
+        "FAST_LIO2_B0": {
+          "proxy_status": "AVAILABLE_PATH_TANGENT_PROXY",
+          "num_moving_chords": 2299,
+          "heading_proxy_rmse_deg": 5.385,
+          "heading_proxy_mean_deg": 3.229,
+          "heading_proxy_max_deg": 52.979
+        },
+        "MM_LINS_B2": {
+          "proxy_status": "AVAILABLE_PATH_TANGENT_PROXY",
+          "num_moving_chords": 2125,
+          "heading_proxy_rmse_deg": 6.197,
+          "heading_proxy_mean_deg": 3.586,
+          "heading_proxy_max_deg": 44.532
+        }
       },
-      "ORB_SLAM3_B0": {
-        "ate_rot_rmse_deg": 6.664,
-        "ate_rot_mean_deg": 5.598,
-        "ate_rot_max_deg": 15.196,
-        "rpe_rot_rmse_deg": 10.746
-      }
-    },
-    "hall_01_Degraded_vs_Repaired_Rotational_Recovery": {
-      "LIO_SAM_GEO_DEGEN_Degraded_B0": {
-        "ate_rot_rmse_deg": 75.449,
-        "ate_rot_mean_deg": 62.887,
-        "ate_rot_max_deg": 157.354,
-        "rpe_rot_rmse_deg": 66.173
+      "hall_02_HeldOut_Clean_Path_Heading_Proxy": {
+        "LIO_SAM_B0": {
+          "proxy_status": "AVAILABLE_PATH_TANGENT_PROXY",
+          "num_moving_chords": 531,
+          "heading_proxy_rmse_deg": 5.442,
+          "heading_proxy_mean_deg": 4.313,
+          "heading_proxy_max_deg": 23.039
+        },
+        "FAST_LIO2_B0": {
+          "proxy_status": "AVAILABLE_PATH_TANGENT_PROXY",
+          "num_moving_chords": 1029,
+          "heading_proxy_rmse_deg": 7.826,
+          "heading_proxy_mean_deg": 6.517,
+          "heading_proxy_max_deg": 18.286
+        },
+        "ORB_SLAM3_B0": {
+          "proxy_status": "AVAILABLE_PATH_TANGENT_PROXY",
+          "num_moving_chords": 1438,
+          "heading_proxy_rmse_deg": 10.816,
+          "heading_proxy_mean_deg": 7.013,
+          "heading_proxy_max_deg": 124.098
+        }
       },
-      "LIO_SAM_GEO_DEGEN_Repaired_B6": {
-        "ate_rot_rmse_deg": 4.653,
-        "ate_rot_mean_deg": 3.658,
-        "ate_rot_max_deg": 12.989,
-        "rpe_rot_rmse_deg": 55.652
-      },
-      "geo_rot_recovery_ratio_G": 0.9881,
-      "LIO_SAM_PlasticBag_Degraded_B0": {
-        "ate_rot_rmse_deg": 86.233,
-        "ate_rot_mean_deg": 68.569,
-        "ate_rot_max_deg": 148.323,
-        "rpe_rot_rmse_deg": 62.964
-      },
-      "LIO_SAM_PlasticBag_Repaired_B6": {
-        "ate_rot_rmse_deg": 3.716,
-        "ate_rot_mean_deg": 2.845,
-        "ate_rot_max_deg": 10.876,
-        "rpe_rot_rmse_deg": 59.901
-      },
-      "pbag_rot_recovery_ratio_G": 1.0011
-    },
-    "room_dark_01_NaturalDark_Orientation": {
-      "ORB_SLAM3_Native_Atlas_B2": {
-        "ate_rot_rmse_deg": 19.268,
-        "ate_rot_mean_deg": 11.292,
-        "ate_rot_max_deg": 96.876,
-        "rpe_rot_rmse_deg": 17.793
-      },
-      "Ours_B6_LiDAR_Anchored_Orientation": {
-        "ate_rot_rmse_deg": 5.211,
-        "ate_rot_mean_deg": 4.229,
-        "ate_rot_max_deg": 11.699,
-        "rpe_rot_rmse_deg": 5.586
+      "hall_01_Degraded_vs_Repaired_Path_Heading_Proxy": {
+        "LIO_SAM_GEO_DEGEN_Degraded_B0": {
+          "proxy_status": "AVAILABLE_PATH_TANGENT_PROXY",
+          "num_moving_chords": 703,
+          "heading_proxy_rmse_deg": 82.788,
+          "heading_proxy_mean_deg": 68.285,
+          "heading_proxy_max_deg": 179.223
+        },
+        "LIO_SAM_GEO_DEGEN_Repaired_B6": {
+          "proxy_status": "AVAILABLE_PATH_TANGENT_PROXY",
+          "num_moving_chords": 792,
+          "heading_proxy_rmse_deg": 6.279,
+          "heading_proxy_mean_deg": 4.424,
+          "heading_proxy_max_deg": 29.867
+        },
+        "LIO_SAM_PlasticBag_Degraded_B0": {
+          "proxy_status": "AVAILABLE_PATH_TANGENT_PROXY",
+          "num_moving_chords": 707,
+          "heading_proxy_rmse_deg": 90.582,
+          "heading_proxy_mean_deg": 72.721,
+          "heading_proxy_max_deg": 152.901
+        },
+        "LIO_SAM_PlasticBag_Repaired_B6": {
+          "proxy_status": "AVAILABLE_PATH_TANGENT_PROXY",
+          "num_moving_chords": 707,
+          "heading_proxy_rmse_deg": 5.247,
+          "heading_proxy_mean_deg": 3.511,
+          "heading_proxy_max_deg": 30.733
+        }
       }
     }
   }

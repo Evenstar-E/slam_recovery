@@ -202,11 +202,13 @@ class ValidationReport:
 class GateThresholds:
     """Thresholds for the unified four-mode gate D(t) in Section 4.8."""
 
-    min_duration_sec: float = 1.0     # \Delta t_{min} for Mode 1 vs quarantine
-    tau_info: float = 25.0            # Minimum information along weak direction v^T \Lambda_{after} v
-    tau_val_nis: float = 2.5          # Maximum normalized holdout innovation squared D_{holdout}
-    sigma_tol: float = 0.50           # Posterior covariance norm tolerance ||P_{after}||
-    sigma_bridge: float = 4.00        # Bridge uncertainty upper bound \Sigma_{bridge}
+    min_duration_sec: float = 1.0          # \Delta t_{min} for Mode 1 vs quarantine
+    tau_info: float = 25.0                 # Minimum information along weak direction v^T \Lambda_{after} v
+    tau_val_nis: float = 2.5               # Maximum normalized holdout innovation squared D_{holdout}
+    sigma_tol: float = 0.50                # Posterior covariance norm tolerance ||P_{after}||
+    sigma_bridge: float = 4.00             # Bridge uncertainty upper bound \Sigma_{bridge}
+    min_wilson_lower_bound: float = 0.55   # Minimum Wilson score lower bound on paired holdout benefit
+    max_reentry_jump_m: float = 0.50       # Maximum re-entry boundary position jump (m)
 
 
 def evaluate_four_mode_gate(
@@ -246,17 +248,47 @@ def evaluate_four_mode_gate(
         )
 
     if candidate is not None:
-        # Reject any candidate containing non-finite (NaN / Inf) poses, covariances, or information matrices (R3 fix)
-        poses_finite = bool(
+        # Reject any candidate containing non-finite (NaN / Inf) poses, biases, covariances, or invalid pose shapes (R3 & F4 fix)
+        def _is_valid_pose_array(p: np.ndarray) -> bool:
+            arr = np.asarray(p, dtype=np.float64)
+            if not np.isfinite(arr).all():
+                return False
+            if arr.shape == (3,):
+                return True
+            if arr.shape == (4, 4):
+                return bool(np.allclose(arr[3, :], [0.0, 0.0, 0.0, 1.0], atol=1e-4))
+            return False
+
+        poses_valid = bool(
             candidate.repaired_poses
-            and all(np.isfinite(p).all() for p in candidate.repaired_poses.values())
+            and all(_is_valid_pose_array(p) for p in candidate.repaired_poses.values())
+        )
+        bias_acc_valid = (
+            True
+            if candidate.repaired_bias_acc is None
+            else (
+                np.asarray(candidate.repaired_bias_acc).shape == (3,)
+                and bool(np.isfinite(candidate.repaired_bias_acc).all())
+            )
+        )
+        bias_gyr_valid = (
+            True
+            if candidate.repaired_bias_gyr is None
+            else (
+                np.asarray(candidate.repaired_bias_gyr).shape == (3,)
+                and bool(np.isfinite(candidate.repaired_bias_gyr).all())
+            )
         )
         mats_finite = bool(
-            np.isfinite(candidate.info_after_6x6).all()
+            np.asarray(candidate.info_after_6x6).shape == (6, 6)
+            and np.asarray(candidate.cov_after_6x6).shape == (6, 6)
+            and np.isfinite(candidate.info_after_6x6).all()
             and np.isfinite(candidate.cov_after_6x6).all()
             and np.isfinite(candidate.holdout_nis)
+            and np.isfinite(candidate.wilson_lower_bound)
+            and np.isfinite(candidate.reentry_pos_jump_m)
         )
-        if not (poses_finite and mats_finite):
+        if not (poses_valid and bias_acc_valid and bias_gyr_valid and mats_finite):
             return ValidationReport(
                 accepted=False,
                 mode=RecoveryMode.MODE3_SOFT_BRIDGE_WAIT if p_prop < thresholds.sigma_bridge else RecoveryMode.MODE4_HARD_SLEEP_SPLIT,
@@ -266,20 +298,25 @@ def evaluate_four_mode_gate(
                 holdout_nis=float("inf"),
                 posterior_cov_norm=float("inf"),
                 propagated_cov_norm=p_prop,
-                reason="Rejected candidate due to non-finite (NaN/Inf) state or covariance values",
+                reason="Rejected candidate due to non-finite (NaN/Inf) state/bias or invalid SE(3) pose shape",
             )
 
         info_after = float(v.T @ candidate.info_after_6x6 @ v)
         info_gain = info_after - info_before
         p_after = float(np.linalg.norm(candidate.cov_after_6x6, ord=2))
         d_hold = float(candidate.holdout_nis)
+        wilson_ok = (
+            bool(candidate.paired_benefit_approved)
+            and float(candidate.wilson_lower_bound) >= thresholds.min_wilson_lower_bound
+            and float(candidate.reentry_pos_jump_m) <= thresholds.max_reentry_jump_m
+        )
 
         if (
             info_after >= thresholds.tau_info
             and info_gain > 0.0
             and d_hold <= thresholds.tau_val_nis
             and p_after <= thresholds.sigma_tol
-            and bool(candidate.paired_benefit_approved)
+            and wilson_ok
         ):
             return ValidationReport(
                 accepted=True,

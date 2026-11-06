@@ -219,21 +219,62 @@ def load_tum_trajectory_se3(file_path: str) -> Tuple[np.ndarray, np.ndarray, np.
     return ts[order], xyz[order], quats[order]
 
 
-def _estimate_planar_heading_rotations(xyz: np.ndarray, step: int = 8) -> np.ndarray:
-    """Construct planar yaw rotation matrices in SO(3) from trajectory displacement chords when quaternions are absent."""
-    n = len(xyz)
-    rots = np.repeat(np.eye(3, dtype=np.float64)[None, :, :], n, axis=0)
-    if n <= step:
-        return rots
-    for i in range(n):
-        j0 = max(0, i - step // 2)
-        j1 = min(n - 1, j0 + step)
-        dp = xyz[j1] - xyz[j0]
-        if np.linalg.norm(dp[:2]) > 1e-4:
-            yaw = float(np.arctan2(dp[1], dp[0]))
-            c, s = np.cos(yaw), np.sin(yaw)
-            rots[i] = np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]], dtype=np.float64)
-    return rots
+def evaluate_path_heading_proxy_deg(
+    ts_est: np.ndarray,
+    xyz_est: np.ndarray,
+    ts_gt: np.ndarray,
+    xyz_gt: np.ndarray,
+    max_diff_sec: float = 0.08,
+    min_chord_m: float = 0.85,
+) -> dict:
+    """
+    Explicitly named path-tangent heading proxy (in degrees) for 3-DoF prism ground truth
+    (e.g., Leica total station where 6-DoF orientation quaternions are absent).
+    Does NOT trim the top 5% tail errors; returns UNAVAILABLE / None if moving segments are insufficient.
+    """
+    idx = np.searchsorted(ts_gt, ts_est)
+    idx_l = np.clip(idx - 1, 0, len(ts_gt) - 1)
+    idx_r = np.clip(idx, 0, len(ts_gt) - 1)
+    dl = np.abs(ts_est - ts_gt[idx_l])
+    dr = np.abs(ts_est - ts_gt[idx_r])
+    best = np.where(dl <= dr, idx_l, idx_r)
+    valid = np.minimum(dl, dr) <= max_diff_sec
+
+    p_e = xyz_est[valid]
+    p_g = xyz_gt[best[valid]]
+    if len(p_e) < 12:
+        return {
+            "proxy_status": "UNAVAILABLE",
+            "heading_proxy_rmse_deg": None,
+            "heading_proxy_mean_deg": None,
+            "heading_proxy_max_deg": None,
+        }
+
+    R_umeyama, _, _ = umeyama_se3_align(p_e, p_g, with_scale=False)
+    p_e_aligned = p_e @ R_umeyama.T
+    win = max(8, min(30, len(p_g) // 18))
+    dp_g = p_g[win:] - p_g[:-win]
+    dp_e = p_e_aligned[win:] - p_e_aligned[:-win]
+    chord_len = np.linalg.norm(dp_g[:, :2], axis=1)
+    steady = chord_len >= min_chord_m
+    if int(np.sum(steady)) < 5:
+        return {
+            "proxy_status": "UNAVAILABLE",
+            "heading_proxy_rmse_deg": None,
+            "heading_proxy_mean_deg": None,
+            "heading_proxy_max_deg": None,
+        }
+
+    yaw_g = np.arctan2(dp_g[steady, 1], dp_g[steady, 0])
+    yaw_e = np.arctan2(dp_e[steady, 1], dp_e[steady, 0])
+    dyaw_deg = np.rad2deg(np.abs(np.arctan2(np.sin(yaw_e - yaw_g), np.cos(yaw_e - yaw_g))))
+    return {
+        "proxy_status": "AVAILABLE_PATH_TANGENT_PROXY",
+        "num_moving_chords": int(np.sum(steady)),
+        "heading_proxy_rmse_deg": round(float(np.sqrt(np.mean(dyaw_deg ** 2))), 3),
+        "heading_proxy_mean_deg": round(float(np.mean(dyaw_deg)), 3),
+        "heading_proxy_max_deg": round(float(np.max(dyaw_deg)), 3),
+    }
 
 
 def evaluate_rotation_ate_rpe_deg(
@@ -247,9 +288,23 @@ def evaluate_rotation_ate_rpe_deg(
     rpe_delta_steps: int = 10,
 ) -> dict:
     """
-    Compute full SE(3) rotational ATE_rot (RMSE / Mean / Max in degrees) and rotational RPE_rot (RMSE in degrees)
-    by aligning estimated orientations with ground-truth orientations via Wahba/Kabsch SVD on SO(3).
+    Compute full SE(3) rotational ATE_rot (RMSE / Mean / Max in degrees) and rotational RPE_rot (RMSE in degrees).
+    Strictly requires valid 6-DoF unit quaternions in both estimate and reference:
+      - If either `quats_est` or `quats_gt` is missing / zero-norm (e.g., 3-DoF Leica prism GT),
+        returns `orientation_status="UNAVAILABLE"` and `None` metrics (never fabricates 0.0 or substitutes path chords).
+      - Calibrates rigid world/extrinsic frame alignment `(R_world, R_ext)` strictly on the initial 20% healthy
+        prefix of the trajectory, never fitting over the full evaluation horizon.
     """
+    unavailable = {
+        "orientation_status": "UNAVAILABLE",
+        "ate_rot_rmse_deg": None,
+        "ate_rot_mean_deg": None,
+        "ate_rot_max_deg": None,
+        "rpe_rot_rmse_deg": None,
+    }
+    if len(ts_est) < 5 or len(ts_gt) < 5:
+        return unavailable
+
     idx = np.searchsorted(ts_gt, ts_est)
     idx_l = np.clip(idx - 1, 0, len(ts_gt) - 1)
     idx_r = np.clip(idx, 0, len(ts_gt) - 1)
@@ -257,76 +312,41 @@ def evaluate_rotation_ate_rpe_deg(
     dr = np.abs(ts_est - ts_gt[idx_r])
     best = np.where(dl <= dr, idx_l, idx_r)
     valid = np.minimum(dl, dr) <= max_diff_sec
+    if int(np.sum(valid)) < 5:
+        return unavailable
 
-    p_e = xyz_est[valid]
-    p_g = xyz_gt[best[valid]]
-    q_e = quats_est[valid]
-    q_g = quats_gt[best[valid]]
-    if float(np.median(np.linalg.norm(q_e, axis=1))) < 1e-3:
-        R_e = _estimate_planar_heading_rotations(p_e)
-    else:
-        R_e = np.asarray([quat_xyzw_to_rot(q) for q in q_e])
+    q_e = np.asarray(quats_est[valid], dtype=np.float64)
+    q_g = np.asarray(quats_gt[best[valid]], dtype=np.float64)
 
-    # Check if ground-truth file provides 6-DoF Mocap quaternions or 3-DoF Leica prism positions (0 0 0 0)
-    gt_quat_norms = np.linalg.norm(q_g, axis=1)
-    if float(np.median(gt_quat_norms)) < 1e-3:
-        # Leica total-station prism GT: construct smooth 3D tangent orientation frame along moving segments (>0.65m chord)
-        R_umeyama, _, _ = umeyama_se3_align(p_e, p_g, with_scale=False)
-        p_e_aligned = p_e @ R_umeyama.T
-        win = max(8, min(30, len(p_g) // 18))
-        dp_g = p_g[win:] - p_g[:-win]
-        dp_e = p_e_aligned[win:] - p_e_aligned[:-win]
-        # Select steady translation segments where chord tangent is well-conditioned
-        chord_len = np.linalg.norm(dp_g[:, :2], axis=1)
-        steady = chord_len > 0.85
-        if np.any(steady):
-            yaw_g = np.arctan2(dp_g[steady, 1], dp_g[steady, 0])
-            yaw_e = np.arctan2(dp_e[steady, 1], dp_e[steady, 0])
-            dyaw = np.rad2deg(np.abs(np.arctan2(np.sin(yaw_e - yaw_g), np.cos(yaw_e - yaw_g))))
-            # Trim top 5% turn-vertex tangent discretization spikes
-            q95 = np.percentile(dyaw, 95)
-            ate_arr = dyaw[dyaw <= q95]
-        else:
-            ate_arr = np.zeros(1, dtype=np.float64)
-
-        # Rotational RPE from consecutive relative rotation matrices dR_e vs smooth chord turn rate
-        rpe_angles_deg = []
-        for i in range(len(R_e) - rpe_delta_steps):
-            dR_e = R_e[i].T @ R_e[i + rpe_delta_steps]
-            ang_e = np.rad2deg(np.arccos(np.clip(0.5 * (np.trace(dR_e) - 1.0), -1.0, 1.0)))
-            if i + rpe_delta_steps + win < len(p_g):
-                v1 = p_g[i + win, :2] - p_g[i, :2]
-                v2 = p_g[i + rpe_delta_steps + win, :2] - p_g[i + rpe_delta_steps, :2]
-                if np.linalg.norm(v1) > 0.85 and np.linalg.norm(v2) > 0.85:
-                    ang_g = abs(np.rad2deg(np.arctan2(v1[0] * v2[1] - v1[1] * v2[0], v1[0] * v2[0] + v1[1] * v2[1])))
-                    rpe_angles_deg.append(abs(ang_e - ang_g))
-        rpe_arr = np.asarray(rpe_angles_deg, dtype=np.float64) if rpe_angles_deg else ate_arr * 0.5
-        return {
-            "ate_rot_rmse_deg": round(float(np.sqrt(np.mean(ate_arr ** 2))), 3),
-            "ate_rot_mean_deg": round(float(np.mean(ate_arr)), 3),
-            "ate_rot_max_deg": round(float(np.max(ate_arr)), 3),
-            "rpe_rot_rmse_deg": round(float(np.sqrt(np.mean(rpe_arr ** 2))), 3),
-        }
+    est_norms = np.linalg.norm(q_e, axis=1)
+    gt_norms = np.linalg.norm(q_g, axis=1)
+    if float(np.median(est_norms)) < 1e-3 or float(np.median(gt_norms)) < 1e-3:
+        return unavailable
 
     # Mocap 6-DoF ground truth: check if GT quaternion is stored as [qw, qx, qy, qz] (M2DGR Vicon convention)
     if float(np.median(np.abs(q_g[:, 0]))) > 0.85 and float(np.median(np.abs(q_g[:, 3]))) < 0.35:
         q_g = np.column_stack([q_g[:, 1], q_g[:, 2], q_g[:, 3], q_g[:, 0]])
+
+    R_e = np.asarray([quat_xyzw_to_rot(q) for q in q_e])
     R_g = np.asarray([quat_xyzw_to_rot(q) for q in q_g])
 
-    # Alternating SVD on SO(3) to solve global world alignment R_world and sensor-to-Mocap extrinsic R_ext:
-    # Minimize \sum_{i} || R_g[i] - R_world @ R_e[i] @ R_ext ||_F^2
+    # Calibrate fixed rigid alignment (R_world, R_ext) strictly on the initial 20% healthy prefix
+    n_cal = max(5, len(R_e) // 5)
+    R_e_cal = R_e[:n_cal]
+    R_g_cal = R_g[:n_cal]
+
     R_world = np.eye(3, dtype=np.float64)
     R_ext = np.eye(3, dtype=np.float64)
     for _ in range(6):
-        M_w = np.einsum("nij,nkj->ik", R_g, np.einsum("nij,jk->nik", R_e, R_ext))
+        M_w = np.einsum("nij,nkj->ik", R_g_cal, np.einsum("nij,jk->nik", R_e_cal, R_ext))
         U_w, _, Vt_w = np.linalg.svd(M_w)
         S_w = np.eye(3)
         if np.linalg.det(U_w) * np.linalg.det(Vt_w) < 0:
             S_w[2, 2] = -1.0
         R_world = U_w @ S_w @ Vt_w
 
-        L = np.einsum("ij,njk->nik", R_world, R_e)
-        M_x = np.einsum("nji,njk->ik", L, R_g)
+        L = np.einsum("ij,njk->nik", R_world, R_e_cal)
+        M_x = np.einsum("nji,njk->ik", L, R_g_cal)
         U_x, _, Vt_x = np.linalg.svd(M_x)
         S_x = np.eye(3)
         if np.linalg.det(U_x) * np.linalg.det(Vt_x) < 0:
@@ -348,12 +368,18 @@ def evaluate_rotation_ate_rpe_deg(
         R_rpe = dR_gt.T @ dR_pred
         cos_th = float(np.clip(0.5 * (np.trace(R_rpe) - 1.0), -1.0, 1.0))
         rpe_angles_deg.append(np.rad2deg(np.arccos(cos_th)))
-    rpe_arr = np.asarray(rpe_angles_deg, dtype=np.float64) if rpe_angles_deg else ate_arr
+
+    if not rpe_angles_deg:
+        rpe_rmse = None
+    else:
+        rpe_arr = np.asarray(rpe_angles_deg, dtype=np.float64)
+        rpe_rmse = round(float(np.sqrt(np.mean(rpe_arr ** 2))), 3)
 
     return {
+        "orientation_status": "AVAILABLE_6DOF_QUATERNION",
+        "calibration_prefix_frames": int(n_cal),
         "ate_rot_rmse_deg": round(float(np.sqrt(np.mean(ate_arr ** 2))), 3),
         "ate_rot_mean_deg": round(float(np.mean(ate_arr)), 3),
         "ate_rot_max_deg": round(float(np.max(ate_arr)), 3),
-        "rpe_rot_rmse_deg": round(float(np.sqrt(np.mean(rpe_arr ** 2))), 3),
+        "rpe_rot_rmse_deg": rpe_rmse,
     }
-

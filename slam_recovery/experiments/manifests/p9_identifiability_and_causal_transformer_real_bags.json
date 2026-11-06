@@ -21,23 +21,19 @@
         "Full_3D_MultiWall_Clean": {
           "identifiability_I_perp_mean": 0.8545,
           "identifiability_I_perp_std": 0.0467,
-          "trans_gram_min_eig": 201.42,
-          "single_modality_identifiable": true
+          "trans_gram_min_eig": 201.42
         },
         "Narrow_12pct_Unoccluded_Sector_After_Bag_Strip": {
           "identifiability_I_perp_mean": 0.0907,
-          "trans_gram_min_eig": 173.83,
-          "single_modality_scale_identifiable": false
+          "trans_gram_min_eig": 173.83
         },
         "Corridor_Longitudinal_Blindness": {
-          "identifiability_I_perp_mean": 0.0,
-          "trans_gram_min_eig": 117.42,
-          "longitudinal_observability_collapsed": true
+          "identifiability_I_perp_mean": 0.65,
+          "trans_gram_min_eig": 2.16
         },
         "PlasticBag_Single_Planar_Sheet_Collinearity": {
           "identifiability_I_perp_mean": 0.0,
-          "collinear_with_6dof_pose": true,
-          "theorem_verified": "I_perp = 0.0000 proves planar sheet shift is 100% absorbed into rigid translation without innovation/cross-modal check"
+          "algebraic_collinearity_sanity_check": "s_sheet in span(H[:, 3:]) => I_perp = 0.0000"
         }
       },
       "room_02": {
@@ -45,23 +41,19 @@
         "Full_3D_MultiWall_Clean": {
           "identifiability_I_perp_mean": 0.88,
           "identifiability_I_perp_std": 0.0561,
-          "trans_gram_min_eig": 185.45,
-          "single_modality_identifiable": true
+          "trans_gram_min_eig": 185.45
         },
         "Narrow_12pct_Unoccluded_Sector_After_Bag_Strip": {
           "identifiability_I_perp_mean": 0.0676,
-          "trans_gram_min_eig": 111.58,
-          "single_modality_scale_identifiable": false
+          "trans_gram_min_eig": 111.58
         },
         "Corridor_Longitudinal_Blindness": {
-          "identifiability_I_perp_mean": 0.0,
-          "trans_gram_min_eig": 109.3,
-          "longitudinal_observability_collapsed": true
+          "identifiability_I_perp_mean": 0.6815,
+          "trans_gram_min_eig": 1.35
         },
         "PlasticBag_Single_Planar_Sheet_Collinearity": {
           "identifiability_I_perp_mean": 0.0,
-          "collinear_with_6dof_pose": true,
-          "theorem_verified": "I_perp = 0.0000 proves planar sheet shift is 100% absorbed into rigid translation without innovation/cross-modal check"
+          "algebraic_collinearity_sanity_check": "s_sheet in span(H[:, 3:]) => I_perp = 0.0000"
         }
       },
       "hall_02": {
@@ -69,77 +61,83 @@
         "Full_3D_MultiWall_Clean": {
           "identifiability_I_perp_mean": 0.9078,
           "identifiability_I_perp_std": 0.0519,
-          "trans_gram_min_eig": 203.29,
-          "single_modality_identifiable": true
+          "trans_gram_min_eig": 203.29
         },
         "Narrow_12pct_Unoccluded_Sector_After_Bag_Strip": {
           "identifiability_I_perp_mean": 0.0682,
-          "trans_gram_min_eig": 112.94,
-          "single_modality_scale_identifiable": false
+          "trans_gram_min_eig": 112.94
         },
         "Corridor_Longitudinal_Blindness": {
-          "identifiability_I_perp_mean": 0.0,
-          "trans_gram_min_eig": 131.9,
-          "longitudinal_observability_collapsed": true
+          "identifiability_I_perp_mean": 0.6839,
+          "trans_gram_min_eig": 1.28
         },
         "PlasticBag_Single_Planar_Sheet_Collinearity": {
           "identifiability_I_perp_mean": 0.0,
-          "collinear_with_6dof_pose": true,
-          "theorem_verified": "I_perp = 0.0000 proves planar sheet shift is 100% absorbed into rigid translation without innovation/cross-modal check"
+          "algebraic_collinearity_sanity_check": "s_sheet in span(H[:, 3:]) => I_perp = 0.0000"
         }
       }
     },
     "Cross_Sequence_Zero_Tuning_Causal_Transformer": {
       "feature_provenance": "SEMI_SYNTHETIC_ON_REAL_SCANS (real 48-cell spherical tensors & real scan-derived 6D FIM eigenvalues + controlled residual/conflict profiles)",
       "readout_training_method": "Closed-Form Ridge-Regularized Readout over Frozen Causal Relative-Attention Representation (113-D)",
-      "frozen_weights_sha256": "3fd6e3cfac2c972a2b1cc565b415e0423098ed98b17c491a976984bb7d498785",
+      "frozen_weights_sha256": "7f2557cc6313e2779c5eadd9e0cbbd05c4f1b3fbddcd4733b74746a78379d9d1",
       "sequences": {
         "hall_02_heldout_test": {
           "event_detection_recall": 1.0,
+          "detected_events": 5,
+          "total_events": 5,
+          "false_alarm_windows_on_nominal": 0,
           "multi_cause_routing_accuracy": 1.0,
-          "slow_ramp_4s_onset_mae_rule_fixed2s_sec": 0.8,
-          "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.1789,
-          "slow_ramp_leaked_frames_rule_fixed2s": 2.0,
+          "slow_ramp_4s_onset_mae_rule_fixed2s_sec": 1.12,
+          "slow_ramp_4s_onset_mae_causal_transformer_sec": 1.0224,
+          "slow_ramp_leaked_frames_rule_fixed2s": 0.0,
           "slow_ramp_leaked_frames_causal_transformer": 0.0,
-          "step_inference_p50_us": 653.74,
-          "step_inference_p95_us": 961.96
+          "step_inference_p50_us": 633.08,
+          "step_inference_p95_us": 696.63
         },
         "room_02_compact_room": {
           "event_detection_recall": 1.0,
+          "detected_events": 5,
+          "total_events": 5,
+          "false_alarm_windows_on_nominal": 0,
           "multi_cause_routing_accuracy": 1.0,
-          "slow_ramp_4s_onset_mae_rule_fixed2s_sec": 0.8,
-          "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.2678,
-          "slow_ramp_leaked_frames_rule_fixed2s": 2.0,
+          "slow_ramp_4s_onset_mae_rule_fixed2s_sec": 1.12,
+          "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.5351,
+          "slow_ramp_leaked_frames_rule_fixed2s": 0.0,
           "slow_ramp_leaked_frames_causal_transformer": 0.0,
-          "step_inference_p50_us": 640.77,
-          "step_inference_p95_us": 701.24
+          "step_inference_p50_us": 639.2,
+          "step_inference_p95_us": 738.16
         },
         "room_dark_01_natural_dark": {
           "event_detection_recall": 1.0,
+          "detected_events": 5,
+          "total_events": 5,
+          "false_alarm_windows_on_nominal": 0,
           "multi_cause_routing_accuracy": 1.0,
-          "slow_ramp_4s_onset_mae_rule_fixed2s_sec": 0.8,
-          "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.2462,
-          "slow_ramp_leaked_frames_rule_fixed2s": 2.0,
+          "slow_ramp_4s_onset_mae_rule_fixed2s_sec": 1.12,
+          "slow_ramp_4s_onset_mae_causal_transformer_sec": 0.6028,
+          "slow_ramp_leaked_frames_rule_fixed2s": 0.0,
           "slow_ramp_leaked_frames_causal_transformer": 0.0,
-          "step_inference_p50_us": 639.4,
-          "step_inference_p95_us": 1082.54
+          "step_inference_p50_us": 636.46,
+          "step_inference_p95_us": 922.93
         }
       }
     },
     "SpatialMutationLog_CoW_Voxel_Benchmark": {
+      "scope_note": "Microbenchmark comparing O(|M|) full-dict deepcopy vs O(|Dirty Set|) rollback on a 10-scan window",
       "total_persistent_map_voxels_20cm": 594979,
       "quarantined_window_dirty_voxels": 82219,
       "dirty_fraction_of_global_map": 0.1382,
       "first_write_cloned_voxels": 37351,
       "zero_copy_inserted_keys": 44868,
-      "full_map_deepcopy_snapshot_ms": 2045.448,
-      "cow_rollback_mutation_journal_ms": 135.495,
-      "cow_capture_redo_image_ms": 188.322,
-      "cow_consume_redo_image_ms": 173.135,
-      "rollback_speedup_vs_full_copy": 15.1,
+      "full_map_deepcopy_snapshot_ms": 1797.261,
+      "cow_rollback_mutation_journal_ms": 99.198,
+      "cow_capture_redo_image_ms": 169.209,
+      "cow_consume_redo_image_ms": 136.666,
+      "rollback_speedup_vs_full_copy": 18.12,
       "reverted_keys_verified": 82219,
       "restored_keys_verified": 82219
     }
   },
-  "created_utc": "2026-11-05T10:36:41.061137+00:00"
+  "created_utc": "2026-11-06T02:19:09.154373+00:00"
 }

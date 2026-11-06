@@ -44,10 +44,31 @@ class TrustedMapTransactionManager:
 
         self.provisional_queue: List[BackendDelta] = []
         self.promoted_history: List[BackendDelta] = []
+        # Before-image undo records aligned 1-to-1 with promoted_history for exact rollback (F5 fix)
+        self._promoted_before_images: List[Tuple[Optional[np.ndarray], List[int], np.ndarray, np.ndarray]] = []
         self.checkpoints: List[Checkpoint] = []
         self.active_quarantine: Optional[QuarantineSegment] = None
         self.sleeping_submaps: List[Dict[int, np.ndarray]] = []
         self.commit_history: List[Tuple[int, str, ValidationReport]] = []
+
+    def _apply_promote(self, item: BackendDelta) -> None:
+        prev_pose = (
+            self.trusted_poses[item.keyframe_id].copy()
+            if (item.keyframe_id is not None and item.keyframe_id in self.trusted_poses)
+            else None
+        )
+        prev_factors = list(self.trusted_factors)
+        prev_ba = self.trusted_bias_acc.copy()
+        prev_bg = self.trusted_bias_gyr.copy()
+        self._promoted_before_images.append((prev_pose, prev_factors, prev_ba, prev_bg))
+
+        if item.keyframe_id is not None:
+            self.trusted_poses[item.keyframe_id] = item.pose_se3.copy()
+        self.trusted_factors.extend(item.factor_ids)
+        self.trusted_bias_acc = item.bias_acc.copy()
+        self.trusted_bias_gyr = item.bias_gyr.copy()
+        item.provisional = False
+        self.promoted_history.append(item)
 
     def create_checkpoint(self, timestamp_ns: int) -> Checkpoint:
         ckpt_id = f"ckpt_v{self.trusted_version}_{timestamp_ns}"
@@ -72,6 +93,11 @@ class TrustedMapTransactionManager:
         self.trusted_factors = list(ckpt.factor_ids)
         self.trusted_bias_acc = ckpt.imu_bias_acc.copy()
         self.trusted_bias_gyr = ckpt.imu_bias_gyr.copy()
+        # Synchronize promoted history to checkpoint timestamp
+        while self.promoted_history and self.promoted_history[-1].timestamp_ns >= ckpt.timestamp_ns:
+            self.promoted_history.pop()
+            if self._promoted_before_images:
+                self._promoted_before_images.pop()
 
     def step_healthy(self, delta: BackendDelta) -> int:
         """
@@ -89,13 +115,7 @@ class TrustedMapTransactionManager:
 
         for item in self.provisional_queue:
             if item.timestamp_ns <= cutoff_ns:
-                if item.keyframe_id is not None:
-                    self.trusted_poses[item.keyframe_id] = item.pose_se3.copy()
-                self.trusted_factors.extend(item.factor_ids)
-                self.trusted_bias_acc = item.bias_acc.copy()
-                self.trusted_bias_gyr = item.bias_gyr.copy()
-                item.provisional = False
-                self.promoted_history.append(item)
+                self._apply_promote(item)
                 promoted += 1
             else:
                 remaining.append(item)
@@ -121,34 +141,35 @@ class TrustedMapTransactionManager:
         safe_pre_onset = [d for d in self.provisional_queue if d.timestamp_ns < t_q_start]
         quarantined_deltas = [d for d in self.provisional_queue if d.timestamp_ns >= t_q_start]
 
-        # Undo-log rollback for late-detected faults (R2 fix): if any already-promoted delta has
-        # timestamp_ns >= t_q_start, revoke it from trusted_poses and trusted_factors back into quarantine!
-        kept_promoted: List[BackendDelta] = []
+        # Undo-log rollback for late-detected faults (R2 & F5 fix): roll back in reverse chronological order
+        # using recorded before-images so overwritten keys and initial biases are restored bit-for-bit!
         revoked_from_trusted: List[BackendDelta] = []
-        for item in self.promoted_history:
-            if item.timestamp_ns >= t_q_start:
-                item.provisional = True
-                revoked_from_trusted.append(item)
+        while self.promoted_history and self.promoted_history[-1].timestamp_ns >= t_q_start:
+            item = self.promoted_history.pop()
+            item.provisional = True
+            revoked_from_trusted.append(item)
+            if self._promoted_before_images:
+                prev_pose, prev_factors, prev_ba, prev_bg = self._promoted_before_images.pop()
+                if item.keyframe_id is not None:
+                    if prev_pose is not None:
+                        self.trusted_poses[item.keyframe_id] = prev_pose.copy()
+                    else:
+                        self.trusted_poses.pop(item.keyframe_id, None)
+                self.trusted_factors = list(prev_factors)
+                self.trusted_bias_acc = prev_ba.copy()
+                self.trusted_bias_gyr = prev_bg.copy()
+            else:
                 if item.keyframe_id is not None:
                     self.trusted_poses.pop(item.keyframe_id, None)
                 for fid in item.factor_ids:
                     if fid in self.trusted_factors:
                         self.trusted_factors.remove(fid)
-            else:
-                kept_promoted.append(item)
-        self.promoted_history = kept_promoted
-        if kept_promoted:
-            self.trusted_bias_acc = kept_promoted[-1].bias_acc.copy()
-            self.trusted_bias_gyr = kept_promoted[-1].bias_gyr.copy()
+                self.trusted_bias_acc = np.zeros(3, dtype=np.float64)
+                self.trusted_bias_gyr = np.zeros(3, dtype=np.float64)
+        revoked_from_trusted.reverse()
 
         for item in safe_pre_onset:
-            if item.keyframe_id is not None:
-                self.trusted_poses[item.keyframe_id] = item.pose_se3.copy()
-            self.trusted_factors.extend(item.factor_ids)
-            self.trusted_bias_acc = item.bias_acc.copy()
-            self.trusted_bias_gyr = item.bias_gyr.copy()
-            item.provisional = False
-            self.promoted_history.append(item)
+            self._apply_promote(item)
         if safe_pre_onset or revoked_from_trusted:
             self.trusted_version += 1
 

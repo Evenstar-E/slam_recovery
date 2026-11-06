@@ -1,6 +1,8 @@
 test_checkpoint_hash_and_restore (slam_recovery.tests.test_atomic_commit.TestCheckpointAndAtomicCommit) ... ok
 test_delayed_commit_prevents_n_kappa_tail_pollution (slam_recovery.tests.test_atomic_commit.TestCheckpointAndAtomicCommit)
 Verify Section 5.2: If degeneracy starts at t=10s and alarm triggers at t=11.5s, ... ok
+test_f1_to_f8_followup_review_probes_resolved (slam_recovery.tests.test_atomic_commit.TestCheckpointAndAtomicCommit)
+Verify all 9 bounded probes in docs/review_20261105_followup/audit_local.py return defect_reproduced == False. ... ok
 test_four_mode_gate_rejects_bad_merge_and_accepts_verified_repair (slam_recovery.tests.test_atomic_commit.TestCheckpointAndAtomicCommit)
 Verify Section 4.8 & 4.9: ... ok
 test_nuisance_projected_identifiability_and_spherical_cells (slam_recovery.tests.test_atomic_commit.TestCheckpointAndAtomicCommit)
@@ -25,6 +27,6 @@ test_recovery_ratio_G_captures_campus2_degradation (slam_recovery.tests.test_tru
 test_trusted_map_invariant_during_mode3_and_archived_on_mode4 (slam_recovery.tests.test_trusted_map_invariance.TestTrustedMapInvariance) ... ok
 
 ----------------------------------------------------------------------
-Ran 17 tests in 0.060s
+Ran 18 tests in 0.440s
 
 OK

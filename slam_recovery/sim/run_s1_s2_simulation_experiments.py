@@ -81,28 +81,30 @@ class Arena3DMeshGroundTruth:
     def compute_distance_to_gt_mesh(self, voxel_centers_world: np.ndarray) -> np.ndarray:
         """
         Compute exact point-to-surface Euclidean distance \min_{g \in \mathcal{G}_{GT}} ||v - g||_2
-        for every 3D voxel center in `voxel_centers_world` (N, 3).
+        for every 3D voxel center in `voxel_centers_world` (N, 3) against FINITE 3D arena walls/boxes
+        spanning x in [-5.0, 36.0], y in [-3.0, 3.0], z in [0.0, 2.6] (F6 fix).
         """
         v = np.asarray(voxel_centers_world, dtype=np.float64)[:, :3]
         if len(v) == 0:
             return np.zeros(0, dtype=np.float64)
 
-        # Distance to floor z = 0.0
-        d_floor = np.abs(v[:, 2])
-        # Distance to North wall y = 3.0 and South wall y = -3.0
-        d_north = np.abs(v[:, 1] - 3.0)
-        d_south = np.abs(v[:, 1] + 3.0)
-        # Distance to West wall x = -5.0, East wall x = 36.0, Pillars x = 2.5 and x = 6.5
-        d_west = np.abs(v[:, 0] + 5.0)
-        d_east = np.abs(v[:, 0] - 36.0)
-        d_pillar1 = np.hypot(
-            np.maximum(0.0, np.abs(v[:, 0] - 2.5) - 0.05),
-            np.maximum(0.0, np.abs(v[:, 1] - 2.2) - 0.65),
-        )
-        d_pillar2 = np.hypot(
-            np.maximum(0.0, np.abs(v[:, 0] - 6.5) - 0.05),
-            np.maximum(0.0, np.abs(v[:, 1] + 2.2) - 0.65),
-        )
+        def _box_dist(pts: np.ndarray, xmin: float, xmax: float, ymin: float, ymax: float, zmin: float, zmax: float) -> np.ndarray:
+            dx = np.maximum(0.0, np.maximum(xmin - pts[:, 0], pts[:, 0] - xmax))
+            dy = np.maximum(0.0, np.maximum(ymin - pts[:, 1], pts[:, 1] - ymax))
+            dz = np.maximum(0.0, np.maximum(zmin - pts[:, 2], pts[:, 2] - zmax))
+            return np.sqrt(dx * dx + dy * dy + dz * dz)
+
+        # 1. Finite Floor slab: x in [-12.0, 48.0], y in [-3.2, 3.2], z = 0.0
+        d_floor = _box_dist(v, -12.0, 48.0, -3.2, 3.2, 0.0, 0.0)
+        # 2. Finite North wall (y = +3.0) & South wall (y = -3.0): x in [-12.0, 48.0], z in [0.0, 2.8]
+        d_north = _box_dist(v, -12.0, 48.0, 3.0, 3.0, 0.0, 2.8)
+        d_south = _box_dist(v, -12.0, 48.0, -3.0, -3.0, 0.0, 2.8)
+        # 3. Finite West wall (x = -5.0) & East wall (x = 36.0): y in [-6.0, 6.0], z in [0.0, 2.8]
+        d_west = _box_dist(v, -5.0, -5.0, -6.0, 6.0, 0.0, 2.8)
+        d_east = _box_dist(v, 36.0, 36.0, -6.0, 6.0, 0.0, 2.8)
+        # 4. Finite Pillars at x = 2.5 (y in [1.55, 2.85]) and x = 6.5 (y in [-2.85, -1.55]), z in [0.0, 2.6]
+        d_pillar1 = _box_dist(v, 2.45, 2.55, 1.55, 2.85, 0.0, 2.6)
+        d_pillar2 = _box_dist(v, 6.45, 6.55, -2.85, -1.55, 0.0, 2.6)
 
         min_dist = np.minimum.reduce([d_floor, d_north, d_south, d_west, d_east, d_pillar1, d_pillar2])
         return min_dist
@@ -256,31 +258,44 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
         # Roll back the rejected B5 trial branch via CoW SpatialMutationLog in O(|Dirty Set|)
         node_r4.voxel_journal.rollback_mutation_journal()
 
-        # S1 Case 3: R5 (Delayed Revisit to Zone A provides orthogonal pillar/wall constraints directly from 3D mesh scans)
+        # S1 Case 3: R5 (Delayed Revisit to Zone A/C provides orthogonal pillar/wall constraints; solve candidate poses from scan planes + pre-quarantine anchor without reading GT poses)
         node_r5.tx_mgr.active_quarantine.weak_direction_6d = np.array([0, 0, 0, 1, 0, 0], dtype=np.float64)
-        for k in quar_poses_gt:
-            node_r5.scan_buffer_body[k] = arena.sample_lidar_scan_in_body_frame(
+        quar_poses_repaired_r5: Dict[int, np.ndarray] = {}
+        max_trusted_kf = max(node_r5.tx_mgr.trusted_poses.keys())
+        pre_anchor_x = float(node_r5.tx_mgr.trusted_poses[max_trusted_kf][0, 3])
+        for k in sorted(quar_poses_drifted_r4.keys()):
+            scan_revisit = arena.sample_lidar_scan_in_body_frame(
                 quar_poses_gt[k], zone_b_featureless=False, plastic_bag_occluded_frac=0.0, rng=rng
             )
+            node_r5.scan_buffer_body[k] = scan_revisit
+            # Estimate pose from scan wall/floor planes in body frame (y_wall = +-3.0, x_pillar/endwall) + pre-quarantine anchor
+            T_cand = np.eye(4, dtype=np.float64)
+            north_pts = scan_revisit[(scan_revisit[:, 1] > 2.2) & (scan_revisit[:, 2] > 0.2)]
+            y_est = 3.0 - float(np.median(north_pts[:, 1])) if len(north_pts) > 5 else 0.0
+            x_est = pre_anchor_x + 0.40 * (k - max_trusted_kf)
+            T_cand[0, 3] = x_est
+            T_cand[1, 3] = y_est
+            quar_poses_repaired_r5[k] = T_cand
+
         rep_r5 = node_r5.evaluate_and_commit_candidate(
-            "R5_revisit_loop", quar_poses_gt, aux_or_loop_info_6x6=None
+            "R5_revisit_loop", quar_poses_repaired_r5, aux_or_loop_info_6x6=None
         )
         r5_info_list.append(rep_r5.weak_dir_info_after)
         r5_nis_list.append(rep_r5.holdout_nis)
 
-        # S1 Case 4: B6 Point-Mixture Stripping on FAST-LIO2 (surviving 3D hall walls, zero manual diagonal matrix)
+        # S1 Case 4: B6 Point-Mixture Stripping on FAST-LIO2 (surviving 3D hall walls, solved candidate poses)
         node_b6_pm = OnlineRecoveryTransactionNode(confirmation_margin_sec=2.0, voxel_size_m=0.10, holdout_stride=5)
         node_b6_pm.committed_map_points = list(node_r5.committed_map_points)
         node_b6_pm.scan_buffer_body = {
             k: arena.sample_lidar_scan_in_body_frame(quar_poses_gt[k], zone_b_featureless=False, plastic_bag_occluded_frac=0.35, rng=rng)
-            for k in quar_poses_gt
+            for k in quar_poses_repaired_r5
         }
         node_b6_pm.tx_mgr = TrustedMapTransactionManager(confirmation_margin_ns=int(2.0 * 1e9))
         node_b6_pm.tx_mgr.trigger_quarantine(
             int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2
         )
         rep_b6_pm = node_b6_pm.evaluate_and_commit_candidate(
-            "B6_point_mixture", quar_poses_gt, aux_or_loop_info_6x6=None
+            "B6_point_mixture", quar_poses_repaired_r5, aux_or_loop_info_6x6=None
         )
         b6_point_info_list.append(rep_b6_pm.weak_dir_info_after)
         b6_point_nis_list.append(rep_b6_pm.holdout_nis)
@@ -297,7 +312,7 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2
         )
         rep_b6_pg = node_b6_pg.evaluate_and_commit_candidate(
-            "B6_aux_pg", quar_poses_gt, aux_or_loop_info_6x6=aux_fim_physical
+            "B6_aux_pg", quar_poses_repaired_r5, aux_or_loop_info_6x6=aux_fim_physical
         )
         b6_pg_info_list.append(rep_b6_pg.weak_dir_info_after)
         b6_pg_nis_list.append(rep_b6_pg.holdout_nis)
@@ -305,7 +320,7 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
         contam_3d["B6"].append(arena.compute_3d_voxel_contamination_ratio(node_r5.committed_voxel_set))
 
     out = {
-        "provenance": "ONLINE_SIM_3D_MESH",
+        "provenance": "ONLINE_SIM_3D_MESH (Controlled Analytical 3D-Mesh Ray-Sampling & Gate Benchmark)",
         "world_file": "slam_recovery/sim/recovery_arena.world",
         "node_file": "slam_recovery/sim/transaction_manager_node.py",
         "num_seeds": len(seeds),
@@ -313,7 +328,7 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             "R4_Dual_Blind_No_Evidence": {
                 "weak_dir_info_after": round(float(np.mean(r4_info_list)), 2),
                 "holdout_nis": round(float(np.mean(r4_nis_list)), 3),
-                "mode": RecoveryMode.MODE3_SOFT_BRIDGE_WAIT.value,
+                "mode": rep_r4.mode.value,
             },
             "B5_Narrow_FoV_Filter_LIOSAM": {
                 "weak_dir_info_after": round(float(np.mean(b5_narrow_info_list)), 2),
@@ -323,17 +338,17 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             "R5_Delayed_Revisit_Loop": {
                 "weak_dir_info_after": round(float(np.mean(r5_info_list)), 2),
                 "holdout_nis": round(float(np.mean(r5_nis_list)), 3),
-                "mode": RecoveryMode.MODE2_ATOMIC_COMMIT.value,
+                "mode": rep_r5.mode.value,
             },
             "B6_Ours_Point_Mixture_FASTLIO2": {
                 "weak_dir_info_after": round(float(np.mean(b6_point_info_list)), 2),
                 "holdout_nis": round(float(np.mean(b6_point_nis_list)), 3),
-                "mode": RecoveryMode.MODE2_ATOMIC_COMMIT.value,
+                "mode": rep_b6_pm.mode.value,
             },
             "B6_Ours_Aux_PoseGraph_LIOSAM": {
                 "weak_dir_info_after": round(float(np.mean(b6_pg_info_list)), 2),
                 "holdout_nis": round(float(np.mean(b6_pg_nis_list)), 3),
-                "mode": RecoveryMode.MODE2_ATOMIC_COMMIT.value,
+                "mode": rep_b6_pg.mode.value,
             },
         },
         "S2_True_3D_Mesh_Voxel_Contamination_Ratio": {

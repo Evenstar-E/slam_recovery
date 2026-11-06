@@ -294,6 +294,56 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
         out0 = tf.step_inference(w_nom)
         self.assertTrue(out0.used_analytical_fallback)
 
+    def test_f1_to_f8_followup_review_probes_resolved(self) -> None:
+        """Verify all 9 bounded probes in docs/review_20261105_followup/audit_local.py return defect_reproduced == False."""
+        from docs.review_20261105_followup.audit_local import (
+            absent_validation_defaults,
+            all_revoked_bias,
+            incomplete_model_hash,
+            late_same_key,
+            mesh_outside_bounds,
+            missing_orientation_fabricates_zero,
+            p9_no_alarm_still_perfect_recall,
+            voxel_rollback_divergence,
+        )
+
+        for probe_fn in (
+            late_same_key,
+            all_revoked_bias,
+            absent_validation_defaults,
+            voxel_rollback_divergence,
+            incomplete_model_hash,
+            missing_orientation_fabricates_zero,
+            mesh_outside_bounds,
+            p9_no_alarm_still_perfect_recall,
+        ):
+            res = probe_fn()
+            self.assertFalse(res["defect_reproduced"], msg=f"Probe {probe_fn.__name__} failed: {res}")
+
+        # Also verify unsafe_candidate_fields rejects both NaN bias and (2,2) invalid pose matrix
+        m = TrustedMapTransactionManager()
+        m.trigger_quarantine(int(10e9), int(14e9), np.array([0.0, 0, 0, 1, 0, 0]), np.eye(6), 1.0)
+        r_nan_bias = m.validate_and_resolve(
+            CandidateMap(
+                "nan_bias",
+                m.trusted_version,
+                {42: np.eye(4)},
+                np.eye(6) * 100,
+                np.eye(6) * 0.01,
+                0.1,
+                repaired_bias_acc=np.array([np.nan, 0.0, 0.0]),
+            )
+        )
+        self.assertFalse(r_nan_bias.accepted)
+
+        m2 = TrustedMapTransactionManager()
+        m2.trigger_quarantine(int(10e9), int(14e9), np.array([0.0, 0, 0, 1, 0, 0]), np.eye(6), 1.0)
+        r_bad_shape = m2.validate_and_resolve(
+            CandidateMap("bad_shape", m2.trusted_version, {42: np.eye(2)}, np.eye(6) * 100, np.eye(6) * 0.01, 0.1)
+        )
+        self.assertFalse(r_bad_shape.accepted)
+        self.assertNotIn(42, m2.trusted_poses)
+
 
 if __name__ == "__main__":
     unittest.main()

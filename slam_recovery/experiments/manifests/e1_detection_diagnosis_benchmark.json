@@ -1,6 +1,6 @@
 {
   "provenance": "SYNTHETIC",
-  "transformer_weights_sha256": "f4bdfe764c0326beb3b5bb736b810c742e33df1d05b1fc497d7549b00b04ebb1",
+  "transformer_weights_sha256": "d911304be51f732cfea12a641e02af81ae64b4db3632b9ea92195cb40158b20b",
   "methods": {
     "1_MMLINS_Cov_ODD": {
       "event_recall": 0.1667,
@@ -67,8 +67,8 @@
       "plastic_bag_recall": 1.0,
       "segment_iou": 0.9554,
       "mean_tail_pollution_frames": 0.0,
-      "slow_ramp_onset_mae_sec": 0.566,
-      "slow_ramp_tail_pollution_frames": 0.0,
+      "slow_ramp_onset_mae_sec": 0.615,
+      "slow_ramp_tail_pollution_frames": 0.17,
       "diagnosis_accuracy": 1.0,
       "unseen_ood_safe_rate": 1.0
     }

@@ -2,10 +2,15 @@
 """Real-Bag Verification of Proposition 2 (Nuisance-Projected Identifiability), 48-Cell Causal Transformer
 Zero-Tuning Generalization, and SpatialMutationLog O(|Dirty Set|) Rollback Benchmark (P9).
 
-Evaluates on real M2DGR bags:
-  - Development set: `hall_01` (used ONLY to train and freeze `PhysicsGuidedCausalTransformer` weights)
-  - Held-out unseen test bags (Zero-Tuning inference): `room_02`, `hall_02`, and `room_dark_01`
-Outputs manifest: `slam_recovery/experiments/manifests/p9_identifiability_and_causal_transformer_real_bags.json`
+Rectified for Follow-up Review F1 (`p9_no_alarm_still_perfect_recall`) & Item 3:
+  1. Event detection recall, false-alarm count, onset localization MAE, and leaked frames are driven
+     100% by the model's own online alarm output (`is_model_alarm`), NEVER by `g_act` or `g_age` truth!
+     If `step_inference` never triggers an alarm (e.g., stubbed to `active_prob=0.0, UNKNOWN`),
+     `detected_events == 0` and `event_detection_recall == 0.0`.
+  2. Multi-cause routing accuracy requires the model's predicted active types at alarm to match the
+     true fault type without spurious extra fault labels.
+  3. Proposition 2 reports the actual scan-derived eigenvalues and nuisance-projected identifiability
+     without hardcoded boolean claim flags.
 """
 
 from __future__ import annotations
@@ -123,7 +128,7 @@ def evaluate_proposition2_on_real_bags() -> dict:
     from `hall_01` (large hall), `room_02` (compact room), and `hall_02` (held-out test hall) across 4 regimes:
       (A) Full 3D multi-wall scan (Clean)
       (B) 88% occluded narrow single-wall sector (after stripping plastic bag)
-      (C) Directional long-corridor blindness (|x| >= 0.65m longitudinal walls removed)
+      (C) Directional long-corridor blindness (points lacking longitudinal x-normal component)
       (D) Co-moving planar plastic-bag sheet normal shift (s_sheet = n_i^T n_bag)
     """
     bag_normal = np.array([1.0, 0.15, 0.05], dtype=np.float64)
@@ -136,7 +141,7 @@ def evaluate_proposition2_on_real_bags() -> dict:
         ("hall_02", "/home/R26534/M2DGR/extracted/hall_02_fl.bag"),
     ]:
         scans = load_real_scans_xyzi(bag_path, max_scans=12, step=25)
-        i_full_scale, i_narrow_scale, i_corr_long, i_sheet_shift = [], [], [], []
+        i_full_scale, i_narrow_scale, i_corr_scale, i_sheet_shift = [], [], [], []
         min_eig_full, min_eig_narrow, min_eig_corr = [], [], []
 
         for idx, (_, xyzi) in enumerate(scans):
@@ -157,13 +162,14 @@ def evaluate_proposition2_on_real_bags() -> dict:
                 i_narrow_scale.append(id_nar)
                 min_eig_narrow.append(float(np.min(np.linalg.eigvalsh(H_nar[:, 3:].T @ H_nar[:, 3:]))))
 
-            # Regime C: Directional corridor blindness (|x| < 0.65m parallel side walls only)
-            corr_mask = np.abs(xyzi[:, 0]) < 0.65
-            corr_xyzi = xyzi[corr_mask]
-            if len(corr_xyzi) > 40:
-                H_cor, _, s_pl_cor, _ = compute_point_to_plane_jacobian_and_distortions(corr_xyzi)
-                id_cor, _ = compute_nuisance_projected_identifiability(H_cor, s_pl_cor)
-                i_corr_long.append(id_cor)
+            # Regime C: Directional corridor blindness (points whose surface normals lack longitudinal x-component)
+            H_cor_all, s_sc_all, _, _ = compute_point_to_plane_jacobian_and_distortions(xyzi)
+            side_wall_mask = np.abs(H_cor_all[:, 3]) < 0.18
+            if int(np.sum(side_wall_mask)) > 20:
+                H_cor = H_cor_all[side_wall_mask]
+                s_sc_cor = s_sc_all[side_wall_mask]
+                id_cor, _ = compute_nuisance_projected_identifiability(H_cor, s_sc_cor)
+                i_corr_scale.append(id_cor)
                 min_eig_corr.append(float(np.min(np.linalg.eigvalsh(H_cor[:, 3:].T @ H_cor[:, 3:]))))
 
             # Regime D: Co-moving near-field plastic-bag sheet normal shift (s_sheet = H[:, 3:] @ bag_normal)
@@ -180,22 +186,18 @@ def evaluate_proposition2_on_real_bags() -> dict:
                 "identifiability_I_perp_mean": round(float(np.mean(i_full_scale)), 4),
                 "identifiability_I_perp_std": round(float(np.std(i_full_scale)), 4),
                 "trans_gram_min_eig": round(float(np.mean(min_eig_full)), 2),
-                "single_modality_identifiable": True,
             },
             "Narrow_12pct_Unoccluded_Sector_After_Bag_Strip": {
                 "identifiability_I_perp_mean": round(float(np.mean(i_narrow_scale)), 4),
                 "trans_gram_min_eig": round(float(np.mean(min_eig_narrow)), 2),
-                "single_modality_scale_identifiable": False,
             },
             "Corridor_Longitudinal_Blindness": {
-                "identifiability_I_perp_mean": round(float(np.mean(i_corr_long)), 4),
+                "identifiability_I_perp_mean": round(float(np.mean(i_corr_scale)), 4),
                 "trans_gram_min_eig": round(float(np.mean(min_eig_corr)), 2),
-                "longitudinal_observability_collapsed": True,
             },
             "PlasticBag_Single_Planar_Sheet_Collinearity": {
                 "identifiability_I_perp_mean": round(float(np.mean(i_sheet_shift)), 4),
-                "collinear_with_6dof_pose": True,
-                "theorem_verified": "I_perp = 0.0000 proves planar sheet shift is 100% absorbed into rigid translation without innovation/cross-modal check",
+                "algebraic_collinearity_sanity_check": "s_sheet in span(H[:, 3:]) => I_perp = 0.0000",
             },
         }
     return results
@@ -220,7 +222,7 @@ def build_real_bag_window_stream(
     gt_active = np.zeros(len(scans), dtype=bool)
     gt_age_sec = np.zeros(len(scans), dtype=np.float64)
 
-    t0 = scans[0][0]
+    t0 = scans[0][0] if len(scans) > 0 else 0.0
     for i, (_, xyzi) in enumerate(scans):
         in_fault = onset_idx <= i <= end_idx
         gt_active[i] = in_fault
@@ -237,7 +239,6 @@ def build_real_bag_window_stream(
                     xyzi, occluded_azimuth_fraction=0.88 * alpha, bag_distance_m=4.30, seed=seed + i
                 )
             elif fault_type == DegeneracyType.GEO_DEGEN:
-                # Retain parallel side walls/floor while progressively attenuating longitudinal end-wall x-Variation
                 cur_xyzi = xyzi.copy()
                 cur_xyzi[:, 0] = cur_xyzi[:, 0] * (1.0 - 0.85 * alpha)
             else:
@@ -247,17 +248,20 @@ def build_real_bag_window_stream(
         cells_list.append(cells_48)
 
         H, _, _, _ = compute_point_to_plane_jacobian_and_distortions(cur_xyzi, max_pts=400)
-        gram_t = H[:, 3:].T @ H[:, 3:] / max(len(H), 1) * 180.0
-        gram_r = H[:, :3].T @ H[:, :3] / max(len(H), 1) * 15.0
+        gram_t = H[:, 3:].T @ H[:, 3:] / max(len(H), 1) * 280.0
+        gram_r = H[:, :3].T @ H[:, :3] / max(len(H), 1) * 25.0
         if fault_type == DegeneracyType.GEO_DEGEN and in_fault:
-            # Progressive corridor longitudinal conditioning loss directly on the Gram matrix x-axis
-            scale_x = np.diag([max(0.12, 1.0 - 0.92 * alpha), 1.0, 1.0])
+            scale_x = np.diag([max(0.08, 1.0 - 0.94 * alpha), 1.0, 1.0])
             gram_t = scale_x @ gram_t @ scale_x
         min_eig_t = float(max(0.2, np.min(np.linalg.eigvalsh(gram_t))))
         min_eig_r = float(max(1.0, np.min(np.linalg.eigvalsh(gram_r))))
 
         ranges_cur = np.linalg.norm(cur_xyzi[:, :3], axis=1)
-        nf_ratio = float(np.mean((ranges_cur > 0.5) & (ranges_cur < 4.55))) if len(ranges_cur) > 0 else 0.04
+        # Measure incremental near-field occluder excess relative to baseline scan geometry
+        ranges_base = np.linalg.norm(xyzi[:, :3], axis=1)
+        nf_base = float(np.mean((ranges_base > 0.5) & (ranges_base < 4.55))) if len(ranges_base) > 0 else 0.04
+        nf_cur = float(np.mean((ranges_cur > 0.5) & (ranges_cur < 4.55))) if len(ranges_cur) > 0 else 0.04
+        nf_ratio = max(0.02, nf_cur - nf_base + 0.04)
 
         nis_mean = 1.05 + rng.normal(0.0, 0.05)
         loso_p = 0.45 + rng.normal(0.0, 0.04)
@@ -311,6 +315,12 @@ def evaluate_cross_sequence_causal_transformer() -> dict:
     Part 2: Train `PhysicsGuidedCausalTransformer` strictly on `hall_01` (development bag, with 48-Cell
     spherical tensors included), freeze its weights (recording SHA-256), and evaluate zero-tuning
     generalization on unseen real M2DGR bags: `hall_02`, `room_02`, and `room_dark_01`.
+
+    Rectified for Follow-up Review F1 (`p9_no_alarm_still_perfect_recall`):
+      - Alarm triggering is 100% determined by the model's own online output (`is_model_alarm`),
+        NEVER by `g_act` or `g_age` ground truth!
+      - If a model never alarms (e.g., stubbed to `active_prob=0.0, UNKNOWN`), `detected_events == 0`
+        and `event_detection_recall == 0.0`.
     """
     dev_scans = load_real_scans_xyzi(
         "/home/R26534/M2DGR/extracted/hall_01_fl.bag", max_scans=40, step=20
@@ -328,50 +338,7 @@ def evaluate_cross_sequence_causal_transformer() -> dict:
             train_types.append(f_type)
 
     model = PhysicsGuidedCausalTransformer(seed=42)
-    # Fit using both HealthWindows and 48-Cell Spherical tensors on hall_01
-    X_all, y_act_all, y_age_bin_all, y_cause_all = [], [], [], []
-    for wins, c_seq, gt_act, gt_age, gt_t in zip(
-        train_wins, train_cells, train_act, train_age, train_types
-    ):
-        reps = model.extract_sequence_representations(wins, cells_seq=c_seq)
-        for i in range(len(wins)):
-            X_all.append(reps[i])
-            act = 1.0 if gt_act[i] else 0.0
-            y_act_all.append(act)
-            age_bin = int(np.clip(np.floor(gt_age[i] / model.age_bin_width_sec), 0, model.n_age_bins - 1))
-            y_age_bin_all.append(age_bin)
-            c_vec = np.zeros(len(model.KNOWN_TYPES), dtype=np.float64)
-            if act > 0.5 and gt_t in model.KNOWN_TYPES:
-                c_vec[model.KNOWN_TYPES.index(gt_t)] = 1.0
-            y_cause_all.append(c_vec)
-
-    X = np.asarray(X_all, dtype=np.float64)
-    N, D = X.shape
-    X_aug = np.hstack([X, np.ones((N, 1))])
-    reg_I = np.eye(D + 1) * 2.0
-    reg_I[-1, -1] = 1e-4
-
-    y_act_target = np.where(np.asarray(y_act_all) > 0.5, 3.2, -3.2)
-    w_act_aug = np.linalg.solve(X_aug.T @ X_aug + reg_I, X_aug.T @ y_act_target)
-    model.W_act = w_act_aug[:-1]
-    model.b_act = float(w_act_aug[-1])
-
-    act_mask = np.asarray(y_act_all) > 0.5
-    X_act = X_aug[act_mask]
-    Y_age_onehot = np.full((int(np.sum(act_mask)), model.n_age_bins), -2.0)
-    for row_i, b_idx in enumerate(np.asarray(y_age_bin_all)[act_mask]):
-        for k in range(model.n_age_bins):
-            Y_age_onehot[row_i, k] = 4.0 * np.exp(-0.5 * ((k - b_idx) / 1.0) ** 2) - 1.5
-    W_age_aug = np.linalg.solve(X_act.T @ X_act + reg_I, X_act.T @ Y_age_onehot)
-    model.W_age = W_age_aug[:-1]
-    model.b_age = W_age_aug[-1]
-
-    Y_cause_target = np.where(np.asarray(y_cause_all)[act_mask] > 0.5, 3.5, -3.5)
-    W_c_aug = np.linalg.solve(X_act.T @ X_act + reg_I, X_act.T @ Y_cause_target)
-    model.W_cause = W_c_aug[:-1]
-    model.b_cause = W_c_aug[-1]
-    model.is_trained = True
-    weights_sha256 = model.weights_sha256()
+    weights_sha256 = model.fit(train_wins, train_act, train_age, train_types, l2_reg=2.0)
 
     unseen_bags = [
         ("hall_02_heldout_test", "/home/R26534/M2DGR/extracted/hall_02_fl.bag"),
@@ -387,7 +354,9 @@ def evaluate_cross_sequence_causal_transformer() -> dict:
 
     for seq_label, bag_path in unseen_bags:
         scans = load_real_scans_xyzi(bag_path, max_scans=40, step=15)
+        detected_events = 0
         correct_causes = 0
+        false_alarm_windows = 0
         total_events = 0
         onset_maes_rule_fixed2s = []
         onset_maes_transformer = []
@@ -400,82 +369,114 @@ def evaluate_cross_sequence_causal_transformer() -> dict:
                 scans, f_type, onset_idx=12, end_idx=34, ramp_steps=20, seed=500 + f_idx
             )
             model.reset_stream()
-            alarm_fired = False
-            pred_types_at_peak = []
+            alarm_fired_tf = False
+            alarm_fired_rule = False
+            pred_types_at_alarm = []
+
+            gt_indices = np.flatnonzero(g_act)
+            true_onset_ns = w_seq[int(gt_indices[0])].t_start_ns
+
+            def _eval_mgr_pollution_at(alarm_idx: int, est_age_s: float) -> tuple[int, float]:
+                from slam_recovery.core import BackendDelta
+                from slam_recovery.quarantine import TrustedMapTransactionManager
+
+                mgr = TrustedMapTransactionManager(confirmation_margin_ns=int(2.0 * 1e9))
+                for k_i in range(alarm_idx):
+                    wk = w_seq[k_i]
+                    mgr.step_healthy(
+                        BackendDelta(
+                            timestamp_ns=wk.t_end_ns,
+                            frame_id="map",
+                            pose_se3=np.eye(4),
+                            velocity=np.zeros(3),
+                            bias_acc=np.zeros(3),
+                            bias_gyr=np.zeros(3),
+                            cov_6x6=np.eye(6) * wk.max_eig_trans_cov,
+                            info_6x6=np.eye(6) * wk.min_eig_trans,
+                            nis_value=wk.nis_mean,
+                            nis_dof=6,
+                            factor_ids=[k_i],
+                            keyframe_id=k_i,
+                        )
+                    )
+                w_al = w_seq[alarm_idx]
+                est_onset_ns = (
+                    w_al.t_end_ns - int(est_age_s * 1e9)
+                    if est_age_s > 0.0
+                    else w_al.t_start_ns
+                )
+                mgr.trigger_quarantine(
+                    estimated_onset_ns=est_onset_ns,
+                    current_ns=w_al.t_end_ns,
+                    weak_direction_6d=w_al.weak_dir_6d,
+                    info_before_6x6=np.eye(6) * w_al.min_eig_trans,
+                    propagated_cov_norm=1.0,
+                )
+                leaked = len(set(gt_indices.tolist()).intersection(set(mgr.trusted_poses.keys())))
+                mae_s = abs(est_onset_ns - true_onset_ns) * 1e-9
+                return leaked, float(mae_s)
 
             for t_i, (w_item, c_item) in enumerate(zip(w_seq, c_seq)):
                 t_start = time.perf_counter()
                 out = model.step_inference(w_item, c_item)
                 step_latencies_us.append((time.perf_counter() - t_start) * 1e6)
 
-                # Under a 4.0s Slow-Ramp onset, conventional NIS/eigenvalue threshold crosses around 2.8s..3.2s into the ramp
-                if g_act[t_i] and not alarm_fired and g_age[t_i] >= 2.80:
-                    alarm_fired = True
-                    from slam_recovery.core import BackendDelta
-                    from slam_recovery.quarantine import TrustedMapTransactionManager
+                active_types = getattr(out.diagnosis, "active_types", [])
+                # Model's own online alarm decision (strictly independent of g_act / g_age truth!)
+                is_model_alarm = (float(out.active_prob) >= 0.55) and (
+                    len(active_types) > 0
+                ) and all(str(getattr(t, "value", t)) != "UNKNOWN" for t in active_types)
 
-                    gt_indices = np.flatnonzero(g_act)
-                    true_onset_ns = w_seq[int(gt_indices[0])].t_start_ns
+                # Rule baseline's own online alarm decision (from window observables only, no g_act / g_age!)
+                is_rule_alarm = (
+                    (float(w_item.nis_mean) >= 2.20)
+                    or (float(w_item.min_eig_trans) <= 10.0)
+                    or (float(w_item.loso_primary_conflict) >= 2.20)
+                    or (float(w_item.loso_aux_conflict) >= 2.50)
+                    or (abs(float(w_item.Cross_corr_lag_sec)) >= 0.030)
+                    or (float(w_item.loop_residual_spike) >= 2.50)
+                )
 
-                    def _eval_mgr_pollution(est_age_s: float) -> tuple[int, float]:
-                        mgr = TrustedMapTransactionManager(confirmation_margin_ns=int(2.0 * 1e9))
-                        for k_i in range(t_i):
-                            wk = w_seq[k_i]
-                            mgr.step_healthy(
-                                BackendDelta(
-                                    timestamp_ns=wk.t_end_ns,
-                                    frame_id="map",
-                                    pose_se3=np.eye(4),
-                                    velocity=np.zeros(3),
-                                    bias_acc=np.zeros(3),
-                                    bias_gyr=np.zeros(3),
-                                    cov_6x6=np.eye(6) * wk.max_eig_trans_cov,
-                                    info_6x6=np.eye(6) * wk.min_eig_trans,
-                                    nis_value=wk.nis_mean,
-                                    nis_dof=6,
-                                    factor_ids=[k_i],
-                                    keyframe_id=k_i,
-                                )
-                            )
-                        w_al = w_seq[t_i]
-                        est_onset_ns = (
-                            w_al.t_end_ns - int(est_age_s * 1e9)
-                            if est_age_s > 0.0
-                            else w_al.t_start_ns
-                        )
-                        mgr.trigger_quarantine(
-                            estimated_onset_ns=est_onset_ns,
-                            current_ns=w_al.t_end_ns,
-                            weak_direction_6d=w_al.weak_dir_6d,
-                            info_before_6x6=np.eye(6) * w_al.min_eig_trans,
-                            propagated_cov_norm=1.0,
-                        )
-                        leaked = len(set(gt_indices.tolist()).intersection(set(mgr.trusted_poses.keys())))
-                        mae_s = abs(est_onset_ns - true_onset_ns) * 1e-9
-                        return leaked, float(mae_s)
+                if not bool(g_act[t_i]):
+                    if is_model_alarm:
+                        false_alarm_windows += 1
+                    continue
 
-                    leaked_rule, _ = _eval_mgr_pollution(0.0)
-                    leaked_tf, err_tf = _eval_mgr_pollution(float(out.estimated_age_sec))
-                    err_rule = abs(float(g_age[t_i]) - 2.0)
-                    onset_maes_rule_fixed2s.append(err_rule)
-                    onset_maes_transformer.append(err_tf)
+                if is_rule_alarm and not alarm_fired_rule:
+                    alarm_fired_rule = True
+                    leaked_rule, err_rule = _eval_mgr_pollution_at(t_i, 0.0)
+                    onset_maes_rule_fixed2s.append(float(err_rule))
                     polluted_frames_rule.append(float(leaked_rule))
+
+                if is_model_alarm and not alarm_fired_tf:
+                    alarm_fired_tf = True
+                    detected_events += 1
+                    pred_types_at_alarm = list(active_types)
+                    leaked_tf, err_tf = _eval_mgr_pollution_at(t_i, float(out.estimated_age_sec))
+                    onset_maes_transformer.append(float(err_tf))
                     polluted_frames_transformer.append(float(leaked_tf))
 
-                if g_act[t_i] and g_age[t_i] >= 3.20:
-                    for pt in out.diagnosis.active_types:
-                        if pt not in pred_types_at_peak:
-                            pred_types_at_peak.append(pt)
-
             total_events += 1
-            if f_type in pred_types_at_peak:
+            if not alarm_fired_tf:
+                polluted_frames_transformer.append(float(np.sum(g_act)))
+            elif pred_types_at_alarm == [f_type]:
                 correct_causes += 1
 
+            if not alarm_fired_rule:
+                polluted_frames_rule.append(float(np.sum(g_act)))
+
         transfer_summary["sequences"][seq_label] = {
-            "event_detection_recall": 1.0,
-            "multi_cause_routing_accuracy": round(correct_causes / float(total_events), 4),
-            "slow_ramp_4s_onset_mae_rule_fixed2s_sec": round(float(np.mean(onset_maes_rule_fixed2s)), 4),
-            "slow_ramp_4s_onset_mae_causal_transformer_sec": round(float(np.mean(onset_maes_transformer)), 4),
+            "event_detection_recall": round(detected_events / float(max(total_events, 1)), 4),
+            "detected_events": int(detected_events),
+            "total_events": int(total_events),
+            "false_alarm_windows_on_nominal": int(false_alarm_windows),
+            "multi_cause_routing_accuracy": round(correct_causes / float(max(total_events, 1)), 4),
+            "slow_ramp_4s_onset_mae_rule_fixed2s_sec": (
+                round(float(np.mean(onset_maes_rule_fixed2s)), 4) if onset_maes_rule_fixed2s else None
+            ),
+            "slow_ramp_4s_onset_mae_causal_transformer_sec": (
+                round(float(np.mean(onset_maes_transformer)), 4) if onset_maes_transformer else None
+            ),
             "slow_ramp_leaked_frames_rule_fixed2s": round(float(np.mean(polluted_frames_rule)), 2),
             "slow_ramp_leaked_frames_causal_transformer": round(float(np.mean(polluted_frames_transformer)), 2),
             "step_inference_p50_us": round(float(np.percentile(step_latencies_us, 50)), 2),
@@ -495,7 +496,6 @@ def benchmark_spatial_mutation_log_on_real_voxels() -> dict:
     )
     voxel_size = 0.20  # 20cm world voxel map
 
-    # Populate global persistent voxel map across 110 scans of trajectory motion (translating along hall)
     base_store = {}
     for s_idx, (_, xyzi) in enumerate(scans[:110]):
         offset = np.array([s_idx * 0.45, (s_idx % 10) * 0.15, 0.0])
@@ -511,12 +511,10 @@ def benchmark_spatial_mutation_log_on_real_voxels() -> dict:
 
     total_map_voxels = len(base_store)
 
-    # 1. Measure Full-Map Deep Copy Snapshot latency O(|M|)
     t0 = time.perf_counter()
     _ = deepcopy(base_store)
     full_copy_ms = (time.perf_counter() - t0) * 1e3
 
-    # 2. Measure `SpatialMutationLog` Copy-on-Write over a 2.0s quarantine window (10 scans: 110..120)
     mut_log = SpatialMutationLog(map_store=base_store)
     mut_log.begin_generation()
 
@@ -553,6 +551,7 @@ def benchmark_spatial_mutation_log_on_real_voxels() -> dict:
     consume_redo_ms = (time.perf_counter() - t_restore) * 1e3
 
     return {
+        "scope_note": "Microbenchmark comparing O(|M|) full-dict deepcopy vs O(|Dirty Set|) rollback on a 10-scan window",
         "total_persistent_map_voxels_20cm": total_map_voxels,
         "quarantined_window_dirty_voxels": dirty_voxels,
         "dirty_fraction_of_global_map": round(dirty_voxels / float(max(total_map_voxels, 1)), 4),
@@ -602,15 +601,17 @@ def main() -> None:
         print(
             f"   [{seq}] Full 3D I_perp={d['Full_3D_MultiWall_Clean']['identifiability_I_perp_mean']:.4f} | "
             f"Narrow 12% Sector I_perp={d['Narrow_12pct_Unoccluded_Sector_After_Bag_Strip']['identifiability_I_perp_mean']:.4f} | "
-            f"Corridor Blindness I_perp={d['Corridor_Longitudinal_Blindness']['identifiability_I_perp_mean']:.4f} | "
+            f"Corridor Blindness I_perp={d['Corridor_Longitudinal_Blindness']['identifiability_I_perp_mean']:.4f} "
+            f"(min_eig_t={d['Corridor_Longitudinal_Blindness']['trans_gram_min_eig']}) | "
             f"Planar Bag Sheet Shift I_perp={d['PlasticBag_Single_Planar_Sheet_Collinearity']['identifiability_I_perp_mean']:.4f}"
         )
 
     print(f"\n2. Zero-Tuning Cross-Sequence Causal Transformer (Frozen Dev SHA256={tf_res['frozen_weights_sha256'][:16]}...):")
     for seq, d in tf_res["sequences"].items():
         print(
-            f"   [{seq:26s}] Recall={d['event_detection_recall']:.3f}, CauseAcc={d['multi_cause_routing_accuracy']:.3f} | "
-            f"Slow-Ramp Onset MAE: Rule(2s)={d['slow_ramp_4s_onset_mae_rule_fixed2s_sec']:.3f}s -> Transformer={d['slow_ramp_4s_onset_mae_causal_transformer_sec']:.3f}s | "
+            f"   [{seq:26s}] Recall={d['event_detection_recall']:.3f} ({d['detected_events']}/{d['total_events']}, FP={d['false_alarm_windows_on_nominal']}), "
+            f"CauseAcc={d['multi_cause_routing_accuracy']:.3f} | "
+            f"Slow-Ramp Onset MAE: Rule(2s)={d['slow_ramp_4s_onset_mae_rule_fixed2s_sec']}s -> Transformer={d['slow_ramp_4s_onset_mae_causal_transformer_sec']}s | "
             f"Leaked Frames: {d['slow_ramp_leaked_frames_rule_fixed2s']:.2f} -> {d['slow_ramp_leaked_frames_causal_transformer']:.2f} | "
             f"Latency P50={d['step_inference_p50_us']:.1f}us"
         )
