@@ -1,0 +1,29 @@
+newmtl Mat_Floor
+Kd 0.820 0.840 0.860
+Ns 30.0
+
+newmtl Mat_Trusted_Wall
+Kd 0.320 0.680 0.860
+Ns 58.0
+
+newmtl Mat_B0_Polluted
+Kd 0.920 0.280 0.220
+Ns 60.0
+d 0.550
+
+newmtl Mat_B2_Drift
+Kd 0.930 0.680 0.160
+Ns 55.0
+d 0.600
+
+newmtl Mat_GT
+Kd 0.120 0.130 0.150
+Ns 65.0
+
+newmtl Mat_Commit
+Kd 0.100 0.620 0.780
+Ns 70.0
+
+newmtl Mat_Checkpoint
+Kd 0.140 0.710 0.420
+Ns 70.0

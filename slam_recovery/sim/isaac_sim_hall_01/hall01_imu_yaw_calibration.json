@@ -1,0 +1,24 @@
+{
+  "cell_m": 0.25,
+  "wall_band_z": [
+    0.15,
+    1.5
+  ],
+  "num_scans": 101,
+  "num_imu_samples": 10133,
+  "candidates": {
+    "sign_1": {
+      "theta0_deg": 99.1,
+      "occupied_25cm_cells": 10927
+    },
+    "sign_-1": {
+      "theta0_deg": 177.6,
+      "occupied_25cm_cells": 16455
+    }
+  },
+  "best": {
+    "sign": 1.0,
+    "theta0_deg": 99.1,
+    "occupied_25cm_cells": 10927
+  }
+}

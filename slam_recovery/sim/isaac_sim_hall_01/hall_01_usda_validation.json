@@ -1,0 +1,72 @@
+{
+  "file": "D:\\REPAIR\\isaac_sim_hall_01\\hall_01_isaac_scene.usda",
+  "bytes": 7726962,
+  "delimiters_ok": true,
+  "delimiter_problems": [],
+  "materials_declared": [
+    "Mat_B0_Polluted",
+    "Mat_B2_Drift",
+    "Mat_Checkpoint",
+    "Mat_Commit",
+    "Mat_Floor",
+    "Mat_GT",
+    "Mat_Trusted_Wall"
+  ],
+  "materials_bound": [
+    "Mat_B0_Polluted",
+    "Mat_B2_Drift",
+    "Mat_Checkpoint",
+    "Mat_Commit",
+    "Mat_Floor",
+    "Mat_GT",
+    "Mat_Trusted_Wall"
+  ],
+  "dangling_material_bindings": [],
+  "mesh_issues": [],
+  "meshes": [
+    {
+      "name": "Floor",
+      "vertices": 36772,
+      "triangles": 76076,
+      "collider": true
+    },
+    {
+      "name": "Walls_And_Pillars",
+      "vertices": 57619,
+      "triangles": 121168,
+      "collider": true
+    },
+    {
+      "name": "Floor_Ghost",
+      "vertices": 4924,
+      "triangles": 9384,
+      "collider": false
+    },
+    {
+      "name": "Wall_Ghost_And_Occluder",
+      "vertices": 3671,
+      "triangles": 6624,
+      "collider": false
+    },
+    {
+      "name": "Wall_Ghost_TailDrift",
+      "vertices": 2268,
+      "triangles": 3704,
+      "collider": false
+    }
+  ],
+  "collider_meshes": [
+    "Floor",
+    "Walls_And_Pillars"
+  ],
+  "robots": {
+    "Robot_Leica_GT": 127,
+    "Robot_B0_Degraded": 127,
+    "Robot_B2_MMLINS": 127,
+    "Robot_B6_Ours": 127
+  },
+  "has_physics_scene": true,
+  "has_collider": true,
+  "has_basis_curves": true,
+  "ok": true
+}

@@ -1,0 +1,13 @@
+{
+  "trusted_wall_cells": 21032,
+  "trusted_floor_cells": 15314,
+  "b0_ghost_cells": 652,
+  "b2_ghost_cells": 334,
+  "triangles_total": 216956,
+  "source_bag": "hall_01.bag",
+  "source_mcap": "hall_01_plasticbag_comparison.mcap",
+  "attitude_source": "IMU AHRS yaw (/handsfree/imu) + calibrated constant offset",
+  "theta0_deg": 99.1,
+  "imu_dt": -0.1,
+  "num_scans": 118
+}

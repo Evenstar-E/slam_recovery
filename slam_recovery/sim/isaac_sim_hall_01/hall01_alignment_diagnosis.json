@@ -1,0 +1,20 @@
+{
+  "theta0_deg": 99.1,
+  "sign": 1.0,
+  "occupied_cells_tangent": 16524,
+  "occupied_cells_imu": 10927,
+  "relative_improvement_pct": 33.87,
+  "time_offset_sweep_s": {
+    "-0.20": 11037,
+    "-0.15": 10797,
+    "-0.10": 10637,
+    "-0.05": 10774,
+    "-0.00": 10927,
+    "+0.05": 11335,
+    "+0.10": 11706,
+    "+0.15": 11992,
+    "+0.20": 12202
+  },
+  "best_time_offset_s": -0.1,
+  "figure": "D:\\REPAIR\\isaac_sim_hall_01\\hall_01_alignment_diagnosis.png"
+}
