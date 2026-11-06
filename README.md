@@ -90,3 +90,4 @@ pdflatex -interaction=nonstopmode paper_main.tex
 - **[docs/review_20261105_followup/README.md](docs/review_20261105_followup/README.md)**: Follow-up review of `23fbe6d`: 17 upstream tests pass, but nine bounded probes reproduce remaining correctness and evaluation issues. Includes source-pinned findings and reproduction evidence.
 - **[Review of `a14bc1c`](docs/review_20261106_a14bc1c/README.md)**: Architecture and paper-figure provenance, transaction boundary probes, and verified fixes following `8a2a541`.
 - **[Review of `357c473`](docs/review_20261106_357c473/README.md)**: Fifth-host experiment controls, ablation gate definitions, metric denominators, and held-out site selection.
+- **[投稿前修复与验收建议](docs/review_20261106_357c473/repair_plan.md)**：候选缺证据、回滚至空地图、独立验证和单宿主四组对照。
