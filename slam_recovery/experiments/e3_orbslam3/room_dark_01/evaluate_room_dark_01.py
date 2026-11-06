@@ -376,8 +376,8 @@ def main() -> None:
         "all_submaps_rpe_rmse_m": round(m_b2_all.rpe_trans_rmse_m, 4),
         "active_map3_only_ate_rmse_m": round(m_b2_act.ate_rmse_m, 4),
         "holdout_nis_unrepaired": round(b2_holdout_nis, 4),
-        "recovery_ratio_G_vs_B0_full": round(
-            compute_recovery_ratio_G(m_b0_full.ate_rmse_m, m_b2_all.ate_rmse_m, orb_clean_ref_ate_m), 4
+        "recovery_ratio_G_vs_B0_full": round_or_none(
+            compute_recovery_ratio_G(m_b0_full.ate_rmse_m, m_b2_all.ate_rmse_m, orb_clean_ref_ate_m)
         ),
         "trusted_map_pollution_ratio": 0.248,
     }

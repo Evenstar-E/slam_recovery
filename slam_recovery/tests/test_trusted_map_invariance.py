@@ -48,6 +48,24 @@ class TestTrustedMapInvariance(unittest.TestCase):
         )
         self.assertLess(G_bad_pgo, -1.0)
 
+    def test_recovery_ratio_G_is_undefined_rather_than_zero(self) -> None:
+        """
+        A zero or inverted denominator means there is no recovery to normalise. Returning 0.0
+        there (the previous behaviour) is indistinguishable from a measured "no improvement";
+        ORB-SLAM3 under a LiDAR-only injection is exactly that case.
+        """
+        from slam_recovery.experiments.evaluation import round_or_none
+
+        # E_degraded == E_clean -> denominator zero
+        self.assertIsNone(compute_recovery_ratio_G(0.9513, 0.5599, 0.9513))
+        # E_clean worse than E_degraded -> negative denominator, sign-flipped ratio
+        self.assertIsNone(compute_recovery_ratio_G(0.7614, 0.5599, 0.9513))
+        # A genuine negative ratio must still be reported
+        self.assertAlmostEqual(compute_recovery_ratio_G(1.7124, 2.1120, 0.5076), -0.3317, places=4)
+        # Manifest emission must survive the undefined case instead of raising
+        self.assertIsNone(round_or_none(None))
+        self.assertEqual(round_or_none(0.123456), 0.1235)
+
 
 if __name__ == "__main__":
     unittest.main()
