@@ -1,5 +1,7 @@
 # IEEE Transactions Manuscript Submission Package
 
+For the anonymous RSS 2027 extended abstract, use the [conference PDF](../paper_rss2027_stage1/paper_main.pdf) or [conference source](../paper_rss2027_stage1/paper_main.tex). The [author review notes](../paper_rss2027_stage1/REVISION_NOTES.md) trace the changes to the experiments and list the outstanding comparison.
+
 ## Contents
 - `paper_main.tex`: Main IEEE Transactions two-column LaTeX manuscript (zero overfull `\hbox`, width-locked tables, figure paths normalized to `figures/`).
 - `references.bib`: Complete BibTeX bibliography database (17 entries).

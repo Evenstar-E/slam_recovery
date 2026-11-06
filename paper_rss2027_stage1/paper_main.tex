@@ -1,0 +1,131 @@
+\documentclass[conference]{IEEEtran}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={When Should SLAM Resume Map Updates After Occlusion?},pdfauthor={},pdfsubject={},pdfkeywords={}}
+\newcommand{\roomseq}{\texttt{room\_dark\_02}}
+\newcommand{\streetseq}{\texttt{street\_08}}
+\begin{document}
+\title{When Should SLAM Resume Map Updates After Occlusion?}
+\author{Author Names Omitted for Anonymous Review}
+\maketitle
+\begin{abstract}
+A robot can regain enough measurements to track its motion while still lacking evidence to rewrite the map it built during an occlusion. We study the decision to admit a proposed repair. A keyframe-level transaction retains a trusted map, evaluates a candidate against the incumbent on paired observations, and permits a write only when the candidate also constrains the weak pose direction and rejoins the trajectory continuously. In a controlled mesh experiment, withholding writes alone and admitting verified repairs both reduce the fraction of off-surface occupied voxels from 43.25\% to zero. Thus this result establishes containment but leaves the added value of readmission unresolved. On a recorded dark-room sequence with injected LiDAR occlusion, post-occlusion translation error falls from 2.202 to 2.019\,m for one host, rises from 1.712 to 2.112\,m for another, and a third lacks an anchor for repair. An outdoor candidate passes the continuity test yet fails both geometric checks. These cases identify when a plausible repair should remain private and which comparison is still required to establish a mapping benefit.
+\end{abstract}
+\IEEEpeerreviewmaketitle
+
+\section{The decision after tracking resumes}
+Consider a robot that passes behind a near-field obstruction. Several scans now describe the obstruction more densely than the room. An estimator can explain some of these returns by moving the sensor; subsequent scans may then align with surfaces written from that displaced pose. Removing the obstruction gives the robot new observations. It does not establish that the intervening poses or surfaces are correct. At re-entry the system must answer a narrower question: is there enough evidence to replace a specific segment of the map?
+
+Robust registration and directional updates address poor conditioning within an estimate \cite{zhang2016degeneracy,tuna2024xicp}. Multi-map odometry can retain alternate map references \cite{ma2025mmlins}; switchable constraints can suppress inconsistent pose-graph edges \cite{sunderhauf2012switchable}. BundleFusion reintegrates surfaces after optimizing historical camera poses \cite{dai2017bundlefusion}. Thus the ability to revise a surface is established. The open decision in a degraded interval is whether the replacement is better supported than what the robot already holds. Here we separate constructing an alternative estimate from granting that estimate permission to change stored geometry. A candidate can reduce its own residuals, rejoin the trajectory near its last trusted pose, and still place a surface on the wrong side of a corridor.
+
+We implement this separation at the keyframe and voxel interface. The method preserves the map available before the suspect segment, compares a repair with the unrepaired estimate, and can continue withholding affected writes after a candidate becomes available. We investigate two questions. Does delaying writes prevent contamination? Once that protection is in place, what evidence supports admitting a repair? The first question requires a map reference. The second additionally requires a comparison against a map that remained protected for the same interval. Treating those baselines separately changes the interpretation of our strongest result.
+
+\section{A write decision for a quarantined segment}
+\subsection{What each branch may change}
+The manager retains a trusted anchor and tags the pose and voxel changes associated with each keyframe. A two-second write delay allows the manager to revoke contributions back to the estimated onset minus a margin when detection arrives late. During quarantine, suspect observations may be used to build a private candidate; a downstream consumer can continue to use the trusted map. A candidate consists of a proposed segment, its pose information and covariance, and measurements taken during validation. The incumbent is the segment available without adopting that candidate. An accepted transaction replaces the affected keyframe-level contributions. Refusing a candidate leaves it private. If propagated uncertainty grows too large, the manager splits the segment rather than connecting it to the trusted map. Figure~\ref{fig:boundary} shows where the decision takes effect.
+
+\begin{figure}[t]
+\centering
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{.43\columnwidth}@{\hspace{.04\columnwidth}}>{\raggedright\arraybackslash}p{.43\columnwidth}@{}}
+\toprule
+\textbf{Trusted map} & \textbf{Private segment}\\
+\midrule
+Retain anchor and keyframe edits. & Fit a candidate from returns or auxiliary motion.\\[3pt]
+\multicolumn{2}{@{}c@{}}{$\downarrow$\quad Compare both estimates on paired scans.\quad$\downarrow$}\\[3pt]
+\textbf{Wait or split} if a check fails or evidence is missing. & \textbf{Admit} if geometry, paired benefit and boundary tests pass.\\
+\bottomrule
+\end{tabular}
+\caption{The decision controls writes to the trusted map. The availability of a private trajectory alone grants no permission to replace a segment.}
+\label{fig:boundary}
+\end{figure}
+
+The boundary matters in two concrete cases. If the first usable keyframe comes after the affected interval, there is no pre-occlusion anchor for the bridge. If revocation removes the last trusted keyframe, the reference point set must also become empty. A cached cloud from that keyframe would allow a withdrawn observation to validate its own replacement. The implementation checks both cases at the transaction boundary. Its rollback covers the represented poses, factors and voxel edits; each host's internal filter or smoothing state has a separate lifetime.
+
+\subsection{Geometric evidence for a repair}
+Let $v$ be the unit weak direction in the local six-dimensional pose coordinates used for comparing the incumbent and candidate. For their information matrices $\Lambda_0$ and $\Lambda_c$, measure
+\begin{equation}
+ J_0=v^\top\Lambda_0 v,\qquad J_c=v^\top\Lambda_c v.
+ \label{eq:info}
+\end{equation}
+With a frozen linearization, fixed correspondences and positive semidefinite measurement information, removing or downweighting observations cannot increase this directional information: the reduction in $J$ is a sum of nonnegative squared directional Jacobians. A candidate may gain information from a later revisit or a supporting sensor. Changing correspondences or changing the linearization can also change Eq.~\eqref{eq:info}. An increase is therefore a reason to test a candidate, not proof that the geometry is correct.
+
+In the controlled evaluator, every fifth scan is a query. The trusted map and the remaining scans provide the reference surfaces. Point-to-plane residuals under the proposed poses give a cross-scan check. Both estimates share that reference, which can itself be distorted. Write $D_c$ for the normalized holdout residual score and $P_c$ for the candidate's pose covariance. In the current implementation the absolute checks require $J_c\geq25$, $J_c>J_0$, $D_c\leq2.5$ and $\lVert P_c\rVert_2\leq0.50$. These are operating thresholds in the implementation's pose coordinates; changing translation or rotation units would require revisiting them. A small jump at the boundary cannot substitute for a missing direction of support.
+
+For paired scan comparisons, let $k$ of $n$ frames favor the candidate under the evaluator's improvement criterion. The validator uses the one-sided Wilson lower bound $L(k,n)$ for that fraction and measures the translation jump $d$ at re-entry. The current node requires four or more paired frames for candidates touching fewer than eight keyframes, and at least eight paired frames for larger candidates. Unanimous improvement gives lower bounds of 0.596 and 0.747 at the respective minima. A write also requires an affirmative paired decision, $L(k,n)\geq0.55$ and $d\leq0.50$\,m. Missing or nonfinite evidence leads to waiting or splitting. Neighboring scans share surfaces and motion, so the Wilson score is an operating statistic; its nominal binomial interpretation does not give a calibrated probability that a map write is safe.
+
+\section{Experiments and evidence}
+The controlled experiment scores occupied voxels against a known mesh. For recordings we use M2DGR \cite{yin2022m2dgr} and distinguish outputs emitted by host binaries from trajectories constructed afterwards. FAST-LIO2 registers points directly against its map \cite{xu2022fastlio2}; LIO-SAM maintains a smoothing graph \cite{shan2020liosam}; MM-LINS has its own triggers and keyframe output \cite{ma2025mmlins}. Consequently, identical input time spans can yield different output intervals or no anchor. The injected obstruction places synthetic near-field returns into a fraction of each affected scan. It tests a point-cloud fault model; it does not reproduce the transmission or scattering physics of a particular material.
+
+\subsection{Containment has a measurable effect}
+In a five-seed controlled mesh benchmark, a 0.1\,m occupied voxel is counted as contaminated when its distance from the mesh exceeds 0.15\,m. With unrestricted writes, 43.25\% of occupied voxels are contaminated. Quarantining writes with a two-second delay yields 0\%. Quarantine followed by verified admission also yields 0\%; immediate unvalidated single-modality admission yields 35.35\%. The quarantine-only map comes from the no-revisit branch, while the verified map comes from the delayed-revisit branch. These two zeroes therefore do not constitute a matched comparison of admission policies. The denominator is the set of occupied voxels in each output. The scorer also returns zero for an empty map. The summary gives no voxel counts or coverage, so either zero leaves the retained surface extent unknown. The recorded statistic establishes protection against off-surface writes on this benchmark; it leaves the incremental coverage from admission unknown.
+
+The controlled scenarios distinguish several reasons for the write decision (Table~\ref{tab:gate}). In the narrow-field case the paired criterion passes: the candidate improves on a poor incumbent. Absolute information and residual tests still fail. In the revisit case new geometry constrains the weak direction; the reported paired diagnostic favors the candidate in 20 of 20 frames and the re-entry jump is 7.4\,mm. These are outcomes of a controlled scenario. They do not estimate the field frequency of safe or unsafe writes.
+
+\begin{table}[t]
+\centering
+\caption{Controlled occlusions. $J_c$ measures information along the original weak direction; smaller $D_c$ indicates closer agreement.}
+\label{tab:gate}
+\begin{tabular}{@{}lrrll@{}}
+\toprule
+Available evidence & $J_c$ & $D_c$ & Paired & Action\\
+\midrule
+Both views blind & 0.78 & 5.253 & Fail & Wait\\
+Narrow field of view & 20.51 & 2.522 & Pass & Wait\\
+Delayed revisit & 87.87 & 1.409 & Pass & Admit\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{A recorded occlusion produces three different outcomes}
+On \roomseq{}, the camera operates in natural darkness throughout. We alter only the LiDAR stream, with 88\% occlusion from 15 to 35\,s. The three LiDAR hosts and their variants all emit poses during 36.272--48.897\,s. Table~\ref{tab:room} uses that shared \emph{post-occlusion} interval. It does not measure the unobserved trajectory during the occlusion. Pose sampling rates still differ. The evaluator fits a rigid transform on each host's clean reference and shares it across conditions; MM-LINS uses its LiDAR front end's clean frame. The archived results describe a different, per-run prefix alignment. We retain the archived values and treat their exact alignment provenance as unresolved. The comparison is within each host, with columns identifying the measurement stream and offline construction.
+
+\begin{table}[t]
+\centering
+\caption{Post-occlusion translational RMSE (m) against motion capture on \roomseq{}. A dash denotes a missing candidate.}
+\label{tab:room}
+\begin{tabular}{@{}lrrrl@{}}
+\toprule
+Host & Clean & Fault & Bridge & Outcome\\
+\midrule
+FAST-LIO2 & 0.105 & 2.202 & 2.019 & Partial gain\\
+MM-LINS   & 0.083 & 2.281 & ---   & No anchor\\
+LIO-SAM   & 0.508 & 1.712 & 2.112 & Worse\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For FAST-LIO2 the offline bridge recovers 0.184\,m of a 2.097\,m fault-induced increase. The point-filtered trajectory alone measures 2.039\,m on that interval. For MM-LINS, the degraded keyframe stream begins at 34.57\,s. The bridge cannot initialize from a trusted keyframe before the incident. The software returns the original output, but including that number as a measured repair would obscure the missing opportunity. For LIO-SAM the constructed trajectory increases error by 0.400\,m. The three outcomes motivate separate accounting for candidate availability, candidate quality and actual admission.
+
+The unchanged camera stream is a further control. An offline bridge can fill missing visual poses with relative motion from the healthy LiDAR recording. On this sequence that construction supplies a position at each requested frame. The completion of those positions says nothing about whether an ORB-SLAM3 tracker \cite{campos2021orbslam3} reacquired visual features. We accordingly exclude this branch from the LiDAR table and from estimates of recovered visual tracking.
+
+\subsection{A smooth join can still carry a bad trajectory}
+On \streetseq{}, a 130\,s recording, the same nominal occlusion fraction is injected during 50--70\,s. For LIO-SAM the degraded output has 333.29\,m translational RMSE and the proposed offline bridge has 337.06\,m. Its measured re-entry jump of 0.404\,m passes the 0.50\,m limit. Its cross-scan score of 4.415 exceeds 2.5 and its paired lower bound of 0.463 falls below 0.55. The decision is to wait. A rule that relied on continuity alone would miss both of those failures. This replay documents one refusal of a harmful candidate. The errors concern the full evaluated trajectory, while the jump concerns a single boundary.
+
+Filtering can also help before the write decision is reached. On the outdoor sequence, the recorded FAST-LIO2 runs report 1.300\,m for degraded input and 0.135\,m for the reported repair, but associate 940 and 1,207 poses respectively. A difference over unequal samples cannot isolate the effect of admitting a repair. On the indoor \texttt{hall\_01} ablation, the filtered and verified FAST-LIO2 entries both report 0.306\,m, against 7.276\,m for degraded input. Reporting the entire reduction as a benefit of validation would credit the write decision for a gain already present at its input.
+
+\section{Testing the added value of readmission}
+The evidence supports two narrower conclusions. Quarantine can prevent bad writes, and complementary checks can refuse a candidate whose first pose looks plausible. It remains open whether, starting from the same protected map, admitting verified candidates restores more correct geometry than simply continuing to withhold writes. This distinction matters operationally: a robot that never resumes mapping can achieve zero contamination in unobserved space.
+
+A decisive comparison would use four policies on identical sensor input: native mapping, quarantine alone, unconditional admission of the same candidate, and verified admission. For the three intervening policies, fix the anchor, candidate construction, data available at decision time and evaluation endpoint. Retain faults that never produce a candidate and clean intervals that trigger an unnecessary intervention. For each event report the proposed action, the executed write and the resulting geometry. Measure both the fraction of produced geometry far from the reference and the fraction of the observed reference surface covered at the same tolerance. Pair trajectory errors only on common ground-truth support, and report the size of that support. Criteria and thresholds should be fixed before a new site's results are opened.
+
+Our hypothesis makes two paired predictions. At a common endpoint, verified admission should cover more of the visible reference surface than quarantine alone while preserving its low contamination. Compared with unconditional admission, it should reduce harmful writes at the cost of declining some helpful candidates. If the first prediction fails but the second holds, the method has demonstrated a screening benefit; an advantage in map recovery would remain unproven.
+
+\paragraph{Paired map endpoints}
+For an output voxel set $M$ and independently measured surface samples $R$ within the common visible region, let $d(x,S)$ be nearest-neighbor distance to $S$. At a prespecified tolerance $\tau$, score
+\begin{align}
+ p_\tau &= |M|^{-1}\textstyle\sum_{x\in M} \mathbf{1}[d(x,R)>\tau],\\
+ c_\tau &= |R|^{-1}\textstyle\sum_{y\in R} \mathbf{1}[d(y,M)\leq\tau].
+\end{align}
+The two denominators answer different questions: how much of the map is misplaced, and how much of the visible scene the map represents. Sample $R$ at uniform spatial resolution. For an empty output with nonempty $R$, report zero coverage and undefined pollution. Report outcomes per incident and site so a long easy sequence cannot hide a harmful write.
+
+This study concerns decisions on a fixed stream of measurements. A request for another view can be exposed to a downstream robot, but the present experiments contain no autonomous choice of motion. The unresolved comparison can be made by replaying the same real recordings and using independent geometric references wherever available. Its outcome would determine whether verified readmission contributes a mapping capability beyond quarantine.
+\clearpage
+\bibliographystyle{plainnat}
+\bibliography{references}
+\end{document}
