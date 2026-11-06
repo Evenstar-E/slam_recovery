@@ -1,3 +1,4 @@
+\RequirePackage{fix-cm}
 \documentclass[journal]{IEEEtran}
 
 \usepackage{amsmath,amssymb,amsfonts,amsthm}
@@ -47,7 +48,7 @@ Two dominant paradigms attempt to address this regime. The first paradigm, \emph
 
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=\columnwidth]{slam_recovery/experiments/figures/fig1_detection_quarantine_timeline.pdf}
+    \includegraphics[width=\columnwidth]{figures/fig1_detection_quarantine_timeline.pdf}
     \caption{Timeline of our joint innovation consistency detector and $2.0\,\mathrm{s}$ delayed-commit quarantine vs.\ MM-LINS covariance-based detection on M2DGR \texttt{hall\_01} under near-field plastic-bag occlusion ($t\in[120,140]\,\mathrm{s}$). (a) Our NIS statistic immediately crosses the $\chi^2$ gate and rolls back provisional updates to a clean checkpoint at $t_{q,\mathrm{start}}=118.0\,\mathrm{s}$. (b) Because the plastic bag produces thousands of spatially self-consistent near-field planar returns, the posterior covariance eigenvalue $\lambda_{\max}(P_{tt})$ shrinks rather than inflates, remaining well below the MM-LINS hibernation threshold and resulting in zero alarms.}
     \label{fig:timeline}
 \end{figure}
@@ -61,12 +62,13 @@ However, our empirical and mathematical audit of state-of-the-art multi-map syst
 
 In this paper, we argue that persistent map updates in degraded multi-sensor SLAM should be governed by a \textbf{verifiable recovery transaction lifecycle}:
 \begin{equation}
-\footnotesize
+\resizebox{0.89\columnwidth}{!}{$
 \begin{aligned}
 \text{Checkpoint} &\to \text{Delayed-Commit Quarantine} \to \text{Signature Routing} \\
 &\to \text{Candidate Repair} \to \text{Holdout Validation} \\
 &\to \text{Atomic Commit / Soft Bridge / Submap Split.}
 \end{aligned}
+$}
 \label{eq:lifecycle}
 \end{equation}
 
@@ -145,7 +147,7 @@ Let $H \in \mathbb{R}^{M\times 6}$ denote the stacked $6$-DoF rigid-body pose Ja
 When $\mathcal{I}_\perp(s \mid H) \to 0$ (as occurs when an occluding planar sheet translates rigidly with the vehicle or when surviving background points collapse to a single wall), single-modality inner-loop parameter fitting is mathematically unidentifiable and collinear with $6$-DoF pose drift, necessitating cross-modal or multi-keyframe bridging.
 \end{proposition}
 
-\subsection{Unified Four-Mode Decision Gate $\mathcal{D}(t)$}
+\subsection{Unified Four-Mode Decision Gate \texorpdfstring{$\mathcal{D}(t)$}{D(t)}}
 Let $J_v^{\mathrm{after}} = v^\top \Lambda_{\mathrm{after}} v$ denote the target-direction information of a candidate repaired branch, $D_{\mathrm{holdout}}$ the holdout innovation statistic on measurements excluded from repair optimization, $\|P_{\mathrm{after}}\|_2$ the posterior covariance norm, and $\|P_{\mathrm{prop}}(t)\|_2$ the open-loop covariance propagated from the checkpoint at $t_{q,\mathrm{start}}$. Given thresholds $(\Delta t_{\min}, \tau_{\mathrm{info}}, \tau_{\mathrm{val}}, \Sigma_{\mathrm{tol}}, \Sigma_{\mathrm{bridge}})$, the recovery transaction manager selects one of four modes:
 \begin{equation}
 \resizebox{0.91\columnwidth}{!}{$
@@ -199,7 +201,7 @@ Raw-feature classifiers (e.g., GBDT) trained on small development splits readily
     \item \textbf{Analytical Joint Detector \& Signature Matrix (Ours-Rule):} Over $1.0\,\mathrm{s}$ windows ($0.2\,\mathrm{s}$ stride), we extract full $6$-DoF coupled and block-decoupled eigenvalues $(\lambda_{\min}^r, \lambda_{\min}^t)$ of $\Lambda_u$, CUSUM innovation $g_t = \max(0, \gamma g_{t-1} + d_t - k)$, Leave-One-Sensor-Out Mahalanobis conflict $D_{\mathrm{LOSO}}$, and cross-correlation lag $\hat{\delta t}$. Table~\ref{tab:signature_matrix} routes single and compound faults with zero training.
     \item \textbf{Physics-Guided Causal Relative-Attention Network \& Factorized Onset-Age Head (Ours-Full):} To localize gradual slow-ramp degradation whose onset precedes alarm time by more than $2.0\,\mathrm{s}$, we compress window metrics via parameter-free physical units $v_t = \operatorname{arcsinh}(z_t / u_{\mathrm{phys}}) \in \mathbb{R}^{12}$ paired with strictly causal past-median residuals $\tilde{\delta}_t = m_t \odot p_t \odot (v_t - \operatorname{median}(\mathcal{H}_{<t}))$ and a permutation-invariant $4\times 12 = 48$ spherical azimuth-elevation cell encoder $f_{\mathrm{sp}}(S_t) \in \mathbb{R}^{32}$. A 2-layer causal relative-attention block ($d=32, H=4$, bounded FIFO cache $M=64$) with fixed orthogonal/Gaussian causal projections feeds a $113$-D concatenated representation $[x_t, h_t^{(L)}, \text{slope}_t]$ into a closed-form ridge-regularized readout head (\texttt{ConditionalRecoveryHead}, requiring zero GPU backprop or small-sample SGD overfitting):
     \begin{equation}
-        \log P(\tau_{\mathrm{age}} = k\Delta\tau \mid \mathcal{F}_t) = \log\sigma(a_t) + \log\operatorname{softmax}(u_t)_k,
+        \log P(\tau_{\mathrm{age}}\!=\!k\Delta\tau \mid \mathcal{F}_t) = \log\sigma(a_t) + \log\operatorname{softmax}(u_t)_k,
     \end{equation}
     which estimates $\hat{\tau}_{\mathrm{age},t} = \sum_{k=0}^{K-1} \operatorname{softmax}(u_t)_k (k+0.5)\Delta\tau$ to roll back slow-ramp drift while falling back to \texttt{SignatureMatrixRouter} during cold-start warm-up ($|\mathcal{H}_{<t}| < 5$).
 \end{enumerate}
@@ -213,14 +215,14 @@ We integrate \texttt{slam\_recovery} into four hosts across two coupling levels:
 
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=\columnwidth]{slam_recovery/experiments/figures/fig2_b0_b7_ablation_matrix.pdf}
+    \includegraphics[width=\columnwidth]{figures/fig2_b0_b7_ablation_matrix.pdf}
     \caption{Complete B0--B6 ablation study on M2DGR \texttt{hall\_01} ($t\in[120,140]\,\mathrm{s}$) and analytical 3D-mesh ray-sampling simulation S2 (Provenance: \texttt{ONLINE\_SIM\_3D\_MESH}). (a) Global ATE RMSE across FAST-LIO2 and LIO-SAM hosts covering B0 (Original Host), B1 (Online Directional Projection), B2 (MM-LINS), B3 (Rollback on Same Data), B4 (Quarantine Only), B5 (Unvalidated Repair), and B6 (Ours Full). (b) Keyframe pose pollution ratio on \texttt{hall\_01} alongside True 3D Mesh Voxel Contamination Ratio $\mathrm{Contam}_{3\mathrm{D}}(t)$ ($\tau_{\mathrm{map}}=0.15\,\mathrm{m}$, voxel size $0.10\,\mathrm{m}$): B2 leaks $17.4\%$ contaminated 3D voxels during its $N_\kappa=10$ confirmation delay and unvalidated B5 reaches $61.2\%$, whereas B4 and B6 achieve $0.0\%$ 3D voxel contamination.}
     \label{fig:ablation}
 \end{figure}
 
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=\columnwidth]{slam_recovery/experiments/figures/fig3_information_gain_and_gate.pdf}
+    \includegraphics[width=\columnwidth]{figures/fig3_information_gain_and_gate.pdf}
     \caption{Quantitative verification of the four-mode gate $\mathcal{D}(t)$ from analytical 3D-mesh ray-sampling simulation S1 (\texttt{ONLINE\_SIM\_3D\_MESH}) using every 5th held-out scan ($\mathcal{S}_{\mathrm{hold}}$): (a) target weak-direction Fisher information $v^\top \Lambda_{\mathrm{after}} v$ vs.\ $\tau_{\mathrm{info}}=25.0$; (b) cross-scan point-to-plane holdout innovation squared $D_{\mathrm{holdout}}$ vs.\ $\tau_{\mathrm{val}}=2.5$.}
     \label{fig:infogate}
 \end{figure}
@@ -262,9 +264,9 @@ Continuous recovery ratio $G = (E_{\mathrm{deg}} - E_{\mathrm{rep}}) / (E_{\math
 \end{table}
 
 \subsection{E1 Detection, Slow-Ramp Backtracking \& Real-Bag Proposition~2 Verification (RQ1)}
-Table~\ref{tab:e1_detection} summarizes the 7-method E1 benchmark across six fault types (\texttt{GEO\_DEGEN}, \texttt{MEAS\_CONTAM}, \texttt{SYNC\_DRIFT}, \texttt{LOOP\_OUTLIER}, \texttt{AUX\_DEGEN}, and unseen \texttt{UNSEEN\_BLUR}) under both step-onset and $4.0\,\mathrm{s}$ quadratic slow-ramp degradation. Pure covariance/eigenvalue detectors (MM-LINS and Zhang) detect only \texttt{GEO\_DEGEN} ($16.7\%$ recall, $0.0\%$ on plastic-bag occlusion). Raw-feature GBDT + \texttt{IsolationForest} overfits training scales (\texttt{Diag.\ Acc.\ = 0.400}, \texttt{OOD Safe = 0.000}). While \textbf{Ours-Rule} (Method~6) achieves $1.000$ recall, $0.955$ IoU, and $0.00$ step-onset tail pollution, slow-ramp faults that cross fixed thresholds $>2.0\,\mathrm{s}$ after true onset leak $0.43$ frames ($2.020\,\mathrm{s}$ onset MAE). By predicting $\hat{\tau}_{\mathrm{age},t}$ via \texttt{ConditionalRecoveryHead}, \textbf{Ours-Full} (Method~7) reduces slow-ramp onset MAE by $72.0\%$ to $\mathbf{0.566\,\mathrm{s}}$ and eliminates slow-ramp tail pollution ($\mathbf{0.00}$ frames).
+Table~\ref{tab:e1_detection} summarizes the 7-method E1 benchmark across six fault types (\texttt{GEO\_DEGEN}, \texttt{MEAS\_CONTAM}, \texttt{SYNC\_DRIFT}, \texttt{LOOP\_OUTLIER}, \texttt{AUX\_DEGEN}, and unseen \texttt{UNSEEN\_BLUR}) under both step-onset and $4.0\,\mathrm{s}$ quadratic slow-ramp degradation. Pure covariance/eigenvalue detectors (MM-LINS and Zhang) detect only \texttt{GEO\_DEGEN} ($16.7\%$ recall, $0.0\%$ on plastic-bag occlusion). Raw-feature GBDT + \texttt{IsolationForest} overfits training scales (\texttt{Diag.\ Acc.\ = 0.400}, \texttt{OOD Safe = 0.000}). While \textbf{Ours-Rule} (Method~6) achieves $1.000$ recall, $0.955$ IoU, and $0.00$ step-onset tail pollution, slow-ramp faults that cross fixed thresholds $>2.0\,\mathrm{s}$ after true onset leak $0.43$ frames ($2.020\,\mathrm{s}$ onset MAE). By predicting $\hat{\tau}_{\mathrm{age},t}$ via \texttt{Conditional\allowbreak Recovery\allowbreak Head}, \textbf{Ours-Full} (Method~7) reduces slow-ramp onset MAE by $72.0\%$ to $\mathbf{0.566\,\mathrm{s}}$ and eliminates slow-ramp tail pollution ($\mathbf{0.00}$ frames).
 
-Furthermore, evaluating \texttt{PhysicsGuidedCausalTransformer} (trained once via closed-form ridge readout on \texttt{hall\_01} and frozen, SHA-256 \texttt{0153b585...}, using real 48-cell spherical tensors and scan-derived $6$-DoF FIM eigenvalues paired with controlled semi-synthetic residual profiles, provenance: \texttt{SEMI\_SYNTHETIC\_ON\_REAL\_SCANS}) across unseen M2DGR bags (\texttt{hall\_02}, \texttt{room\_02}, \texttt{room\_dark\_01}) yields $\mathbf{1.000}$ event recall and $\mathbf{1.000}$ multi-cause accuracy on all three sequences, reducing $4.0\,\mathrm{s}$ slow-ramp onset MAE from $0.800\,\mathrm{s}$ (fixed $2\,\mathrm{s}$ rule) to $\mathbf{0.179\,\mathrm{s}}$ (\texttt{hall\_02}), $\mathbf{0.268\,\mathrm{s}}$ (\texttt{room\_02}), and $\mathbf{0.246\,\mathrm{s}}$ (\texttt{room\_dark\_01}) with $\mathbf{0.00}$ leaked frames ($615.9\text{--}623.5\,\mu\mathrm{s}$ P50 inference latency). Real-scan evaluation of Proposition~\ref{prop:identifiability} confirms that $\mathcal{I}_\perp(s \mid H)$ drops from $\mathbf{0.8545\text{--}0.9078}$ on clean multi-wall scans (\texttt{hall\_01}, \texttt{room\_02}, \texttt{hall\_02}) to $\mathbf{0.0676\text{--}0.0907}$ on the surviving $12\%$ sector after plastic-bag stripping, and collapses to $\mathbf{0.0000}$ under planar bag sheet translation and corridor blindness. Finally, on a \textbf{Hard-Negative Near-Wall Traversal Test} across un-injected \texttt{room\_02} ($76/76$ scans with mean $79.9\%$ points $<4.2\,\mathrm{m}$) and \texttt{hall\_02}, a naive geometry-only RANSAC near-field filter falsely strips real load-bearing walls in $100.0\%$ of compact-room scans, whereas our NIS/$D_{\mathrm{LOSO}}$-gated \texttt{SignatureMatrixRouter} achieves $\mathbf{0.00\%}$ false positive rate ($0$ false alarms or wall strips).
+Furthermore, evaluating \texttt{PhysicsGuided\allowbreak Causal\allowbreak Transformer} (trained once via closed-form ridge readout on \texttt{hall\_01} and frozen, SHA-256 \texttt{0153b585...}, using real 48-cell spherical tensors and scan-derived $6$-DoF FIM eigenvalues paired with controlled semi-synthetic residual profiles, provenance: \texttt{SEMI\_\allowbreak SYNTHETIC\_\allowbreak ON\_\allowbreak REAL\_\allowbreak SCANS}) across unseen M2DGR bags (\texttt{hall\_02}, \texttt{room\_02}, \texttt{room\_dark\_01}) yields $\mathbf{1.000}$ event recall and $\mathbf{1.000}$ multi-cause accuracy on all three sequences, reducing $4.0\,\mathrm{s}$ slow-ramp onset MAE from $0.800\,\mathrm{s}$ (fixed $2\,\mathrm{s}$ rule) to $\mathbf{0.179\,\mathrm{s}}$ (\texttt{hall\_02}), $\mathbf{0.268\,\mathrm{s}}$ (\texttt{room\_02}), and $\mathbf{0.246\,\mathrm{s}}$ (\texttt{room\_dark\_01}) with $\mathbf{0.00}$ leaked frames ($639.4\text{--}653.7\,\mu\mathrm{s}$ P50 inference latency). Real-scan evaluation of Proposition~\ref{prop:identifiability} confirms that $\mathcal{I}_\perp(s \mid H)$ drops from $\mathbf{0.8545\text{--}0.9078}$ on clean multi-wall scans (\texttt{hall\_01}, \texttt{room\_02}, \texttt{hall\_02}) to $\mathbf{0.0676\text{--}0.0907}$ on the surviving $12\%$ sector after plastic-bag stripping, and collapses to $\mathbf{0.0000}$ under planar bag sheet translation and corridor blindness. Finally, on a \textbf{Hard-Negative Near-Wall Traversal Test} across un-injected \texttt{room\_02} ($76/76$ scans with mean $79.9\%$ points $<4.2\,\mathrm{m}$) and \texttt{hall\_02}, a naive geometry-only RANSAC near-field filter falsely strips real load-bearing walls in $100.0\%$ of compact-room scans, whereas our NIS/$D_{\mathrm{LOSO}}$-gated \texttt{Signature\allowbreak Matrix\allowbreak Router} achieves $\mathbf{0.00\%}$ false positive rate ($0$ false alarms or wall strips).
 
 \begin{table*}[!t]
 \centering
@@ -332,14 +334,14 @@ Table~\ref{tab:main_results} and Figs.~\ref{fig:ablation}--\ref{fig:multiscenari
 
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=\columnwidth]{slam_recovery/experiments/figures/fig4_multi_scenario_and_campus_recovery.pdf}
+    \includegraphics[width=\columnwidth]{figures/fig4_multi_scenario_and_campus_recovery.pdf}
     \caption{(a) Degraded baseline (B0/B2) vs.\ our verifiable recovery (B6) across six distinct degradation regimes on \texttt{hall\_01} and \texttt{room\_02}. (b) End-to-end closure error on four real-world outdoor Campus plastic-bag sequences \cite{ma2025mmlins}.}
     \label{fig:multiscenario}
 \end{figure}
 
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=\columnwidth]{slam_recovery/experiments/figures/fig5_orbslam3_second_host_transfer.pdf}
+    \includegraphics[width=\columnwidth]{figures/fig5_orbslam3_second_host_transfer.pdf}
     \caption{Second-host transfer (E3) on ORB-SLAM3 \cite{campos2021orbslam3}. (a) Trajectory comparison under severe low-light ($g=0.05$) on \texttt{hall\_01}. (b) Quantitative RMSE comparison across \texttt{hall\_01} and \texttt{room\_02} dark+blur scenarios.}
     \label{fig:orbslam3}
 \end{figure}
@@ -380,10 +382,10 @@ Table~\ref{tab:main_results} and Figs.~\ref{fig:ablation}--\ref{fig:multiscenari
 }
 \end{table}
 
-\subsection{E3 Second-Host Transfer to ORB-SLAM3 and Held-Out \texttt{hall\_02} Blind Test (RQ5)}
+\subsection{E3 Second-Host Transfer to ORB-SLAM3 and Held-Out \texorpdfstring{\texttt{hall\_02}}{hall\_02} Blind Test (RQ5)}
 Table~\ref{tab:e3_orbslam3} and Fig.~\ref{fig:orbslam3} evaluate second-host transfer on ORB-SLAM3 \cite{campos2021orbslam3} using true cross-scan point-to-plane holdout NIS ($\mathcal{S}_k \to \mathcal{S}_{k-5}$ transformed solely by the candidate trajectory's relative displacement $\Delta p_{\mathrm{cand}}$) and unbiased Wilson sequential lower bounds. Under severe low-light ($g=0.05$) on \texttt{hall\_01}, real C++ single-map B0 (\texttt{ORB\_SINGLE\_MAP=1}) loses $174$ frames ($1.3755\,\mathrm{m}$ ATE), whereas native Atlas (B2) merges skewed transitional keyframes at $148\,\mathrm{s}$ and worsens global ATE to $2.1822\,\mathrm{m}$ (window RMSE $6.8941\,\mathrm{m}$, cross-scan $\mathrm{NIS}=3.2854 > 2.5$). Our B6 repair achieves $0.9066\,\mathrm{m}$ global ATE and $0.7366\,\mathrm{m}$ window RMSE ($G_{\mathrm{win}}=+0.9673$, $J_v^{\mathrm{after}}=116.51$, cross-scan $\mathrm{NIS}=2.1806\le 2.5$, unbiased Wilson LB $=0.8162\ge 0.55$). On the $106.8\,\mathrm{s}$ \textbf{real natural darkness} sequence \texttt{room\_dark\_01} (Mocap GT), single-map B0 permanently loses tracking at $48.13\,\mathrm{s}$ ($1.0186\,\mathrm{m}$ ATE) and native Atlas leaves \texttt{Map~4} ($74$ frames) permanently unmerged ($0.4855\,\mathrm{m}$ ATE, cross-scan $\mathrm{NIS}=1.4511$), whereas B6 achieves $0.2154\,\mathrm{m}$ ATE across all $1545$ frames ($J_v^{\mathrm{after}}=142.34$, cross-scan $\mathrm{NIS}=1.1051\le 2.5$, unbiased Wilson LB $=0.6919$). Finally, on the \textbf{held-out test sequence \texttt{hall\_02}} ($128.7\,\mathrm{s}$, Leica GT, evaluated with strictly frozen development hyperparameters), MM-LINS misses the plastic-bag occlusion for a fourth consecutive sequence (\texttt{/Issleeping}=0, $4.0331\,\mathrm{m}\to 0.2410\,\mathrm{m}$ B6, $G=+0.9864$), FAST-LIO2 recovers from $4.5275\,\mathrm{m}$ to $\mathbf{0.2796\,\mathrm{m}}$ ($G=+0.9995$), LIO-SAM rejects the diverging B5 point filter ($237.49\,\mathrm{m}$) and recovers via B6 to $\mathbf{0.2430\,\mathrm{m}}$ ($G=+0.9971$), and ORB-SLAM3 B6 reduces window RMSE from $1.8409\,\mathrm{m}$ (Atlas) to $\mathbf{0.6057\,\mathrm{m}}$ ($G_{\mathrm{win}}=+0.7782$, cross-scan $\mathrm{NIS}=2.1586$, Wilson LB $=0.7902$).
 
-\subsection{Analytical 3D-Mesh Ray-Sampling Simulation (S1/S2, Provenance: \texttt{ONLINE\_SIM\_3D\_MESH}) and Runtime Overhead}
+\subsection{Analytical 3D-Mesh Ray-Sampling Simulation (S1/S2, Provenance: \texorpdfstring{\texttt{ONLINE\_SIM\_3D\_MESH}}{ONLINE\_SIM\_3D\_MESH}) and Runtime Overhead}
 To evaluate true 3D volumetric map contamination against an exact ground-truth surface mesh $\mathcal{G}_{\mathrm{GT}}$ and execute strict counterfactual trajectories for R4 (no loop revisit) versus R5 (delayed revisit to Zone~A), we evaluate our online node (\texttt{OnlineRecoveryTransactionNode} in \texttt{slam\_recovery/sim/}, directly backed by \texttt{SpatialMutationLog}) in an analytical 3D-mesh ray-sampling arena (\texttt{recovery\_arena.world}, $40\,\mathrm{m}\times 25\,\mathrm{m}$, 5 seeds, provenance: \texttt{ONLINE\_SIM\_3D\_MESH}, kept strictly distinct from real-host rosbag executions). Defining the true 3D trusted-map voxel contamination ratio at $0.10\,\mathrm{m}$ resolution as $\mathrm{Contam}_{3\mathrm{D}}(t) = |\mathcal{V}_{\mathrm{trusted}}|^{-1}\sum_{v\in\mathcal{V}_{\mathrm{trusted}}} \mathbb{I}(\min_{g\in\mathcal{G}_{\mathrm{GT}}}\|v-g\|_2 > 0.15\,\mathrm{m})$, unprotected B0 ($40.66\%$), online projection B1 ($40.60\%$), and same-data rollback B3 ($40.66\%$) severely corrupt the map, while MM-LINS B2 ($\Delta t_{\mathrm{margin}}=0\,\mathrm{s}$) permanently writes $N_\kappa=10$ confirmation-delay frames into the sleeping submap resulting in $17.41\%$ 3D voxel contamination, and unvalidated single-modality B5 reaches $61.16\%$ (Fig.~\ref{fig:ablation}b). Using every 5th scan as a strictly held-out scan set $\mathcal{S}_{\mathrm{hold}}$ with zero manual scaling factors (Fig.~\ref{fig:infogate}), our $2.0\,\mathrm{s}$ delayed-commit buffer keeps $\mathrm{Contam}_{3\mathrm{D}} = 0.00\%$ across B4 and B6, holds R4 in \texttt{MODE3\_SOFT\_BRIDGE\_WAIT} ($J_v^{\mathrm{after}}=0.78 < 25.0$, cross-scan $\mathrm{NIS}=5.881$), rejects narrow-FoV B5 ($J_v^{\mathrm{after}}=20.51$, $\mathrm{NIS}=3.867 > 2.5$, rolling back its trial voxel writes via \texttt{SpatialMutationLog}), and atomically commits R5 upon loop revisit ($J_v^{\mathrm{after}}=87.87$, $\mathrm{NIS}=1.645 \le 2.5$).
 
 On an Intel Core i7 CPU, our online health feature extraction, decoupled eigendecomposition, joint detector, and signature matrix router require $\mathbf{0.0599\,\mathrm{ms}}$ (P50) and $\mathbf{0.0852\,\mathrm{ms}}$ (P95) per window---only $\mathbf{0.0639\%}$ of a $10\,\mathrm{Hz}$ LiDAR frame budget---while adding the 48-cell spherical encoder and 2-layer causal relative-attention network takes $\mathbf{0.616\text{--}0.624\,\mathrm{ms}}$ (P50). Delayed-commit queue management and SHA-256 checkpointing take $0.0034\,\mathrm{ms}$ (P50) and $0.4171\,\mathrm{ms}$ (P95) ($48.5\,\mathrm{KB}$ per snapshot). On the persistent $20\,\mathrm{cm}$ global voxel map of \texttt{hall\_01} ($|M|=594,979$ voxels, $|\Delta M_{\mathrm{dirty}}|=82,219$ dirty voxels in the quarantined window, $13.8\%$ of the map), full-map deep-copy snapshot rollback requires $1700.11\,\mathrm{ms}$, whereas our Copy-on-Write \texttt{SpatialMutationLog} rolls back all $82,219$ dirty voxels in $\mathbf{76.15\,\mathrm{ms}}$ ($\mathbf{22.33\times}$ speedup) with exact bit-for-bit restoration. The 25k-point RANSAC mixture filter takes $30.82\,\mathrm{ms}$ (P50) and is invoked exclusively on quarantined background branches.
