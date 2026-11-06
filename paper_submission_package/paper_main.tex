@@ -168,8 +168,15 @@ Rather than claiming exact mathematical equivalence to the internal solvers of Z
 
 \section{Transactional Recovery Framework}
 
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=\textwidth]{figures/fig0_system_architecture.pdf}
+    \caption{System architecture of \texttt{slam\_recovery} across multi-sensor SLAM hosts (FAST-LIO2, LIO-SAM, MM-LINS, and ORB-SLAM3). The framework decouples the host's provisional estimation loop from the persistent map via a $2.0\,\mathrm{s}$ delayed-commit quarantine buffer, a 6-DoF FIM and NIS-CUSUM health detector, a 48-cell physics-guided causal relative-attention network paired with a zero-training signature router, tiered repairers, a Copy-on-Write \texttt{SpatialMutationLog} ($O(|\Delta M_{\mathrm{dirty}}|)$ rollback), and the unified four-mode gate $\mathcal{D}(t)$.}
+    \label{fig:architecture}
+\end{figure*}
+
 \subsection{Delayed-Commit Ring Buffer, Copy-on-Write Spatial Mutation Log, and Trusted Map Invariance}
-If degradation begins at $t_{\mathrm{onset}}$ but detection requires a confirmation window of $\Delta t_{\mathrm{det}}$ seconds, checkpointing at alarm time $t_{\mathrm{alarm}} = t_{\mathrm{onset}} + \Delta t_{\mathrm{det}}$ fails to prevent map corruption during $[t_{\mathrm{onset}}, t_{\mathrm{alarm}}]$. We therefore decouple the host's \emph{provisional live state} from the \emph{trusted persistent map}. Every keyframe delta emitted by the host is held in a ring buffer for a confirmation margin $\Delta t_{\mathrm{margin}} = 2.0\,\mathrm{s}$ before promotion to the trusted map. When an anomaly is confirmed with estimated onset age $\hat{\tau}_{\mathrm{age},t}$ (or $\hat{t}_{\mathrm{onset}} = t_{\mathrm{alarm}} - \hat{\tau}_{\mathrm{age},t}$), the quarantine start time is set to
+As illustrated in Fig.~\ref{fig:architecture}, if degradation begins at $t_{\mathrm{onset}}$ but detection requires a confirmation window of $\Delta t_{\mathrm{det}}$ seconds, checkpointing at alarm time $t_{\mathrm{alarm}} = t_{\mathrm{onset}} + \Delta t_{\mathrm{det}}$ fails to prevent map corruption during $[t_{\mathrm{onset}}, t_{\mathrm{alarm}}]$. We therefore decouple the host's \emph{provisional live state} from the \emph{trusted persistent map}. Every keyframe delta emitted by the host is held in a ring buffer for a confirmation margin $\Delta t_{\mathrm{margin}} = 2.0\,\mathrm{s}$ before promotion to the trusted map. When an anomaly is confirmed with estimated onset age $\hat{\tau}_{\mathrm{age},t}$ (or $\hat{t}_{\mathrm{onset}} = t_{\mathrm{alarm}} - \hat{\tau}_{\mathrm{age},t}$), the quarantine start time is set to
 \begin{equation}
     t_{q,\mathrm{start}} = t_{\mathrm{alarm}} - \hat{\tau}_{\mathrm{age},t} - \Delta t_{\mathrm{margin}},
 \end{equation}
