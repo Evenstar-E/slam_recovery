@@ -1,0 +1,209 @@
+{
+ "protocol": {
+  "source": "docs/MILESTONE_fixed_input_repair.md (M3 decomposition)",
+  "question": "is the room_02 failure measurement (filter), native re-estimation, or reference quality?",
+  "arms": {
+   "A": {
+    "scan": "RAW_INJECTED",
+    "pose": "HOST"
+   },
+   "B": {
+    "scan": "RAW_INJECTED",
+    "pose": "CLEAN_REFERENCE"
+   },
+   "C": {
+    "scan": "ORACLE_CLEAN",
+    "pose": "CLEAN_REFERENCE"
+   },
+   "D": {
+    "scan": "ACTUAL_FILTER",
+    "pose": "CLEAN_REFERENCE"
+   },
+   "E": {
+    "scan": "ACTUAL_FILTER",
+    "pose": "ACTUAL_REESTIMATION"
+   }
+  }
+ },
+ "provenance": "REAL_HOST for A and E; B/C/D reuse existing poses and scans",
+ "reference": {
+  "source": "CLEAN_RUN_FROM_RAW_WINDOW",
+  "note": "proxy, not GT; single sequence"
+ },
+ "inputs_sha256": {
+  "injected_scans": "66b3515c58d172f73d8f0d705c7314720b587612e4a8cca6740b87993449b0a9",
+  "injected_poses": "6309b036263f25d813420dca5e356889da58d8a31fc9009a00e6db542b4e1c7d",
+  "clean_scans": "809b98f1d61702d1dad3a3f2c0b0c52f7473295c768eadef0cfbd46b6b9d4b6d",
+  "clean_poses": "e09901a85d816f138ca8ad5e2d301e28dbcc2bc056bd706a71f7a0026b51b77c",
+  "filtered_scans": "6bb966188894ae876ce2e8f8475a932d873a2d6ff42519b25f56eb425f68b090",
+  "rerun_poses": "e325d4345abd9e7f5c52e1f802c8645f9870f65dec673385aba1084495e035b0"
+ },
+ "injection_window": {
+  "onset_ns": 1627643759554082870,
+  "end_ns": 1627643779393426895,
+  "differing_frames": 199
+ },
+ "frame_set": {
+  "n_frames": 326,
+  "n_keys": 398,
+  "missing": [
+   181,
+   183,
+   185,
+   187,
+   189,
+   191,
+   193,
+   195,
+   197,
+   199,
+   201,
+   203,
+   205,
+   207,
+   209,
+   211,
+   213,
+   215,
+   217,
+   219,
+   221,
+   223,
+   227,
+   229,
+   231,
+   233,
+   235,
+   237,
+   239,
+   241,
+   243,
+   245,
+   247,
+   249,
+   251,
+   253,
+   255,
+   259,
+   261,
+   263,
+   265,
+   267,
+   269,
+   271,
+   273,
+   275,
+   277,
+   279,
+   281,
+   283,
+   285,
+   289,
+   291,
+   293,
+   295,
+   297,
+   299,
+   303,
+   305,
+   307,
+   309,
+   329,
+   331,
+   333,
+   335,
+   337,
+   339,
+   349,
+   351,
+   360,
+   361,
+   367
+  ],
+  "ns_sha256": "95d0c1d665cc871db70e9c7b58dbe6843084802f97f30df0fa4390d8003ee33a"
+ },
+ "arms": {
+  "A": {
+   "scan_source": "RAW_INJECTED",
+   "pose_source": "HOST",
+   "map_points": 81500,
+   "proxy_covered": 6617272,
+   "proxy_coverage_fraction": 0.7672199420289855,
+   "patch_unsupported_points": 37370,
+   "patch_unsupported_fraction": 0.4585276073619632,
+   "patch_median_m": 0.00930954671451457
+  },
+  "B": {
+   "scan_source": "RAW_INJECTED",
+   "pose_source": "CLEAN_REFERENCE",
+   "map_points": 81500,
+   "proxy_covered": 8616032,
+   "proxy_coverage_fraction": 0.998960231884058,
+   "patch_unsupported_points": 23539,
+   "patch_unsupported_fraction": 0.28882208588957053,
+   "patch_median_m": 0.0018960222304181238
+  },
+  "C": {
+   "scan_source": "ORACLE_CLEAN",
+   "pose_source": "CLEAN_REFERENCE",
+   "map_points": 81500,
+   "proxy_covered": 8614392,
+   "proxy_coverage_fraction": 0.9987700869565217,
+   "patch_unsupported_points": 491,
+   "patch_unsupported_fraction": 0.006024539877300614,
+   "patch_median_m": 0.0018806726102357282
+  },
+  "D": {
+   "scan_source": "ACTUAL_FILTER",
+   "pose_source": "CLEAN_REFERENCE",
+   "map_points": 81500,
+   "proxy_covered": 8614645,
+   "proxy_coverage_fraction": 0.998799420289855,
+   "patch_unsupported_points": 574,
+   "patch_unsupported_fraction": 0.007042944785276074,
+   "patch_median_m": 0.0019204880474503346
+  },
+  "E": {
+   "scan_source": "ACTUAL_FILTER",
+   "pose_source": "ACTUAL_REESTIMATION",
+   "map_points": 81500,
+   "proxy_covered": 5995707,
+   "proxy_coverage_fraction": 0.6951544347826087,
+   "patch_unsupported_points": 53705,
+   "patch_unsupported_fraction": 0.6589570552147239,
+   "patch_median_m": 0.00334879230051792
+  }
+ },
+ "deltas": {
+  "A->B": {
+   "coverage_delta": 0.23174028985507256,
+   "unsupported_delta": -0.16970552147239265,
+   "isolates": "pose"
+  },
+  "B->C": {
+   "coverage_delta": -0.00019014492753632872,
+   "unsupported_delta": -0.2827975460122699,
+   "isolates": "measurement (oracle ceiling)"
+  },
+  "C->D": {
+   "coverage_delta": 2.9333333333325662e-05,
+   "unsupported_delta": 0.00101840490797546,
+   "isolates": "filter versus oracle"
+  },
+  "D->E": {
+   "coverage_delta": -0.3036449855072463,
+   "unsupported_delta": 0.6519141104294478,
+   "isolates": "re-estimation"
+  }
+ },
+ "healthy_window": {
+  "status": "BOUND",
+  "input_sha256": "66b3515c58d172f73d8f0d705c7314720b587612e4a8cca6740b87993449b0a9",
+  "frames_outside": 400,
+  "points_outside": 20576778,
+  "real_filter_removed": 919702,
+  "real_filter_fraction": 0.04469611325932563,
+  "oracle_removed": 0,
+  "oracle_fraction": 0.0
+ }
+}
