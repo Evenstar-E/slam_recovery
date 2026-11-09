@@ -1,254 +1,262 @@
 {
- "inputs": {
-  "clip": "/tmp/fastlivo/rate_diag_clip.bag",
-  "clip_sha256": "113a56e249d2dce89f7b12a461586365f0007c5b1b77707f17ac27732e3a9416",
-  "output": "/tmp/fastlivo/rate_diag_out.bag",
-  "output_sha256": "87364b4483c78b435dc78a4712d8cc03d44e054bc30510dc1eeecf41ed77cbc9"
- },
- "segments": [
-  {
-   "start": 1627785275.808,
-   "end": 1627785285.226
+  "inputs": {
+    "clip": "/tmp/fastlivo/rate_diag_clip.bag",
+    "clip_sha256": "113a56e249d2dce89f7b12a461586365f0007c5b1b77707f17ac27732e3a9416",
+    "output": "/tmp/fastlivo/rate_diag_out.bag",
+    "output_sha256": "87364b4483c78b435dc78a4712d8cc03d44e054bc30510dc1eeecf41ed77cbc9"
   },
-  {
-   "start": 1627785295.246,
-   "end": 1627785295.446
-  }
- ],
- "runs": {
-  "lidar": {
-   "series": {
-    "n": 300,
-    "median_ms": 100.19397735595703,
-    "p95_ms": 101.24032497406006,
-    "max_ms": 103.09171676635742,
-    "n_over_1.5x_median": 0,
-    "hole_definition_ms": 200.39,
-    "n_holes": 0,
-    "hole_times": []
-   },
-   "per_segment": [
+  "segments": [
     {
-     "n_inside": 93,
-     "median_ms_inside": 100.19636154174805,
-     "median_ms_neighbours": 100.19302368164062,
-     "max_ms_inside": 102.10609436035156,
-     "slow_interval_fraction_inside": 0.8804347826086957,
-     "slow_interval_fraction_neighbours": 0.8878048780487805
+      "start": 1627785275.808,
+      "end": 1627785285.226
     },
     {
-     "n_inside": 1,
-     "median_ms_inside": null,
-     "median_ms_neighbours": 100.1960039138794,
-     "max_ms_inside": null,
-     "slow_interval_fraction_inside": null,
-     "slow_interval_fraction_neighbours": 0.8762886597938144
+      "start": 1627785295.246,
+      "end": 1627785295.446
     }
-   ],
-   "first": 1627785269.99646,
-   "last": 1627785299.9550295
-  },
-  "imu": {
-   "series": {
-    "n": 4298,
-    "median_ms": 6.906986236572266,
-    "p95_ms": 9.245777130126951,
-    "max_ms": 22.505998611450195,
-    "n_over_1.5x_median": 183,
-    "hole_definition_ms": 50.0,
-    "n_holes": 0,
-    "hole_times": []
-   },
-   "per_segment": [
-    {
-     "n_inside": 1352,
-     "median_ms_inside": 6.918907165527344,
-     "median_ms_neighbours": 6.899476051330566,
-     "max_ms_inside": 22.17698097229004,
-     "slow_interval_fraction_inside": 0.0,
-     "slow_interval_fraction_neighbours": 0.0
+  ],
+  "runs": {
+    "lidar": {
+      "series": {
+        "n": 300,
+        "median_ms": 100.19397735595703,
+        "p95_ms": 101.24032497406006,
+        "max_ms": 103.09171676635742,
+        "n_over_1.5x_median": 0,
+        "hole_definition_ms": 200.39,
+        "n_holes": 0,
+        "hole_times": []
+      },
+      "per_segment": [
+        {
+          "n_inside": 93,
+          "median_ms_inside": 100.19636154174805,
+          "median_ms_neighbours": 100.19302368164062,
+          "max_ms_inside": 102.10609436035156,
+          "slow_interval_fraction_inside": 0.8804347826086957,
+          "slow_interval_fraction_neighbours": 0.8878048780487805
+        },
+        {
+          "n_inside": 1,
+          "median_ms_inside": null,
+          "median_ms_neighbours": 100.1960039138794,
+          "max_ms_inside": null,
+          "slow_interval_fraction_inside": null,
+          "slow_interval_fraction_neighbours": 0.8762886597938144
+        }
+      ],
+      "first": 1627785269.99646,
+      "last": 1627785299.9550295
     },
-    {
-     "n_inside": 30,
-     "median_ms_inside": 6.780862808227539,
-     "median_ms_neighbours": 6.899833679199219,
-     "max_ms_inside": 9.440898895263672,
-     "slow_interval_fraction_inside": 0.0,
-     "slow_interval_fraction_neighbours": 0.0
+    "imu": {
+      "series": {
+        "n": 4298,
+        "median_ms": 6.906986236572266,
+        "p95_ms": 9.245777130126951,
+        "max_ms": 22.505998611450195,
+        "n_over_1.5x_median": 183,
+        "hole_definition_ms": 50.0,
+        "n_holes": 0,
+        "hole_times": []
+      },
+      "per_segment": [
+        {
+          "n_inside": 1352,
+          "median_ms_inside": 6.918907165527344,
+          "median_ms_neighbours": 6.899476051330566,
+          "max_ms_inside": 22.17698097229004,
+          "slow_interval_fraction_inside": 0.0,
+          "slow_interval_fraction_neighbours": 0.0
+        },
+        {
+          "n_inside": 30,
+          "median_ms_inside": 6.780862808227539,
+          "median_ms_neighbours": 6.899833679199219,
+          "max_ms_inside": 9.440898895263672,
+          "slow_interval_fraction_inside": 0.0,
+          "slow_interval_fraction_neighbours": 0.0
+        }
+      ],
+      "first": 1627785269.997716,
+      "last": 1627785299.994056
+    },
+    "odom_out": {
+      "series": {
+        "n": 370,
+        "median_ms": 66.66779518127441,
+        "p95_ms": 133.32524299621582,
+        "max_ms": 133.5766315460205,
+        "n_over_1.5x_median": 63,
+        "hole_definition_ms": 133.34,
+        "n_holes": 8,
+        "hole_times": [
+          1627785275.881222,
+          1627785276.0815835,
+          1627785277.481387,
+          1627785277.6815674,
+          1627785277.8817573,
+          1627785278.0819566,
+          1627785278.2821655,
+          1627785294.7589738
+        ]
+      },
+      "per_segment": [
+        {
+          "n_inside": 98,
+          "median_ms_inside": 66.73526763916016,
+          "median_ms_neighbours": 66.66719913482666,
+          "max_ms_inside": 133.5766315460205,
+          "slow_interval_fraction_inside": 0.4329896907216495,
+          "slow_interval_fraction_neighbours": 0.07037037037037037
+        },
+        {
+          "n_inside": 2,
+          "median_ms_inside": 66.66088104248047,
+          "median_ms_neighbours": 66.6666030883789,
+          "max_ms_inside": 66.66088104248047,
+          "slow_interval_fraction_inside": 0.0,
+          "slow_interval_fraction_neighbours": 0.16532258064516128
+        }
+      ],
+      "first": 1627785271.0675325,
+      "last": 1627785299.892213
     }
-   ],
-   "first": 1627785269.997716,
-   "last": 1627785299.994056
   },
-  "odom_out": {
-   "series": {
-    "n": 370,
-    "median_ms": 66.66779518127441,
-    "p95_ms": 133.32524299621582,
-    "max_ms": 133.5766315460205,
-    "n_over_1.5x_median": 63,
-    "hole_definition_ms": 133.34,
-    "n_holes": 8,
-    "hole_times": [
-     1627785275.881222,
-     1627785276.0815835,
-     1627785277.481387,
-     1627785277.6815674,
-     1627785277.8817573,
-     1627785278.0819566,
-     1627785278.2821655,
-     1627785294.7589738
+  "run_dir": "/tmp/fl_run_20261109T102305Z_2383599",
+  "receipt": {
+    "status": "OK",
+    "status_reason": "completed",
+    "termination": "PLANNED_KILL_AFTER_DRAIN",
+    "pre_run": {
+      "paths": {
+        "script": "/tmp/wt-sim/docs/review_20261109_bbc3dcb/fl_run_isolated.sh",
+        "input_bag": "/tmp/fastlivo/rate_diag_clip.bag",
+        "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+        "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+        "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping"
+      },
+      "sha256": {
+        "script": "d51dcc7940e45c9bd91d80c2f795abc2337892d1ee616ec73b8524d2d466e594",
+        "input_bag": "113a56e249d2dce89f7b12a461586365f0007c5b1b77707f17ac27732e3a9416",
+        "config_m2dgr": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+        "config_camera": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+        "host_binary": "ca1959c45121a4b60fcae597a293e918c41df1df53efd08a79b1ccc8e6076a6a"
+      },
+      "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+      "captured": "BEFORE_LAUNCH",
+      "sizes": {
+        "script": 11760,
+        "input_bag": 565097216,
+        "config_m2dgr": 2052,
+        "config_camera": 238,
+        "host_binary": 100720
+      }
+    },
+    "sources_changed_during_run": [],
+    "config": {
+      "m2dgr": {
+        "path": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+        "sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93"
+      },
+      "camera": {
+        "path": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+        "sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7"
+      },
+      "ros_params_dump": {
+        "path": "/tmp/fl_run_20261109T102305Z_2383599/ros_params.yaml",
+        "sha256": "18d0bbeab1d3311eb8a1c5c959a1c5a3fad1eaea6ba47ef113f14bb306948854"
+      }
+    },
+    "host": {
+      "binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+      "sha256": "ca1959c45121a4b60fcae597a293e918c41df1df53efd08a79b1ccc8e6076a6a",
+      "source_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64"
+    },
+    "run": {
+      "rate": 0.5,
+      "drain_sec": 20.0,
+      "master_uri": "http://127.0.0.1:41315",
+      "run_dir": "/tmp/fl_run_20261109T102305Z_2383599"
+    },
+    "managed_pids": {
+      "roscore": null,
+      "record": 2384706,
+      "node": 2384876
+    },
+    "process_exit": {
+      "rosbag_play": 0,
+      "rosbag_record": 0,
+      "fastlivo_node": 137
+    },
+    "output": {
+      "bag": "/tmp/fastlivo/rate_diag_out.bag",
+      "exists": true,
+      "bytes": 299563,
+      "sha256": "87364b4483c78b435dc78a4712d8cc03d44e054bc30510dc1eeecf41ed77cbc9",
+      "odometry_messages": 370,
+      "first_stamp_sec": 1627785271.0675325,
+      "last_stamp_sec": 1627785299.892213,
+      "duration_sec": 28.82468056678772,
+      "bag_start_sec": 1794219803.7133348,
+      "bag_end_sec": 1794219861.3423586,
+      "verdict": "OK"
+    }
+  },
+  "node": {
+    "bytes": 1144545,
+    "frames_logged": 739,
+    "total_time_median_s": 0.008962,
+    "total_time_p95_s": 0.1099933,
+    "total_time_max_s": 0.152565,
+    "icp_median_s": 0.014138000000000001,
+    "above_frame_budget": 41,
+    "note": "frame budget at 10 Hz is 0.100 s"
+  },
+  "resources": {
+    "samples": 90,
+    "load1_min": 81.2,
+    "load1_median": 258.1,
+    "load1_max": 875.2,
+    "cpu_sec_per_sample_median": 0.25,
+    "cpu_sec_per_sample_max": 8.85,
+    "note": "sampled every 2 s; cpu = utime+stime deltas of fastlivo_mapping"
+  },
+  "judgement": {
+    "verdict": "CONTENTION_SUSPECTED",
+    "reason": "the host skipped publications while its inputs were continuous; load average was 258.1 against 128 cores, so the host was CPU-starved rather than missing data -- candidate mechanism only; a same-prefix low-load control is required",
+    "input_holes_detected": false,
+    "odom_stretch_detected": true,
+    "load_median": 258.1,
+    "n_cpu": 128,
+    "cpu_sec_per_sample_median": 0.25,
+    "node_frames_over_100ms_budget": 41,
+    "segment_comparison": [
+      {
+        "segment": 0,
+        "odom_ms_inside": 66.73526763916016,
+        "odom_ms_neighbours": 66.66719913482666,
+        "lidar_ms_inside": 100.19636154174805,
+        "imu_ms_inside": 6.918907165527344,
+        "slow_fraction_inside": 0.4329896907216495,
+        "slow_fraction_neighbours": 0.07037037037037037
+      },
+      {
+        "segment": 1,
+        "odom_ms_inside": 66.66088104248047,
+        "odom_ms_neighbours": 66.6666030883789,
+        "lidar_ms_inside": null,
+        "imu_ms_inside": 6.780862808227539,
+        "slow_fraction_inside": 0.0,
+        "slow_fraction_neighbours": 0.16532258064516128
+      }
+    ],
+    "original_verdict": "SCHEDULING_CONTENTION",
+    "causal_status": "SUSPECTED",
+    "superseded_by": "40e7a6d/1fdafda review (d798ea3): load average is not a runnable-wait measure, and the clip skipped 8.92 s of the original prefix",
+    "unknown": [
+      "runnable wait time",
+      "IO/synchronisation blocking",
+      "effect of a different initialisation"
     ]
-   },
-   "per_segment": [
-    {
-     "n_inside": 98,
-     "median_ms_inside": 66.73526763916016,
-     "median_ms_neighbours": 66.66719913482666,
-     "max_ms_inside": 133.5766315460205,
-     "slow_interval_fraction_inside": 0.4329896907216495,
-     "slow_interval_fraction_neighbours": 0.07037037037037037
-    },
-    {
-     "n_inside": 2,
-     "median_ms_inside": 66.66088104248047,
-     "median_ms_neighbours": 66.6666030883789,
-     "max_ms_inside": 66.66088104248047,
-     "slow_interval_fraction_inside": 0.0,
-     "slow_interval_fraction_neighbours": 0.16532258064516128
-    }
-   ],
-   "first": 1627785271.0675325,
-   "last": 1627785299.892213
   }
- },
- "run_dir": "/tmp/fl_run_20261109T102305Z_2383599",
- "receipt": {
-  "status": "OK",
-  "status_reason": "completed",
-  "termination": "PLANNED_KILL_AFTER_DRAIN",
-  "pre_run": {
-   "paths": {
-    "script": "/tmp/wt-sim/docs/review_20261109_bbc3dcb/fl_run_isolated.sh",
-    "input_bag": "/tmp/fastlivo/rate_diag_clip.bag",
-    "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
-    "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
-    "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping"
-   },
-   "sha256": {
-    "script": "d51dcc7940e45c9bd91d80c2f795abc2337892d1ee616ec73b8524d2d466e594",
-    "input_bag": "113a56e249d2dce89f7b12a461586365f0007c5b1b77707f17ac27732e3a9416",
-    "config_m2dgr": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
-    "config_camera": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
-    "host_binary": "ca1959c45121a4b60fcae597a293e918c41df1df53efd08a79b1ccc8e6076a6a"
-   },
-   "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
-   "captured": "BEFORE_LAUNCH",
-   "sizes": {
-    "script": 11760,
-    "input_bag": 565097216,
-    "config_m2dgr": 2052,
-    "config_camera": 238,
-    "host_binary": 100720
-   }
-  },
-  "sources_changed_during_run": [],
-  "config": {
-   "m2dgr": {
-    "path": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
-    "sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93"
-   },
-   "camera": {
-    "path": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
-    "sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7"
-   },
-   "ros_params_dump": {
-    "path": "/tmp/fl_run_20261109T102305Z_2383599/ros_params.yaml",
-    "sha256": "18d0bbeab1d3311eb8a1c5c959a1c5a3fad1eaea6ba47ef113f14bb306948854"
-   }
-  },
-  "host": {
-   "binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
-   "sha256": "ca1959c45121a4b60fcae597a293e918c41df1df53efd08a79b1ccc8e6076a6a",
-   "source_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64"
-  },
-  "run": {
-   "rate": 0.5,
-   "drain_sec": 20.0,
-   "master_uri": "http://127.0.0.1:41315",
-   "run_dir": "/tmp/fl_run_20261109T102305Z_2383599"
-  },
-  "managed_pids": {
-   "roscore": null,
-   "record": 2384706,
-   "node": 2384876
-  },
-  "process_exit": {
-   "rosbag_play": 0,
-   "rosbag_record": 0,
-   "fastlivo_node": 137
-  },
-  "output": {
-   "bag": "/tmp/fastlivo/rate_diag_out.bag",
-   "exists": true,
-   "bytes": 299563,
-   "sha256": "87364b4483c78b435dc78a4712d8cc03d44e054bc30510dc1eeecf41ed77cbc9",
-   "odometry_messages": 370,
-   "first_stamp_sec": 1627785271.0675325,
-   "last_stamp_sec": 1627785299.892213,
-   "duration_sec": 28.82468056678772,
-   "bag_start_sec": 1794219803.7133348,
-   "bag_end_sec": 1794219861.3423586,
-   "verdict": "OK"
-  }
- },
- "node": {
-  "bytes": 1144545,
-  "frames_logged": 739,
-  "total_time_median_s": 0.008962,
-  "total_time_p95_s": 0.1099933,
-  "total_time_max_s": 0.152565,
-  "icp_median_s": 0.014138000000000001,
-  "above_frame_budget": 41,
-  "note": "frame budget at 10 Hz is 0.100 s"
- },
- "resources": {
-  "samples": 90,
-  "load1_min": 81.2,
-  "load1_median": 258.1,
-  "load1_max": 875.2,
-  "cpu_sec_per_sample_median": 0.25,
-  "cpu_sec_per_sample_max": 8.85,
-  "note": "sampled every 2 s; cpu = utime+stime deltas of fastlivo_mapping"
- },
- "judgement": {
-  "verdict": "SCHEDULING_CONTENTION",
-  "reason": "the host skipped publications while its inputs were continuous; load average was 258.1 against 128 cores, so the host was CPU-starved rather than missing data",
-  "input_holes_detected": false,
-  "odom_stretch_detected": true,
-  "load_median": 258.1,
-  "n_cpu": 128,
-  "cpu_sec_per_sample_median": 0.25,
-  "node_frames_over_100ms_budget": 41,
-  "segment_comparison": [
-   {
-    "segment": 0,
-    "odom_ms_inside": 66.73526763916016,
-    "odom_ms_neighbours": 66.66719913482666,
-    "lidar_ms_inside": 100.19636154174805,
-    "imu_ms_inside": 6.918907165527344,
-    "slow_fraction_inside": 0.4329896907216495,
-    "slow_fraction_neighbours": 0.07037037037037037
-   },
-   {
-    "segment": 1,
-    "odom_ms_inside": 66.66088104248047,
-    "odom_ms_neighbours": 66.6666030883789,
-    "lidar_ms_inside": null,
-    "imu_ms_inside": 6.780862808227539,
-    "slow_fraction_inside": 0.0,
-    "slow_fraction_neighbours": 0.16532258064516128
-   }
-  ]
- }
 }
