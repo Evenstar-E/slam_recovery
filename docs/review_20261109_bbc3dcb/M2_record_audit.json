@@ -209,8 +209,15 @@
     "masks": 598,
     "failures": [],
     "failure_count": 0,
-    "source_bag_sha256": "aa740037b01abae537d409a150d8a633fb4026d7474f6b8e766be2d508683aae",
-    "output_bag_sha256": "700ce116192eb0958f8048a630237de6429ebe0c9eb4c2038ed91790f4b70bdd"
+    "source_bag_sha256_recorded": "aa740037b01abae537d409a150d8a633fb4026d7474f6b8e766be2d508683aae",
+    "source_bag_sha256_recomputed": "aa740037b01abae537d409a150d8a633fb4026d7474f6b8e766be2d508683aae",
+    "output_bag_sha256_recorded": "700ce116192eb0958f8048a630237de6429ebe0c9eb4c2038ed91790f4b70bdd",
+    "output_bag_sha256_recomputed": "700ce116192eb0958f8048a630237de6429ebe0c9eb4c2038ed91790f4b70bdd"
+  },
+  "authoritative_status": {
+    "field": "id_topic_verification",
+    "verdict": "PASS",
+    "supersedes": "point_record.checks[original point id preserved] (advisory only)"
   },
   "non_lidar": {
     "checks": [

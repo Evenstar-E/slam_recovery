@@ -100,6 +100,18 @@ int32 掩码：21,198,773 保留点 × 4 B = **84,795,092 B**，输出包 1,415,
 - 掩码帧数必须等于点云帧数，重复 stamp 判失败；
 - 缺包或 `id_schema_version < 2` → `UNVERIFIABLE`/`FAIL`。
 
+**bag 身份在主审计里现算**：`audit_id_topic()` 自己算源包与输出包的 sha256 再与 sidecar 比对，
+不转述 sidecar 的自我声明。本次两者逐位相同：
+
+```
+source aa740037b01abae537d409a150d8a633fb4026d7474f6b8e766be2d508683aae  (recorded == recomputed)
+output 700ce116192eb0958f8048a630237de6429ebe0c9eb4c2038ed91790f4b70bdd  (recorded == recomputed)
+```
+
+**权威状态字段**固定为 `authoritative_status.field = "id_topic_verification"`；
+`point_record` 里那条话题存在性检查降级为 advisory，`authoritative_status.supersedes` 明确写了它被取代，
+汇总不得回退到旧字段。
+
 本次结果：**PASS**，598 云 / 598 掩码 / 0 失败 / schema 2。
 
 **两个函数覆盖两个包，界线写清**：`verify_stripped_frames()` 核的是**原被审计包**
@@ -123,8 +135,26 @@ int32 掩码：21,198,773 保留点 × 4 B = **84,795,092 B**，输出包 1,415,
 | `test_rejects_source_hash_mismatch` | 篡改 sidecar 源哈希 → 必须与现算值不等 |
 | `test_rejects_filter_report_disagreement` | 改一帧 kept 计数 → 必须报与 filter report 不符 |
 
-负例共用同一个 `validate()`：正例要求返回空列表，负例要求返回包含特定原因的错误。
+**负例共用同一个 `validate()`**：正例要求返回空列表，负例要求返回包含特定原因的错误。
 "什么都不报"的实现会在负例上失败。
+
+`validate()` 现在接受 `bag_hashes / msgtype / schema_version` 参数，因此
+"源 hash 不符"不再只断言字符串不同，而是**真的调用校验器并要求它拒绝**。
+
+第二个测试类 `TestFixtures` 完全不碰 bag（合成输入，无需 rosbag），覆盖四类无包场景：
+
+| fixture | 期望 |
+|---|---|
+| sidecar 为 `None` / `per_frame` 为空 | 报 "no sidecar entry" |
+| stride 写成 4（v1 的字节单位 bug） | 报 "dim size/stride" |
+| msgtype 错（`Int32MultiArray`） | 报 "msgtype" |
+| `id_schema_version = 1` | 报 schema 过旧 |
+| 源 bag hash 不符 | 报 "source bag sha256" |
+
+同 stamp 重复掩码帧的负例也改成真重复流：把同一 `(scan_ns, idx)` 再追加一次，
+校验器报 `duplicate mask stamps`（原先加的是另一个 stamp，测的是数量不符，不是重复）。
+
+合计 **15 项**：真实数据 9 项 + 负例/夹具 6 项。
 
 ## 6. 这次提交的两类改动
 

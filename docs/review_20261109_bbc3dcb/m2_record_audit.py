@@ -296,6 +296,15 @@ def audit_id_topic(n_checked=0):
 
     if len(masks) != checked:
         bad.append({"why": f"{len(masks)} masks for {checked} clouds"})
+    # Identity of the bags is established here, not asserted by the sidecar about itself.
+    src_sha = sha256_file(SRC) if SRC.exists() else None
+    out_sha = sha256_file(ID_BAG)
+    if src_sha != side.get("source_bag_sha256"):
+        bad.append({"why": f"source bag sha256 {src_sha} != recorded "
+                           f"{side.get('source_bag_sha256')}"})
+    if out_sha != side.get("output_bag_sha256"):
+        bad.append({"why": f"output bag sha256 {out_sha} != recorded "
+                           f"{side.get('output_bag_sha256')}"})
     if dup:
         bad.append({"why": f"duplicate mask frames: {dup[:5]}"})
     verdict = "PASS" if (msgtype_ok and not bad and side.get("id_schema_version", 0) >= 2) else "FAIL"
@@ -304,8 +313,10 @@ def audit_id_topic(n_checked=0):
             "schema_version": side.get("id_schema_version"),
             "clouds_checked": checked, "masks": len(masks), "failures": bad[:10],
             "failure_count": len(bad),
-            "source_bag_sha256": side.get("source_bag_sha256"),
-            "output_bag_sha256": side.get("output_bag_sha256")}
+            "source_bag_sha256_recorded": side.get("source_bag_sha256"),
+            "source_bag_sha256_recomputed": src_sha,
+            "output_bag_sha256_recorded": side.get("output_bag_sha256"),
+            "output_bag_sha256_recomputed": out_sha}
 
 def _iter_clouds(path):
     with rosbag.Bag(str(path), "r") as b:
@@ -449,6 +460,14 @@ def main():
     out["stripped_frames"] = verify_stripped_frames()
     print("stripped frames done", flush=True)
     out["id_topic_verification"] = audit_id_topic()
+    # The authoritative M2 status is this one block. `point_record`'s topic-existence check is
+    # advisory and must never be read as the verdict: it cannot tell an index topic from a
+    # debug topic, which is why it was replaced.
+    out["authoritative_status"] = {
+        "field": "id_topic_verification",
+        "verdict": out["id_topic_verification"]["verdict"],
+        "supersedes": "point_record.checks[original point id preserved] (advisory only)",
+    }
     print("id topic done:", out["id_topic_verification"]["verdict"], flush=True)
     out["non_lidar"] = audit_non_lidar()
     print("non-lidar done", flush=True)
