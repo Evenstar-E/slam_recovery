@@ -10,9 +10,14 @@ controls, labels and provenance do not get chosen after seeing the numbers.
 - Injection window: absolute `[1627785275.607, 1627785295.546]`, measured by per-frame buffer
   equality against the clean bag (200 differing frames). This is an **INJECTION_ORACLE**; it needs
   the clean recording and is not an online detector.
-- Key set: frozen before evaluation. Two acceptable sets, both reported explicitly:
-  the gate's committable set (259 keys at the time of writing) or all quarantine keyframes (445).
-  The key list and the reference hash are exported with the results.
+- Key set (frozen; `docs/milestone_m0_keys.json`):
+  - **primary**: all 445 quarantine scans, independent of candidate support
+    (sha256 `95832fee...9ae89d3`);
+  - **diagnostic subset**: the 259 gate-committable scans, reported only as a subset
+    (sha256 `a234dee4...0eb58e`);
+  - **healthy prefix**: the 133 pre-onset paired keyframes (sha256 `852b9ee0...2f35eb93`).
+  A candidate-dependent set is never the common population for the four controls. Missing poses or
+  observations are listed separately, not dropped from the denominator.
 - Reference surface: the clean run's map, built only from the clean recording
   (`REAL_HOST_CLEAN_PROXY`). `hall_01` has no ground-truth mesh, so no GT contamination value is
   reported.
@@ -24,11 +29,37 @@ controls, labels and provenance do not get chosen after seeing the numbers.
 | C0 | contaminated (as recorded) | host (FAST-LIVO2 on the injected bag) | REAL_HOST |
 | C1 | contaminated | reference (clean-run pose mapped into the injected frame by the pre-onset SE(3)) | OFFLINE_CONSTRUCT |
 | C2 | oracle-decontaminated (injector azimuth sector removed **inside the injection window only**) | reference | ORACLE_CEILING |
-| C3 | actual filter output (repository near-field filter / mixture repairer) | actual re-estimation | DEPLOYABLE_REPAIR |
+| C3 | actual filter output (repository near-field filter / mixture repairer) | actual re-estimation | OFFLINE_NATIVE_REESTIMATION at M0/M1; DEPLOYABLE_REPAIR only after a true online host checkpoint run |
 
-C2 is a ceiling, never a deployable result. C3 is the only condition that can support a claim about
-what the system can do. If the C3 chain cannot run on the archived data, it is recorded as
-`UNAVAILABLE` with the missing input named; it is not replaced by C2 or by a hand-written rule.
+C2 is a ceiling, never a deployable result. It removes contaminated points but cannot restore the
+occluded background, so it is not a universal optimal-map bound. C3 is the only condition that can
+support a claim about what the system can do. If the C3 chain cannot run on the archived data, it is
+recorded as `UNAVAILABLE` with the missing input named; it is not replaced by C2 or by a hand-written
+rule.
+
+C1 and C2 use clean-run poses and are scored against the clean-run map, so their numbers are an
+oracle/proxy consistency control, not independent GT accuracy. C3 must be evaluated against an
+independent or held-out reference; if none exists, the proxy limitation is stated and the
+connectivity work still proceeds.
+
+### C3 host-input consumption record (M0/M2 deliverable)
+
+The native rerun must record: sha256 of the original, converted and filtered bags; the host binary
+and its revision; the configuration actually loaded; the exact command; and the output hash. File
+hashes alone identify files, not that the host consumed them. The first rerun from the same healthy
+prefix is labelled `OFFLINE_NATIVE_REESTIMATION`; `DEPLOYABLE_REPAIR` requires an online checkpoint
+and host map commit run, which is a separate milestone.
+
+### State and full point-record contract (M2)
+
+- The filter must preserve ring, time, header stamp and the original point id; a filtered message
+  without those cannot be replayed or attributed.
+- The host deskew/estimation must produce new full SE3 poses and a map; report translation and RPE
+  on the common time support, the output missing rate, false interventions on recovery tail and
+  clean windows, and runtime.
+- Oracle contamination identity is scored only on points inside the absolute injection window.
+  Points from the same azimuth sector outside the window are healthy background and must not count
+  as true positives.
 
 ## Measurements (same keys and region for every condition)
 
