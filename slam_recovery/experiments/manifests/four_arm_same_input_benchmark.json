@@ -147,44 +147,92 @@
     "what": "clean-run poses mapped into the injected frame by the pre-onset SE(3); the gate reference is still only the injected run's pre-onset keyframes",
     "accepted": false,
     "mode": "MODE3_SOFT_BRIDGE_WAIT",
-    "holdout_nis": 1187.7734,
-    "reason": "Refused Mode 2 atomic commit: paired-benefit evidence FAILED (explicit failure, non-finite value, or threshold violation)",
-    "evidence_status": "FAILED",
+    "holdout_nis": 225.6975,
+    "reason": "Insufficient verified info; maintaining soft bridge while waiting for new evidence",
+    "evidence_status": "PASSED",
     "admitted_quarantined_frames": 0,
     "paired_evidence": {
-      "num_paired_frames": 14,
+      "num_paired_frames": 317,
       "required_paired_frames": 8,
-      "candidate_keyframes": 14,
-      "pairable_frames": 14,
+      "candidate_keyframes": 317,
+      "pairable_frames": 317,
       "frames_without_independent_reference": 0,
       "reference_frames_from_candidate": 0,
-      "num_improved_frames": 0,
-      "improved_fraction": 0.0,
-      "wilson_lower_bound": 0.0,
-      "approved": false,
-      "reason": "wilson_sequential_benefit_lower_bound_failed",
-      "incumbent_mean_residual": 929.4290735206911,
-      "candidate_mean_residual": 1198.7541668006104,
+      "num_improved_frames": 301,
+      "improved_fraction": 0.9495268138801262,
+      "wilson_lower_bound": 0.9252250347887798,
+      "approved": true,
+      "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+      "incumbent_mean_residual": 1729.0840332531375,
+      "candidate_mean_residual": 210.40051392085255,
       "reentry_pos_jump_m": 0.1848906880467479
     },
     "diagnostics": {
       "candidate_dict_size": 391,
       "support_diagnostics": {
-        "holdout_frames_total": 3,
-        "holdout_frames_scorable": 3,
+        "holdout_frames_total": 64,
+        "holdout_frames_scorable": 64,
         "candidate_frames_total": 391,
         "candidate_frames_committable": 317,
-        "candidate_frames_committed": 14,
-        "candidate_frames_deferred": 377,
+        "candidate_frames_committed": 317,
+        "candidate_frames_deferred": 74,
         "frames_missing_scan": [],
         "frames_in_reference": [],
-        "prefix_stop_key": 14,
-        "prefix_stop_reason": "no_reference_support",
-        "committable_frames_after_prefix": 303
+        "deferred_runs": [
+          [
+            14,
+            14
+          ],
+          [
+            17,
+            19
+          ],
+          [
+            21,
+            24
+          ],
+          [
+            26,
+            38
+          ],
+          [
+            42,
+            43
+          ],
+          [
+            49,
+            55
+          ],
+          [
+            57,
+            93
+          ],
+          [
+            95,
+            96
+          ],
+          [
+            98,
+            99
+          ],
+          [
+            102,
+            102
+          ],
+          [
+            104,
+            104
+          ],
+          [
+            116,
+            116
+          ]
+        ],
+        "first_deferred_reason": "no_reference_support"
       }
     },
     "per_frame_paired_residuals": {
-      "n": 14,
+      "n": 317,
       "pairs": [
         {
           "kf": 0,
@@ -269,64 +317,1866 @@
           "incumbent": 53.3163,
           "candidate": 56.4045,
           "candidate_better": false
+        },
+        {
+          "kf": 14,
+          "incumbent": 56.4347,
+          "candidate": 56.2959,
+          "candidate_better": true
+        },
+        {
+          "kf": 15,
+          "incumbent": 52.0037,
+          "candidate": 53.9536,
+          "candidate_better": false
+        },
+        {
+          "kf": 16,
+          "incumbent": 59.9,
+          "candidate": 57.2336,
+          "candidate_better": true
+        },
+        {
+          "kf": 17,
+          "incumbent": 59.5148,
+          "candidate": 60.6348,
+          "candidate_better": false
+        },
+        {
+          "kf": 18,
+          "incumbent": 65.7439,
+          "candidate": 54.0428,
+          "candidate_better": true
+        },
+        {
+          "kf": 19,
+          "incumbent": 68.8007,
+          "candidate": 60.4846,
+          "candidate_better": true
+        },
+        {
+          "kf": 20,
+          "incumbent": 71.5392,
+          "candidate": 57.1514,
+          "candidate_better": true
+        },
+        {
+          "kf": 21,
+          "incumbent": 72.2243,
+          "candidate": 56.5311,
+          "candidate_better": true
+        },
+        {
+          "kf": 22,
+          "incumbent": 62.9612,
+          "candidate": 55.1654,
+          "candidate_better": true
+        },
+        {
+          "kf": 23,
+          "incumbent": 61.3402,
+          "candidate": 54.088,
+          "candidate_better": true
+        },
+        {
+          "kf": 24,
+          "incumbent": 64.6396,
+          "candidate": 48.7146,
+          "candidate_better": true
+        },
+        {
+          "kf": 25,
+          "incumbent": 64.6134,
+          "candidate": 48.1353,
+          "candidate_better": true
+        },
+        {
+          "kf": 26,
+          "incumbent": 71.9403,
+          "candidate": 58.061,
+          "candidate_better": true
+        },
+        {
+          "kf": 27,
+          "incumbent": 68.3708,
+          "candidate": 55.1297,
+          "candidate_better": true
+        },
+        {
+          "kf": 28,
+          "incumbent": 71.9252,
+          "candidate": 55.0902,
+          "candidate_better": true
+        },
+        {
+          "kf": 29,
+          "incumbent": 71.045,
+          "candidate": 51.1711,
+          "candidate_better": true
+        },
+        {
+          "kf": 30,
+          "incumbent": 56.0176,
+          "candidate": 45.9514,
+          "candidate_better": true
+        },
+        {
+          "kf": 31,
+          "incumbent": 63.8481,
+          "candidate": 52.9695,
+          "candidate_better": true
+        },
+        {
+          "kf": 32,
+          "incumbent": 67.4617,
+          "candidate": 55.4904,
+          "candidate_better": true
+        },
+        {
+          "kf": 33,
+          "incumbent": 64.8179,
+          "candidate": 53.9772,
+          "candidate_better": true
+        },
+        {
+          "kf": 34,
+          "incumbent": 64.7405,
+          "candidate": 50.0365,
+          "candidate_better": true
+        },
+        {
+          "kf": 35,
+          "incumbent": 56.1917,
+          "candidate": 47.84,
+          "candidate_better": true
+        },
+        {
+          "kf": 36,
+          "incumbent": 57.2036,
+          "candidate": 53.9154,
+          "candidate_better": true
+        },
+        {
+          "kf": 37,
+          "incumbent": 65.9159,
+          "candidate": 51.9264,
+          "candidate_better": true
+        },
+        {
+          "kf": 38,
+          "incumbent": 70.6513,
+          "candidate": 51.4626,
+          "candidate_better": true
+        },
+        {
+          "kf": 39,
+          "incumbent": 78.5764,
+          "candidate": 56.6494,
+          "candidate_better": true
+        },
+        {
+          "kf": 40,
+          "incumbent": 63.3112,
+          "candidate": 44.5981,
+          "candidate_better": true
+        },
+        {
+          "kf": 41,
+          "incumbent": 60.2286,
+          "candidate": 43.9783,
+          "candidate_better": true
+        },
+        {
+          "kf": 42,
+          "incumbent": 62.8458,
+          "candidate": 49.4778,
+          "candidate_better": true
+        },
+        {
+          "kf": 43,
+          "incumbent": 64.4195,
+          "candidate": 53.5199,
+          "candidate_better": true
+        },
+        {
+          "kf": 44,
+          "incumbent": 65.6006,
+          "candidate": 42.8806,
+          "candidate_better": true
+        },
+        {
+          "kf": 45,
+          "incumbent": 68.0766,
+          "candidate": 50.1806,
+          "candidate_better": true
+        },
+        {
+          "kf": 46,
+          "incumbent": 71.788,
+          "candidate": 51.8155,
+          "candidate_better": true
+        },
+        {
+          "kf": 47,
+          "incumbent": 62.923,
+          "candidate": 48.2497,
+          "candidate_better": true
+        },
+        {
+          "kf": 48,
+          "incumbent": 66.7798,
+          "candidate": 49.2404,
+          "candidate_better": true
+        },
+        {
+          "kf": 49,
+          "incumbent": 57.5765,
+          "candidate": 54.1938,
+          "candidate_better": true
+        },
+        {
+          "kf": 50,
+          "incumbent": 59.4664,
+          "candidate": 59.0588,
+          "candidate_better": true
+        },
+        {
+          "kf": 51,
+          "incumbent": 68.022,
+          "candidate": 50.7579,
+          "candidate_better": true
+        },
+        {
+          "kf": 52,
+          "incumbent": 70.9684,
+          "candidate": 50.3949,
+          "candidate_better": true
+        },
+        {
+          "kf": 53,
+          "incumbent": 72.577,
+          "candidate": 45.4174,
+          "candidate_better": true
+        },
+        {
+          "kf": 54,
+          "incumbent": 73.6405,
+          "candidate": 50.8575,
+          "candidate_better": true
+        },
+        {
+          "kf": 55,
+          "incumbent": 68.1816,
+          "candidate": 55.1533,
+          "candidate_better": true
+        },
+        {
+          "kf": 56,
+          "incumbent": 63.8224,
+          "candidate": 45.994,
+          "candidate_better": true
+        },
+        {
+          "kf": 57,
+          "incumbent": 59.9259,
+          "candidate": 55.5184,
+          "candidate_better": true
+        },
+        {
+          "kf": 58,
+          "incumbent": 57.5128,
+          "candidate": 52.7818,
+          "candidate_better": true
+        },
+        {
+          "kf": 59,
+          "incumbent": 65.8368,
+          "candidate": 61.4895,
+          "candidate_better": true
+        },
+        {
+          "kf": 60,
+          "incumbent": 61.3203,
+          "candidate": 52.2127,
+          "candidate_better": true
+        },
+        {
+          "kf": 61,
+          "incumbent": 61.9994,
+          "candidate": 61.8169,
+          "candidate_better": true
+        },
+        {
+          "kf": 62,
+          "incumbent": 69.4303,
+          "candidate": 59.2035,
+          "candidate_better": true
+        },
+        {
+          "kf": 63,
+          "incumbent": 67.6596,
+          "candidate": 61.5855,
+          "candidate_better": true
+        },
+        {
+          "kf": 64,
+          "incumbent": 79.4891,
+          "candidate": 59.0875,
+          "candidate_better": true
+        },
+        {
+          "kf": 65,
+          "incumbent": 83.6414,
+          "candidate": 58.271,
+          "candidate_better": true
+        },
+        {
+          "kf": 66,
+          "incumbent": 94.2667,
+          "candidate": 58.8801,
+          "candidate_better": true
+        },
+        {
+          "kf": 67,
+          "incumbent": 93.0493,
+          "candidate": 52.052,
+          "candidate_better": true
+        },
+        {
+          "kf": 68,
+          "incumbent": 86.1278,
+          "candidate": 47.6414,
+          "candidate_better": true
+        },
+        {
+          "kf": 69,
+          "incumbent": 88.0129,
+          "candidate": 53.4347,
+          "candidate_better": true
+        },
+        {
+          "kf": 70,
+          "incumbent": 89.0618,
+          "candidate": 53.7989,
+          "candidate_better": true
+        },
+        {
+          "kf": 71,
+          "incumbent": 79.4564,
+          "candidate": 54.8309,
+          "candidate_better": true
+        },
+        {
+          "kf": 72,
+          "incumbent": 70.5374,
+          "candidate": 50.4982,
+          "candidate_better": true
+        },
+        {
+          "kf": 73,
+          "incumbent": 74.7544,
+          "candidate": 54.9283,
+          "candidate_better": true
+        },
+        {
+          "kf": 74,
+          "incumbent": 69.0523,
+          "candidate": 56.913,
+          "candidate_better": true
+        },
+        {
+          "kf": 75,
+          "incumbent": 68.8437,
+          "candidate": 59.3885,
+          "candidate_better": true
+        },
+        {
+          "kf": 76,
+          "incumbent": 61.276,
+          "candidate": 55.4817,
+          "candidate_better": true
+        },
+        {
+          "kf": 77,
+          "incumbent": 69.6039,
+          "candidate": 61.1061,
+          "candidate_better": true
+        },
+        {
+          "kf": 78,
+          "incumbent": 59.9809,
+          "candidate": 56.9981,
+          "candidate_better": true
+        },
+        {
+          "kf": 79,
+          "incumbent": 64.6312,
+          "candidate": 58.3347,
+          "candidate_better": true
+        },
+        {
+          "kf": 80,
+          "incumbent": 57.0537,
+          "candidate": 69.2556,
+          "candidate_better": false
+        },
+        {
+          "kf": 81,
+          "incumbent": 59.8688,
+          "candidate": 56.5984,
+          "candidate_better": true
+        },
+        {
+          "kf": 82,
+          "incumbent": 56.0236,
+          "candidate": 56.4313,
+          "candidate_better": false
+        },
+        {
+          "kf": 83,
+          "incumbent": 51.948,
+          "candidate": 48.8665,
+          "candidate_better": true
+        },
+        {
+          "kf": 84,
+          "incumbent": 47.6887,
+          "candidate": 52.0437,
+          "candidate_better": false
+        },
+        {
+          "kf": 85,
+          "incumbent": 50.5078,
+          "candidate": 53.389,
+          "candidate_better": false
+        },
+        {
+          "kf": 86,
+          "incumbent": 40.8933,
+          "candidate": 60.0343,
+          "candidate_better": false
+        },
+        {
+          "kf": 87,
+          "incumbent": 40.1087,
+          "candidate": 59.6893,
+          "candidate_better": false
+        },
+        {
+          "kf": 88,
+          "incumbent": 42.5302,
+          "candidate": 63.2946,
+          "candidate_better": false
+        },
+        {
+          "kf": 89,
+          "incumbent": 42.4555,
+          "candidate": 62.3747,
+          "candidate_better": false
+        },
+        {
+          "kf": 90,
+          "incumbent": 36.825,
+          "candidate": 66.4612,
+          "candidate_better": false
+        },
+        {
+          "kf": 91,
+          "incumbent": 36.0094,
+          "candidate": 70.8759,
+          "candidate_better": false
+        },
+        {
+          "kf": 92,
+          "incumbent": 39.5228,
+          "candidate": 68.9427,
+          "candidate_better": false
+        },
+        {
+          "kf": 93,
+          "incumbent": 40.9634,
+          "candidate": 80.1292,
+          "candidate_better": false
+        },
+        {
+          "kf": 94,
+          "incumbent": 34.7118,
+          "candidate": 68.8309,
+          "candidate_better": false
+        },
+        {
+          "kf": 95,
+          "incumbent": 36.638,
+          "candidate": 63.2341,
+          "candidate_better": false
+        },
+        {
+          "kf": 96,
+          "incumbent": 33.6916,
+          "candidate": 70.4092,
+          "candidate_better": false
+        },
+        {
+          "kf": 97,
+          "incumbent": 32.2308,
+          "candidate": 68.8197,
+          "candidate_better": false
+        },
+        {
+          "kf": 98,
+          "incumbent": 33.9257,
+          "candidate": 65.2607,
+          "candidate_better": false
+        },
+        {
+          "kf": 99,
+          "incumbent": 33.4918,
+          "candidate": 66.5629,
+          "candidate_better": false
+        },
+        {
+          "kf": 100,
+          "incumbent": 32.8014,
+          "candidate": 59.1779,
+          "candidate_better": false
+        },
+        {
+          "kf": 101,
+          "incumbent": 33.2437,
+          "candidate": 67.9659,
+          "candidate_better": false
+        },
+        {
+          "kf": 102,
+          "incumbent": 32.8935,
+          "candidate": 65.1309,
+          "candidate_better": false
+        },
+        {
+          "kf": 103,
+          "incumbent": 33.0826,
+          "candidate": 65.9636,
+          "candidate_better": false
+        },
+        {
+          "kf": 104,
+          "incumbent": 30.7987,
+          "candidate": 67.5332,
+          "candidate_better": false
+        },
+        {
+          "kf": 105,
+          "incumbent": 31.5131,
+          "candidate": 65.4688,
+          "candidate_better": false
+        },
+        {
+          "kf": 106,
+          "incumbent": 32.2323,
+          "candidate": 63.6572,
+          "candidate_better": false
+        },
+        {
+          "kf": 107,
+          "incumbent": 33.1088,
+          "candidate": 70.8094,
+          "candidate_better": false
+        },
+        {
+          "kf": 108,
+          "incumbent": 35.1144,
+          "candidate": 59.1902,
+          "candidate_better": false
+        },
+        {
+          "kf": 109,
+          "incumbent": 34.7516,
+          "candidate": 74.1393,
+          "candidate_better": false
+        },
+        {
+          "kf": 110,
+          "incumbent": 36.8815,
+          "candidate": 68.2705,
+          "candidate_better": false
+        },
+        {
+          "kf": 111,
+          "incumbent": 36.6254,
+          "candidate": 64.5005,
+          "candidate_better": false
+        },
+        {
+          "kf": 112,
+          "incumbent": 43.8154,
+          "candidate": 72.5699,
+          "candidate_better": false
+        },
+        {
+          "kf": 113,
+          "incumbent": 37.1966,
+          "candidate": 70.7627,
+          "candidate_better": false
+        },
+        {
+          "kf": 114,
+          "incumbent": 45.1368,
+          "candidate": 64.3691,
+          "candidate_better": false
+        },
+        {
+          "kf": 115,
+          "incumbent": 43.8616,
+          "candidate": 60.1825,
+          "candidate_better": false
+        },
+        {
+          "kf": 116,
+          "incumbent": 41.8992,
+          "candidate": 65.8108,
+          "candidate_better": false
+        },
+        {
+          "kf": 117,
+          "incumbent": 48.4026,
+          "candidate": 65.3809,
+          "candidate_better": false
+        },
+        {
+          "kf": 118,
+          "incumbent": 51.7407,
+          "candidate": 65.6999,
+          "candidate_better": false
+        },
+        {
+          "kf": 119,
+          "incumbent": 49.5258,
+          "candidate": 68.0563,
+          "candidate_better": false
+        },
+        {
+          "kf": 120,
+          "incumbent": 45.3141,
+          "candidate": 70.5669,
+          "candidate_better": false
+        },
+        {
+          "kf": 121,
+          "incumbent": 47.3754,
+          "candidate": 64.9847,
+          "candidate_better": false
+        },
+        {
+          "kf": 122,
+          "incumbent": 50.6949,
+          "candidate": 71.0835,
+          "candidate_better": false
+        },
+        {
+          "kf": 123,
+          "incumbent": 58.0158,
+          "candidate": 66.2472,
+          "candidate_better": false
+        },
+        {
+          "kf": 124,
+          "incumbent": 57.2199,
+          "candidate": 60.4645,
+          "candidate_better": false
+        },
+        {
+          "kf": 125,
+          "incumbent": 55.6031,
+          "candidate": 59.607,
+          "candidate_better": false
+        },
+        {
+          "kf": 126,
+          "incumbent": 57.9865,
+          "candidate": 66.1291,
+          "candidate_better": false
+        },
+        {
+          "kf": 127,
+          "incumbent": 61.9652,
+          "candidate": 58.0757,
+          "candidate_better": true
+        },
+        {
+          "kf": 128,
+          "incumbent": 62.5656,
+          "candidate": 51.1554,
+          "candidate_better": true
+        },
+        {
+          "kf": 129,
+          "incumbent": 59.5702,
+          "candidate": 59.1311,
+          "candidate_better": true
+        },
+        {
+          "kf": 130,
+          "incumbent": 60.6438,
+          "candidate": 54.5665,
+          "candidate_better": true
+        },
+        {
+          "kf": 131,
+          "incumbent": 417.5274,
+          "candidate": 46.9617,
+          "candidate_better": true
+        },
+        {
+          "kf": 132,
+          "incumbent": 70.2276,
+          "candidate": 50.4527,
+          "candidate_better": true
+        },
+        {
+          "kf": 133,
+          "incumbent": 77.4802,
+          "candidate": 49.7478,
+          "candidate_better": true
+        },
+        {
+          "kf": 134,
+          "incumbent": 75.6335,
+          "candidate": 49.2895,
+          "candidate_better": true
+        },
+        {
+          "kf": 135,
+          "incumbent": 75.0854,
+          "candidate": 50.1514,
+          "candidate_better": true
+        },
+        {
+          "kf": 136,
+          "incumbent": 68.6763,
+          "candidate": 45.6232,
+          "candidate_better": true
+        },
+        {
+          "kf": 137,
+          "incumbent": 73.826,
+          "candidate": 46.499,
+          "candidate_better": true
+        },
+        {
+          "kf": 138,
+          "incumbent": 84.1394,
+          "candidate": 46.7689,
+          "candidate_better": true
+        },
+        {
+          "kf": 139,
+          "incumbent": 68.9622,
+          "candidate": 39.5325,
+          "candidate_better": true
+        },
+        {
+          "kf": 140,
+          "incumbent": 482.7938,
+          "candidate": 42.3179,
+          "candidate_better": true
+        },
+        {
+          "kf": 141,
+          "incumbent": 422.7624,
+          "candidate": 41.6242,
+          "candidate_better": true
+        },
+        {
+          "kf": 142,
+          "incumbent": 470.1823,
+          "candidate": 35.3678,
+          "candidate_better": true
+        },
+        {
+          "kf": 143,
+          "incumbent": 498.3631,
+          "candidate": 37.4824,
+          "candidate_better": true
+        },
+        {
+          "kf": 144,
+          "incumbent": 80.1405,
+          "candidate": 30.9837,
+          "candidate_better": true
+        },
+        {
+          "kf": 145,
+          "incumbent": 60.2048,
+          "candidate": 13.595,
+          "candidate_better": true
+        },
+        {
+          "kf": 146,
+          "incumbent": 67.7201,
+          "candidate": 16.7857,
+          "candidate_better": true
+        },
+        {
+          "kf": 147,
+          "incumbent": 65.4993,
+          "candidate": 16.6945,
+          "candidate_better": true
+        },
+        {
+          "kf": 148,
+          "incumbent": 60.1802,
+          "candidate": 15.3198,
+          "candidate_better": true
+        },
+        {
+          "kf": 149,
+          "incumbent": 67.0169,
+          "candidate": 17.2024,
+          "candidate_better": true
+        },
+        {
+          "kf": 150,
+          "incumbent": 61.5955,
+          "candidate": 17.2319,
+          "candidate_better": true
+        },
+        {
+          "kf": 151,
+          "incumbent": 69.3873,
+          "candidate": 15.2467,
+          "candidate_better": true
+        },
+        {
+          "kf": 152,
+          "incumbent": 60.3876,
+          "candidate": 19.8857,
+          "candidate_better": true
+        },
+        {
+          "kf": 153,
+          "incumbent": 60.0664,
+          "candidate": 15.0208,
+          "candidate_better": true
+        },
+        {
+          "kf": 154,
+          "incumbent": 66.2487,
+          "candidate": 14.7327,
+          "candidate_better": true
+        },
+        {
+          "kf": 155,
+          "incumbent": 60.4219,
+          "candidate": 13.1901,
+          "candidate_better": true
+        },
+        {
+          "kf": 156,
+          "incumbent": 64.1688,
+          "candidate": 20.7338,
+          "candidate_better": true
+        },
+        {
+          "kf": 157,
+          "incumbent": 60.7823,
+          "candidate": 14.4373,
+          "candidate_better": true
+        },
+        {
+          "kf": 158,
+          "incumbent": 63.7872,
+          "candidate": 16.6677,
+          "candidate_better": true
+        },
+        {
+          "kf": 159,
+          "incumbent": 61.2745,
+          "candidate": 17.2085,
+          "candidate_better": true
+        },
+        {
+          "kf": 160,
+          "incumbent": 60.7073,
+          "candidate": 13.9571,
+          "candidate_better": true
+        },
+        {
+          "kf": 161,
+          "incumbent": 66.4051,
+          "candidate": 12.6889,
+          "candidate_better": true
+        },
+        {
+          "kf": 162,
+          "incumbent": 64.4187,
+          "candidate": 15.7972,
+          "candidate_better": true
+        },
+        {
+          "kf": 163,
+          "incumbent": 55.2279,
+          "candidate": 18.8691,
+          "candidate_better": true
+        },
+        {
+          "kf": 164,
+          "incumbent": 59.3897,
+          "candidate": 14.8873,
+          "candidate_better": true
+        },
+        {
+          "kf": 165,
+          "incumbent": 57.6113,
+          "candidate": 16.553,
+          "candidate_better": true
+        },
+        {
+          "kf": 166,
+          "incumbent": 67.3791,
+          "candidate": 13.3355,
+          "candidate_better": true
+        },
+        {
+          "kf": 167,
+          "incumbent": 63.2512,
+          "candidate": 15.0102,
+          "candidate_better": true
+        },
+        {
+          "kf": 168,
+          "incumbent": 66.1488,
+          "candidate": 17.0116,
+          "candidate_better": true
+        },
+        {
+          "kf": 169,
+          "incumbent": 61.9639,
+          "candidate": 13.7345,
+          "candidate_better": true
+        },
+        {
+          "kf": 170,
+          "incumbent": 55.0031,
+          "candidate": 14.1182,
+          "candidate_better": true
+        },
+        {
+          "kf": 171,
+          "incumbent": 59.2008,
+          "candidate": 17.0002,
+          "candidate_better": true
+        },
+        {
+          "kf": 172,
+          "incumbent": 56.9774,
+          "candidate": 18.0422,
+          "candidate_better": true
+        },
+        {
+          "kf": 173,
+          "incumbent": 54.0441,
+          "candidate": 15.4193,
+          "candidate_better": true
+        },
+        {
+          "kf": 174,
+          "incumbent": 67.2881,
+          "candidate": 15.4847,
+          "candidate_better": true
+        },
+        {
+          "kf": 175,
+          "incumbent": 62.97,
+          "candidate": 10.8902,
+          "candidate_better": true
+        },
+        {
+          "kf": 176,
+          "incumbent": 66.9931,
+          "candidate": 17.5544,
+          "candidate_better": true
+        },
+        {
+          "kf": 177,
+          "incumbent": 57.0035,
+          "candidate": 14.1469,
+          "candidate_better": true
+        },
+        {
+          "kf": 178,
+          "incumbent": 59.3938,
+          "candidate": 18.8972,
+          "candidate_better": true
+        },
+        {
+          "kf": 179,
+          "incumbent": 61.9804,
+          "candidate": 13.3394,
+          "candidate_better": true
+        },
+        {
+          "kf": 180,
+          "incumbent": 71.0982,
+          "candidate": 14.0363,
+          "candidate_better": true
+        },
+        {
+          "kf": 181,
+          "incumbent": 70.8934,
+          "candidate": 13.6392,
+          "candidate_better": true
+        },
+        {
+          "kf": 182,
+          "incumbent": 69.1851,
+          "candidate": 18.7161,
+          "candidate_better": true
+        },
+        {
+          "kf": 183,
+          "incumbent": 66.3326,
+          "candidate": 15.9932,
+          "candidate_better": true
+        },
+        {
+          "kf": 184,
+          "incumbent": 71.1005,
+          "candidate": 12.9979,
+          "candidate_better": true
+        },
+        {
+          "kf": 185,
+          "incumbent": 66.2443,
+          "candidate": 14.9155,
+          "candidate_better": true
+        },
+        {
+          "kf": 186,
+          "incumbent": 73.7888,
+          "candidate": 16.2397,
+          "candidate_better": true
+        },
+        {
+          "kf": 187,
+          "incumbent": 77.5978,
+          "candidate": 15.7184,
+          "candidate_better": true
+        },
+        {
+          "kf": 188,
+          "incumbent": 68.8241,
+          "candidate": 14.1408,
+          "candidate_better": true
+        },
+        {
+          "kf": 189,
+          "incumbent": 68.0599,
+          "candidate": 14.2192,
+          "candidate_better": true
+        },
+        {
+          "kf": 190,
+          "incumbent": 63.001,
+          "candidate": 17.6758,
+          "candidate_better": true
+        },
+        {
+          "kf": 191,
+          "incumbent": 70.8154,
+          "candidate": 14.4604,
+          "candidate_better": true
+        },
+        {
+          "kf": 192,
+          "incumbent": 73.2793,
+          "candidate": 17.0167,
+          "candidate_better": true
+        },
+        {
+          "kf": 193,
+          "incumbent": 80.0039,
+          "candidate": 16.0545,
+          "candidate_better": true
+        },
+        {
+          "kf": 194,
+          "incumbent": 70.2464,
+          "candidate": 16.4497,
+          "candidate_better": true
+        },
+        {
+          "kf": 195,
+          "incumbent": 72.5441,
+          "candidate": 16.3237,
+          "candidate_better": true
+        },
+        {
+          "kf": 196,
+          "incumbent": 62.5231,
+          "candidate": 18.3863,
+          "candidate_better": true
+        },
+        {
+          "kf": 197,
+          "incumbent": 75.7128,
+          "candidate": 16.3854,
+          "candidate_better": true
+        },
+        {
+          "kf": 198,
+          "incumbent": 77.586,
+          "candidate": 17.181,
+          "candidate_better": true
+        },
+        {
+          "kf": 199,
+          "incumbent": 76.3746,
+          "candidate": 15.0375,
+          "candidate_better": true
+        },
+        {
+          "kf": 200,
+          "incumbent": 80.2527,
+          "candidate": 14.0778,
+          "candidate_better": true
+        },
+        {
+          "kf": 201,
+          "incumbent": 73.4406,
+          "candidate": 13.7384,
+          "candidate_better": true
+        },
+        {
+          "kf": 202,
+          "incumbent": 75.7253,
+          "candidate": 14.7639,
+          "candidate_better": true
+        },
+        {
+          "kf": 203,
+          "incumbent": 79.0442,
+          "candidate": 17.8508,
+          "candidate_better": true
+        },
+        {
+          "kf": 204,
+          "incumbent": 77.1211,
+          "candidate": 17.384,
+          "candidate_better": true
+        },
+        {
+          "kf": 205,
+          "incumbent": 76.1661,
+          "candidate": 18.8193,
+          "candidate_better": true
+        },
+        {
+          "kf": 206,
+          "incumbent": 76.9117,
+          "candidate": 12.5311,
+          "candidate_better": true
+        },
+        {
+          "kf": 207,
+          "incumbent": 71.4224,
+          "candidate": 18.0743,
+          "candidate_better": true
+        },
+        {
+          "kf": 208,
+          "incumbent": 88.385,
+          "candidate": 14.5991,
+          "candidate_better": true
+        },
+        {
+          "kf": 209,
+          "incumbent": 78.7959,
+          "candidate": 14.8461,
+          "candidate_better": true
+        },
+        {
+          "kf": 210,
+          "incumbent": 75.4434,
+          "candidate": 14.4975,
+          "candidate_better": true
+        },
+        {
+          "kf": 211,
+          "incumbent": 78.8471,
+          "candidate": 13.9443,
+          "candidate_better": true
+        },
+        {
+          "kf": 212,
+          "incumbent": 84.0169,
+          "candidate": 13.9366,
+          "candidate_better": true
+        },
+        {
+          "kf": 213,
+          "incumbent": 73.5513,
+          "candidate": 17.0538,
+          "candidate_better": true
+        },
+        {
+          "kf": 214,
+          "incumbent": 76.5374,
+          "candidate": 14.2141,
+          "candidate_better": true
+        },
+        {
+          "kf": 215,
+          "incumbent": 78.8449,
+          "candidate": 15.1423,
+          "candidate_better": true
+        },
+        {
+          "kf": 216,
+          "incumbent": 73.5967,
+          "candidate": 18.803,
+          "candidate_better": true
+        },
+        {
+          "kf": 217,
+          "incumbent": 72.6734,
+          "candidate": 15.8027,
+          "candidate_better": true
+        },
+        {
+          "kf": 218,
+          "incumbent": 76.3661,
+          "candidate": 12.9511,
+          "candidate_better": true
+        },
+        {
+          "kf": 219,
+          "incumbent": 76.65,
+          "candidate": 15.3219,
+          "candidate_better": true
+        },
+        {
+          "kf": 220,
+          "incumbent": 82.1656,
+          "candidate": 13.0694,
+          "candidate_better": true
+        },
+        {
+          "kf": 221,
+          "incumbent": 76.2922,
+          "candidate": 14.4905,
+          "candidate_better": true
+        },
+        {
+          "kf": 222,
+          "incumbent": 81.1155,
+          "candidate": 16.2819,
+          "candidate_better": true
+        },
+        {
+          "kf": 223,
+          "incumbent": 81.278,
+          "candidate": 10.7288,
+          "candidate_better": true
+        },
+        {
+          "kf": 224,
+          "incumbent": 80.6546,
+          "candidate": 9.5683,
+          "candidate_better": true
+        },
+        {
+          "kf": 225,
+          "incumbent": 79.4561,
+          "candidate": 15.869,
+          "candidate_better": true
+        },
+        {
+          "kf": 226,
+          "incumbent": 75.2562,
+          "candidate": 16.5417,
+          "candidate_better": true
+        },
+        {
+          "kf": 227,
+          "incumbent": 79.6363,
+          "candidate": 18.7467,
+          "candidate_better": true
+        },
+        {
+          "kf": 228,
+          "incumbent": 75.389,
+          "candidate": 12.3244,
+          "candidate_better": true
+        },
+        {
+          "kf": 229,
+          "incumbent": 73.925,
+          "candidate": 18.5175,
+          "candidate_better": true
+        },
+        {
+          "kf": 230,
+          "incumbent": 82.1375,
+          "candidate": 16.6416,
+          "candidate_better": true
+        },
+        {
+          "kf": 231,
+          "incumbent": 79.8988,
+          "candidate": 13.8877,
+          "candidate_better": true
+        },
+        {
+          "kf": 232,
+          "incumbent": 79.2954,
+          "candidate": 15.7633,
+          "candidate_better": true
+        },
+        {
+          "kf": 233,
+          "incumbent": 67.7914,
+          "candidate": 13.3443,
+          "candidate_better": true
+        },
+        {
+          "kf": 234,
+          "incumbent": 77.2949,
+          "candidate": 15.2528,
+          "candidate_better": true
+        },
+        {
+          "kf": 235,
+          "incumbent": 81.1736,
+          "candidate": 16.3084,
+          "candidate_better": true
+        },
+        {
+          "kf": 236,
+          "incumbent": 76.1614,
+          "candidate": 13.0504,
+          "candidate_better": true
+        },
+        {
+          "kf": 237,
+          "incumbent": 83.4329,
+          "candidate": 13.2859,
+          "candidate_better": true
+        },
+        {
+          "kf": 238,
+          "incumbent": 78.6345,
+          "candidate": 16.7264,
+          "candidate_better": true
+        },
+        {
+          "kf": 239,
+          "incumbent": 77.6357,
+          "candidate": 13.5914,
+          "candidate_better": true
+        },
+        {
+          "kf": 240,
+          "incumbent": 78.1632,
+          "candidate": 11.7248,
+          "candidate_better": true
+        },
+        {
+          "kf": 241,
+          "incumbent": 95.5243,
+          "candidate": 11.7977,
+          "candidate_better": true
+        },
+        {
+          "kf": 242,
+          "incumbent": 79.9641,
+          "candidate": 15.7746,
+          "candidate_better": true
+        },
+        {
+          "kf": 243,
+          "incumbent": 72.7718,
+          "candidate": 11.1216,
+          "candidate_better": true
+        },
+        {
+          "kf": 244,
+          "incumbent": 89.2275,
+          "candidate": 11.5593,
+          "candidate_better": true
+        },
+        {
+          "kf": 245,
+          "incumbent": 91.819,
+          "candidate": 15.761,
+          "candidate_better": true
+        },
+        {
+          "kf": 246,
+          "incumbent": 86.4227,
+          "candidate": 13.4046,
+          "candidate_better": true
+        },
+        {
+          "kf": 247,
+          "incumbent": 493.9997,
+          "candidate": 14.7933,
+          "candidate_better": true
+        },
+        {
+          "kf": 248,
+          "incumbent": 474.6293,
+          "candidate": 11.2235,
+          "candidate_better": true
+        },
+        {
+          "kf": 249,
+          "incumbent": 546.4569,
+          "candidate": 16.1193,
+          "candidate_better": true
+        },
+        {
+          "kf": 250,
+          "incumbent": 497.0498,
+          "candidate": 16.7639,
+          "candidate_better": true
+        },
+        {
+          "kf": 251,
+          "incumbent": 490.3551,
+          "candidate": 16.3682,
+          "candidate_better": true
+        },
+        {
+          "kf": 252,
+          "incumbent": 444.258,
+          "candidate": 13.9233,
+          "candidate_better": true
+        },
+        {
+          "kf": 253,
+          "incumbent": 538.4115,
+          "candidate": 14.7379,
+          "candidate_better": true
+        },
+        {
+          "kf": 254,
+          "incumbent": 379.3146,
+          "candidate": 14.4136,
+          "candidate_better": true
+        },
+        {
+          "kf": 255,
+          "incumbent": 446.2022,
+          "candidate": 13.6914,
+          "candidate_better": true
+        },
+        {
+          "kf": 256,
+          "incumbent": 427.0858,
+          "candidate": 16.2208,
+          "candidate_better": true
+        },
+        {
+          "kf": 257,
+          "incumbent": 382.0611,
+          "candidate": 15.9148,
+          "candidate_better": true
+        },
+        {
+          "kf": 258,
+          "incumbent": 349.4851,
+          "candidate": 16.1382,
+          "candidate_better": true
+        },
+        {
+          "kf": 259,
+          "incumbent": 428.7141,
+          "candidate": 16.6217,
+          "candidate_better": true
+        },
+        {
+          "kf": 260,
+          "incumbent": 390.1951,
+          "candidate": 15.6444,
+          "candidate_better": true
+        },
+        {
+          "kf": 261,
+          "incumbent": 471.6536,
+          "candidate": 14.2098,
+          "candidate_better": true
+        },
+        {
+          "kf": 262,
+          "incumbent": 340.9745,
+          "candidate": 16.2727,
+          "candidate_better": true
+        },
+        {
+          "kf": 263,
+          "incumbent": 307.7242,
+          "candidate": 18.6281,
+          "candidate_better": true
+        },
+        {
+          "kf": 264,
+          "incumbent": 276.8297,
+          "candidate": 15.5874,
+          "candidate_better": true
+        },
+        {
+          "kf": 265,
+          "incumbent": 272.6947,
+          "candidate": 15.7263,
+          "candidate_better": true
+        },
+        {
+          "kf": 266,
+          "incumbent": 298.0423,
+          "candidate": 15.2135,
+          "candidate_better": true
+        },
+        {
+          "kf": 267,
+          "incumbent": 238.7014,
+          "candidate": 17.053,
+          "candidate_better": true
+        },
+        {
+          "kf": 268,
+          "incumbent": 257.2318,
+          "candidate": 15.2832,
+          "candidate_better": true
+        },
+        {
+          "kf": 269,
+          "incumbent": 310.052,
+          "candidate": 15.5439,
+          "candidate_better": true
+        },
+        {
+          "kf": 270,
+          "incumbent": 487.104,
+          "candidate": 16.4167,
+          "candidate_better": true
+        },
+        {
+          "kf": 271,
+          "incumbent": 309.6264,
+          "candidate": 16.6453,
+          "candidate_better": true
+        },
+        {
+          "kf": 272,
+          "incumbent": 453.4324,
+          "candidate": 17.2166,
+          "candidate_better": true
+        },
+        {
+          "kf": 273,
+          "incumbent": 326.2819,
+          "candidate": 14.1874,
+          "candidate_better": true
+        },
+        {
+          "kf": 274,
+          "incumbent": 349.4462,
+          "candidate": 17.3038,
+          "candidate_better": true
+        },
+        {
+          "kf": 275,
+          "incumbent": 376.1015,
+          "candidate": 16.8215,
+          "candidate_better": true
+        },
+        {
+          "kf": 276,
+          "incumbent": 454.8361,
+          "candidate": 15.1122,
+          "candidate_better": true
+        },
+        {
+          "kf": 277,
+          "incumbent": 553.0527,
+          "candidate": 13.1117,
+          "candidate_better": true
+        },
+        {
+          "kf": 278,
+          "incumbent": 703.4517,
+          "candidate": 13.6513,
+          "candidate_better": true
+        },
+        {
+          "kf": 279,
+          "incumbent": 422.9538,
+          "candidate": 12.7023,
+          "candidate_better": true
+        },
+        {
+          "kf": 280,
+          "incumbent": 497.7587,
+          "candidate": 14.8433,
+          "candidate_better": true
+        },
+        {
+          "kf": 281,
+          "incumbent": 363.6945,
+          "candidate": 13.9034,
+          "candidate_better": true
+        },
+        {
+          "kf": 282,
+          "incumbent": 402.6965,
+          "candidate": 14.2731,
+          "candidate_better": true
+        },
+        {
+          "kf": 283,
+          "incumbent": 344.5728,
+          "candidate": 18.0754,
+          "candidate_better": true
+        },
+        {
+          "kf": 284,
+          "incumbent": 387.5534,
+          "candidate": 14.136,
+          "candidate_better": true
+        },
+        {
+          "kf": 285,
+          "incumbent": 338.6723,
+          "candidate": 16.6896,
+          "candidate_better": true
+        },
+        {
+          "kf": 286,
+          "incumbent": 351.6255,
+          "candidate": 13.3902,
+          "candidate_better": true
+        },
+        {
+          "kf": 287,
+          "incumbent": 376.2232,
+          "candidate": 13.5947,
+          "candidate_better": true
+        },
+        {
+          "kf": 288,
+          "incumbent": 392.4268,
+          "candidate": 15.7503,
+          "candidate_better": true
+        },
+        {
+          "kf": 289,
+          "incumbent": 599.0002,
+          "candidate": 19.2287,
+          "candidate_better": true
+        },
+        {
+          "kf": 290,
+          "incumbent": 1021.1012,
+          "candidate": 12.9138,
+          "candidate_better": true
+        },
+        {
+          "kf": 291,
+          "incumbent": 660.6214,
+          "candidate": 20.0162,
+          "candidate_better": true
+        },
+        {
+          "kf": 292,
+          "incumbent": 667.6118,
+          "candidate": 15.4828,
+          "candidate_better": true
+        },
+        {
+          "kf": 293,
+          "incumbent": 1165.5965,
+          "candidate": 18.8789,
+          "candidate_better": true
+        },
+        {
+          "kf": 294,
+          "incumbent": 1063.6956,
+          "candidate": 17.0008,
+          "candidate_better": true
+        },
+        {
+          "kf": 295,
+          "incumbent": 1052.5337,
+          "candidate": 16.1687,
+          "candidate_better": true
+        },
+        {
+          "kf": 296,
+          "incumbent": 904.8677,
+          "candidate": 18.1605,
+          "candidate_better": true
+        },
+        {
+          "kf": 297,
+          "incumbent": 897.6358,
+          "candidate": 19.0859,
+          "candidate_better": true
+        },
+        {
+          "kf": 298,
+          "incumbent": 929.9653,
+          "candidate": 12.869,
+          "candidate_better": true
+        },
+        {
+          "kf": 299,
+          "incumbent": 1117.4463,
+          "candidate": 17.0641,
+          "candidate_better": true
+        },
+        {
+          "kf": 300,
+          "incumbent": 1159.3218,
+          "candidate": 18.435,
+          "candidate_better": true
+        },
+        {
+          "kf": 301,
+          "incumbent": 1441.7066,
+          "candidate": 18.6628,
+          "candidate_better": true
+        },
+        {
+          "kf": 302,
+          "incumbent": 1554.0671,
+          "candidate": 16.8759,
+          "candidate_better": true
+        },
+        {
+          "kf": 303,
+          "incumbent": 1520.8273,
+          "candidate": 18.6524,
+          "candidate_better": true
+        },
+        {
+          "kf": 304,
+          "incumbent": 1836.3863,
+          "candidate": 18.3285,
+          "candidate_better": true
+        },
+        {
+          "kf": 305,
+          "incumbent": 1745.2584,
+          "candidate": 17.9026,
+          "candidate_better": true
+        },
+        {
+          "kf": 306,
+          "incumbent": 1953.4282,
+          "candidate": 19.6568,
+          "candidate_better": true
+        },
+        {
+          "kf": 307,
+          "incumbent": 1851.9927,
+          "candidate": 16.3671,
+          "candidate_better": true
+        },
+        {
+          "kf": 308,
+          "incumbent": 2012.2175,
+          "candidate": 16.1877,
+          "candidate_better": true
+        },
+        {
+          "kf": 309,
+          "incumbent": 1740.6347,
+          "candidate": 18.3183,
+          "candidate_better": true
+        },
+        {
+          "kf": 310,
+          "incumbent": 1659.6553,
+          "candidate": 19.4199,
+          "candidate_better": true
+        },
+        {
+          "kf": 311,
+          "incumbent": 1408.6194,
+          "candidate": 16.6694,
+          "candidate_better": true
+        },
+        {
+          "kf": 312,
+          "incumbent": 1835.0414,
+          "candidate": 22.1102,
+          "candidate_better": true
+        },
+        {
+          "kf": 313,
+          "incumbent": 1779.0439,
+          "candidate": 15.5916,
+          "candidate_better": true
+        },
+        {
+          "kf": 314,
+          "incumbent": 1993.0345,
+          "candidate": 20.0706,
+          "candidate_better": true
+        },
+        {
+          "kf": 315,
+          "incumbent": 2021.2891,
+          "candidate": 18.74,
+          "candidate_better": true
+        },
+        {
+          "kf": 316,
+          "incumbent": 2589.9434,
+          "candidate": 21.7121,
+          "candidate_better": true
         }
       ],
-      "candidate_better_frames": 9,
-      "diff_median": 3.192,
+      "candidate_better_frames": 265,
+      "diff_median": 46.7502,
       "diff_iqr": [
-        -2.1046,
-        4.6163
+        8.3161,
+        73.0181
       ],
       "reference_points_used_by_estimator": 600,
       "note": "the NIS estimator fits on at most 600 reference points; residuals are on that scale"
     },
-    "last_paired_evidence_committable": {
-      "num_paired_frames": 317,
-      "required_paired_frames": 8,
-      "candidate_keyframes": 317,
-      "pairable_frames": 317,
-      "frames_without_independent_reference": 0,
-      "reference_frames_from_candidate": 0,
-      "num_improved_frames": 301,
-      "improved_fraction": 0.9495268138801262,
-      "wilson_lower_bound": 0.9252250347887798,
-      "approved": true,
-      "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
-      "incumbent_mean_residual": 1729.0840332531375,
-      "candidate_mean_residual": 210.40051392085255,
-      "reentry_pos_jump_m": 0.1848906880467479,
-      "used_for_admission": false
-    },
+    "last_paired_evidence_committable": null,
     "map_metrics": "UNAVAILABLE (circular: the candidate and the scoring proxy are both the clean run)",
     "coverage_consistency_check_only": {},
     "bad_candidate_for_comparison": {
       "mode": "MODE3_SOFT_BRIDGE_WAIT",
-      "holdout_nis": 1141.6141,
-      "evidence_status": "FAILED",
+      "holdout_nis": 224.1031,
+      "evidence_status": "PASSED",
       "admitted_quarantined_frames": 0
     }
   },
   "gate_result_A3": {
     "accepted": false,
     "mode": "MODE3_SOFT_BRIDGE_WAIT",
-    "holdout_nis": 1141.6141,
-    "reason": "Refused Mode 2 atomic commit: paired-benefit evidence FAILED (explicit failure, non-finite value, or threshold violation)",
-    "evidence_status": "FAILED",
+    "holdout_nis": 224.1031,
+    "reason": "Insufficient verified info; maintaining soft bridge while waiting for new evidence",
+    "evidence_status": "PASSED",
     "paired_test_informative": true,
     "paired_evidence": {
-      "num_paired_frames": 14,
+      "num_paired_frames": 319,
       "required_paired_frames": 8,
-      "candidate_keyframes": 14,
-      "pairable_frames": 14,
+      "candidate_keyframes": 319,
+      "pairable_frames": 319,
       "frames_without_independent_reference": 0,
       "reference_frames_from_candidate": 0,
-      "num_improved_frames": 1,
-      "improved_fraction": 0.07142857142857142,
-      "wilson_lower_bound": 0.01609806571673135,
-      "approved": false,
-      "reason": "wilson_sequential_benefit_lower_bound_failed",
-      "incumbent_mean_residual": 929.4290735206911,
-      "candidate_mean_residual": 1151.4931568217696,
+      "num_improved_frames": 306,
+      "improved_fraction": 0.9592476489028213,
+      "wilson_lower_bound": 0.9368444480828932,
+      "approved": true,
+      "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+      "incumbent_mean_residual": 1735.5570447159403,
+      "candidate_mean_residual": 214.71450791023514,
       "reentry_pos_jump_m": 0.07869478597996016
     }
   },
@@ -585,7 +2435,7 @@
       "clean_interval_keyframes_not_admitted": 0,
       "appendix_voxel_unsupported": 0.2613,
       "appendix_voxel_coverage": 0.0306,
-      "runtime_sec": 15.0689
+      "runtime_sec": 19.0725
     }
   },
   "caveats": [
