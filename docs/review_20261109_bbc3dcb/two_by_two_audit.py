@@ -27,6 +27,7 @@ PREREG = os.path.join(_REPO, "docs/review_20261109_6b61c9d/single_factor_preregi
 BAGS = os.path.join(_REPO, "docs/review_20261109_6b61c9d/single_factor_bags.json")
 EVAL = os.path.join(_REPO, "docs/review_20261109_6b61c9d/evaluate_2x2_runs.json")
 OUT = os.path.join(_HERE, "two_by_two_audit.json")
+BIST = os.path.join(_HERE, "room02_bistability_results.json")
 BEFORE = os.environ.get("TWOBY2_BEFORE", "/tmp/2x2_before.json")
 
 CELLS = ("O", "O_plus_F", "O_minus_B", "O_plus_F_minus_B")
@@ -66,7 +67,8 @@ def audit_protocol(results, prereg):
             "results_protocol": proto}
 
 
-def audit_receipts(manifest, receipts=None, hasher=None, exists=None):
+def audit_receipts(manifest, receipts=None, hasher=None, exists=None, arms=None,
+                   expect_per_arm=2):
     """Each receipt must bind its bag and the runner identity; the identity must be shared.
 
     `receipts`, `hasher` and `exists` are injectable so the fixtures can exercise a mismatch
@@ -81,6 +83,7 @@ def audit_receipts(manifest, receipts=None, hasher=None, exists=None):
     else:
         names = [r.get("_name", f"receipt{i}") for i, r in enumerate(receipts)]
 
+    arms = tuple(arms) if arms else CELLS
     declared = {a: manifest["arms"][a].get("sha256") for a in manifest["arms"]}
     rows, bad = [], []
     for name, rec in zip(names, receipts):
@@ -105,13 +108,13 @@ def audit_receipts(manifest, receipts=None, hasher=None, exists=None):
                      "host_revision": pre.get("host_revision"),
                      "status": rec.get("status")})
 
-    per_arm = {a: sum(1 for r in rows if r["arm"] == a) for a in CELLS}
+    per_arm = {a: sum(1 for r in rows if r["arm"] == a) for a in arms}
     for a, n in per_arm.items():
-        if n != 2:
-            bad.append(f"{a} has {n} receipts, expected 2")
+        if n != expect_per_arm:
+            bad.append(f"{a} has {n} receipts, expected {expect_per_arm}")
 
     disk = {}
-    for a in CELLS:
+    for a in arms:
         path = f"/tmp/fastlivo/room02_2x2_{a}.bag"
         if not exists(path):
             disk[a] = None
@@ -298,6 +301,88 @@ def audit_diagnostic_unchanged(new, before):
                                 for k, v in sorted(n_cells.items())}}
 
 
+def audit_bistability(results, manifest, receipts):
+    """Modes must follow the stated rule, and counts are magnitudes, not probabilities."""
+    bad = []
+    proto = results.get("protocol") or {}
+    rule = proto.get("mode_rule", "")
+    good_t, bad_t = 0.10, 0.50
+    if "< 0.1" not in rule or "> 0.5" not in rule:
+        bad.append(f"mode_rule does not state the thresholds: {rule!r}")
+    per_run = results.get("new_runs") or {}
+    seq = {c: [] for c in proto.get("cells", [])}
+    for key, rec in per_run.items():
+        arm = key.split("#")[0]
+        u = rec.get("unsupported_fraction")
+        want = "GOOD" if u < good_t else ("BAD" if u > bad_t else "UNCLEAR")
+        if rec.get("mode") != want:
+            bad.append(f"{key}: mode {rec.get('mode')} but unsupported {u:.4f} implies {want}")
+        if arm in seq:
+            seq[arm].append(want)
+    for cell, rec in (results.get("cells") or {}).items():
+        if list(rec.get("sequence", [])) != seq.get(cell):
+            bad.append(f"{cell}: recorded sequence {rec.get('sequence')} != recomputed "
+                       f"{seq.get(cell)}")
+        tot = rec.get("good", 0) + rec.get("bad", 0) + rec.get("unclear", 0)
+        comb = rec.get("combined_with_earlier_2", {})
+        n_comb = len(comb.get("modes", []))
+        if tot != len(seq.get(cell)):
+            bad.append(f"{cell}: counts sum to {tot}, sequence has {len(seq.get(cell))}")
+        if n_comb and (comb.get("good", 0) + comb.get("bad", 0)) > n_comb:
+            bad.append(f"{cell}: combined counts exceed {n_comb} runs")
+    # a count out of six is a magnitude; wording that turns it into a rate is a finding
+    text = json.dumps(results.get("cells"), ensure_ascii=False)
+    for token in ("probability", "p =", "rate of", "chance"):
+        if token in text:
+            bad.append(f"count is described as a {token!r}: a 2/6 count is a magnitude, not a "
+                       "probability")
+    return {"verdict": "PASS" if not bad else "FAIL", "problems": bad,
+            "mode_rule": rule, "recomputed_sequences": seq}
+
+
+def check_common_mode_consistency(bist):
+    """Per-run mode and common-set mode must agree, and the crossing flags must follow the data."""
+    bad = []
+    for grp in ("new_runs", "earlier_2x2_runs"):
+        for key, rec in (bist.get(grp) or {}).items():
+            if rec.get("mode") != rec.get("mode_common"):
+                bad.append(f"{key}: mode {rec.get('mode')} != mode_common {rec.get('mode_common')}")
+    for cell, rec in (bist.get("cells") or {}).items():
+        seq, common = rec.get("sequence", []), rec.get("sequence_common_set", [])
+        if seq != common:
+            bad.append(f"{cell}: per-run sequence {seq} != common-set sequence {common}")
+        crosses_ga = ("GOOD" in seq) and ("BAD" in seq)
+        if bool(rec.get("crosses_good_and_bad")) != crosses_ga:
+            bad.append(f"{cell}: crosses_good_and_bad {rec.get('crosses_good_and_bad')} "
+                       f"but sequence {seq} implies {crosses_ga}")
+        crosses_any = len(set(seq)) > 1
+        if bool(rec.get("crosses_modes")) != crosses_any:
+            bad.append(f"{cell}: crosses_modes {rec.get('crosses_modes')} but {seq} implies "
+                       f"{crosses_any}")
+    return {"verdict": "PASS" if not bad else "FAIL", "problems": bad}
+
+
+def check_run_output_hashes(bist, receipts):
+    """Every recorded run hash must be a receipt's output and match the file on disk."""
+    by_sha = {}
+    for rec in receipts:
+        out = rec.get("output", {})
+        if out.get("sha256") and out.get("bag"):
+            by_sha[out["sha256"]] = out["bag"]
+    bad, checked = [], 0
+    for grp in ("new_runs", "earlier_2x2_runs"):
+        for key, rec in (bist.get(grp) or {}).items():
+            sha = rec.get("output_sha256")
+            checked += 1
+            if not sha:
+                bad.append(f"{key}: no output_sha256")
+            elif sha not in by_sha:
+                bad.append(f"{key}: hash does not match any receipt output")
+            elif _sha256(by_sha[sha]) != sha:
+                bad.append(f"{key}: output bag on disk != recorded hash")
+    return {"verdict": "PASS" if not bad else "FAIL", "problems": bad, "checked": checked}
+
+
 def main():
     results = json.load(open(RESULTS, encoding="utf-8"))
     prereg = json.load(open(PREREG, encoding="utf-8"))
@@ -310,6 +395,25 @@ def main():
            "4_ate_convention": audit_ate_convention(results),
            "5_frozen_transform": audit_frozen_transform(results),
            "6_hash_chain": audit_hash_chain(results, manifest),
+           "9_bist_runs": {
+               "modes": check_common_mode_consistency(json.load(open(BIST, encoding="utf-8"))),
+               "hashes": check_run_output_hashes(
+                   json.load(open(BIST, encoding="utf-8")),
+                   [json.load(open(p, encoding="utf-8")) for p in sorted(
+                       glob.glob(os.path.join(_HERE, "room02_bist_receipt_fl_run_*.json"))
+                       + glob.glob(os.path.join(_HERE, "room02_2x2_receipt_fl_run_*.json")))]),
+           },
+           "8_bistability": dict(
+               audit_bistability(json.load(open(BIST, encoding="utf-8")), manifest,
+               [json.load(open(p, encoding="utf-8")) for p in sorted(glob.glob(
+                   os.path.join(_HERE, "room02_bist_receipt_fl_run_*.json")))]
+               if glob.glob(os.path.join(_HERE, "room02_bist_receipt_fl_run_*.json"))
+               else None),
+               receipts=audit_receipts(
+                   manifest,
+                   receipts=[json.load(open(p, encoding="utf-8")) for p in sorted(glob.glob(
+                       os.path.join(_HERE, "room02_bist_receipt_fl_run_*.json")))],
+                   arms=("O", "O_plus_F_minus_B"), expect_per_arm=4)),
            "7_diagnostic_unchanged": (
                audit_diagnostic_unchanged(results, json.load(open(BEFORE, encoding="utf-8")))
                if os.path.exists(BEFORE) else
@@ -318,7 +422,11 @@ def main():
     with open(OUT, "w", encoding="utf-8") as fh:
         json.dump(out, fh, indent=1, default=float)
     for k in ("1_protocol", "2_receipts", "3_independent", "4_ate_convention",
-              "5_frozen_transform", "6_hash_chain", "7_diagnostic_unchanged"):
+              "5_frozen_transform", "6_hash_chain", "7_diagnostic_unchanged",
+              "8_bistability", "9_bist_runs"):
+        if k == "9_bist_runs":
+            print(k, {name: v["verdict"] for name, v in out[k].items()})
+            continue
         print(k, out[k]["verdict"], (out[k].get("problems")
                                      or out[k].get("cells_where_conventions_disagree")
                                      or [])[:3])

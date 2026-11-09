@@ -95,6 +95,51 @@ ate_frozen_prefix_protocol_m      冻结 healthy-prefix 协议量
 
 本文件第 4 节保留为**历史记录**（针对 9bd2ff7 的旧数值），但不作为当前结论。
 
+## 6. 方差对照审计（main 5f2284f）
+
+| 项 | 结果 |
+|---|---|
+| 8 份 bist receipt 绑定 | **PASS**：O 4 份、O+F−B 4 份；输入包 sha = manifest = 磁盘；config/script/revision 八份同一；8 个 output sha 全部与磁盘一致 |
+| `mode_rule` 与逐次分类 | **PASS**：按 `unsupported < 0.1 / > 0.5 / else` 重算得 O `BAD,GOOD,BAD,BAD`、O+F−B `UNCLEAR,UNCLEAR,BAD,BAD`，与记录逐项相同 |
+| 2/6、1/6 的量级表述 | **PASS**：DAILY 与 MILESTONE 都写明「只作量级，不作概率估计」，未出现 probability/rate/chance 措辞 |
+| 首分歧诊断的标签 | **PASS**：MILESTONE 标 `POST_HOC_DESCRIPTIVE`，规则明写「for prospective use on the next repeat pair」，未写成已预注册 |
+
+### 一处无法核验：双稳协议的「预注册」
+
+`room02_bistability_results.json:protocol.source` 写作 `preregistered bistability estimate`，
+DAILY §12 标题写「预注册，`55f7b87`」，正文写「该判据写在运行之前」。
+
+但 `55f7b87` 正是**加入这 8 份 receipt 的那次提交**；`55f7b87^` 的全部文件里没有任何一处出现
+"bistability"。也就是说，仓库内没有任何证据表明该判据早于运行被写下——它可能是会话中先声明的，
+但那不可被审计。
+
+判 **UNVERIFIABLE**（不是 FAIL）。建议：像 2×2 那样单独提交一份
+`bistability_preregistration.json`（含 `declared_before_results` 与声明时戳），
+或把 DAILY 的引用从 `55f7b87` 改成一个确实早于 receipt 的提交。
+
+## 7. 共同集重算复核（main 71b31d3）
+
+| 项 | 结果 |
+|---|---|
+| 12 个 run 的 `output_sha256` | **PASS**：每条都能对上某份 receipt 的 `output.sha256`，且该包磁盘现算值相同 |
+| `mode` vs `mode_common` | **PASS**：12/12 相同，无一条因换共同集而翻类 |
+| 逐 run 序列 vs 共同集序列 | **PASS**：O `BAD,GOOD,BAD,BAD` 与 O+F−B `UNCLEAR,UNCLEAR,BAD,BAD` 两口径逐项相同 |
+| `crosses_good_and_bad` 推导 | **PASS**：O 有 GOOD 与 BAD → True；O+F−B 只有 UNCLEAR 与 BAD → False |
+
+最后一条正是要点：O+F−B 的 `crosses_modes=True` 但 `crosses_good_and_bad=False`，
+不是两个吸引子之间的跨越，而是「一个坏态 + 一个中间态」。判定仍按运行前写的**类别跨模式**
+规则触发，这个区分在数据里成立。
+
+### 一处文档内自相矛盾
+
+`docs/DAILY_20261109.md:118`（§11）仍写着：
+
+> **好模式在 O 与 actual 各出现一次，与臂无关**，即宿主在这条序列上**双稳**。
+
+而同文件 `:160`（§12）写着「**"双稳"一词不再使用**」。§11 的这句没有被改，
+只读 §11 的人会拿到已被 §12 撤回的结论。建议在 §11 该句后加「（§12 已撤回：O+F−B 只有
+中间态与坏态，不构成两个吸引子）」，或直接改写。
+
 ## 5b. R2 / R3 处置（同意你的提议）
 
 - **R2**：旧 `room02_hybrid_bag_report.json` 属已废弃的 X/Y 设计，2×2 已取代它。

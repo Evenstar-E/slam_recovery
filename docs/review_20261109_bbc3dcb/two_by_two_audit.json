@@ -278,6 +278,157 @@
   },
   "run_bags": 8
  },
+ "9_bist_runs": {
+  "modes": {
+   "verdict": "PASS",
+   "problems": []
+  },
+  "hashes": {
+   "verdict": "PASS",
+   "problems": [],
+   "checked": 12
+  }
+ },
+ "8_bistability": {
+  "verdict": "PASS",
+  "problems": [],
+  "mode_rule": "GOOD unsupported < 0.1, BAD > 0.5, else UNCLEAR",
+  "recomputed_sequences": {
+   "O": [
+    "BAD",
+    "GOOD",
+    "BAD",
+    "BAD"
+   ],
+   "O+F-B": [
+    "UNCLEAR",
+    "UNCLEAR",
+    "BAD",
+    "BAD"
+   ]
+  },
+  "receipts": {
+   "verdict": "PASS",
+   "problems": [],
+   "receipts": [
+    {
+     "receipt": "receipt0",
+     "arm": "O",
+     "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+     "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+     "status": "OK"
+    },
+    {
+     "receipt": "receipt1",
+     "arm": "O_plus_F_minus_B",
+     "input_sha256": "cd12dddbb8fb9707bda1b551d238f8d3b6525798a62638ee62f95986f11e6301",
+     "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+     "status": "OK"
+    },
+    {
+     "receipt": "receipt2",
+     "arm": "O",
+     "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+     "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+     "status": "OK"
+    },
+    {
+     "receipt": "receipt3",
+     "arm": "O_plus_F_minus_B",
+     "input_sha256": "cd12dddbb8fb9707bda1b551d238f8d3b6525798a62638ee62f95986f11e6301",
+     "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+     "status": "OK"
+    },
+    {
+     "receipt": "receipt4",
+     "arm": "O",
+     "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+     "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+     "status": "OK"
+    },
+    {
+     "receipt": "receipt5",
+     "arm": "O_plus_F_minus_B",
+     "input_sha256": "cd12dddbb8fb9707bda1b551d238f8d3b6525798a62638ee62f95986f11e6301",
+     "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+     "status": "OK"
+    },
+    {
+     "receipt": "receipt6",
+     "arm": "O",
+     "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+     "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+     "status": "OK"
+    },
+    {
+     "receipt": "receipt7",
+     "arm": "O_plus_F_minus_B",
+     "input_sha256": "cd12dddbb8fb9707bda1b551d238f8d3b6525798a62638ee62f95986f11e6301",
+     "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+     "status": "OK"
+    }
+   ],
+   "per_arm": {
+    "O": 4,
+    "O_plus_F_minus_B": 4
+   },
+   "bag_hashes_on_disk_match_manifest": {
+    "O": true,
+    "O_plus_F_minus_B": true
+   },
+   "identity_shared": true,
+   "outputs": [
+    {
+     "bag": "/tmp/fastlivo/res_bist_O_r1.bag",
+     "sha256": "bb579d933e8f8eefbc3ec8bb63c24e1183172fbdc88718bfd18b681fa7602bac",
+     "on_disk": true,
+     "match": true
+    },
+    {
+     "bag": "/tmp/fastlivo/res_bist_O_plus_F_minus_B_r1.bag",
+     "sha256": "7794388bc49e9f1c62dea902f79d9fa4b9f1159b5f66ade83a7258a1ba2c7c0c",
+     "on_disk": true,
+     "match": true
+    },
+    {
+     "bag": "/tmp/fastlivo/res_bist_O_r2.bag",
+     "sha256": "a9ab16a9d0f846db29ca7cb0faaad79e6082252458b5322775c46fd9a0bef5f5",
+     "on_disk": true,
+     "match": true
+    },
+    {
+     "bag": "/tmp/fastlivo/res_bist_O_plus_F_minus_B_r2.bag",
+     "sha256": "1e3c73ae10bf71334a6f0c482331ef46491ad9cfcea75d6f22b0a66aac495b03",
+     "on_disk": true,
+     "match": true
+    },
+    {
+     "bag": "/tmp/fastlivo/res_bist_O_r3.bag",
+     "sha256": "75feda067ec5fb056b535bbff79eb53207b9746d542fd4013ee905bb0b103a8b",
+     "on_disk": true,
+     "match": true
+    },
+    {
+     "bag": "/tmp/fastlivo/res_bist_O_plus_F_minus_B_r3.bag",
+     "sha256": "abdaea94584d4d7f6d2f170befebf644fa0cee4e137573ed1404626d9619735e",
+     "on_disk": true,
+     "match": true
+    },
+    {
+     "bag": "/tmp/fastlivo/res_bist_O_r4.bag",
+     "sha256": "77ae6ed5bc1dafcbdb60ae78e3f9797f7dbc8b0ac895a18dcbed65e414ee7582",
+     "on_disk": true,
+     "match": true
+    },
+    {
+     "bag": "/tmp/fastlivo/res_bist_O_plus_F_minus_B_r4.bag",
+     "sha256": "4ebc5336bdcf53e74b8ee54fba72d68976034032be8a9755ebead0db6110ad6f",
+     "on_disk": true,
+     "match": true
+    }
+   ]
+  }
+ },
  "7_diagnostic_unchanged": {
   "verdict": "PASS",
   "problems": [],
