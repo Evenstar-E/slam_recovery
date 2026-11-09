@@ -1,0 +1,181 @@
+{
+  "onset": {
+    "start_rel_sec": 14.528,
+    "end_rel_sec": 34.467,
+    "differing_frames": 200
+  },
+  "n_frames": 445,
+  "reference_points": 1995000,
+  "cross_run_alignment": {
+    "fitted_on": "pre-onset overlap of the two trajectories",
+    "frames": 121,
+    "residual_median_m": 0.0053,
+    "residual_p95_m": 0.0114,
+    "note": "clean poses are carried into the injected frame by T_inv; without this the reference and the queries are in two different world frames"
+  },
+  "filter_rule": "drop returns with range in [4.0, 4.6] m (the injected sheet shell)",
+  "support_check": {
+    "voxel_m": 0.3,
+    "radius_m": 1.0,
+    "min_fraction": 0.6,
+    "subsample_per_frame": 400,
+    "supported_frames": 391,
+    "source": "slam_recovery/sim/transaction_manager_node.py::_frame_has_reference_support"
+  },
+  "shell_fraction_per_frame": {
+    "mean": 0.1038,
+    "median": 0.1035,
+    "p90": 0.1998
+  },
+  "observations": {
+    "all_quarantine_frames": {
+      "raw_injected": {
+        "frames_scored": 445,
+        "nis_mean": 253.631,
+        "nis_median": 18.781,
+        "residual_p50_m": 0.4047,
+        "residual_p90_m": 3.4122,
+        "residual_p95_m": 6.8421,
+        "residual_p99_m": 10.1077,
+        "mean_support_fraction_lt_1m": 0.6494,
+        "estimator_reference_points_used": [
+          600
+        ],
+        "mean_nn_radius_m": 2.551
+      },
+      "filtered_injected": {
+        "frames_scored": 445,
+        "nis_mean": 480.569,
+        "nis_median": 19.367,
+        "residual_p50_m": 0.4109,
+        "residual_p90_m": 4.6239,
+        "residual_p95_m": 7.2604,
+        "residual_p99_m": 10.2486,
+        "mean_support_fraction_lt_1m": 0.6494,
+        "estimator_reference_points_used": [
+          600
+        ],
+        "mean_nn_radius_m": 2.721
+      },
+      "oracle_clean": {
+        "frames_scored": 445,
+        "nis_mean": 16.11,
+        "nis_median": 15.666,
+        "residual_p50_m": 0.2112,
+        "residual_p90_m": 1.0855,
+        "residual_p95_m": 1.9837,
+        "residual_p99_m": 5.0144,
+        "mean_support_fraction_lt_1m": 0.6494,
+        "estimator_reference_points_used": [
+          600
+        ],
+        "mean_nn_radius_m": 1.6624
+      }
+    },
+    "support_checked_frames": {
+      "raw_injected": {
+        "frames_scored": 391,
+        "nis_mean": 226.718,
+        "nis_median": 18.134,
+        "residual_p50_m": 0.3772,
+        "residual_p90_m": 2.9158,
+        "residual_p95_m": 6.4338,
+        "residual_p99_m": 9.9481,
+        "mean_support_fraction_lt_1m": 0.658,
+        "estimator_reference_points_used": [
+          600
+        ],
+        "mean_nn_radius_m": 2.441
+      },
+      "filtered_injected": {
+        "frames_scored": 391,
+        "nis_mean": 425.259,
+        "nis_median": 18.319,
+        "residual_p50_m": 0.3844,
+        "residual_p90_m": 3.828,
+        "residual_p95_m": 7.151,
+        "residual_p99_m": 10.0506,
+        "mean_support_fraction_lt_1m": 0.658,
+        "estimator_reference_points_used": [
+          600
+        ],
+        "mean_nn_radius_m": 2.5944
+      },
+      "oracle_clean": {
+        "frames_scored": 391,
+        "nis_mean": 16.226,
+        "nis_median": 15.889,
+        "residual_p50_m": 0.2157,
+        "residual_p90_m": 1.0848,
+        "residual_p95_m": 1.9793,
+        "residual_p99_m": 5.0365,
+        "mean_support_fraction_lt_1m": 0.658,
+        "estimator_reference_points_used": [
+          600
+        ],
+        "mean_nn_radius_m": 1.6615
+      }
+    },
+    "node_style_every_5th_supported": {
+      "raw_injected": {
+        "frames_scored": 79,
+        "nis_mean": 235.164,
+        "nis_median": 17.73,
+        "residual_p50_m": 0.3842,
+        "residual_p90_m": 2.9566,
+        "residual_p95_m": 6.5117,
+        "residual_p99_m": 9.9367,
+        "mean_support_fraction_lt_1m": 0.6595,
+        "estimator_reference_points_used": [
+          600
+        ],
+        "mean_nn_radius_m": 2.4443
+      },
+      "filtered_injected": {
+        "frames_scored": 79,
+        "nis_mean": 428.082,
+        "nis_median": 18.319,
+        "residual_p50_m": 0.3867,
+        "residual_p90_m": 3.8364,
+        "residual_p95_m": 7.1285,
+        "residual_p99_m": 10.0297,
+        "mean_support_fraction_lt_1m": 0.6595,
+        "estimator_reference_points_used": [
+          600
+        ],
+        "mean_nn_radius_m": 2.5821
+      },
+      "oracle_clean": {
+        "frames_scored": 79,
+        "nis_mean": 16.172,
+        "nis_median": 15.893,
+        "residual_p50_m": 0.2181,
+        "residual_p90_m": 1.0907,
+        "residual_p95_m": 2.0199,
+        "residual_p99_m": 5.047,
+        "mean_support_fraction_lt_1m": 0.6595,
+        "estimator_reference_points_used": [
+          600
+        ],
+        "mean_nn_radius_m": 1.6623
+      }
+    }
+  },
+  "budget_sweep_support_checked": {
+    "ref_cap_600": {
+      "raw_injected": 226.718,
+      "filtered_injected": 425.259,
+      "oracle_clean": 16.226
+    },
+    "ref_cap_1200": {
+      "raw_injected": 81.152,
+      "filtered_injected": 154.695,
+      "oracle_clean": 13.334
+    },
+    "ref_cap_2400": {
+      "raw_injected": 28.985,
+      "filtered_injected": 67.023,
+      "oracle_clean": 9.984
+    }
+  }
+}
