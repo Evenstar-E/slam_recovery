@@ -123,6 +123,30 @@ filtered bag at run time; file hashes identify files, not consumption.
   with `tau = 2.5`; the milestone is about map accuracy, completeness and connectivity under the
   four conditions.
 
+## M3: same-region net correct geometry (protocol, before results)
+
+The question is not whether a repair improves a score, but whether it adds *correct* geometry to the
+same region without adding wrong geometry. Two arms, same frozen region and query sample:
+
+- **Q (quarantine only)**: the pre-onset trusted map only; no post-onset frame is written.
+- **C3 (real repair)**: the repository filter plus the FAST-LIVO2 rerun, `OFFLINE_NATIVE_REESTIMATION`.
+
+Region and queries: the clean-run proxy restricted to the common support of both arms, with the
+same query sample and tolerance used by the bounded metric (NN cap 0.5 m; patch radius 0.30 m,
+plane RMS 0.02 m). Key and reference are the frozen M0 sets; the reference is exported before any
+metric.
+
+Report absolute counts on both sides, not one ratio:
+
+1. proxy surface points covered by each arm (NN <= 0.5 m), and the coverage fraction;
+2. map points that are unsupported by the bounded patch test, and the unsupported fraction;
+3. the coverage gained by C3 relative to Q, in proxy points, and the map points it adds that Q
+   does not have, split into supported and unsupported;
+4. frames written and missing per arm.
+
+No single "net score" is formed from points of different populations. The proxy is the clean run's
+map, not a GT surface; the result is a conditional same-region comparison, not a deployment claim.
+
 ## Open, not claimed complete
 
 - A human/independent baseline for the clean proxy (it is a clean-run map, not a GT surface).
