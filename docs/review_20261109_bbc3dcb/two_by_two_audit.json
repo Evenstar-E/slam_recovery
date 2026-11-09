@@ -287,14 +287,13 @@
    "receipts": 6
   },
   "verdict_scope": {
-   "verdict": "FAIL",
-   "problems": [
-    "room02_T3a_results carries no run set",
-    "room02_T3a_results carries no build identifier",
-    "criterion.verdict present without the runs it covers"
+   "verdict": "PASS",
+   "problems": [],
+   "scope": [
+    "r1",
+    "r2"
    ],
-   "scope": null,
-   "build": null
+   "build": "A: executable 76359f53..., library X (build A); superseded for conclusion by bui"
   },
   "enriched_scope": {
    "verdict": "PASS",

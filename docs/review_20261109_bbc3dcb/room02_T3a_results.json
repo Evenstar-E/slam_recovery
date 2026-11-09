@@ -15,5 +15,25 @@
  "criterion": {
   "mode_rule": "GOOD unsupported<0.10 / BAD>0.50",
   "verdict": "S3_ACCEPTED_AS_SEED"
- }
+ },
+ "scope": {
+  "runs_analysed": [
+   "r1",
+   "r2"
+  ],
+  "build": "A: executable 76359f53..., library X (not recorded per run)",
+  "verdict_is_local": true,
+  "superseded_for_conclusion_by": "room02_T3a_enriched_results.json (build B, 4 runs: BAD/BAD/GOOD/GOOD)",
+  "note": "S3_ACCEPTED_AS_SEED holds only for these two runs of build A; four runs of build B cross modes."
+ },
+ "provenance_gap": {
+  "receipt_library_sha256": "ABSENT",
+  "why": "the six T3a receipts record only the executable sha, which is identical across builds; the behaviour lives in liblaser_mapping.so",
+  "fix_forward": "receipts must record library_path and library_sha256 read from the running process (/proc/<pid>/maps), not from a declared config"
+ },
+ "runs_analysed": [
+  "r1",
+  "r2"
+ ],
+ "build": "A: executable 76359f53..., library X (build A); superseded for conclusion by build B four runs"
 }

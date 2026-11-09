@@ -320,8 +320,10 @@ window it determines (S4); they are to be tested as two separate single-factor c
 **T3a (deterministic grouping)**: switching to an `AsyncSpinner(1)` with a blocking condition
 variable (20 ms fallback, no busy-wait), everything else as in T2, still splits: build A gave two
 GOOD runs, while the same build B run four times gave BAD/BAD/GOOD/GOOD. The executable sha was
-identical across builds because the behaviour lives in `liblaser_mapping.so`; both hashes are now
-recorded. Single-factor controls for reduction order, scheduling/load and wall-clock phase are
+identical across builds because the behaviour lives in `liblaser_mapping.so`; the enriched
+result records both, but the six receipts carry only the executable sha (a retrospective gap that
+cannot be attributed per run). Future receipts must record `library_path` and `library_sha256` read
+from the running process (`/proc/<pid>/maps`), not from a declared config. Single-factor controls for reduction order, scheduling/load and wall-clock phase are
 exhausted, and the host crosses modes on repeated identical runs at roughly half rate (magnitude
 only). Single-run factor comparison on room_02 is therefore invalid and the four-cell answer stays
 UNKNOWN. The next step is a bounded applicability check, not another mechanism exclusion: run the
