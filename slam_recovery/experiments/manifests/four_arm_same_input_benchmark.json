@@ -142,10 +142,45 @@
     "rotation_err_max_deg": 3.7566,
     "note": "gap exceeds MAX_GAP, so this bounds the interpolator from above"
   },
+  "good_candidate_arm": {
+    "candidate_provenance": "OFFLINE_CONSTRUCT_FROM_CLEAN_RUN",
+    "what": "clean-run poses mapped into the injected frame by the pre-onset SE(3); the gate reference is still only the injected run's pre-onset keyframes",
+    "accepted": false,
+    "mode": "MODE3_SOFT_BRIDGE_WAIT",
+    "holdout_nis": null,
+    "reason": "Rejected candidate due to non-finite (NaN/Inf) state/bias or invalid SE(3) pose shape",
+    "evidence_status": "MISSING",
+    "admitted_quarantined_frames": 0,
+    "paired_evidence": {
+      "num_paired_frames": 0,
+      "reason": "no_repaired_poses"
+    },
+    "diagnostics": {
+      "candidate_dict_size": 391,
+      "support_diagnostics": {
+        "holdout_frames_total": 0,
+        "holdout_frames_scorable": 0,
+        "candidate_frames_total": 391,
+        "candidate_frames_committable": 246,
+        "candidate_frames_committed": 0,
+        "candidate_frames_deferred": 391,
+        "frames_missing_scan": [],
+        "frames_in_reference": []
+      }
+    },
+    "map_metrics": "UNAVAILABLE (circular: the candidate and the scoring proxy are both the clean run)",
+    "coverage_consistency_check_only": {},
+    "bad_candidate_for_comparison": {
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "holdout_nis": null,
+      "evidence_status": "MISSING",
+      "admitted_quarantined_frames": 0
+    }
+  },
   "gate_result_A3": {
     "accepted": false,
     "mode": "MODE3_SOFT_BRIDGE_WAIT",
-    "holdout_nis": Infinity,
+    "holdout_nis": null,
     "reason": "Rejected candidate due to non-finite (NaN/Inf) state/bias or invalid SE(3) pose shape",
     "evidence_status": "MISSING",
     "paired_test_informative": true,
@@ -162,9 +197,12 @@
       "admitted_duration_sec": 57.61,
       "distance_stats": {
         "n_points": 142250,
-        "median_m": 0.1044,
-        "p90_m": 1.2824,
-        "p99_m": NaN,
+        "n_beyond_search_radius": 3773,
+        "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
+        "median_m": 0.1005,
+        "p90_m": 1.0191,
+        "p99_m": 3.2283,
+        "p99_scope": "finite distances only; see n_beyond_search_radius",
         "tail_over_0.25m": 0.3015,
         "tail_over_0.5m": 0.2146,
         "tail_over_1.0m": 0.126,
@@ -223,9 +261,12 @@
       "admitted_duration_sec": 17.73,
       "distance_stats": {
         "n_points": 44500,
-        "median_m": 0.0892,
-        "p90_m": 1.1221,
-        "p99_m": NaN,
+        "n_beyond_search_radius": 565,
+        "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
+        "median_m": 0.0877,
+        "p90_m": 0.9679,
+        "p99_m": 3.2801,
+        "p99_scope": "finite distances only; see n_beyond_search_radius",
         "tail_over_0.25m": 0.2563,
         "tail_over_0.5m": 0.1781,
         "tail_over_1.0m": 0.1087,
@@ -284,9 +325,12 @@
       "admitted_duration_sec": 57.61,
       "distance_stats": {
         "n_points": 142250,
-        "median_m": 0.1044,
-        "p90_m": 1.2824,
-        "p99_m": NaN,
+        "n_beyond_search_radius": 3773,
+        "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
+        "median_m": 0.1005,
+        "p90_m": 1.0191,
+        "p99_m": 3.2283,
+        "p99_scope": "finite distances only; see n_beyond_search_radius",
         "tail_over_0.25m": 0.3015,
         "tail_over_0.5m": 0.2146,
         "tail_over_1.0m": 0.126,
@@ -345,9 +389,12 @@
       "admitted_duration_sec": 17.73,
       "distance_stats": {
         "n_points": 44500,
-        "median_m": 0.0892,
-        "p90_m": 1.1221,
-        "p99_m": NaN,
+        "n_beyond_search_radius": 565,
+        "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
+        "median_m": 0.0877,
+        "p90_m": 0.9679,
+        "p99_m": 3.2801,
+        "p99_scope": "finite distances only; see n_beyond_search_radius",
         "tail_over_0.25m": 0.2563,
         "tail_over_0.5m": 0.1781,
         "tail_over_1.0m": 0.1087,
@@ -397,7 +444,7 @@
       "clean_interval_keyframes_not_admitted": 0,
       "appendix_voxel_unsupported": 0.2613,
       "appendix_voxel_coverage": 0.0306,
-      "runtime_sec": 4.3545
+      "runtime_sec": 4.0436
     }
   },
   "caveats": [
