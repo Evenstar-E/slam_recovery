@@ -38,6 +38,111 @@ import run_fixed_input_repair_c0c3 as R          # noqa: E402
 RESULT_JSON = os.path.join(_HERE, "completeness_healthy_region_results.json")
 
 
+
+def cloud_widths(path):
+    """{scan_ns: message width} straight from the bag, with no range filter or cap.
+
+    `V.load_scans` keeps only 0.5-30 m points and caps the count, so its lengths are not the
+    observation size; comparing them to `n_kept` in the audit invents a mismatch.
+    """
+    out = {}
+    with V.Reader(path) as r:
+        conns = [c for c in r.connections if c.topic == V.SCAN_TOPIC]
+        for conn, _t, raw in r.messages(connections=conns):
+            m = V.TYPESTORE.deserialize_ros1(raw, conn.msgtype)
+            out[int(m.header.stamp.sec) * 10 ** 9 + int(m.header.stamp.nanosec)] = int(m.width)
+    return out
+
+
+def classify_key(has_pose, scan_len, dt_near, gap, near_dt, max_gap):
+    """One keyframe's status, as a pure function so it can be tested without a bag.
+
+    `scan_len` is None when no scan message exists at the stamp, and 0 when the message is
+    present but empty. Success is `pose AND nonempty observation` -- a frame with a pose but no
+    usable scan is MISSING, not written.
+    """
+    has_scan = scan_len is not None and scan_len > 0
+    if has_pose and has_scan:
+        return {"ok": True, "reason": None, "reasons": [], "cause": None}
+
+    reasons = []
+    if not has_pose:
+        reasons.append("NO_POSE")
+    if scan_len is None:
+        reasons.append("MISSING_SCAN")
+    elif scan_len == 0:
+        reasons.append("EMPTY_SCAN")
+
+    if scan_len is None:
+        cause = "FILTERED_SCAN_MISSING"
+        reason = "NO_POSE" if not has_pose else "MISSING_SCAN"
+    elif scan_len == 0:
+        cause = "FILTERED_SCAN_EMPTY"
+        reason = "NO_POSE" if not has_pose else "EMPTY_SCAN"
+    elif not has_pose:
+        if dt_near is None:
+            cause, reason = "POSE_STREAM_HAS_NO_NEIGHBOUR", "UNKNOWN"
+        elif dt_near <= near_dt:
+            cause, reason = "UNEXPECTED (pose exists within the nearest rule)", "UNKNOWN"
+        elif gap is not None and gap <= max_gap:
+            cause, reason = "UNEXPECTED (interpolatable gap)", "UNKNOWN"
+        else:
+            cause = "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)"
+            reason = "PAIRING_RULE_MISSING"
+    else:
+        cause, reason = "UNKNOWN", "UNKNOWN"
+    return {"ok": False, "reason": reason, "reasons": reasons, "cause": cause}
+
+
+def describe_recoverability(scan_len, dt_near, gap):
+    """(recoverable_frozen, recoverable_if_relaxed, explanation).
+
+    `gap` is None whenever the pose stream has no bracketing pair, and the old inline f-string
+    formatted it unconditionally -- a None there raised TypeError instead of reporting UNKNOWN.
+    """
+    if scan_len is None:
+        return False, False, "no filtered scan at this stamp"
+    if scan_len == 0:
+        return False, False, "the filtered scan at this stamp is empty"
+    if dt_near is None or dt_near > 1.0:
+        return False, False, ("the odometry stream has no message within 1.0 s; would need a "
+                              "re-run")
+    rec_relax = gap is not None and gap <= 0.150
+    gap_txt = "n/a (no bracketing pair)" if gap is None else f"{gap * 1e3:.1f} ms"
+    why = (f"scan present; nearest pose {dt_near*1e3:.1f} ms, bracketing gap {gap_txt} -- "
+           "refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol"
+           + ("; would be recoverable only by relaxing the gap limit, which the protocol does "
+              "not allow" if rec_relax else ""))
+    return False, rec_relax, why
+
+
+def check_audit_binding(audit, src_sha, inj_path, scan_len_by_ns, pts_outside_total=None):
+    """Tie a stored filter audit to THIS run's inputs, or call it stale.
+
+    A per-frame audit is only evidence for the run whose bag it read. The bind is the source bag
+    hash plus per-frame agreement between the audit's kept counts and the filtered clouds the
+    script just loaded; anything else is STALE_AUDIT and must not be attached to this identity.
+    """
+    bad = []
+    if audit.get("input") != inj_path:
+        bad.append(f"audit input path {audit.get('input')} != {inj_path}")
+    if audit.get("input_sha256") != src_sha:
+        bad.append(f"audit input sha256 {str(audit.get('input_sha256'))[:16]} != {src_sha[:16]}")
+    per = audit.get("per_frame", [])
+    mismatched = 0
+    for f in per:
+        got = scan_len_by_ns.get(int(f["ns"]))
+        if got is None or int(got) != int(f["n_kept"]):
+            mismatched += 1
+    if mismatched:
+        bad.append(f"{mismatched}/{len(per)} audit frames disagree with the filtered bag")
+    status = "BOUND" if not bad else "STALE_AUDIT"
+    return {"status": status, "problems": bad, "audit_frames": len(per),
+            "audit_input_sha256": audit.get("input_sha256"),
+            "current_input_sha256": src_sha}
+
+
+
 def main():
     sha = {r: V._sha_file(p) for r, p in
            (("injected_scans", R.INJ_SCANS), ("injected_poses", R.INJ_POSES),
@@ -67,58 +172,50 @@ def main():
     f_sha = V._sha_file(R.FILTERED_BAG)
     f_scans, _ = V.load_scans(R.FILTERED_BAG, f_sha)
     by_stamp = {round(t, 6): p for t, p in f_scans}
+    widths = cloud_widths(R.FILTERED_BAG)
     c3_poses, _ = R.pose_lookup(V.load_poses(R.RERUN_BAG), prefix + keys, _ts_of)
     r_ts, _rx, _rq = V.load_poses(R.RERUN_BAG)
 
     # ---- 1. every missing frame, classified ------------------------------------------------
+    # Success is pose AND nonempty observation. A key with a pose but no usable scan is MISSING
+    # too: the old loop only walked keys without a pose, so that case was silently dropped.
     missing = []
+    written = []
     for i in keys:
-        if i in c3_poses:
-            continue
         ts = inj_kfs[i]["ts"]
-        has_scan = round(ts, 6) in by_stamp and len(by_stamp[round(ts, 6)]) > 0
+        has_pose = i in c3_poses
+        scan_len = widths.get(int(kf_ns[i]))
         j = int(np.searchsorted(r_ts, ts))
         near = [k for k in (j - 1, j) if 0 <= k < len(r_ts)]
         best = min(near, key=lambda k: abs(r_ts[k] - ts)) if near else None
         dt_near = float(abs(r_ts[best] - ts)) if best is not None else None
         gap = float(r_ts[j] - r_ts[j - 1]) if 0 < j < len(r_ts) else None
-        if not has_scan:
-            cause = "FILTERED_SCAN_MISSING"
-        elif best is None:
-            cause = "POSE_STREAM_HAS_NO_NEIGHBOUR"
-        elif dt_near is not None and dt_near <= R.POSE_NEAR_DT:
-            cause = "UNEXPECTED (pose exists within the nearest rule)"
-        elif gap is not None and gap <= R.POSE_MAX_GAP:
-            cause = "UNEXPECTED (interpolatable gap)"
-        else:
-            cause = "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)"
+        verdict = classify_key(has_pose, scan_len, dt_near, gap,
+                               R.POSE_NEAR_DT, R.POSE_MAX_GAP)
+        if verdict["ok"]:
+            written.append(i)
+            continue
+        cause = verdict["cause"]
         # recoverability is two questions, not one
-        if not has_scan:
-            rec_frozen, rec_relax = False, False
-            why = "no filtered scan at this stamp"
-        elif dt_near is None or dt_near > 1.0:
-            rec_frozen, rec_relax = False, False
-            why = "the odometry stream has no message within 1.0 s; would need a re-run"
-        else:
-            rec_frozen = False
-            rec_relax = gap is not None and gap <= 0.150
-            why = (f"scan present; nearest pose {dt_near*1e3:.1f} ms, bracketing gap "
-                   f"{gap*1e3:.1f} ms -- refused by the 75 ms interpolation limit. Not "
-                   f"recoverable under the frozen protocol"
-                   + ("; would be recoverable only by relaxing the gap limit, which the "
-                      "protocol does not allow" if rec_relax else ""))
+        rec_frozen, rec_relax, why = describe_recoverability(scan_len, dt_near, gap)
         missing.append({"id": int(i), "ns": int(kf_ns[i]), "ts": float(ts),
-                        "has_filtered_scan": bool(has_scan),
+                        "has_pose": bool(has_pose),
+                        "has_filtered_scan": bool(scan_len is not None and scan_len > 0),
+                        "scan_points": None if scan_len is None else int(scan_len),
                         "nearest_pose_dt_ms": None if dt_near is None else round(dt_near * 1e3, 3),
                         "bracketing_gap_ms": None if gap is None else round(gap * 1e3, 3),
                         "cause": cause,
+                        "reason": verdict["reason"],
+                        "reasons": verdict["reasons"],
                         "recoverable_under_frozen_protocol": bool(rec_frozen),
                         "recoverable_if_rule_relaxed": bool(rec_relax),
                         "recoverability": why})
 
     causes = {}
+    by_reason = {}
     for m in missing:
         causes[m["cause"]] = causes.get(m["cause"], 0) + 1
+        by_reason[m["reason"]] = by_reason.get(m["reason"], 0) + 1
     if missing:
         _ts = sorted(m["ts"] for m in missing)
         gaps = np.diff(_ts)
@@ -135,11 +232,16 @@ def main():
                 lo = t
             prev = t
         segments.append([round(lo, 3), round(prev, 3)])
-    print(f"[] missing frames: {len(missing)} of {len(keys)}; causes {causes}")
+    print(f"[] missing frames: {len(missing)} of {len(keys)}; causes {causes}; "
+          f"reasons {by_reason}")
 
     # ---- 2. healthy-region cost ------------------------------------------------------------
     audit = json.load(open(os.path.join(_HERE, "fixed_input_repair_filter_audit.json"),
                            encoding="utf-8"))
+    # Tie the stored audit to THIS run before using a single number from it.
+    binding = check_audit_binding(audit, sha["injected_scans"], R.INJ_SCANS, widths)
+    if binding["status"] != "BOUND":
+        print(f"[] WARNING audit binding {binding['status']}: {binding['problems']}")
     pf = audit["per_frame"]
     outside = [f for f in pf if not (start_ns <= f["ns"] <= end_ns)]
     inside = [f for f in pf if start_ns <= f["ns"] <= end_ns]
@@ -171,14 +273,18 @@ def main():
             "fraction": (float(sum(f["n"] - f["n_kept"] for f in inside)
                                / sum(f["n"] for f in inside)) if inside else None)},
         "independently_confirms_previous_claim": bool(len(nonzero) == 0),
+        "audit_binding": binding,
+        "usable": binding["status"] == "BOUND",
     }
+    if binding["status"] != "BOUND":
+        healthy["warning"] = ("the stored filter audit does not describe this run's inputs; the "
+                              "numbers above must not be attributed to this identity")
     print(f"[] healthy region: {len(outside)} frames, {healthy['points_outside']} points, "
           f"removed {healthy['points_removed_outside']} "
           f"({healthy['removal_fraction_outside']}); frames with any removal "
           f"{healthy['frames_with_any_removal']}")
 
     # ---- 3. service completeness: 446 declared, 400 written --------------------------------
-    written = [i for i in keys if i in c3_poses and round(inj_kfs[i]["ts"], 6) in by_stamp]
     map_points = 250 * len(written)          # 250-point sidecar per written frame
     completeness = {
         "denominator_policy": ("frozen 446 is the denominator; a frame without output is MISSING "
@@ -211,6 +317,19 @@ def main():
         "reference": "clean-run map (proxy), not GT",
         "inputs_sha256": sha,
         "filtered_bag_sha256": f_sha,
+        "rerun_bag_sha256": V._sha_file(R.RERUN_BAG),
+        "consumed_inputs": {
+            "injected_scans": {"path": R.INJ_SCANS, "sha256": sha["injected_scans"]},
+            "injected_poses": {"path": R.INJ_POSES, "sha256": sha["injected_poses"]},
+            "clean_scans_proxy_only": {"path": R.CLN_SCANS,
+                                       "sha256": sha["clean_scans_proxy_only"]},
+            "clean_poses_proxy_only": {"path": R.CLN_POSES,
+                                       "sha256": sha["clean_poses_proxy_only"]},
+            "filtered_bag": {"path": R.FILTERED_BAG, "sha256": f_sha},
+            "rerun_bag": {"path": R.RERUN_BAG, "sha256": V._sha_file(R.RERUN_BAG)},
+        },
+        "audit_binding": binding,
+        "missing_by_reason": by_reason,
         "missing_frames": missing,
         "missing_by_cause": causes,
         "missing_segments_abs_sec": segments,

@@ -8,15 +8,58 @@
   "clean_poses_proxy_only": "32f0bf4465e3dc1f7d06182e6b7c612e9128e5070684973de7a0d574417edc47"
  },
  "filtered_bag_sha256": "c90300cb2911be53361645b037ba864f7aa9f9d1483905a9c5b757a4bd269178",
+ "rerun_bag_sha256": "1109fccf46abba4b5843d504899718a6e5616439766df6cedbc35e8879e18a36",
+ "consumed_inputs": {
+  "injected_scans": {
+   "path": "/tmp/fastlivo/hall01_inj43.bag",
+   "sha256": "aa740037b01abae537d409a150d8a633fb4026d7474f6b8e766be2d508683aae"
+  },
+  "injected_poses": {
+   "path": "/tmp/fastlivo/res_h1_inj43_vis.bag",
+   "sha256": "03e75983eefc0cfcd849694630cab720c5638c8f7bdd62355d4eafa4efd78123"
+  },
+  "clean_scans_proxy_only": {
+   "path": "/tmp/fastlivo/hall01_100_160.bag",
+   "sha256": "905c6a15ed4134a53fc6bad6e18c6644957bf691b99612d30169bf2c80ca30b7"
+  },
+  "clean_poses_proxy_only": {
+   "path": "/tmp/fastlivo/res_hall01_clean_05x.bag",
+   "sha256": "32f0bf4465e3dc1f7d06182e6b7c612e9128e5070684973de7a0d574417edc47"
+  },
+  "filtered_bag": {
+   "path": "/tmp/fastlivo/hall01_inj43_filtered.bag",
+   "sha256": "c90300cb2911be53361645b037ba864f7aa9f9d1483905a9c5b757a4bd269178"
+  },
+  "rerun_bag": {
+   "path": "/tmp/fastlivo/res_h1_inj43_filtered.bag",
+   "sha256": "1109fccf46abba4b5843d504899718a6e5616439766df6cedbc35e8879e18a36"
+  }
+ },
+ "audit_binding": {
+  "status": "BOUND",
+  "problems": [],
+  "audit_frames": 598,
+  "audit_input_sha256": "aa740037b01abae537d409a150d8a633fb4026d7474f6b8e766be2d508683aae",
+  "current_input_sha256": "aa740037b01abae537d409a150d8a633fb4026d7474f6b8e766be2d508683aae"
+ },
+ "missing_by_reason": {
+  "PAIRING_RULE_MISSING": 46
+ },
  "missing_frames": [
   {
    "id": 134,
    "ns": 1627785275807806969,
    "ts": 1627785275.807807,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5838,
    "nearest_pose_dt_ms": 60.147,
    "bracketing_gap_ms": 133.562,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 60.1 ms, bracketing gap 133.6 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -25,10 +68,16 @@
    "id": 136,
    "ns": 1627785276008208513,
    "ts": 1627785276.0082085,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5826,
    "nearest_pose_dt_ms": 60.202,
    "bracketing_gap_ms": 133.577,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 60.2 ms, bracketing gap 133.6 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -37,10 +86,16 @@
    "id": 140,
    "ns": 1627785276409005165,
    "ts": 1627785276.4090052,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5803,
    "nearest_pose_dt_ms": 60.137,
    "bracketing_gap_ms": 133.24,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 60.1 ms, bracketing gap 133.2 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -49,10 +104,16 @@
    "id": 142,
    "ns": 1627785276610954046,
    "ts": 1627785276.610954,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5813,
    "nearest_pose_dt_ms": 62.227,
    "bracketing_gap_ms": 133.23,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 62.2 ms, bracketing gap 133.2 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -61,10 +122,16 @@
    "id": 146,
    "ns": 1627785277010176420,
    "ts": 1627785277.0101764,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5721,
    "nearest_pose_dt_ms": 61.778,
    "bracketing_gap_ms": 133.211,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 61.8 ms, bracketing gap 133.2 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -73,10 +140,16 @@
    "id": 148,
    "ns": 1627785277210542202,
    "ts": 1627785277.2105422,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5749,
    "nearest_pose_dt_ms": 62.33,
    "bracketing_gap_ms": 133.201,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 62.3 ms, bracketing gap 133.2 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -85,10 +158,16 @@
    "id": 150,
    "ns": 1627785277411109447,
    "ts": 1627785277.4111094,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5775,
    "nearest_pose_dt_ms": 63.171,
    "bracketing_gap_ms": 133.448,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 63.2 ms, bracketing gap 133.4 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -97,10 +176,16 @@
    "id": 152,
    "ns": 1627785277611365318,
    "ts": 1627785277.6113653,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5832,
    "nearest_pose_dt_ms": 63.252,
    "bracketing_gap_ms": 133.455,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 63.3 ms, bracketing gap 133.5 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -109,10 +194,16 @@
    "id": 154,
    "ns": 1627785277811749458,
    "ts": 1627785277.8117495,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5830,
    "nearest_pose_dt_ms": 63.453,
    "bracketing_gap_ms": 133.461,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 63.5 ms, bracketing gap 133.5 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -121,10 +212,16 @@
    "id": 156,
    "ns": 1627785278012118816,
    "ts": 1627785278.0121188,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5824,
    "nearest_pose_dt_ms": 63.63,
    "bracketing_gap_ms": 133.467,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 63.6 ms, bracketing gap 133.5 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -133,10 +230,16 @@
    "id": 158,
    "ns": 1627785278212527990,
    "ts": 1627785278.212528,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5827,
    "nearest_pose_dt_ms": 63.836,
    "bracketing_gap_ms": 133.474,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 63.8 ms, bracketing gap 133.5 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -145,10 +248,16 @@
    "id": 160,
    "ns": 1627785278412906408,
    "ts": 1627785278.4129064,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5828,
    "nearest_pose_dt_ms": 63.944,
    "bracketing_gap_ms": 133.276,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 63.9 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -157,10 +266,16 @@
    "id": 162,
    "ns": 1627785278613305807,
    "ts": 1627785278.6133058,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5796,
    "nearest_pose_dt_ms": 64.432,
    "bracketing_gap_ms": 133.267,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 64.4 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -169,10 +284,16 @@
    "id": 164,
    "ns": 1627785278813706160,
    "ts": 1627785278.8137062,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5755,
    "nearest_pose_dt_ms": 64.934,
    "bracketing_gap_ms": 133.259,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 64.9 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -181,10 +302,16 @@
    "id": 166,
    "ns": 1627785279014089108,
    "ts": 1627785279.014089,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5705,
    "nearest_pose_dt_ms": 65.429,
    "bracketing_gap_ms": 133.251,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 65.4 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -193,10 +320,16 @@
    "id": 168,
    "ns": 1627785279214470625,
    "ts": 1627785279.2144706,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5721,
    "nearest_pose_dt_ms": 65.936,
    "bracketing_gap_ms": 133.243,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 65.9 ms, bracketing gap 133.2 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -205,10 +338,16 @@
    "id": 170,
    "ns": 1627785279414889097,
    "ts": 1627785279.414889,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5779,
    "nearest_pose_dt_ms": 66.502,
    "bracketing_gap_ms": 133.273,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 66.5 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -217,10 +356,16 @@
    "id": 172,
    "ns": 1627785279615255356,
    "ts": 1627785279.6152554,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5793,
    "nearest_pose_dt_ms": 66.305,
    "bracketing_gap_ms": 133.265,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 66.3 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -229,10 +374,16 @@
    "id": 176,
    "ns": 1627785280016039848,
    "ts": 1627785280.0160398,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5831,
    "nearest_pose_dt_ms": 65.283,
    "bracketing_gap_ms": 133.248,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 65.3 ms, bracketing gap 133.2 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -241,10 +392,16 @@
    "id": 178,
    "ns": 1627785280216433525,
    "ts": 1627785280.2164335,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5867,
    "nearest_pose_dt_ms": 64.752,
    "bracketing_gap_ms": 133.24,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 64.8 ms, bracketing gap 133.2 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -253,10 +410,16 @@
    "id": 180,
    "ns": 1627785280416828156,
    "ts": 1627785280.4168282,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5916,
    "nearest_pose_dt_ms": 64.255,
    "bracketing_gap_ms": 133.296,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 64.3 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -265,10 +428,16 @@
    "id": 182,
    "ns": 1627785280617594957,
    "ts": 1627785280.617595,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5915,
    "nearest_pose_dt_ms": 63.424,
    "bracketing_gap_ms": 133.289,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 63.4 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -277,10 +446,16 @@
    "id": 184,
    "ns": 1627785280817767620,
    "ts": 1627785280.8177676,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5910,
    "nearest_pose_dt_ms": 63.176,
    "bracketing_gap_ms": 133.282,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 63.2 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -289,10 +464,16 @@
    "id": 186,
    "ns": 1627785281018114090,
    "ts": 1627785281.018114,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5914,
    "nearest_pose_dt_ms": 62.744,
    "bracketing_gap_ms": 133.276,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 62.7 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -301,10 +482,16 @@
    "id": 188,
    "ns": 1627785281218379974,
    "ts": 1627785281.21838,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5929,
    "nearest_pose_dt_ms": 62.383,
    "bracketing_gap_ms": 133.268,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 62.4 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -313,10 +500,16 @@
    "id": 190,
    "ns": 1627785281418802738,
    "ts": 1627785281.4188027,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5879,
    "nearest_pose_dt_ms": 61.87,
    "bracketing_gap_ms": 133.276,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 61.9 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -325,10 +518,16 @@
    "id": 192,
    "ns": 1627785281619167566,
    "ts": 1627785281.6191676,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5896,
    "nearest_pose_dt_ms": 61.41,
    "bracketing_gap_ms": 133.268,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 61.4 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -337,10 +536,16 @@
    "id": 194,
    "ns": 1627785281819571495,
    "ts": 1627785281.8195715,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5901,
    "nearest_pose_dt_ms": 60.898,
    "bracketing_gap_ms": 133.26,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 60.9 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -349,10 +554,16 @@
    "id": 196,
    "ns": 1627785282019945621,
    "ts": 1627785282.0199456,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5879,
    "nearest_pose_dt_ms": 60.404,
    "bracketing_gap_ms": 133.252,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 60.4 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -361,10 +572,16 @@
    "id": 198,
    "ns": 1627785282220352650,
    "ts": 1627785282.2203526,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5791,
    "nearest_pose_dt_ms": 59.865,
    "bracketing_gap_ms": 133.244,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 59.9 ms, bracketing gap 133.2 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -373,10 +590,16 @@
    "id": 202,
    "ns": 1627785282621627808,
    "ts": 1627785282.6216278,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5819,
    "nearest_pose_dt_ms": 58.408,
    "bracketing_gap_ms": 133.281,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 58.4 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -385,10 +608,16 @@
    "id": 204,
    "ns": 1627785282822945118,
    "ts": 1627785282.822945,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5879,
    "nearest_pose_dt_ms": 57.004,
    "bracketing_gap_ms": 133.274,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 57.0 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -397,10 +626,16 @@
    "id": 206,
    "ns": 1627785283021960735,
    "ts": 1627785283.0219607,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5877,
    "nearest_pose_dt_ms": 57.891,
    "bracketing_gap_ms": 133.267,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 57.9 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -409,10 +644,16 @@
    "id": 208,
    "ns": 1627785283222319841,
    "ts": 1627785283.2223198,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5892,
    "nearest_pose_dt_ms": 57.424,
    "bracketing_gap_ms": 133.26,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 57.4 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -421,10 +662,16 @@
    "id": 210,
    "ns": 1627785283422702551,
    "ts": 1627785283.4227026,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5735,
    "nearest_pose_dt_ms": 56.942,
    "bracketing_gap_ms": 133.279,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 56.9 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -433,10 +680,16 @@
    "id": 212,
    "ns": 1627785283623100519,
    "ts": 1627785283.6231005,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5692,
    "nearest_pose_dt_ms": 56.453,
    "bracketing_gap_ms": 133.271,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 56.5 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -445,10 +698,16 @@
    "id": 214,
    "ns": 1627785283823498726,
    "ts": 1627785283.8234987,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5701,
    "nearest_pose_dt_ms": 55.951,
    "bracketing_gap_ms": 133.263,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 56.0 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -457,10 +716,16 @@
    "id": 216,
    "ns": 1627785284023880959,
    "ts": 1627785284.023881,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5552,
    "nearest_pose_dt_ms": 55.454,
    "bracketing_gap_ms": 133.256,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 55.5 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -469,10 +734,16 @@
    "id": 218,
    "ns": 1627785284224254131,
    "ts": 1627785284.2242541,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5512,
    "nearest_pose_dt_ms": 54.954,
    "bracketing_gap_ms": 133.247,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 55.0 ms, bracketing gap 133.2 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -481,10 +752,16 @@
    "id": 220,
    "ns": 1627785284424652576,
    "ts": 1627785284.4246526,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5471,
    "nearest_pose_dt_ms": 54.446,
    "bracketing_gap_ms": 133.278,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 54.4 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -493,10 +770,16 @@
    "id": 222,
    "ns": 1627785284625069618,
    "ts": 1627785284.6250696,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5399,
    "nearest_pose_dt_ms": 53.936,
    "bracketing_gap_ms": 133.27,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 53.9 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -505,10 +788,16 @@
    "id": 224,
    "ns": 1627785284825474739,
    "ts": 1627785284.8254747,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5439,
    "nearest_pose_dt_ms": 53.427,
    "bracketing_gap_ms": 133.262,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 53.4 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -517,10 +806,16 @@
    "id": 226,
    "ns": 1627785285025828838,
    "ts": 1627785285.0258288,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5406,
    "nearest_pose_dt_ms": 52.956,
    "bracketing_gap_ms": 133.254,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 53.0 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -529,10 +824,16 @@
    "id": 228,
    "ns": 1627785285226233959,
    "ts": 1627785285.226234,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5434,
    "nearest_pose_dt_ms": 52.422,
    "bracketing_gap_ms": 133.246,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 52.4 ms, bracketing gap 133.2 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -541,10 +842,16 @@
    "id": 328,
    "ns": 1627785295245818138,
    "ts": 1627785295.2458181,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5506,
    "nearest_pose_dt_ms": 20.185,
    "bracketing_gap_ms": 133.324,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 20.2 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -553,10 +860,16 @@
    "id": 330,
    "ns": 1627785295446205139,
    "ts": 1627785295.4462051,
+   "has_pose": false,
    "has_filtered_scan": true,
+   "scan_points": 5449,
    "nearest_pose_dt_ms": 20.587,
    "bracketing_gap_ms": 133.33,
    "cause": "PAIRING_RULE_MISSING (bracketing gap over the 75 ms limit)",
+   "reason": "PAIRING_RULE_MISSING",
+   "reasons": [
+    "NO_POSE"
+   ],
    "recoverable_under_frozen_protocol": false,
    "recoverable_if_rule_relaxed": true,
    "recoverability": "scan present; nearest pose 20.6 ms, bracketing gap 133.3 ms -- refused by the 75 ms interpolation limit. Not recoverable under the frozen protocol; would be recoverable only by relaxing the gap limit, which the protocol does not allow"
@@ -603,7 +916,15 @@
    "removed": 8974676,
    "fraction": 0.8876490475898939
   },
-  "independently_confirms_previous_claim": true
+  "independently_confirms_previous_claim": true,
+  "audit_binding": {
+   "status": "BOUND",
+   "problems": [],
+   "audit_frames": 598,
+   "audit_input_sha256": "aa740037b01abae537d409a150d8a633fb4026d7474f6b8e766be2d508683aae",
+   "current_input_sha256": "aa740037b01abae537d409a150d8a633fb4026d7474f6b8e766be2d508683aae"
+  },
+  "usable": true
  },
  "service_completeness": {
   "denominator_policy": "frozen 446 is the denominator; a frame without output is MISSING and is never removed from the count",
