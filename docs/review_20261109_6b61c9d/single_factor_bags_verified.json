@@ -32,7 +32,9 @@
   "combined_equals_actual_in_window": true,
   "arms_match_original_indices": true,
   "row_counts_match": true,
-  "frames_complete": true
+  "frames_complete": true,
+  "sidecar_order_ok": true,
+  "no_fatal": true
  },
  "failure_counts": {
   "stamp_mismatch": 0,

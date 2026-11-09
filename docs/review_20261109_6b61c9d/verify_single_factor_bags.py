@@ -196,6 +196,8 @@ def main():
         "row_counts_match": counts["row_count"] == 0 and counts["metadata_mismatch"] == 0
                             and n_in > 0,
         "frames_complete": counts["stamp_mismatch"] == 0 and counts["missing_message"] == 0,
+        "sidecar_order_ok": counts["sidecar_order"] == 0,
+        "no_fatal": counts["fatal"] == 0,
     }
     res = {"inputs": {"injected_sha256": _sha256(INJ), "filtered_sha256": _sha256(FIL),
                       "sidecar_sha256": _sha256(SIDECAR)},
@@ -217,7 +219,9 @@ def main():
         json.dump(res, fh, indent=1)
     print(json.dumps(checks, indent=1))
     print("failure counts:", {k: v for k, v in counts.items() if v})
-    return 0 if all(checks.values()) else 1
+    # Gate on the counters, not on a hand-maintained list of checks: a new failure kind that is
+    # recorded but not yet wired into `checks` must still make the run fail.
+    return 0 if not any(counts.values()) else 1
 
 
 if __name__ == "__main__":
