@@ -292,6 +292,7 @@ class OnlineRecoveryTransactionNode:
         reference_world: Optional[np.ndarray] = None,
         reference_keys: Optional[set] = None,
         empty_reason: str = "no_repaired_poses",
+        support_reference: Optional[np.ndarray] = None,
     ) -> Tuple[Optional[bool], Optional[float], Optional[float]]:
         """
         Measure the paired-benefit / re-entry evidence of a candidate against its incumbent.
@@ -346,7 +347,12 @@ class OnlineRecoveryTransactionNode:
         # produce enormous but meaningless residuals -- that is "no evidence", not "bad candidate",
         # and the two must not be conflated. Keep only frames whose points are predominantly
         # supported by the reference cloud.
-        paired_keys = [k for k in pairable_keys if self._frame_has_reference_support(k, ref_pts, repaired_poses)]
+        # Coverage of the paired frame is decided on the spatially sampled reference, for the same
+        # reason as the commit prefix: the 1500-point scoring cloud is a budget, not a coverage
+        # definition. Using it here made every paired frame look unsupported in the four-arm replay
+        # even though the same frames had already passed the (correct) prefix check.
+        support = ref_pts if support_reference is None else support_reference
+        paired_keys = [k for k in pairable_keys if self._frame_has_reference_support(k, support, repaired_poses)]
         unsupported = len(pairable_keys) - len(paired_keys)
         # Evidence requirement scales with how much of the map the candidate would commit. This is
         # a floor under both settings, so a caller that raises min_paired_observations above the
@@ -555,6 +561,7 @@ class OnlineRecoveryTransactionNode:
             empty_reason=(
                 "no_committable_prefix" if (not commit_keys and kf_sorted) else "no_repaired_poses"
             ),
+            support_reference=support_ref,
         )
 
         cand = CandidateMap(
