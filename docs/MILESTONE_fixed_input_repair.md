@@ -272,8 +272,10 @@ interaction**: O split 0.072/14.439 m, O+F−B split 554.6/0.301 m, and the two 
 failed in both repeats (O+F 593.0/14.9 m, O−B 48.8/19.7 m). Map coverage is bimodal in the same
 way (0.9988/0.007 unsupported in the good mode, ~0.69/0.65 in the bad mode), and the good mode
 appeared once for O and once for the actual cell, independent of the arm. The pre-registered rule
-therefore reads `NOT_A_CLEAN_INTERACTION`, with host-run variance dominating **under the metric the
-pre-registration named** — the full-alignment diagnostic. That was a pre-registration error; the
+therefore reads `NOT_A_CLEAN_INTERACTION`: the pre-registered interaction pattern is not supported
+and the repeats are unstable **under the metric the pre-registration named** — the full-alignment
+diagnostic. With two repeats per cell this does not establish the absence of an interaction, nor
+that variance statistically dominates every factor. That was a pre-registration error; the
 protocol quantity is the frozen-prefix ATE. The first protocol computation also had a frame error
 (run→clean prefix alignment compared directly with GT, with no clean→GT transform); after fitting
 one frozen clean→GT transform on pre-onset clean keyframes (177 matched, 0.091 m residual) and
@@ -281,7 +283,26 @@ composing run→clean→GT, the protocol cells are O 0.093/26.373, O+F 743.3/26.
 O+F−B 687.5/0.314 m. The metric is not swapped after seeing results: both readings are reported,
 both reject interaction, and after the frame fix they agree that the same two runs (O#1 and
 O+F−B#2) are good while the other six fail. The earlier "all eight fail the protocol" reading was
-an artifact of the missing transform. The single-run "filter is the cause" observation is withdrawn as not
+an artifact of the missing transform.
+
+**Where the repeats first disagree**: comparing each cell's two pose streams directly (same input,
+same world frame), the first recorded pose already differs by 0.159–1.589 m and 0.017–0.122 rad,
+14–17 s before onset, and the first output stamps spread over 3.4 s (O pair 3.4 s, O+F/O-B pairs 0.4 s, O+F-B pair 2.0 s). The split is therefore seeded in
+initialisation/early tracking, before the injection window; later >1 m differences are its
+amplification, not evidence about the in-window rows. A pre-registered variance control then ran each of O and O+F−B four more times on the same bags,
+config and runner, varying only the run order. Both cells crossed modes (O: BAD/GOOD/BAD/BAD;
+O+F−B: UNCLEAR/UNCLEAR/BAD/BAD), so the pre-registered rule fires
+**`SEQUENCE_UNUSABLE_FOR_SINGLE_RUN`**. Pooled with the first two repeats, O is good in ~2/6 and
+O+F−B in ~1/6 runs (magnitude only). Two O+F−B runs are intermediate (unsupported 0.114/0.190,
+ATE 0.69/1.93 m), so this is a continuum with two ends, not a binary bistability. No single-run A/B
+on this sequence can compare factors; the four-cell answer stays **UNKNOWN** until the variance is
+controlled.
+
+This diagnostic is `POST_HOC_DESCRIPTIVE` (instability was seen first); its rule is stated here
+for prospective use on the next repeat pair: first divergence is the first matched pose with
+|Δp| > 1 cm or Δangle > 1e-3 rad, and a pre-onset first divergence names initialisation/early
+tracking as the locus. It locates when the repeats diverge, not how often; with two repeats per
+cell it is not a probability estimate. The single-run "filter is the cause" observation is withdrawn as not
 reproducible. Two independently written
 builders and audits (one per side) produce the same in-window counts. Until the host variance is
 brought under control, the existing E_actual vs E_oracle comparison changes both

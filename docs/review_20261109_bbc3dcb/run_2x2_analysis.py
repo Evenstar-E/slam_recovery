@@ -187,7 +187,9 @@ def main():
                   "ate_frozen_prefix_protocol_m": ate_prefix,
                   "fail": (None if ate_full is None else bool(ate_full > FAIL_ATE_M)),
                   "fail_protocol": (None if ate_prefix is None
-                                    else bool(ate_prefix > FAIL_ATE_M))}
+                                    else bool(ate_prefix > FAIL_ATE_M)),
+                  "run_sha256": (V._sha_file(cells[k]["bag"]) if cells.get(k, {}).get("bag")
+                                 else None)}
         print(f"   {k:10s} cover {out[k]['coverage']:.4f} unsup "
               f"{out[k]['unsupported_fraction']:.4f} ATE {ate_full} "
               f"{'FAIL' if out[k]['fail'] else 'ok'}")
@@ -210,6 +212,37 @@ def main():
     interaction_protocol = (summary_protocol["O+F-B"]["fails_both"]
                             and summary_protocol["O+F"]["ok_both"]
                             and summary_protocol["O-B"]["ok_both"])
+    # Enforce the per-receipt input -> host -> output chain, not just record it.
+    import glob
+    arm_of_input = {os.path.basename(ARMS[a]): a for a in ARMS}
+    receipt_chain, configs = {}, {"config_m2dgr": set(), "config_camera": set(),
+                                  "host_binary": set()}
+    for rp in glob.glob(os.path.join(_HERE, "room02_2x2_receipt_*.json")):
+        d = json.load(open(rp, encoding="utf-8"))
+        arm = arm_of_input.get(os.path.basename(d["pre_run"]["paths"]["input_bag"]))
+        cell = os.path.basename(d["output"]["bag"])
+        cell = cell[len("res_2x2_"):-len(".bag")].replace("_plus_", "+").replace("_minus_", "-")
+        cell = cell.replace("_r", "#")
+        if arm is None or cell not in out:
+            raise SystemExit(f"receipt {rp} does not map onto a cell: arm={arm} cell={cell}")
+        got_in = d["pre_run"]["sha256"]["input_bag"]
+        got_out = d["output"]["sha256"]
+        want_out = out[cell].get("run_sha256") or V._sha_file(cells[cell]["bag"])
+        if got_in != map_inputs[arm]["sha256"]:
+            raise SystemExit(f"receipt {rp}: input sha {got_in[:12]} != manifest "
+                             f"{map_inputs[arm]['sha256'][:12]}")
+        if got_out != want_out:
+            raise SystemExit(f"receipt {rp}: output sha {got_out[:12]} != disk {want_out[:12]}")
+        for k in configs:
+            configs[k].add(d["pre_run"]["sha256"][k])
+        receipt_chain[cell] = {"receipt": os.path.relpath(rp, _REPO),
+                               "input_sha256": got_in, "output_sha256": got_out,
+                               "status": d.get("status")}
+    if len(receipt_chain) != len(out):
+        raise SystemExit(f"receipts cover {len(receipt_chain)} of {len(out)} cells")
+    if any(len(v) != 1 for v in configs.values()):
+        raise SystemExit(f"configs differ across receipts: { {k: len(v) for k, v in configs.items()} }")
+
     res = {
         "protocol": {"source": "docs/MILESTONE_fixed_input_repair.md (2x2 single factor)",
                      "fail_rule": f"full-alignment ATE > {FAIL_ATE_M} m fails; both repeats must "
@@ -224,7 +257,9 @@ def main():
                                     if cells.get(k, {}).get("bag")
                                     and os.path.exists(cells[k]["bag"]) else None}
                                 for k in out},
-                   "manifest": os.path.relpath(manifest_path, _REPO)},
+                   "manifest": os.path.relpath(manifest_path, _REPO),
+                   "receipts": receipt_chain,
+                   "config_sha256_single_valued": True},
         "clean_to_gt": clean_to_gt,
         "common_set": {"n": len(common), "n_keys": len(keys),
                        "ns_sha256": hashlib.sha256(",".join(str(int(kf_ns[i])) for i in

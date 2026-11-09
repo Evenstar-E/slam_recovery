@@ -62,7 +62,58 @@
     "sha256": "d63a6e37662c8be1404c407fd05999851e0e6b1432f464a63858b53e7f34c2d4"
    }
   },
-  "manifest": "docs/review_20261109_6b61c9d/single_factor_bags.json"
+  "manifest": "docs/review_20261109_6b61c9d/single_factor_bags.json",
+  "receipts": {
+   "O-B#2": {
+    "receipt": "docs/review_20261109_bbc3dcb/room02_2x2_receipt_fl_run_20261109T123103Z_2491100.json",
+    "input_sha256": "73f7bcdd2291a437d345523912139f09a5a2bb110017f45c969ed0df315d218e",
+    "output_sha256": "c2bffb1edf5b075c05f7d2ce64a40546bcdfbbc9d14e075409004379bc170108",
+    "status": "OK"
+   },
+   "O+F-B#2": {
+    "receipt": "docs/review_20261109_bbc3dcb/room02_2x2_receipt_fl_run_20261109T123311Z_2494242.json",
+    "input_sha256": "cd12dddbb8fb9707bda1b551d238f8d3b6525798a62638ee62f95986f11e6301",
+    "output_sha256": "d63a6e37662c8be1404c407fd05999851e0e6b1432f464a63858b53e7f34c2d4",
+    "status": "OK"
+   },
+   "O+F-B#1": {
+    "receipt": "docs/review_20261109_bbc3dcb/room02_2x2_receipt_fl_run_20261109T122447Z_2482360.json",
+    "input_sha256": "cd12dddbb8fb9707bda1b551d238f8d3b6525798a62638ee62f95986f11e6301",
+    "output_sha256": "9550a9ad63c1c807c24dfa22e39ae7feea8db51d031ee04df6d19319dde0022c",
+    "status": "OK"
+   },
+   "O#2": {
+    "receipt": "docs/review_20261109_bbc3dcb/room02_2x2_receipt_fl_run_20261109T122651Z_2485321.json",
+    "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+    "output_sha256": "d620df78f3f143de212da8b5f24ca7112ed559b07cb41ab62c0c6d1c9754b15b",
+    "status": "OK"
+   },
+   "O+F#1": {
+    "receipt": "docs/review_20261109_bbc3dcb/room02_2x2_receipt_fl_run_20261109T122034Z_2476238.json",
+    "input_sha256": "f45d0cbe95ad28e509a451c93d39b978da1d891dc60c1757ed128f555e482b66",
+    "output_sha256": "b095029adde04ce56a27a8be9d2e4c13b58ea4a5b6fbf33ccea626a7698404f6",
+    "status": "OK"
+   },
+   "O-B#1": {
+    "receipt": "docs/review_20261109_bbc3dcb/room02_2x2_receipt_fl_run_20261109T122242Z_2479535.json",
+    "input_sha256": "73f7bcdd2291a437d345523912139f09a5a2bb110017f45c969ed0df315d218e",
+    "output_sha256": "0a172bd8ee681569999ca729d7473af39c03c358098b323f6e6a17e61e23f927",
+    "status": "OK"
+   },
+   "O#1": {
+    "receipt": "docs/review_20261109_bbc3dcb/room02_2x2_receipt_fl_run_20261109T121820Z_2471820.json",
+    "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+    "output_sha256": "6dc3a18fe530043965ac33e8c853be7104cf3d3622b1a77db292f395e3521b2f",
+    "status": "OK"
+   },
+   "O+F#2": {
+    "receipt": "docs/review_20261109_bbc3dcb/room02_2x2_receipt_fl_run_20261109T122854Z_2488173.json",
+    "input_sha256": "f45d0cbe95ad28e509a451c93d39b978da1d891dc60c1757ed128f555e482b66",
+    "output_sha256": "740699c640d7610127658f091a465e66358aec712e270c5383136b9f962c54b1",
+    "status": "OK"
+   }
+  },
+  "config_sha256_single_valued": true
  },
  "clean_to_gt": {
   "matched": 177,
@@ -119,7 +170,8 @@
    "ate_full_alignment_diagnostic_m": 0.07162458349543022,
    "ate_frozen_prefix_protocol_m": 0.09264491035181353,
    "fail": false,
-   "fail_protocol": false
+   "fail_protocol": false,
+   "run_sha256": "6dc3a18fe530043965ac33e8c853be7104cf3d3622b1a77db292f395e3521b2f"
   },
   "O#2": {
    "status": "OK",
@@ -132,7 +184,8 @@
    "ate_full_alignment_diagnostic_m": 14.43858960214947,
    "ate_frozen_prefix_protocol_m": 26.372984556112733,
    "fail": true,
-   "fail_protocol": true
+   "fail_protocol": true,
+   "run_sha256": "d620df78f3f143de212da8b5f24ca7112ed559b07cb41ab62c0c6d1c9754b15b"
   },
   "O+F#1": {
    "status": "OK",
@@ -145,7 +198,8 @@
    "ate_full_alignment_diagnostic_m": 593.0262141110676,
    "ate_frozen_prefix_protocol_m": 743.3113232627709,
    "fail": true,
-   "fail_protocol": true
+   "fail_protocol": true,
+   "run_sha256": "b095029adde04ce56a27a8be9d2e4c13b58ea4a5b6fbf33ccea626a7698404f6"
   },
   "O+F#2": {
    "status": "OK",
@@ -158,7 +212,8 @@
    "ate_full_alignment_diagnostic_m": 14.872150834451231,
    "ate_frozen_prefix_protocol_m": 26.148378020286646,
    "fail": true,
-   "fail_protocol": true
+   "fail_protocol": true,
+   "run_sha256": "740699c640d7610127658f091a465e66358aec712e270c5383136b9f962c54b1"
   },
   "O-B#1": {
    "status": "OK",
@@ -171,7 +226,8 @@
    "ate_full_alignment_diagnostic_m": 48.84667762983906,
    "ate_frozen_prefix_protocol_m": 76.07003376566831,
    "fail": true,
-   "fail_protocol": true
+   "fail_protocol": true,
+   "run_sha256": "0a172bd8ee681569999ca729d7473af39c03c358098b323f6e6a17e61e23f927"
   },
   "O-B#2": {
    "status": "OK",
@@ -184,7 +240,8 @@
    "ate_full_alignment_diagnostic_m": 19.67264276177945,
    "ate_frozen_prefix_protocol_m": 33.68205386132164,
    "fail": true,
-   "fail_protocol": true
+   "fail_protocol": true,
+   "run_sha256": "c2bffb1edf5b075c05f7d2ce64a40546bcdfbbc9d14e075409004379bc170108"
   },
   "O+F-B#1": {
    "status": "OK",
@@ -197,7 +254,8 @@
    "ate_full_alignment_diagnostic_m": 554.5608455651169,
    "ate_frozen_prefix_protocol_m": 687.5204171734307,
    "fail": true,
-   "fail_protocol": true
+   "fail_protocol": true,
+   "run_sha256": "9550a9ad63c1c807c24dfa22e39ae7feea8db51d031ee04df6d19319dde0022c"
   },
   "O+F-B#2": {
    "status": "OK",
@@ -210,7 +268,8 @@
    "ate_full_alignment_diagnostic_m": 0.3005104007819498,
    "ate_frozen_prefix_protocol_m": 0.3142783935483675,
    "fail": false,
-   "fail_protocol": false
+   "fail_protocol": false,
+   "run_sha256": "d63a6e37662c8be1404c407fd05999851e0e6b1432f464a63858b53e7f34c2d4"
   }
  },
  "summary": {
