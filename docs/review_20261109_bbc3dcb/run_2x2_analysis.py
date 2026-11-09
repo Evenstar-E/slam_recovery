@@ -69,10 +69,41 @@ def main():
     ts_gt, xyz_gt, _ = load_tum_trajectory_se3(GT)
     cln_ts = np.asarray([k["ts"] for k in cln_kfs])
     cln_xyz = np.asarray([k["T"][:3, 3] for k in cln_kfs])
+
+    # Frozen clean-run world -> GT transform. The prefix alignment maps the run into the clean
+    # world; comparing that directly with GT silently includes the clean->GT origin/orientation
+    # offset. Estimate clean->GT once, on pre-onset clean keyframes, and compose.
+    cpre = [k for k in cln_kfs if k["ts"] < onset_ns * 1e-9]
+    cts = np.asarray([k["ts"] for k in cpre])
+    cxy = np.asarray([k["T"][:3, 3] for k in cpre])
+    mtcg, mecg, mgcg = associate_trajectories(cts, cxy, ts_gt, xyz_gt, 0.05)
+    if len(mtcg) >= 10:
+        R_cg, t_cg = V.umeyama(mecg, mgcg)
+        err_cg = np.linalg.norm(mecg @ R_cg.T + t_cg - mgcg, axis=1)
+        clean_to_gt = {"matched": int(len(mtcg)),
+                       "residual_rmse_m": float(np.sqrt(np.mean(err_cg ** 2))),
+                       "transform": [R_cg.tolist(), t_cg.tolist()]}
+    else:
+        R_cg = t_cg = None
+        clean_to_gt = {"matched": int(len(mtcg)), "status": "TOO_FEW"}
     proxy = np.vstack([V.world_pts(k) for k in cln_kfs])
     proxy_tree = cKDTree(proxy)
 
 
+
+    # Bind the map inputs to the manifest the host receipts consumed, and record run-bag hashes.
+    manifest_path = os.path.join(os.path.dirname(_HERE), "review_20261109_6b61c9d",
+                                 "single_factor_bags.json")
+    manifest = json.load(open(manifest_path, encoding="utf-8"))["arms"]
+    manifest_key = {"O": "O", "O+F": "O_plus_F", "O-B": "O_minus_B",
+                    "O+F-B": "O_plus_F_minus_B"}
+    map_inputs = {}
+    for arm, path in ARMS.items():
+        got = V._sha_file(path)
+        want = manifest[manifest_key[arm]]["sha256"]
+        if got != want:
+            raise SystemExit(f"map bag for {arm} is {got[:12]}, manifest says {want[:12]}")
+        map_inputs[arm] = {"path": path, "sha256": got, "matches_manifest": True}
 
     cells = {}
     avail = {}
@@ -140,9 +171,10 @@ def main():
             err = np.linalg.norm(me @ Ru.T + tu - mg, axis=1)
             ate_full = float(np.sqrt(np.mean(err ** 2)))
         ate_prefix = None
-        mpre = mt < cln_ts.min() + 1e9  # all of it, aligned by prefix
-        if len(mt) >= 10:
-            err2 = np.linalg.norm(me @ R_p.T + t_p - mg, axis=1)
+        if len(mt) >= 10 and R_cg is not None:
+            # run -> clean world (prefix alignment) -> GT (frozen clean->GT), then compare to GT.
+            in_gt = (me @ R_p.T + t_p) @ R_cg.T + t_cg
+            err2 = np.linalg.norm(in_gt - mg, axis=1)
             ate_prefix = float(np.sqrt(np.mean(err2 ** 2)))
 
         out[k] = {"status": "OK", "frames_scored": len(common),
@@ -153,7 +185,9 @@ def main():
                   "healthy_unsupported_fraction": _frac(~in_win),
                   "ate_full_alignment_diagnostic_m": ate_full,
                   "ate_frozen_prefix_protocol_m": ate_prefix,
-                  "fail": (None if ate_full is None else bool(ate_full > FAIL_ATE_M))}
+                  "fail": (None if ate_full is None else bool(ate_full > FAIL_ATE_M)),
+                  "fail_protocol": (None if ate_prefix is None
+                                    else bool(ate_prefix > FAIL_ATE_M))}
         print(f"   {k:10s} cover {out[k]['coverage']:.4f} unsup "
               f"{out[k]['unsupported_fraction']:.4f} ATE {ate_full} "
               f"{'FAIL' if out[k]['fail'] else 'ok'}")
@@ -165,8 +199,17 @@ def main():
                         "stable": (None if any(x is None for x in f) else f[0] == f[1]),
                         "fails_both": bool(f[0] is True and f[1] is True),
                         "ok_both": bool(f[0] is False and f[1] is False)}
+    summary_protocol = {}
+    for arm in ARMS:
+        f = [out.get(f"{arm}#{r}", {}).get("fail_protocol") for r in (1, 2)]
+        summary_protocol[arm] = {"fail_repeats": f,
+                                 "fails_both": bool(f[0] is True and f[1] is True),
+                                 "ok_both": bool(f[0] is False and f[1] is False)}
     interaction = (summary["O+F-B"]["fails_both"] and summary["O+F"]["ok_both"]
                    and summary["O-B"]["ok_both"])
+    interaction_protocol = (summary_protocol["O+F-B"]["fails_both"]
+                            and summary_protocol["O+F"]["ok_both"]
+                            and summary_protocol["O-B"]["ok_both"])
     res = {
         "protocol": {"source": "docs/MILESTONE_fixed_input_repair.md (2x2 single factor)",
                      "fail_rule": f"full-alignment ATE > {FAIL_ATE_M} m fails; both repeats must "
@@ -175,6 +218,14 @@ def main():
                                          "and O-B do not"},
         "provenance": "REAL_HOST, two repeats per cell; proxy is the clean run map, not GT; "
                       "single sequence",
+        "inputs": {"map_bags": map_inputs,
+                   "run_bags": {k: {"path": cells.get(k, {}).get("bag"),
+                                    "sha256": V._sha_file(cells[k]["bag"])
+                                    if cells.get(k, {}).get("bag")
+                                    and os.path.exists(cells[k]["bag"]) else None}
+                                for k in out},
+                   "manifest": os.path.relpath(manifest_path, _REPO)},
+        "clean_to_gt": clean_to_gt,
         "common_set": {"n": len(common), "n_keys": len(keys),
                        "ns_sha256": hashlib.sha256(",".join(str(int(kf_ns[i])) for i in
                                                            common).encode()).hexdigest()},
@@ -182,10 +233,14 @@ def main():
         "cells": {k: {kk: vv for kk, vv in v.items() if kk not in ("ids", "poses")}
                   for k, v in out.items()},
         "summary": summary,
+        "summary_protocol": summary_protocol,
         "interaction_supported": bool(interaction),
-        "ate_note": "ate_full_alignment_diagnostic_m is a FULL_ALIGNMENT_DIAGNOSTIC and must not "
-                    "be merged into the frozen-prefix protocol table; ate_frozen_prefix_protocol_m "
-                    "is the protocol number",
+        "interaction_supported_protocol": bool(interaction_protocol),
+        "ate_note": "The pre-registered fail rule used ate_full_alignment_diagnostic_m, a "
+                    "FULL_ALIGNMENT_DIAGNOSTIC; it is kept as the deciding variable. "
+                    "ate_frozen_prefix_protocol_m is now computed as run->clean (prefix alignment) "
+                    "composed with a frozen clean->GT transform estimated on pre-onset clean "
+                    "keyframes; it is reported alongside, not swapped in after the fact.",
     }
     with open(RESULTS, "w", encoding="utf-8") as fh:
         json.dump(res, fh, indent=1, default=float)

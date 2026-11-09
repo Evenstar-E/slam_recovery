@@ -5,6 +5,93 @@
   "interaction_rule": "supported only if O+F-B fails both repeats while O+F and O-B do not"
  },
  "provenance": "REAL_HOST, two repeats per cell; proxy is the clean run map, not GT; single sequence",
+ "inputs": {
+  "map_bags": {
+   "O": {
+    "path": "/tmp/fastlivo/room02_2x2_O.bag",
+    "sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+    "matches_manifest": true
+   },
+   "O+F": {
+    "path": "/tmp/fastlivo/room02_2x2_O_plus_F.bag",
+    "sha256": "f45d0cbe95ad28e509a451c93d39b978da1d891dc60c1757ed128f555e482b66",
+    "matches_manifest": true
+   },
+   "O-B": {
+    "path": "/tmp/fastlivo/room02_2x2_O_minus_B.bag",
+    "sha256": "73f7bcdd2291a437d345523912139f09a5a2bb110017f45c969ed0df315d218e",
+    "matches_manifest": true
+   },
+   "O+F-B": {
+    "path": "/tmp/fastlivo/room02_2x2_O_plus_F_minus_B.bag",
+    "sha256": "cd12dddbb8fb9707bda1b551d238f8d3b6525798a62638ee62f95986f11e6301",
+    "matches_manifest": true
+   }
+  },
+  "run_bags": {
+   "O#1": {
+    "path": "/tmp/fastlivo/res_2x2_O_r1.bag",
+    "sha256": "6dc3a18fe530043965ac33e8c853be7104cf3d3622b1a77db292f395e3521b2f"
+   },
+   "O#2": {
+    "path": "/tmp/fastlivo/res_2x2_O_r2.bag",
+    "sha256": "d620df78f3f143de212da8b5f24ca7112ed559b07cb41ab62c0c6d1c9754b15b"
+   },
+   "O+F#1": {
+    "path": "/tmp/fastlivo/res_2x2_O_plus_F_r1.bag",
+    "sha256": "b095029adde04ce56a27a8be9d2e4c13b58ea4a5b6fbf33ccea626a7698404f6"
+   },
+   "O+F#2": {
+    "path": "/tmp/fastlivo/res_2x2_O_plus_F_r2.bag",
+    "sha256": "740699c640d7610127658f091a465e66358aec712e270c5383136b9f962c54b1"
+   },
+   "O-B#1": {
+    "path": "/tmp/fastlivo/res_2x2_O_minus_B_r1.bag",
+    "sha256": "0a172bd8ee681569999ca729d7473af39c03c358098b323f6e6a17e61e23f927"
+   },
+   "O-B#2": {
+    "path": "/tmp/fastlivo/res_2x2_O_minus_B_r2.bag",
+    "sha256": "c2bffb1edf5b075c05f7d2ce64a40546bcdfbbc9d14e075409004379bc170108"
+   },
+   "O+F-B#1": {
+    "path": "/tmp/fastlivo/res_2x2_O_plus_F_minus_B_r1.bag",
+    "sha256": "9550a9ad63c1c807c24dfa22e39ae7feea8db51d031ee04df6d19319dde0022c"
+   },
+   "O+F-B#2": {
+    "path": "/tmp/fastlivo/res_2x2_O_plus_F_minus_B_r2.bag",
+    "sha256": "d63a6e37662c8be1404c407fd05999851e0e6b1432f464a63858b53e7f34c2d4"
+   }
+  },
+  "manifest": "docs/review_20261109_6b61c9d/single_factor_bags.json"
+ },
+ "clean_to_gt": {
+  "matched": 177,
+  "residual_rmse_m": 0.09067429305577145,
+  "transform": [
+   [
+    [
+     -0.9806216835952754,
+     -0.19585348017815934,
+     -0.004746363331157318
+    ],
+    [
+     0.1958613121140288,
+     -0.980630820496862,
+     -0.0012410917061159749
+    ],
+    [
+     -0.004411358037945955,
+     -0.0021466703881579618,
+     0.9999879657908419
+    ]
+   ],
+   [
+    0.06971026284621895,
+    0.36364562816761903,
+    1.0123346383356966
+   ]
+  ]
+ },
  "common_set": {
   "n": 323,
   "n_keys": 398,
@@ -30,8 +117,9 @@
    "in_window_unsupported_fraction": 0.011258064516128985,
    "healthy_unsupported_fraction": 0.0048643216080401785,
    "ate_full_alignment_diagnostic_m": 0.07162458349543022,
-   "ate_frozen_prefix_protocol_m": 3.8123448824832122,
-   "fail": false
+   "ate_frozen_prefix_protocol_m": 0.09264491035181353,
+   "fail": false,
+   "fail_protocol": false
   },
   "O#2": {
    "status": "OK",
@@ -42,8 +130,9 @@
    "in_window_unsupported_fraction": 0.17645161290322575,
    "healthy_unsupported_fraction": 1.0,
    "ate_full_alignment_diagnostic_m": 14.43858960214947,
-   "ate_frozen_prefix_protocol_m": 24.423010866557135,
-   "fail": true
+   "ate_frozen_prefix_protocol_m": 26.372984556112733,
+   "fail": true,
+   "fail_protocol": true
   },
   "O+F#1": {
    "status": "OK",
@@ -54,8 +143,9 @@
    "in_window_unsupported_fraction": 0.15890322580645166,
    "healthy_unsupported_fraction": 1.0,
    "ate_full_alignment_diagnostic_m": 593.0262141110676,
-   "ate_frozen_prefix_protocol_m": 742.8650587701793,
-   "fail": true
+   "ate_frozen_prefix_protocol_m": 743.3113232627709,
+   "fail": true,
+   "fail_protocol": true
   },
   "O+F#2": {
    "status": "OK",
@@ -66,8 +156,9 @@
    "in_window_unsupported_fraction": 0.12906451612903225,
    "healthy_unsupported_fraction": 1.0,
    "ate_full_alignment_diagnostic_m": 14.872150834451231,
-   "ate_frozen_prefix_protocol_m": 24.584551754443208,
-   "fail": true
+   "ate_frozen_prefix_protocol_m": 26.148378020286646,
+   "fail": true,
+   "fail_protocol": true
   },
   "O-B#1": {
    "status": "OK",
@@ -78,8 +169,9 @@
    "in_window_unsupported_fraction": 0.08619354838709681,
    "healthy_unsupported_fraction": 1.0,
    "ate_full_alignment_diagnostic_m": 48.84667762983906,
-   "ate_frozen_prefix_protocol_m": 75.13141143351287,
-   "fail": true
+   "ate_frozen_prefix_protocol_m": 76.07003376566831,
+   "fail": true,
+   "fail_protocol": true
   },
   "O-B#2": {
    "status": "OK",
@@ -90,8 +182,9 @@
    "in_window_unsupported_fraction": 0.10564516129032253,
    "healthy_unsupported_fraction": 1.0,
    "ate_full_alignment_diagnostic_m": 19.67264276177945,
-   "ate_frozen_prefix_protocol_m": 31.957210961213807,
-   "fail": true
+   "ate_frozen_prefix_protocol_m": 33.68205386132164,
+   "fail": true,
+   "fail_protocol": true
   },
   "O+F-B#1": {
    "status": "OK",
@@ -102,8 +195,9 @@
    "in_window_unsupported_fraction": 0.07690322580645159,
    "healthy_unsupported_fraction": 1.0,
    "ate_full_alignment_diagnostic_m": 554.5608455651169,
-   "ate_frozen_prefix_protocol_m": 687.1975647075819,
-   "fail": true
+   "ate_frozen_prefix_protocol_m": 687.5204171734307,
+   "fail": true,
+   "fail_protocol": true
   },
   "O+F-B#2": {
    "status": "OK",
@@ -114,8 +208,9 @@
    "in_window_unsupported_fraction": 0.016709677419354807,
    "healthy_unsupported_fraction": 0.006090452261306556,
    "ate_full_alignment_diagnostic_m": 0.3005104007819498,
-   "ate_frozen_prefix_protocol_m": 3.736026195670787,
-   "fail": false
+   "ate_frozen_prefix_protocol_m": 0.3142783935483675,
+   "fail": false,
+   "fail_protocol": false
   }
  },
  "summary": {
@@ -156,6 +251,41 @@
    "ok_both": false
   }
  },
+ "summary_protocol": {
+  "O": {
+   "fail_repeats": [
+    false,
+    true
+   ],
+   "fails_both": false,
+   "ok_both": false
+  },
+  "O+F": {
+   "fail_repeats": [
+    true,
+    true
+   ],
+   "fails_both": true,
+   "ok_both": false
+  },
+  "O-B": {
+   "fail_repeats": [
+    true,
+    true
+   ],
+   "fails_both": true,
+   "ok_both": false
+  },
+  "O+F-B": {
+   "fail_repeats": [
+    true,
+    false
+   ],
+   "fails_both": false,
+   "ok_both": false
+  }
+ },
  "interaction_supported": false,
- "ate_note": "ate_full_alignment_diagnostic_m is a FULL_ALIGNMENT_DIAGNOSTIC and must not be merged into the frozen-prefix protocol table; ate_frozen_prefix_protocol_m is the protocol number"
+ "interaction_supported_protocol": false,
+ "ate_note": "The pre-registered fail rule used ate_full_alignment_diagnostic_m, a FULL_ALIGNMENT_DIAGNOSTIC; it is kept as the deciding variable. ate_frozen_prefix_protocol_m is now computed as run->clean (prefix alignment) composed with a frozen clean->GT transform estimated on pre-onset clean keyframes; it is reported alongside, not swapped in after the fact."
 }

@@ -273,11 +273,15 @@ failed in both repeats (O+F 593.0/14.9 m, O−B 48.8/19.7 m). Map coverage is bi
 way (0.9988/0.007 unsupported in the good mode, ~0.69/0.65 in the bad mode), and the good mode
 appeared once for O and once for the actual cell, independent of the arm. The pre-registered rule
 therefore reads `NOT_A_CLEAN_INTERACTION`, with host-run variance dominating **under the metric the
-pre-registration named** — the full-alignment diagnostic. That was a pre-registration error: the
-protocol quantity is the frozen-prefix ATE, and under it all eight reruns exceed 1.0 m (3.74–742.9 m),
-so the cells fail uniformly rather than split. The metric is not swapped after seeing results:
-both readings are reported, both agree that no interaction is supported, and they disagree only on
-whether variance dominates. The single-run "filter is the cause" observation is withdrawn as not
+pre-registration named** — the full-alignment diagnostic. That was a pre-registration error; the
+protocol quantity is the frozen-prefix ATE. The first protocol computation also had a frame error
+(run→clean prefix alignment compared directly with GT, with no clean→GT transform); after fitting
+one frozen clean→GT transform on pre-onset clean keyframes (177 matched, 0.091 m residual) and
+composing run→clean→GT, the protocol cells are O 0.093/26.373, O+F 743.3/26.1, O−B 76.1/33.7,
+O+F−B 687.5/0.314 m. The metric is not swapped after seeing results: both readings are reported,
+both reject interaction, and after the frame fix they agree that the same two runs (O#1 and
+O+F−B#2) are good while the other six fail. The earlier "all eight fail the protocol" reading was
+an artifact of the missing transform. The single-run "filter is the cause" observation is withdrawn as not
 reproducible. Two independently written
 builders and audits (one per side) produce the same in-window counts. Until the host variance is
 brought under control, the existing E_actual vs E_oracle comparison changes both

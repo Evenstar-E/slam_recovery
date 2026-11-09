@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Build the four single-factor in-window bags and the index-level audit, in one pass.
+"""UNUSED PARALLEL IMPLEMENTATION -- do not score these bags against the host runs.
+
+This builder writes `/tmp/fastlivo/room02_inj43_O|OF|OB|OFB.bag` and keeps every raw row outside
+the window. The eight native runs consumed the different, equivalence-verified set
+`/tmp/fastlivo/room02_2x2_*.bag` produced by `build_single_factor_bags.py`, whose outside-window
+policy is the actual filtered rows. The two sets are not interchangeable; this file is kept as an
+independent implementation record only.
+
+Build the four single-factor in-window bags and the index-level audit, in one pass.
 
 The previous hybrid builder matched rows by hash-set, which silently restores every duplicate row
 and cannot preserve multiplicity. Everything here is by ORIGINAL ROW INDEX.
