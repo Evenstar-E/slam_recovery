@@ -82,9 +82,6 @@ class OnlineRecoveryTransactionNode:
         # Diagnostics of the most recent paired-benefit measurement, recorded verbatim into the
         # run manifests so every Mode 2 decision can be traced back to its measured evidence.
         self.last_paired_evidence: Dict[str, object] = {}
-        # Same measurement over every supportable frame (not only the committable prefix), for
-        # diagnosis only. ``used_for_admission`` is always False; the gate never reads this.
-        self.last_paired_evidence_committable: Dict[str, object] = {}
         self.tx_mgr = TrustedMapTransactionManager(
             confirmation_margin_ns=int(confirmation_margin_sec * 1e9),
             gate_thresholds=gate_thresholds,
@@ -296,6 +293,30 @@ class OnlineRecoveryTransactionNode:
             nearest[s:s + chunk] = d2.min(axis=1)
         return bool(np.mean(nearest <= r2) >= min_supported_fraction)
 
+    @staticmethod
+    def _contiguous_runs(keys) -> List[List[int]]:
+        ks = sorted(int(k) for k in keys)
+        if not ks:
+            return []
+        runs = [[ks[0], ks[0]]]
+        for k in ks[1:]:
+            if k == runs[-1][1] + 1:
+                runs[-1][1] = k
+            else:
+                runs.append([k, k])
+        return runs
+
+    def _noncommittable_reason(self, kf_id: int, reference_keys: set,
+                               incumbent_keys: Optional[set]) -> str:
+        """Why a candidate frame cannot be committed. Same cases the support test separates."""
+        if kf_id not in self.scan_buffer_body:
+            return "missing_scan"
+        if kf_id in reference_keys:
+            return "reference_overlap"
+        if incumbent_keys is not None and kf_id not in incumbent_keys:
+            return "no_incumbent_pose"
+        return "no_reference_support"
+
     def _measure_paired_evidence(
         self,
         repaired_poses: Dict[int, np.ndarray],
@@ -467,14 +488,20 @@ class OnlineRecoveryTransactionNode:
         # A candidate pose that moves its scan out of the trusted map's coverage used to drop that
         # frame from *scoring* while it stayed in *commit* -- the worse the pose, the less evidence
         # it produced, and a badly-wrong tail could ride in behind eight good frames. The commit is
-        # therefore restricted to the maximal verified *prefix* of the candidate in keyframe order:
+        # therefore restricted to the frames the reference supports:
         #   - a frame is committable only if the independent reference supports it,
         #   - only if it did not contribute to that reference, and
         #   - only if an incumbent pose exists to pair it against.
-        # Frames after the first non-committable one stay quarantined (`deferred`). They are not
-        # rejected; they are not yet verifiable. Truncating at the first gap keeps the committed
-        # submap contiguous with the trusted timeline, so the boundary and graph dependencies are
-        # re-established at the cut rather than in the middle of the commit.
+        # Unsupported frames stay quarantined (`deferred`). They are not rejected; they are not yet
+        # verifiable.
+        #
+        # An earlier version committed only the *contiguous prefix* of committable frames. The
+        # four-arm replay showed why that is wrong: one unsupported frame at index 14 stopped the
+        # commit at 14 while 303 later frames were supported, and the gate was then judged on the
+        # hardest 14 frames (Wilson 0.0) instead of on the 317-frame set it would commit (Wilson
+        # 0.925). The review allows "an independently verified committable subset"; it does not
+        # require that subset to be contiguous, and keyframe factors are added per committed id, so
+        # a gap does not break the commit.
         incumbent_keys = set(incumbent_poses.keys()) if incumbent_poses is not None else None
         missing_scan_keys = [k for k in kf_sorted if k not in self.scan_buffer_body]
         # The coverage test gets a spatially sampled reference, not the 1500-point cloud used for
@@ -488,26 +515,7 @@ class OnlineRecoveryTransactionNode:
             and (incumbent_keys is None or k in incumbent_keys)
             and self._frame_has_reference_support(k, support_ref, repaired_poses)
         }
-        commit_keys: List[int] = []
-        stop_key: Optional[int] = None
-        stop_reason: Optional[str] = None
-        for k in kf_sorted:
-            if k not in committable:
-                stop_key = k
-                # Say *why* the prefix stopped. "Zero frames committed" is not enough: a missing
-                # scan, a frame that contributed to the reference, and a frame the reference does
-                # not cover all truncate the same prefix but call for different fixes.
-                stop_reason = (
-                    "missing_scan"
-                    if k not in self.scan_buffer_body
-                    else "reference_overlap"
-                    if k in reference_keys
-                    else "no_incumbent_pose"
-                    if (incumbent_keys is not None and k not in incumbent_keys)
-                    else "no_reference_support"
-                )
-                break
-            commit_keys.append(k)
+        commit_keys: List[int] = [k for k in kf_sorted if k in committable]
         deferred_keys = [k for k in kf_sorted if k not in set(commit_keys)]
         candidate_poses = {k: repaired_poses[k] for k in commit_keys}
 
@@ -524,15 +532,16 @@ class OnlineRecoveryTransactionNode:
             "candidate_frames_deferred": len(deferred_keys),
             "frames_missing_scan": missing_scan_keys,
             "frames_in_reference": sorted(set(kf_sorted) & reference_keys),
-            # Diagnostics for the truncation itself. A prefix can stop at its very first frame
-            # while later frames are perfectly supportable; without these fields that case is
-            # indistinguishable from "the candidate contained nothing".
-            "prefix_stop_key": stop_key,
-            "prefix_stop_reason": stop_reason,
-            "committable_frames_after_prefix": (
-                len([k for k in kf_sorted if k in committable and k not in set(commit_keys)])
-                if stop_key is not None
-                else 0
+            # Deferred frames are holes in the commit, not a truncated tail. Record each contiguous
+            # run so the graph consequence is visible: a single unverifiable keyframe between two
+            # committed ones is a gap, not a reason to discard everything after it.
+            "deferred_runs": self._contiguous_runs(deferred_keys),
+            "first_deferred_reason": (
+                self._noncommittable_reason(
+                    deferred_keys[0], reference_keys, incumbent_keys
+                )
+                if deferred_keys
+                else None
             ),
         }
 
@@ -562,8 +571,8 @@ class OnlineRecoveryTransactionNode:
         # Paired-benefit evidence must be measured, never assumed; unmeasured components stay None
         # and force the gate to wait (Mode 3/4) instead of committing.
         # The two ways the scored set can end up empty must not share one log string: an empty
-        # *input* candidate and a candidate whose first frame has no reference support (prefix
-        # length zero) send the operator to completely different places.
+        # *input* candidate and a non-empty candidate with no supportable frame send the operator
+        # to completely different places.
         paired_ok, wilson_lb, reentry_jump = self._measure_paired_evidence(
             candidate_poses,
             incumbent_poses=incumbent_poses,
@@ -571,30 +580,10 @@ class OnlineRecoveryTransactionNode:
             reference_world=train_world,
             reference_keys=reference_keys,
             empty_reason=(
-                "no_committable_prefix" if (not commit_keys and kf_sorted) else "no_repaired_poses"
+                "no_committable_frames" if (not commit_keys and kf_sorted) else "no_repaired_poses"
             ),
             support_reference=support_ref,
         )
-        admission_evidence = dict(self.last_paired_evidence)
-
-        # Diagnostic only: when the prefix stops early, the frames it blocked were still
-        # supportable. Measure them too, but keep the result away from the admission decision --
-        # the gate must see the prefix, not the larger set, or the commit invariant reopens.
-        self.last_paired_evidence_committable = {}
-        if len(committable) > len(commit_keys):
-            committable_poses = {k: repaired_poses[k] for k in kf_sorted if k in committable}
-            self._measure_paired_evidence(
-                committable_poses,
-                incumbent_poses=incumbent_poses,
-                reentry_anchor_pose=reentry_anchor_pose,
-                reference_world=train_world,
-                reference_keys=reference_keys,
-                empty_reason="no_committable_frames",
-                support_reference=support_ref,
-            )
-            self.last_paired_evidence_committable = dict(self.last_paired_evidence)
-            self.last_paired_evidence_committable["used_for_admission"] = False
-            self.last_paired_evidence = admission_evidence
 
         cand = CandidateMap(
             candidate_id=candidate_id,

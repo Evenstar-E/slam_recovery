@@ -81,12 +81,12 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
         self.assertEqual(node._last_holdout_support["frames_missing_scan"], [0])
         self.assertEqual(node.tx_mgr.trusted_poses, {})
         # A candidate whose first frame has no support must not be logged as an empty candidate.
-        self.assertEqual(node.last_paired_evidence["reason"], "no_committable_prefix")
-        self.assertEqual(node._last_holdout_support["prefix_stop_key"], 0)
-        self.assertEqual(node._last_holdout_support["prefix_stop_reason"], "missing_scan")
+        self.assertEqual(node.last_paired_evidence["reason"], "no_committable_frames")
+        self.assertEqual(node._last_holdout_support["deferred_runs"], [[0, 0]])
+        self.assertEqual(node._last_holdout_support["first_deferred_reason"], "missing_scan")
 
-    def test_prefix_stop_is_reported_with_the_frames_it_blocks(self) -> None:
-        """One unsupported first frame truncates the prefix, but the blocked frames stay visible."""
+    def test_a_hole_does_not_discard_the_frames_after_it(self) -> None:
+        """One unsupported frame is a gap in the commit, not a reason to drop the rest."""
         cloud = _plane_cloud()
         node = _node_with_quarantine(cloud)
         poses, incumbent = {}, {}
@@ -109,17 +109,13 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
         support = node._last_holdout_support
         self.assertEqual(support["candidate_frames_total"], 6)
         self.assertEqual(support["candidate_frames_committable"], 5)
-        self.assertEqual(support["candidate_frames_committed"], 0)
-        self.assertEqual(support["prefix_stop_key"], 0)
-        self.assertEqual(support["prefix_stop_reason"], "no_reference_support")
-        self.assertEqual(support["committable_frames_after_prefix"], 5)
+        # Frame 0 is deferred; frames 1..5 are committed and judged on their own evidence.
+        self.assertEqual(support["candidate_frames_committed"], 5)
+        self.assertEqual(support["deferred_runs"], [[0, 0]])
+        self.assertEqual(support["first_deferred_reason"], "no_reference_support")
+        self.assertEqual(node.last_paired_evidence["num_paired_frames"], 5)
+        # Identical candidate and incumbent poses carry no improvement, so the gate still waits.
         self.assertNotEqual(report.mode, RecoveryMode.MODE2_ATOMIC_COMMIT)
-        self.assertEqual(node.tx_mgr.trusted_poses, {})
-        # The blocked frames are still measured, but only as a diagnostic: the admission evidence
-        # stays the zero-length prefix and the commit set stays empty.
-        self.assertFalse(node.last_paired_evidence_committable["used_for_admission"])
-        self.assertEqual(node.last_paired_evidence_committable["num_paired_frames"], 5)
-        self.assertEqual(node.last_paired_evidence["reason"], "no_committable_prefix")
 
     def test_frame_in_reference_is_not_scored_against_itself(self) -> None:
         """Provenance must come from the map, not from a comment."""
