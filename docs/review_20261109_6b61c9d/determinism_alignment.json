@@ -26,6 +26,7 @@
    "gauge_residual_rmse_m": 0.015742512553985667,
    "aligned_first_scored_m": 0.015112692829842275,
    "onset_index": 248,
+   "onset_nearest_dt_s": -0.027424097061157227,
    "aligned_at_onset_m": 0.008714856854047095,
    "raw_first_output_delta_m": 0.006127622095215033,
    "ate_run1_m": 0.3477579126938776,
@@ -35,8 +36,10 @@
    "first_aligned_over_1m_rel_onset_s": 15.389373302459717,
    "receipt_r1_first_stamp_s": 1627643742.844585,
    "receipt_r1_output_sha256": "49f7a23003b1562bf903e6d7658376f148d64dc78e917f7746d16191320f2cf7",
+   "receipt_r1_matches_bag": true,
    "receipt_r2_first_stamp_s": 1627643741.5119612,
-   "receipt_r2_output_sha256": "b3273685e141193440dbbf588582ec7ebf6b55ca03c7909b67bed0baf6baf812"
+   "receipt_r2_output_sha256": "b3273685e141193440dbbf588582ec7ebf6b55ca03c7909b67bed0baf6baf812",
+   "receipt_r2_matches_bag": true
   },
   "T2": {
    "run1_bag": "/tmp/fastlivo/res_T2_O_r1.bag",
@@ -56,6 +59,7 @@
    "gauge_residual_rmse_m": 0.01433357177756487,
    "aligned_first_scored_m": 0.007725599257149206,
    "onset_index": 257,
+   "onset_nearest_dt_s": -0.027424097061157227,
    "aligned_at_onset_m": 0.0038995943143811016,
    "raw_first_output_delta_m": 0.01126355091204399,
    "ate_run1_m": 0.08454816455594473,
@@ -65,8 +69,11 @@
    "first_aligned_over_1m_rel_onset_s": 16.654210090637207,
    "receipt_r1_first_stamp_s": 1627643741.378685,
    "receipt_r1_output_sha256": "fcb0bff53c381f5f333ae0dc97aaf760f49675af43bdbcb22323cdbd64eb2051",
+   "receipt_r1_matches_bag": true,
    "receipt_r2_first_stamp_s": 1627643742.244886,
-   "receipt_r2_output_sha256": "094815c7398991e793a53841805a518f3700cfa6da07551eaf508b748d6a954f"
+   "receipt_r2_output_sha256": "094815c7398991e793a53841805a518f3700cfa6da07551eaf508b748d6a954f",
+   "receipt_r2_matches_bag": true
   }
- }
+ },
+ "receipt_outputs_match_disk": true
 }

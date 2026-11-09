@@ -69,6 +69,9 @@ def main():
         ia, ib = np.flatnonzero(ok), pick[ok]
         ts = ta[ia]
         pre = ts < ONSET_S
+        if pre.sum() < 5:
+            out["pairs"][tag] = {"status": "TOO_FEW_PREFIX", "prefix_ids": int(pre.sum())}
+            continue
         R_g, t_g = V.umeyama(xb[ib][pre], xa[ia][pre])
         gauge = np.linalg.norm(xb[ib][pre] @ R_g.T + t_g - xa[ia][pre], axis=1)
         dp = np.linalg.norm(xa[ia] - (xb[ib] @ R_g.T + t_g), axis=1)
@@ -85,6 +88,7 @@ def main():
             "gauge_residual_rmse_m": float(np.sqrt(np.mean(gauge ** 2))),
             "aligned_first_scored_m": float(dp[0]),
             "onset_index": int(np.argmin(np.abs(ts - ONSET_S))),
+            "onset_nearest_dt_s": float(ts[int(np.argmin(np.abs(ts - ONSET_S)))] - ONSET_S),
             "aligned_at_onset_m": float(dp[int(np.argmin(np.abs(ts - ONSET_S)))]),
             "raw_first_output_delta_m": float(np.linalg.norm(xa[0] - xb[0])),
             "ate_run1_m": _ate(pa, ts_gt, xyz_gt)[0],
@@ -100,9 +104,18 @@ def main():
                 d = json.load(open(path, encoding="utf-8"))
                 rec[f"receipt_r{i + 1}_first_stamp_s"] = d["output"]["first_stamp_sec"]
                 rec[f"receipt_r{i + 1}_output_sha256"] = d["output"]["sha256"]
+                bag = (pa, pb)[i]
+                rec[f"receipt_r{i + 1}_matches_bag"] = (
+                    d["output"]["sha256"] == V._sha_file(bag))
         out["pairs"][tag] = rec
+    mismatched = {tag: [i + 1 for i in range(2)
+                        if r.get(f"receipt_r{i + 1}_matches_bag") is False]
+                  for tag, r in out["pairs"].items() if r.get("status") == "OK"}
+    out["receipt_outputs_match_disk"] = not any(mismatched.values())
     with open(OUT, "w", encoding="utf-8") as fh:
         json.dump(out, fh, indent=1)
+    if any(mismatched.values()):
+        raise SystemExit(f"receipt output hashes disagree with disk: {mismatched}")
     for tag, r in out["pairs"].items():
         print(tag, "first_output", round(r["first_output_run1_s"], 3),
               round(r["first_output_run2_s"], 3),
