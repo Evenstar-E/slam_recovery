@@ -68,11 +68,15 @@ in `layout.dim[0].label` so pairing does not depend on message order. The payloa
 `flatnonzero(keep)`, the sidecar records `scan_ns / n_original / n_kept / mask_sha256` plus the
 source and output bag hashes, and `point_step` stays 24 with fields and offsets unchanged. Cost is
 5.99% of bag size (4 B per original point). Two independent exporters produced the same mask for
-the first filtered frame. Reconstruction is `src_rows = source[mask]`; deleted rows are the
+the first filtered frame, and all 598 frames join source/cloud/sidecar by `scan_ns` with 0 failures;
+the audit decodes the topic (exact msgtype, ns from `layout.dim[0].label`) instead of trusting its
+name, and ten positive/negative tests share one validator. Reconstruction is `src_rows = source[mask]`; deleted rows are the
 complement, so no value matching is needed.
 
-The audited bag `c90300cb...` is kept as the record it is; the point-id-bearing bag is
-`/tmp/fastlivo/hall01_inj43_filtered_id.bag` (`a1113a76...87ec`). The C3 numbers in the M1 result
+Schema v2 (2026-11-09) fixes `layout.dim[0].stride` to the element count (`len(idx)`), hashes
+the mask as `<u4`, and records `id_schema_version`. The audited bag `c90300cb...` is kept as the
+record it is; the point-id-bearing bag is `/tmp/fastlivo/hall01_inj43_filtered_id.bag`
+(`700ce116...70bdd`). The C3 numbers in the M1 result
 were produced from the earlier bag and are not rerun on this one; that rerun is a separate step.
 
 ### Runtime receipt and runner (M2)
