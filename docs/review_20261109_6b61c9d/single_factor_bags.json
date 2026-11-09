@@ -1,0 +1,59 @@
+{
+ "inputs": {
+  "injected": "/tmp/fastlivo/room02_inj43.bag",
+  "injected_sha256": "66b3515c58d172f73d8f0d705c7314720b587612e4a8cca6740b87993449b0a9",
+  "filtered": "/tmp/fastlivo/room02_inj43_filtered.bag",
+  "filtered_sha256": "6bb966188894ae876ce2e8f8475a932d873a2d6ff42519b25f56eb425f68b090",
+  "index_sidecar": "/tmp/fastlivo/room02_original_index_sidecar.npz",
+  "index_sidecar_sha256": "c25515acfb80c76c345433381805777bc2967da0165248ed1f74b6d330ca25a0"
+ },
+ "outside_window_policy": "actual filtered rows in every arm",
+ "expected_in_window_rows": {
+  "O": 1186220,
+  "O_plus_F": 1187485,
+  "O_minus_B": 1162613,
+  "O_plus_F_minus_B": 1163878
+ },
+ "arms": {
+  "O": {
+   "path": "/tmp/fastlivo/room02_2x2_O.bag",
+   "sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+   "bytes": 1318694375,
+   "cloud_messages": 599,
+   "in_window_frames": 199,
+   "in_window_rows_total": 1186220,
+   "in_window_rows_min": 5267,
+   "in_window_rows_max": 6367
+  },
+  "O_plus_F": {
+   "path": "/tmp/fastlivo/room02_2x2_O_plus_F.bag",
+   "sha256": "f45d0cbe95ad28e509a451c93d39b978da1d891dc60c1757ed128f555e482b66",
+   "bytes": 1318724735,
+   "cloud_messages": 599,
+   "in_window_frames": 199,
+   "in_window_rows_total": 1187485,
+   "in_window_rows_min": 5312,
+   "in_window_rows_max": 6905
+  },
+  "O_minus_B": {
+   "path": "/tmp/fastlivo/room02_2x2_O_minus_B.bag",
+   "sha256": "73f7bcdd2291a437d345523912139f09a5a2bb110017f45c969ed0df315d218e",
+   "bytes": 1318127807,
+   "cloud_messages": 599,
+   "in_window_frames": 199,
+   "in_window_rows_total": 1162613,
+   "in_window_rows_min": 5022,
+   "in_window_rows_max": 6367
+  },
+  "O_plus_F_minus_B": {
+   "path": "/tmp/fastlivo/room02_2x2_O_plus_F_minus_B.bag",
+   "sha256": "cd12dddbb8fb9707bda1b551d238f8d3b6525798a62638ee62f95986f11e6301",
+   "bytes": 1318158167,
+   "cloud_messages": 599,
+   "in_window_frames": 199,
+   "in_window_rows_total": 1163878,
+   "in_window_rows_min": 5022,
+   "in_window_rows_max": 6905
+  }
+ }
+}

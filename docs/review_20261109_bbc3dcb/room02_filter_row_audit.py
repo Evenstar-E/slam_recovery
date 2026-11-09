@@ -75,14 +75,21 @@ def main():
 
     def _agg(sel):
         n = sum(f["background_present"] for f in sel)
+        kept_inj = sum(f["kept_injected"] for f in sel)
+        dropped_inj = sum(f["dropped_injected"] for f in sel)
+        injected = kept_inj + dropped_inj
         return {"frames": len(sel), "background_present": int(n),
                 "kept_background": int(sum(f["kept_background"] for f in sel)),
-                "kept_injected": int(sum(f["kept_injected"] for f in sel)),
+                "kept_injected": int(kept_inj),
                 "dropped_background": int(sum(f["dropped_background"] for f in sel)),
-                "dropped_injected": int(sum(f["dropped_injected"] for f in sel)),
-                "false_negative_rate": (sum(f["kept_injected"] for f in sel) / n) if n else None,
+                "dropped_injected": int(dropped_inj),
+                "injected_present": int(injected),
+                # FNR is conditional on injected rows, not on the background population.
+                "false_negative_rate": (kept_inj / injected) if injected else None,
                 "false_positive_rate": (sum(f["dropped_background"] for f in sel) / n)
                 if n else None,
+                # The old field: surviving injected rows divided by background rows. Kept, renamed.
+                "kept_injected_over_background_present": (kept_inj / n) if n else None,
                 "rows_raw": int(sum(f["n_raw"] for f in sel)),
                 "background_present": int(n)}
 
