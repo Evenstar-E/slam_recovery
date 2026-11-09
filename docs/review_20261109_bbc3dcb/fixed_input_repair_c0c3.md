@@ -226,13 +226,64 @@ query 样本相同。脚本 `run_raw_vs_repaired.py`，结果 `raw_vs_repaired_r
 读法：C3 新增的点 85.3% 落在参考面上；被替换掉的 R 点 95.1% 本来就是 unsupported——
 修复主要是在删坏点、补好点，而不是简单地把地图搬了个位置。参考面仍是干净跑地图而非 GT。
 
-## 11. 复现
+## 11. 冻结 446 的服务完整度与健康区代价
+
+预注册于主树 `docs/MILESTONE_fixed_input_repair.md`；脚本 `run_m4_completeness.py`；
+结果 `completeness_healthy_region_results.json`。provenance `OFFLINE_NATIVE_REESTIMATION`，
+参考面是干净跑地图（proxy，非 GT）。
+
+### 11.1 46 个缺位姿帧：逐帧归因
+
+| 归因 | 帧数 |
+|---|---:|
+| 过滤包缺扫描 | **0** |
+| 位姿流无近邻（>1 s） | **0** |
+| **配对规则判 MISSING**（夹逼间隔超过 75 ms） | **46** |
+
+- 46 帧**全部都有过滤后的扫描**——不是过滤器丢的；
+- 最近位姿距目标 **20.2–66.5 ms**（中位 61.6 ms），夹住目标的相邻位姿间隔 **133.2–133.6 ms**；
+- 也就是说重跑那段里程计是 ~7.5 Hz（正常 ~15 Hz），配对规则不允许跨 133 ms 内插，故判 MISSING；
+- 两段：`1627785275.808–1627785285.226`（约 9.4 s）与 `1627785295.246–1627785295.446`；
+- **可恢复性**：在冻结协议下 **0 帧可恢复**；仅在放宽 75 ms 间隔上限时可恢复 **46 帧**——
+  协议不允许，所以不恢复，也不改阈值。
+
+### 11.2 健康区（非注入帧）误删
+
+注入窗 `[1627785275.607, 1627785295.546]` 之外：
+
+| 项 | 值 |
+|---|---:|
+| 帧数 | 398 |
+| 总点数 | 20 062 836 |
+| 删除点数 | **0** |
+| 删除比例 | **0.0000** |
+| 有任何删除的帧 | **0** |
+| 帧删除比例 >0.1% | 0 |
+| 每帧删除点数 min/p50/p95/max | 0 / 0 / 0 / 0 |
+
+对照（窗内 200 帧）：10 110 613 点，删除 8 974 676（**0.8876**）。
+即"窗外 0/20,062,836"独立复核成立：过滤器在健康区没有付出任何删除代价，
+窗内外的差异是 0.8876 对 0。
+
+### 11.3 服务完整度（446 为分母）
+
+| 口径 | 帧数 | 完整度 | 每帧地图点 |
+|---|---:|---:|---:|
+| **冻结 446**（缺帧记为 missing，不剔除） | 446 | **0.8969** | 224.2 |
+| 旧口径（分母 = 存活帧） | 400 | 1.0000 | 250.0 |
+
+缺帧 46 = 10.31%，全部为上面的 `PAIRING_RULE_MISSING`。
+覆盖率与 patch unsupported 是**地图本身**的属性，不随分母变化（见 §4/§10 同帧对照）；
+随分母变化的是任何按帧的比率，故两套口径并列给出，不混用。
+
+
 
 ```bash
 python3 -B docs/review_20261109_bbc3dcb/run_fixed_input_repair_c0c3.py filter-audit
 python3 -B docs/review_20261109_bbc3dcb/run_fixed_input_repair_c0c3.py measure
 python3 -B docs/review_20261109_bbc3dcb/run_m3_same_region.py
 python3 -B docs/review_20261109_bbc3dcb/run_raw_vs_repaired.py
+python3 -B docs/review_20261109_bbc3dcb/run_m4_completeness.py
 bash docs/review_20261109_bbc3dcb/fl_run_isolated.sh <bag> <new-out> 0.5 60
 bash docs/review_20261109_bbc3dcb/test_fl_run_cleanup.sh
 ```
