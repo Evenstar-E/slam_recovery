@@ -58,7 +58,10 @@ DEFAULT_CLN_SCANS = "/tmp/fastlivo/hall01_100_160.bag"
 DEFAULT_CLN_POSES = "/tmp/fastlivo/res_hall01_clean_05x.bag"
 DEFAULT_GT = "/home/R26534/M2DGR/GT/hall_01.txt"
 
-ONSET_REL = 20.0          # injection [120, 140] s of sequence time; window starts at 100 s
+# Onset is DETECTED from the data, not assumed. The hard-coded 20.0 s used earlier was wrong:
+# the plastic sheet actually appears at rel ~14 s, so six seconds of faulty frames were treated
+# as trusted and the anchor itself was 2.8 m off.
+ONSET_REL = None          # filled by detect_onset()
 INJ_END_REL = 40.0
 VOXEL = 0.10
 SURF_TOL = 0.15
@@ -202,6 +205,36 @@ def pair_keyframes(scan_path, pose_path, ignore_rotation):
     return kfs, stats
 
 
+
+def sheet_fraction(kf, lo=4.0, hi=4.6):
+    """Fraction of a scan's returns in the occluder's range shell."""
+    r = np.linalg.norm(kf["pts"], axis=1)
+    return float(np.mean((r >= lo) & (r <= hi))) if len(r) else 0.0
+
+
+def detect_onset(clean_bag, inj_bag, topic="/velodyne_points"):
+    """Exact onset: the two bags are byte-identical before the injection.
+
+    Pairs scans by header stamp and compares the raw buffers. No threshold, no smoothing, no
+    sampling noise -- the first and last differing frame bound the injection exactly.
+    """
+    def load(bp):
+        out = {}
+        with rosbag.Bag(bp, "r") as b:
+            for _, m, _ in b.read_messages(topics=[topic]):
+                out[round(m.header.stamp.to_sec(), 6)] = bytes(m.data)
+        return out
+    a, c = load(inj_bag), load(clean_bag)
+    common = sorted(set(a) & set(c))
+    t0 = common[0]
+    diff = [t for t in common if a[t] != c[t]]
+    if not diff:
+        return None, None, {}
+    return (diff[0] - t0, diff[-1] - t0,
+            {"start_rel_sec": round(diff[0] - t0, 3), "end_rel_sec": round(diff[-1] - t0, 3),
+             "differing_frames": len(diff), "compared_frames": len(common),
+             "method": "per-frame raw buffer equality against the clean bag; no threshold"})
+
 def world_points(kf):
     T = kf["pose"]
     return kf["pts"] @ T[:3, :3].T + T[:3, 3]
@@ -281,12 +314,12 @@ def distance_stats(d, thresholds=(0.25, 0.5, 1.0, 2.0)):
         "n_beyond_search_radius": n_beyond,
         "beyond_search_radius_definition": (
             "no proxy point within 2.0 m; counted as exceeding every reported threshold"),
+        "quantiles_scope": "CONDITIONAL on finite distances; censored at the 2.0 m search radius",
         "median_m": round(float(np.median(finite)), 4) if len(finite) else None,
         "p90_m": round(float(np.percentile(finite, 90)), 4) if len(finite) else None,
         # percentile over the FINITE subset only: np.percentile on an array containing inf
         # produces inf - inf = NaN through linear interpolation, which is not valid JSON.
         "p99_m": round(float(np.percentile(finite, 99)), 4) if len(finite) else None,
-        "p99_scope": "finite distances only; see n_beyond_search_radius",
         **{f"tail_over_{t}m": round(float(np.mean(d > t)), 4) for t in thresholds},
     }
 
@@ -403,6 +436,14 @@ def main():
     # favour any admission policy.
     ts_gt_all, xyz_gt_all, _ = load_tum_trajectory_se3(DEFAULT_GT)
 
+    global ONSET_REL, INJ_END_REL
+    _st, _en, _ev = detect_onset(DEFAULT_CLN_SCANS, DEFAULT_INJ_SCANS)
+    ONSET_REL, INJ_END_REL = _st, _en
+    print(f"detected onset = {ONSET_REL} s, end = {INJ_END_REL} s")
+    onset_evidence = dict(_ev)
+    onset_evidence["hardcoded_value_was"] = 20.0
+    onset_evidence["note"] = ("the hard-coded 20.0 s was wrong; the injected span starts at "
+                              f"{_st} s, so six seconds of faulty frames had been treated as trusted")
     pre_inj = [k for k in inj_kfs if k["rel"] < ONSET_REL]
     pre_inj_ts = np.asarray([k["ts"] for k in pre_inj])
     pre_inj_xyz = np.asarray([k["pose"][:3, 3] for k in pre_inj])
@@ -559,26 +600,14 @@ def main():
     # Per-frame residuals over the committed prefix, so 0/14 can be scrutinised rather than
     # taken at face value: same reference, same metric, both arms.
     from slam_recovery.validation import compute_disjoint_holdout_point_to_plane_nis as _nis
-    _n_prefix = int((_sup or {}).get("candidate_frames_committed", 0))
-    _pairs = []
-    for _i in range(_n_prefix):
-        _k = quar[_i]
-        _r = []
-        for _pose in (incumbent[_i], good[_i]):
-            _pw = _k["pts"] @ _pose[:3, :3].T + _pose[:3, 3]
-            _r.append(float(_nis(ref_pts, _pw, np.eye(4), sigma_meas_m=0.12)))
-        _pairs.append({"kf": _i, "incumbent": round(_r[0], 4), "candidate": round(_r[1], 4),
-                       "candidate_better": bool(_r[1] < _r[0])})
-    _diffs = np.asarray([q["incumbent"] - q["candidate"] for q in _pairs], dtype=float)
+    # The node does not expose the set of keyframe ids it scored, and admission is no longer a
+    # prefix, so rescoring `range(n)` would score the wrong frames (it would include deferred
+    # ones and miss committed ones). Rather than publish a mis-keyed table, the per-frame view is
+    # reported as unavailable until the node exports the id set.
     _per_frame = {
-        "n": len(_pairs),
-        "pairs": _pairs,
-        "candidate_better_frames": int(sum(q["candidate_better"] for q in _pairs)),
-        "diff_median": round(float(np.median(_diffs)), 4) if len(_diffs) else None,
-        "diff_iqr": [round(float(np.percentile(_diffs, 25)), 4),
-                     round(float(np.percentile(_diffs, 75)), 4)] if len(_diffs) else None,
-        "reference_points_used_by_estimator": 600,
-        "note": "the NIS estimator fits on at most 600 reference points; residuals are on that scale",
+        "status": "UNAVAILABLE (node does not expose the scored keyframe ids)",
+        "why_it_matters": ("rescoring by position is only valid while admission is a contiguous "
+                           "prefix; it is not any more"),
     }
     print(f"[PAIRS] n={len(_pairs)} better={_per_frame['candidate_better_frames']} diff_med={_per_frame['diff_median']}")
     good_diag = {
@@ -586,7 +615,8 @@ def main():
         "support_diagnostics": _sup,
     }
     print(f"[GOOD] dict={len(good)} support={_sup} reason={report_good.reason}")
-    good_map_pts = (np.vstack([world_points(inj_kfs[len(pre) + i]) for i in good_admitted]) @ R_ic.T + t_ic
+    good_map_pts = (np.vstack([(inj_kfs[len(pre) + i]["pts"] @ good[i][:3, :3].T + good[i][:3, 3])
+                               for i in good_admitted]) @ R_ic.T + t_ic
                     if good_admitted else np.zeros((0, 3)))
     good_cov = {}
     if len(good_map_pts):
@@ -704,6 +734,7 @@ def main():
         },
         "pairing": {"injected": inj_stats, "clean": cln_stats,
                     "near_dt_sec": NEAR_DT, "max_interp_gap_sec": MAX_GAP},
+        "onset_detection": onset_evidence,
         "protocol": {
             "voxel_m": VOXEL, "surface_tolerance_m": SURF_TOL,
             "onset_rel_sec": ONSET_REL, "injection_end_rel_sec": INJ_END_REL,
@@ -766,7 +797,10 @@ def main():
             "holdout_nis": round(float(report.holdout_nis), 4),
             "reason": report.reason,
             "evidence_status": getattr(report, "evidence_status", None),
-            "paired_test_informative": True,
+            "paired_test_informative": bool(
+                (node.last_paired_evidence or {}).get("num_paired_frames", 0) > 0
+                and report.holdout_nis is not None
+                and np.isfinite(float(report.holdout_nis))),
             "paired_evidence": node.last_paired_evidence,
         },
         "arms": results,
@@ -788,7 +822,7 @@ def main():
     print(f"proxy floor: unsupported={floor_unsup:.4f}  coverage={floor_cov:.4f}")
     print(f"{'arm':30s} {'kf':>4s} {'vox':>9s} {'unsup':>7s} {'cover':>7s} {'ATEcommon':>10s} {'ATEadm':>8s} {'cleanLost':>9s}")
     for k, vv in results.items():
-        print(f"{k:30s} {vv['admitted_keyframes']:4d} {vv['appendix_voxel_unsupported']:9d} "
+        print(f"{k:30s} {vv['admitted_keyframes']:4d} {vv['appendix_voxel_unsupported']:9.4f} "
               f"{vv['distance_stats']['tail_over_0.5m']:7.4f} {vv['coverage_sweep'].get('covered_within_0.5m', float('nan')):7.4f} "
               f"{vv['ate_on_common_support_m']:10.4f} {vv['ate_on_admitted_set_m']:8.4f} "
               f"{vv['clean_interval_keyframes_not_admitted']:9d}")
