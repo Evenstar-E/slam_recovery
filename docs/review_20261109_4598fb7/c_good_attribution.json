@@ -1,44 +1,69 @@
 {
   "provenance": "ARCHIVED_REAL_HOST_POSES + INJECTION_SCANS; clean scans are ORACLE_CLEAN_SCANS",
-  "onset_rel_sec": 14.528,
-  "pre_keyframes": 133,
-  "quarantine_keyframes": 445,
+  "statistic": "gate holdout set: every 5th committable keyframe, mean of the estimator NIS",
+  "committable_keys": 250,
+  "holdout_keys": 50,
+  "gate_holdout_nis": 15.2567,
   "reference_points": 1500,
-  "alignment_fit_pairs": 121,
-  "alignment_fit_residual_m": {
-    "mean": 0.006024,
-    "p95": 0.011412
-  },
+  "oracle_removal": "azimuth <= 2.3876 rad removed (injector's replaced sector, 88% of the circle)",
   "variants": {
     "raw": {
-      "n": 445,
-      "mean": 208.114,
-      "median": 19.103,
-      "p90": 976.264,
-      "equivalent_residual_m": 1.731
+      "n": 50,
+      "mean": 15.257,
+      "median": 14.366
     },
-    "filtered": {
-      "n": 445,
-      "mean": 399.408,
-      "median": 19.859,
-      "p90": 1326.482,
-      "equivalent_residual_m": 2.398
+    "oracle": {
+      "n": 50,
+      "mean": 25.046,
+      "median": 26.999
     },
     "clean": {
-      "n": 445,
-      "mean": 17.078,
-      "median": 16.205,
-      "p90": 23.202,
-      "equivalent_residual_m": 0.496
-    },
-    "raw_host_pose": {
-      "n": 445,
-      "mean": 254.234,
-      "median": 45.233,
-      "p90": 698.801,
-      "equivalent_residual_m": 1.913
+      "n": 50,
+      "mean": 14.895,
+      "median": 14.111
     }
   },
-  "reading": "Compare medians: the clean-scan control is the floor imposed by the reference budget and the cross-run alignment. If raw is close to clean, the occluder is not what drives the NIS; if filtered moves toward clean, it is.",
-  "filter": "drop returns with sensor range in [4.0, 4.6] m (the 4.30 m sheet shell)"
+  "budget_sweep": {
+    "600": {
+      "raw": {
+        "n": 50,
+        "mean": 15.257,
+        "median": 14.366
+      },
+      "clean": {
+        "n": 50,
+        "mean": 14.895,
+        "median": 14.111
+      }
+    },
+    "1200": {
+      "raw": {
+        "n": 50,
+        "mean": 12.545,
+        "median": 11.933
+      },
+      "clean": {
+        "n": 50,
+        "mean": 12.163,
+        "median": 11.894
+      }
+    },
+    "2400": {
+      "raw": {
+        "n": 50,
+        "mean": 12.046,
+        "median": 11.129
+      },
+      "clean": {
+        "n": 50,
+        "mean": 11.769,
+        "median": 11.078
+      }
+    }
+  },
+  "support": {
+    "committable": 250,
+    "deferred": 195,
+    "holdout_frames_total": 50
+  }
 }
