@@ -147,6 +147,15 @@ Report absolute counts on both sides, not one ratio:
 No single "net score" is formed from points of different populations. The proxy is the clean run's
 map, not a GT surface; the result is a conditional same-region comparison, not a deployment claim.
 
+Measured (`1ae5eaa`), shared base and pose-free ROIs: C3 is base + repaired frames (133,000 points,
+532 frames); Q is the base alone. Primary ROI, the whole 8,490,000-point clean reference: Q 91.85%
+coverage / 5.68% patch-unsupported, C3 99.20% / 8.41%, and C3 adds 623,880 covered points
+(+7.35 pp) that all lie outside the base support. On the 7,797,828-point base-support ROI both arms
+cover 100.00% and the difference is 0.000 pp. The primary-ROI gain is therefore trajectory coverage,
+not repair quality; in the common region coverage cannot rank the arms. What remains comparable is
+the composition of the added points (71.4% supported) and the unsupported fraction 5.68% -> 8.41%.
+A ranking would need a pre-stated weighting of coverage against contamination.
+
 ## Open, not claimed complete
 
 - A human/independent baseline for the clean proxy (it is a clean-run map, not a GT surface).
