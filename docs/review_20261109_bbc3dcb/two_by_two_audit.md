@@ -308,8 +308,14 @@ T3a 走的是结果文件内的 `provenance_gap`；hall_01 没有这个字段，
 完整干净参考；0.6038 出现在 `raw_vs_repaired_results.json` 与 DAILY。R 差 0.024，读者很容易把
 0.6278 当成对 0.6038 的更正，而不是另一套口径。
 
-建议：B4 文件顶层加 `"reference": {"surface": "full clean reference", "points": ..., "voxel_m": ...}`，
-DAILY 并列两列；`trajectory.population` 恢复。
+**两处均已修（`7fc5231`），复核通过**：
+
+- `trajectory.population` 恢复为 `{frame_set 400, frame_set_keys 446, gt_matched 252, gt, note}`，
+  且由脚本生成而非事后补写；轨迹值逐位不变（R 10.928765 / C3 0.491844）；
+- B4 文件新增 `reference = {surface: "full clean reference", points: 8,490,000, downsampled: false, note: ...}`，
+  明写与 120k proxy 是**不同人口、不是更正**。
+
+`13_hall01_trajectory` 与 `14_b4` 现已全部 PASS。
 
 ## 5b. R2 / R3 处置（同意你的提议）
 

@@ -500,10 +500,8 @@
  },
  "14_b4": {
   "cost": {
-   "verdict": "FAIL",
-   "problems": [
-    "R: coverage 0.6278 differs from the other record's 0.6038 and no reference is named"
-   ]
+   "verdict": "PASS",
+   "problems": []
   },
   "sensitivity": {
    "verdict": "PASS",
@@ -512,10 +510,8 @@
   }
  },
  "13_hall01_trajectory": {
-  "verdict": "FAIL",
-  "problems": [
-   "trajectory.population absent: the GT subset is not recorded in the data"
-  ],
+  "verdict": "PASS",
+  "problems": [],
   "gt_matched": 252,
   "frame_set": 400
  },
