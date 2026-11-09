@@ -20,6 +20,7 @@ sys.path.insert(0, _HERE)
 import room02_original_index_audit as A               # noqa: E402
 import build_single_factor_bags as B                  # noqa: E402
 import verify_single_factor_bags as V                # noqa: E402
+import evaluate_determinism_pairs as E               # noqa: E402
 
 
 class OrderedSubsequenceTest(unittest.TestCase):
@@ -134,3 +135,29 @@ class ExtraStreamEofTest(unittest.TestCase):
 
     def test_trailing_message(self):
         self.assertTrue(V._extra_messages(iter([object()])))
+
+
+class ReceiptChainGateTest(unittest.TestCase):
+    """The gate must reject False and missing comparisons, not just look at status."""
+
+    def _pair(self, m1, m2, status="OK"):
+        return {"status": status,
+                "receipt_r1_matches_bag": m1, "receipt_r2_matches_bag": m2}
+
+    def test_all_true_passes(self):
+        gate = E.receipt_chain({"T1": self._pair(True, True)})
+        self.assertTrue(gate["ok"])
+
+    def test_false_with_ok_status_fails(self):
+        gate = E.receipt_chain({"T1": self._pair(True, False)})
+        self.assertFalse(gate["ok"])
+        self.assertEqual(gate["mismatched"], ["T1#2"])
+
+    def test_missing_comparison_is_unverifiable(self):
+        gate = E.receipt_chain({"T1": self._pair(True, None)})
+        self.assertFalse(gate["ok"])
+        self.assertEqual(gate["unverifiable"], ["T1#2"])
+
+    def test_non_ok_record_is_skipped(self):
+        gate = E.receipt_chain({"T1": self._pair(None, None, status="TOO_FEW_PREFIX")})
+        self.assertTrue(gate["ok"])

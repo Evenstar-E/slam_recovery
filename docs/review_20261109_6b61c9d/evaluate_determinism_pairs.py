@@ -48,9 +48,29 @@ def _ate(path, ts_gt, xyz_gt):
     return float(np.sqrt(np.mean(err ** 2))), int(len(mt))
 
 
+def receipt_chain(pairs):
+    """Return the receipt/bag gate for the pairs that actually produced numbers.
+
+    A record that is not OK is skipped, but an OK record with a missing comparison is
+    UNVERIFIABLE, not a pass; only explicit True values satisfy the chain.
+    """
+    mismatched, unverifiable = [], []
+    for tag, r in pairs.items():
+        if r.get("status") != "OK":
+            continue
+        for i in (1, 2):
+            value = r.get(f"receipt_r{i}_matches_bag")
+            if value is None:
+                unverifiable.append(f"{tag}#{i}")
+            elif value is False:
+                mismatched.append(f"{tag}#{i}")
+    return {"ok": not mismatched and not unverifiable,
+            "mismatched": mismatched, "unverifiable": unverifiable}
+
+
 def main():
     ts_gt, xyz_gt, _ = load_tum_trajectory_se3(GT)
-    out = {"onset_s": ONSET_S,
+    out = {"onset_s": ONSET_S, "association_tol_s": 0.01,
            "field_definitions": {
                "first_output_s": "first stamped pose in the output bag",
                "first_scored_s": "first timestamp in the common matched stream (both runs)",
@@ -76,6 +96,7 @@ def main():
         gauge = np.linalg.norm(xb[ib][pre] @ R_g.T + t_g - xa[ia][pre], axis=1)
         dp = np.linalg.norm(xa[ia] - (xb[ib] @ R_g.T + t_g), axis=1)
         rec = {
+            "status": "OK",
             "run1_bag": pa, "run2_bag": pb,
             "run1_sha256": V._sha_file(pa), "run2_sha256": V._sha_file(pb),
             "first_output_run1_s": float(ta.min()), "first_output_run2_s": float(tb.min()),
@@ -108,15 +129,16 @@ def main():
                 rec[f"receipt_r{i + 1}_matches_bag"] = (
                     d["output"]["sha256"] == V._sha_file(bag))
         out["pairs"][tag] = rec
-    mismatched = {tag: [i + 1 for i in range(2)
-                        if r.get(f"receipt_r{i + 1}_matches_bag") is False]
-                  for tag, r in out["pairs"].items() if r.get("status") == "OK"}
-    out["receipt_outputs_match_disk"] = not any(mismatched.values())
+    gate = receipt_chain(out["pairs"])
+    out["receipt_chain"] = gate
     with open(OUT, "w", encoding="utf-8") as fh:
         json.dump(out, fh, indent=1)
-    if any(mismatched.values()):
-        raise SystemExit(f"receipt output hashes disagree with disk: {mismatched}")
+    if not gate["ok"]:
+        raise SystemExit(f"receipt chain failed: {gate}")
     for tag, r in out["pairs"].items():
+        if r.get("status") != "OK":
+            print(tag, r.get("status"))
+            continue
         print(tag, "first_output", round(r["first_output_run1_s"], 3),
               round(r["first_output_run2_s"], 3),
               "first_scored", round(r["first_scored_s"], 3),

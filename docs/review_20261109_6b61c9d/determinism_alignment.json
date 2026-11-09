@@ -1,5 +1,6 @@
 {
  "onset_s": 1627643759.5540829,
+ "association_tol_s": 0.01,
  "field_definitions": {
   "first_output_s": "first stamped pose in the output bag",
   "first_scored_s": "first timestamp in the common matched stream (both runs)",
@@ -9,6 +10,7 @@
  },
  "pairs": {
   "T1": {
+   "status": "OK",
    "run1_bag": "/tmp/fastlivo/res_T1_O_r1.bag",
    "run2_bag": "/tmp/fastlivo/res_T1_O_r2.bag",
    "run1_sha256": "49f7a23003b1562bf903e6d7658376f148d64dc78e917f7746d16191320f2cf7",
@@ -42,6 +44,7 @@
    "receipt_r2_matches_bag": true
   },
   "T2": {
+   "status": "OK",
    "run1_bag": "/tmp/fastlivo/res_T2_O_r1.bag",
    "run2_bag": "/tmp/fastlivo/res_T2_O_r2.bag",
    "run1_sha256": "fcb0bff53c381f5f333ae0dc97aaf760f49675af43bdbcb22323cdbd64eb2051",
@@ -75,5 +78,9 @@
    "receipt_r2_matches_bag": true
   }
  },
- "receipt_outputs_match_disk": true
+ "receipt_chain": {
+  "ok": true,
+  "mismatched": [],
+  "unverifiable": []
+ }
 }
