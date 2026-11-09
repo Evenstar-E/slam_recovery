@@ -280,10 +280,15 @@
  },
  "11_t3a": {
   "receipt_library": {
-   "verdict": "FAIL",
+   "verdict": "RETROSPECTIVE_PARTIAL",
    "problems": [
-    "6/6 receipts record no loaded-library hash"
+    "6/6 receipts predate the requirement; the gap is declared, not silently missing"
    ],
+   "declared_gap": {
+    "receipt_library_sha256": "ABSENT",
+    "why": "the six T3a receipts record only the executable sha, which is identical across builds; the behaviour lives in liblaser_mapping.so",
+    "fix_forward": "receipts must record library_path and library_sha256 read from the running process (/proc/<pid>/maps), not from a declared config"
+   },
    "receipts": 6
   },
   "verdict_scope": {

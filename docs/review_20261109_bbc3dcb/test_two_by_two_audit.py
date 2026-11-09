@@ -190,5 +190,35 @@ class TestRunIdentity(unittest.TestCase):
         self.assertEqual(r["verdict"], "FAIL")
 
 
+class TestReceiptLibrary(unittest.TestCase):
+    @staticmethod
+    def _rec(lib=None):
+        h = {"binary": "/x/fastlivo_mapping", "sha256": "b" * 64}
+        if lib:
+            h["library_sha256"] = lib
+        return {"status": "OK", "host": h, "pre_run": {}, "output": {}}
+
+    def test_receipt_with_library_passes(self):
+        self.assertEqual(A.check_receipt_library([self._rec("l" * 64)])["verdict"], "PASS")
+
+    def test_missing_library_without_declared_gap_fails(self):
+        r = A.check_receipt_library([self._rec()])
+        self.assertEqual(r["verdict"], "FAIL")
+
+    def test_declared_gap_is_retrospective_partial(self):
+        results = {"provenance_gap": {"receipt_library_sha256": "ABSENT"}}
+        r = A.check_receipt_library([self._rec()], results)
+        self.assertEqual(r["verdict"], "RETROSPECTIVE_PARTIAL")
+
+    def test_partial_declaration_does_not_excuse_a_new_receipt(self):
+        results = {"provenance_gap": {"receipt_library_sha256": "SOMETHING_ELSE"}}
+        self.assertEqual(A.check_receipt_library([self._rec()], results)["verdict"], "FAIL")
+
+    def test_mixed_batch_with_gap_is_partial(self):
+        results = {"provenance_gap": {"receipt_library_sha256": "ABSENT"}}
+        r = A.check_receipt_library([self._rec("l" * 64), self._rec()], results)
+        self.assertEqual(r["verdict"], "RETROSPECTIVE_PARTIAL")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -469,19 +469,33 @@ def check_verdict_scope(results, label=""):
             "scope": scope, "build": str(build)[:80] if build else None}
 
 
-def check_receipt_library(receipts, label=""):
+def check_receipt_library(receipts, results=None):
     """An executable hash that is identical across builds cannot identify a build.
 
     If the behaviour lives in a shared library, the receipt must hash that library too.
+
+    A batch recorded before the requirement existed cannot be back-filled: its receipts only
+    carry the shared executable sha, and inventing a library hash per run would fabricate
+    provenance. Such a batch is reported as RETROSPECTIVE_PARTIAL -- the gap is known and
+    written down -- while a receipt that had no declared gap still fails outright, so the rule
+    stays able to catch a new one.
     """
     if not receipts:
         return {"verdict": "UNVERIFIABLE", "problems": ["no receipts"]}
     missing = [r.get("host", {}).get("binary", "")[-40:] for r in receipts
                if not (r.get("host", {}).get("library_sha256")
                        or r.get("host", {}).get("libraries"))]
-    return {"verdict": "PASS" if not missing else "FAIL",
-            "problems": ([f"{len(missing)}/{len(receipts)} receipts record no loaded-library hash"]
-                         if missing else []),
+    if not missing:
+        return {"verdict": "PASS", "problems": [], "receipts": len(receipts)}
+    gap = (results or {}).get("provenance_gap") or {}
+    if gap.get("receipt_library_sha256") == "ABSENT":
+        return {"verdict": "RETROSPECTIVE_PARTIAL",
+                "problems": [f"{len(missing)}/{len(receipts)} receipts predate the requirement; "
+                             "the gap is declared, not silently missing"],
+                "declared_gap": gap, "receipts": len(receipts)}
+    return {"verdict": "FAIL",
+            "problems": [f"{len(missing)}/{len(receipts)} receipts record no loaded-library hash "
+                         "and no declared gap explains it"],
             "receipts": len(receipts)}
 
 
@@ -498,7 +512,7 @@ def main():
            "5_frozen_transform": audit_frozen_transform(results),
            "6_hash_chain": audit_hash_chain(results, manifest),
            "11_t3a": {
-               "receipt_library": check_receipt_library(T3A_RECEIPTS),
+               "receipt_library": check_receipt_library(T3A_RECEIPTS, T3A_RESULTS),
                "verdict_scope": check_verdict_scope(T3A_RESULTS, "room02_T3a_results"),
                "enriched_scope": check_verdict_scope(T3A_ENRICHED, "room02_T3a_enriched_results"),
                "identity": audit_receipts(

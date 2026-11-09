@@ -214,6 +214,13 @@ provenance 的教训是「exec sha 相同，行为在 `liblaser_mapping.so`」�
 同理，`S3_ACCEPTED_AS_SEED` 写在 `room02_T3a_results.json` 里，而该文件不写它覆盖了哪两次运行、
 哪个 build。四个 run 的 enriched 文件推翻它时，两份记录之间没有任何机器可读的关联。
 
+**处置（`0ca16fd` 后）**：verdict_scope 已 **PASS**（`runs_analysed`、`build`、`scope.superseded_for_conclusion_by` 齐全）。
+receipt_library 改为三分：新 receipt 缺库 hash → **FAIL**；**已声明 `provenance_gap.receipt_library_sha256 = ABSENT` 的历史批次 → `RETROSPECTIVE_PARTIAL`**；
+缺字段又无声明 → FAIL。这样这一条不会永远红着稀释新回归，同时对**新** receipt 仍然能抓。
+
+历史批次逐 run 回填是不可能的：六份 receipt 只有跨 build 相同的 exec sha，补一个"当时的库 hash"就是伪造 provenance。
+`RETROSPECTIVE_PARTIAL` 的含义是「缺口已知且被写下」，不是「可以忽略」。
+
 建议：
 1. receipt 的 `host` 增加 `library_path` 与 `library_sha256`（运行时从 `/proc/<pid>/maps` 或
    `ldd` 解析出实际加载的 `.so`，而不是声明值）；
