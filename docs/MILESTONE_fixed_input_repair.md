@@ -234,12 +234,25 @@ set or threshold.
 
 ### Final mechanism split (pre-registered)
 
-Two arms on the same room_02 input, window, frame set and host, to separate residual contamination
-from false deletion:
+A true single-factor 2×2 on the same room_02 input, window, frame set, config, runner and
+outside-window policy. Every cell is built from **original row indices/masks** (never `set(row
+hash)`, which loses duplicate-value multiplicity), and the construction is exported as a sidecar
+with the consumed-input hash:
 
-- **X**: oracle removal **plus the 1,265 injected rows the filter kept** (contamination-only residual).
-- **Y**: oracle removal **plus the 23,607 background rows the filter dropped** (deletion-only residual).
+- **O**: exact clean-background retained (oracle removal).
+- **O+F**: O plus the 1,265 injected rows the filter kept (contamination-only).
+- **O−B**: O minus the 23,607 background rows the filter dropped (deletion-only).
+- **O+F−B**: both changes together, i.e. the actual in-window filter output.
 
-Both are re-estimated natively; measure ATE and the bounded map metrics. If X reproduces the failure,
-the residual sheet rows are the cause; if Y does, the false deletions are; if neither, the two interact.
-The oracle remains a diagnostic ceiling, not a deployable repair.
+All four are re-estimated natively and repeated to expose host-run variance; report service
+population, the complete common set, pose/matching residuals, ATE and the bounded map metrics. X
+reproducing the failure implicates the residual rows, Y the false deletions, neither their
+interaction. The oracle remains a mechanism diagnostic, not a deployable repair.
+
+**Current status**: the existing E_actual vs E_oracle comparison changes both factors at once
+(1,265 retained + 23,607 dropped), and its hybrid arm only holds the outside-window policy fixed;
+it therefore does **not** yet establish which in-window factor matters. The 315.16 m ATE is a
+`FULL_ALIGNMENT_DIAGNOSTIC` (full-trajectory SE(3) fit), separate from the frozen healthy-prefix
+protocol. The comparison set is the 323-frame intersection of E_actual's 326 usable frames and
+E_oracle's 323, of which 317 have a GT match. Row-audit `false_negative_rate` is 1,265/9,073,943 =
+0.00013941 (0.01394%); 0.00106641 is background-normalized and is renamed accordingly.
