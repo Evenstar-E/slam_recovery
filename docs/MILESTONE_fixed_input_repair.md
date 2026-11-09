@@ -198,6 +198,19 @@ Applied to `1ae5eaa`: ΔC = 0.0000 (both 100.00%), ΔU = +0.0273 (8.41% − 5.68
 fails, so **no net-benefit claim is made**. The primary-ROI ΔC of +0.0735 is not used: those points
 lie outside the common region and measure trajectory extent, not repair quality.
 
+## Independent confirmation (next mainline, pre-registered)
+
+Sequence: `room_02`, 4.30 m injection (`/tmp/fastlivo/room02_inj43.bag`), the prepared window; the
+same filter, host config, runner and reconstruction. The injection window is measured by per-frame
+buffer equality against the clean `room_02` recording (oracle), not assumed.
+
+Frame set: frames with both a filtered scan and a rerun pose, frozen and exported before metrics.
+The criterion is the same one used on `hall_01`, declared before the run: novel added points must
+have supported > unsupported, and the added-unsupported fraction must not exceed R's. Report the
+added and lost points in total and in the novel subset, service completeness on the declared
+denominator, and healthy-region removals. If it fails, report the failure; no tuning of ROI, frame
+set or threshold.
+
 ## Open, not claimed complete
 
 - A human/independent baseline for the clean proxy (it is a clean-run map, not a GT surface).
