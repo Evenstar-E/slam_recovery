@@ -1,0 +1,140 @@
+{
+  "run_id": "four_arm_same_input_benchmark",
+  "provenance": "ARCHIVED_REAL_HOST_POSES + INJECTION_SCANS",
+  "provenance_note": "Replays a recorded FAST-LIVO2 run. The poses are archived, not produced for this experiment; this is not an independent reproduction of the host.",
+  "inputs": {
+    "injected_scans": "/tmp/fastlivo/hall01_inj43.bag",
+    "injected_poses": "/tmp/fastlivo/res_hall01_inj_05x.bag",
+    "clean_scans_proxy_only": "/tmp/fastlivo/hall01_100_160.bag",
+    "clean_poses_proxy_only": "/tmp/fastlivo/res_hall01_clean_05x.bag",
+    "gt_trajectory": "/home/R26534/M2DGR/GT/hall_01.txt"
+  },
+  "pairing": {
+    "injected": {
+      "scans": 598,
+      "paired": 357,
+      "dropped_dt": 241,
+      "dt_ms_p50": 11.067,
+      "dt_ms_p95": 19.18,
+      "dt_ms_max": 19.993
+    },
+    "clean": {
+      "scans": 598,
+      "paired": 355,
+      "dropped_dt": 243,
+      "dt_ms_p50": 11.173,
+      "dt_ms_p95": 19.186,
+      "dt_ms_max": 19.993
+    },
+    "max_dt_sec": 0.02
+  },
+  "protocol": {
+    "voxel_m": 0.1,
+    "surface_tolerance_m": 0.15,
+    "onset_rel_sec": 20.0,
+    "injection_end_rel_sec": 40.0,
+    "alignment": "single SE(3) fitted on the pre-onset keyframes of the host, applied to all arms"
+  },
+  "reference_surface": {
+    "provenance": "REAL_HOST_CLEAN_PROXY",
+    "gt_surface_contam_3d": "UNAVAILABLE (no hall_01 GT mesh; M2DGR provides trajectory only)",
+    "self_calibration": {
+      "builds_from_even_points_scores_odd": {
+        "unsupported_voxel_fraction": 0.0814,
+        "coverage_recall": 0.471,
+        "_n_map_voxels": 1342258,
+        "_n_surface_voxels": 1342661
+      },
+      "builds_from_odd_points_scores_even": {
+        "unsupported_voxel_fraction": 0.0814,
+        "coverage_recall": 0.4711,
+        "_n_map_voxels": 1342661,
+        "_n_surface_voxels": 1342258
+      }
+    },
+    "resolution_floor": {
+      "unsupported_voxel_fraction": 0.0814,
+      "coverage_recall": 0.471,
+      "use": "differences between arms smaller than this are not findings"
+    }
+  },
+  "validation_reference_source": {
+    "A0_Host_Native": "none (no gate)",
+    "A1_Quarantine_Only": "none (no gate)",
+    "A2_Unconditional_Admission": "none (admission is unconditional)",
+    "A3_Verified_Admission": "injected_run_pre_onset_keyframes"
+  },
+  "gate_result_A3": {
+    "accepted": false,
+    "mode": "MODE3_SOFT_BRIDGE_WAIT",
+    "holdout_nis": Infinity,
+    "reason": "Rejected candidate due to non-finite (NaN/Inf) state/bias or invalid SE(3) pose shape",
+    "paired_evidence": {
+      "num_paired_frames": 0,
+      "reason": "no_repaired_poses"
+    }
+  },
+  "arms": {
+    "A0_Host_Native": {
+      "admitted_keyframes": 357,
+      "deferred_keyframes": 0,
+      "admitted_duration_sec": 57.61,
+      "committed_voxels": 2065357,
+      "unsupported_voxel_fraction_vs_clean_proxy": 0.1724,
+      "clean_proxy_coverage_recall": 0.4403,
+      "ate_on_common_support_m": 0.1431,
+      "ate_on_common_support_frames": 64,
+      "ate_on_admitted_set_m": 0.5273,
+      "ate_on_admitted_set_frames": 222,
+      "clean_interval_keyframes_not_admitted": 0,
+      "runtime_sec": null
+    },
+    "A1_Quarantine_Only": {
+      "admitted_keyframes": 103,
+      "deferred_keyframes": 254,
+      "admitted_duration_sec": 17.73,
+      "committed_voxels": 731891,
+      "unsupported_voxel_fraction_vs_clean_proxy": 0.1251,
+      "clean_proxy_coverage_recall": 0.1912,
+      "ate_on_common_support_m": 0.1431,
+      "ate_on_common_support_frames": 64,
+      "ate_on_admitted_set_m": 0.1431,
+      "ate_on_admitted_set_frames": 64,
+      "clean_interval_keyframes_not_admitted": 0,
+      "runtime_sec": null
+    },
+    "A2_Unconditional_Admission": {
+      "admitted_keyframes": 357,
+      "deferred_keyframes": 0,
+      "admitted_duration_sec": 57.61,
+      "committed_voxels": 2065357,
+      "unsupported_voxel_fraction_vs_clean_proxy": 0.1724,
+      "clean_proxy_coverage_recall": 0.4403,
+      "ate_on_common_support_m": 0.1431,
+      "ate_on_common_support_frames": 64,
+      "ate_on_admitted_set_m": 0.5273,
+      "ate_on_admitted_set_frames": 222,
+      "clean_interval_keyframes_not_admitted": 0,
+      "runtime_sec": null
+    },
+    "A3_Verified_Admission": {
+      "admitted_keyframes": 103,
+      "deferred_keyframes": 254,
+      "admitted_duration_sec": 17.73,
+      "committed_voxels": 731891,
+      "unsupported_voxel_fraction_vs_clean_proxy": 0.1251,
+      "clean_proxy_coverage_recall": 0.1912,
+      "ate_on_common_support_m": 0.1431,
+      "ate_on_common_support_frames": 64,
+      "ate_on_admitted_set_m": 0.1431,
+      "ate_on_admitted_set_frames": 64,
+      "clean_interval_keyframes_not_admitted": 0,
+      "runtime_sec": 2.1082
+    }
+  },
+  "caveats": [
+    "The candidate is the host's own quarantined trajectory; the archive holds no repaired candidate for this window, so A3 can only accept or reject the host poses themselves.",
+    "A0 and A2 write the identical keyframe set and therefore produce the same map; they differ only in that A2 passed through quarantine before admitting everything.",
+    "ATE on the admitted set is confounded by coverage: arms that admit fewer keyframes are scored over less of the trajectory. ate_on_common_support is the like-for-like number; differences there are the only ones attributable to admission policy."
+  ]
+}
