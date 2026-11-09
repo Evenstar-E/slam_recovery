@@ -150,11 +150,15 @@ map, not a GT surface; the result is a conditional same-region comparison, not a
 Measured (`1ae5eaa`), shared base and pose-free ROIs: C3 is base + repaired frames (133,000 points,
 532 frames); Q is the base alone. Primary ROI, the whole 8,490,000-point clean reference: Q 91.85%
 coverage / 5.68% patch-unsupported, C3 99.20% / 8.41%, and C3 adds 623,880 covered points
-(+7.35 pp) that all lie outside the base support. On the 7,797,828-point base-support ROI both arms
-cover 100.00% and the difference is 0.000 pp. The primary-ROI gain is therefore trajectory coverage,
-not repair quality; in the common region coverage cannot rank the arms. What remains comparable is
-the composition of the added points (71.4% supported) and the unsupported fraction 5.68% -> 8.41%.
-A ranking would need a pre-stated weighting of coverage against contamination.
+(+7.35 pp) that all lie outside the base support, so that gain is trajectory extent, not repair
+quality. The 7,797,828-point base-support ROI gives 100.00% for both arms, but that is **tautological**:
+the ROI is defined by distance to the shared base, so it cannot say anything about repair quality in
+either direction. The `24252d0` review is right to reject that inference.
+
+Required next, and not claimed here: a **fixed-frame native/raw versus repaired comparison** on the
+same 400 frames (raw host map vs filtered/re-estimated map), with error counts reported both for all
+added points and for the novel subset outside the base support. Until that exists, no ranking or
+net-benefit claim is made.
 
 ### Pre-stated decision rule (written before applying it)
 
