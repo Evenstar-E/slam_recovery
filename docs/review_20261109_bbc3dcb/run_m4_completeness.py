@@ -138,20 +138,28 @@ def check_audit_binding(audit, src_sha, inj_path, fingerprints):
         return {"status": "UNVERIFIABLE", "problems": ["audit carries no per-frame records"],
                 "audit_frames": 0, "audit_input_sha256": audit.get("input_sha256"),
                 "current_input_sha256": src_sha}
-    count_bad = hash_bad = 0
+    count_bad = hash_bad = no_digest = 0
     for f in per:
         got = fingerprints.get(int(f["ns"]))
         if got is None or int(got[0]) != int(f["n_kept"]):
             count_bad += 1
             continue
         want = f.get("output_sha256") or f.get("kept_rows_sha256")
-        if want is not None and got[1] != want:
+        if want is None:
+            # A record without a digest cannot be checked against the bag. Skipping it would
+            # let an audit of unknown content bind on its counts alone.
+            no_digest += 1
+            continue
+        if got[1] != want:
             hash_bad += 1
+    if no_digest:
+        bad.append(f"{no_digest}/{len(per)} audit frames carry no payload digest")
     if count_bad:
         bad.append(f"{count_bad}/{len(per)} audit frames keep a different count than the bag")
     if hash_bad:
         bad.append(f"{hash_bad}/{len(per)} audit frames keep different rows than the bag")
-    status = "BOUND" if not bad else "STALE_AUDIT"
+    status = "BOUND" if not bad else ("UNVERIFIABLE" if no_digest and not count_bad
+                                      and not hash_bad else "STALE_AUDIT")
     return {"status": status, "problems": bad, "audit_frames": len(per),
             "audit_input_sha256": audit.get("input_sha256"),
             "current_input_sha256": src_sha}

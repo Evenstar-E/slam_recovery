@@ -141,6 +141,23 @@ class TestAuditBinding(unittest.TestCase):
         self.assertEqual(r["status"], "STALE_AUDIT")
         self.assertTrue(any("different rows" in p for p in r["problems"]))
 
+    def test_missing_digest_is_not_bound(self):
+        """Counts alone are not evidence: a record with no payload hash must not bind."""
+        audit = {"input": "/tmp/fastlivo/hall01_inj43.bag", "input_sha256": "a" * 64,
+                 "per_frame": [{"ns": 100, "n_kept": 2}]}
+        r = M.check_audit_binding(audit, "a" * 64, "/tmp/fastlivo/hall01_inj43.bag",
+                                  {100: (2, "9" * 64)})
+        self.assertNotEqual(r["status"], "BOUND")
+        self.assertEqual(r["status"], "UNVERIFIABLE")
+        self.assertTrue(any("no payload digest" in p for p in r["problems"]))
+
+    def test_one_digest_missing_among_many_is_not_bound(self):
+        audit = self._audit(kept=(10, 20))
+        del audit["per_frame"][1]["output_sha256"]
+        r = M.check_audit_binding(audit, "a" * 64, "/tmp/fastlivo/hall01_inj43.bag",
+                                  self._fp())
+        self.assertNotEqual(r["status"], "BOUND")
+
     def test_empty_audit_is_not_bound(self):
         """An audit with no frames agrees with nothing and must not pass."""
         r = M.check_audit_binding({"input": "/tmp/fastlivo/hall01_inj43.bag",

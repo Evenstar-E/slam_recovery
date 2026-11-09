@@ -41,6 +41,7 @@ RESOURCE_LOG = "/tmp/rate_diag_resource.log"
 RUN_LOG = "/tmp/rate_diag_run.log"
 RESULT_JSON = os.path.join(_HERE, "rate_diagnosis_results.json")
 
+SLOW_THRESHOLD_S = 0.100   # absolute, NOT relative to each topic's median
 SEGMENTS = [(1627785275.808, 1627785285.226), (1627785295.246, 1627785295.446)]
 TOPICS = {"/velodyne_points": "lidar", "/handsfree/imu": "imu",
           "/aft_mapped_to_init": "odom"}
@@ -74,6 +75,14 @@ def _intervals(ts):
 
 
 def _segment_stats(ts, lo, hi):
+    """Interval statistics for one fault segment and its neighbours.
+
+    `raw_threshold_fraction_*` counts intervals above a FIXED 100 ms. It is a raw threshold, not
+    a baseline-relative one: LiDAR's own median interval is 100.19 ms, so a value near 0.888
+    means "almost every interval exceeds 100 ms" -- which is equally true of the neighbour
+    stretches and therefore says nothing about holes or about continuity. Input continuity is
+    decided by the 2 x median hole test in `_intervals` (zero holes), never by this fraction.
+    """
     m = (ts >= lo) & (ts <= hi)
     inside = np.diff(ts[m]) if m.sum() > 1 else np.zeros(0)
     # Left and right neighbours are differenced SEPARATELY and then concatenated. Diffing the
@@ -82,13 +91,13 @@ def _segment_stats(ts, lo, hi):
     right = ts[(ts > hi) & (ts <= hi + 15.0)]
     outside = np.concatenate([np.diff(left) if len(left) > 1 else np.zeros(0),
                               np.diff(right) if len(right) > 1 else np.zeros(0)])
-    slow = inside > 0.100 if len(inside) else np.zeros(0, bool)   # 133 ms = a skipped publish
+    slow = inside > SLOW_THRESHOLD_S if len(inside) else np.zeros(0, bool)
     return {"n_inside": int(m.sum()),
             "median_ms_inside": float(np.median(inside) * 1e3) if len(inside) else None,
             "median_ms_neighbours": float(np.median(outside) * 1e3) if len(outside) else None,
             "max_ms_inside": float(inside.max() * 1e3) if len(inside) else None,
-            "slow_interval_fraction_inside": float(slow.mean()) if len(slow) else None,
-            "slow_interval_fraction_neighbours": (float((outside > 0.100).mean())
+            "raw_threshold_fraction_inside": float(slow.mean()) if len(slow) else None,
+            "raw_threshold_fraction_neighbours": (float((outside > SLOW_THRESHOLD_S).mean())
                                                   if len(outside) else None)}
 
 
@@ -218,10 +227,10 @@ def main():
              .get("per_segment", [{}] * 2)[i].get("median_ms_inside"),
              "imu_ms_inside": res["runs"].get("imu", {})
              .get("per_segment", [{}] * 2)[i].get("median_ms_inside"),
-             "slow_fraction_inside": res["runs"].get("odom_out", {})
-             .get("per_segment", [{}] * 2)[i].get("slow_interval_fraction_inside"),
-             "slow_fraction_neighbours": res["runs"].get("odom_out", {})
-             .get("per_segment", [{}] * 2)[i].get("slow_interval_fraction_neighbours")}
+             "raw_threshold_fraction_inside": res["runs"].get("odom_out", {})
+             .get("per_segment", [{}] * 2)[i].get("raw_threshold_fraction_inside"),
+             "raw_threshold_fraction_neighbours": res["runs"].get("odom_out", {})
+             .get("per_segment", [{}] * 2)[i].get("raw_threshold_fraction_neighbours")}
             for i in range(len(SEGMENTS))],
     }
     with open(RESULT_JSON, "w", encoding="utf-8") as fh:
