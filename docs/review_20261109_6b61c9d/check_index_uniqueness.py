@@ -34,7 +34,7 @@ import numpy as np
 def main():
     if rosbag is None:
         raise SystemExit("run under the ROS python (/home/R26534/mm/ros/bin/python)")
-    frames, frames_with_dupes, dup_rows, max_mult = 0, 0, 0, 0
+    frames, frames_with_dupes, dup_rows, max_mult, max_extra = 0, 0, 0, 0, 0
     worst = None
     with rosbag.Bag(INJ, "r") as bag:
         for _topic, msg, _t in bag.read_messages(topics=["/velodyne_points"]):
@@ -46,16 +46,21 @@ def main():
             step = int(msg.point_step)
             rows = np.frombuffer(bytes(msg.data), dtype=np.uint8).reshape(-1, step)
             counts = Counter(hashlib.blake2b(bytes(r), digest_size=16).digest() for r in rows)
+            frame_max = max(counts.values())          # 1 when every row is distinct
+            max_mult = max(max_mult, frame_max)
+            max_extra = max(max_extra, frame_max - 1)
             dup = sum(v - 1 for v in counts.values() if v > 1)
             if dup:
                 frames_with_dupes += 1
                 dup_rows += dup
-                m = max(counts.values())
-                if m > max_mult:
-                    max_mult, worst = m, ns
+                if frame_max > 1:
+                    worst = ns
     res = {"input": INJ, "window": {"onset_ns": ONSET_NS, "end_ns": END_NS},
-           "frames": frames, "frames_with_duplicate_rows": frames_with_dupes,
-           "duplicate_rows": dup_rows, "max_multiplicity": max_mult,
+           "frames": frames,
+           "frames_with_duplicate_injected_rows": frames_with_dupes,
+           "duplicate_injected_rows": dup_rows,
+           "max_multiplicity": max_mult,            # 1 = every row in every frame is distinct
+           "max_extra_copies": max_extra,           # 0 under the same condition
            "worst_frame_ns": worst,
            "mapping": ("UNIQUE" if dup_rows == 0 else
                        "AMBIGUOUS: greedy-earliest is one valid witness, not a unique index")}
