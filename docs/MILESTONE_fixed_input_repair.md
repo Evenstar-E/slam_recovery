@@ -10,12 +10,17 @@ controls, labels and provenance do not get chosen after seeing the numbers.
 - Injection window: absolute `[1627785275.607, 1627785295.546]`, measured by per-frame buffer
   equality against the clean bag (200 differing frames). This is an **INJECTION_ORACLE**; it needs
   the clean recording and is not an online detector.
-- Key set (frozen; `docs/milestone_m0_keys.json`):
-  - **primary**: all 445 quarantine scans, independent of candidate support
-    (sha256 `95832fee...9ae89d3`);
-  - **diagnostic subset**: the 259 gate-committable scans, reported only as a subset
-    (sha256 `a234dee4...0eb58e`);
-  - **healthy prefix**: the 133 pre-onset paired keyframes (sha256 `852b9ee0...2f35eb93`).
+- Key set (frozen; `docs/milestone_m0_keys.json`, integer nanoseconds):
+  - **primary**: all 446 paired quarantine scans, independent of candidate support
+    (sha256 `89a8bfa1...d3235a3f`);
+  - **diagnostic subset**: the 252 gate-committable scans, reported only as a subset
+    (sha256 `2bb7fe3d...00101f5`);
+  - **healthy prefix**: the 132 paired pre-onset keyframes, `ts_ns < start_ns`
+    (sha256 `74995bb9...62268788`);
+  - **outside the cohort**: 20 raw scans with no pose under the pairing rule, listed by ns.
+  The encoding is integer `header.stamp.to_nsec()`; a list hash is sha256 of the comma-joined sorted
+  ns. An earlier float-rounded boundary (445 / 259 / 133) put the first injected scan into the
+  healthy prefix; it is superseded, and the four-arm archive generated with it is marked as such.
   A candidate-dependent set is never the common population for the four controls. Missing poses or
   observations are listed separately, not dropped from the denominator.
 - Reference surface: the clean run's map, built only from the clean recording

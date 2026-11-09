@@ -635,5 +635,20 @@
       }
     },
     "reading": "at full spatial coverage the A0/A1 tail gap is 0.2969 vs 0.0029; the 120k floor 0.0079 is about two-thirds sampling. The main manifest keeps the 120k fields it was generated with; the voxel values are this branch's rerun and are not merged into the arm rows."
+  },
+  "segment_boundary": {
+    "used_in_this_manifest": "float seconds rounded to 6 decimals; counts 445 quarantine / 259 committable / 133 healthy",
+    "frozen_ns_boundary": {
+      "start_ns": 1627785275607408524,
+      "end_ns": 1627785295546408653,
+      "counts": {
+        "primary_quarantine": 446,
+        "diagnostic_committable": 252,
+        "healthy": 132,
+        "missing_raw": 20
+      },
+      "note": "the rounded boundary put the first injected scan into the healthy prefix; the ns boundary is the frozen one for M0, and this manifest's arm numbers were not regenerated under it"
+    },
+    "action": "M0/M1/M2 rerun under the ns boundary; do not mix the two key sets"
   }
 }

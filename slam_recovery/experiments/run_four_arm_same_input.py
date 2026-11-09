@@ -64,8 +64,10 @@ DEFAULT_GT = "/home/R26534/M2DGR/GT/hall_01.txt"
 # as trusted and the anchor itself was 2.8 m off.
 ONSET_REL = None          # filled by detect_onset()
 INJ_END_REL = 40.0
-ONSET_ABS = None          # absolute stamps; the segment split uses these, not bag-relative rel
+ONSET_ABS = None          # absolute seconds, for display/alignment
 INJ_END_ABS = None
+ONSET_NS = None           # integer nanoseconds: the segment split uses these
+INJ_END_NS = None
 VOXEL = 0.10
 SURF_TOL = 0.15
 MAX_KF_POINTS = 15000
@@ -142,7 +144,7 @@ def load_scans(path, topic="/velodyne_points"):
             p = p[(r > 0.5) & (r < 30.0)]
             if len(p) > MAX_KF_POINTS:
                 p = p[:: max(1, len(p) // MAX_KF_POINTS)][:MAX_KF_POINTS]
-            out.append((m.header.stamp.to_sec(), p))
+            out.append((m.header.stamp.to_sec(), int(m.header.stamp.to_nsec()), p))
     out.sort(key=lambda kv: kv[0])
     return out
 
@@ -176,7 +178,7 @@ def pair_keyframes(scan_path, pose_path, ignore_rotation):
 
     kfs, dts, interp, dropped, drop_rel = [], [], 0, 0, []
     t_start = pts[0][0]
-    for ts, p in pts:
+    for ts, ts_ns, p in pts:
         j = int(np.searchsorted(pt, ts))
         near = [i for i in (j - 1, j) if 0 <= i < len(pt)]
         best = min(near, key=lambda i: abs(pt[i] - ts)) if near else None
@@ -200,7 +202,7 @@ def pair_keyframes(scan_path, pose_path, ignore_rotation):
             T[:3, 3] = xyz
         else:
             T = pose_matrix(xyz, q)
-        kfs.append({"ts": ts, "rel": ts - t_start, "pts": p, "pose": T, "pose_source": flag})
+        kfs.append({"ts": ts, "ts_ns": ts_ns, "rel": ts - t_start, "pts": p, "pose": T, "pose_source": flag})
 
     d = np.asarray(dts) if dts else np.zeros(1)
     stats = {
@@ -245,7 +247,7 @@ def detect_onset(clean_bag, inj_bag, topic="/velodyne_points"):
         out = {}
         with rosbag.Bag(bp, "r") as b:
             for _, m, _ in b.read_messages(topics=[topic]):
-                out[round(m.header.stamp.to_sec(), 6)] = bytes(m.data)
+                out[int(m.header.stamp.to_nsec())] = bytes(m.data)
         return out
     a, c = load(inj_bag), load(clean_bag)
     common = sorted(set(a) & set(c))
@@ -255,9 +257,12 @@ def detect_onset(clean_bag, inj_bag, topic="/velodyne_points"):
     diff = [t for t in common if a[t] != c[t]]
     if not diff:
         raise RuntimeError("detect_onset: no scan differs; refusing to run an 'injection' replay")
-    return (diff[0] - t0, diff[-1] - t0,
-            {"start_rel_sec": round(diff[0] - t0, 3), "end_rel_sec": round(diff[-1] - t0, 3),
-             "start_abs_sec": diff[0], "end_abs_sec": diff[-1], "first_common_abs_sec": t0,
+    return ((diff[0] - t0) * 1e-9, (diff[-1] - t0) * 1e-9,
+            {"start_rel_sec": round((diff[0] - t0) * 1e-9, 6),
+             "end_rel_sec": round((diff[-1] - t0) * 1e-9, 6),
+             "start_abs_ns": diff[0], "end_abs_ns": diff[-1], "first_common_abs_ns": t0,
+             "start_abs_sec": diff[0] * 1e-9, "end_abs_sec": diff[-1] * 1e-9,
+             "first_common_abs_sec": t0 * 1e-9,
              "differing_frames": len(diff), "compared_frames": len(common),
              "missing_in_injected": len(set(c) - set(a)),
              "missing_in_clean": len(set(a) - set(c)),
@@ -466,13 +471,14 @@ def main():
     # favour any admission policy.
     ts_gt_all, xyz_gt_all, _ = load_tum_trajectory_se3(DEFAULT_GT)
 
-    global ONSET_REL, INJ_END_REL, ONSET_ABS, INJ_END_ABS
+    global ONSET_REL, INJ_END_REL, ONSET_ABS, INJ_END_ABS, ONSET_NS, INJ_END_NS
     _st, _en, _ev = detect_onset(DEFAULT_CLN_SCANS, DEFAULT_INJ_SCANS)
     ONSET_REL, INJ_END_REL = _st, _en
     # Segment membership is decided on absolute header stamps. detect_onset keys its rel values
     # to the first *common* scan while pair_keyframes keys rel to each bag's first scan; the two
     # bases differ whenever a bag is missing head frames.
     ONSET_ABS, INJ_END_ABS = _ev["start_abs_sec"], _ev["end_abs_sec"]
+    ONSET_NS, INJ_END_NS = _ev["start_abs_ns"], _ev["end_abs_ns"]
     # first paired scan minus first common scan. This includes any pairing drop at the head, so it
     # is a pairing delay, not evidence that the two bags' heads differ; segment decisions use
     # absolute stamps and are unaffected either way.
@@ -482,7 +488,7 @@ def main():
     onset_evidence["hardcoded_value_was"] = 20.0
     onset_evidence["note"] = ("the hard-coded 20.0 s was wrong; the injected span starts at "
                               f"{_st} s, so six seconds of faulty frames had been treated as trusted")
-    pre_inj = [k for k in inj_kfs if k["ts"] < ONSET_ABS]
+    pre_inj = [k for k in inj_kfs if k["ts_ns"] < ONSET_NS]
     pre_inj_ts = np.asarray([k["ts"] for k in pre_inj])
     pre_inj_xyz = np.asarray([k["pose"][:3, 3] for k in pre_inj])
     cln_ts_all = np.asarray([k["ts"] for k in cln_kfs])
@@ -545,7 +551,7 @@ def main():
     # clean proxy. This measures the disagreement between two runs that saw identical input, which
     # is the resolution limit for any cross-run comparison.
     pre_aligned = np.vstack([world_points(k) for k in
-                             [k for k in inj_kfs if k["ts"] < ONSET_ABS]]) @ R_ic.T + t_ic
+                             [k for k in inj_kfs if k["ts_ns"] < ONSET_NS]]) @ R_ic.T + t_ic
     pre_vox = voxels(pre_aligned)
     cross_floor = {
         "unsupported_voxel_fraction": round(float(unsupported_fraction(pre_vox, proxy_surface)), 4),
@@ -578,8 +584,8 @@ def main():
     print(f"  interp LOO: {interp_loo['translation_err_mean_m']*1000:.2f} mm / "
           f"{interp_loo['rotation_err_mean_deg']:.3f} deg")
 
-    pre = [k for k in inj_kfs if k["ts"] < ONSET_ABS]
-    quar = [k for k in inj_kfs if k["ts"] >= ONSET_ABS]
+    pre = [k for k in inj_kfs if k["ts_ns"] < ONSET_NS]
+    quar = [k for k in inj_kfs if k["ts_ns"] >= ONSET_NS]
 
     tail = pre[-EXTRAP_FRAMES:]
     dt_span = tail[-1]["ts"] - tail[0]["ts"]
@@ -700,7 +706,7 @@ def main():
 
     # Absolute stamps, like pre/quar: ONSET_REL is keyed to the first *common* scan while
     # inj_kfs rel is keyed to this bag's first scan, so the two diverge when head frames differ.
-    floor_ids = [i for i in range(len(inj_kfs)) if inj_kfs[i]["ts"] < ONSET_ABS]
+    floor_ids = [i for i in range(len(inj_kfs)) if inj_kfs[i]["ts_ns"] < ONSET_NS]
     floor_d = per_kf_distances(floor_ids)
     floor_flat = np.concatenate(floor_d) if floor_d else np.zeros(0)
     floor_stats = distance_stats(floor_flat)
