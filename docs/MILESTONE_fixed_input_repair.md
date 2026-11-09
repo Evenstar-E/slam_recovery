@@ -333,7 +333,9 @@ host/config-wide, and if it does not, room_02 is a sequence-specific degenerate 
 **Applicability check (hall_01, same build B)**: four runs on the non-injected `hall01_100_160.bag`
 against the hall_01 clean proxy (2,422,718 points after 5 cm voxels), scored on one common frame
 set (562 of 566), give patch-unsupported 0.2282/0.2790/0.2427/0.2715, NN supported 1.0000, median
-0.008-0.010 m. The raw spread is 0.0508, against room_02's 0.007 vs 0.66-0.69 (spread 0.68). The
+0.008-0.010 m. The raw spread is 0.0508, against room_02's 0.007 vs 0.66-0.69 (spread 0.68). These compare
+within-dataset dispersion, not absolute levels: the proxy surfaces and baselines differ, so the
+unsupported levels are not comparable across sequences. The
 0.10/0.50 mode rule labels all four UNCLEAR, so the stability reading rests on the raw values, not
 on a shared label: the rule's thresholds describe room_02's distribution and do not transfer.
 Verdict `STABLE_ON_HALL01_ROOM02_IS_SEQUENCE_SPECIFIC`: the host/config is stable on hall_01 and
