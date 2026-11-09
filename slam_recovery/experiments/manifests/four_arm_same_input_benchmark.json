@@ -527,7 +527,8 @@
     "Incumbent is a constant-velocity extrapolation, not a per-frame record, so the paired test asks whether the candidate beats 'no repair', not whether it is optimal.",
     "A0 and A2 write the identical keyframe set and therefore the same map; A2 differs only in having passed through quarantine before admitting everything.",
     "ATE on the admitted set is confounded by coverage; ate_on_common_support is the like-for-like number.",
-    "The 120k-point proxy subsample inflates both contamination tails; at full proxy resolution the values are 0.2966 (A0) and 0.0029 (A1), and the 0.0079 floor is two-thirds sampling."
+    "The 120k-point proxy subsample inflates both contamination tails; at full proxy resolution the values are 0.2966 (A0) and 0.0029 (A1), and the 0.0079 floor is two-thirds sampling.",
+    "C_good attribution: the clean-scan control at the same reference scores median 16.2, so most of NIS 18.07 is the reference/alignment floor, not the un-stripped occluder; filtering the 4.0-4.6 m shell does not reduce it."
   ],
   "evidence_status_scope": "evidence_status describes the paired-benefit term only; the holdout-NIS term is reported separately as holdout_nis, and accepted=False means the candidate did not enter Mode 2.",
   "time_bases": {
@@ -560,5 +561,41 @@
     "independent_maps": "A0 equals A2 and A1 equals A3 (the gate rejected the candidate, so verified admission degenerates to quarantine). Only the A0-vs-A1 comparison is independent; the floor is a third copy of A1.",
     "coverage_net_gain_percentage_points": 2.97,
     "interpretation": "The contamination gap is consistent with the archived 12.9 m post-window trajectory residual: 'the written map is far from the clean surface' and 'the host trajectory drifted' are two descriptions of one fact. Report it as a consistency check, not as independent evidence for the admission policy."
+  },
+  "good_candidate_attribution": {
+    "probe": "docs/review_20261109_4598fb7/probe_c_good_attribution.py",
+    "fixed_key_set": "all quarantine keyframes (445)",
+    "reference_points": 1500,
+    "variants": {
+      "raw": {
+        "n": 445,
+        "mean": 208.114,
+        "median": 19.103,
+        "p90": 976.264,
+        "equivalent_residual_m": 1.731
+      },
+      "filtered": {
+        "n": 445,
+        "mean": 399.408,
+        "median": 19.859,
+        "p90": 1326.482,
+        "equivalent_residual_m": 2.398
+      },
+      "clean": {
+        "n": 445,
+        "mean": 17.078,
+        "median": 16.205,
+        "p90": 23.202,
+        "equivalent_residual_m": 0.496
+      },
+      "raw_host_pose": {
+        "n": 445,
+        "mean": 254.234,
+        "median": 45.233,
+        "p90": 698.801,
+        "equivalent_residual_m": 1.913
+      }
+    },
+    "reading": "Under the same 1500-point reference, the clean-scan control scores median 16.2 while the raw-injected C_good scores 19.1: the NIS scale is dominated by the reference budget and the cross-run alignment, and the un-stripped 4.30 m returns add about 18% to the median. Removing the 4.0-4.6 m shell does not help (median 19.9), so 'strip the occluder' is not the fix. The control still contains cross-run misalignment, so the 18% cannot be assigned to the occluder alone; no single-cause claim is made."
   }
 }

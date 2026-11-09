@@ -1,0 +1,44 @@
+{
+  "provenance": "ARCHIVED_REAL_HOST_POSES + INJECTION_SCANS; clean scans are ORACLE_CLEAN_SCANS",
+  "onset_rel_sec": 14.528,
+  "pre_keyframes": 133,
+  "quarantine_keyframes": 445,
+  "reference_points": 1500,
+  "alignment_fit_pairs": 121,
+  "alignment_fit_residual_m": {
+    "mean": 0.006024,
+    "p95": 0.011412
+  },
+  "variants": {
+    "raw": {
+      "n": 445,
+      "mean": 208.114,
+      "median": 19.103,
+      "p90": 976.264,
+      "equivalent_residual_m": 1.731
+    },
+    "filtered": {
+      "n": 445,
+      "mean": 399.408,
+      "median": 19.859,
+      "p90": 1326.482,
+      "equivalent_residual_m": 2.398
+    },
+    "clean": {
+      "n": 445,
+      "mean": 17.078,
+      "median": 16.205,
+      "p90": 23.202,
+      "equivalent_residual_m": 0.496
+    },
+    "raw_host_pose": {
+      "n": 445,
+      "mean": 254.234,
+      "median": 45.233,
+      "p90": 698.801,
+      "equivalent_residual_m": 1.913
+    }
+  },
+  "reading": "Compare medians: the clean-scan control is the floor imposed by the reference budget and the cross-run alignment. If raw is close to clean, the occluder is not what drives the NIS; if filtered moves toward clean, it is.",
+  "filter": "drop returns with sensor range in [4.0, 4.6] m (the 4.30 m sheet shell)"
+}
