@@ -36,6 +36,9 @@ for _p in (_HERE, _REPO):
 import verify_four_arm_independent as V          # noqa: E402
 
 REPORT = os.path.join(_HERE, "room02_oracle_bag_report.json")
+# Independent window declaration (measured by raw-buffer equality in the original-index audit).
+WINDOW_DECL = os.path.join(_REPO, "docs", "review_20261109_6b61c9d",
+                           "room02_original_index_audit.json")
 
 
 def _row_hash(row):
@@ -85,7 +88,22 @@ def main():
                                      "layout_mismatch": len(bad_layout),
                                      "row_count_mismatch": len(bad_rows)}))
     differing = [ns for ns in shared if inj[ns][0] != cln[ns][0]]
-    onset_ns, end_ns = min(differing), max(differing)
+    measured = (min(differing), max(differing))
+    # The window must come from a declaration outside this loop. Deriving it from min/max here and
+    # then checking "no difference outside min/max" is a tautology, not an independent check.
+    if not os.path.exists(WINDOW_DECL):
+        raise SystemExit(json.dumps({"status": "BLOCKED", "reason": "WINDOW_UNDECLARED",
+                                     "expected": WINDOW_DECL}))
+    with open(WINDOW_DECL, encoding="utf-8") as fh:
+        decl = json.load(fh)["window"]
+    onset_ns, end_ns = int(decl["onset_ns"]), int(decl["end_ns"])
+    if not decl.get("source"):
+        raise SystemExit(json.dumps({"status": "BLOCKED", "reason": "WINDOW_NO_SOURCE"}))
+    misplaced = [ns for ns in differing if not (onset_ns <= ns <= end_ns)]
+    if misplaced:
+        raise SystemExit(json.dumps({"status": "BLOCKED",
+                                     "reason": "DIFFERS_OUTSIDE_DECLARED_WINDOW",
+                                     "count": len(misplaced)}))
     outside_diff = [ns for ns in shared if (ns < onset_ns or ns > end_ns)
                     and inj[ns][0] != cln[ns][0]]
     if outside_diff:
@@ -149,6 +167,9 @@ def main():
            "hybrid_with": a.hybrid_with, "mode": a.mode,
            "output": a.out, "output_sha256": V._sha_file(a.out),
            "window": {"onset_ns": onset_ns, "end_ns": end_ns,
+                      "source": decl.get("source"),
+                      "measured_onset_ns": measured[0], "measured_end_ns": measured[1],
+                      "declaration_matches_measurement": list(measured) == [onset_ns, end_ns],
                       "differing_frames": len(differing)},
            "points_in": int(kept_total + dropped_total), "points_kept": int(kept_total),
            "removed": int(dropped_total),

@@ -267,7 +267,15 @@ together; sidecar indices are gated on dtype, sign, bounds, ordering and missing
 sidecar hash is bound to the audit. The non-scan streams the bags inherit (IMU 8,313, images 884)
 are identical between the injected and filtered recordings, and the window contains no duplicate
 LiDAR rows, so the ordered-subsequence index is unique rather than one of several witnesses.
-Host reruns are the remaining step. Until they run, the existing E_actual vs E_oracle comparison changes both
+The eight host reruns (two per cell) then ran on those bags. **They do not support a factor or an
+interaction**: O split 0.072/14.439 m, O+F−B split 554.6/0.301 m, and the two single-factor cells
+failed in both repeats (O+F 593.0/14.9 m, O−B 48.8/19.7 m). Map coverage is bimodal in the same
+way (0.9988/0.007 unsupported in the good mode, ~0.69/0.65 in the bad mode), and the good mode
+appeared once for O and once for the actual cell, independent of the arm. The pre-registered rule
+therefore reads `NOT_A_CLEAN_INTERACTION`, with host-run variance dominating; the single-run
+"filter is the cause" observation is withdrawn as not reproducible. Two independently written
+builders and audits (one per side) produce the same in-window counts. Until the host variance is
+brought under control, the existing E_actual vs E_oracle comparison changes both
 factors at once
 (1,265 retained + 23,607 dropped), and its hybrid arm only holds the outside-window policy fixed;
 it therefore does **not** yet establish which in-window factor matters. The 315.16 m ATE is a
