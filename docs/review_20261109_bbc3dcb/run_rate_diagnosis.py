@@ -76,8 +76,14 @@ def _intervals(ts):
 def _segment_stats(ts, lo, hi):
     m = (ts >= lo) & (ts <= hi)
     inside = np.diff(ts[m]) if m.sum() > 1 else np.zeros(0)
-    out_mask = ((ts >= lo - 15.0) & (ts < lo)) | ((ts > hi) & (ts <= hi + 15.0))
-    outside = np.diff(ts[out_mask]) if out_mask.sum() > 1 else np.zeros(0)
+    # The neighbours are two disjoint stretches, so their intervals must be computed
+    # separately. Concatenating the samples first and then diffing invents an interval that
+    # spans the fault window: ts=[0,.066,1,1.066,2,2.066] with fault=[.9,1.1] would yield
+    # [.066, 1.934, .066] and report a 1/3 slow fraction from two 66 ms gaps.
+    left = ts[(ts >= lo - 15.0) & (ts < lo)]
+    right = ts[(ts > hi) & (ts <= hi + 15.0)]
+    outside = np.concatenate([np.diff(left) if len(left) > 1 else np.zeros(0),
+                              np.diff(right) if len(right) > 1 else np.zeros(0)])
     slow = inside > 0.100 if len(inside) else np.zeros(0, bool)   # 133 ms = a skipped publish
     return {"n_inside": int(m.sum()),
             "median_ms_inside": float(np.median(inside) * 1e3) if len(inside) else None,

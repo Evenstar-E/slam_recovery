@@ -31,18 +31,18 @@
     {
      "n_inside": 93,
      "median_ms_inside": 100.19636154174805,
-     "median_ms_neighbours": 100.19338130950928,
+     "median_ms_neighbours": 100.19302368164062,
      "max_ms_inside": 102.10609436035156,
      "slow_interval_fraction_inside": 0.8804347826086957,
-     "slow_interval_fraction_neighbours": 0.8883495145631068
+     "slow_interval_fraction_neighbours": 0.8878048780487805
     },
     {
      "n_inside": 1,
      "median_ms_inside": null,
-     "median_ms_neighbours": 100.19612312316895,
+     "median_ms_neighbours": 100.1960039138794,
      "max_ms_inside": null,
      "slow_interval_fraction_inside": null,
-     "slow_interval_fraction_neighbours": 0.8769230769230769
+     "slow_interval_fraction_neighbours": 0.8762886597938144
     }
    ],
    "first": 1627785269.99646,
@@ -63,10 +63,10 @@
     {
      "n_inside": 1352,
      "median_ms_inside": 6.918907165527344,
-     "median_ms_neighbours": 6.899833679199219,
+     "median_ms_neighbours": 6.899476051330566,
      "max_ms_inside": 22.17698097229004,
      "slow_interval_fraction_inside": 0.0,
-     "slow_interval_fraction_neighbours": 0.00033955857385398983
+     "slow_interval_fraction_neighbours": 0.0
     },
     {
      "n_inside": 30,
@@ -74,7 +74,7 @@
      "median_ms_neighbours": 6.899833679199219,
      "max_ms_inside": 9.440898895263672,
      "slow_interval_fraction_inside": 0.0,
-     "slow_interval_fraction_neighbours": 0.00035919540229885057
+     "slow_interval_fraction_neighbours": 0.0
     }
    ],
    "first": 1627785269.997716,
@@ -104,10 +104,10 @@
     {
      "n_inside": 98,
      "median_ms_inside": 66.73526763916016,
-     "median_ms_neighbours": 66.66731834411621,
+     "median_ms_neighbours": 66.66719913482666,
      "max_ms_inside": 133.5766315460205,
      "slow_interval_fraction_inside": 0.4329896907216495,
-     "slow_interval_fraction_neighbours": 0.07380073800738007
+     "slow_interval_fraction_neighbours": 0.07037037037037037
     },
     {
      "n_inside": 2,
@@ -115,7 +115,7 @@
      "median_ms_neighbours": 66.6666030883789,
      "max_ms_inside": 66.66088104248047,
      "slow_interval_fraction_inside": 0.0,
-     "slow_interval_fraction_neighbours": 0.1686746987951807
+     "slow_interval_fraction_neighbours": 0.16532258064516128
     }
    ],
    "first": 1627785271.0675325,
@@ -234,11 +234,11 @@
    {
     "segment": 0,
     "odom_ms_inside": 66.73526763916016,
-    "odom_ms_neighbours": 66.66731834411621,
+    "odom_ms_neighbours": 66.66719913482666,
     "lidar_ms_inside": 100.19636154174805,
     "imu_ms_inside": 6.918907165527344,
     "slow_fraction_inside": 0.4329896907216495,
-    "slow_fraction_neighbours": 0.07380073800738007
+    "slow_fraction_neighbours": 0.07037037037037037
    },
    {
     "segment": 1,
@@ -247,7 +247,7 @@
     "lidar_ms_inside": null,
     "imu_ms_inside": 6.780862808227539,
     "slow_fraction_inside": 0.0,
-    "slow_fraction_neighbours": 0.1686746987951807
+    "slow_fraction_neighbours": 0.16532258064516128
    }
   ]
  }

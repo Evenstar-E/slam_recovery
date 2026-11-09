@@ -21,6 +21,7 @@ not GT.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sys
@@ -39,18 +40,21 @@ RESULT_JSON = os.path.join(_HERE, "completeness_healthy_region_results.json")
 
 
 
-def cloud_widths(path):
-    """{scan_ns: message width} straight from the bag, with no range filter or cap.
+def cloud_fingerprints(path):
+    """{scan_ns: (message width, sha256 of the payload)} straight from the bag.
 
     `V.load_scans` keeps only 0.5-30 m points and caps the count, so its lengths are not the
-    observation size; comparing them to `n_kept` in the audit invents a mismatch.
+    observation size; comparing them to `n_kept` invents a mismatch. The digest matters as much
+    as the count: two runs can keep the same number of points from different rows.
     """
     out = {}
     with V.Reader(path) as r:
         conns = [c for c in r.connections if c.topic == V.SCAN_TOPIC]
         for conn, _t, raw in r.messages(connections=conns):
             m = V.TYPESTORE.deserialize_ros1(raw, conn.msgtype)
-            out[int(m.header.stamp.sec) * 10 ** 9 + int(m.header.stamp.nanosec)] = int(m.width)
+            payload = np.asarray(m.data, dtype=np.uint8).tobytes()
+            ns = int(m.header.stamp.sec) * 10 ** 9 + int(m.header.stamp.nanosec)
+            out[ns] = (int(m.width), hashlib.sha256(payload).hexdigest())
     return out
 
 
@@ -116,7 +120,7 @@ def describe_recoverability(scan_len, dt_near, gap):
     return False, rec_relax, why
 
 
-def check_audit_binding(audit, src_sha, inj_path, scan_len_by_ns, pts_outside_total=None):
+def check_audit_binding(audit, src_sha, inj_path, fingerprints):
     """Tie a stored filter audit to THIS run's inputs, or call it stale.
 
     A per-frame audit is only evidence for the run whose bag it read. The bind is the source bag
@@ -129,13 +133,24 @@ def check_audit_binding(audit, src_sha, inj_path, scan_len_by_ns, pts_outside_to
     if audit.get("input_sha256") != src_sha:
         bad.append(f"audit input sha256 {str(audit.get('input_sha256'))[:16]} != {src_sha[:16]}")
     per = audit.get("per_frame", [])
-    mismatched = 0
+    if not per:
+        # An audit with no frames binds to nothing; an empty list is not agreement.
+        return {"status": "UNVERIFIABLE", "problems": ["audit carries no per-frame records"],
+                "audit_frames": 0, "audit_input_sha256": audit.get("input_sha256"),
+                "current_input_sha256": src_sha}
+    count_bad = hash_bad = 0
     for f in per:
-        got = scan_len_by_ns.get(int(f["ns"]))
-        if got is None or int(got) != int(f["n_kept"]):
-            mismatched += 1
-    if mismatched:
-        bad.append(f"{mismatched}/{len(per)} audit frames disagree with the filtered bag")
+        got = fingerprints.get(int(f["ns"]))
+        if got is None or int(got[0]) != int(f["n_kept"]):
+            count_bad += 1
+            continue
+        want = f.get("output_sha256") or f.get("kept_rows_sha256")
+        if want is not None and got[1] != want:
+            hash_bad += 1
+    if count_bad:
+        bad.append(f"{count_bad}/{len(per)} audit frames keep a different count than the bag")
+    if hash_bad:
+        bad.append(f"{hash_bad}/{len(per)} audit frames keep different rows than the bag")
     status = "BOUND" if not bad else "STALE_AUDIT"
     return {"status": status, "problems": bad, "audit_frames": len(per),
             "audit_input_sha256": audit.get("input_sha256"),
@@ -172,7 +187,7 @@ def main():
     f_sha = V._sha_file(R.FILTERED_BAG)
     f_scans, _ = V.load_scans(R.FILTERED_BAG, f_sha)
     by_stamp = {round(t, 6): p for t, p in f_scans}
-    widths = cloud_widths(R.FILTERED_BAG)
+    fingerprints = cloud_fingerprints(R.FILTERED_BAG)
     c3_poses, _ = R.pose_lookup(V.load_poses(R.RERUN_BAG), prefix + keys, _ts_of)
     r_ts, _rx, _rq = V.load_poses(R.RERUN_BAG)
 
@@ -184,7 +199,8 @@ def main():
     for i in keys:
         ts = inj_kfs[i]["ts"]
         has_pose = i in c3_poses
-        scan_len = widths.get(int(kf_ns[i]))
+        _fp = fingerprints.get(int(kf_ns[i]))
+        scan_len = None if _fp is None else int(_fp[0])
         j = int(np.searchsorted(r_ts, ts))
         near = [k for k in (j - 1, j) if 0 <= k < len(r_ts)]
         best = min(near, key=lambda k: abs(r_ts[k] - ts)) if near else None
@@ -239,7 +255,7 @@ def main():
     audit = json.load(open(os.path.join(_HERE, "fixed_input_repair_filter_audit.json"),
                            encoding="utf-8"))
     # Tie the stored audit to THIS run before using a single number from it.
-    binding = check_audit_binding(audit, sha["injected_scans"], R.INJ_SCANS, widths)
+    binding = check_audit_binding(audit, sha["injected_scans"], R.INJ_SCANS, fingerprints)
     if binding["status"] != "BOUND":
         print(f"[] WARNING audit binding {binding['status']}: {binding['problems']}")
     pf = audit["per_frame"]

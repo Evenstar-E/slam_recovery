@@ -89,39 +89,65 @@ class TestRecoverabilityText(unittest.TestCase):
 class TestAuditBinding(unittest.TestCase):
     """A stored audit is evidence only for the run whose bag it read."""
 
-    @staticmethod
-    def _audit(sha="a" * 64, path="/tmp/fastlivo/hall01_inj43.bag", kept=(10, 20)):
+    H = "f" * 64
+
+    @classmethod
+    def _audit(cls, sha="a" * 64, path="/tmp/fastlivo/hall01_inj43.bag", kept=(10, 20),
+               rows=None):
+        rows = rows or ([cls.H, cls.H] if len(kept) == 2 else [cls.H] * len(kept))
         return {"input": path, "input_sha256": sha,
-                "per_frame": [{"ns": 100 + i, "n_kept": k} for i, k in enumerate(kept)]}
+                "per_frame": [{"ns": 100 + i, "n_kept": k, "output_sha256": rows[i]}
+                              for i, k in enumerate(kept)]}
+
+    @classmethod
+    def _fp(cls, kept=(10, 20), rows=None):
+        rows = rows or ([cls.H, cls.H] if len(kept) == 2 else [cls.H] * len(kept))
+        return {100 + i: (k, rows[i]) for i, k in enumerate(kept)}
 
     def test_binds_when_everything_matches(self):
         r = M.check_audit_binding(self._audit(), "a" * 64, "/tmp/fastlivo/hall01_inj43.bag",
-                                  {100: 10, 101: 20})
+                                  self._fp())
         self.assertEqual(r["status"], "BOUND")
         self.assertEqual(r["problems"], [])
 
     def test_stale_on_source_hash(self):
         r = M.check_audit_binding(self._audit(sha="b" * 64), "a" * 64,
-                                  "/tmp/fastlivo/hall01_inj43.bag", {100: 10, 101: 20})
+                                  "/tmp/fastlivo/hall01_inj43.bag", self._fp())
         self.assertEqual(r["status"], "STALE_AUDIT")
         self.assertTrue(any("sha256" in p for p in r["problems"]))
 
     def test_stale_on_path(self):
         r = M.check_audit_binding(self._audit(path="/other.bag"), "a" * 64,
-                                  "/tmp/fastlivo/hall01_inj43.bag", {100: 10, 101: 20})
+                                  "/tmp/fastlivo/hall01_inj43.bag", self._fp())
         self.assertEqual(r["status"], "STALE_AUDIT")
         self.assertTrue(any("path" in p for p in r["problems"]))
 
-    def test_stale_on_frame_mismatch(self):
+    def test_stale_on_count_mismatch(self):
         r = M.check_audit_binding(self._audit(), "a" * 64, "/tmp/fastlivo/hall01_inj43.bag",
-                                  {100: 10, 101: 99})
+                                  self._fp(kept=(10, 99)))
         self.assertEqual(r["status"], "STALE_AUDIT")
-        self.assertTrue(any("disagree" in p for p in r["problems"]))
+        self.assertTrue(any("different count" in p for p in r["problems"]))
 
     def test_stale_when_a_frame_is_absent_from_the_bag(self):
         r = M.check_audit_binding(self._audit(), "a" * 64, "/tmp/fastlivo/hall01_inj43.bag",
-                                  {100: 10})
+                                  {100: (10, self.H)})
         self.assertEqual(r["status"], "STALE_AUDIT")
+
+    def test_stale_on_same_count_different_payload(self):
+        """The case the count-only check missed: identical n_kept, different rows."""
+        fp = self._fp(rows=["0" * 64, self.H])
+        r = M.check_audit_binding(self._audit(), "a" * 64,
+                                  "/tmp/fastlivo/hall01_inj43.bag", fp)
+        self.assertEqual(r["status"], "STALE_AUDIT")
+        self.assertTrue(any("different rows" in p for p in r["problems"]))
+
+    def test_empty_audit_is_not_bound(self):
+        """An audit with no frames agrees with nothing and must not pass."""
+        r = M.check_audit_binding({"input": "/tmp/fastlivo/hall01_inj43.bag",
+                                   "input_sha256": "a" * 64, "per_frame": []},
+                                  "a" * 64, "/tmp/fastlivo/hall01_inj43.bag", {})
+        self.assertNotEqual(r["status"], "BOUND")
+        self.assertEqual(r["status"], "UNVERIFIABLE")
 
 
 if __name__ == "__main__":
