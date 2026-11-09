@@ -1,39 +1,617 @@
 {
  "protocol": {
   "source": "docs/MILESTONE_fixed_input_repair.md @ 107c05a",
-  "text": "sequence room_02 at 4.30 m injection; same filter, host config, runner and reconstruction; the injection window must be measured per frame against clean room_02 -- an oracle, not an assumption; frame set = frames with both a filtered scan and a re-run pose, frozen before metrics; criterion: novel added supported > unsupported AND added unsupported fraction <= R; report total and novel added/lost, completeness with declared frames as denominator, healthy-region removal; a missing input is reported as BLOCKED with the minimal unblock, not filled with older data."
+  "text": "sequence room_02 at 4.30 m injection; same filter, same host config, same runner, same reconstruction; injection window measured per frame by raw buffer equality against clean room_02; frame set = frames with both a filtered scan and a re-run pose, frozen and exported before metrics; criterion: novel added supported > unsupported AND added unsupported fraction <= R; report total and novel added/lost, service completeness with declared frames as denominator, healthy-region removal; failure is reported as failure; no ROI, frame-set or threshold retry."
  },
- "status": "BLOCKED",
- "blocked_on": "clean room_02 recording corresponding to /tmp/fastlivo/room02_inj43.bag",
- "why": [
-  "the injected clip shares NO header stamp with /home/R26534/M2DGR/extracted/room_02_fl.bag",
-  "matching by nearest stamp (constant ~99.5 ms offset) pairs frames whose per-point mean difference is 0.67-0.94 m even after a per-frame rigid alignment, so they are different observations, not a re-encoding",
-  "per-point range differences are ~0.6 m in the earliest frames, i.e. before any injection could have been applied",
-  "point counts coincide (~50k) only because the 32-beam pattern repeats; that is not identity"
- ],
- "consequence": "neither the oracle injection window nor a clean proxy for this clip can be produced as the protocol requires; without them the healthy prefix, the healthy-region removal and every coverage/unsupported number would be assumed rather than measured",
- "already_completed_and_valid": {
-  "filtered_bag": "/tmp/fastlivo/room02_inj43_filtered.bag",
-  "filtered_bag_sha256": "6bb966188894ae876ce2e8f8475a932d873a2d6ff42519b25f56eb425f68b090",
-  "filter_report": "room02_filter_report.json",
-  "rerun_poses": "/tmp/fastlivo/res_room02_filtered.bag",
-  "rerun_receipt": "room02_filtered_receipt.json",
-  "clean_noimg_probe": "room02_clean_reference_receipt.json",
-  "note": "the expensive half of the chain (filter -> filtered bag -> host rerun) is done and receipted; only the reference is missing"
- },
- "minimal_unblock": [
-  "the clean room_02 recording from which room02_inj43.bag was built (same session, with images), or",
-  "the injector's source bag plus its parameters, so the window can be recomputed"
- ],
- "provenance": "REAL_HOST for the new runs; R would use the archived host run",
- "reference": "proxy would be the clean run map, not GT; single sequence",
+ "provenance": "REAL_HOST for the new runs; R uses the archived host run",
+ "reference": "clean run map (proxy), not GT; single sequence",
  "inputs_sha256": {
   "injected_scans": "66b3515c58d172f73d8f0d705c7314720b587612e4a8cca6740b87993449b0a9",
-  "candidate_clean_scans": "fc9e1988973effc5068c245e6a862dd0b0e7fa6b8c8756d361d46d5344859c24",
-  "host_poses_raw_arm": "6309b036263f25d813420dca5e356889da58d8a31fc9009a00e6db542b4e1c7d",
+  "injected_poses": "6309b036263f25d813420dca5e356889da58d8a31fc9009a00e6db542b4e1c7d",
+  "clean_scans": "809b98f1d61702d1dad3a3f2c0b0c52f7473295c768eadef0cfbd46b6b9d4b6d",
+  "clean_poses": "e09901a85d816f138ca8ad5e2d301e28dbcc2bc056bd706a71f7a0026b51b77c",
   "filtered_scans": "6bb966188894ae876ce2e8f8475a932d873a2d6ff42519b25f56eb425f68b090",
-  "rerun_poses": "e325d4345abd9e7f5c52e1f802c8645f9870f65dec673385aba1084495e035b0",
+  "rerun_poses": "e325d4345abd9e7f5c52e1f802c8645f9870f65dec673385aba1084495e035b0"
+ },
+ "input_identity_chain": {
+  "injected_scans": "/tmp/fastlivo/room02_inj43.bag",
+  "clean_reference_scans": "/tmp/fastlivo/room02_clean_60s.bag",
+  "clean_reference_poses": "/tmp/fastlivo/res_room02_clean_60s.bag",
+  "host_poses_raw_arm": "/tmp/fastlivo/res_r2_inj43_vis.bag",
+  "filtered_scans": "/tmp/fastlivo/room02_inj43_filtered.bag",
+  "rerun_poses": "/tmp/fastlivo/res_room02_filtered.bag",
+  "runner": "/tmp/wt-sim/docs/review_20261109_bbc3dcb/fl_run_isolated.sh",
   "runner_sha256": "cdf5849ab355803d5fa97430ed089fb3bb67c2482c1c0f7440e526c98d064409",
-  "host_binary_sha256": "ca1959c45121a4b60fcae597a293e918c41df1df53efd08a79b1ccc8e6076a6a"
+  "host_binary_sha256": "ca1959c45121a4b60fcae597a293e918c41df1df53efd08a79b1ccc8e6076a6a",
+  "configs": {
+   "m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+   "camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml"
+  },
+  "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping"
+ },
+ "evaluation_rules": {
+  "nn_cap_m": 0.5,
+  "patch_radius_m": 0.3,
+  "patch_plane_rms_m": 0.02,
+  "frame_set": "quarantine keyframes with both a filtered scan and a re-run pose",
+  "completeness_denominator": "declared quarantine keys; a frame without output is MISSING and stays in the denominator",
+  "healthy_region": "frames outside [onset_ns, end_ns]"
+ },
+ "injection_window": {
+  "onset_ns": 1627643759554082870,
+  "end_ns": 1627643779393426895,
+  "method": "per-frame raw buffer equality (oracle)",
+  "differing_frames": 199,
+  "common_frames": 599
+ },
+ "frame_set": {
+  "primary_scan_set": {
+   "definition": "every scan of the prepared room_02 window",
+   "count": 599,
+   "ns_sha256": "5df6d8baf504e3b28d0edec794fb5da4fa1797c215838935d4da028140bcd291"
+  },
+  "healthy_prefix": {
+   "definition": "paired keyframes with ns < onset_ns",
+   "count": 171,
+   "ns_sha256": "879a6bd915e4b04828eb586244b099171b90155bd00c7422a21e8d8dff354f6a"
+  },
+  "quarantine_keys": {
+   "definition": "paired keyframes with ns >= onset_ns",
+   "count": 398,
+   "ns_sha256": "4e041c591f457916b9f6fdc268fd21aad204cbb5d4b2351cb05822b92ddcc4c6"
+  },
+  "frame_set": {
+   "definition": "quarantine keyframes with both a filtered scan and a re-run pose",
+   "n_frames": 326,
+   "ns_sha256": "95d0c1d665cc871db70e9c7b58dbe6843084802f97f30df0fa4390d8003ee33a"
+  },
+  "missing": {
+   "count": 72,
+   "by_cause": {
+    "NO_RERUN_POSE_UNDER_THE_75MS_RULE": 72
+   },
+   "detail": [
+    {
+     "id": 181,
+     "ns": 1627643760556013107,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 31.22
+    },
+    {
+     "id": 183,
+     "ns": 1627643760756531239,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 32.11
+    },
+    {
+     "id": 185,
+     "ns": 1627643760957835674,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 32.79
+    },
+    {
+     "id": 187,
+     "ns": 1627643761157441139,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 32.81
+    },
+    {
+     "id": 189,
+     "ns": 1627643761357557297,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 32.29
+    },
+    {
+     "id": 191,
+     "ns": 1627643761559303761,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 30.11
+    },
+    {
+     "id": 193,
+     "ns": 1627643761758546352,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 32.07
+    },
+    {
+     "id": 195,
+     "ns": 1627643761958862066,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 33.78
+    },
+    {
+     "id": 197,
+     "ns": 1627643762159127712,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 35.62
+    },
+    {
+     "id": 199,
+     "ns": 1627643762360064030,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 30.55
+    },
+    {
+     "id": 201,
+     "ns": 1627643762559906006,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 28.19
+    },
+    {
+     "id": 203,
+     "ns": 1627643762761787176,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 28.5
+    },
+    {
+     "id": 205,
+     "ns": 1627643762960693121,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 26.83
+    },
+    {
+     "id": 207,
+     "ns": 1627643763161695004,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 26.98
+    },
+    {
+     "id": 209,
+     "ns": 1627643763361910343,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 26.34
+    },
+    {
+     "id": 211,
+     "ns": 1627643763562863827,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 26.41
+    },
+    {
+     "id": 213,
+     "ns": 1627643763762252808,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 24.91
+    },
+    {
+     "id": 215,
+     "ns": 1627643763962685108,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 25.48
+    },
+    {
+     "id": 217,
+     "ns": 1627643764163029194,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 26.55
+    },
+    {
+     "id": 219,
+     "ns": 1627643764363918543,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 28.2
+    },
+    {
+     "id": 221,
+     "ns": 1627643764563946724,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 29.03
+    },
+    {
+     "id": 223,
+     "ns": 1627643764764201641,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 30.13
+    },
+    {
+     "id": 227,
+     "ns": 1627643765165022373,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 29.45
+    },
+    {
+     "id": 229,
+     "ns": 1627643765365378857,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 28.61
+    },
+    {
+     "id": 231,
+     "ns": 1627643765565773964,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 27.72
+    },
+    {
+     "id": 233,
+     "ns": 1627643765766260624,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 26.84
+    },
+    {
+     "id": 235,
+     "ns": 1627643765967385530,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 27.36
+    },
+    {
+     "id": 237,
+     "ns": 1627643766167203903,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 26.95
+    },
+    {
+     "id": 239,
+     "ns": 1627643766367387772,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 26.89
+    },
+    {
+     "id": 241,
+     "ns": 1627643766568672657,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 27.91
+    },
+    {
+     "id": 243,
+     "ns": 1627643766768184185,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 27.13
+    },
+    {
+     "id": 245,
+     "ns": 1627643766968586922,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 38.98
+    },
+    {
+     "id": 247,
+     "ns": 1627643767168901205,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 28.18
+    },
+    {
+     "id": 249,
+     "ns": 1627643767369615078,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 29.18
+    },
+    {
+     "id": 251,
+     "ns": 1627643767570113659,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 29.99
+    },
+    {
+     "id": 253,
+     "ns": 1627643767770246983,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 30.45
+    },
+    {
+     "id": 255,
+     "ns": 1627643767970469475,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 30.97
+    },
+    {
+     "id": 259,
+     "ns": 1627643768373339176,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 34.51
+    },
+    {
+     "id": 261,
+     "ns": 1627643768572004795,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 33.54
+    },
+    {
+     "id": 263,
+     "ns": 1627643768772016048,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 32.8
+    },
+    {
+     "id": 265,
+     "ns": 1627643768972489834,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 32.07
+    },
+    {
+     "id": 267,
+     "ns": 1627643769172814846,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 31.48
+    },
+    {
+     "id": 269,
+     "ns": 1627643769373200417,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 30.81
+    },
+    {
+     "id": 271,
+     "ns": 1627643769573590755,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 30.11
+    },
+    {
+     "id": 273,
+     "ns": 1627643769773990393,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 29.39
+    },
+    {
+     "id": 275,
+     "ns": 1627643769974514008,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 28.83
+    },
+    {
+     "id": 277,
+     "ns": 1627643770174757242,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 28.55
+    },
+    {
+     "id": 279,
+     "ns": 1627643770375159502,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 28.1
+    },
+    {
+     "id": 281,
+     "ns": 1627643770576237679,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 26.98
+    },
+    {
+     "id": 283,
+     "ns": 1627643770776281118,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 26.89
+    },
+    {
+     "id": 285,
+     "ns": 1627643770976338387,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 26.59
+    },
+    {
+     "id": 289,
+     "ns": 1627643771377502441,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 24.88
+    },
+    {
+     "id": 291,
+     "ns": 1627643771577733994,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 24.34
+    },
+    {
+     "id": 293,
+     "ns": 1627643771778942585,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 22.05
+    },
+    {
+     "id": 295,
+     "ns": 1627643771979524851,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 24.1
+    },
+    {
+     "id": 297,
+     "ns": 1627643772178999662,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 27.35
+    },
+    {
+     "id": 299,
+     "ns": 1627643772379216194,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 29.95
+    },
+    {
+     "id": 303,
+     "ns": 1627643772779841661,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 32.44
+    },
+    {
+     "id": 305,
+     "ns": 1627643772980230808,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 31.09
+    },
+    {
+     "id": 307,
+     "ns": 1627643773180668116,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 32.04
+    },
+    {
+     "id": 309,
+     "ns": 1627643773381687403,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 33.61
+    },
+    {
+     "id": 329,
+     "ns": 1627643775384930134,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 23.94
+    },
+    {
+     "id": 331,
+     "ns": 1627643775586521864,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 21.76
+    },
+    {
+     "id": 333,
+     "ns": 1627643775785707474,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 21.94
+    },
+    {
+     "id": 335,
+     "ns": 1627643775986162186,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 21.37
+    },
+    {
+     "id": 337,
+     "ns": 1627643776186492920,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 21.8
+    },
+    {
+     "id": 339,
+     "ns": 1627643776386887789,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 22.18
+    },
+    {
+     "id": 349,
+     "ns": 1627643777388843060,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 21.55
+    },
+    {
+     "id": 351,
+     "ns": 1627643777589248180,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 20.59
+    },
+    {
+     "id": 360,
+     "ns": 1627643778497725010,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 20.48
+    },
+    {
+     "id": 361,
+     "ns": 1627643778591176987,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 20.02
+    },
+    {
+     "id": 367,
+     "ns": 1627643779192559719,
+     "cause": "NO_RERUN_POSE_UNDER_THE_75MS_RULE",
+     "nearest_rerun_pose_dt_ms": 20.98
+    }
+   ]
+  },
+  "onset_ns": 1627643759554082870,
+  "end_ns": 1627643779393426895,
+  "injection_window_measured_by": "raw buffer equality against the clean recording",
+  "rerun_pairing": {
+   "nearest": 326,
+   "interpolated": 171,
+   "missing": 72,
+   "dt_ms_p50": 2.9401779174804688,
+   "dt_ms_p95": 18.25704574584961,
+   "dt_ms_max": 19.907474517822266,
+   "interpolated_fraction": 0.30052724077328646,
+   "rule": "nearest <=20 ms, else interpolate across a gap <=75 ms, else MISSING"
+  },
+  "host_pairing": {
+   "nearest": 326,
+   "interpolated": 243,
+   "missing": 0,
+   "dt_ms_p50": 1.5804767608642578,
+   "dt_ms_p95": 18.074083328247074,
+   "dt_ms_max": 19.907474517822266,
+   "interpolated_fraction": 0.4270650263620387,
+   "rule": "nearest <=20 ms, else interpolate across a gap <=75 ms, else MISSING"
+  }
+ },
+ "roi": {
+  "definition": "the whole clean reference cloud",
+  "n_points": 8625000,
+  "reference_sha256": "c77d92bc8aa890f23f421db734a07afa885869b6f7d39eb64a0f87b87e6d43ec"
+ },
+ "arms": {
+  "R": {
+   "label": "RAW_NATIVE",
+   "map_points": 81500,
+   "proxy_covered": 6617272,
+   "proxy_coverage_fraction": 0.7672199420289855,
+   "patch_unsupported_points": 37370,
+   "patch_unsupported_fraction": 0.4585276073619632
+  },
+  "C3": {
+   "label": "OFFLINE_NATIVE_REESTIMATION",
+   "map_points": 81500,
+   "proxy_covered": 5995707,
+   "proxy_coverage_fraction": 0.6951544347826087,
+   "patch_unsupported_points": 53705,
+   "patch_unsupported_fraction": 0.6589570552147239
+  }
+ },
+ "added_by_C3": {
+  "total": {
+   "n": 64315,
+   "supported": 10724,
+   "unsupported": 53591,
+   "supported_fraction": 0.16674181761641918,
+   "novel_outside_base": 53027
+  },
+  "novel_outside_base": {
+   "n": 53027,
+   "supported": 60,
+   "unsupported": 52967,
+   "supported_fraction": 0.0011314990476549683,
+   "novel_outside_base": 53027
+  }
+ },
+ "lost_from_R": {
+  "total": {
+   "n": 49160,
+   "supported": 15028,
+   "unsupported": 34132,
+   "supported_fraction": 0.30569568755085436,
+   "novel_outside_base": 32534
+  },
+  "novel_outside_base": {
+   "n": 32534,
+   "supported": 689,
+   "unsupported": 31845,
+   "supported_fraction": 0.021177844716296797,
+   "novel_outside_base": 32534
+  }
+ },
+ "lost_good": {
+  "definition": "R points C3 does not have that are supported",
+  "points": 15028,
+  "fraction_of_lost": 0.30569568755085436,
+  "novel_outside_base": 689
+ },
+ "service_completeness": {
+  "declared_frames": 398,
+  "frames_with_output": 326,
+  "missing_frames": 72,
+  "missing_by_cause": {
+   "NO_RERUN_POSE_UNDER_THE_75MS_RULE": 72
+  },
+  "completeness": 0.8190954773869347
+ },
+ "healthy_region_removal": {
+  "frames_outside": 400,
+  "points_outside": 20576778,
+  "removed_outside": 919702,
+  "fraction_outside": 0.04469611325932563,
+  "frames_with_any_removal": 52
+ },
+ "criterion": {
+  "declared": "novel_added_supported > novel_added_unsupported AND added_unsupported_fraction <= R_unsupported_fraction",
+  "novel_added_supported_gt_unsupported": false,
+  "added_unsupported_fraction": 0.8332581823835808,
+  "R_unsupported_fraction": 0.4585276073619632,
+  "added_unsup_not_above_R": false,
+  "verdict": "SAME_FRAME_COMPARISON_DOES_NOT_SUPPORT_NET_BENEFIT"
  }
 }

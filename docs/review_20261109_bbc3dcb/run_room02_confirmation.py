@@ -38,8 +38,10 @@ import run_fixed_input_repair_c0c3 as R          # noqa: E402
 
 INJ_SCANS = "/tmp/fastlivo/room02_inj43.bag"
 INJ_POSES = "/tmp/fastlivo/res_r2_inj43_vis.bag"
-CLN_SCANS = "/home/R26534/M2DGR/extracted/room_02_fl.bag"
-CLN_POSES = "/tmp/fastlivo/res_room02_clean_full.bag"
+CLN_SCANS = os.environ.get("ROOM02_CLEAN_BAG",
+                          "/tmp/fastlivo/room02_clean_60s.bag")
+CLN_POSES = os.environ.get("ROOM02_CLEAN_POSES",
+                          "/tmp/fastlivo/res_room02_clean_60s.bag")
 FILTERED = "/tmp/fastlivo/room02_inj43_filtered.bag"
 RERUN = "/tmp/fastlivo/res_room02_filtered.bag"
 RESULTS = os.path.join(_HERE, "room02_confirmation_results.json")
@@ -83,6 +85,9 @@ def main():
     diff = [ns for ns in common if inj_raw[ns] != cln_raw[ns]]
     if not diff:
         raise SystemExit("no differing frame: this is not an injected recording")
+    if len(common) < len(inj_raw):
+        raise SystemExit(f"clean bag covers only {len(common)} of {len(inj_raw)} injected frames; "
+                         f"refusing to score a partial reference")
     onset_ns, end_ns = int(diff[0]), int(diff[-1])
     print(f"[] oracle window: {len(diff)}/{len(common)} frames differ, "
           f"{onset_ns} .. {end_ns}")

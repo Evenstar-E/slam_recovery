@@ -1,0 +1,46 @@
+{
+  "source_bag": "/home/R26534/M2DGR/raw/room_02.bag",
+  "source_bag_bytes": 15162620712,
+  "source_bag_mtime_ns": 1793693616394677709,
+  "source_bag_sha256": "ee621ccb1a37cc19edb1424c39de9b9a2223f9dbc9b0b3dcb4e4b849e9f72ac1",
+  "output_bag": "/tmp/fastlivo/room02_clean_60s.bag",
+  "output_bag_bytes": 1558597612,
+  "output_bag_sha256": "809b98f1d61702d1dad3a3f2c0b0c52f7473295c768eadef0cfbd46b6b9d4b6d",
+  "argv": [
+    "/home/R26534/MM-LINS/slam_recovery/experiments/prepare_m2dgr_for_fastlivo.py",
+    "--bag",
+    "/home/R26534/M2DGR/raw/room_02.bag",
+    "--out",
+    "/tmp/fastlivo/room02_clean_60s.bag",
+    "--start-rel",
+    "0",
+    "--duration",
+    "60"
+  ],
+  "git_commit": "2e6bc3cebfba3943bf223b138f673a0e5a5443ce",
+  "window_start_sec": 1627643739.4872,
+  "window_end_sec": 1627643799.4872,
+  "clouds": 599,
+  "lidar_injected": 0,
+  "imu": 8313,
+  "images": 884,
+  "visually_degraded": 0,
+  "lidar_injection": {
+    "window_rel": [
+      null,
+      null
+    ],
+    "occluded_azimuth_fraction": 0.88,
+    "bag_distance_m": 4.3
+  },
+  "visual_degradation": {
+    "window_rel": [
+      null,
+      null
+    ],
+    "gain": null,
+    "blur_kernel": null,
+    "seed_base": 42,
+    "per_frame_seed": true
+  }
+}
