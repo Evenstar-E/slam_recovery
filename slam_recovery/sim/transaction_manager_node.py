@@ -53,7 +53,16 @@ class OnlineRecoveryTransactionNode:
         min_paired_observations: int = 4,
         large_candidate_keyframe_threshold: int = 8,
         min_paired_observations_large_candidate: int = 8,
+        sigma_meas_m: float = 0.12,
     ) -> None:
+        # Point-to-plane noise scale used by every holdout/paired NIS in this node.
+        #
+        # NIS scales as 1/sigma^2, so this constant decides verdicts and must be calibrated, not
+        # guessed: on room_dark_02 the clean run scores 0.77-0.99 at sigma=0.25 but 3.35-4.30 at
+        # 0.12, i.e. at the old default the gate rejects *healthy* data. The default is kept for
+        # backward compatibility with the simulator; any real host must pass the value obtained by
+        # setting the clean run's NIS to 1 (sigma* = RMS of its point-to-plane residuals).
+        self.sigma_meas_m = float(sigma_meas_m)
         self.voxel_size_m = float(voxel_size_m)
         self.holdout_stride = int(holdout_stride)
         # Smallest sample size at which a unanimous frame-wise improvement still clears the
@@ -73,6 +82,9 @@ class OnlineRecoveryTransactionNode:
         # Diagnostics of the most recent paired-benefit measurement, recorded verbatim into the
         # run manifests so every Mode 2 decision can be traced back to its measured evidence.
         self.last_paired_evidence: Dict[str, object] = {}
+        # Same measurement over every supportable frame (not only the committable prefix), for
+        # diagnosis only. ``used_for_admission`` is always False; the gate never reads this.
+        self.last_paired_evidence_committable: Dict[str, object] = {}
         self.tx_mgr = TrustedMapTransactionManager(
             confirmation_margin_ns=int(confirmation_margin_sec * 1e9),
             gate_thresholds=gate_thresholds,
@@ -388,7 +400,7 @@ class OnlineRecoveryTransactionNode:
                 sink.append(
                     float(
                         compute_disjoint_holdout_point_to_plane_nis(
-                            ref_pts, pts_w, delta_pose_se3=np.eye(4), sigma_meas_m=0.12
+                            ref_pts, pts_w, delta_pose_se3=np.eye(4), sigma_meas_m=self.sigma_meas_m
                         )
                     )
                 )
@@ -531,7 +543,7 @@ class OnlineRecoveryTransactionNode:
             pts_b = self.scan_buffer_body[k]
             pts_w = (pts_b @ T_k[:3, :3].T) + T_k[:3, 3]
             nis_k = compute_disjoint_holdout_point_to_plane_nis(
-                train_world, pts_w, delta_pose_se3=np.eye(4), sigma_meas_m=0.12
+                train_world, pts_w, delta_pose_se3=np.eye(4), sigma_meas_m=self.sigma_meas_m
             )
             holdout_nis_list.append(nis_k)
             fim_k, _, _, _, _ = compute_6dof_point_to_plane_fim(
@@ -563,6 +575,26 @@ class OnlineRecoveryTransactionNode:
             ),
             support_reference=support_ref,
         )
+        admission_evidence = dict(self.last_paired_evidence)
+
+        # Diagnostic only: when the prefix stops early, the frames it blocked were still
+        # supportable. Measure them too, but keep the result away from the admission decision --
+        # the gate must see the prefix, not the larger set, or the commit invariant reopens.
+        self.last_paired_evidence_committable = {}
+        if len(committable) > len(commit_keys):
+            committable_poses = {k: repaired_poses[k] for k in kf_sorted if k in committable}
+            self._measure_paired_evidence(
+                committable_poses,
+                incumbent_poses=incumbent_poses,
+                reentry_anchor_pose=reentry_anchor_pose,
+                reference_world=train_world,
+                reference_keys=reference_keys,
+                empty_reason="no_committable_frames",
+                support_reference=support_ref,
+            )
+            self.last_paired_evidence_committable = dict(self.last_paired_evidence)
+            self.last_paired_evidence_committable["used_for_admission"] = False
+            self.last_paired_evidence = admission_evidence
 
         cand = CandidateMap(
             candidate_id=candidate_id,
