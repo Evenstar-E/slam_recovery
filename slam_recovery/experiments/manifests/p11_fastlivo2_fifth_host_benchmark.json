@@ -52,42 +52,88 @@
     "alignment": "rigid SE(3) fitted on the leading 20% of matched poses, never on the evaluation window",
     "prefix_poses": 170
   },
-  "results": {
-    "clean_vision_on": {
-      "provenance": "REAL_HOST",
-      "matched_poses": 852,
-      "gt_outlier_samples_rejected": 1,
-      "ate_rmse_m": 0.0771,
-      "ate_max_m": 0.1566,
-      "rpe_trans_rmse_m": 0.0459,
-      "window_20_40s_rmse_m": 0.1077
-    },
-    "clean_lidar_inertial_only": {
-      "provenance": "REAL_HOST",
-      "matched_poses": 569,
-      "gt_outlier_samples_rejected": 1,
-      "ate_rmse_m": 0.0761,
-      "ate_max_m": 0.1531,
-      "rpe_trans_rmse_m": 0.0588,
-      "window_20_40s_rmse_m": 0.1063,
-      "note": "img_en=0 control; isolates what the visual term contributes"
-    },
-    "lidar_only_88pct_near_field_occlusion_20_40s": {
-      "provenance": "REAL_HOST",
-      "matched_poses": 848,
-      "gt_outlier_samples_rejected": 1,
-      "ate_rmse_m": 0.0886,
-      "ate_max_m": 0.2318,
-      "rpe_trans_rmse_m": 0.07,
-      "window_20_40s_rmse_m": 0.1287,
-      "injection": "inject_plastic_bag_near_field_occlusion, occluded_azimuth_fraction=0.88, bag_distance=0.35 m, seed=42",
-      "injection_scope": "LiDAR stream only; the RGB stream is unchanged"
-    }
-  },
   "findings": [
-    "On this sequence FAST-LIVO2 is essentially immune to a LiDAR-only 88% near-field occlusion: ATE 0.0771 -> 0.0886 m (+15%), window RMSE 0.1077 -> 0.1287 m.",
-    "The visual term contributes nothing on the clean run (0.0771 m with vision vs 0.0761 m LiDAR-inertial only), so the invariance comes from the LiDAR-inertial solution surviving, not from vision rescuing it.",
-    "This does not reproduce the cross-modal contamination mechanism hypothesised for FAST-LIVO2 (contaminated VoxelMap depth corrupting the photometric term). A sequence where the LiDAR degenerates for longer, or where the camera is also degraded, is still needed before claiming either way.",
-    "M2DGR Mocap GT contains isolated corrupted samples: one at room_02 t=26.35 s moves 7.11 m and returns 20 ms later, which alone inflated ATE from 0.077 to 0.254 m and ATE_max to 7.05 m. The evaluator now rejects such samples and reports the count."
-  ]
+    "FAST-LIVO2 is close to immune to a LiDAR-only 88% near-field occlusion on both sequences: room_02 ATE 0.0771 -> 0.0886 m (+15%), hall_01 ATE 0.3143 -> 0.3653 m (+16%), hall_01 window RMSE 0.4341 -> 0.5868 m (+35%).",
+    "The visual term contributes nothing on the clean room_02 run (0.0771 m with vision vs 0.0761 m LiDAR-inertial only), so the invariance comes from the LiDAR-inertial solution surviving, not from vision rescuing it.",
+    "This does not reproduce the cross-modal contamination mechanism hypothesised for FAST-LIVO2 (a contaminated VoxelMap depth prior corrupting the photometric term). A tightly-coupled LIVO is already robust to single-modality near-field occlusion on these two sequences, so our framework's value for this host must be argued for the case where the camera is degraded too, or where the degeneracy outlasts the IMU bridge.",
+    "hall_01 needs 0.5x playback: at 1.0x the node consumed only 35.6 s of the 60 s window and the resulting ATE was a truncation artefact.",
+    "M2DGR Mocap GT contains isolated corrupted samples (room_02 t=26.35 s moves 7.11 m for one sample). The evaluator rejects them and reports the count; hall_01 needed none."
+  ],
+  "sequences": {
+    "room_02_0_60s": {
+      "input_bag": "/home/R26534/M2DGR/raw/room_02.bag",
+      "window": "first 60 s of the raw bag",
+      "playback_rate": 1.0,
+      "injection": "88% azimuth, 0.35 m near-field sheet over window [20, 40) s, LiDAR stream only",
+      "results": {
+        "clean_vision_on": {
+          "provenance": "REAL_HOST",
+          "matched_poses": 852,
+          "gt_outlier_samples_rejected": 1,
+          "ate_rmse_m": 0.0771,
+          "ate_max_m": 0.1566,
+          "rpe_trans_rmse_m": 0.0459,
+          "window_rmse_m": 0.1077
+        },
+        "clean_lidar_inertial_only": {
+          "provenance": "REAL_HOST",
+          "matched_poses": 569,
+          "gt_outlier_samples_rejected": 1,
+          "ate_rmse_m": 0.0761,
+          "ate_max_m": 0.1531,
+          "rpe_trans_rmse_m": 0.0588,
+          "window_rmse_m": 0.1063,
+          "note": "img_en=0 control"
+        },
+        "lidar_only_88pct_near_field_occlusion": {
+          "provenance": "REAL_HOST",
+          "matched_poses": 848,
+          "gt_outlier_samples_rejected": 1,
+          "ate_rmse_m": 0.0886,
+          "ate_max_m": 0.2318,
+          "rpe_trans_rmse_m": 0.07,
+          "window_rmse_m": 0.1287
+        }
+      },
+      "degradation": {
+        "ate_ratio_degraded_over_clean": 1.1492
+      }
+    },
+    "hall_01_100_160s": {
+      "input_bag": "/home/R26534/M2DGR/raw/hall_01.bag",
+      "window": "sequence time [100, 160] s; the plastic-bag occlusion of the paper sits in [120, 140] s",
+      "conversion": {
+        "clouds": 598,
+        "images": 888,
+        "imu_messages": 8599
+      },
+      "playback_rate": 0.5,
+      "playback_rate_reason": "FAST-LIVO2 processes hall_01 slower than real time. At 1.0x the node had consumed only 35.6 s of the 60 s window when playback ended, so the recorded trajectory was truncated and its ATE (0.288 m, rising 0.09 -> 0.56 with time) was an artefact of the cut, not drift. At 0.5x the run covers 57.7 s of 60 s and is the number reported here.",
+      "injection": "88% azimuth, 0.35 m, seed 42, LiDAR stream only over sequence time [120, 140] s",
+      "results": {
+        "clean": {
+          "provenance": "REAL_HOST",
+          "matched_poses": 549,
+          "gt_outlier_samples_rejected": 0,
+          "ate_rmse_m": 0.3143,
+          "ate_max_m": 0.5467,
+          "rpe_trans_rmse_m": 0.1059,
+          "window_rmse_m": 0.4341
+        },
+        "lidar_only_88pct_near_field_occlusion_120_140s": {
+          "provenance": "REAL_HOST",
+          "matched_poses": 553,
+          "gt_outlier_samples_rejected": 0,
+          "ate_rmse_m": 0.3653,
+          "ate_max_m": 0.7445,
+          "rpe_trans_rmse_m": 0.2354,
+          "window_rmse_m": 0.5868
+        }
+      },
+      "degradation": {
+        "ate_ratio_degraded_over_clean": 1.1623,
+        "window_ratio_degraded_over_clean": 1.3518
+      }
+    }
+  }
 }
