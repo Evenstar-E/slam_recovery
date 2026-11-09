@@ -1,0 +1,39 @@
+{
+ "protocol": {
+  "source": "docs/MILESTONE_fixed_input_repair.md @ 107c05a",
+  "text": "sequence room_02 at 4.30 m injection; same filter, host config, runner and reconstruction; the injection window must be measured per frame against clean room_02 -- an oracle, not an assumption; frame set = frames with both a filtered scan and a re-run pose, frozen before metrics; criterion: novel added supported > unsupported AND added unsupported fraction <= R; report total and novel added/lost, completeness with declared frames as denominator, healthy-region removal; a missing input is reported as BLOCKED with the minimal unblock, not filled with older data."
+ },
+ "status": "BLOCKED",
+ "blocked_on": "clean room_02 recording corresponding to /tmp/fastlivo/room02_inj43.bag",
+ "why": [
+  "the injected clip shares NO header stamp with /home/R26534/M2DGR/extracted/room_02_fl.bag",
+  "matching by nearest stamp (constant ~99.5 ms offset) pairs frames whose per-point mean difference is 0.67-0.94 m even after a per-frame rigid alignment, so they are different observations, not a re-encoding",
+  "per-point range differences are ~0.6 m in the earliest frames, i.e. before any injection could have been applied",
+  "point counts coincide (~50k) only because the 32-beam pattern repeats; that is not identity"
+ ],
+ "consequence": "neither the oracle injection window nor a clean proxy for this clip can be produced as the protocol requires; without them the healthy prefix, the healthy-region removal and every coverage/unsupported number would be assumed rather than measured",
+ "already_completed_and_valid": {
+  "filtered_bag": "/tmp/fastlivo/room02_inj43_filtered.bag",
+  "filtered_bag_sha256": "6bb966188894ae876ce2e8f8475a932d873a2d6ff42519b25f56eb425f68b090",
+  "filter_report": "room02_filter_report.json",
+  "rerun_poses": "/tmp/fastlivo/res_room02_filtered.bag",
+  "rerun_receipt": "room02_filtered_receipt.json",
+  "clean_noimg_probe": "room02_clean_reference_receipt.json",
+  "note": "the expensive half of the chain (filter -> filtered bag -> host rerun) is done and receipted; only the reference is missing"
+ },
+ "minimal_unblock": [
+  "the clean room_02 recording from which room02_inj43.bag was built (same session, with images), or",
+  "the injector's source bag plus its parameters, so the window can be recomputed"
+ ],
+ "provenance": "REAL_HOST for the new runs; R would use the archived host run",
+ "reference": "proxy would be the clean run map, not GT; single sequence",
+ "inputs_sha256": {
+  "injected_scans": "66b3515c58d172f73d8f0d705c7314720b587612e4a8cca6740b87993449b0a9",
+  "candidate_clean_scans": "fc9e1988973effc5068c245e6a862dd0b0e7fa6b8c8756d361d46d5344859c24",
+  "host_poses_raw_arm": "6309b036263f25d813420dca5e356889da58d8a31fc9009a00e6db542b4e1c7d",
+  "filtered_scans": "6bb966188894ae876ce2e8f8475a932d873a2d6ff42519b25f56eb425f68b090",
+  "rerun_poses": "e325d4345abd9e7f5c52e1f802c8645f9870f65dec673385aba1084495e035b0",
+  "runner_sha256": "cdf5849ab355803d5fa97430ed089fb3bb67c2482c1c0f7440e526c98d064409",
+  "host_binary_sha256": "ca1959c45121a4b60fcae597a293e918c41df1df53efd08a79b1ccc8e6076a6a"
+ }
+}

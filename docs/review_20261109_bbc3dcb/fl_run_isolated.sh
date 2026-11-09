@@ -41,7 +41,7 @@ printf '%s\n' "$0 $*" > "$RUN_DIR/command.txt"
 
 SELF=$(readlink -f "$0")
 BIN=/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping
-CFG=/home/R26534/FAST-LIVO2/config/m2dgr.yaml
+CFG="${FL_CONFIG:-/home/R26534/FAST-LIVO2/config/m2dgr.yaml}"
 CAM=/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml
 PARAMS="$RUN_DIR/ros_params.yaml"
 STATUS=FAIL
@@ -106,7 +106,7 @@ rec = {
     "termination": term,
     "pre_run": pre,
     "sources_changed_during_run": changed,
-    "config": {"m2dgr": {"path": cfg, "sha256": sha(cfg)},
+    "config": {"primary": {"path": cfg, "sha256": sha(cfg), "override_env": os.environ.get("FL_CONFIG", "")},
                "camera": {"path": cam, "sha256": sha(cam)},
                "ros_params_dump": {"path": params, "sha256": sha(params)}},
     "host": {"binary": binp, "sha256": sha(binp),

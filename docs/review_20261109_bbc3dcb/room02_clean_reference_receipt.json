@@ -1,0 +1,81 @@
+{
+ "status": "OK",
+ "status_reason": "completed",
+ "termination": "PLANNED_KILL_AFTER_DRAIN",
+ "pre_run": {
+  "paths": {
+   "script": "/tmp/wt-sim/docs/review_20261109_bbc3dcb/fl_run_isolated.sh",
+   "input_bag": "/home/R26534/M2DGR/extracted/room_02_fl.bag",
+   "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr_noimg.yaml",
+   "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+   "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping"
+  },
+  "sha256": {
+   "script": "cdf5849ab355803d5fa97430ed089fb3bb67c2482c1c0f7440e526c98d064409",
+   "input_bag": "fc9e1988973effc5068c245e6a862dd0b0e7fa6b8c8756d361d46d5344859c24",
+   "config_m2dgr": "dc2b7bd7ab9d41145ec5ca41dfd402339962029b74d990f3defbe44c7e76d2bb",
+   "config_camera": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+   "host_binary": "ca1959c45121a4b60fcae597a293e918c41df1df53efd08a79b1ccc8e6076a6a"
+  },
+  "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+  "captured": "BEFORE_LAUNCH",
+  "sizes": {
+   "script": 11907,
+   "input_bag": 937255034,
+   "config_m2dgr": 2052,
+   "config_camera": 238,
+   "host_binary": 100720
+  }
+ },
+ "sources_changed_during_run": [],
+ "config": {
+  "primary": {
+   "path": "/home/R26534/FAST-LIVO2/config/m2dgr_noimg.yaml",
+   "sha256": "dc2b7bd7ab9d41145ec5ca41dfd402339962029b74d990f3defbe44c7e76d2bb",
+   "override_env": "/home/R26534/FAST-LIVO2/config/m2dgr_noimg.yaml"
+  },
+  "camera": {
+   "path": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+   "sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7"
+  },
+  "ros_params_dump": {
+   "path": "/tmp/fl_run_20261109T105338Z_2411972/ros_params.yaml",
+   "sha256": "a2ef6a5d0b6d12db7017c824ac87eae93be72fe5acf4f9e681133321b9c90b75"
+  }
+ },
+ "host": {
+  "binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+  "sha256": "ca1959c45121a4b60fcae597a293e918c41df1df53efd08a79b1ccc8e6076a6a",
+  "source_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64"
+ },
+ "run": {
+  "rate": 1.0,
+  "drain_sec": 30.0,
+  "master_uri": "http://127.0.0.1:57351",
+  "run_dir": "/tmp/fl_run_20261109T105338Z_2411972",
+  "taskset_prefix": ""
+ },
+ "managed_pids": {
+  "roscore": null,
+  "record": 2412909,
+  "node": 2413061
+ },
+ "process_exit": {
+  "rosbag_play": 0,
+  "rosbag_record": 0,
+  "fastlivo_node": 137
+ },
+ "output": {
+  "bag": "/tmp/fastlivo/res_room02_clean_full.bag",
+  "exists": true,
+  "bytes": 586235,
+  "sha256": "467331aaae1891085d36c283c80d5412bd1994ab089d3e23ab844c1b756cc627",
+  "odometry_messages": 738,
+  "first_stamp_sec": 1627643740.9183197,
+  "last_stamp_sec": 1627643814.7623715,
+  "duration_sec": 73.84405183792114,
+  "bag_start_sec": 1794221634.17709,
+  "bag_end_sec": 1794221707.9852827,
+  "verdict": "OK"
+ }
+}
