@@ -1,7 +1,9 @@
 # Milestone: fixed-input measurement repair and native map reconstruction
 
-Status: in progress. This document fixes the protocol before results arrive; it exists so the
-controls, labels and provenance do not get chosen after seeing the numbers.
+Status: M1 measured (C0-C3 on the ns boundary, `OFFLINE_NATIVE_REESTIMATION` for C3); M2 (full-record
+filtered exporter and native host runner) and M3 (online checkpoint / deployable repair) remain open.
+This document fixed the protocol before results existed, so the controls and labels were not chosen
+after seeing the numbers.
 
 ## Scope (frozen)
 
