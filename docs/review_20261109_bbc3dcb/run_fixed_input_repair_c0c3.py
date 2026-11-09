@@ -1120,11 +1120,11 @@ def build_filtered_bag(in_path=INJ_SCANS, out_path=FILTERED_BAG):
                 id_msg = T[ID_MSGTYPE](
                     layout=T["std_msgs/msg/MultiArrayLayout"](
                         dim=[T["std_msgs/msg/MultiArrayDimension"](
-                            label=f"scan_ns={scan_ns}", size=int(len(idx)), stride=4)],
+                            label=f"scan_ns={scan_ns}", size=int(len(idx)), stride=int(len(idx)))],
                         data_offset=0),
                     data=idx)
                 w.write(id_conn, t, V.TYPESTORE.serialize_ros1(id_msg, ID_MSGTYPE))
-                mask_sha = hashlib.sha256(np.asarray(idx, dtype="<i4").tobytes()).hexdigest()
+                mask_sha = hashlib.sha256(np.asarray(idx, dtype="<u4").tobytes()).hexdigest()
                 n_kept += int(keep.sum())
                 n_all += len(a)
                 per_frame.append({"t": round(float(m.header.stamp.sec
@@ -1144,9 +1144,14 @@ def build_filtered_bag(in_path=INJ_SCANS, out_path=FILTERED_BAG):
             "output_bag_sha256": V._sha_file(out_path),
             "id_topic": ID_TOPIC, "id_msgtype": ID_MSGTYPE,
             "id_encoding": ("uint32 original point indices, np.flatnonzero(keep); "
-                            "mask_sha256 is sha256 of the same indices as int32 little-endian "
+                            "mask_sha256 is sha256 of the same indices as uint32 little-endian "
                             "C-order bytes"),
             "id_payload_bytes": int(4 * n_kept),
+            "id_schema_version": 2,
+            "id_schema_changelog": ("v1 wrote stride=4 (bytes) and hashed <i4; "
+                                    "v2 writes stride=len(idx) (elements, the ROS "
+                                    "convention) and hashes <u4. Same bytes for "
+                                    "non-negative indices, so v1 and v2 hashes agree."),
             "points_in": n_all, "points_kept": n_kept,
             "global_strip_fraction": round(1.0 - n_kept / max(n_all, 1), 4),
             "frames": len(per_frame),

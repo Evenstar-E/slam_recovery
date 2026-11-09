@@ -26,6 +26,10 @@ FILT = Path("/tmp/fastlivo/hall01_inj43_filtered.bag")
 REPLAY = Path("/tmp/fastlivo/res_h1_inj43_filtered.bag")
 CONTROL = Path("/tmp/fastlivo/res_h1_inj43_rerun_unfiltered.bag")
 HOST_BIN = Path("/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping")
+ID_BAG = Path("/tmp/fastlivo/hall01_inj43_filtered_id.bag")
+ID_SIDECAR = Path("/tmp/fastlivo/hall01_inj43_filtered_id_report.json")
+ID_TOPIC = "/velodyne_points/kept_index"
+ID_MSGTYPE = "std_msgs/msg/UInt32MultiArray"
 HOST_SRC = Path("/home/R26534/fast_livo2_ws/src/FAST-LIVO2")
 RESULTS = REVIEW / "fixed_input_repair_c0c3_results.json"
 FILTER_REPORT = REVIEW / "fixed_input_repair_filter_report.json"
@@ -225,10 +229,88 @@ def audit_labels():
     return {"checks": checks, "c3_keys": sorted(c3.keys())}
 
 
+
+def audit_id_topic(n_checked=0):
+    """Decode the point-id topic and verify it against the source, joined by scan_ns.
+
+    Topic *existence* is not evidence: the join is by the scan_ns carried in the message, and
+    every mask must reproduce the filtered rows exactly from the source rows it names.
+    """
+    if not (ID_BAG.exists() and ID_SIDECAR.exists()):
+        return {"verdict": "UNVERIFIABLE",
+                "why": f"missing {ID_BAG.name} or {ID_SIDECAR.name}"}
+    side = json.loads(ID_SIDECAR.read_text())
+    by_ns = {int(f["scan_ns"]): f for f in side["per_frame"]}
+
+    with rosbag.Bag(str(ID_BAG), "r") as b:
+        types = {t: v.msg_type for t, v in b.get_type_and_topic_info().topics.items()}
+        msgtype_ok = types.get(ID_TOPIC) == "std_msgs/UInt32MultiArray"
+        masks = {}
+        dup = []
+        for _, m, _ in b.read_messages(topics=[ID_TOPIC]):
+            label = m.layout.dim[0].label if len(m.layout.dim) else ""
+            try:
+                sns = int(label.split("=", 1)[1])
+            except (IndexError, ValueError):
+                return {"verdict": "FAIL", "why": f"unparseable scan_ns label {label!r}"}
+            if sns in masks:
+                dup.append(sns)
+            masks[sns] = (np.asarray(m.data, dtype=np.uint32), int(m.layout.dim[0].stride),
+                          int(m.layout.dim[0].size))
+
+    src = {}
+    for ns, _m, buf, step in _iter_clouds(SRC):
+        src[ns] = np.frombuffer(buf, dtype=np.uint8).reshape(-1, step)
+    checked, bad = 0, []
+    for ns, _m, buf, step in _iter_clouds(ID_BAG):
+        if ns not in masks:
+            bad.append({"scan_ns": ns, "why": "no mask"})
+            continue
+        idx, stride, size = masks[ns]
+        rows = np.frombuffer(buf, dtype=np.uint8).reshape(-1, step)
+        n_src = len(src[ns])
+        reasons = []
+        if len(idx) != len(rows):
+            reasons.append(f"len(mask)={len(idx)} != cloud width {len(rows)}")
+        if stride != len(idx) or size != len(idx):
+            reasons.append(f"dim size/stride {size}/{stride} != len(idx) {len(idx)}")
+        if len(idx) > 1 and not np.all(np.diff(idx.astype(np.int64)) > 0):
+            reasons.append("mask not strictly increasing")
+        if len(idx) and int(idx.max()) >= n_src:
+            reasons.append(f"index {int(idx.max())} >= n_original {n_src}")
+        else:
+            if len(idx) and not np.array_equal(src[ns][idx.astype(np.int64)], rows):
+                reasons.append("source[idx] != filtered rows")
+        rec = by_ns.get(ns)
+        if rec is None:
+            reasons.append("no sidecar entry")
+        else:
+            sha = hashlib.sha256(np.asarray(idx, dtype="<u4").tobytes()).hexdigest()
+            if sha != rec["mask_sha256"]:
+                reasons.append("mask_sha256 mismatch")
+            if int(rec["n_original"]) != n_src:
+                reasons.append(f"sidecar n_original {rec['n_original']} != {n_src}")
+        if reasons:
+            bad.append({"scan_ns": ns, "why": "; ".join(reasons)})
+        checked += 1
+
+    if len(masks) != checked:
+        bad.append({"why": f"{len(masks)} masks for {checked} clouds"})
+    if dup:
+        bad.append({"why": f"duplicate mask frames: {dup[:5]}"})
+    verdict = "PASS" if (msgtype_ok and not bad and side.get("id_schema_version", 0) >= 2) else "FAIL"
+    return {"verdict": verdict, "msgtype": types.get(ID_TOPIC),
+            "msgtype_expected": "std_msgs/UInt32MultiArray", "msgtype_ok": msgtype_ok,
+            "schema_version": side.get("id_schema_version"),
+            "clouds_checked": checked, "masks": len(masks), "failures": bad[:10],
+            "failure_count": len(bad),
+            "source_bag_sha256": side.get("source_bag_sha256"),
+            "output_bag_sha256": side.get("output_bag_sha256")}
+
 def _iter_clouds(path):
     with rosbag.Bag(str(path), "r") as b:
         for _, m, _ in b.read_messages(topics=[LIDAR]):
-            yield (int(m.header.stamp.to_sec() * 1e9), m, bytes(m.data), int(m.point_step))
+            yield (int(m.header.stamp.to_nsec()), m, bytes(m.data), int(m.point_step))
 
 def _ordered_match(filtered_rows, source_rows):
     """Assign each filtered row to a distinct source index, preserving order.
@@ -366,6 +448,8 @@ def main():
     print("point record done", flush=True)
     out["stripped_frames"] = verify_stripped_frames()
     print("stripped frames done", flush=True)
+    out["id_topic_verification"] = audit_id_topic()
+    print("id topic done:", out["id_topic_verification"]["verdict"], flush=True)
     out["non_lidar"] = audit_non_lidar()
     print("non-lidar done", flush=True)
     chain = audit_chain()

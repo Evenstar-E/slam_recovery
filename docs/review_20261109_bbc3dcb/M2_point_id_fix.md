@@ -68,9 +68,63 @@ int32 掩码：21,198,773 保留点 × 4 B = **84,795,092 B**，输出包 1,415,
 它把 `flatnonzero(keep)` 写在 `/slam_recovery/filtered_point_ids`）对该帧记录的
 `kept_id_sha256` **逐位相同**。两个互不相干的实现给出同一个掩码，说明这不是某一侧的口径产物。
 
-新包 sha256 `a1113a765f2e3783698c6c1b6b342ec49501fee6dcb3b3098a277eb8d41187ec`，
+新包 sha256 `700ce116192eb0958f8048a630237de6429ebe0c9eb4c2038ed91790f4b70bdd`，
 写在 `/tmp/fastlivo/hall01_inj43_filtered_id.bag`；原来被审计的 `c90300cb…` 包**原样保留、未覆盖**
 （重跑时 Writer 会拒绝覆盖已存在文件，本次是显式写到新路径）。
+
+## 5b. 修订：schema v2 与解码核验
+
+### 格式修正（非阻断，但影响可解析性）
+
+| 项 | v1 | v2 |
+|---|---|---|
+| `layout.dim[0].stride` | `4`（字节数） | `len(idx)`（**元素数**，ROS 惯例） |
+| mask hash 编码 | `<i4` | `<u4` |
+| 时间戳 | `int(to_sec()*1e9)` | `to_nsec()` |
+| sidecar | — | `id_schema_version: 2` + changelog |
+
+`<i4` 与 `<u4` 对非负索引产生**相同字节**，所以 v1 与 v2 的 `mask_sha256` 一致——
+重建后帧 145 仍是 `93f92164…bf3`，与独立导出器的记录仍逐位相同。
+包 sha 变为 `700ce116…`，差异只来自 dim 元数据。
+
+### 主审计改为解码点 ID（P2-1）
+
+`audit_id_topic()`：
+
+- 只认 `msgtype == std_msgs/UInt32MultiArray` 且话题为 `/velodyne_points/kept_index`，
+  不再"排除三个已知话题后还有别的就算通过"；
+- 从 `layout.dim[0].label` 解出 `scan_ns`，**以 scan_ns 为键** join 源包/点云/sidecar，
+  不按流顺序；
+- 逐帧校验 `len(idx)`、严格递增、`idx < n_original`、`source[idx]` 与过滤行 24 B 相同、
+  sidecar 计数与 `mask_sha256`；
+- 掩码帧数必须等于点云帧数，重复 stamp 判失败；
+- 缺包或 `id_schema_version < 2` → `UNVERIFIABLE`/`FAIL`。
+
+本次结果：**PASS**，598 云 / 598 掩码 / 0 失败 / schema 2。
+
+**两个函数覆盖两个包，界线写清**：`verify_stripped_frames()` 核的是**原被审计包**
+`c90300cb…`（无 id，只能按值做有序一一匹配）；`audit_id_topic()` 核的是**新 ID 包**
+`700ce116…`（有显式掩码，可以做精确映射）。两者互不替代。
+
+### 测试补强（P2-2）
+
+`test_m2_point_id.py` 现为 10 项，全部按 `scan_ns` join：
+
+| 测试 | 断言 |
+|---|---|
+| `test_bags_bound_by_hash` | 现算源包与输出包的 sha256，必须等于 sidecar 记录（不是只查字符串长度） |
+| `test_schema_version` | `id_schema_version >= 2` |
+| `test_every_cloud_has_a_mask_and_matches` | 598 帧全量：布局、`len(idx)`、strictly increasing、`idx < n_original`、`source[idx]==rows`、sidecar 计数与 hash |
+| `test_stripped_frames_are_covered` | 取**首帧/末帧/剥离最强帧**（三者必须互不相同），每帧剥离率 >0.8，并逐帧核验 |
+| `test_zero_deletion_frame_is_identity` | 零删除帧 mask == `[0..N-1]`，载荷与源逐字节相同 |
+| `test_rejects_wrong_scan_ns` | 全部掩码 stamp 平移 → 必须报 "no mask" |
+| `test_rejects_out_of_range_index` | 把一个索引改成 `n_original` → 必须报越界 |
+| `test_rejects_duplicate_mask_frame` | 多出一个掩码帧 → 必须报数量不符 |
+| `test_rejects_source_hash_mismatch` | 篡改 sidecar 源哈希 → 必须与现算值不等 |
+| `test_rejects_filter_report_disagreement` | 改一帧 kept 计数 → 必须报与 filter report 不符 |
+
+负例共用同一个 `validate()`：正例要求返回空列表，负例要求返回包含特定原因的错误。
+"什么都不报"的实现会在负例上失败。
 
 ## 6. 这次提交的两类改动
 
