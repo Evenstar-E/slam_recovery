@@ -1,0 +1,35 @@
+{
+ "experiment": "bounded applicability check: is the bimodality room_02-specific?",
+ "host_build": {
+  "executable_sha256": "76359f5387f75da3dcad7aa72372048c3feefd91b340ae0c40f92f6fb534a53b",
+  "library_sha256": "6337ec0f8ba3ea33ca76bca15e24b567a2b93a422de98e110607e68937d58633",
+  "flags": "NO_MP=ON + DET_SYNC=ON"
+ },
+ "sequence": {
+  "bag": "/tmp/fastlivo/hall01_100_160.bag",
+  "injection": "none (clean recording)",
+  "reference": "archived hall_01 clean run: res_hall01_clean_05x.bag poses + clean scans -> reference cloud, the same reference and bounded metric used in C0-C3"
+ },
+ "run_controls": {
+  "taskset": "0-7",
+  "playback_rate": 1.0,
+  "drain_s": 40,
+  "note": "identical to T2/T3a conditions, quiet machine"
+ },
+ "scoring": {
+  "alignment": "single SE(3) fitted on the first 120 paired keyframes (~12 s), then coverage and patch-unsupported over every paired keyframe with a pose",
+  "metric": "bounded NN cap 0.5 m, patch radius 0.30 m, plane RMS 0.02 m",
+  "roi": "the whole hall_01 reference cloud",
+  "no_retuning": "no ROI, threshold or frame-set change"
+ },
+ "mode_rule": "GOOD unsupported < 0.10, BAD > 0.50, else UNCLEAR (same rule as room_02)",
+ "criterion": {
+  "declared": "four runs; if they cross modes the host/config is unstable on this dataset too and single-run factor comparisons stop everywhere; if all four agree, room_02 is recorded as a sequence-specific degradation case",
+  "forbidden": "no medians or cherry-picked initialisations to call a lucky run 'controlled'"
+ },
+ "record": [
+  "exec + library sha",
+  "per-run group statistics from the DET_SYNC log",
+  "service population (declared frames, frames with output, missing)"
+ ]
+}

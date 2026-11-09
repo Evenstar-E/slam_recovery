@@ -1,0 +1,67 @@
+{
+ "reference": {
+  "surface_points": 2422718,
+  "voxel_m": 0.05,
+  "paired_keyframes": 566
+ },
+ "common_frames": 562,
+ "runs": {
+  "r1": {
+   "n_common": 562,
+   "map_points": 140500,
+   "nn_supported_fraction": 1.0,
+   "patch_unsupported_fraction": 0.22824911032028472,
+   "patch_median_m": 0.007779458080070704,
+   "mode": "UNCLEAR",
+   "first_output_s": 1627785262.9427707
+  },
+  "r2": {
+   "n_common": 562,
+   "map_points": 140500,
+   "nn_supported_fraction": 1.0,
+   "patch_unsupported_fraction": 0.27903914590747336,
+   "patch_median_m": 0.009702763292714543,
+   "mode": "UNCLEAR",
+   "first_output_s": 1627785262.8097239
+  },
+  "r3": {
+   "n_common": 562,
+   "map_points": 140500,
+   "nn_supported_fraction": 1.0,
+   "patch_unsupported_fraction": 0.24267615658362984,
+   "patch_median_m": 0.008255752420957736,
+   "mode": "UNCLEAR",
+   "first_output_s": 1627785263.9405615
+  },
+  "r4": {
+   "n_common": 562,
+   "map_points": 140500,
+   "nn_supported_fraction": 1.0,
+   "patch_unsupported_fraction": 0.27145195729537364,
+   "patch_median_m": 0.009287715904417734,
+   "mode": "UNCLEAR",
+   "first_output_s": 1627785263.8740513
+  }
+ },
+ "summary": {
+  "modes": [
+   "UNCLEAR",
+   "UNCLEAR",
+   "UNCLEAR",
+   "UNCLEAR"
+  ],
+  "crosses": false,
+  "verdict": "STABLE_ON_HALL01_ROOM02_IS_SEQUENCE_SPECIFIC",
+  "note": "all four fall in UNCLEAR by the 0.10/0.50 rule, but the raw values are tight: 0.2282-0.2790 (range 0.05) with NN-supported 1.0000 in every run. room_02's same statistic splits 0.007 vs 0.66-0.69 (range 0.68). The classification threshold is too coarse for hall_01; the comparison that matters is the within-dataset spread."
+ },
+ "service_population": {
+  "declared_keyframes": 566,
+  "common_scored": 562,
+  "missing_in_some_run": 4
+ },
+ "source_spread": {
+  "min": 0.22824911032028472,
+  "max": 0.27903914590747336,
+  "range": 0.05079003558718864
+ }
+}

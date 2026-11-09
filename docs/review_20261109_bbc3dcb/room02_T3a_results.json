@@ -14,7 +14,7 @@
  "same_mode": true,
  "criterion": {
   "mode_rule": "GOOD unsupported<0.10 / BAD>0.50",
-  "verdict": "S3_ACCEPTED_AS_SEED"
+  "verdict": "S3_ACCEPTED_AS_SEED__SUPERSEDED_BY_BUILD_B_FOUR_RUNS"
  },
  "scope": {
   "runs_analysed": [
@@ -35,5 +35,12 @@
   "r1",
   "r2"
  ],
- "build": "A: executable 76359f53..., library X (build A); superseded for conclusion by build B four runs"
+ "build": "A: executable 76359f53..., library X (build A); superseded for conclusion by build B four runs",
+ "superseded_by": {
+  "file": "room02_T3a_enriched_results.json",
+  "what": "build B (same executable, library 6337ec0f) ran 4 times and produced BAD, BAD, GOOD, GOOD -- the two-run \"same mode\" was two draws on the same side",
+  "runs_analysed": 2,
+  "build": "A (exec 76359f53 + lib X, pre-enrichment)",
+  "status": "SUPERSEDED -- do not cite S3_ACCEPTED_AS_SEED from this file alone"
+ }
 }
