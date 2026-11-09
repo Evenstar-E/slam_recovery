@@ -760,7 +760,7 @@ def main():
             "admitted_quarantined_frames": len([i for i in ids if i >= len(pre)]),
             "deferred_keyframes": len(inj_kfs) - len(ids),
             "admitted_duration_sec": round(float(admitted_ts[-1] - admitted_ts[0]), 2) if len(ids) else 0.0,
-            "distance_stats": stats,
+            "distance_stats_voxel_surface": stats,
             "distance_tail_bootstrap": boot,
             "distance_stats_proxy_120k_subsample": stats_120k,
             "coverage_sweep": cov,
@@ -835,6 +835,13 @@ def main():
                 "primary_grid_cell_m": PROXY_CELL,
                 "legacy": "stride subsample, kept only for comparability with earlier manifests",
                 "legacy_points": int(len(proxy_pts_120k)),
+                "distance_fields": {
+                    "distance_stats_voxel_surface":
+                        "distances to the 5 cm voxel surface, nearest-neighbour cell 0.25 m (primary)",
+                    "distance_stats_proxy_120k_subsample":
+                        "distances to the legacy 120k stride surface; not comparable to `distance_stats` "
+                        "in manifests published before this revision",
+                },
                 "why": (
                     "a stride subsample keeps 1.4% of 8.49M points and inflates every distance to "
                     "the surface; the earlier 'floor' was partly sampling, not the map. Voxel "
@@ -920,7 +927,7 @@ def main():
     print(f"{'arm':30s} {'kf':>4s} {'vox':>9s} {'unsup':>7s} {'cover':>7s} {'ATEcommon':>10s} {'ATEadm':>8s} {'cleanLost':>9s}")
     for k, vv in results.items():
         print(f"{k:30s} {vv['admitted_keyframes']:4d} {vv['appendix_voxel_unsupported']:9.4f} "
-              f"{vv['distance_stats']['tail_over_0.5m']:7.4f} {vv['coverage_sweep'].get('covered_within_0.5m', float('nan')):7.4f} "
+              f"{vv['distance_stats_voxel_surface']['tail_over_0.5m']:7.4f} {vv['coverage_sweep'].get('covered_within_0.5m', float('nan')):7.4f} "
               f"{vv['ate_on_common_support_m']:10.4f} {vv['ate_on_admitted_set_m']:8.4f} "
               f"{vv['clean_interval_keyframes_not_admitted']:9d}")
     print(f"\nA3 gate: {report.mode.value} accepted={report.accepted} nis={report.holdout_nis:.3f}")

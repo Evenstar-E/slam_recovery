@@ -117,6 +117,10 @@
       "primary_grid_cell_m": 0.25,
       "legacy": "stride subsample, kept only for comparability with earlier manifests",
       "legacy_points": 120000,
+      "distance_fields": {
+        "distance_stats_voxel_surface": "distances to the 5 cm voxel surface, nearest-neighbour cell 0.25 m (primary)",
+        "distance_stats_proxy_120k_subsample": "distances to the legacy 120k stride surface; not comparable to `distance_stats` in manifests published before this revision"
+      },
       "why": "a stride subsample keeps 1.4% of 8.49M points and inflates every distance to the surface; the earlier 'floor' was partly sampling, not the map. Voxel downsampling keeps full spatial coverage at the stated resolution. Distances measured on the legacy surface are reported under `*_proxy_120k_subsample`."
     },
     "self_calibration": {
@@ -278,7 +282,7 @@
       "admitted_quarantined_frames": 445,
       "deferred_keyframes": 0,
       "admitted_duration_sec": 58.51,
-      "distance_stats": {
+      "distance_stats_voxel_surface": {
         "n_points": 144500,
         "n_beyond_search_radius": 2451,
         "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
@@ -355,7 +359,7 @@
       "admitted_quarantined_frames": 0,
       "deferred_keyframes": 445,
       "admitted_duration_sec": 13.23,
-      "distance_stats": {
+      "distance_stats_voxel_surface": {
         "n_points": 33250,
         "n_beyond_search_radius": 9,
         "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
@@ -432,7 +436,7 @@
       "admitted_quarantined_frames": 445,
       "deferred_keyframes": 0,
       "admitted_duration_sec": 58.51,
-      "distance_stats": {
+      "distance_stats_voxel_surface": {
         "n_points": 144500,
         "n_beyond_search_radius": 2451,
         "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
@@ -509,7 +513,7 @@
       "admitted_quarantined_frames": 0,
       "deferred_keyframes": 445,
       "admitted_duration_sec": 13.23,
-      "distance_stats": {
+      "distance_stats_voxel_surface": {
         "n_points": 33250,
         "n_beyond_search_radius": 9,
         "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
@@ -579,7 +583,7 @@
       "clean_interval_keyframes_not_admitted": 0,
       "appendix_voxel_unsupported": 0.0074,
       "appendix_voxel_coverage": 0.0313,
-      "runtime_sec": 16.697
+      "runtime_sec": 17.7129
     }
   },
   "caveats": [
