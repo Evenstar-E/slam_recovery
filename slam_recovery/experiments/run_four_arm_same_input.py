@@ -266,15 +266,40 @@ class NearestGrid:
 
 
 def distance_stats(d, thresholds=(0.25, 0.5, 1.0, 2.0)):
+    """d holds inf where the proxy has no point within the search radius."""
     if len(d) == 0:
         return {}
+    finite = d[np.isfinite(d)]
+    n_beyond = int(np.sum(~np.isfinite(d)))
     return {
         "n_points": int(len(d)),
-        "median_m": round(float(np.median(d)), 4),
-        "p90_m": round(float(np.percentile(d, 90)), 4),
-        "p99_m": round(float(np.percentile(d, 99)), 4),
+        "n_beyond_search_radius": n_beyond,
+        "beyond_search_radius_definition": (
+            "no proxy point within 2.0 m; counted as exceeding every reported threshold"),
+        "median_m": round(float(np.median(finite)), 4) if len(finite) else None,
+        "p90_m": round(float(np.percentile(finite, 90)), 4) if len(finite) else None,
+        # percentile over the FINITE subset only: np.percentile on an array containing inf
+        # produces inf - inf = NaN through linear interpolation, which is not valid JSON.
+        "p99_m": round(float(np.percentile(finite, 99)), 4) if len(finite) else None,
+        "p99_scope": "finite distances only; see n_beyond_search_radius",
         **{f"tail_over_{t}m": round(float(np.mean(d > t)), 4) for t in thresholds},
     }
+
+
+def json_safe(o):
+    """Replace non-finite floats with None so the manifest is strict JSON."""
+    if isinstance(o, dict):
+        return {k: json_safe(v) for k, v in o.items()}
+    if isinstance(o, (list, tuple)):
+        return [json_safe(v) for v in o]
+    if isinstance(o, float) and not np.isfinite(o):
+        return None
+    if isinstance(o, (np.floating,)):
+        f = float(o)
+        return f if np.isfinite(f) else None
+    if isinstance(o, (np.integer,)):
+        return int(o)
+    return o
 
 
 def bootstrap_tail(kf_dists, thresholds=(0.25, 0.5, 1.0, 2.0), n_boot=1000, seed=0):
@@ -484,9 +509,75 @@ def main():
 
     t0 = time.perf_counter()
     report = node.evaluate_and_commit_candidate(
-        "four_arm_A3", candidate, incumbent_poses=incumbent, reentry_anchor_pose=np.eye(4))
+        "four_arm_A3", candidate, incumbent_poses=incumbent, reentry_anchor_pose=pre[-1]["pose"].copy())
     a3_runtime = time.perf_counter() - t0
     verified_prefix = sorted(node.tx_mgr.trusted_poses.keys()) if report.accepted else []
+
+    # ---- good candidate: the clean run's poses, carried into the injected frame ----------
+    # This is the arm the review actually asks for: does the gate accept a candidate that is
+    # genuinely better? C_good is constructed offline from the clean run (OFFLINE_CONSTRUCT_
+    # FROM_CLEAN_RUN). The gate's reference is still ONLY the injected run's pre-onset keyframes.
+    T_inv = np.eye(4)
+    T_inv[:3, :3] = R_ic.T
+    T_inv[:3, 3] = -R_ic.T @ t_ic
+    cln_ts_arr = np.asarray([k["ts"] for k in cln_kfs])
+    good = {}
+    for i, k in enumerate(quar):
+        j = int(np.argmin(np.abs(cln_ts_arr - k["ts"])))
+        good[i] = T_inv @ cln_kfs[j]["pose"]
+
+    node_good = OnlineRecoveryTransactionNode(confirmation_margin_sec=2.0, voxel_size_m=VOXEL, holdout_stride=5)
+    node_good.committed_map_points = [ref_pts] if len(ref_pts) else []
+    node_good.scan_buffer_body = {i: k["pts"] for i, k in enumerate(quar)}
+    node_good.tx_mgr = TrustedMapTransactionManager(confirmation_margin_ns=int(2.0e9))
+    node_good.tx_mgr.trigger_quarantine(
+        int(ONSET_REL * 1e9), int((ONSET_REL + 2.0) * 1e9),
+        np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2,
+    )
+    report_good = node_good.evaluate_and_commit_candidate(
+        "four_arm_A3_good", good, incumbent_poses=incumbent, reentry_anchor_pose=pre[-1]["pose"].copy())
+    good_admitted = sorted(node_good.tx_mgr.trusted_poses.keys()) if report_good.accepted else []
+    _sup = getattr(node_good, "_last_holdout_support", None)
+    _committable_ev = getattr(node_good, "last_paired_evidence_committable", None)
+
+    # Per-frame residuals over the committed prefix, so 0/14 can be scrutinised rather than
+    # taken at face value: same reference, same metric, both arms.
+    from slam_recovery.validation import compute_disjoint_holdout_point_to_plane_nis as _nis
+    _n_prefix = int((_sup or {}).get("candidate_frames_committed", 0))
+    _pairs = []
+    for _i in range(_n_prefix):
+        _k = quar[_i]
+        _r = []
+        for _pose in (incumbent[_i], good[_i]):
+            _pw = _k["pts"] @ _pose[:3, :3].T + _pose[:3, 3]
+            _r.append(float(_nis(ref_pts, _pw, np.eye(4), sigma_meas_m=0.12)))
+        _pairs.append({"kf": _i, "incumbent": round(_r[0], 4), "candidate": round(_r[1], 4),
+                       "candidate_better": bool(_r[1] < _r[0])})
+    _diffs = np.asarray([q["incumbent"] - q["candidate"] for q in _pairs], dtype=float)
+    _per_frame = {
+        "n": len(_pairs),
+        "pairs": _pairs,
+        "candidate_better_frames": int(sum(q["candidate_better"] for q in _pairs)),
+        "diff_median": round(float(np.median(_diffs)), 4) if len(_diffs) else None,
+        "diff_iqr": [round(float(np.percentile(_diffs, 25)), 4),
+                     round(float(np.percentile(_diffs, 75)), 4)] if len(_diffs) else None,
+        "reference_points_used_by_estimator": 600,
+        "note": "the NIS estimator fits on at most 600 reference points; residuals are on that scale",
+    }
+    print(f"[PAIRS] n={len(_pairs)} better={_per_frame['candidate_better_frames']} diff_med={_per_frame['diff_median']}")
+    good_diag = {
+        "candidate_dict_size": len(good),
+        "support_diagnostics": _sup,
+    }
+    print(f"[GOOD] dict={len(good)} support={_sup} reason={report_good.reason}")
+    good_map_pts = (np.vstack([world_points(inj_kfs[len(pre) + i]) for i in good_admitted]) @ R_ic.T + t_ic
+                    if good_admitted else np.zeros((0, 3)))
+    good_cov = {}
+    if len(good_map_pts):
+        _g = NearestGrid(good_map_pts)
+        _dq = proxy_grid  # reuse proxy points as query set
+        _dd = _g.query(proxy_pts_all[:: max(1, len(proxy_pts_all) // 40000)][:40000], max_r=2.5)
+        good_cov = {f"covered_within_{t}m": round(float(np.mean(_dd <= t)), 4) for t in (0.25, 0.5, 1.0, 2.0)}
 
     arms = {
         "A0_Host_Native": list(range(len(inj_kfs))),
@@ -615,6 +706,28 @@ def main():
             "note": "identical for every arm, so it cannot favour an admission policy; the post-injection residual grows, which bounds how far the proxy can be trusted downstream",
         },
         "interpolation": interp_loo,
+        "good_candidate_arm": {
+            "candidate_provenance": "OFFLINE_CONSTRUCT_FROM_CLEAN_RUN",
+            "what": "clean-run poses mapped into the injected frame by the pre-onset SE(3); the gate reference is still only the injected run's pre-onset keyframes",
+            "accepted": bool(report_good.accepted),
+            "mode": report_good.mode.value,
+            "holdout_nis": round(float(report_good.holdout_nis), 4),
+            "reason": report_good.reason,
+            "evidence_status": getattr(report_good, "evidence_status", None),
+            "admitted_quarantined_frames": len(good_admitted),
+            "paired_evidence": node_good.last_paired_evidence,
+            "diagnostics": good_diag,
+            "per_frame_paired_residuals": _per_frame,
+            "last_paired_evidence_committable": _committable_ev,
+            "map_metrics": "UNAVAILABLE (circular: the candidate and the scoring proxy are both the clean run)",
+            "coverage_consistency_check_only": good_cov,
+            "bad_candidate_for_comparison": {
+                "mode": report.mode.value,
+                "holdout_nis": round(float(report.holdout_nis), 4),
+                "evidence_status": getattr(report, "evidence_status", None),
+                "admitted_quarantined_frames": len(verified_prefix),
+            },
+        },
         "gate_result_A3": {
             "accepted": bool(report.accepted),
             "mode": report.mode.value,
@@ -637,7 +750,7 @@ def main():
         ],
     }
     with open(out_manifest, "w", encoding="utf-8") as f:
-        json.dump(manifest, f, indent=2)
+        json.dump(json_safe(manifest), f, indent=2, allow_nan=False)
 
     print("\n=== four-arm same-input (archived replay) ===")
     print(f"proxy floor: unsupported={floor_unsup:.4f}  coverage={floor_cov:.4f}")

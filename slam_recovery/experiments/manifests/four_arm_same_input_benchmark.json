@@ -142,16 +142,192 @@
     "rotation_err_max_deg": 3.7566,
     "note": "gap exceeds MAX_GAP, so this bounds the interpolator from above"
   },
+  "good_candidate_arm": {
+    "candidate_provenance": "OFFLINE_CONSTRUCT_FROM_CLEAN_RUN",
+    "what": "clean-run poses mapped into the injected frame by the pre-onset SE(3); the gate reference is still only the injected run's pre-onset keyframes",
+    "accepted": false,
+    "mode": "MODE3_SOFT_BRIDGE_WAIT",
+    "holdout_nis": 1187.7734,
+    "reason": "Refused Mode 2 atomic commit: paired-benefit evidence FAILED (explicit failure, non-finite value, or threshold violation)",
+    "evidence_status": "FAILED",
+    "admitted_quarantined_frames": 0,
+    "paired_evidence": {
+      "num_paired_frames": 14,
+      "required_paired_frames": 8,
+      "candidate_keyframes": 14,
+      "pairable_frames": 14,
+      "frames_without_independent_reference": 0,
+      "reference_frames_from_candidate": 0,
+      "num_improved_frames": 0,
+      "improved_fraction": 0.0,
+      "wilson_lower_bound": 0.0,
+      "approved": false,
+      "reason": "wilson_sequential_benefit_lower_bound_failed",
+      "incumbent_mean_residual": 929.4290735206911,
+      "candidate_mean_residual": 1198.7541668006104,
+      "reentry_pos_jump_m": 0.1848906880467479
+    },
+    "diagnostics": {
+      "candidate_dict_size": 391,
+      "support_diagnostics": {
+        "holdout_frames_total": 3,
+        "holdout_frames_scorable": 3,
+        "candidate_frames_total": 391,
+        "candidate_frames_committable": 317,
+        "candidate_frames_committed": 14,
+        "candidate_frames_deferred": 377,
+        "frames_missing_scan": [],
+        "frames_in_reference": [],
+        "prefix_stop_key": 14,
+        "prefix_stop_reason": "no_reference_support",
+        "committable_frames_after_prefix": 303
+      }
+    },
+    "per_frame_paired_residuals": {
+      "n": 14,
+      "pairs": [
+        {
+          "kf": 0,
+          "incumbent": 48.8065,
+          "candidate": 44.9424,
+          "candidate_better": true
+        },
+        {
+          "kf": 1,
+          "incumbent": 58.9857,
+          "candidate": 55.855,
+          "candidate_better": true
+        },
+        {
+          "kf": 2,
+          "incumbent": 50.0768,
+          "candidate": 48.8136,
+          "candidate_better": true
+        },
+        {
+          "kf": 3,
+          "incumbent": 51.2811,
+          "candidate": 42.8676,
+          "candidate_better": true
+        },
+        {
+          "kf": 4,
+          "incumbent": 53.9834,
+          "candidate": 50.4205,
+          "candidate_better": true
+        },
+        {
+          "kf": 5,
+          "incumbent": 54.2319,
+          "candidate": 49.3649,
+          "candidate_better": true
+        },
+        {
+          "kf": 6,
+          "incumbent": 58.6939,
+          "candidate": 49.7761,
+          "candidate_better": true
+        },
+        {
+          "kf": 7,
+          "incumbent": 51.7764,
+          "candidate": 52.4676,
+          "candidate_better": false
+        },
+        {
+          "kf": 8,
+          "incumbent": 52.0668,
+          "candidate": 55.7748,
+          "candidate_better": false
+        },
+        {
+          "kf": 9,
+          "incumbent": 52.808,
+          "candidate": 47.4919,
+          "candidate_better": true
+        },
+        {
+          "kf": 10,
+          "incumbent": 60.2542,
+          "candidate": 57.0009,
+          "candidate_better": true
+        },
+        {
+          "kf": 11,
+          "incumbent": 59.4394,
+          "candidate": 62.2661,
+          "candidate_better": false
+        },
+        {
+          "kf": 12,
+          "incumbent": 54.9432,
+          "candidate": 57.519,
+          "candidate_better": false
+        },
+        {
+          "kf": 13,
+          "incumbent": 53.3163,
+          "candidate": 56.4045,
+          "candidate_better": false
+        }
+      ],
+      "candidate_better_frames": 9,
+      "diff_median": 3.192,
+      "diff_iqr": [
+        -2.1046,
+        4.6163
+      ],
+      "reference_points_used_by_estimator": 600,
+      "note": "the NIS estimator fits on at most 600 reference points; residuals are on that scale"
+    },
+    "last_paired_evidence_committable": {
+      "num_paired_frames": 317,
+      "required_paired_frames": 8,
+      "candidate_keyframes": 317,
+      "pairable_frames": 317,
+      "frames_without_independent_reference": 0,
+      "reference_frames_from_candidate": 0,
+      "num_improved_frames": 301,
+      "improved_fraction": 0.9495268138801262,
+      "wilson_lower_bound": 0.9252250347887798,
+      "approved": true,
+      "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+      "incumbent_mean_residual": 1729.0840332531375,
+      "candidate_mean_residual": 210.40051392085255,
+      "reentry_pos_jump_m": 0.1848906880467479,
+      "used_for_admission": false
+    },
+    "map_metrics": "UNAVAILABLE (circular: the candidate and the scoring proxy are both the clean run)",
+    "coverage_consistency_check_only": {},
+    "bad_candidate_for_comparison": {
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "holdout_nis": 1141.6141,
+      "evidence_status": "FAILED",
+      "admitted_quarantined_frames": 0
+    }
+  },
   "gate_result_A3": {
     "accepted": false,
     "mode": "MODE3_SOFT_BRIDGE_WAIT",
-    "holdout_nis": Infinity,
-    "reason": "Rejected candidate due to non-finite (NaN/Inf) state/bias or invalid SE(3) pose shape",
-    "evidence_status": "MISSING",
+    "holdout_nis": 1141.6141,
+    "reason": "Refused Mode 2 atomic commit: paired-benefit evidence FAILED (explicit failure, non-finite value, or threshold violation)",
+    "evidence_status": "FAILED",
     "paired_test_informative": true,
     "paired_evidence": {
-      "num_paired_frames": 0,
-      "reason": "no_repaired_poses"
+      "num_paired_frames": 14,
+      "required_paired_frames": 8,
+      "candidate_keyframes": 14,
+      "pairable_frames": 14,
+      "frames_without_independent_reference": 0,
+      "reference_frames_from_candidate": 0,
+      "num_improved_frames": 1,
+      "improved_fraction": 0.07142857142857142,
+      "wilson_lower_bound": 0.01609806571673135,
+      "approved": false,
+      "reason": "wilson_sequential_benefit_lower_bound_failed",
+      "incumbent_mean_residual": 929.4290735206911,
+      "candidate_mean_residual": 1151.4931568217696,
+      "reentry_pos_jump_m": 0.07869478597996016
     }
   },
   "arms": {
@@ -162,9 +338,12 @@
       "admitted_duration_sec": 57.61,
       "distance_stats": {
         "n_points": 142250,
-        "median_m": 0.1044,
-        "p90_m": 1.2824,
-        "p99_m": NaN,
+        "n_beyond_search_radius": 3773,
+        "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
+        "median_m": 0.1005,
+        "p90_m": 1.0191,
+        "p99_m": 3.2283,
+        "p99_scope": "finite distances only; see n_beyond_search_radius",
         "tail_over_0.25m": 0.3015,
         "tail_over_0.5m": 0.2146,
         "tail_over_1.0m": 0.126,
@@ -223,9 +402,12 @@
       "admitted_duration_sec": 17.73,
       "distance_stats": {
         "n_points": 44500,
-        "median_m": 0.0892,
-        "p90_m": 1.1221,
-        "p99_m": NaN,
+        "n_beyond_search_radius": 565,
+        "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
+        "median_m": 0.0877,
+        "p90_m": 0.9679,
+        "p99_m": 3.2801,
+        "p99_scope": "finite distances only; see n_beyond_search_radius",
         "tail_over_0.25m": 0.2563,
         "tail_over_0.5m": 0.1781,
         "tail_over_1.0m": 0.1087,
@@ -284,9 +466,12 @@
       "admitted_duration_sec": 57.61,
       "distance_stats": {
         "n_points": 142250,
-        "median_m": 0.1044,
-        "p90_m": 1.2824,
-        "p99_m": NaN,
+        "n_beyond_search_radius": 3773,
+        "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
+        "median_m": 0.1005,
+        "p90_m": 1.0191,
+        "p99_m": 3.2283,
+        "p99_scope": "finite distances only; see n_beyond_search_radius",
         "tail_over_0.25m": 0.3015,
         "tail_over_0.5m": 0.2146,
         "tail_over_1.0m": 0.126,
@@ -345,9 +530,12 @@
       "admitted_duration_sec": 17.73,
       "distance_stats": {
         "n_points": 44500,
-        "median_m": 0.0892,
-        "p90_m": 1.1221,
-        "p99_m": NaN,
+        "n_beyond_search_radius": 565,
+        "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
+        "median_m": 0.0877,
+        "p90_m": 0.9679,
+        "p99_m": 3.2801,
+        "p99_scope": "finite distances only; see n_beyond_search_radius",
         "tail_over_0.25m": 0.2563,
         "tail_over_0.5m": 0.1781,
         "tail_over_1.0m": 0.1087,
@@ -397,7 +585,7 @@
       "clean_interval_keyframes_not_admitted": 0,
       "appendix_voxel_unsupported": 0.2613,
       "appendix_voxel_coverage": 0.0306,
-      "runtime_sec": 4.3545
+      "runtime_sec": 15.0689
     }
   },
   "caveats": [
