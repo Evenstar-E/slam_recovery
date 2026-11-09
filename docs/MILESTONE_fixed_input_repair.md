@@ -298,6 +298,13 @@ ATE 0.69/1.93 m), so this is a continuum with two ends, not a binary bistability
 on this sequence can compare factors; the four-cell answer stays **UNKNOWN** until the variance is
 controlled.
 
+**Initialisation proxy is negative**: the first-pose delay (first `/aft_mapped_to_init` minus the
+first LiDAR scan, read from the 16 existing output bags) does not separate modes — GOOD delays are
+1.864/4.196/5.462 s, BAD 1.397–3.130 s, overlapping at 1.86 s, and the delay drifts with the run
+batch (1.4–2.3 s for the first eight, 2.1–5.5 s for the last eight). Load/batch and mode are
+confounded in this sample, so the proxy neither confirms nor rules out the initialisation-timing
+hypothesis; a controlled environment is required.
+
 This diagnostic is `POST_HOC_DESCRIPTIVE` (instability was seen first); its rule is stated here
 for prospective use on the next repeat pair: first divergence is the first matched pose with
 |Δp| > 1 cm or Δangle > 1e-3 rad, and a pre-onset first divergence names initialisation/early

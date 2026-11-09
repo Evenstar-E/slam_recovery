@@ -73,26 +73,42 @@ def main():
     bags = {c: {round(t, 6): p for t, p in V.load_scans(p, V._sha_file(p))[0]}
             for c, p in CELLS.items()}
 
-    def _score(cell, path):
+    def _poses(path):
         poses, _st = R.pose_lookup(V.load_poses(path), range(len(inj_kfs)),
                                    lambda i: inj_kfs[i]["ts"])
+        return poses
+
+    def _score(cell, path, common_ids):
+        poses = _poses(path)
         ids = [i for i in keys if i in poses]
         use = [i for i in prefix if i in poses]
         _mt, mi, mc = V.associate(np.asarray([inj_kfs[i]["ts"] for i in use]),
                                   np.asarray([poses[i][:3, 3] for i in use]), cln_ts, cln_xyz)
         Ra, ta = V.umeyama(mi, mc)
-        pts = []
+        w_by = {}
         for i in ids:
             body = bags[cell][round(inj_kfs[i]["ts"], 6)]
             w = body @ poses[i][:3, :3].T + poses[i][:3, 3]
             if len(w) > V.KF_CAP:
                 w = w[:: max(1, len(w) // V.KF_CAP)][:V.KF_CAP]
-            pts.append(w)
-        pts = np.vstack(pts) @ Ra.T + ta
-        d, _ = cKDTree(pts).query(proxy, k=1, distance_upper_bound=R.R_NN)
-        cov = float(np.isfinite(d).mean())
-        bm = R.bounded_metrics(pts, proxy_tree, proxy)
-        uns = float(bm["patch"]["unsupported_fraction"])
+            w_by[i] = w
+
+        def _metrics(id_list):
+            pts = np.vstack([w_by[i] for i in id_list]) @ Ra.T + ta
+            d, _ = cKDTree(pts).query(proxy, k=1, distance_upper_bound=R.R_NN)
+            cov = float(np.isfinite(d).mean())
+            bm = R.bounded_metrics(pts, proxy_tree, proxy)
+            return cov, float(bm["patch"]["unsupported_fraction"])
+
+        cov, uns = _metrics(ids)
+        ids_c = [i for i in common_ids if i in w_by]
+        cov_c, uns_c = _metrics(ids_c) if ids_c else (None, None)
+
+        def _mode(u):
+            if u is None:
+                return None
+            return "GOOD" if u < GOOD_MAX else ("BAD" if u > BAD_MIN else "UNCLEAR")
+
         ts = np.asarray([inj_kfs[i]["ts"] for i in ids])
         xyz = np.asarray([poses[i][:3, 3] for i in ids])
         mt, me, mg = associate_trajectories(ts, xyz, ts_gt, xyz_gt, 0.05)
@@ -100,16 +116,15 @@ def main():
         if len(mt) >= 10:
             Ru, tu = V.umeyama(me, mg)
             ate = float(np.sqrt(np.mean(np.sum((me @ Ru.T + tu - mg) ** 2, axis=1))))
-        if uns < GOOD_MAX:
-            mode = "GOOD"
-        elif uns > BAD_MIN:
-            mode = "BAD"
-        else:
-            mode = "UNCLEAR"
-        return {"frames": len(ids), "coverage": cov, "unsupported_fraction": uns,
-                "ate_full_alignment_diagnostic_m": ate, "mode": mode}
+        return {"frames": len(ids), "common_frames": len(ids_c),
+                "coverage": cov, "unsupported_fraction": uns,
+                "common_coverage": cov_c, "common_unsupported_fraction": uns_c,
+                "ate_full_alignment_diagnostic_m": ate,
+                "mode": _mode(uns), "mode_common": _mode(uns_c),
+                "output_sha256": V._sha_file(path)}
 
-    res = {"protocol": {"source": "preregistered bistability estimate",
+    res = {"protocol": {"source": "declared in session before the four repeats; not verifiable "
+                                  "from the repository (UNVERIFIABLE)",
                         "cells": list(CELLS), "repeats_per_cell": 4,
                         "rule": "if a cell crosses modes at least once across its four repeats, "
                                 "the sequence is not usable for single-run factor comparison",
@@ -119,16 +134,23 @@ def main():
                          "interleaving",
            "new_runs": {}, "earlier_2x2_runs": {}, "cells": {}}
 
+    all_paths = {k: p for k, p in list(NEW.items()) + list(EARLIER.items())
+                 if os.path.exists(p)}
+    ids_by_run = {k: set(i for i in keys if i in _poses(p)) for k, p in all_paths.items()}
+    common_ids = sorted(set.intersection(*ids_by_run.values())) if ids_by_run else []
+    res["common_set"] = {"n": len(common_ids), "n_keys": len(keys),
+                         "per_run_available": {f"{c}#{i}": len(v)
+                                               for (c, i), v in ids_by_run.items()}}
     for key, path in NEW.items():
         cell, i = key
         if not os.path.exists(path):
             res["new_runs"][f"{cell}#{i}"] = {"status": "MISSING", "bag": path}
             continue
-        res["new_runs"][f"{cell}#{i}"] = _score(cell, path)
+        res["new_runs"][f"{cell}#{i}"] = _score(cell, path, common_ids)
     for key, path in EARLIER.items():
         cell, i = key
         if os.path.exists(path):
-            res["earlier_2x2_runs"][f"{cell}#earlier{i}"] = _score(cell, path)
+            res["earlier_2x2_runs"][f"{cell}#earlier{i}"] = _score(cell, path, common_ids)
 
     for cell in CELLS:
         seq = [res["new_runs"].get(f"{cell}#{i}", {}).get("mode") for i in (1, 2, 3, 4)]
@@ -136,8 +158,16 @@ def main():
         cross = len(set(modes)) > 1 if modes else None
         combined = modes + [v["mode"] for k, v in res["earlier_2x2_runs"].items()
                             if k.startswith(f"{cell}#")]
+        seq_c = [res["new_runs"].get(f"{cell}#{i}", {}).get("mode_common")
+                 for i in (1, 2, 3, 4)]
+        modes_c = [m for m in seq_c if m in ("GOOD", "BAD", "UNCLEAR")]
         res["cells"][cell] = {
-            "sequence": seq, "crosses_modes": cross,
+            "sequence": seq,
+            "sequence_common_set": seq_c,
+            "crosses_modes": cross,
+            # Different categories are not proof of two attractors; report the literal
+            # GOOD-vs-BAD crossing separately from UNCLEAR involvement.
+            "crosses_good_and_bad": (("GOOD" in modes) and ("BAD" in modes)),
             "good": modes.count("GOOD"), "bad": modes.count("BAD"),
             "unclear": modes.count("UNCLEAR"),
             "combined_with_earlier_2": {"modes": combined,
