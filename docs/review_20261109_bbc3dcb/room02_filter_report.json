@@ -1,11 +1,22 @@
 {
  "input": "/tmp/fastlivo/room02_inj43.bag",
+ "input_sha256": "66b3515c58d172f73d8f0d705c7314720b587612e4a8cca6740b87993449b0a9",
  "output": "/tmp/fastlivo/room02_inj43_filtered.bag",
+ "output_sha256": "6bb966188894ae876ce2e8f8475a932d873a2d6ff42519b25f56eb425f68b090",
+ "frames": 599,
+ "binding": {
+  "method": "every frame's n must equal the input bag's point count and its kept must equal the output bag's point count, at the same header millisecond",
+  "frames_checked": 599,
+  "mismatched": [],
+  "missing": [],
+  "n_mismatched": 0,
+  "n_missing": 0,
+  "verdict": "BOUND"
+ },
  "filter": "MixtureFilterConfig() defaults",
  "points_in": 30836941,
  "points_kept": 20820954,
  "global_strip_fraction": 0.3248,
- "frames": 599,
  "frames_stripping_gt_10pct": 251,
  "per_frame": [
   {

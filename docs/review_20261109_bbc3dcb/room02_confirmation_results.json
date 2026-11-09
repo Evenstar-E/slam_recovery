@@ -600,6 +600,14 @@
   "completeness": 0.8190954773869347
  },
  "healthy_region_removal": {
+  "identity": {
+   "report": "/tmp/wt-sim/docs/review_20261109_bbc3dcb/room02_filter_report.json",
+   "input": "/tmp/fastlivo/room02_inj43.bag",
+   "input_sha256": "66b3515c58d172f73d8f0d705c7314720b587612e4a8cca6740b87993449b0a9",
+   "output": "/tmp/fastlivo/room02_inj43_filtered.bag",
+   "output_sha256": "6bb966188894ae876ce2e8f8475a932d873a2d6ff42519b25f56eb425f68b090",
+   "binding_verdict": "BOUND"
+  },
   "frames_outside": 400,
   "points_outside": 20576778,
   "removed_outside": 919702,

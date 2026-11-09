@@ -1178,7 +1178,9 @@ def build_filtered_bag(in_path=INJ_SCANS, out_path=FILTERED_BAG):
                                   "repairable": bool(rep)})
         finally:
             w.close()
-    side = {"input": in_path, "output": out_path, "filter": "MixtureFilterConfig() defaults",
+    side = {"input": in_path, "input_sha256": V._sha_file(in_path),
+            "output": out_path, "output_sha256": V._sha_file(out_path),
+            "filter": "MixtureFilterConfig() defaults",
             "source_bag_sha256": V._sha_file(in_path),
             "output_bag_sha256": V._sha_file(out_path),
             "id_topic": ID_TOPIC, "id_msgtype": ID_MSGTYPE,

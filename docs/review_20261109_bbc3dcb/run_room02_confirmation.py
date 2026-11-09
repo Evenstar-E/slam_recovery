@@ -72,6 +72,31 @@ def _raw_by_ns(path, topic):
     return out
 
 
+def _blocked(status, evidence, inputs_sha):
+    """A precheck failure is a result, not a traceback: write it and exit non-zero."""
+    res = {"protocol": {"source": "docs/MILESTONE_fixed_input_repair.md @ 107c05a"},
+           "status": "BLOCKED", "blocked_on": status,
+           "evidence": evidence, "inputs_sha256": inputs_sha,
+           "provenance": "not run: the confirmation needs a verified clean reference",
+           "reference": "proxy would be the clean run map, not GT; single sequence"}
+    with open(RESULTS, "w", encoding="utf-8") as fh:
+        json.dump(res, fh, indent=1, default=str)
+    print(f"BLOCKED ({status}): wrote {RESULTS}")
+    raise SystemExit(2)
+
+
+def _scan_fields(path):
+    with V.Reader(path) as r:
+        for c in r.connections:
+            if c.topic == V.SCAN_TOPIC:
+                for conn, _t, raw in r.messages(connections=[c]):
+                    m = V.TYPESTORE.deserialize_ros1(raw, conn.msgtype)
+                    return {"point_step": int(m.point_step),
+                            "fields": ",".join(f"{f.name}@{f.offset}:{f.datatype}"
+                                               for f in m.fields)}
+    return {}
+
+
 def main():
     sha = {r: V._sha_file(p) for r, p in
            (("injected_scans", INJ_SCANS), ("injected_poses", INJ_POSES),
@@ -79,15 +104,37 @@ def main():
             ("filtered_scans", FILTERED), ("rerun_poses", RERUN))}
 
     # ---- oracle injection window: per-frame raw-buffer equality --------------------------
+    for role in ("injected_scans", "clean_scans"):
+        if sha.get(role) is None:
+            _blocked("MISSING", {"role": role}, sha)
     inj_raw = _raw_by_ns(INJ_SCANS, "/velodyne_points")
     cln_raw = _raw_by_ns(CLN_SCANS, "/velodyne_points")
     common = sorted(set(inj_raw) & set(cln_raw))
+    if not common:
+        _blocked("NO_COMMON_STAMPS", {
+            "injected": {"path": INJ_SCANS, "frames": len(inj_raw),
+                         "first_ns": min(inj_raw), "last_ns": max(inj_raw),
+                         "sha256": sha["injected_scans"],
+                         "scan_topic_layout": _scan_fields(INJ_SCANS)},
+            "clean": {"path": CLN_SCANS, "frames": len(cln_raw),
+                      "first_ns": min(cln_raw), "last_ns": max(cln_raw),
+                      "sha256": sha["clean_scans"],
+                      "scan_topic_layout": _scan_fields(CLN_SCANS)},
+            "comparison": "exact header nanosecond intersection",
+            "command": "python3 -B docs/review_20261109_bbc3dcb/run_room02_confirmation.py",
+        }, sha)
     diff = [ns for ns in common if inj_raw[ns] != cln_raw[ns]]
     if not diff:
-        raise SystemExit("no differing frame: this is not an injected recording")
+        _blocked("NO_COMMON_STAMPS", {"common_frames": len(common),
+                                      "differing_frames": 0,
+                                      "note": "common stamps exist but every buffer is identical",
+                                      "sha256": sha}, sha)
     if len(common) < len(inj_raw):
-        raise SystemExit(f"clean bag covers only {len(common)} of {len(inj_raw)} injected frames; "
-                         f"refusing to score a partial reference")
+        _blocked("UNVERIFIED_SOURCE", {
+            "injected_frames": len(inj_raw), "clean_frames": len(cln_raw),
+            "shared_frames": len(common),
+            "note": "the clean bag does not cover every injected frame",
+            "sha256": sha}, sha)
     onset_ns, end_ns = int(diff[0]), int(diff[-1])
     print(f"[] oracle window: {len(diff)}/{len(common)} frames differ, "
           f"{onset_ns} .. {end_ns}")
@@ -243,14 +290,31 @@ def main():
 
     # healthy-region removal, from the filter build sidecar
     healthy = None
-    rep = "/tmp/filtered_bag_report.json"
-    if os.path.exists(rep):
+    rep = os.path.join(_HERE, "room02_filter_report.json")
+    ident = {"report": rep}
+    if not os.path.exists(rep):
+        healthy = {"status": "STALE_AUDIT", "why": "no room-specific bound sidecar"}
+    else:
         fr = json.load(open(rep))
+        binding = fr.get("binding", {})
+        ident.update({"input": fr.get("input"), "input_sha256": fr.get("input_sha256"),
+                      "output": fr.get("output"), "output_sha256": fr.get("output_sha256"),
+                      "binding_verdict": binding.get("verdict")})
+        ok_ident = (binding.get("verdict") == "BOUND"
+                    and fr.get("input") == INJ_SCANS
+                    and fr.get("input_sha256") == sha["injected_scans"]
+                    and fr.get("output") == FILTERED
+                    and fr.get("output_sha256") == sha["filtered_scans"])
+        if not ok_ident:
+            healthy = {"status": "STALE_AUDIT", "identity": ident,
+                       "why": "the sidecar does not describe these bags"}
+    if healthy is None:
         pf = fr.get("per_frame", [])
         out_frames = [f for f in pf if not (onset_ns / 1e9 - 5e-4 <= f["t"] <= end_ns / 1e9 + 5e-4)]
         rem = sum(f["n"] - f["kept"] for f in out_frames)
         tot = sum(f["n"] for f in out_frames)
-        healthy = {"frames_outside": len(out_frames), "points_outside": int(tot),
+        healthy = {"identity": ident,
+                   "frames_outside": len(out_frames), "points_outside": int(tot),
                    "removed_outside": int(rem),
                    "fraction_outside": float(rem / tot) if tot else None,
                    "frames_with_any_removal": int(sum(1 for f in out_frames
