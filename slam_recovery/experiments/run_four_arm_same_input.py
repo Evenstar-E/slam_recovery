@@ -252,7 +252,7 @@ def detect_onset(clean_bag, inj_bag, topic="/velodyne_points"):
         raise RuntimeError("detect_onset: no scan differs; refusing to run an 'injection' replay")
     return (diff[0] - t0, diff[-1] - t0,
             {"start_rel_sec": round(diff[0] - t0, 3), "end_rel_sec": round(diff[-1] - t0, 3),
-             "start_abs_sec": diff[0], "end_abs_sec": diff[-1],
+             "start_abs_sec": diff[0], "end_abs_sec": diff[-1], "first_common_abs_sec": t0,
              "differing_frames": len(diff), "compared_frames": len(common),
              "missing_in_injected": len(set(c) - set(a)),
              "missing_in_clean": len(set(a) - set(c)),
@@ -468,6 +468,9 @@ def main():
     # to the first *common* scan while pair_keyframes keys rel to each bag's first scan; the two
     # bases differ whenever a bag is missing head frames.
     ONSET_ABS, INJ_END_ABS = _ev["start_abs_sec"], _ev["end_abs_sec"]
+    # If the bags do not share a head frame, the two zero points differ; every segment decision
+    # below uses absolute stamps, and this offset records whether that case occurred.
+    _ev["head_frame_offset_sec"] = round(float(inj_kfs[0]["ts"] - _ev["first_common_abs_sec"]), 6)
     print(f"detected onset = {ONSET_REL} s, end = {INJ_END_REL} s")
     onset_evidence = dict(_ev)
     onset_evidence["hardcoded_value_was"] = 20.0
@@ -689,7 +692,9 @@ def main():
     def per_kf_distances(ids):
         return [proxy_grid.query(kf_points(i), max_r=2.5) for i in ids]
 
-    floor_ids = [i for i in range(len(inj_kfs)) if inj_kfs[i]["rel"] < ONSET_REL]
+    # Absolute stamps, like pre/quar: ONSET_REL is keyed to the first *common* scan while
+    # inj_kfs rel is keyed to this bag's first scan, so the two diverge when head frames differ.
+    floor_ids = [i for i in range(len(inj_kfs)) if inj_kfs[i]["ts"] < ONSET_ABS]
     floor_d = per_kf_distances(floor_ids)
     floor_flat = np.concatenate(floor_d) if floor_d else np.zeros(0)
     floor_stats = distance_stats(floor_flat)

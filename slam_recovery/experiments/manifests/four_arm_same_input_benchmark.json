@@ -93,7 +93,10 @@
     "start_abs_sec": 1627785275.607,
     "end_abs_sec": 1627785295.546,
     "role": "INJECTION_ORACLE (offline; requires the clean recording)",
-    "deployable_detector": false
+    "deployable_detector": false,
+    "first_common_abs_sec": 1627785261.079,
+    "head_frame_offset_sec": 0.0,
+    "segment_time_base": "pre/quar, alignment windows and floor_ids all compare absolute header stamps; this run shares all 598 head frames, so the relative and absolute bases coincide (offset 0.0)."
   },
   "protocol": {
     "voxel_m": 0.1,
