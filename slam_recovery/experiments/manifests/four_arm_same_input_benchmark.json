@@ -526,7 +526,8 @@
     "Candidate is the host's own quarantined trajectory; the archive holds no repaired candidate for this window, so A3 can only accept or reject the host poses.",
     "Incumbent is a constant-velocity extrapolation, not a per-frame record, so the paired test asks whether the candidate beats 'no repair', not whether it is optimal.",
     "A0 and A2 write the identical keyframe set and therefore the same map; A2 differs only in having passed through quarantine before admitting everything.",
-    "ATE on the admitted set is confounded by coverage; ate_on_common_support is the like-for-like number."
+    "ATE on the admitted set is confounded by coverage; ate_on_common_support is the like-for-like number.",
+    "The 120k-point proxy subsample inflates both contamination tails; at full proxy resolution the values are 0.2966 (A0) and 0.0029 (A1), and the 0.0079 floor is two-thirds sampling."
   ],
   "evidence_status_scope": "evidence_status describes the paired-benefit term only; the holdout-NIS term is reported separately as holdout_nis, and accepted=False means the candidate did not enter Mode 2.",
   "time_bases": {
@@ -538,5 +539,26 @@
     "meaning": "head_frame_offset_sec = first paired scan - first common scan, i.e. the pairing delay at the head, not a difference between the two bags' heads. The clean run's first paired scan is 1627785263.58389 (head dropped [0,2.4] s).",
     "method": "measured by re-running pair_keyframes on the archived bags after the 3eb9408 review; the earlier zero values were hand-filled and wrong",
     "note": "Segment membership (pre/quar, alignment windows, floor_ids) uses absolute header stamps, so this pairing delay does not shift any segment; it only means the first paired keyframe is 1.30 s after the first raw scan."
+  },
+  "independent_check": {
+    "script": "docs/review_20261109_bbc3dcb/verify_four_arm_independent.py",
+    "recomputed_matches_archive": {
+      "A0_tail_over_0_5m": 0.3647,
+      "A1_tail_over_0_5m": 0.0079,
+      "A0_coverage": 0.9496,
+      "A1_coverage": 0.9199,
+      "note": "own nearest-neighbour implementation, no sampling; identical to 4 decimals"
+    },
+    "proxy_resolution": {
+      "headline_proxy_points": 120000,
+      "clean_run_points": 8490000,
+      "fraction_used": 0.014,
+      "full_resolution_A0_tail_over_0_5m": 0.2966,
+      "full_resolution_A1_tail_over_0_5m": 0.0029,
+      "note": "the 120k stride subsample inflates both tails; about two-thirds of the reported 0.0079 floor is proxy sampling rather than map error"
+    },
+    "independent_maps": "A0 equals A2 and A1 equals A3 (the gate rejected the candidate, so verified admission degenerates to quarantine). Only the A0-vs-A1 comparison is independent; the floor is a third copy of A1.",
+    "coverage_net_gain_percentage_points": 2.97,
+    "interpretation": "The contamination gap is consistent with the archived 12.9 m post-window trajectory residual: 'the written map is far from the clean surface' and 'the host trajectory drifted' are two descriptions of one fact. Report it as a consistency check, not as independent evidence for the admission policy."
   }
 }
