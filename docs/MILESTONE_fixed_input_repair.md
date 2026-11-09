@@ -1,7 +1,10 @@
 # Milestone: fixed-input measurement repair and native map reconstruction
 
-Status: M1 measured (C0-C3 on the ns boundary, `OFFLINE_NATIVE_REESTIMATION` for C3); M2 (full-record
-filtered exporter and native host runner) and M3 (online checkpoint / deployable repair) remain open.
+Status: M1 diagnostic measured (C0-C3 on the ns boundary, `OFFLINE_NATIVE_REESTIMATION` for C3), but the
+surface-accuracy claim is withdrawn pending a bounded-geometry evaluation: an unbounded 8-NN plane
+residual scores a point 99.9 m from a finite patch as zero. M2 (full-record filtered exporter with
+original point ids, native host runner and runtime receipt) and M3 (online checkpoint / deployable
+repair) remain open.
 This document fixed the protocol before results existed, so the controls and labels were not chosen
 after seeing the numbers.
 
