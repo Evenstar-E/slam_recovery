@@ -234,6 +234,7 @@
   "open_items": [
     "Per-frame visual contribution is not logged: no count of selected visual points, no valid photometric residual count, no state delta per update. Without them the visual term's role cannot be attributed from the outside.",
     "Camera-LiDAR calibration has not been verified against the images; only the calibration file was copied.",
-    "img_point_cov and dept_err have different units, residual spaces and normalisations, so their numeric comparison is not a weight ratio and must not be used as one."
+    "img_point_cov and dept_err have different units, residual spaces and normalisations, so their numeric comparison is not a weight ratio and must not be used as one.",
+    "The conversion sidecar now records the source and output bag hashes, argv and the git commit, but only for conversions run after that change. The FAST-LIVO2 runs archived in this manifest predate it, so their inputs are identified by path and size only and are not byte-replayable from the sidecar alone."
   ]
 }
