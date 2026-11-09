@@ -64,6 +64,8 @@ DEFAULT_GT = "/home/R26534/M2DGR/GT/hall_01.txt"
 # as trusted and the anchor itself was 2.8 m off.
 ONSET_REL = None          # filled by detect_onset()
 INJ_END_REL = 40.0
+ONSET_ABS = None          # absolute stamps; the segment split uses these, not bag-relative rel
+INJ_END_ABS = None
 VOXEL = 0.10
 SURF_TOL = 0.15
 MAX_KF_POINTS = 15000
@@ -459,15 +461,19 @@ def main():
     # favour any admission policy.
     ts_gt_all, xyz_gt_all, _ = load_tum_trajectory_se3(DEFAULT_GT)
 
-    global ONSET_REL, INJ_END_REL
+    global ONSET_REL, INJ_END_REL, ONSET_ABS, INJ_END_ABS
     _st, _en, _ev = detect_onset(DEFAULT_CLN_SCANS, DEFAULT_INJ_SCANS)
     ONSET_REL, INJ_END_REL = _st, _en
+    # Segment membership is decided on absolute header stamps. detect_onset keys its rel values
+    # to the first *common* scan while pair_keyframes keys rel to each bag's first scan; the two
+    # bases differ whenever a bag is missing head frames.
+    ONSET_ABS, INJ_END_ABS = _ev["start_abs_sec"], _ev["end_abs_sec"]
     print(f"detected onset = {ONSET_REL} s, end = {INJ_END_REL} s")
     onset_evidence = dict(_ev)
     onset_evidence["hardcoded_value_was"] = 20.0
     onset_evidence["note"] = ("the hard-coded 20.0 s was wrong; the injected span starts at "
                               f"{_st} s, so six seconds of faulty frames had been treated as trusted")
-    pre_inj = [k for k in inj_kfs if k["rel"] < ONSET_REL]
+    pre_inj = [k for k in inj_kfs if k["ts"] < ONSET_ABS]
     pre_inj_ts = np.asarray([k["ts"] for k in pre_inj])
     pre_inj_xyz = np.asarray([k["pose"][:3, 3] for k in pre_inj])
     cln_ts_all = np.asarray([k["ts"] for k in cln_kfs])
@@ -483,12 +489,16 @@ def main():
         if len(mi) < 3:
             return {}
         err = np.linalg.norm(mi @ R_ic.T + t_ic - mc, axis=1)
-        rel = mt - inj_kfs[0]["ts"]
+        t0 = inj_kfs[0]["ts"]
         out = {}
-        for lo, hi in ((0, ONSET_REL), (ONSET_REL, INJ_END_REL), (INJ_END_REL, 1e9)):
-            m = (rel >= lo) & (rel < hi)
+        for label, lo_abs, hi_abs in (
+            ("pre", 0.0, ONSET_ABS),
+            ("injection", ONSET_ABS, INJ_END_ABS),
+            ("post", INJ_END_ABS, 1e18),
+        ):
+            m = (mt >= lo_abs) & (mt < hi_abs)
             if m.sum():
-                out[f"[{lo:g},{hi if hi < 1e8 else 60:g})s"] = {
+                out[f"{label}_rel[{lo_abs - t0:.2f},{hi_abs - t0:.2f})s"] = {
                     "n": int(m.sum()),
                     "mean_m": round(float(np.mean(err[m])), 4),
                     "p95_m": round(float(np.percentile(err[m], 95)), 4),
@@ -526,7 +536,7 @@ def main():
     # clean proxy. This measures the disagreement between two runs that saw identical input, which
     # is the resolution limit for any cross-run comparison.
     pre_aligned = np.vstack([world_points(k) for k in
-                             [k for k in inj_kfs if k["rel"] < ONSET_REL]]) @ R_ic.T + t_ic
+                             [k for k in inj_kfs if k["ts"] < ONSET_ABS]]) @ R_ic.T + t_ic
     pre_vox = voxels(pre_aligned)
     cross_floor = {
         "unsupported_voxel_fraction": round(float(unsupported_fraction(pre_vox, proxy_surface)), 4),
@@ -559,8 +569,8 @@ def main():
     print(f"  interp LOO: {interp_loo['translation_err_mean_m']*1000:.2f} mm / "
           f"{interp_loo['rotation_err_mean_deg']:.3f} deg")
 
-    pre = [k for k in inj_kfs if k["rel"] < ONSET_REL]
-    quar = [k for k in inj_kfs if k["rel"] >= ONSET_REL]
+    pre = [k for k in inj_kfs if k["ts"] < ONSET_ABS]
+    quar = [k for k in inj_kfs if k["ts"] >= ONSET_ABS]
 
     tail = pre[-EXTRAP_FRAMES:]
     dt_span = tail[-1]["ts"] - tail[0]["ts"]
