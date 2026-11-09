@@ -310,7 +310,8 @@ controlled.
 **Determinism controls T1/T2 (REAL_HOST)**: compiling the OpenMP reduction out (NO_MP=ON, new
 binary `6e0a3e57…`, old binary backed up) still leaves cell O split (GOOD 0.309 m / BAD 336.75 m;
 archived aligned first-pose 11.3 mm at the onset frame; an independent recomputation gives 8.7 mm
-at the same frame and 15.1 mm at the first common frame). Serial reductions plus `taskset 0-7`, `nice` and a quiet machine
+at the same frame and 15.1 mm at the first common frame, with the common-ID hashes reproduced
+exactly by a separate implementation). Serial reductions plus `taskset 0-7`, `nice` and a quiet machine
 (load 52/128) shrink the archived aligned first-pose difference to 1.95 mm (independent: 3.9 mm at the onset frame,
 7.7 mm at the first common frame) and the cell still splits (GOOD 0.072 m / BAD 17.910 m). Neither control is sufficient to stabilise the cell; this rejects the hypothesis that the control alone removes the instability, not that the reduction or scheduling contributes to the original failure. T2 is a combined resource control and n=2 per condition, so no per-factor exclusion is claimed.
 The remaining candidates are the 5 kHz wall-clock frame grouping (S3) and the IMU initialisation
