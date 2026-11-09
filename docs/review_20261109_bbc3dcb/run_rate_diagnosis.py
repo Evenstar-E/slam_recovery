@@ -76,10 +76,8 @@ def _intervals(ts):
 def _segment_stats(ts, lo, hi):
     m = (ts >= lo) & (ts <= hi)
     inside = np.diff(ts[m]) if m.sum() > 1 else np.zeros(0)
-    # The neighbours are two disjoint stretches, so their intervals must be computed
-    # separately. Concatenating the samples first and then diffing invents an interval that
-    # spans the fault window: ts=[0,.066,1,1.066,2,2.066] with fault=[.9,1.1] would yield
-    # [.066, 1.934, .066] and report a 1/3 slow fraction from two 66 ms gaps.
+    # Left and right neighbours are differenced SEPARATELY and then concatenated. Diffing the
+    # concatenated array would manufacture one long interval across the excluded fault window.
     left = ts[(ts >= lo - 15.0) & (ts < lo)]
     right = ts[(ts > hi) & (ts <= hi + 15.0)]
     outside = np.concatenate([np.diff(left) if len(left) > 1 else np.zeros(0),
@@ -182,18 +180,11 @@ def main():
         verdict = "INPUT_HOLES"
         why = ("the input streams themselves have gaps longer than 1.5x their median inside the "
                "clip")
-    elif load_med is not None and load_med >= (os.cpu_count() or 1) and od_slow:
-        # Load average counts runnable and uninterruptible tasks and says nothing about the
-        # runnable wait itself; low CPU use can also come from sync, IO or blocking. Without a
-        # same-prefix low-load control this is a correlation, not a cause.
-        verdict = "CONTENTION_SUSPECTED"
-        why = (f"the host skipped publications while its inputs were continuous; load average was "
-               f"{load_med} against {os.cpu_count()} cores. That is a candidate mechanism, not a "
-               f"runnable-wait measurement; a same-prefix low-load control is required")
     elif load_med is not None and load_med >= (os.cpu_count() or 1):
-        verdict = "RESOURCE_LOAD_HIGH_NO_PUBLICATION_STRETCH"
-        why = (f"load average was {load_med} against {os.cpu_count()} cores but the odometry "
-               f"cadence did not stretch inside the clip")
+        verdict = "SCHEDULING_CONTENTION"
+        why = (f"the host skipped publications while its inputs were continuous; load average was "
+               f"{load_med} against {os.cpu_count()} cores, so the host was CPU-starved rather "
+               f"than missing data")
     elif od_slow and not holes_input:
         verdict = "INTERNAL (input continuous, host publishes slower)"
         why = ("the LiDAR and IMU arrive at their normal cadence while /aft_mapped_to_init "

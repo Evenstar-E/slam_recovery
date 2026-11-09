@@ -112,7 +112,8 @@ rec = {
     "host": {"binary": binp, "sha256": sha(binp),
              "source_revision": pre.get("host_revision")},
     "run": {"rate": float(rate), "drain_sec": float(drain),
-            "master_uri": os.environ.get("ROS_MASTER_URI"), "run_dir": rd},
+            "master_uri": os.environ.get("ROS_MASTER_URI"), "run_dir": rd,
+            "taskset_prefix": os.environ.get("FL_TASKSET", "")},
     "managed_pids": {"roscore": i(rc_pid), "record": i(rec_pid), "node": i(node_pid)},
     "process_exit": {"rosbag_play": i(play_x), "rosbag_record": i(rec_x),
                      "fastlivo_node": i(node_x)},
@@ -199,7 +200,7 @@ rosparam dump "$PARAMS" / || { STATUS=FAIL; REASON="could not dump ROS parameter
 setsid rosbag record -O "$OUT" /aft_mapped_to_init > "$RUN_DIR/record.log" 2>&1 &
 REC=$!
 sleep 2
-setsid rosrun fast_livo fastlivo_mapping > "$RUN_DIR/node.log" 2>&1 &
+setsid ${FL_TASKSET:-} rosrun fast_livo fastlivo_mapping > "$RUN_DIR/node.log" 2>&1 &
 NODE=$!
 sleep 3
 

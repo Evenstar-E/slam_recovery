@@ -1,0 +1,80 @@
+{
+ "status": "OK",
+ "status_reason": "completed",
+ "termination": "PLANNED_KILL_AFTER_DRAIN",
+ "pre_run": {
+  "paths": {
+   "script": "/tmp/wt-sim/docs/review_20261109_bbc3dcb/fl_run_isolated.sh",
+   "input_bag": "/tmp/fastlivo/rate_diag_fullprefix.bag",
+   "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+   "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+   "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping"
+  },
+  "sha256": {
+   "script": "de554a925e868d1c5b1a75ca4e15bac473797ddc2451ec0bd4e6a5c6eef7c75b",
+   "input_bag": "dd9bfdcef7f6344b1f5a39e6630987d82ae42172711c52b1ed660b4792e59a7c",
+   "config_m2dgr": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+   "config_camera": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+   "host_binary": "ca1959c45121a4b60fcae597a293e918c41df1df53efd08a79b1ccc8e6076a6a"
+  },
+  "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+  "captured": "BEFORE_LAUNCH",
+  "sizes": {
+   "script": 11840,
+   "input_bag": 796355367,
+   "config_m2dgr": 2052,
+   "config_camera": 238,
+   "host_binary": 100720
+  }
+ },
+ "sources_changed_during_run": [],
+ "config": {
+  "m2dgr": {
+   "path": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+   "sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93"
+  },
+  "camera": {
+   "path": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+   "sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7"
+  },
+  "ros_params_dump": {
+   "path": "/tmp/fl_run_20261109T103719Z_2398162/ros_params.yaml",
+   "sha256": "88d93eb185ab8e9f93bdbafed3f2aef6fa5c7f3aad82380878cd06d438a0f32b"
+  }
+ },
+ "host": {
+  "binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+  "sha256": "ca1959c45121a4b60fcae597a293e918c41df1df53efd08a79b1ccc8e6076a6a",
+  "source_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64"
+ },
+ "run": {
+  "rate": 0.5,
+  "drain_sec": 20.0,
+  "master_uri": "http://127.0.0.1:57457",
+  "run_dir": "/tmp/fl_run_20261109T103719Z_2398162",
+  "taskset_prefix": "taskset -c 92,29,68,120,123,36,122,7"
+ },
+ "managed_pids": {
+  "roscore": null,
+  "record": 2399422,
+  "node": 2399593
+ },
+ "process_exit": {
+  "rosbag_play": 0,
+  "rosbag_record": 0,
+  "fastlivo_node": 137
+ },
+ "output": {
+  "bag": "/tmp/fastlivo/rate_diag_outB.bag",
+  "exists": true,
+  "bytes": 403949,
+  "sha256": "4baa8eb74b2a8e364f61f01bab0d0110c2c3094baf6487a8ded94836e9b368f5",
+  "odometry_messages": 504,
+  "first_stamp_sec": 1627785262.1425724,
+  "last_stamp_sec": 1627785299.892213,
+  "duration_sec": 37.749640703201294,
+  "bag_start_sec": 1794220658.7955546,
+  "bag_end_sec": 1794220734.3019536,
+  "verdict": "OK"
+ }
+}
