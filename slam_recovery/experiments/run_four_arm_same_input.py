@@ -213,6 +213,11 @@ def pair_keyframes(scan_path, pose_path, ignore_rotation):
         "dt_ms_max": round(float(d.max()) * 1e3, 3),
         "dropped_time_ranges_rel_sec": _ranges(drop_rel),
         "pose_stream": pose_stats,
+        # Three distinct zeros: the raw bag's first scan, the first scan that survived pairing,
+        # and (from detect_onset) the first common scan. Recording them separately keeps a
+        # pairing-drop delay from masquerading as a bag head difference.
+        "first_raw_scan_abs_sec": round(float(pts[0][0]), 6) if pts else None,
+        "first_paired_abs_sec": round(float(kfs[0]["ts"]), 6) if kfs else None,
     }
     return kfs, stats
 

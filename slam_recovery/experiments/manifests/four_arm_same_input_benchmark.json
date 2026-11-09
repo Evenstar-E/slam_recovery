@@ -527,5 +527,12 @@
     "A0 and A2 write the identical keyframe set and therefore the same map; A2 differs only in having passed through quarantine before admitting everything.",
     "ATE on the admitted set is confounded by coverage; ate_on_common_support is the like-for-like number."
   ],
-  "evidence_status_scope": "evidence_status describes the paired-benefit term only; the holdout-NIS term is reported separately as holdout_nis, and accepted=False means the candidate did not enter Mode 2."
+  "evidence_status_scope": "evidence_status describes the paired-benefit term only; the holdout-NIS term is reported separately as holdout_nis, and accepted=False means the candidate did not enter Mode 2.",
+  "time_bases": {
+    "first_raw_scan_abs_sec": 1627785261.079,
+    "first_paired_scan_abs_sec": 1627785261.079,
+    "first_common_scan_abs_sec": 1627785261.079,
+    "head_frame_offset_sec": 0.0,
+    "note": "All three coincide in this run (598/598 scans paired at the head). Segment membership is decided on absolute header stamps, so a future head mismatch or pairing drop cannot shift pre/quar or floor_ids; this block records the case rather than proving it absent by idleness."
+  }
 }
