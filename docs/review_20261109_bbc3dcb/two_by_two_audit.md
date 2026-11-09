@@ -167,6 +167,33 @@ gauge 残差 1.32–1.54 cm，所以 1 cm 阈值确实会在首样本必然触�
 7 项 fixture：完整集 PASS；`{}` 判 UNVERIFIABLE；缺 run、多 run、缺 `n_runs`、`n_runs` 不符、
 批次前缀丢失各自判 FAIL。
 
+## 9. T1/T2 对齐复算（main 291a0dd）
+
+用**不共享任何代码**的实现独立复算（rosbag 读位姿、自己的最近邻关联、自己的 Umeyama、
+自己读 TUM GT）：
+
+| 量 | T1 | T2 | 与记录 |
+|---|---|---|---|
+| `first_output`（两 run） | 42.844585 / 41.511961 | 41.378685 / 42.244886 | **逐位相同** |
+| `first_scored` | 42.844585 | 42.244886 | **逐位相同** |
+| `common_ids` | 769 | 778 | **相同** |
+| `common_ids_sha256` | `f2e3aac4…` | `279585d5…` | **逐位相同** |
+| gauge 残差 | 0.015743 | 0.014334 | **相同** |
+| `aligned_at_onset_m` | 0.008715 | 0.003900 | **相同** |
+| `aligned_first_scored_m` | 0.015113 | 0.007726 | **相同** |
+| ATE（两 run） | 0.347764/300.275260 | 0.084578/18.510512 | 记录 0.347758/300.275246、0.084548/18.510589（≈1e-5 相对差） |
+
+只有 ATE 在 1e-5 量级有差，来源是 GT 关联的并列取舍（`associate_trajectories` 与我的实现
+在等距时选点不同）。所有对齐量与两个 common-ID 哈希**完全可复现**。
+
+两套口径的定义写在 `field_definitions` 里，清楚：`aligned_at_onset_m` 是结果 JSON 报的那个量，
+`aligned_first_scored_m` 是从首个共同帧算的。两个数（8.7 mm vs 15.1 mm、3.9 mm vs 7.7 mm）
+都远低于 5 cm，且 T1/T2 各自都是一好一坏（0.348/300.3、0.085/18.5），所以「该控制未稳定结果」
+成立，与「排除该机制贡献」是两回事——文档现在也是这么分开写的。
+
+复算脚本：`docs/review_20261109_6b61c9d/verify_determinism_alignment.py`，
+结果 `determinism_alignment_verified.json`。
+
 ## 5b. R2 / R3 处置（同意你的提议）
 
 - **R2**：旧 `room02_hybrid_bag_report.json` 属已废弃的 X/Y 设计，2×2 已取代它。

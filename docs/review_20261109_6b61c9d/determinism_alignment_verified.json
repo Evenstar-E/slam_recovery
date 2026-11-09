@@ -1,0 +1,39 @@
+{
+ "record": "/tmp/wt-fourarm/docs/review_20261109_6b61c9d/determinism_alignment.json",
+ "pairs": {
+  "T1": {
+   "recomputed": {
+    "first_output_run1_s": 1627643742.844585,
+    "first_output_run2_s": 1627643741.5119612,
+    "first_scored_s": 1627643742.844585,
+    "common_ids": 769,
+    "common_ids_sha256": "f2e3aac4896de9f3286d8826fa60c7cb136d4e46dce2e4124021bd697da40293",
+    "gauge_prefix_ids": 249,
+    "gauge_residual_rmse_m": 0.015742512553985673,
+    "aligned_first_scored_m": 0.015112692829841947,
+    "aligned_at_onset_m": 0.008714856854047033,
+    "ate_run1_m": 0.347764248050722,
+    "ate_run2_m": 300.27525983082046
+   },
+   "diffs": {},
+   "verdict": "PASS"
+  },
+  "T2": {
+   "recomputed": {
+    "first_output_run1_s": 1627643741.378685,
+    "first_output_run2_s": 1627643742.244886,
+    "first_scored_s": 1627643742.244886,
+    "common_ids": 778,
+    "common_ids_sha256": "279585d5676f342a42392a654fb566dd6b1c000c3b3c3eb1b033cdd5bbf36438",
+    "gauge_prefix_ids": 258,
+    "gauge_residual_rmse_m": 0.014333571777564886,
+    "aligned_first_scored_m": 0.007725599257148883,
+    "aligned_at_onset_m": 0.00389959431438095,
+    "ate_run1_m": 0.08457797495886256,
+    "ate_run2_m": 18.510512300017837
+   },
+   "diffs": {},
+   "verdict": "PASS"
+  }
+ }
+}
