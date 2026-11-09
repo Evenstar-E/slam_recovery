@@ -214,6 +214,19 @@ class TestReceiptLibrary(unittest.TestCase):
         results = {"provenance_gap": {"receipt_library_sha256": "SOMETHING_ELSE"}}
         self.assertEqual(A.check_receipt_library([self._rec()], results)["verdict"], "FAIL")
 
+    def test_registry_excuses_only_the_records_it_names(self):
+        reg = {"batches": {"b": {"records": ["old1.json"]}}}
+        ok = A.check_receipt_library([self._rec()], None, reg, "b", ["old1.json"])
+        self.assertEqual(ok["verdict"], "RETROSPECTIVE_PARTIAL")
+        new = A.check_receipt_library([self._rec()], None, reg, "b", ["new1.json"])
+        self.assertEqual(new["verdict"], "FAIL")
+        self.assertTrue(any("not named in the registry" in p for p in new["problems"]))
+
+    def test_unlisted_batch_still_fails_even_with_a_registry(self):
+        reg = {"batches": {"other": {"records": ["x.json"]}}}
+        r = A.check_receipt_library([self._rec()], None, reg, "b", ["a.json"])
+        self.assertEqual(r["verdict"], "FAIL")
+
     def test_mixed_batch_with_gap_is_partial(self):
         results = {"provenance_gap": {"receipt_library_sha256": "ABSENT"}}
         r = A.check_receipt_library([self._rec("l" * 64), self._rec()], results)

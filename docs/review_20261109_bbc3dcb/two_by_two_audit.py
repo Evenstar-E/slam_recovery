@@ -29,15 +29,17 @@ EVAL = os.path.join(_REPO, "docs/review_20261109_6b61c9d/evaluate_2x2_runs.json"
 OUT = os.path.join(_HERE, "two_by_two_audit.json")
 BIST = os.path.join(_HERE, "room02_bistability_results.json")
 HALL01 = json.load(open(os.path.join(_HERE, "hall01_stability_results.json"), encoding="utf-8"))
-HALL01_RECEIPTS = [json.load(open(p, encoding="utf-8")) for p in sorted(
-    glob.glob(os.path.join(_HERE, "hall01_stab_receipt_fl_run_*.json")))]
+HALL01_PATHS = sorted(glob.glob(os.path.join(_HERE, "hall01_stab_receipt_fl_run_*.json")))
+HALL01_RECEIPTS = [json.load(open(p, encoding="utf-8")) for p in HALL01_PATHS]
+HALL01_NAMES = [os.path.basename(p) for p in HALL01_PATHS]
 LIB_GAP = (json.load(open(os.path.join(_HERE, "library_hash_gap.json"), encoding="utf-8"))
            if os.path.exists(os.path.join(_HERE, "library_hash_gap.json")) else {})
 T3A_RESULTS = json.load(open(os.path.join(_HERE, "room02_T3a_results.json"), encoding="utf-8"))
 T3A_ENRICHED = json.load(open(os.path.join(_HERE, "room02_T3a_enriched_results.json"),
                               encoding="utf-8"))
-T3A_RECEIPTS = [json.load(open(p, encoding="utf-8")) for p in sorted(
-    glob.glob(os.path.join(_HERE, "room02_T3a*_receipt_r*.json")))]
+T3A_PATHS = sorted(glob.glob(os.path.join(_HERE, "room02_T3a*_receipt_r*.json")))
+T3A_RECEIPTS = [json.load(open(p, encoding="utf-8")) for p in T3A_PATHS]
+T3A_NAMES = [os.path.basename(p) for p in T3A_PATHS]
 BEFORE = os.environ.get("TWOBY2_BEFORE", "/tmp/2x2_before.json")
 
 CELLS = ("O", "O_plus_F", "O_minus_B", "O_plus_F_minus_B")
@@ -474,7 +476,7 @@ def check_verdict_scope(results, label=""):
             "scope": scope, "build": str(build)[:80] if build else None}
 
 
-def check_receipt_library(receipts, results=None, registry=None, batch=None):
+def check_receipt_library(receipts, results=None, registry=None, batch=None, names=None):
     """An executable hash that is identical across builds cannot identify a build.
 
     If the behaviour lives in a shared library, the receipt must hash that library too.
@@ -494,7 +496,20 @@ def check_receipt_library(receipts, results=None, registry=None, batch=None):
         return {"verdict": "PASS", "problems": [], "receipts": len(receipts)}
     gap = (results or {}).get("provenance_gap") or {}
     reg = registry or {}
-    listed = batch is not None and batch in (reg.get("batches") or {})
+    entry = (reg.get("batches") or {}).get(batch) if batch else None
+    if entry is not None and names:
+        # the registry names individual historical records; a new receipt in the same batch
+        # must not inherit the excuse just because the batch is listed
+        allowed = set(entry.get("records") or [])
+        unlisted = [n for n in names if n not in allowed]
+        if unlisted:
+            return {"verdict": "FAIL",
+                    "problems": [f"{len(unlisted)} receipt(s) are not named in the registry "
+                                 f"(e.g. {unlisted[0]}) and record no loaded-library hash"],
+                    "receipts": len(receipts)}
+        listed = True
+    else:
+        listed = entry is not None
     if gap.get("receipt_library_sha256") == "ABSENT" or listed:
         return {"verdict": "RETROSPECTIVE_PARTIAL",
                 "problems": [f"{len(missing)}/{len(receipts)} receipts predate the requirement; "
@@ -587,7 +602,7 @@ def main():
            "6_hash_chain": audit_hash_chain(results, manifest),
            "11_t3a": {
                "receipt_library": check_receipt_library(T3A_RECEIPTS, T3A_RESULTS,
-                                                        LIB_GAP, "room02_T3a"),
+                                                        LIB_GAP, "room02_T3a", T3A_NAMES),
                "verdict_scope": check_verdict_scope(T3A_RESULTS, "room02_T3a_results"),
                "enriched_scope": check_verdict_scope(T3A_ENRICHED, "room02_T3a_enriched_results"),
                "identity": audit_receipts(
@@ -598,7 +613,7 @@ def main():
                "stability": check_hall01_stability(HALL01),
                "identity": check_batch_identity(HALL01_RECEIPTS),
                "receipt_library": check_receipt_library(HALL01_RECEIPTS, HALL01,
-                                                        LIB_GAP, "hall01_stab"),
+                                                        LIB_GAP, "hall01_stab", HALL01_NAMES),
            },
            "10_run_identity": check_run_identity(
                json.load(open(BIST, encoding="utf-8"))),

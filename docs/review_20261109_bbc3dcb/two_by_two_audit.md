@@ -256,8 +256,11 @@ T3a 走的是结果文件内的 `provenance_gap`；hall_01 没有这个字段，
                   "observed": "4/4 receipts carry only the executable sha"}}}
 ```
 
-把它补进去，两批都会判 `RETROSPECTIVE_PARTIAL`，而**新** receipt 缺字段仍判 FAIL——
-注册表只覆盖列明的批次，不构成通用豁免。
+注册表已由 `3c2091b` 落盘，两批均判 `RETROSPECTIVE_PARTIAL`（6/6、4/4）。
+
+**一处收紧**：注册表列的是**具体记录名**（`records` 数组），所以规则也按记录名豁免——
+同一批次里**新增**的 receipt 若缺库 hash，仍判 **FAIL**，不会因为批次名在册而继承豁免。
+否则只要批次被列过一次，该批次以后所有漏记都会被同一条声明掩护过去，注册表就退化成通用豁免了。
 
 ## 12. T3a verdict 冲突（已解）
 
