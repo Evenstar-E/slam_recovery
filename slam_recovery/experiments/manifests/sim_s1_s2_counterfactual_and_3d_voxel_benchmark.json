@@ -168,7 +168,10 @@
           "candidate_frames_committed": 10,
           "candidate_frames_deferred": 10,
           "frames_missing_scan": [],
-          "frames_in_reference": []
+          "frames_in_reference": [],
+          "prefix_stop_key": 30,
+          "prefix_stop_reason": "no_reference_support",
+          "committable_frames_after_prefix": 0
         },
         "gt_nis_analytic_mean": 0.005302
       },
@@ -214,7 +217,10 @@
           "candidate_frames_committed": 10,
           "candidate_frames_deferred": 10,
           "frames_missing_scan": [],
-          "frames_in_reference": []
+          "frames_in_reference": [],
+          "prefix_stop_key": 30,
+          "prefix_stop_reason": "no_reference_support",
+          "committable_frames_after_prefix": 0
         },
         "gt_nis_analytic_mean": 0.005272
       },
@@ -260,7 +266,10 @@
           "candidate_frames_committed": 10,
           "candidate_frames_deferred": 10,
           "frames_missing_scan": [],
-          "frames_in_reference": []
+          "frames_in_reference": [],
+          "prefix_stop_key": 30,
+          "prefix_stop_reason": "no_reference_support",
+          "committable_frames_after_prefix": 0
         },
         "gt_nis_analytic_mean": 0.005594
       },
@@ -306,7 +315,10 @@
           "candidate_frames_committed": 10,
           "candidate_frames_deferred": 10,
           "frames_missing_scan": [],
-          "frames_in_reference": []
+          "frames_in_reference": [],
+          "prefix_stop_key": 30,
+          "prefix_stop_reason": "no_reference_support",
+          "committable_frames_after_prefix": 0
         },
         "gt_nis_analytic_mean": 0.005437
       },
@@ -352,7 +364,10 @@
           "candidate_frames_committed": 10,
           "candidate_frames_deferred": 10,
           "frames_missing_scan": [],
-          "frames_in_reference": []
+          "frames_in_reference": [],
+          "prefix_stop_key": 30,
+          "prefix_stop_reason": "no_reference_support",
+          "committable_frames_after_prefix": 0
         },
         "gt_nis_analytic_mean": 0.005431
       }

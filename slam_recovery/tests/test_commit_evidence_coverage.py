@@ -80,6 +80,41 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
         self.assertEqual(report.deferred_pose_keys, [0])
         self.assertEqual(node._last_holdout_support["frames_missing_scan"], [0])
         self.assertEqual(node.tx_mgr.trusted_poses, {})
+        # A candidate whose first frame has no support must not be logged as an empty candidate.
+        self.assertEqual(node.last_paired_evidence["reason"], "no_committable_prefix")
+        self.assertEqual(node._last_holdout_support["prefix_stop_key"], 0)
+        self.assertEqual(node._last_holdout_support["prefix_stop_reason"], "missing_scan")
+
+    def test_prefix_stop_is_reported_with_the_frames_it_blocks(self) -> None:
+        """One unsupported first frame truncates the prefix, but the blocked frames stay visible."""
+        cloud = _plane_cloud()
+        node = _node_with_quarantine(cloud)
+        poses, incumbent = {}, {}
+        for k in range(6):
+            node.scan_buffer_body[k] = cloud.copy()
+            poses[k] = np.eye(4)
+            incumbent[k] = np.eye(4)
+        # Frame 0 sits 100 m above the reference surface: not supportable. Frames 1..5 are fine.
+        poses[0] = np.eye(4)
+        poses[0][2, 3] = 100.0
+
+        report = node.evaluate_and_commit_candidate(
+            "bad_head",
+            poses,
+            aux_or_loop_info_6x6=np.eye(6) * 100,
+            incumbent_poses=incumbent,
+            reentry_anchor_pose=np.eye(4),
+        )
+
+        support = node._last_holdout_support
+        self.assertEqual(support["candidate_frames_total"], 6)
+        self.assertEqual(support["candidate_frames_committable"], 5)
+        self.assertEqual(support["candidate_frames_committed"], 0)
+        self.assertEqual(support["prefix_stop_key"], 0)
+        self.assertEqual(support["prefix_stop_reason"], "no_reference_support")
+        self.assertEqual(support["committable_frames_after_prefix"], 5)
+        self.assertNotEqual(report.mode, RecoveryMode.MODE2_ATOMIC_COMMIT)
+        self.assertEqual(node.tx_mgr.trusted_poses, {})
 
     def test_frame_in_reference_is_not_scored_against_itself(self) -> None:
         """Provenance must come from the map, not from a comment."""
@@ -105,6 +140,55 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
         # Frame 0 is part of the reference, so it cannot be verified and cannot be committed.
         self.assertNotIn(0, node.tx_mgr.trusted_poses)
         self.assertEqual(node._last_holdout_support["frames_in_reference"], [0])
+
+    def test_infinite_holdout_is_missing_evidence_not_invalid_state(self) -> None:
+        """No scorable holdout frame must read as MISSING, not as a non-finite pose."""
+        mgr = TrustedMapTransactionManager(confirmation_margin_ns=0)
+        mgr.trigger_quarantine(
+            estimated_onset_ns=int(1e9),
+            current_ns=int(2e9),
+            weak_direction_6d=np.array([0, 0, 0, 1, 0, 0]),
+            info_before_6x6=np.eye(6) * 2,
+            propagated_cov_norm=1.2,
+        )
+        cand = CandidateMap(
+            candidate_id="no_holdout",
+            parent_map_version=mgr.trusted_version,
+            repaired_poses={0: np.eye(4)},
+            info_after_6x6=np.eye(6) * 100,
+            cov_after_6x6=np.eye(6) * 0.01,
+            holdout_nis=float("inf"),
+            paired_benefit_approved=True,
+            wilson_lower_bound=0.9,
+            reentry_pos_jump_m=0.0,
+        )
+        report = mgr.validate_and_resolve(cand)
+        self.assertIn(
+            report.mode,
+            (RecoveryMode.MODE3_SOFT_BRIDGE_WAIT, RecoveryMode.MODE4_HARD_SLEEP_SPLIT),
+        )
+        self.assertIn("holdout evidence MISSING", report.reason)
+        self.assertNotIn("non-finite", report.reason)
+
+    def test_nan_holdout_is_still_rejected_as_invalid(self) -> None:
+        mgr = TrustedMapTransactionManager(confirmation_margin_ns=0)
+        mgr.trigger_quarantine(
+            estimated_onset_ns=int(1e9),
+            current_ns=int(2e9),
+            weak_direction_6d=np.array([0, 0, 0, 1, 0, 0]),
+            info_before_6x6=np.eye(6) * 2,
+            propagated_cov_norm=1.2,
+        )
+        cand = CandidateMap(
+            candidate_id="nan_holdout",
+            parent_map_version=mgr.trusted_version,
+            repaired_poses={0: np.eye(4)},
+            info_after_6x6=np.eye(6) * 100,
+            cov_after_6x6=np.eye(6) * 0.01,
+            holdout_nis=float("nan"),
+        )
+        report = mgr.validate_and_resolve(cand)
+        self.assertIn("non-finite", report.reason)
 
     def test_manager_refuses_a_candidate_with_unverified_frames(self) -> None:
         """Defence in depth: the manager enforces the invariant even for direct callers."""

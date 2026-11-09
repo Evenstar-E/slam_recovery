@@ -265,6 +265,7 @@ class OnlineRecoveryTransactionNode:
         reentry_anchor_pose: Optional[np.ndarray] = None,
         reference_world: Optional[np.ndarray] = None,
         reference_keys: Optional[set] = None,
+        empty_reason: str = "no_repaired_poses",
     ) -> Tuple[Optional[bool], Optional[float], Optional[float]]:
         """
         Measure the paired-benefit / re-entry evidence of a candidate against its incumbent.
@@ -275,7 +276,7 @@ class OnlineRecoveryTransactionNode:
         atomic commit rather than assuming a pass (P1-1).
         """
         keys = sorted(repaired_poses.keys())
-        self.last_paired_evidence = {"num_paired_frames": 0, "reason": "no_repaired_poses"}
+        self.last_paired_evidence = {"num_paired_frames": 0, "reason": empty_reason}
         if not keys:
             return None, None, None
 
@@ -440,8 +441,23 @@ class OnlineRecoveryTransactionNode:
             and self._frame_has_reference_support(k, train_world, repaired_poses)
         }
         commit_keys: List[int] = []
+        stop_key: Optional[int] = None
+        stop_reason: Optional[str] = None
         for k in kf_sorted:
             if k not in committable:
+                stop_key = k
+                # Say *why* the prefix stopped. "Zero frames committed" is not enough: a missing
+                # scan, a frame that contributed to the reference, and a frame the reference does
+                # not cover all truncate the same prefix but call for different fixes.
+                stop_reason = (
+                    "missing_scan"
+                    if k not in self.scan_buffer_body
+                    else "reference_overlap"
+                    if k in reference_keys
+                    else "no_incumbent_pose"
+                    if (incumbent_keys is not None and k not in incumbent_keys)
+                    else "no_reference_support"
+                )
                 break
             commit_keys.append(k)
         deferred_keys = [k for k in kf_sorted if k not in set(commit_keys)]
@@ -460,6 +476,16 @@ class OnlineRecoveryTransactionNode:
             "candidate_frames_deferred": len(deferred_keys),
             "frames_missing_scan": missing_scan_keys,
             "frames_in_reference": sorted(set(kf_sorted) & reference_keys),
+            # Diagnostics for the truncation itself. A prefix can stop at its very first frame
+            # while later frames are perfectly supportable; without these fields that case is
+            # indistinguishable from "the candidate contained nothing".
+            "prefix_stop_key": stop_key,
+            "prefix_stop_reason": stop_reason,
+            "committable_frames_after_prefix": (
+                len([k for k in kf_sorted if k in committable and k not in set(commit_keys)])
+                if stop_key is not None
+                else 0
+            ),
         }
 
         holdout_nis_list = []
@@ -487,12 +513,18 @@ class OnlineRecoveryTransactionNode:
 
         # Paired-benefit evidence must be measured, never assumed; unmeasured components stay None
         # and force the gate to wait (Mode 3/4) instead of committing.
+        # The two ways the scored set can end up empty must not share one log string: an empty
+        # *input* candidate and a candidate whose first frame has no reference support (prefix
+        # length zero) send the operator to completely different places.
         paired_ok, wilson_lb, reentry_jump = self._measure_paired_evidence(
             candidate_poses,
             incumbent_poses=incumbent_poses,
             reentry_anchor_pose=reentry_anchor_pose,
             reference_world=train_world,
             reference_keys=reference_keys,
+            empty_reason=(
+                "no_committable_prefix" if (not commit_keys and kf_sorted) else "no_repaired_poses"
+            ),
         )
 
         cand = CandidateMap(
