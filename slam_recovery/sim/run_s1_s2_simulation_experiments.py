@@ -139,6 +139,8 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
     # Tri-state paired-benefit evidence outcome recorded per branch (P1-1)
     r4_evidence_list, r5_evidence_list, b5_evidence_list = [], [], []
     b6_point_evidence_list, b6_pg_evidence_list = [], []
+    b6_point_mode_list, b6_point_committed_kfs_list = [], []
+    b6_point_voxel_count_list, b6_point_contam_list = [], []
 
     # S2: 3D Voxel Contamination Ratio \mathrm{Contam}_{3D} across B0, B1, B2, B3, B4, B5, B6
     contam_3d = {"B0": [], "B1": [], "B2": [], "B3": [], "B4": [], "B5": [], "B6": []}
@@ -352,6 +354,11 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
         b6_point_info_list.append(rep_b6_pm.weak_dir_info_after)
         b6_point_nis_list.append(rep_b6_pm.holdout_nis)
         b6_point_evidence_list.append(rep_b6_pm.evidence_status)
+        b6_point_mode_list.append(rep_b6_pm.mode.value)
+        b6_point_committed_kfs_list.append(int(len(node_b6_pm.tx_mgr.trusted_poses)))
+        b6_point_voxel_count_list.append(int(len(node_b6_pm.committed_voxel_set)))
+        b6_point_contam_list.append(
+            arena.compute_3d_voxel_contamination_ratio(node_b6_pm.committed_voxel_set))
 
         # S1 Case 5: B6 Aux Pose-Graph Bridge on LIO-SAM (with physical IMU/visual relative odometry Fisher prior \sigma_{rel}^{-2})
         sigma_rel_rot_rad = 0.04
@@ -373,7 +380,12 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
         b6_pg_nis_list.append(rep_b6_pg.holdout_nis)
         b6_pg_evidence_list.append(rep_b6_pg.evidence_status)
 
-        contam_3d["B6"].append(arena.compute_3d_voxel_contamination_ratio(node_r5.committed_voxel_set))
+        # B6 must be scored on the node that actually ran the verified candidate. The previous
+        # line measured `node_r5`, which is the quarantine-only node and therefore has exactly the
+        # same committed set as B4 -- so B6's reported 0% was B4's 0%, not a property of verified
+        # admission. `node_b6_pm` writes its (filtered) scan buffer under the accepted poses via
+        # `_sync_spatial_map_with_trusted_poses()`, which is the semantics the paper claims.
+        contam_3d["B6"].append(arena.compute_3d_voxel_contamination_ratio(node_b6_pm.committed_voxel_set))
 
     out = {
         "provenance": "ONLINE_SIM_3D_MESH (Controlled Analytical 3D-Mesh Ray-Sampling & Gate Benchmark)",
@@ -405,6 +417,11 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
                 "holdout_nis": round(float(np.mean(b6_point_nis_list)), 3),
                 "mode": rep_b6_pm.mode.value,
                 "paired_evidence_status": sorted(set(b6_point_evidence_list)),
+                "gate_modes": sorted(set(b6_point_mode_list)),
+                "trusted_keyframes_after_commit": b6_point_committed_kfs_list,
+                "committed_voxels_per_scenario": b6_point_voxel_count_list,
+                "committed_voxels_mean": round(float(np.mean(b6_point_voxel_count_list)), 1),
+                "contam_3d_per_scenario": [round(float(c), 6) for c in b6_point_contam_list],
                 "paired_evidence_diagnostics": node_b6_pm.last_paired_evidence,
             },
             "B6_Ours_Aux_PoseGraph_LIOSAM": {

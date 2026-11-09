@@ -48,6 +48,31 @@
       "paired_evidence_status": [
         "PASSED"
       ],
+      "gate_modes": [
+        "MODE2_ATOMIC_COMMIT"
+      ],
+      "trusted_keyframes_after_commit": [
+        20,
+        20,
+        20,
+        20,
+        20
+      ],
+      "committed_voxels_per_scenario": [
+        10276,
+        10308,
+        10223,
+        10246,
+        10236
+      ],
+      "committed_voxels_mean": 10257.8,
+      "contam_3d_per_scenario": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
       "paired_evidence_diagnostics": {
         "num_paired_frames": 20,
         "required_paired_frames": 8,

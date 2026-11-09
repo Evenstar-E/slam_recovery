@@ -11,7 +11,11 @@ from slam_recovery.core import (
     RecoveryState,
 )
 from slam_recovery.quarantine import TrustedMapTransactionManager
-from slam_recovery.validation import evaluate_paired_sequential_benefit, wilson_score_lower_bound
+from slam_recovery.validation import (
+    compute_disjoint_holdout_point_to_plane_nis,
+    evaluate_paired_sequential_benefit,
+    wilson_score_lower_bound,
+)
 
 
 def _make_delta(ts_sec: float, kf_id: int, x_pos: float) -> BackendDelta:
@@ -129,6 +133,86 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
         self.assertEqual(rep2.mode, RecoveryMode.MODE2_ATOMIC_COMMIT)
         self.assertEqual(mgr.trusted_version, version_before + 1)
         self.assertIn(2, mgr.trusted_poses)
+
+    def test_p1a_self_fitting_candidate_fails_independent_scan(self) -> None:
+        """
+        P1-A: a candidate can be *perfectly self-consistent* --- its residuals against the map it
+        just rebuilt are ~0 --- while making an independent scan strictly worse.
+
+        The trusted surface is the floor z = 0. Incumbent poses sit 5 cm above it, candidate poses
+        20 cm above it. Because the candidate rebuilds its own map from its own scans, its
+        point-to-plane NIS against that map is ~0 no matter how wrong the pose is. Only the paired
+        test against a reference the candidate did not fit exposes the damage, and the gate must
+        refuse the commit even though every self-measured number looks admissible.
+        """
+        rng = np.random.default_rng(11)
+        n = 600
+        trusted_floor = np.column_stack([rng.uniform(-2, 2, n), rng.uniform(-2, 2, n), np.zeros(n)])
+        scans = [
+            np.column_stack([rng.uniform(-2, 2, n), rng.uniform(-2, 2, n), np.zeros(n)])
+            for _ in range(8)
+        ]
+
+        def place(dz: float):
+            return np.zeros((0, 3)) if False else [s + np.array([0.0, 0.0, dz]) for s in scans]
+
+        incumbent = place(0.05)
+        candidate = place(0.20)
+
+        # (a) Self-consistency: score the candidate against the map it built for itself.
+        self_map = np.vstack(candidate[0::2])
+        cand_self_nis = float(np.mean([
+            compute_disjoint_holdout_point_to_plane_nis(self_map, s, np.eye(4), sigma_meas_m=0.05)
+            for s in candidate[1::2]
+        ]))
+        self.assertLess(cand_self_nis, 1.0, "counterexample needs a self-consistent candidate")
+
+        # (b) Independent reference: the trusted floor, which the candidate never fitted.
+        inc_res = np.asarray([float(np.mean(np.abs(s[:, 2]))) for s in incumbent])
+        cand_res = np.asarray([float(np.mean(np.abs(s[:, 2]))) for s in candidate])
+        self.assertTrue(np.all(cand_res > inc_res), "candidate must be uniformly worse on the holdout")
+
+        benefit = evaluate_paired_sequential_benefit(
+            inc_res, cand_res, reentry_position_jump_m=0.0, min_observations=4
+        )
+        self.assertFalse(benefit.approved)
+        self.assertEqual(benefit.num_improved_frames, 0)
+        self.assertLess(benefit.wilson_lower_bound, 0.55)
+
+        # (c) The gate must refuse it, even though its self-measured holdout NIS looks excellent
+        #     and its weak-direction information gain is comfortably above tau_info.
+        mgr = TrustedMapTransactionManager(
+            confirmation_margin_ns=int(2.0 * 1e9),
+            gate_thresholds=GateThresholds(tau_info=25.0, tau_val_nis=2.5, sigma_tol=0.5, sigma_bridge=4.0),
+        )
+        mgr.step_healthy(_make_delta(1.0, 1, 1.0))
+        mgr.step_healthy(_make_delta(4.0, 2, 2.0))
+        mgr.trigger_quarantine(
+            estimated_onset_ns=int(3.5 * 1e9),
+            current_ns=int(6.0 * 1e9),
+            weak_direction_6d=np.array([0, 0, 0, 1, 0, 0], dtype=np.float64),
+            info_before_6x6=np.diag([60, 60, 60, 3.0, 60, 60]),
+            propagated_cov_norm=1.8,
+        )
+        version_before = mgr.trusted_version
+
+        self_fitting = CandidateMap(
+            candidate_id="self_fitting_candidate",
+            parent_map_version=version_before,
+            repaired_poses={2: np.eye(4)},
+            info_after_6x6=np.diag([60, 60, 60, 45.0, 60, 60]),  # passes tau_info=25.0
+            cov_after_6x6=np.eye(6) * 0.05,                       # passes sigma_tol=0.5
+            holdout_nis=cand_self_nis,                            # passes tau_val_nis=2.5
+            paired_benefit_approved=benefit.approved,
+            wilson_lower_bound=benefit.wilson_lower_bound,
+            reentry_pos_jump_m=0.0,
+        )
+        self.assertLess(self_fitting.holdout_nis, 2.5)
+        rep = mgr.validate_and_resolve(self_fitting)
+        self.assertFalse(rep.accepted)
+        self.assertNotEqual(rep.mode, RecoveryMode.MODE2_ATOMIC_COMMIT)
+        self.assertEqual(mgr.trusted_version, version_before)
+        self.assertNotIn(2, mgr.trusted_poses)
 
     def test_wilson_sequential_benefit_and_reentry_continuity(self) -> None:
         """
