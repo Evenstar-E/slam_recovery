@@ -216,12 +216,37 @@ class OnlineRecoveryTransactionNode:
                 self._sync_spatial_map_with_trusted_poses()
         return None
 
+    def _frame_has_reference_support(
+        self,
+        kf_id: int,
+        ref_pts: np.ndarray,
+        repaired_poses: Dict[int, np.ndarray],
+        radius_m: float = 1.0,
+        min_supported_fraction: float = 0.60,
+    ) -> bool:
+        """True when most of this frame's points land near the independent reference cloud.
+
+        A frame far outside the reference's coverage cannot be validated: scoring it would compare
+        the scan against a plane extrapolated from unrelated geometry.
+        """
+        if len(ref_pts) == 0:
+            return False
+        T = np.asarray(repaired_poses[kf_id], dtype=np.float64)
+        pts_b = np.asarray(self.scan_buffer_body[kf_id], dtype=np.float64)[:, :3]
+        if len(pts_b) == 0:
+            return False
+        pts_w = (pts_b @ T[:3, :3].T) + T[:3, 3]
+        q = pts_w[:: max(1, len(pts_w) // 200)][:200]
+        d = np.linalg.norm(q[:, None, :] - ref_pts[None, :, :], axis=-1)
+        return bool(np.mean(d.min(axis=1) <= radius_m) >= min_supported_fraction)
+
     def _measure_paired_evidence(
         self,
         repaired_poses: Dict[int, np.ndarray],
         incumbent_poses: Optional[Dict[int, np.ndarray]] = None,
         reentry_anchor_pose: Optional[np.ndarray] = None,
         reference_world: Optional[np.ndarray] = None,
+        reference_keys: Optional[set] = None,
     ) -> Tuple[Optional[bool], Optional[float], Optional[float]]:
         """
         Measure the paired-benefit / re-entry evidence of a candidate against its incumbent.
@@ -261,7 +286,23 @@ class OnlineRecoveryTransactionNode:
             if reference_world is not None and len(reference_world) > 0
             else self.get_trusted_map_points(max_pts=1500)
         )
-        paired_keys = [k for k in keys if k in self.scan_buffer_body and k in incumbent_poses]
+        # P1-A: score only frames that did not contribute to the reference. With the reference now
+        # built from the trusted map alone this excludes nothing, but the exclusion is enforced
+        # structurally so that any future caller supplying anchor frames cannot silently re-introduce
+        # the self-reference that fix 1 removed.
+        pairable_keys = [
+            k for k in keys
+            if k in self.scan_buffer_body and k in incumbent_poses
+            and k not in (reference_keys or set())
+        ]
+        # P1-A (second half): a frame can only be scored where an independent reference actually
+        # exists. Once the candidate's own scans stop propping up the reference, frames that sit
+        # beyond the trusted map's coverage would be compared against an extrapolated surface and
+        # produce enormous but meaningless residuals -- that is "no evidence", not "bad candidate",
+        # and the two must not be conflated. Keep only frames whose points are predominantly
+        # supported by the reference cloud.
+        paired_keys = [k for k in pairable_keys if self._frame_has_reference_support(k, ref_pts, repaired_poses)]
+        unsupported = len(pairable_keys) - len(paired_keys)
         # Evidence requirement scales with how much of the map the candidate would commit. This is
         # a floor under both settings, so a caller that raises min_paired_observations above the
         # large-candidate requirement cannot end up demanding *less* evidence for a bigger commit.
@@ -279,6 +320,9 @@ class OnlineRecoveryTransactionNode:
                 # traceable as an accepted one.
                 "required_paired_frames": required_paired,
                 "candidate_keyframes": len(keys),
+                "pairable_frames": len(pairable_keys),
+                "frames_without_independent_reference": unsupported,
+                "reference_frames_from_candidate": len(reference_keys or ()),
                 "reentry_pos_jump_m": reentry_jump,
             }
             return None, None, reentry_jump
@@ -311,6 +355,9 @@ class OnlineRecoveryTransactionNode:
             "num_paired_frames": int(report.num_observations),
             "required_paired_frames": required_paired,
             "candidate_keyframes": len(keys),
+            "pairable_frames": len(pairable_keys),
+            "frames_without_independent_reference": unsupported,
+            "reference_frames_from_candidate": len(reference_keys or ()),
             "num_improved_frames": int(report.num_improved_frames),
             "improved_fraction": float(report.empirical_improved_fraction),
             "wilson_lower_bound": float(report.wilson_lower_bound),
@@ -337,22 +384,30 @@ class OnlineRecoveryTransactionNode:
             and compute point-to-plane NIS against the trusted map \mathcal{M}_{trusted}
             and non-holdout anchor scans.
         """
+        # P1-A: the validation reference must be independent of the candidate. It is built ONLY from
+        # the trusted map as it stood before the quarantine opened. The candidate's non-holdout
+        # scans used to be concatenated in here, which made the "independent holdout" partially
+        # self-referential: a candidate was scored against geometry produced by the very poses it
+        # was supposed to justify, so any self-consistent drift looked like agreement.
         trusted_map_pts = self.get_trusted_map_points(max_pts=1500)
         kf_sorted = sorted(repaired_poses.keys())
         holdout_kfs = [k for idx, k in enumerate(kf_sorted) if idx % self.holdout_stride == 0]
-        train_kfs = [k for idx, k in enumerate(kf_sorted) if idx % self.holdout_stride != 0]
 
-        train_world_list = [trusted_map_pts] if len(trusted_map_pts) > 0 else []
-        for k in train_kfs:
-            if k in self.scan_buffer_body:
-                T_k = repaired_poses[k]
-                pts_b = self.scan_buffer_body[k]
-                train_world_list.append((pts_b @ T_k[:3, :3].T) + T_k[:3, 3])
-        train_world = np.vstack(train_world_list) if train_world_list else np.zeros((0, 3))
+        train_world = trusted_map_pts if len(trusted_map_pts) > 0 else np.zeros((0, 3))
+        reference_keys: set = set()
+
+        # Same independence rule as the paired test: a holdout frame may only be scored where the
+        # trusted map actually supports it, otherwise the residual measures extrapolation rather
+        # than candidate quality.
+        scorable_holdout = [k for k in holdout_kfs if self._frame_has_reference_support(k, train_world, repaired_poses)]
+        self._last_holdout_support = {
+            "holdout_frames_total": len(holdout_kfs),
+            "holdout_frames_scorable": len(scorable_holdout),
+        }
 
         holdout_nis_list = []
         fims_after = []
-        for k in holdout_kfs:
+        for k in scorable_holdout:
             if k in self.scan_buffer_body:
                 T_k = repaired_poses[k]
                 pts_b = self.scan_buffer_body[k]
@@ -381,6 +436,7 @@ class OnlineRecoveryTransactionNode:
             incumbent_poses=incumbent_poses,
             reentry_anchor_pose=reentry_anchor_pose,
             reference_world=train_world,
+            reference_keys=reference_keys,
         )
 
         cand = CandidateMap(

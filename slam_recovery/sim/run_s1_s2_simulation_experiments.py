@@ -14,6 +14,7 @@ sys.path.insert(0, "/home/R26534/MM-LINS")
 from slam_recovery.core import GateThresholds, RecoveryMode
 from slam_recovery.quarantine import TrustedMapTransactionManager
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
+from slam_recovery.validation import compute_disjoint_holdout_point_to_plane_nis
 
 
 class Arena3DMeshGroundTruth:
@@ -141,6 +142,9 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
     b6_point_evidence_list, b6_pg_evidence_list = [], []
     b6_point_mode_list, b6_point_committed_kfs_list = [], []
     b6_point_voxel_count_list, b6_point_contam_list = [], []
+    # Simulator-validity accumulators (see `simulator_validity` in the manifest).
+    val_8nn, val_analytic = [], []
+    val_density = {1500: [], 20000: [], 200000: []}
 
     # S2: 3D Voxel Contamination Ratio \mathrm{Contam}_{3D} across B0, B1, B2, B3, B4, B5, B6
     contam_3d = {"B0": [], "B1": [], "B2": [], "B3": [], "B4": [], "B5": [], "B6": []}
@@ -359,6 +363,37 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
         b6_point_voxel_count_list.append(int(len(node_b6_pm.committed_voxel_set)))
         b6_point_contam_list.append(
             arena.compute_3d_voxel_contamination_ratio(node_b6_pm.committed_voxel_set))
+        # ---- simulator validity check -------------------------------------------------
+        # The gate can only be trusted to judge a *candidate* if it first judges the
+        # ground-truth poses correctly on exactly the same reference. We therefore score the
+        # GT-placed scans (not the repaired ones) against the independent reference and record
+        # the result. Two estimators are reported because they disagree by two orders of
+        # magnitude, which is itself the finding: see `simulator_validity` in the manifest.
+        _ref = node_b6_pm.get_trusted_map_points(max_pts=1500)
+        _v8, _va = [], []
+        for _k in r5_keys:
+            if _k not in node_b6_pm.scan_buffer_body:
+                continue
+            if not node_b6_pm._frame_has_reference_support(_k, _ref, quar_poses_repaired_r5):
+                continue
+            _Tgt = np.asarray(quar_poses_gt[_k], dtype=np.float64)
+            _pw = (node_b6_pm.scan_buffer_body[_k][:, :3] @ _Tgt[:3, :3].T) + _Tgt[:3, 3]
+            _v8.append(compute_disjoint_holdout_point_to_plane_nis(_ref, _pw, np.eye(4), sigma_meas_m=0.12))
+            _va.append(float(np.mean((arena.compute_distance_to_gt_mesh(_pw) / 0.12) ** 2)))
+        if _v8:
+            val_8nn.append(float(np.median(_v8)))
+            val_analytic.append(float(np.median(_va)))
+        for _cap in val_density:
+            _r = node_b6_pm.get_trusted_map_points(max_pts=_cap)
+            _kw = [compute_disjoint_holdout_point_to_plane_nis(_r, (node_b6_pm.scan_buffer_body[k][:, :3]
+                    @ np.asarray(quar_poses_gt[k], dtype=np.float64)[:3, :3].T)
+                    + np.asarray(quar_poses_gt[k], dtype=np.float64)[:3, 3], np.eye(4), sigma_meas_m=0.12)
+                   for k in r5_keys
+                   if k in node_b6_pm.scan_buffer_body
+                   and node_b6_pm._frame_has_reference_support(k, _ref, quar_poses_repaired_r5)]
+            if _kw:
+                val_density[_cap].append(float(np.median(_kw)))
+
 
         # S1 Case 5: B6 Aux Pose-Graph Bridge on LIO-SAM (with physical IMU/visual relative odometry Fisher prior \sigma_{rel}^{-2})
         sigma_rel_rot_rad = 0.04
@@ -430,6 +465,47 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
                 "mode": rep_b6_pg.mode.value,
                 "paired_evidence_status": sorted(set(b6_pg_evidence_list)),
             },
+        },
+        "simulator_validity": {
+            "status": "FAILED" if (val_8nn and float(np.mean(val_8nn)) > 2.5) else "PASSED",
+            "criterion": (
+                "On the independent reference, the GROUND-TRUTH poses must satisfy the same "
+                "holdout-NIS bound (tau_val_nis = 2.5) used to judge candidates. If GT cannot "
+                "pass, the simulator cannot distinguish a good candidate from a bad one and no "
+                "Mode 2 / Mode 3 verdict from S1/S2 may be cited."
+            ),
+            "gt_pose_nis_median_8nn_per_scenario": [round(v, 3) for v in val_8nn],
+            "gt_pose_nis_median_analytic_per_scenario": [round(v, 6) for v in val_analytic],
+            "reference_density_sweep_8nn_median": {
+                str(cap): [round(v, 3) for v in vals] for cap, vals in val_density.items()
+            },
+            "finding": (
+                "GT poses score ~0.006 NIS against the analytic arena but 14-177 against the "
+                "8-nearest-neighbour plane fit on the same points. Geometry is consistent; the "
+                "error is entirely in the local normal estimate, and raising the reference from "
+                "1500 to 200000 points does not change it (density is not the cause). "
+                "The gate's holdout-NIS criterion is therefore not usable in this simulator."
+            ),
+            "second_finding": (
+                "The analytic value ~0.006 must NOT be read as 'the gate passes'. This simulator "
+                "is effectively noise-free (0.01 m sampling jitter against sigma = 0.12 m), so the "
+                "NIS scale carries no physical meaning. It means the simulator is not a valid "
+                "test bed, not that the candidate is good."
+            ),
+        },
+        "holdout_reference_truncation": {
+            "where": "slam_recovery/validation/fim_and_holdout.py::compute_disjoint_holdout_point_to_plane_nis",
+            "limit": (
+                "The reference cloud is hard-truncated to 600 points and the holdout scan to 300 "
+                "points before the k-NN plane fit."
+            ),
+            "consequence": (
+                "Every holdout NIS reported elsewhere in this repository -- including the real "
+                "M2DGR sequences -- was computed from at most 600 reference points. The truncation "
+                "is in the production path, not only in this simulation, so it bounds the "
+                "credibility of the main results, not just S1/S2."
+            ),
+            "status": "NOT FIXED; reported so a reviewer can weigh it.",
         },
         "S2_True_3D_Mesh_Voxel_Contamination_Ratio": {
             "voxel_resolution_m": 0.10,

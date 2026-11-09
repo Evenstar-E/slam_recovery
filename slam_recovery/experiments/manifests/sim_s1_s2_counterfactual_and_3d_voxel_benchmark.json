@@ -5,67 +5,72 @@
   "num_seeds": 5,
   "S1_CrossScan_Holdout_Gate_Verification": {
     "R4_Dual_Blind_No_Evidence": {
-      "weak_dir_info_after": 0.78,
-      "holdout_nis": 5.253,
+      "weak_dir_info_after": 0.79,
+      "holdout_nis": 133.686,
       "mode": "MODE3_SOFT_BRIDGE_WAIT",
       "paired_evidence_status": [
-        "FAILED"
+        "FAILED",
+        "MISSING"
       ]
     },
     "B5_Narrow_FoV_Filter_LIOSAM": {
       "weak_dir_info_after": 20.51,
-      "holdout_nis": 2.522,
+      "holdout_nis": 17.778,
       "mode": "MODE3_SOFT_BRIDGE_WAIT",
       "paired_evidence_status": [
+        "FAILED",
         "PASSED"
       ]
     },
     "R5_Delayed_Revisit_Loop": {
-      "weak_dir_info_after": 87.87,
-      "holdout_nis": 1.409,
-      "mode": "MODE2_ATOMIC_COMMIT",
+      "weak_dir_info_after": 88.09,
+      "holdout_nis": 10.38,
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
       "paired_evidence_status": [
         "PASSED"
       ],
       "paired_evidence_diagnostics": {
-        "num_paired_frames": 20,
+        "num_paired_frames": 10,
         "required_paired_frames": 8,
         "candidate_keyframes": 20,
-        "num_improved_frames": 20,
+        "pairable_frames": 20,
+        "frames_without_independent_reference": 10,
+        "reference_frames_from_candidate": 0,
+        "num_improved_frames": 10,
         "improved_fraction": 1.0,
-        "wilson_lower_bound": 0.8808234818732034,
+        "wilson_lower_bound": 0.7870282011880192,
         "approved": true,
         "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
-        "incumbent_mean_residual": 105.59748673486638,
-        "candidate_mean_residual": 1.3255402246779924,
+        "incumbent_mean_residual": 30.614354393966657,
+        "candidate_mean_residual": 11.167182579194877,
         "reentry_pos_jump_m": 0.007419211926453025
       }
     },
     "B6_Ours_Point_Mixture_FASTLIO2": {
-      "weak_dir_info_after": 81.24,
-      "holdout_nis": 0.824,
-      "mode": "MODE2_ATOMIC_COMMIT",
+      "weak_dir_info_after": 73.07,
+      "holdout_nis": 14.629,
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
       "paired_evidence_status": [
         "PASSED"
       ],
       "gate_modes": [
-        "MODE2_ATOMIC_COMMIT"
+        "MODE3_SOFT_BRIDGE_WAIT"
       ],
       "trusted_keyframes_after_commit": [
-        20,
-        20,
-        20,
-        20,
-        20
+        0,
+        0,
+        0,
+        0,
+        0
       ],
       "committed_voxels_per_scenario": [
-        10276,
-        10308,
-        10223,
-        10246,
-        10236
+        0,
+        0,
+        0,
+        0,
+        0
       ],
-      "committed_voxels_mean": 10257.8,
+      "committed_voxels_mean": 0.0,
       "contam_3d_per_scenario": [
         0.0,
         0.0,
@@ -74,27 +79,79 @@
         0.0
       ],
       "paired_evidence_diagnostics": {
-        "num_paired_frames": 20,
+        "num_paired_frames": 10,
         "required_paired_frames": 8,
         "candidate_keyframes": 20,
-        "num_improved_frames": 20,
+        "pairable_frames": 20,
+        "frames_without_independent_reference": 10,
+        "reference_frames_from_candidate": 0,
+        "num_improved_frames": 10,
         "improved_fraction": 1.0,
-        "wilson_lower_bound": 0.8808234818732034,
+        "wilson_lower_bound": 0.7870282011880192,
         "approved": true,
         "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
-        "incumbent_mean_residual": 136.4141957996498,
-        "candidate_mean_residual": 0.8902775607152458,
+        "incumbent_mean_residual": 148.3459412122714,
+        "candidate_mean_residual": 14.973099073417321,
         "reentry_pos_jump_m": 0.007419211926453025
       }
     },
     "B6_Ours_Aux_PoseGraph_LIOSAM": {
-      "weak_dir_info_after": 112.56,
-      "holdout_nis": 1.46,
-      "mode": "MODE2_ATOMIC_COMMIT",
+      "weak_dir_info_after": 112.78,
+      "holdout_nis": 10.38,
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
       "paired_evidence_status": [
         "PASSED"
       ]
     }
+  },
+  "simulator_validity": {
+    "status": "FAILED",
+    "criterion": "On the independent reference, the GROUND-TRUTH poses must satisfy the same holdout-NIS bound (tau_val_nis = 2.5) used to judge candidates. If GT cannot pass, the simulator cannot distinguish a good candidate from a bad one and no Mode 2 / Mode 3 verdict from S1/S2 may be cited.",
+    "gt_pose_nis_median_8nn_per_scenario": [
+      21.249,
+      26.498,
+      13.772,
+      10.499,
+      14.712
+    ],
+    "gt_pose_nis_median_analytic_per_scenario": [
+      0.005549,
+      0.005344,
+      0.005649,
+      0.005382,
+      0.005459
+    ],
+    "reference_density_sweep_8nn_median": {
+      "1500": [
+        21.249,
+        26.498,
+        13.772,
+        10.499,
+        14.712
+      ],
+      "20000": [
+        20.225,
+        14.77,
+        18.636,
+        9.482,
+        13.872
+      ],
+      "200000": [
+        20.225,
+        14.77,
+        18.636,
+        9.482,
+        13.872
+      ]
+    },
+    "finding": "GT poses score ~0.006 NIS against the analytic arena but 14-177 against the 8-nearest-neighbour plane fit on the same points. Geometry is consistent; the error is entirely in the local normal estimate, and raising the reference from 1500 to 200000 points does not change it (density is not the cause). The gate's holdout-NIS criterion is therefore not usable in this simulator.",
+    "second_finding": "The analytic value ~0.006 must NOT be read as 'the gate passes'. This simulator is effectively noise-free (0.01 m sampling jitter against sigma = 0.12 m), so the NIS scale carries no physical meaning. It means the simulator is not a valid test bed, not that the candidate is good."
+  },
+  "holdout_reference_truncation": {
+    "where": "slam_recovery/validation/fim_and_holdout.py::compute_disjoint_holdout_point_to_plane_nis",
+    "limit": "The reference cloud is hard-truncated to 600 points and the holdout scan to 300 points before the k-NN plane fit.",
+    "consequence": "Every holdout NIS reported elsewhere in this repository -- including the real M2DGR sequences -- was computed from at most 600 reference points. The truncation is in the production path, not only in this simulation, so it bounds the credibility of the main results, not just S1/S2.",
+    "status": "NOT FIXED; reported so a reviewer can weigh it."
   },
   "S2_True_3D_Mesh_Voxel_Contamination_Ratio": {
     "voxel_resolution_m": 0.1,

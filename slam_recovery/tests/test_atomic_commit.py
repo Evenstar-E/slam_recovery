@@ -11,6 +11,7 @@ from slam_recovery.core import (
     RecoveryState,
 )
 from slam_recovery.quarantine import TrustedMapTransactionManager
+from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
 from slam_recovery.validation import (
     compute_disjoint_holdout_point_to_plane_nis,
     evaluate_paired_sequential_benefit,
@@ -213,6 +214,74 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
         self.assertNotEqual(rep.mode, RecoveryMode.MODE2_ATOMIC_COMMIT)
         self.assertEqual(mgr.trusted_version, version_before)
         self.assertNotIn(2, mgr.trusted_poses)
+
+    def test_p1a_node_reference_is_independent_of_the_candidate(self) -> None:
+        """
+        P1-A on the real node path (`evaluate_and_commit_candidate`), not just the principle.
+
+        A candidate that is self-consistent by construction --- its own scans placed under its own
+        poses --- must not be scored against a reference containing those same scans. The trusted
+        map is the true floor at z = 0; the incumbent sits 5 cm above it, the candidate 20 cm.
+        Against its own cloud the candidate looks perfect; against the trusted map it is strictly
+        worse. The node must refuse it, and the paired evidence must record that no reference frame
+        came from the candidate.
+        """
+        rng = np.random.default_rng(23)
+        n = 600
+        trusted_floor = np.column_stack([rng.uniform(-2, 2, n), rng.uniform(-2, 2, n), np.zeros(n)])
+        scan_body = np.column_stack([rng.uniform(-2, 2, n), rng.uniform(-2, 2, n), np.zeros(n)])
+
+        keys = list(range(6))
+        def pose(dz: float) -> np.ndarray:
+            T = np.eye(4)
+            T[2, 3] = dz
+            return T
+
+        incumbent_poses = {k: pose(0.05) for k in keys}   # 5 cm off
+        repaired_poses = {k: pose(0.20) for k in keys}    # 20 cm off, but self-consistent
+
+        # Sanity: the candidate is perfectly consistent with the cloud it would build itself.
+        self_map = np.vstack([(scan_body @ repaired_poses[k][:3, :3].T) + repaired_poses[k][:3, 3]
+                              for k in keys[:3]])
+        self_nis = float(np.mean([
+            compute_disjoint_holdout_point_to_plane_nis(
+                self_map, (scan_body @ repaired_poses[k][:3, :3].T) + repaired_poses[k][:3, 3],
+                np.eye(4), sigma_meas_m=0.12)
+            for k in keys[3:]
+        ]))
+        self.assertLess(self_nis, 1.0, "counterexample needs a self-consistent candidate")
+
+        node = OnlineRecoveryTransactionNode(confirmation_margin_sec=2.0, voxel_size_m=0.10,
+                                             holdout_stride=5)
+        node.committed_map_points = [trusted_floor]
+        node.scan_buffer_body = {k: scan_body.copy() for k in keys}
+        node.tx_mgr = TrustedMapTransactionManager(confirmation_margin_ns=int(2.0 * 1e9))
+        node.tx_mgr.trigger_quarantine(
+            int(10e9), int(20e9),
+            np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2,
+        )
+        version_before = node.tx_mgr.trusted_version
+
+        report = node.evaluate_and_commit_candidate(
+            "self_fitting_through_node",
+            repaired_poses,
+            incumbent_poses=incumbent_poses,
+            reentry_anchor_pose=np.eye(4),
+        )
+
+        ev = node.last_paired_evidence
+        # The reference was built from the trusted map alone: no frame of the candidate leaked in.
+        self.assertEqual(ev["reference_frames_from_candidate"], 0)
+        # Every pairable frame here is independent, and all of them were scored.
+        self.assertEqual(ev["num_paired_frames"], len(keys))
+        self.assertEqual(ev["candidate_keyframes"], len(keys))
+        self.assertFalse(ev["approved"])
+        self.assertLess(ev["wilson_lower_bound"], 0.55)
+
+        self.assertFalse(report.accepted)
+        self.assertNotEqual(report.mode, RecoveryMode.MODE2_ATOMIC_COMMIT)
+        self.assertEqual(node.tx_mgr.trusted_version, version_before)
+        self.assertNotIn(0, node.tx_mgr.trusted_poses)
 
     def test_wilson_sequential_benefit_and_reentry_continuity(self) -> None:
         """

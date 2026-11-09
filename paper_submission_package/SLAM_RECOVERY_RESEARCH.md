@@ -1614,7 +1614,7 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
 | **B6：完整方法（签名路由 + Mode 2 验证）** | `INJECTION` (FL) / `OFFLINE_CONSTRUCT` (LIO) | **0.3058** | **`+0.9949`** | **1.5139** | **`+0.7883`** | **0.00%** | **0.00%** |
 
 同时完成三项基于真实 6×6 点面 FIM 的机制验证：
-1. **R4 vs R5 真实 6×6 FIM 信息预算验证**：在单向墙面盲化（R4，$J_v^{\mathrm{before}}=0.00$）时，四态门控输出 `MODE3_SOFT_BRIDGE_WAIT`（`accepted=False`）；当重访正交墙面点云到达（R5，经 `compute_6dof_point_to_plane_fim` 实测 $J_v^{\mathrm{after}} = 29.01 \ge 25.0$，$\Delta J_v = +29.01$，$\mathrm{NIS}_{\mathrm{holdout}}=0.92 \le 2.5$）时，切换为 `MODE2_ATOMIC_COMMIT`（`accepted=True`）。
+1. **R4 vs R5 真实 6×6 FIM 信息预算验证（结论已撤回，见 §13.16）**：在单向墙面盲化（R4，$J_v^{\mathrm{before}}=0.00$）时，四态门控输出 `MODE3_SOFT_BRIDGE_WAIT`（`accepted=False`）；重访正交墙面点云到达（R5）时，早期版本曾报告切换为 `MODE2_ATOMIC_COMMIT`。**该结论已撤回**：当时的验证参考集 = 前置可信地图 + 候选自身的非留出扫描，所谓"独立留出"实际含候选自己的数据。修正为纯前置可信地图后，R5 `NIS=10.38`、B6 点混合 `14.63`、B6 位姿图 `10.38`，**全部 > 2.5，一律 `MODE3_SOFT_BRIDGE_WAIT`**；可用配对帧由 20 降至 10（共 20 关键帧）。
 2. **`SYNC_DRIFT` 时间偏移估计与补偿**：在注入 $50.00\text{ ms}$ 跨传感器时延下，角速度互相关估计器恢复出 $\hat\delta t = 50.00\text{ ms}$（残余时延误差 $< 0.01\text{ ms}$）。
 3. **`LOOP_OUTLIER` 感知混叠回环撤销**：通过 25 帧窗口累积应变 GNC-TLS 筛选，自动识别并撤销 `hall_01` 中 150 个由对称走廊引起的异常回环拉伸区间（奇偶不相交留出 NIS 为 `0.007`）。
 
@@ -1936,3 +1936,74 @@ S2 三维体素污染率不变：B0 43.25%、B1 43.21%、B2 17.79%、B3 43.25%�
 - `pointcloud_injection_strip_preview.png`：四联俯视图（干净扫描 / 注入 / 被剥离 / 剩余），剩余点云中塑料袋点残留 **0**。
 - `pointcloud_injection_range_hist.png`：距离直方图（对数纵轴）。注入后在 0.3–1.5 m 出现万点量级尖峰，剥离后该尖峰消失，只剩稀疏背景。
 - MCAP 四话题：`/points/clean`（`REAL_HOST`）、`/points/injected`（`INJECTION`）、`/points/removed`、`/points/background`（均 `OFFLINE_CONSTRUCT`），并附逐帧 `strip_fraction`、`bag_points_surviving`、`background_points_stripped` 于同名 manifest。
+
+## 13.16 S1/S2 仿真的"自指参考"缺陷、仿真器有效性判据与 Mode 2 证据来源的重新界定（已撤回旧结论）
+
+### 1. 缺陷：验证参考集含候选自身扫描
+
+`OnlineRecoveryTransactionNode.evaluate_and_commit_candidate()` 在构造留出验证参考时，曾把候选的**非留出扫描**（`train_kfs`，按 `repaired_poses` 变换到世界系）直接拼进 `train_world`。后果是所谓"独立留出"实际是拿候选去和它自己生成的点云比对：任何自洽的漂移都会显得"一致"，留出 NIS 被系统性压低。
+
+修正（三处，`transaction_manager_node.py`）：
+
+1. `train_world` 只由**前置可信地图**构成，候选扫描不进参考集；
+2. 配对评测显式排除任何参与构造参考的帧（结构性防御，即使将来传入锚点帧也不会重新引入自指）；
+3. 新增 `_frame_has_reference_support()`：帧内 ≥60% 的点落在参考云 1.0 m 内才计分。修完 1 之后暴露出，超出可信地图覆盖的帧是在与"外推平面"比对，残差可达 6000+——那属于"无证据"，不是"候选差"，两者必须区分。
+
+修正结果（5 seeds）：
+
+| 指标 | 修正前 | 修正后 |
+|---|---:|---:|
+| 可用配对帧 / 总关键帧 | 20 / 20 | **10 / 20** |
+| Wilson 下界 | 0.881 | 0.787（仍 > 0.55） |
+| R5 holdout NIS | 1.409 | **10.380** |
+| B6 点混合 holdout NIS | 0.824 | **14.629** |
+| B6 辅助位姿图 holdout NIS | 1.460 | **10.380** |
+| 门控判决 | 三者均 `MODE2_ATOMIC_COMMIT` | **三者均 `MODE3_SOFT_BRIDGE_WAIT`** |
+
+### 2. 仿真器有效性判据：GT 位姿必须先过门
+
+**判据**：在独立参考上，用**真值位姿**放置的扫描必须满足与候选相同的 `τ_val_nis = 2.5`。若真值都过不了，说明参考构造仍不自洽，仿真对候选**没有任何区分力**，S1/S2 的 Mode 2/Mode 3 判决一律不得引用。
+
+实测（5 个场景，`simulator_validity` 字段已写入 manifest）：
+
+| 估计方式 | GT 位姿 NIS（中位数，5 场景） | 结论 |
+|---|---|---|
+| 8-NN 局部平面拟合 | `21.25 / 26.50 / 13.77 / 10.50 / 14.71` | **远超 2.5，不通过** |
+| 解析几何残差 | `0.0055 / 0.0053 / 0.0056 / 0.0054 / 0.0055` | 通过上限 |
+
+**判据结论：`simulator_validity.status = FAILED`。**
+
+关于解析值 `0.006` 的读法必须写死，避免后人误读：**它不是"门控通过"，而是这个仿真器几乎是零噪声的**——采样只有 0.01 m 抖动，而 NIS 用 σ = 0.12 m，量纲本身没有物理意义。解析残差小只证明点云与轨迹几何自洽（这是好事），不证明候选好；`0.006` 是"仿真器不成立"的证据，不是好消息。
+
+密度扫描（同一批 GT 帧，只改参考点数上限）：
+
+| 参考点数上限 | 1500 | 20000 | 200000 | 0.1 m 规则网格 |
+|---|---:|---:|---:|---:|
+| GT 位姿 8-NN NIS（中位数） | 21.25 | 20.22 | 20.22 | 16.70 |
+
+**加密不改善、甚至局部变差**，说明问题不在采样量，而在 8-NN 局部法向估计本身（云边界与多面交汇处法向估计失效）。
+
+### 3. `holdout_reference_truncation`：生产路径的同类限制
+
+`compute_disjoint_holdout_point_to_plane_nis()`（`slam_recovery/validation/fim_and_holdout.py`）在拟合前把参考云**硬截断到 600 点**、留出扫描**截断到 300 点**：
+
+```python
+t_sub = train_xyz[:: max(1, len(train_xyz) // 600)][:600]
+h_sub = hold_trans[:: max(1, len(hold_trans) // 300)][:300]
+```
+
+这是**生产路径**，不只影响仿真——本文所有真实序列（`street_08`、`room_dark_02`、`hall_01`、`hall_02` 等）的 holdout NIS 都只用了 600 个参考点。它不改变本次的判决方向，但界定了主结果的可信度上限，因此单独记入 manifest 的 `holdout_reference_truncation` 字段。**本次未修改该函数**，因为改它会改变已报告的结果。
+
+### 4. Mode 2 证据的重新界定
+
+S1/S2 不再提供任何 Mode 2 正面证据。当前 Mode 2 的全部证据来自真实序列，且必须**一拒一过**成对出现：
+
+| 序列 | 判定 | 关键实测 |
+|---|---|---|
+| `street_08`（室外未见，Leica/RTK） | **拒绝** → `MODE3_SOFT_BRIDGE_WAIT` | 跨帧 NIS `4.4145 > 2.5`，Wilson 下界 `0.4626 < 0.55`，重入跳变 `0.4042 m ≤ 0.50 m`（三项中两项不过） |
+| `room_dark_02`（室内未见自然暗光，Mocap） | **通过** → `MODE2_ATOMIC_COMMIT` | Wilson 下界 `0.9235 ≥ 0.55`，跨帧 NIS `0.6532 ≤ 2.5`，重入跳变 `0.0375 m` |
+
+### 5. 复现入口
+
+- 仿真与有效性凭证：`slam_recovery/sim/run_s1_s2_simulation_experiments.py` → `slam_recovery/experiments/manifests/sim_s1_s2_counterfactual_and_3d_voxel_benchmark.json`，字段 `simulator_validity`、`holdout_reference_truncation`、`S1_CrossScan_Holdout_Gate_Verification`
+- 单元测试：`slam_recovery/tests/test_atomic_commit.py::test_p1a_self_fitting_candidate_fails_independent_scan`（原理层）与 `::test_p1a_node_reference_is_independent_of_the_candidate`（真实节点路径）
