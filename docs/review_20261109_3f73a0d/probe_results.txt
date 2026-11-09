@@ -1,0 +1,14 @@
+Target: 3f73a0d; local execution 2026-11-09.
+python -B -m unittest discover -s slam_recovery/tests: 36 tests, OK.
+python -B docs/review_20261109_3f73a0d/probe_lifecycle.py:
+
+tail accepted=True committed=[0,1,2,3,4,5,6,7] deferred=[8,9,10,11,12,13,14,15,16,17,18,19] state=HEALTHY active_quarantine=None jump_evidence=0.0
+retry_deferred: RuntimeError No active quarantine segment to validate
+
+gap accepted=True committed=[0,1,2,3,4,5,6,7,9,10,11,12,13,14,15,16,17,18,19] deferred=[8] state=HEALTHY active_quarantine=None jump_evidence=0.0
+retry_deferred: RuntimeError No active quarantine segment to validate
+
+missing_holdout accepted=False evidence_status=PASSED
+reason=Refused Mode 2 atomic commit: holdout evidence MISSING (no scorable holdout frame against the independent reference)
+
+Warnings: pre-existing invalid escape sequences in docstrings. No real bag replay or host execution performed locally.
