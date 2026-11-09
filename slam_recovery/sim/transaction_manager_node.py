@@ -152,6 +152,16 @@ class OnlineRecoveryTransactionNode:
             return all_pts[::step][:max_pts]
         return all_pts
 
+    def get_trusted_map_keys(self) -> set:
+        """Keyframes that contributed points to the trusted reference cloud.
+
+        A frame in this set cannot be scored against the trusted map: its own geometry is part of
+        the reference, so agreement would be self-agreement. The caller must exclude these keys
+        from both the paired test and the commit set, and it must be able to state the exclusion
+        from actual provenance rather than from a comment (P2 fix).
+        """
+        return set(self._kf_map_points.keys())
+
     def step_frame(
         self,
         kf_id: int,
@@ -231,7 +241,15 @@ class OnlineRecoveryTransactionNode:
         """
         if len(ref_pts) == 0:
             return False
+        # A frame with no buffered scan or no candidate pose is *unmeasured*, not unsupported:
+        # there is nothing to project, so it cannot contribute evidence. Returning False here and
+        # letting the caller record the key as deferred keeps that distinction visible, and stops
+        # the helper from raising KeyError on a hole in the scan buffer (P2 fix).
+        if kf_id not in self.scan_buffer_body or kf_id not in repaired_poses:
+            return False
         T = np.asarray(repaired_poses[kf_id], dtype=np.float64)
+        if T.shape != (4, 4) or not np.all(np.isfinite(T)):
+            return False
         pts_b = np.asarray(self.scan_buffer_body[kf_id], dtype=np.float64)[:, :3]
         if len(pts_b) == 0:
             return False
@@ -391,35 +409,73 @@ class OnlineRecoveryTransactionNode:
         # was supposed to justify, so any self-consistent drift looked like agreement.
         trusted_map_pts = self.get_trusted_map_points(max_pts=1500)
         kf_sorted = sorted(repaired_poses.keys())
-        holdout_kfs = [k for idx, k in enumerate(kf_sorted) if idx % self.holdout_stride == 0]
 
         train_world = trusted_map_pts if len(trusted_map_pts) > 0 else np.zeros((0, 3))
-        reference_keys: set = set()
 
-        # Same independence rule as the paired test: a holdout frame may only be scored where the
-        # trusted map actually supports it, otherwise the residual measures extrapolation rather
-        # than candidate quality.
-        scorable_holdout = [k for k in holdout_kfs if self._frame_has_reference_support(k, train_world, repaired_poses)]
+        # P2: take the exclusion set from the map's actual provenance. Until now `reference_keys`
+        # was hard-wired to the empty set and the comment merely asserted independence; any future
+        # reference built with anchor frames would have let a frame score itself.
+        reference_keys = self.get_trusted_map_keys()
+
+        # P1: the scored set and the committed set must be the same set.
+        #
+        # A candidate pose that moves its scan out of the trusted map's coverage used to drop that
+        # frame from *scoring* while it stayed in *commit* -- the worse the pose, the less evidence
+        # it produced, and a badly-wrong tail could ride in behind eight good frames. The commit is
+        # therefore restricted to the maximal verified *prefix* of the candidate in keyframe order:
+        #   - a frame is committable only if the independent reference supports it,
+        #   - only if it did not contribute to that reference, and
+        #   - only if an incumbent pose exists to pair it against.
+        # Frames after the first non-committable one stay quarantined (`deferred`). They are not
+        # rejected; they are not yet verifiable. Truncating at the first gap keeps the committed
+        # submap contiguous with the trusted timeline, so the boundary and graph dependencies are
+        # re-established at the cut rather than in the middle of the commit.
+        incumbent_keys = set(incumbent_poses.keys()) if incumbent_poses is not None else None
+        missing_scan_keys = [k for k in kf_sorted if k not in self.scan_buffer_body]
+        committable = {
+            k
+            for k in kf_sorted
+            if k not in reference_keys
+            and (incumbent_keys is None or k in incumbent_keys)
+            and self._frame_has_reference_support(k, train_world, repaired_poses)
+        }
+        commit_keys: List[int] = []
+        for k in kf_sorted:
+            if k not in committable:
+                break
+            commit_keys.append(k)
+        deferred_keys = [k for k in kf_sorted if k not in set(commit_keys)]
+        candidate_poses = {k: repaired_poses[k] for k in commit_keys}
+
+        holdout_kfs = [k for idx, k in enumerate(commit_keys) if idx % self.holdout_stride == 0]
+        # Every committed frame already passed the support check, so no second filter is applied;
+        # the counters are kept so a MISSING verdict says how many frames were even considered.
+        scorable_holdout = holdout_kfs
         self._last_holdout_support = {
             "holdout_frames_total": len(holdout_kfs),
             "holdout_frames_scorable": len(scorable_holdout),
+            "candidate_frames_total": len(kf_sorted),
+            "candidate_frames_committable": len(committable),
+            "candidate_frames_committed": len(commit_keys),
+            "candidate_frames_deferred": len(deferred_keys),
+            "frames_missing_scan": missing_scan_keys,
+            "frames_in_reference": sorted(set(kf_sorted) & reference_keys),
         }
 
         holdout_nis_list = []
         fims_after = []
         for k in scorable_holdout:
-            if k in self.scan_buffer_body:
-                T_k = repaired_poses[k]
-                pts_b = self.scan_buffer_body[k]
-                pts_w = (pts_b @ T_k[:3, :3].T) + T_k[:3, 3]
-                nis_k = compute_disjoint_holdout_point_to_plane_nis(
-                    train_world, pts_w, delta_pose_se3=np.eye(4), sigma_meas_m=0.12
-                )
-                holdout_nis_list.append(nis_k)
-                fim_k, _, _, _, _ = compute_6dof_point_to_plane_fim(
-                    pts_w, sigma_meas_m=0.075, aux_odom_info_6x6=aux_or_loop_info_6x6
-                )
-                fims_after.append(fim_k)
+            T_k = repaired_poses[k]
+            pts_b = self.scan_buffer_body[k]
+            pts_w = (pts_b @ T_k[:3, :3].T) + T_k[:3, 3]
+            nis_k = compute_disjoint_holdout_point_to_plane_nis(
+                train_world, pts_w, delta_pose_se3=np.eye(4), sigma_meas_m=0.12
+            )
+            holdout_nis_list.append(nis_k)
+            fim_k, _, _, _, _ = compute_6dof_point_to_plane_fim(
+                pts_w, sigma_meas_m=0.075, aux_odom_info_6x6=aux_or_loop_info_6x6
+            )
+            fims_after.append(fim_k)
 
         mean_holdout_nis = float(np.mean(holdout_nis_list)) if holdout_nis_list else float("inf")
         if fims_after:
@@ -432,7 +488,7 @@ class OnlineRecoveryTransactionNode:
         # Paired-benefit evidence must be measured, never assumed; unmeasured components stay None
         # and force the gate to wait (Mode 3/4) instead of committing.
         paired_ok, wilson_lb, reentry_jump = self._measure_paired_evidence(
-            repaired_poses,
+            candidate_poses,
             incumbent_poses=incumbent_poses,
             reentry_anchor_pose=reentry_anchor_pose,
             reference_world=train_world,
@@ -442,7 +498,11 @@ class OnlineRecoveryTransactionNode:
         cand = CandidateMap(
             candidate_id=candidate_id,
             parent_map_version=self.tx_mgr.trusted_version,
-            repaired_poses=repaired_poses,
+            # Only verified frames enter the candidate. The transaction manager commits exactly
+            # this dict, so there is no path by which an unscored frame reaches the trusted map.
+            repaired_poses=candidate_poses,
+            verified_pose_keys=frozenset(commit_keys),
+            deferred_pose_keys=tuple(deferred_keys),
             info_after_6x6=info_after,
             cov_after_6x6=cov_after,
             holdout_nis=mean_holdout_nis,

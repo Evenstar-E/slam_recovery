@@ -9,13 +9,12 @@
       "holdout_nis": 133.686,
       "mode": "MODE3_SOFT_BRIDGE_WAIT",
       "paired_evidence_status": [
-        "FAILED",
-        "MISSING"
+        "FAILED"
       ]
     },
     "B5_Narrow_FoV_Filter_LIOSAM": {
-      "weak_dir_info_after": 20.51,
-      "holdout_nis": 17.778,
+      "weak_dir_info_after": 18.39,
+      "holdout_nis": 15.613,
       "mode": "MODE3_SOFT_BRIDGE_WAIT",
       "paired_evidence_status": [
         "FAILED",
@@ -32,10 +31,10 @@
       "paired_evidence_diagnostics": {
         "num_paired_frames": 10,
         "required_paired_frames": 8,
-        "candidate_keyframes": 20,
-        "pairable_frames": 20,
-        "frames_without_independent_reference": 10,
-        "reference_frames_from_candidate": 0,
+        "candidate_keyframes": 10,
+        "pairable_frames": 10,
+        "frames_without_independent_reference": 0,
+        "reference_frames_from_candidate": 16,
         "num_improved_frames": 10,
         "improved_fraction": 1.0,
         "wilson_lower_bound": 0.7870282011880192,
@@ -81,9 +80,9 @@
       "paired_evidence_diagnostics": {
         "num_paired_frames": 10,
         "required_paired_frames": 8,
-        "candidate_keyframes": 20,
-        "pairable_frames": 20,
-        "frames_without_independent_reference": 10,
+        "candidate_keyframes": 10,
+        "pairable_frames": 10,
+        "frames_without_independent_reference": 0,
         "reference_frames_from_candidate": 0,
         "num_improved_frames": 10,
         "improved_fraction": 1.0,

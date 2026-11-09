@@ -220,9 +220,28 @@ class TrustedMapTransactionManager:
             self.gate_thresholds,
         )
 
+        if candidate is not None:
+            # Report the split on every path, so a Mode 3 wait says which frames it is waiting on
+            # just as clearly as a partial Mode 2 commit does.
+            report.deferred_pose_keys = [int(k) for k in candidate.deferred_pose_keys]
+            report.committed_pose_keys = []
+
         if report.mode == RecoveryMode.MODE2_ATOMIC_COMMIT and candidate is not None:
             if candidate.parent_map_version != self.trusted_version:
                 raise RuntimeError("Candidate parent_map_version does not match current trusted_version")
+            # Commit invariant (P1): the manager writes exactly candidate.repaired_poses into the
+            # trusted map, so any frame in there must have been independently scored. A caller that
+            # declares a verified set that does not cover the candidate is rejected outright rather
+            # than allowed to commit unscored frames. ``None`` is the legacy contract: the caller
+            # makes no verification claim and the manager cannot check one, which is recorded in
+            # the report instead of being silently treated as full coverage.
+            if candidate.verified_pose_keys is not None:
+                unverified = set(candidate.repaired_poses.keys()) - set(candidate.verified_pose_keys)
+                if unverified:
+                    raise RuntimeError(
+                        "Mode 2 candidate contains frames with no verification evidence: "
+                        f"{sorted(unverified)}"
+                    )
             new_poses = deepcopy(self.trusted_poses)
             for kf_id, pose in candidate.repaired_poses.items():
                 new_poses[kf_id] = pose.copy()
@@ -242,6 +261,9 @@ class TrustedMapTransactionManager:
             self.provisional_queue.clear()
             self.active_quarantine = None
             self.state = RecoveryState.HEALTHY
+            # Make the commit auditable: which frames were written, and which stayed quarantined.
+            report.committed_pose_keys = sorted(int(k) for k in candidate.repaired_poses.keys())
+            report.partial_commit = bool(report.deferred_pose_keys)
             self.commit_history.append((self.trusted_version, candidate.candidate_id, report))
         elif report.mode in (RecoveryMode.MODE3_SOFT_BRIDGE_WAIT, RecoveryMode.MODE1_ONLINE_REWEIGHT):
             # Trusted map stays strictly invariant; system waits for delayed loop or auxiliary evidence

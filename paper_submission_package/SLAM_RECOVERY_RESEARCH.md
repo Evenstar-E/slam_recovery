@@ -2007,3 +2007,37 @@ S1/S2 不再提供任何 Mode 2 正面证据。当前 Mode 2 的全部证据来�
 
 - 仿真与有效性凭证：`slam_recovery/sim/run_s1_s2_simulation_experiments.py` → `slam_recovery/experiments/manifests/sim_s1_s2_counterfactual_and_3d_voxel_benchmark.json`，字段 `simulator_validity`、`holdout_reference_truncation`、`S1_CrossScan_Holdout_Gate_Verification`
 - 单元测试：`slam_recovery/tests/test_atomic_commit.py::test_p1a_self_fitting_candidate_fails_independent_scan`（原理层）与 `::test_p1a_node_reference_is_independent_of_the_candidate`（真实节点路径）
+
+## 13.17 复审核验：Mode 2 的评分集合必须等于提交集合（P1），参考来源与缺测语义（P2）
+
+> 对应复审：`docs/review_20261109_bbc3dcb/README.md`。
+> 复现：`python -B docs/review_20261109_bbc3dcb/probe.py`（该脚本的断言描述**修复前**的缺陷，修复后按设计失败）、
+> `python -B -m unittest slam_recovery.tests.test_commit_evidence_coverage`（反转后的回归断言）。
+
+### 1. P1：被跳过的帧曾与通过评分的帧一起提交
+
+- **原缺陷**：`evaluate_and_commit_candidate` 先按候选位姿判断哪一帧还落在可信参考的覆盖范围内（`_frame_has_reference_support`），把不满足的帧从跨帧留出与配对收益中剔除；但随后构造 `CandidateMap` 时传入的是**完整** `repaired_poses`，事务管理器又无条件把它们写入 `trusted_poses`。于是候选位姿越坏，产生的证据越少，而提交范围不受影响。
+- **入口级反例（复审提供，已实跑复现）**：600 点 z=0 参考、20 帧候选、前 8 帧正确、后 12 帧平移到 z=100 m、incumbent 在 z=0.3 m。修复前输出 `accepted=true`、`MODE2_ATOMIC_COMMIT`、`holdout_nis=0.0`、`num_paired_frames=8`、`committed_poses=20`、`committed_100m_poses=12`。
+- **修复**：提交集合改为**已验证的连续前缀**。一帧可提交当且仅当（i）独立参考支持它，（ii）它没有参与构造该参考，（iii）存在可配对的 incumbent 位姿。遇到第一帧不满足即停止，其余帧进入 `deferred_pose_keys` 并留在可信地图之外。选择前缀而不是"全拒"，是因为全拒会让系统永久停在 Mode 3、恢复永不发生；前缀截断同时把边界与图依赖重新建立在切点上，而不是嵌在提交集合内部。
+- **修复后实测**：`committed_poses=8`、`committed_100m_poses=0`、`candidate_frames_deferred=12`、`partial_commit=true`；`report.committed_pose_keys=[0..7]`、`report.deferred_pose_keys=[8..19]`。
+- **管理器不变式（纵深防御）**：`CandidateMap.verified_pose_keys` 若不覆盖 `repaired_poses`，`validate_and_resolve` 在 Mode 2 分支**先抛错、后改图**，不会出现半提交。`None` 是旧调用方的契约（未作验证声明），报告会记录这一点而不是默认视为全覆盖。
+- **未验证帧不会自动重试**：它们被排除在可信地图之外，但也不进入新的隔离段自动重放。这是当前的操作限制，不是安全缺陷；真实宿主若需要重试，应由下一次健康监测重新开启隔离段。
+
+### 2. P2-a：参考来源从地图导出，而不是靠注释声明
+
+- **原缺陷**：`reference_keys` 被硬编码为空集，注释声称"参考只由可信地图构成所以无需排除"。一旦将来参考包含锚点帧，该帧就会对自己的地图评分。
+- **修复**：新增 `get_trusted_map_keys()`，返回真正贡献了 `committed_map_points` 的关键帧集合；配对评分与提交前缀都从该集合排除，并在 manifest 的 `frames_in_reference` 中记录交集。
+
+### 3. P2-b：缺扫描返回缺测，不再抛 KeyError
+
+- **原缺陷**：`_frame_has_reference_support` 直接索引 `scan_buffer_body[kf_id]`；候选包含一帧而缓冲区缺该扫描时抛 `KeyError: 0`。
+- **修复**：helper 在索引前检查扫描、候选位姿的存在与有限性，缺失即返回"不可评分"；调用方把该帧记为 `deferred`，`frames_missing_scan` 记录缺测键。缺测走 Mode 3/4 等待，不再崩溃。
+
+### 4. 对 S1/S2 的影响
+
+修复后重跑 S1/S2，五个分支**判决不变**（全部 `MODE3_SOFT_BRIDGE_WAIT`），因为留出 NIS 本来就远高于 2.5。唯一数字变化是 B5 的跨帧留出 NIS `17.778 → 15.613`：留出集现在按**提交集合**每 5 帧取样，而不是按完整候选取样。这正是"评分集合 = 提交集合"的预期后果。
+
+### 5. 仍待完成（不属于本节）
+
+- 仿真 validity 的五条实现缺陷（参考快照时刻、GT 支持筛选、同统计量、空集/NaN 判决、密度扫描预算）正在另一条工作线上修复，本节不声称已完成。
+- 局部平面评分的正负候选校准、FAST-LIVO2 的同输入四臂地图修复实验仍未做。

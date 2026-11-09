@@ -186,6 +186,15 @@ class CandidateMap:
     paired_benefit_approved: Optional[bool] = None
     wilson_lower_bound: Optional[float] = None
     reentry_pos_jump_m: Optional[float] = None
+    # The set of keyframes whose poses were actually scored against an independent reference.
+    # Mode 2 commits exactly ``repaired_poses``, so this set is the commit invariant: a frame that
+    # produced no evidence must never be committed alongside the frames that did. ``None`` means
+    # the caller did not make a verification claim (legacy callers); the transaction manager then
+    # cannot enforce independence for it and records that fact rather than assuming coverage.
+    verified_pose_keys: Optional[frozenset] = None
+    # Candidate frames left out of the commit because they could not be independently scored.
+    # They stay quarantined; they are not "rejected", they are "not yet verifiable".
+    deferred_pose_keys: tuple = ()
 
 
 @dataclass
@@ -205,6 +214,12 @@ class ValidationReport:
     #   "FAILED"  -> measured and violated (or non-finite); Mode 2 is refused
     #   "NOT_APPLICABLE" -> the gate never reached the candidate branch (Mode 1/3/4)
     evidence_status: str = "NOT_APPLICABLE"
+    # Audit of what Mode 2 actually wrote into the trusted map. ``partial_commit`` is True when
+    # the candidate carried frames that could not be independently scored; those frames are
+    # listed in ``deferred_pose_keys`` and remain outside the trusted map.
+    committed_pose_keys: Optional[List[int]] = None
+    deferred_pose_keys: Optional[List[int]] = None
+    partial_commit: bool = False
 
 
 @dataclass(frozen=True)

@@ -22,8 +22,10 @@ Usage (ROS1 python):
 from __future__ import annotations
 
 import argparse
+import hashlib
 import io
 import os
+import sys
 
 import numpy as np
 import rosbag
@@ -219,10 +221,37 @@ def main() -> None:
     print(f"wrote {args.out} ({os.path.getsize(args.out) / 1e6:.1f} MB)")
     print(f"  window [{lo:.2f}, {hi:.2f}] s  ({args.duration:.0f} s)")
     import json as _json
+    import subprocess
+
+    def _sha256(path: str) -> str:
+        h = hashlib.sha256()
+        with open(path, "rb") as src:
+            for chunk in iter(lambda: src.read(1 << 20), b""):
+                h.update(chunk)
+        return h.hexdigest()
+
+    try:
+        git_commit = subprocess.run(
+            ["git", "-C", os.path.dirname(os.path.abspath(__file__)), "rev-parse", "HEAD"],
+            capture_output=True, text=True, timeout=10, check=True,
+        ).stdout.strip()
+    except Exception:
+        git_commit = None
 
     with open(os.path.splitext(args.out)[0] + ".conversion.json", "w", encoding="utf-8") as fh:
         _json.dump({
-            "source_bag": args.bag, "window_start_sec": lo, "window_end_sec": hi,
+            "source_bag": args.bag,
+            # A conversion record that names only the path cannot be replayed: the bag may be
+            # replaced, the script may change. Hash both sides and record the code revision.
+            "source_bag_bytes": os.path.getsize(args.bag),
+            "source_bag_mtime_ns": os.stat(args.bag).st_mtime_ns,
+            "source_bag_sha256": _sha256(args.bag),
+            "output_bag": args.out,
+            "output_bag_bytes": os.path.getsize(args.out),
+            "output_bag_sha256": _sha256(args.out),
+            "argv": sys.argv,
+            "git_commit": git_commit,
+            "window_start_sec": lo, "window_end_sec": hi,
             "clouds": counts[CLOUD], "lidar_injected": injected, "imu": counts[IMU],
             "images": counts[IMG_OUT], "visually_degraded": visually_degraded,
             "lidar_injection": {"window_rel": [args.inject_start_rel, args.inject_end_rel],
