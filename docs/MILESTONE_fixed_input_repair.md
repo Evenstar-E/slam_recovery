@@ -156,6 +156,20 @@ not repair quality; in the common region coverage cannot rank the arms. What rem
 the composition of the added points (71.4% supported) and the unsupported fraction 5.68% -> 8.41%.
 A ranking would need a pre-stated weighting of coverage against contamination.
 
+### Pre-stated decision rule (written before applying it)
+
+Population: the common ROI of the base-support set (7,797,828 points), where both arms are
+observable, so the comparison is about repair quality rather than trajectory extent.
+
+- ΔC = coverage fraction (C3) − coverage fraction (Q), in proxy points;
+- ΔU = patch-unsupported fraction (C3) − patch-unsupported fraction (Q), in map points;
+- A net-benefit claim is allowed only if **ΔC ≥ 0.05 and ΔU ≤ 0.05**. Both values are reported
+  whether or not the rule passes; no alternative ROI is tried.
+
+Applied to `1ae5eaa`: ΔC = 0.0000 (both 100.00%), ΔU = +0.0273 (8.41% − 5.68%). The coverage clause
+fails, so **no net-benefit claim is made**. The primary-ROI ΔC of +0.0735 is not used: those points
+lie outside the common region and measure trajectory extent, not repair quality.
+
 ## Open, not claimed complete
 
 - A human/independent baseline for the clean proxy (it is a clean-run map, not a GT surface).
