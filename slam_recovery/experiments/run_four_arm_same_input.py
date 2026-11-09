@@ -509,7 +509,7 @@ def main():
 
     t0 = time.perf_counter()
     report = node.evaluate_and_commit_candidate(
-        "four_arm_A3", candidate, incumbent_poses=incumbent, reentry_anchor_pose=np.eye(4))
+        "four_arm_A3", candidate, incumbent_poses=incumbent, reentry_anchor_pose=pre[-1]["pose"].copy())
     a3_runtime = time.perf_counter() - t0
     verified_prefix = sorted(node.tx_mgr.trusted_poses.keys()) if report.accepted else []
 
@@ -535,9 +535,36 @@ def main():
         np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2,
     )
     report_good = node_good.evaluate_and_commit_candidate(
-        "four_arm_A3_good", good, incumbent_poses=incumbent, reentry_anchor_pose=np.eye(4))
+        "four_arm_A3_good", good, incumbent_poses=incumbent, reentry_anchor_pose=pre[-1]["pose"].copy())
     good_admitted = sorted(node_good.tx_mgr.trusted_poses.keys()) if report_good.accepted else []
     _sup = getattr(node_good, "_last_holdout_support", None)
+    _committable_ev = getattr(node_good, "last_paired_evidence_committable", None)
+
+    # Per-frame residuals over the committed prefix, so 0/14 can be scrutinised rather than
+    # taken at face value: same reference, same metric, both arms.
+    from slam_recovery.validation import compute_disjoint_holdout_point_to_plane_nis as _nis
+    _n_prefix = int((_sup or {}).get("candidate_frames_committed", 0))
+    _pairs = []
+    for _i in range(_n_prefix):
+        _k = quar[_i]
+        _r = []
+        for _pose in (incumbent[_i], good[_i]):
+            _pw = _k["pts"] @ _pose[:3, :3].T + _pose[:3, 3]
+            _r.append(float(_nis(ref_pts, _pw, np.eye(4), sigma_meas_m=0.12)))
+        _pairs.append({"kf": _i, "incumbent": round(_r[0], 4), "candidate": round(_r[1], 4),
+                       "candidate_better": bool(_r[1] < _r[0])})
+    _diffs = np.asarray([q["incumbent"] - q["candidate"] for q in _pairs], dtype=float)
+    _per_frame = {
+        "n": len(_pairs),
+        "pairs": _pairs,
+        "candidate_better_frames": int(sum(q["candidate_better"] for q in _pairs)),
+        "diff_median": round(float(np.median(_diffs)), 4) if len(_diffs) else None,
+        "diff_iqr": [round(float(np.percentile(_diffs, 25)), 4),
+                     round(float(np.percentile(_diffs, 75)), 4)] if len(_diffs) else None,
+        "reference_points_used_by_estimator": 600,
+        "note": "the NIS estimator fits on at most 600 reference points; residuals are on that scale",
+    }
+    print(f"[PAIRS] n={len(_pairs)} better={_per_frame['candidate_better_frames']} diff_med={_per_frame['diff_median']}")
     good_diag = {
         "candidate_dict_size": len(good),
         "support_diagnostics": _sup,
@@ -690,6 +717,8 @@ def main():
             "admitted_quarantined_frames": len(good_admitted),
             "paired_evidence": node_good.last_paired_evidence,
             "diagnostics": good_diag,
+            "per_frame_paired_residuals": _per_frame,
+            "last_paired_evidence_committable": _committable_ev,
             "map_metrics": "UNAVAILABLE (circular: the candidate and the scoring proxy are both the clean run)",
             "coverage_consistency_check_only": good_cov,
             "bad_candidate_for_comparison": {
