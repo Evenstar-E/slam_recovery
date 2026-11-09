@@ -192,12 +192,47 @@ index sha256 `9e062969…`，参考云 sha256 `37cf7cb6…`。敏感性 ROI = �
   那部分场景也写进了地图（+7.35 pp，全部在基座之外），并且新增点里 71.4% 是有界 supported，
   同时它的 unsupported 点从 1 874 增到 11 183（其中 9 309 来自修复帧）。
 
-## 10. 复现
+## 10. 同帧 raw vs repaired（R 对 C3）
+
+固定同一批帧：**C3 同时具备过滤扫描与重跑位姿的 400 帧**（446 中缺 46，ID 见 JSON）。
+两臂同帧，所以轨迹覆盖范围的混淆被消除。ROI = 整个干净参考云（与输出位姿无关），
+query 样本相同。脚本 `run_raw_vs_repaired.py`，结果 `raw_vs_repaired_results.json`。
+
+| 臂 | 地图点 | 覆盖代理点 | 覆盖率 | patch unsupported | unsupported 比例 |
+|---|---:|---:|---:|---:|---:|
+| **R**（注入原始扫描 + 宿主位姿） | 100 000 | 5 125 990 | **0.6038** | 62 510 | **0.6251** |
+| **C3**（过滤扫描 + 重估位姿） | 100 000 | 8 361 975 | **0.9849** | 9 309 | **0.0931** |
+
+**C3 相对 R 新增的点**
+
+| 子集 | 总数 | supported | unsupported | supported 比例 |
+|---|---:|---:|---:|---:|
+| 总新增 | 42 227 | **35 999** | 6 228 | 0.8526 |
+| 仅 novel（基座支撑之外） | 10 581 | **7 318** | 3 263 | 0.6916 |
+
+**R 有而 C3 没有的点**
+
+| 子集 | 总数 | supported | unsupported | unsupported 比例 |
+|---|---:|---:|---:|---:|
+| 总损失 | 50 234 | 2 444 | **47 790** | 0.9514 |
+| 仅 novel | 48 814 | 1 995 | **46 819** | 0.9591 |
+
+**预先声明的判据**：`novel 子集 supported > unsupported` **且** `总新增的 unsupported 比例 ≤ R 自身`。
+- novel 新增 7 318 supported vs 3 263 unsupported → 满足；
+- 总新增 unsupported 比例 **0.1475** ≤ R 的 **0.6251** → 满足。
+
+**判定：`REPAIR_BENEFIT_SUPPORTED`**（同帧、同 ROI、同 query，未换帧集或 ROI 重试）。
+
+读法：C3 新增的点 85.3% 落在参考面上；被替换掉的 R 点 95.1% 本来就是 unsupported——
+修复主要是在删坏点、补好点，而不是简单地把地图搬了个位置。参考面仍是干净跑地图而非 GT。
+
+## 11. 复现
 
 ```bash
 python3 -B docs/review_20261109_bbc3dcb/run_fixed_input_repair_c0c3.py filter-audit
 python3 -B docs/review_20261109_bbc3dcb/run_fixed_input_repair_c0c3.py measure
 python3 -B docs/review_20261109_bbc3dcb/run_m3_same_region.py
+python3 -B docs/review_20261109_bbc3dcb/run_raw_vs_repaired.py
 bash docs/review_20261109_bbc3dcb/fl_run_isolated.sh <bag> <new-out> 0.5 60
 bash docs/review_20261109_bbc3dcb/test_fl_run_cleanup.sh
 ```

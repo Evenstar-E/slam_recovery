@@ -1,0 +1,131 @@
+{
+ "protocol": "same-frame raw/native vs repaired, fixed frame set",
+ "frame_set": {
+  "definition": "keys whose repaired arm has both a filtered scan and a re-run pose",
+  "n_frames": 400,
+  "n_keys": 446,
+  "missing_ids": [
+   134,
+   136,
+   140,
+   142,
+   146,
+   148,
+   150,
+   152,
+   154,
+   156,
+   158,
+   160,
+   162,
+   164,
+   166,
+   168,
+   170,
+   172,
+   176,
+   178,
+   180,
+   182,
+   184,
+   186,
+   188,
+   190,
+   192,
+   194,
+   196,
+   198,
+   202,
+   204,
+   206,
+   208,
+   210,
+   212,
+   214,
+   216,
+   218,
+   220,
+   222,
+   224,
+   226,
+   228,
+   328,
+   330
+  ],
+  "ns_sha256": "8a53f2968369087837e553e68de28fa3973f3298f1492d5d6092417bc9590420"
+ },
+ "roi": {
+  "definition": "the whole clean reference cloud; independent of evaluated poses",
+  "n_points": 8490000,
+  "reference_sha256": "37cf7cb65d6b8ae9d3028ee23c0e4849f672f765418056a968fc10e473bef864"
+ },
+ "arms": {
+  "R": {
+   "label": "RAW_NATIVE",
+   "map_points": 100000,
+   "proxy_covered": 5125990,
+   "proxy_coverage_fraction": 0.6037679623085983,
+   "patch_unsupported_points": 62510,
+   "patch_unsupported_fraction": 0.6251,
+   "patch_median_m": 0.017973038599221836
+  },
+  "C3": {
+   "label": "OFFLINE_NATIVE_REESTIMATION",
+   "map_points": 100000,
+   "proxy_covered": 8361975,
+   "proxy_coverage_fraction": 0.9849204946996466,
+   "patch_unsupported_points": 9309,
+   "patch_unsupported_fraction": 0.09309,
+   "patch_median_m": 0.006918628782930163
+  }
+ },
+ "added_by_C3": {
+  "total": {
+   "n": 42227,
+   "supported": 35999,
+   "unsupported": 6228,
+   "supported_fraction": 0.8525114263385986,
+   "median_m": 0.007858503447981802,
+   "novel_outside_base": 10581
+  },
+  "novel_outside_base": {
+   "n": 10581,
+   "supported": 7318,
+   "unsupported": 3263,
+   "supported_fraction": 0.6916170494282204,
+   "median_m": 0.018135135286928387,
+   "novel_outside_base": 10581
+  }
+ },
+ "lost_from_R": {
+  "total": {
+   "n": 50234,
+   "supported": 2444,
+   "unsupported": 47790,
+   "supported_fraction": 0.048652307202293264,
+   "median_m": 0.1053816035248224,
+   "novel_outside_base": 48814
+  },
+  "novel_outside_base": {
+   "n": 48814,
+   "supported": 1995,
+   "unsupported": 46819,
+   "supported_fraction": 0.040869422706600565,
+   "median_m": 0.11402915612049838,
+   "novel_outside_base": 48814
+  }
+ },
+ "criterion": {
+  "declared": "supported_novel > unsupported_novel AND added_unsupported_fraction <= R_unsupported_fraction",
+  "novel_added_supported_gt_unsupported": true,
+  "added_unsupported_fraction": 0.14748857366140147,
+  "R_unsupported_fraction": 0.6251,
+  "added_unsup_not_above_R": true,
+  "verdict": "REPAIR_BENEFIT_SUPPORTED"
+ },
+ "notes": [
+  "The proxy is the clean run's map, not a GT surface.",
+  "Both arms use the same frames, so the trajectory-extent confound is removed.",
+  "Absolute unsupported counts are not comparable across arms of different size; the pre-declared criterion is used instead."
+ ]
+}
