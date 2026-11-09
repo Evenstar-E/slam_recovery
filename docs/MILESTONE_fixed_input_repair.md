@@ -231,3 +231,15 @@ set or threshold.
 - Boundary continuity remains `BOUND_ONLY` (elapsed-time envelope, not an independent
   relative-motion measurement).
 - `LOOP_OUTLIER` real-host test: no unused sequence available.
+
+### Final mechanism split (pre-registered)
+
+Two arms on the same room_02 input, window, frame set and host, to separate residual contamination
+from false deletion:
+
+- **X**: oracle removal **plus the 1,265 injected rows the filter kept** (contamination-only residual).
+- **Y**: oracle removal **plus the 23,607 background rows the filter dropped** (deletion-only residual).
+
+Both are re-estimated natively; measure ATE and the bounded map metrics. If X reproduces the failure,
+the residual sheet rows are the cause; if Y does, the false deletions are; if neither, the two interact.
+The oracle remains a diagnostic ceiling, not a deployable repair.
