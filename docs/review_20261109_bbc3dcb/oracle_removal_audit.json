@@ -1,0 +1,79 @@
+{
+ "subject": "run_room02_decomposition.py oracle-removal audit",
+ "read_only": true,
+ "producer": "docs/review_20261109_bbc3dcb/run_room02_decomposition.py @ a05a8ba",
+ "1_layout_order": {
+  "common_frames": 599,
+  "point_step_mismatch": 0,
+  "field_layout_mismatch": 0,
+  "row_count_mismatch": 0,
+  "differing_frames": 199,
+  "window_ns": [
+   1627643759554082870,
+   1627643779393426895
+  ],
+  "frames_in_span_not_differing": 0,
+  "reordered_but_not_rewritten_frames": 0,
+  "row_diff_fraction_median": 0.8819082782743879,
+  "row_diff_fraction_max": 0.8969517921427453,
+  "frames_with_all_rows_differing": 0
+ },
+ "2_oracle_failopen": {
+  "shape_mismatched_frames_in_data": 0,
+  "fail_open_expression_present": true,
+  "missing_key_guard_present": false,
+  "verdict": "FAIL: a shape mismatch returns the raw scan, so an unsplittable frame is silently scored as ORACLE_CLEAN",
+  "how_a_mismatch_enters": "any re-encode that changes point_step or the row count of one bag's frame makes the whole frame unsplittable"
+ },
+ "3_clean_pose": {
+  "frame_filter_mentions_clean_pose": false,
+  "frame_filter_expression": "frames = [i for i in keys\n              if i in rerun_poses and round(inj_kfs[i][\"ts\"], 6) in by_stamp]",
+  "ref_poses_built_from": "ref_poses = {i: T_inv @ cln_poses[i] for i in cln_poses}",
+  "poses_indexed_without_guard": true,
+  "verdict": "FAIL: the frame set is filtered on rerun poses and filtered scans only; a key missing a clean pose reaches `poses[i]` and raises KeyError"
+ },
+ "4_healthy_binding": {
+  "report_has_output_sha256": true,
+  "script_compares_output_sha256": false,
+  "report_binding_method": "every frame's n must equal the input bag's point count and its kept must equal the output bag's point count, at the same header millisecond",
+  "report_binding_verdict": "BOUND",
+  "verdict": "FAIL: the script checks binding.verdict and input_sha256 only; the report's own binding is count-based, so identical counts over different rows would still read BOUND"
+ },
+ "5_time_partition": {
+  "arm_fields": [
+   "map_points",
+   "patch_median_m",
+   "patch_unsupported_fraction",
+   "patch_unsupported_points",
+   "pose_source",
+   "proxy_coverage_fraction",
+   "proxy_covered",
+   "scan_source"
+  ],
+  "present_of_expected": [],
+  "missing_of_expected": [
+   "in_window_unsupported_fraction",
+   "in_window_retained_fraction",
+   "in_window_map_points",
+   "healthy_unsupported_fraction"
+  ],
+  "healthy_window_fields": [
+   "frames_outside",
+   "input_sha256",
+   "oracle_fraction",
+   "oracle_removed",
+   "points_outside",
+   "real_filter_fraction",
+   "real_filter_removed",
+   "status"
+  ],
+  "verdict": "FAIL: arms carry whole-set totals only; the in-window unsupported and retained fractions the docstring promises are absent"
+ },
+ "verdicts": {
+  "1_layout_order": "PASS",
+  "2_oracle_failopen": "FAIL",
+  "3_clean_pose": "FAIL",
+  "4_healthy_binding": "FAIL",
+  "5_time_partition": "FAIL"
+ }
+}
