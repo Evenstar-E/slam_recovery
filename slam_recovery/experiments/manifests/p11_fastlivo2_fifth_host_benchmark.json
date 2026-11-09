@@ -135,7 +135,7 @@
     },
     "hall_01_100_160s": {
       "input_bag": "/home/R26534/M2DGR/raw/hall_01.bag",
-      "window": "sequence time [100, 160] s; the plastic-bag occlusion of the paper sits in [120, 140] s",
+      "window": "sequence time [100, 160] s; the plastic-bag occlusion of the paper sits in [120, 140] s; NOTE: the 4.30 m FAST-LIVO2 bag hall01_inj43.bag actually carries the injection over sequence [114.528, 134.467] s (rel [14.528, 34.467] from the window start), measured by per-frame raw-buffer equality against the clean bag. The nominal [120, 140] s refers to the original LiDAR-host protocol; the prepared bag is shifted.",
       "conversion": {
         "clouds": 598,
         "images": 888,

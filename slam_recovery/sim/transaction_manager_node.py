@@ -91,6 +91,8 @@ class OnlineRecoveryTransactionNode:
 
         # Raw scan buffer indexed by keyframe_id for cross-scan holdout validation and 3D map commit
         self.scan_buffer_body: Dict[int, np.ndarray] = {}
+        # Per-keyframe timestamps, used to scale a segment-boundary bound by the elapsed time.
+        self._kf_timestamps: Dict[int, int] = {}
         self.voxel_store: Dict[Tuple[int, int, int], int] = {}
         self.voxel_journal: SpatialMutationLog[Tuple[int, int, int], int] = SpatialMutationLog(self.voxel_store)
         self._kf_applied_poses: Dict[int, np.ndarray] = {}
@@ -202,6 +204,7 @@ class OnlineRecoveryTransactionNode:
         loop_spike: float = 0.3,
     ) -> Optional[ValidationReport]:
         self.scan_buffer_body[kf_id] = np.asarray(scan_body_xyz, dtype=np.float64)[:, :3].copy()
+        self._kf_timestamps[kf_id] = int(timestamp_ns)
         fim_6x6, cov_6x6, min_r, min_t, weak_dir = compute_6dof_point_to_plane_fim(
             scan_body_xyz, sigma_meas_m=0.075
         )
@@ -533,6 +536,46 @@ class OnlineRecoveryTransactionNode:
         deferred_keys = [k for k in kf_sorted if k not in set(commit_keys)]
         candidate_poses = {k: repaired_poses[k] for k in commit_keys}
 
+        # A non-contiguous commit has one boundary per gap. Measure each of them: a run that
+        # starts 1.5 m from the last committed keyframe is a map discontinuity even when every
+        # individual frame fits the reference (a tangential shift on a plane leaves point-to-plane
+        # residual at zero). The bound is the gate's re-entry bound plus the distance the host
+        # could have travelled over the elapsed time at a conservative 2 m/s; without timestamps
+        # the absolute bound applies.
+        runs = self._contiguous_runs(commit_keys)
+        jump_bound = float(self.tx_mgr.gate_thresholds.max_reentry_jump_m)
+        boundary_jumps: List[float] = []
+        boundary_ok = True
+        for prev_run, run in zip(runs, runs[1:]):
+            prev_k, next_k = prev_run[-1], run[0]
+            jump = float(np.linalg.norm(
+                np.asarray(repaired_poses[next_k], dtype=np.float64)[:3, 3]
+                - np.asarray(repaired_poses[prev_k], dtype=np.float64)[:3, 3]
+            ))
+            dt = 0.0
+            if prev_k in self._kf_timestamps and next_k in self._kf_timestamps:
+                dt = max(0.0, (self._kf_timestamps[next_k] - self._kf_timestamps[prev_k]) * 1e-9)
+            boundary_jumps.append(jump)
+            if jump > jump_bound + 2.0 * dt:
+                boundary_ok = False
+        # The first committed run is measured against the trusted anchor as well; the re-entry
+        # check above uses the candidate's boundary frame, which may not itself be committed.
+        first_run_jump: Optional[float] = None
+        if runs and reentry_anchor_pose is not None:
+            anchor_arr = np.asarray(reentry_anchor_pose, dtype=np.float64)
+            head = np.asarray(repaired_poses[runs[0][0]], dtype=np.float64)
+            if anchor_arr.shape == (4, 4) and head.shape == (4, 4):
+                first_run_jump = float(np.linalg.norm(head[:3, 3] - anchor_arr[:3, 3]))
+                dt0 = 0.0
+                if runs[0][0] in self._kf_timestamps and kf_sorted[0] in self._kf_timestamps:
+                    dt0 = max(0.0, (self._kf_timestamps[runs[0][0]]
+                                    - self._kf_timestamps[kf_sorted[0]]) * 1e-9)
+                if first_run_jump > jump_bound + 2.0 * dt0:
+                    boundary_ok = False
+        # Without an independent relative-motion measurement the check is an elapsed-time speed
+        # envelope, not geometric continuity; say so rather than presenting it as verified.
+        boundary_basis = "BOUND_ONLY"
+
         holdout_kfs = [k for idx, k in enumerate(commit_keys) if idx % self.holdout_stride == 0]
         # Every committed frame already passed the support check, so no second filter is applied;
         # the counters are kept so a MISSING verdict says how many frames were even considered.
@@ -550,6 +593,10 @@ class OnlineRecoveryTransactionNode:
             # run so the graph consequence is visible: a single unverifiable keyframe between two
             # committed ones is a gap, not a reason to discard everything after it.
             "deferred_runs": self._contiguous_runs(deferred_keys),
+            "segment_boundary_jumps_m": boundary_jumps,
+            "segment_boundary_ok": boundary_ok,
+            "first_run_jump_m": first_run_jump,
+            "boundary_basis": boundary_basis,
             "first_deferred_reason": (
                 self._noncommittable_reason(
                     deferred_keys[0], reference_keys, incumbent_keys
@@ -609,6 +656,9 @@ class OnlineRecoveryTransactionNode:
             repaired_poses=candidate_poses,
             verified_pose_keys=frozenset(commit_keys),
             deferred_pose_keys=tuple(deferred_keys),
+            boundary_continuity_ok=boundary_ok,
+            boundary_jumps_m=boundary_jumps,
+            boundary_basis=boundary_basis,
             info_after_6x6=info_after,
             cov_after_6x6=cov_after,
             holdout_nis=mean_holdout_nis,

@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import hashlib
 import sys
 import time
 
@@ -63,12 +64,23 @@ DEFAULT_GT = "/home/R26534/M2DGR/GT/hall_01.txt"
 # as trusted and the anchor itself was 2.8 m off.
 ONSET_REL = None          # filled by detect_onset()
 INJ_END_REL = 40.0
+ONSET_ABS = None          # absolute stamps; the segment split uses these, not bag-relative rel
+INJ_END_ABS = None
 VOXEL = 0.10
 SURF_TOL = 0.15
 MAX_KF_POINTS = 15000
 NEAR_DT = 0.020
 MAX_GAP = 0.075
 EXTRAP_FRAMES = 5
+
+def _sha256(path: str) -> str:
+    """Content hash of an input bag: a path or an ATE is not an identity."""
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
 
 DT = np.dtype({
     "names": ["x", "y", "z", "intensity", "time", "ring"],
@@ -213,10 +225,16 @@ def sheet_fraction(kf, lo=4.0, hi=4.6):
 
 
 def detect_onset(clean_bag, inj_bag, topic="/velodyne_points"):
-    """Exact onset: the two bags are byte-identical before the injection.
+    """INJECTION_ORACLE: locate the injected span by comparing against the clean bag.
+
+    This is an offline protocol-alignment tool, not an online fault detector: it needs the clean
+    recording, which a deployed system does not have. Its output must be labelled as an oracle in
+    any experiment that uses it, and it is not evidence about detection latency or recall.
 
     Pairs scans by header stamp and compares the raw buffers. No threshold, no smoothing, no
-    sampling noise -- the first and last differing frame bound the injection exactly.
+    sampling noise -- the first and last differing frame bound the injection exactly. A raw-buffer
+    difference means the bytes changed, not that every changed byte is the configured fault; the
+    conversion sidecar and input hashes carry that part of the provenance.
     """
     def load(bp):
         out = {}
@@ -226,14 +244,21 @@ def detect_onset(clean_bag, inj_bag, topic="/velodyne_points"):
         return out
     a, c = load(inj_bag), load(clean_bag)
     common = sorted(set(a) & set(c))
+    if not common:
+        raise RuntimeError("detect_onset: the two bags share no scan timestamps")
     t0 = common[0]
     diff = [t for t in common if a[t] != c[t]]
     if not diff:
-        return None, None, {}
+        raise RuntimeError("detect_onset: no scan differs; refusing to run an 'injection' replay")
     return (diff[0] - t0, diff[-1] - t0,
             {"start_rel_sec": round(diff[0] - t0, 3), "end_rel_sec": round(diff[-1] - t0, 3),
+             "start_abs_sec": diff[0], "end_abs_sec": diff[-1],
              "differing_frames": len(diff), "compared_frames": len(common),
-             "method": "per-frame raw buffer equality against the clean bag; no threshold"})
+             "missing_in_injected": len(set(c) - set(a)),
+             "missing_in_clean": len(set(a) - set(c)),
+             "method": "per-frame raw buffer equality against the clean bag; no threshold",
+             "role": "INJECTION_ORACLE (offline; requires the clean recording)",
+             "deployable_detector": False})
 
 def world_points(kf):
     T = kf["pose"]
@@ -436,15 +461,19 @@ def main():
     # favour any admission policy.
     ts_gt_all, xyz_gt_all, _ = load_tum_trajectory_se3(DEFAULT_GT)
 
-    global ONSET_REL, INJ_END_REL
+    global ONSET_REL, INJ_END_REL, ONSET_ABS, INJ_END_ABS
     _st, _en, _ev = detect_onset(DEFAULT_CLN_SCANS, DEFAULT_INJ_SCANS)
     ONSET_REL, INJ_END_REL = _st, _en
+    # Segment membership is decided on absolute header stamps. detect_onset keys its rel values
+    # to the first *common* scan while pair_keyframes keys rel to each bag's first scan; the two
+    # bases differ whenever a bag is missing head frames.
+    ONSET_ABS, INJ_END_ABS = _ev["start_abs_sec"], _ev["end_abs_sec"]
     print(f"detected onset = {ONSET_REL} s, end = {INJ_END_REL} s")
     onset_evidence = dict(_ev)
     onset_evidence["hardcoded_value_was"] = 20.0
     onset_evidence["note"] = ("the hard-coded 20.0 s was wrong; the injected span starts at "
                               f"{_st} s, so six seconds of faulty frames had been treated as trusted")
-    pre_inj = [k for k in inj_kfs if k["rel"] < ONSET_REL]
+    pre_inj = [k for k in inj_kfs if k["ts"] < ONSET_ABS]
     pre_inj_ts = np.asarray([k["ts"] for k in pre_inj])
     pre_inj_xyz = np.asarray([k["pose"][:3, 3] for k in pre_inj])
     cln_ts_all = np.asarray([k["ts"] for k in cln_kfs])
@@ -460,12 +489,16 @@ def main():
         if len(mi) < 3:
             return {}
         err = np.linalg.norm(mi @ R_ic.T + t_ic - mc, axis=1)
-        rel = mt - inj_kfs[0]["ts"]
+        t0 = inj_kfs[0]["ts"]
         out = {}
-        for lo, hi in ((0, ONSET_REL), (ONSET_REL, INJ_END_REL), (INJ_END_REL, 1e9)):
-            m = (rel >= lo) & (rel < hi)
+        for label, lo_abs, hi_abs in (
+            ("pre", 0.0, ONSET_ABS),
+            ("injection", ONSET_ABS, INJ_END_ABS),
+            ("post", INJ_END_ABS, 1e18),
+        ):
+            m = (mt >= lo_abs) & (mt < hi_abs)
             if m.sum():
-                out[f"[{lo:g},{hi if hi < 1e8 else 60:g})s"] = {
+                out[f"{label}_rel[{lo_abs - t0:.2f},{hi_abs - t0:.2f})s"] = {
                     "n": int(m.sum()),
                     "mean_m": round(float(np.mean(err[m])), 4),
                     "p95_m": round(float(np.percentile(err[m], 95)), 4),
@@ -503,7 +536,7 @@ def main():
     # clean proxy. This measures the disagreement between two runs that saw identical input, which
     # is the resolution limit for any cross-run comparison.
     pre_aligned = np.vstack([world_points(k) for k in
-                             [k for k in inj_kfs if k["rel"] < ONSET_REL]]) @ R_ic.T + t_ic
+                             [k for k in inj_kfs if k["ts"] < ONSET_ABS]]) @ R_ic.T + t_ic
     pre_vox = voxels(pre_aligned)
     cross_floor = {
         "unsupported_voxel_fraction": round(float(unsupported_fraction(pre_vox, proxy_surface)), 4),
@@ -536,15 +569,19 @@ def main():
     print(f"  interp LOO: {interp_loo['translation_err_mean_m']*1000:.2f} mm / "
           f"{interp_loo['rotation_err_mean_deg']:.3f} deg")
 
-    pre = [k for k in inj_kfs if k["rel"] < ONSET_REL]
-    quar = [k for k in inj_kfs if k["rel"] >= ONSET_REL]
+    pre = [k for k in inj_kfs if k["ts"] < ONSET_ABS]
+    quar = [k for k in inj_kfs if k["ts"] >= ONSET_ABS]
 
-    # Incumbent = what the system would have committed had it not repaired anything, i.e. the
-    # host's own poses for the quarantined keyframes ("host_quarantined_poses"). A constant-
-    # velocity extrapolation diverges over a 40 s quarantine, so every still-tracking trajectory
-    # beats it by >95% of frames and the comparison would measure "tracking vs divergence"
-    # rather than "repair vs no repair".
-    incumbent = {i: k["pose"].copy() for i, k in enumerate(quar)}
+    tail = pre[-EXTRAP_FRAMES:]
+    dt_span = tail[-1]["ts"] - tail[0]["ts"]
+    v = (tail[-1]["pose"][:3, 3] - tail[0]["pose"][:3, 3]) / dt_span if dt_span > 1e-6 else np.zeros(3)
+    anchor_T = tail[-1]["pose"].copy()
+    anchor_t = tail[-1]["ts"]
+    incumbent = {}
+    for i, k in enumerate(quar):
+        T = anchor_T.copy()
+        T[:3, 3] = anchor_T[:3, 3] + v * (k["ts"] - anchor_t)
+        incumbent[i] = T
     candidate = {i: k["pose"].copy() for i, k in enumerate(quar)}
 
     ref_pts = np.vstack([world_points(k) for k in pre]) if pre else np.zeros((0, 3))
@@ -554,6 +591,9 @@ def main():
     node = OnlineRecoveryTransactionNode(confirmation_margin_sec=2.0, voxel_size_m=VOXEL, holdout_stride=5)
     node.committed_map_points = [ref_pts] if len(ref_pts) else []
     node.scan_buffer_body = {i: k["pts"] for i, k in enumerate(quar)}
+    # step_frame() is bypassed by this replay, so the timestamps the segment-boundary bound
+    # scales by must be supplied explicitly; without them every gap is judged against 0.5 m.
+    node._kf_timestamps = {i: int(k["ts"] * 1e9) for i, k in enumerate(quar)}
     node.tx_mgr = TrustedMapTransactionManager(confirmation_margin_ns=int(2.0e9))
     node.tx_mgr.trigger_quarantine(
         int(ONSET_REL * 1e9), int((ONSET_REL + 2.0) * 1e9),
@@ -582,6 +622,7 @@ def main():
     node_good = OnlineRecoveryTransactionNode(confirmation_margin_sec=2.0, voxel_size_m=VOXEL, holdout_stride=5)
     node_good.committed_map_points = [ref_pts] if len(ref_pts) else []
     node_good.scan_buffer_body = {i: k["pts"] for i, k in enumerate(quar)}
+    node_good._kf_timestamps = {i: int(k["ts"] * 1e9) for i, k in enumerate(quar)}
     node_good.tx_mgr = TrustedMapTransactionManager(confirmation_margin_ns=int(2.0e9))
     node_good.tx_mgr.trigger_quarantine(
         int(ONSET_REL * 1e9), int((ONSET_REL + 2.0) * 1e9),
@@ -605,7 +646,7 @@ def main():
         "why_it_matters": ("rescoring by position is only valid while admission is a contiguous "
                            "prefix; it is not any more"),
     }
-    print(f"[PAIRS] n={len(_pairs)} better={_per_frame['candidate_better_frames']} diff_med={_per_frame['diff_median']}")
+    print(f"[PAIRS] {_per_frame['status']}")
     good_diag = {
         "candidate_dict_size": len(good),
         "support_diagnostics": _sup,
@@ -728,14 +769,26 @@ def main():
             "clean_scans_proxy_only": DEFAULT_CLN_SCANS, "clean_poses_proxy_only": DEFAULT_CLN_POSES,
             "gt_trajectory": DEFAULT_GT,
         },
+        # Provenance chain: the scan/pose pair is identified by content, not by a filename.
+        # A healthy-prefix ATE cannot distinguish two injection distances because that prefix is
+        # identical in both runs.
+        "inputs_sha256": {
+            role: _sha256(path)
+            for role, path in (
+                ("injected_scans", DEFAULT_INJ_SCANS),
+                ("injected_poses", DEFAULT_INJ_POSES),
+                ("clean_scans_proxy_only", DEFAULT_CLN_SCANS),
+                ("clean_poses_proxy_only", DEFAULT_CLN_POSES),
+            )
+        },
         "pairing": {"injected": inj_stats, "clean": cln_stats,
                     "near_dt_sec": NEAR_DT, "max_interp_gap_sec": MAX_GAP},
         "onset_detection": onset_evidence,
         "protocol": {
             "voxel_m": VOXEL, "surface_tolerance_m": SURF_TOL,
             "onset_rel_sec": ONSET_REL, "injection_end_rel_sec": INJ_END_REL,
-            "incumbent_model": "host_quarantined_poses (what the system would commit without repairing)",
-            
+            "incumbent_model": "constant-velocity extrapolation of the last pre-onset keyframes",
+            "extrap_frames": EXTRAP_FRAMES,
             "alignment": "single SE(3) fitted on the pre-onset keyframes of the host, applied to all arms",
         },
         "reference_surface": {

@@ -11,7 +11,7 @@ import unittest
 
 import numpy as np
 
-from slam_recovery.core import CandidateMap, RecoveryMode
+from slam_recovery.core import CandidateMap, RecoveryMode, RecoveryState
 from slam_recovery.quarantine import TrustedMapTransactionManager
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
 
@@ -275,6 +275,137 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
         # Old code measured the anchor-to-first-committed-frame distance (3 m); the boundary
         # frame is frame 0, which is continuous with the anchor.
         self.assertAlmostEqual(node.last_paired_evidence["reentry_pos_jump_m"], 0.0, places=6)
+
+    def test_partial_commit_keeps_a_pending_quarantine(self) -> None:
+        """Deferred frames are not discarded: the quarantine stays open for them."""
+        cloud = _plane_cloud()
+        node = _node_with_quarantine(cloud)
+        poses, incumbent = {}, {}
+        for k in range(20):
+            node.scan_buffer_body[k] = cloud.copy()
+            poses[k] = np.eye(4)
+            incumbent[k] = np.eye(4)
+            incumbent[k][2, 3] = 0.3
+            if k >= 8:
+                poses[k][2, 3] = 100.0
+
+        report = node.evaluate_and_commit_candidate(
+            "partial", poses, np.eye(6) * 100, incumbent, np.eye(4)
+        )
+
+        self.assertTrue(report.partial_commit)
+        self.assertNotEqual(node.tx_mgr.state, RecoveryState.HEALTHY)
+        self.assertIsNotNone(node.tx_mgr.active_quarantine)
+        self.assertEqual(
+            sorted(int(k) for k in node.tx_mgr.active_quarantine.raw_frame_refs),
+            list(range(8, 20)),
+        )
+        # Retrying the deferred subset must be possible, not raise "no active quarantine".
+        node.evaluate_and_commit_candidate(
+            "retry", {k: poses[k] for k in range(8, 20)}, np.eye(6) * 100, incumbent, np.eye(4)
+        )
+
+    def test_pending_set_survives_batch_retries(self) -> None:
+        """Committing part of the deferred set must not drop the rest of it."""
+        mgr = TrustedMapTransactionManager(confirmation_margin_ns=0)
+        mgr.trigger_quarantine(
+            estimated_onset_ns=int(1e9),
+            current_ns=int(2e9),
+            weak_direction_6d=np.array([0, 0, 0, 1, 0, 0]),
+            info_before_6x6=np.eye(6) * 2,
+            propagated_cov_norm=1.2,
+        )
+
+        def cand(committed, deferred, version):
+            return CandidateMap(
+                candidate_id=f"batch_{min(committed)}_{len(committed)}",
+                parent_map_version=version,
+                repaired_poses={int(k): np.eye(4) for k in committed},
+                info_after_6x6=np.eye(6) * 100,
+                cov_after_6x6=np.eye(6) * 0.01,
+                holdout_nis=0.0,
+                paired_benefit_approved=True,
+                wilson_lower_bound=0.9,
+                reentry_pos_jump_m=0.0,
+                verified_pose_keys=frozenset(int(k) for k in committed),
+                deferred_pose_keys=tuple(int(k) for k in deferred),
+            )
+
+        r1 = mgr.validate_and_resolve(cand(range(8), range(8, 20), mgr.trusted_version))
+        self.assertTrue(r1.accepted)
+        self.assertEqual(
+            sorted(int(k) for k in mgr.active_quarantine.raw_frame_refs), list(range(8, 20))
+        )
+
+        # Retry only four of the twelve: the other eight must stay pending.
+        r2 = mgr.validate_and_resolve(cand(range(8, 12), (), mgr.trusted_version))
+        self.assertTrue(r2.accepted)
+        self.assertNotEqual(mgr.state, RecoveryState.HEALTHY)
+        # The receipt describes the remaining set, not this candidate's (empty) deferral.
+        self.assertEqual(r2.deferred_pose_keys, list(range(12, 20)))
+        self.assertEqual(r2.newly_deferred_pose_keys, [])
+        self.assertEqual(r2.remaining_pending_pose_keys, list(range(12, 20)))
+        self.assertTrue(r2.partial_commit)
+        self.assertEqual(
+            sorted(int(k) for k in mgr.active_quarantine.raw_frame_refs), list(range(12, 20))
+        )
+
+        # Finish the set: now the quarantine can close.
+        r3 = mgr.validate_and_resolve(cand(range(12, 20), (), mgr.trusted_version))
+        self.assertTrue(r3.accepted)
+        self.assertEqual(r3.deferred_pose_keys, [])
+        self.assertFalse(r3.partial_commit)
+        self.assertEqual(mgr.state, RecoveryState.HEALTHY)
+        self.assertIsNone(mgr.active_quarantine)
+
+    def test_each_segment_boundary_is_checked(self) -> None:
+        """A 1.5 m tangential shift after a gap has zero point-to-plane residual but is a jump."""
+        cloud = _plane_cloud()
+        node = _node_with_quarantine(cloud)
+        poses, incumbent = {}, {}
+        for k in range(20):
+            node.scan_buffer_body[k] = cloud.copy()
+            poses[k] = np.eye(4)
+            incumbent[k] = np.eye(4)
+            incumbent[k][2, 3] = 0.3
+            if k == 8:
+                poses[k][2, 3] = 100.0
+            elif k > 8:
+                poses[k][0, 3] = 1.5
+                incumbent[k][0, 3] = 1.5
+
+        report = node.evaluate_and_commit_candidate(
+            "gap", poses, np.eye(6) * 100, incumbent, np.eye(4)
+        )
+
+        self.assertFalse(report.accepted)
+        self.assertIn("boundary", report.reason)
+        self.assertFalse(node._last_holdout_support["segment_boundary_ok"])
+        self.assertTrue(any(j > 1.4 for j in node._last_holdout_support["segment_boundary_jumps_m"]))
+
+    def test_missing_holdout_sets_the_machine_status_to_missing(self) -> None:
+        mgr = TrustedMapTransactionManager(confirmation_margin_ns=0)
+        mgr.trigger_quarantine(
+            estimated_onset_ns=int(1e9),
+            current_ns=int(2e9),
+            weak_direction_6d=np.array([0, 0, 0, 1, 0, 0]),
+            info_before_6x6=np.eye(6) * 2,
+            propagated_cov_norm=1.2,
+        )
+        cand = CandidateMap(
+            candidate_id="missing_holdout",
+            parent_map_version=mgr.trusted_version,
+            repaired_poses={0: np.eye(4)},
+            info_after_6x6=np.eye(6) * 100,
+            cov_after_6x6=np.eye(6) * 0.01,
+            holdout_nis=float("inf"),
+            paired_benefit_approved=True,
+            wilson_lower_bound=0.9,
+            reentry_pos_jump_m=0.0,
+        )
+        report = mgr.validate_and_resolve(cand)
+        self.assertFalse(report.accepted)
+        self.assertEqual(report.evidence_status, "MISSING")
 
     def test_manager_refuses_a_candidate_with_unverified_frames(self) -> None:
         """Defence in depth: the manager enforces the invariant even for direct callers."""
