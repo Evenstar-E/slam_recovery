@@ -44,6 +44,7 @@
   "metadata_mismatch": 0,
   "empty_outside": 0,
   "empty_window": 0,
+  "sidecar_order": 0,
   "fatal": 0
  },
  "failures": [],

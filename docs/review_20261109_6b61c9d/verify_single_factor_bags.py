@@ -42,7 +42,7 @@ RECEIPT = os.path.join(_HERE, "single_factor_bags_verified.json")
 
 KINDS = ("stamp_mismatch", "missing_message", "outside_mismatch", "combined_mismatch",
          "index_mismatch", "row_count", "metadata_mismatch", "empty_outside", "empty_window",
-         "fatal")
+         "sidecar_order", "fatal")
 WHY = {
     "stamp_mismatch": "stamp mismatch between bags",
     "missing_message": "a bag ended before the reference stream",
@@ -53,6 +53,7 @@ WHY = {
     "metadata_mismatch": "message metadata disagrees with the reconstructed row set",
     "empty_outside": "no outside-window frame: equality would be vacuously true",
     "empty_window": "no in-window frame: equivalence would be vacuously true",
+    "sidecar_order": "a sidecar index array is not strictly increasing",
     "fatal": "verifier aborted; the exception is in the error field",
 }
 
@@ -101,6 +102,17 @@ def main():
             raise KeyError(f"unregistered failure kind {kind!r}")
         counts[kind] += 1
         failures.append({"kind": kind, "why": WHY[kind], **kw})
+
+    # The arm comparison infers index correctness from the rows; a malformed sidecar would be
+    # reported against the arm. Assert the sidecar itself: every array strictly increasing (which
+    # also gives uniqueness), with indices inside the injected row count.
+    for key in side.files:
+        if not key.startswith(("k", "b")):
+            continue
+        arr = np.asarray(side[key])
+        ns = key[1:]
+        if arr.size and not np.all(np.diff(arr.astype(np.int64)) > 0):
+            fail("sidecar_order", ns=ns, array=key[0])
 
     try:
         while True:
