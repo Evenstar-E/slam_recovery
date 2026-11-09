@@ -498,23 +498,26 @@
    ]
   }
  },
+ "14_b4": {
+  "cost": {
+   "verdict": "FAIL",
+   "problems": [
+    "R: coverage 0.6278 differs from the other record's 0.6038 and no reference is named"
+   ]
+  },
+  "sensitivity": {
+   "verdict": "PASS",
+   "problems": [],
+   "remaining": 319
+  }
+ },
  "13_hall01_trajectory": {
-  "verdict": "PASS",
+  "verdict": "FAIL",
   "problems": [
-   "clean_to_gt records matched/residual but not the fit window or the transform, so a reader cannot check that it was pre-onset"
+   "trajectory.population absent: the GT subset is not recorded in the data"
   ],
   "gt_matched": 252,
-  "frame_set": 400,
-  "ate": {
-   "R": {
-    "full": 1.9085491271221064,
-    "prefix": 10.928765092783461
-   },
-   "C3": {
-    "full": 0.3185291881794998,
-    "prefix": 0.49184380829384977
-   }
-  }
+  "frame_set": 400
  },
  "12_hall01": {
   "stability": {

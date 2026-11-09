@@ -287,6 +287,30 @@ T3a 走的是结果文件内的 `provenance_gap`；hall_01 没有这个字段，
 以及 `R_cg`/`t_cg` 的数值。这与之前 `window.declared_from` 那次是同一类问题——**声明在文字里，
 不在数据里**。
 
+## 14. B4 成本 / 缺测敏感性 / 覆盖度口径（main 60c4b1c + cf81d17）
+
+| 项 | 结果 |
+|---|---|
+| `clean_to_gt.start_ns` | **PASS**：`1627785275607408524` 与 `docs/milestone_m0_keys.json` 的 `injection_window.start_ns` 完全相同 |
+| `clean_to_gt.fitted_on` | **PASS**：与代码 `cln_ts < start_ns*1e-9` 一致；`R_cg`/`t_cg` 已入数据 |
+| 成本两口径 | **PASS**：R `DERIVED_FROM_COMMAND ... not measured`（296 s，rate 0.5/drain 150）、C3 `MEASURED`（122.9 s，rate 1.0/drain 40），峰值内存各自注明 UNAVAILABLE 及原因；**全库无任何加速比或 ratio** |
+| 缺测敏感性 | **PASS**：319 = 400 − 81；R 0.7977/0.4200/1.617、C3 0.9759/0.0975/0.274，排序不变 |
+| 覆盖度两套口径 | **FAIL**：0.6278/0.9850（`hall01_b4_cost_and_gap.json`）与 0.6038/0.9849（`raw_vs_repaired_results.json`）不一致，且**前者没有 `reference` 字段** |
+
+### 两处需要修
+
+**（a）`trajectory.population` 在 60c4b1c 中消失了。** c458a22 有结构化块
+`{frame_set: 400, gt_matched: 252, gt: ...}`；60c4b1c 加入变换字段时把它删了，只剩 notes 里那句散文。
+于是「ATE 是 252 帧诊断、不是 400 帧指标」这条**不再可被机器读取或校验**——
+为修一项而删掉另一项的防护，是最容易漏掉的一种回归。
+
+**（b）两套 coverage 只有一套被标注。** 0.6278/0.9850 只出现在 B4 文件里，没有任何字段说明用的是
+完整干净参考；0.6038 出现在 `raw_vs_repaired_results.json` 与 DAILY。R 差 0.024，读者很容易把
+0.6278 当成对 0.6038 的更正，而不是另一套口径。
+
+建议：B4 文件顶层加 `"reference": {"surface": "full clean reference", "points": ..., "voxel_m": ...}`，
+DAILY 并列两列；`trajectory.population` 恢复。
+
 ## 5b. R2 / R3 处置（同意你的提议）
 
 - **R2**：旧 `room02_hybrid_bag_report.json` 属已废弃的 X/Y 设计，2×2 已取代它。

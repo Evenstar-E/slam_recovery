@@ -625,6 +625,88 @@ def check_trajectory_population(results):
                         "prefix": tr[a].get("ate_frozen_prefix_protocol_m")} for a in arms}}
 
 
+def check_trajectory_population(results):
+    """Trajectory metrics must name the population they were computed on."""
+    bad = []
+    tr = results.get("trajectory") or {}
+    pop = tr.get("population") or {}
+    fs = results.get("frame_set") or {}
+    arms = [a for a in ("R", "C3") if a in tr]
+    if len(arms) != 2:
+        bad.append(f"trajectory has {arms}, expected R and C3")
+    matched = {tr[a].get("gt_matched") for a in arms}
+    if len(matched) != 1:
+        bad.append(f"arms match different GT counts: {matched}")
+    m = matched.pop() if len(matched) == 1 else None
+    if not pop:
+        bad.append("trajectory.population absent: the GT subset is not recorded in the data")
+    else:
+        if m is not None and pop.get("gt_matched") != m:
+            bad.append(f"population.gt_matched {pop.get('gt_matched')} != arm match {m}")
+        if pop.get("frame_set") != fs.get("n_frames"):
+            bad.append(f"population.frame_set {pop.get('frame_set')} != {fs.get('n_frames')}")
+    for a in arms:
+        if tr[a].get("ate_full_alignment_diagnostic_m") is None:
+            bad.append(f"{a}: no diagnostic ATE")
+        if tr[a].get("ate_frozen_prefix_protocol_m") is None:
+            bad.append(f"{a}: no protocol ATE")
+    cg = results.get("clean_to_gt") or {}
+    if int(cg.get("matched", 0)) < 10:
+        bad.append(f"clean->GT fitted on {cg.get('matched')} poses")
+    if not cg.get("start_ns") or not cg.get("R_cg"):
+        bad.append("clean_to_gt records no start_ns or transform: the fit basis is prose only")
+    return {"verdict": "PASS" if not bad else "FAIL", "problems": bad,
+            "gt_matched": m, "frame_set": fs.get("n_frames")}
+
+
+def check_b4_cost(b4, other_coverage=None):
+    """Cost rows from different runners may sit together but may not be divided."""
+    import re as _re
+    bad = []
+    cost = b4.get("cost") or {}
+    if len(cost) != 2:
+        bad.append(f"{len(cost)} cost rows, expected 2")
+    for k, v in cost.items():
+        basis = (v.get("wall_basis") or "")
+        if "DERIVED" in basis and "not measured" not in basis.lower():
+            bad.append(f"{k}: derived wall time without an explicit 'not measured' marker")
+        if v.get("peak_rss") == "UNAVAILABLE" and not v.get("rss_basis"):
+            bad.append(f"{k}: peak_rss UNAVAILABLE without a reason")
+    text = json.dumps(b4)
+    for token in ("speedup", "speed_up", "x faster"):
+        if token in text:
+            bad.append(f"record contains {token!r}: differently-run wall times are not a speed-up")
+    if _re.search(r"\bratio\b", text, _re.I):
+        bad.append("record contains a ratio between differently-run wall times")
+    if other_coverage and "reference" not in b4:
+        for arm, val in (b4.get("with_all_400") or {}).items():
+            other = other_coverage.get(arm)
+            if other is not None and abs(float(val.get("coverage", -1)) - float(other)) > 1e-4:
+                bad.append(f"{arm}: coverage {val.get('coverage'):.4f} differs from the other "
+                           f"record's {other:.4f} and no reference is named")
+    return {"verdict": "PASS" if not bad else "FAIL", "problems": bad}
+
+
+def check_gap_sensitivity(b4):
+    """Dropping the gap-adjacent frames must leave the ordering unchanged."""
+    bad = []
+    pop = b4.get("population") or {}
+    if pop.get("remaining") != (pop.get("frames_400", 0) - pop.get("gap_adjacent_within_1s", 0)):
+        bad.append("remaining != frames - gap neighbours")
+    full, drop = b4.get("with_all_400") or {}, b4.get("without_gap_neighbours") or {}
+    for arm in full:
+        if drop.get(arm, {}).get("frames") != pop.get("remaining"):
+            bad.append(f"{arm}: dropped-set frames != remaining")
+    if all(k in full and k in drop for k in ("R", "C3")):
+        def better(d):
+            return (d["C3"]["coverage"] > d["R"]["coverage"]
+                    and d["C3"]["unsupported"] < d["R"]["unsupported"]
+                    and d["C3"]["ate_full"] < d["R"]["ate_full"])
+        if better(full) != better(drop):
+            bad.append("ordering flips when gap-adjacent frames are removed")
+    return {"verdict": "PASS" if not bad else "FAIL", "problems": bad,
+            "remaining": pop.get("remaining")}
+
 def main():
     results = json.load(open(RESULTS, encoding="utf-8"))
     prereg = json.load(open(PREREG, encoding="utf-8"))
@@ -645,6 +727,18 @@ def main():
                "identity": audit_receipts(
                    manifest,
                    receipts=T3A_RECEIPTS, arms=("O",), expect_per_arm=6),
+           },
+           "14_b4": {
+               "cost": check_b4_cost(
+                   json.load(open(os.path.join(_HERE, "hall01_b4_cost_and_gap.json"),
+                                  encoding="utf-8")),
+                   other_coverage={k: v.get("proxy_coverage_fraction") for k, v in
+                                   (json.load(open(os.path.join(_HERE,
+                                    "raw_vs_repaired_results.json"),
+                                    encoding="utf-8")).get("arms") or {}).items()}),
+               "sensitivity": check_gap_sensitivity(
+                   json.load(open(os.path.join(_HERE, "hall01_b4_cost_and_gap.json"),
+                                  encoding="utf-8"))),
            },
            "13_hall01_trajectory": check_trajectory_population(
                json.load(open(os.path.join(_HERE, "raw_vs_repaired_results.json"),
@@ -685,9 +779,15 @@ def main():
         json.dump(out, fh, indent=1, default=float)
     for k in ("1_protocol", "2_receipts", "3_independent", "4_ate_convention",
               "5_frozen_transform", "6_hash_chain", "7_diagnostic_unchanged",
-              "8_bistability", "9_bist_runs", "10_run_identity", "11_t3a", "12_hall01", "13_hall01_trajectory"):
+              "8_bistability", "9_bist_runs", "10_run_identity", "11_t3a", "12_hall01", "13_hall01_trajectory", "14_b4"):
+        if k == "14_b4":
+            print(k, {n: v["verdict"] for n, v in out[k].items()})
+            for n, v in out[k].items():
+                if v["verdict"] != "PASS":
+                    print("   ", n, v.get("problems", [])[:2])
+            continue
         if k == "13_hall01_trajectory":
-            print(k, out[k]["verdict"], out[k]["problems"][:3], out[k]["ate"])
+            print(k, out[k]["verdict"], out[k]["problems"][:3])
             continue
         if k == "12_hall01":
             print(k, {n: v["verdict"] for n, v in out[k].items()})
