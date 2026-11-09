@@ -28,6 +28,11 @@ BAGS = os.path.join(_REPO, "docs/review_20261109_6b61c9d/single_factor_bags.json
 EVAL = os.path.join(_REPO, "docs/review_20261109_6b61c9d/evaluate_2x2_runs.json")
 OUT = os.path.join(_HERE, "two_by_two_audit.json")
 BIST = os.path.join(_HERE, "room02_bistability_results.json")
+T3A_RESULTS = json.load(open(os.path.join(_HERE, "room02_T3a_results.json"), encoding="utf-8"))
+T3A_ENRICHED = json.load(open(os.path.join(_HERE, "room02_T3a_enriched_results.json"),
+                              encoding="utf-8"))
+T3A_RECEIPTS = [json.load(open(p, encoding="utf-8")) for p in sorted(
+    glob.glob(os.path.join(_HERE, "room02_T3a*_receipt_r*.json")))]
 BEFORE = os.environ.get("TWOBY2_BEFORE", "/tmp/2x2_before.json")
 
 CELLS = ("O", "O_plus_F", "O_minus_B", "O_plus_F_minus_B")
@@ -444,6 +449,42 @@ def check_run_identity(bist):
             "common_frames": (bist.get("common_set") or {}).get("n")}
 
 
+def check_verdict_scope(results, label=""):
+    """A verdict must name the runs it covers; a partial verdict cannot be quoted on its own.
+
+    `S3_ACCEPTED_AS_SEED` came from two runs of one build and was later contradicted by four
+    runs of the next. Without the run set in the record, the verdict travels alone.
+    """
+    bad = []
+    scope = (results.get("runs_analysed") or results.get("run_set")
+             or results.get("runs") or results.get("run_labels"))
+    if not scope:
+        bad.append(f"{label or 'verdict'} carries no run set")
+    build = results.get("build") or results.get("binary") or results.get("host")
+    if not build:
+        bad.append(f"{label or 'verdict'} carries no build identifier")
+    if (results.get("criterion") or {}).get("verdict") and not scope:
+        bad.append("criterion.verdict present without the runs it covers")
+    return {"verdict": "PASS" if not bad else "FAIL", "problems": bad,
+            "scope": scope, "build": str(build)[:80] if build else None}
+
+
+def check_receipt_library(receipts, label=""):
+    """An executable hash that is identical across builds cannot identify a build.
+
+    If the behaviour lives in a shared library, the receipt must hash that library too.
+    """
+    if not receipts:
+        return {"verdict": "UNVERIFIABLE", "problems": ["no receipts"]}
+    missing = [r.get("host", {}).get("binary", "")[-40:] for r in receipts
+               if not (r.get("host", {}).get("library_sha256")
+                       or r.get("host", {}).get("libraries"))]
+    return {"verdict": "PASS" if not missing else "FAIL",
+            "problems": ([f"{len(missing)}/{len(receipts)} receipts record no loaded-library hash"]
+                         if missing else []),
+            "receipts": len(receipts)}
+
+
 def main():
     results = json.load(open(RESULTS, encoding="utf-8"))
     prereg = json.load(open(PREREG, encoding="utf-8"))
@@ -456,6 +497,14 @@ def main():
            "4_ate_convention": audit_ate_convention(results),
            "5_frozen_transform": audit_frozen_transform(results),
            "6_hash_chain": audit_hash_chain(results, manifest),
+           "11_t3a": {
+               "receipt_library": check_receipt_library(T3A_RECEIPTS),
+               "verdict_scope": check_verdict_scope(T3A_RESULTS, "room02_T3a_results"),
+               "enriched_scope": check_verdict_scope(T3A_ENRICHED, "room02_T3a_enriched_results"),
+               "identity": audit_receipts(
+                   manifest,
+                   receipts=T3A_RECEIPTS, arms=("O",), expect_per_arm=6),
+           },
            "10_run_identity": check_run_identity(
                json.load(open(BIST, encoding="utf-8"))),
            "9_bist_runs": {
@@ -486,7 +535,13 @@ def main():
         json.dump(out, fh, indent=1, default=float)
     for k in ("1_protocol", "2_receipts", "3_independent", "4_ate_convention",
               "5_frozen_transform", "6_hash_chain", "7_diagnostic_unchanged",
-              "8_bistability", "9_bist_runs", "10_run_identity"):
+              "8_bistability", "9_bist_runs", "10_run_identity", "11_t3a"):
+        if k == "11_t3a":
+            print(k, {n: v["verdict"] for n, v in out[k].items()})
+            for n, v in out[k].items():
+                if v["verdict"] != "PASS":
+                    print("   ", n, v.get("problems", [])[:2])
+            continue
         if k == "9_bist_runs":
             print(k, {name: v["verdict"] for name, v in out[k].items()})
             continue

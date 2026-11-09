@@ -278,6 +278,221 @@
   },
   "run_bags": 8
  },
+ "11_t3a": {
+  "receipt_library": {
+   "verdict": "FAIL",
+   "problems": [
+    "6/6 receipts record no loaded-library hash"
+   ],
+   "receipts": 6
+  },
+  "verdict_scope": {
+   "verdict": "FAIL",
+   "problems": [
+    "room02_T3a_results carries no run set",
+    "room02_T3a_results carries no build identifier",
+    "criterion.verdict present without the runs it covers"
+   ],
+   "scope": null,
+   "build": null
+  },
+  "enriched_scope": {
+   "verdict": "PASS",
+   "problems": [],
+   "scope": {
+    "r1": {
+     "score": {
+      "coverage": 0.6794693333333334,
+      "unsupported": 0.6795913312693498,
+      "ate_full": 24.17188371953432,
+      "mode": "BAD",
+      "scored_frames": 323
+     },
+     "init_iter": 37,
+     "packages": 1734,
+     "scans_in_pkg": {
+      "min": 1,
+      "max": 2,
+      "mean": 1.4994232987312572
+     },
+     "queued_lidar_max": 9,
+     "imu_in_pkg": {
+      "min": 0,
+      "max": 48,
+      "mean": 4.651672433679354
+     },
+     "img_in_pkg_max": 1,
+     "first_pkg": {
+      "lid_stamp": 1627643741.118071,
+      "pos": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "last_pkg": {
+      "lid_stamp": 1627643799.362292,
+      "pos": [
+       -52.989267,
+       -6.119036,
+       -2.113256
+      ]
+     },
+     "first_output_s": 1627643741.5119612
+    },
+    "r2": {
+     "score": {
+      "coverage": 0.6927867826086956,
+      "unsupported": 0.6636780185758514,
+      "ate_full": 17.355769013899632,
+      "mode": "BAD",
+      "scored_frames": 323
+     },
+     "init_iter": 73,
+     "packages": 1722,
+     "scans_in_pkg": {
+      "min": 1,
+      "max": 2,
+      "mean": 1.4994192799070847
+     },
+     "queued_lidar_max": 8,
+     "imu_in_pkg": {
+      "min": 0,
+      "max": 48,
+      "mean": 4.645180023228804
+     },
+     "img_in_pkg_max": 1,
+     "first_pkg": {
+      "lid_stamp": 1627643741.519202,
+      "pos": [
+       0.0,
+       0.0,
+       0.0
+      ]
+     },
+     "last_pkg": {
+      "lid_stamp": 1627643799.362292,
+      "pos": [
+       -35.680663,
+       -13.514959,
+       -3.001746
+      ]
+     },
+     "first_output_s": 1627643742.244886
+    },
+    "r3": {
+     "score": {
+      "coverage": 0.9987708985507247,
+      "unsupported": 0.0074179566563467025,
+      "ate_full": 0.07062558376346979,
+      "mode": "GOOD"
+     }
+    },
+    "r4": {
+     "score": {
+      "coverage": 0.9987892173913043,
+      "unsupported": 0.007269349845201223,
+      "ate_full": 0.07255224644600478,
+      "mode": "GOOD"
+     }
+    }
+   },
+   "build": "{'executable_sha256': '76359f5387f75da3dcad7aa72372048c3feefd91b340ae0c40f92f6fb"
+  },
+  "identity": {
+   "verdict": "PASS",
+   "problems": [],
+   "receipts": [
+    {
+     "receipt": "receipt0",
+     "arm": "O",
+     "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+     "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+     "status": "OK"
+    },
+    {
+     "receipt": "receipt1",
+     "arm": "O",
+     "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+     "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+     "status": "OK"
+    },
+    {
+     "receipt": "receipt2",
+     "arm": "O",
+     "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+     "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+     "status": "OK"
+    },
+    {
+     "receipt": "receipt3",
+     "arm": "O",
+     "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+     "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+     "status": "OK"
+    },
+    {
+     "receipt": "receipt4",
+     "arm": "O",
+     "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+     "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+     "status": "OK"
+    },
+    {
+     "receipt": "receipt5",
+     "arm": "O",
+     "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+     "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+     "status": "OK"
+    }
+   ],
+   "per_arm": {
+    "O": 6
+   },
+   "bag_hashes_on_disk_match_manifest": {
+    "O": true
+   },
+   "identity_shared": true,
+   "outputs": [
+    {
+     "bag": "/tmp/fastlivo/res_T3a2_O_r1.bag",
+     "sha256": "bba0c5b5453a74f94e0c735bedbd8aaf21dc165b649647da681b2dc956b98a70",
+     "on_disk": true,
+     "match": true
+    },
+    {
+     "bag": "/tmp/fastlivo/res_T3a2_O_r2.bag",
+     "sha256": "93660a223bca4a10b20e8a0c33815d19eb2c1657ad05bfa419461c2367cda32c",
+     "on_disk": true,
+     "match": true
+    },
+    {
+     "bag": "/tmp/fastlivo/res_T3a2_O_r3.bag",
+     "sha256": "77b69de44c795b57183d14a9e61aef24a684d780ba30d83e0afe9a27d01753ac",
+     "on_disk": true,
+     "match": true
+    },
+    {
+     "bag": "/tmp/fastlivo/res_T3a2_O_r4.bag",
+     "sha256": "a39ee9a6c6099641e9419675b04ad829c92079bafeeaa3c3f6d36caa8c9032e1",
+     "on_disk": true,
+     "match": true
+    },
+    {
+     "bag": "/tmp/fastlivo/res_T3a_O_r1.bag",
+     "sha256": "1e3b152442e1c7839d1533853fff88fc610ba221333990b639659f627dca9b39",
+     "on_disk": true,
+     "match": true
+    },
+    {
+     "bag": "/tmp/fastlivo/res_T3a_O_r2.bag",
+     "sha256": "e8f93570c6c923298321cf0c97c11e17f4d763f7db15b5ffc7ff52bdc933a4db",
+     "on_disk": true,
+     "match": true
+    }
+   ]
+  }
+ },
  "10_run_identity": {
   "verdict": "PASS",
   "problems": [],

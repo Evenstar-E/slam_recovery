@@ -194,6 +194,31 @@ gauge 残差 1.32–1.54 cm，所以 1 cm 阈值确实会在首样本必然触�
 复算脚本：`docs/review_20261109_6b61c9d/verify_determinism_alignment.py`，
 结果 `determinism_alignment_verified.json`。
 
+## 10. T3a 审计（main 2381d82）
+
+| 项 | 结果 |
+|---|---|
+| 6 份 receipt 的输入/config/身份 | **PASS**：同一 input `f8b26ddf…`、同一 config、同一 exec `76359f53…`、6 份全 `OK` |
+| **receipt 是否记录加载的库 hash** | **FAIL**：6/6 都没有 `library_sha256` 字段（`grep library` 在 receipt 里命中 0） |
+| `room02_T3a_results.json` 的 verdict 作用域 | **FAIL**：不带 run 集合、不带 build 标识，`S3_ACCEPTED_AS_SEED` 可脱离上下文被单独引用 |
+| `room02_T3a_enriched_results.json` 的作用域 | **PASS**：含 `runs`、`four_runs_same_build`、`build_comparison` |
+| mode 规则一致性 | **PASS**：GOOD <0.10 / BAD >0.50，与 bistability 同一规则；r1 0.0067、r2 0.044 均判 GOOD |
+
+### 两条都是同一个教训的两半
+
+provenance 的教训是「exec sha 相同，行为在 `liblaser_mapping.so`」。但**修复只落在分析文件里**：
+`build_comparison` 的键名写作 `lib_6337ec0f`，而 **receipt 本身仍只有一个跨 build 相同的 exec sha**。
+也就是说：拿到任何一份 T3a receipt 的人，**无法从 receipt 判断它跑的是 build A 还是 build B**——
+这正是该教训要防的事。
+
+同理，`S3_ACCEPTED_AS_SEED` 写在 `room02_T3a_results.json` 里，而该文件不写它覆盖了哪两次运行、
+哪个 build。四个 run 的 enriched 文件推翻它时，两份记录之间没有任何机器可读的关联。
+
+建议：
+1. receipt 的 `host` 增加 `library_path` 与 `library_sha256`（运行时从 `/proc/<pid>/maps` 或
+   `ldd` 解析出实际加载的 `.so`，而不是声明值）；
+2. 任何 `verdict` 旁附 `runs_analysed` 与 `build`，缺这两项时下游规则判 FAIL（已加入第 11 组检查）。
+
 ## 5b. R2 / R3 处置（同意你的提议）
 
 - **R2**：旧 `room02_hybrid_bag_report.json` 属已废弃的 X/Y 设计，2×2 已取代它。
