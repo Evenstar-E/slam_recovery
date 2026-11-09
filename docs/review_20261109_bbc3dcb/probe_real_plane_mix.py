@@ -287,8 +287,11 @@ def calibrate_sigma(pairs, label: str) -> dict:
         "n_pairs": len(per_pair_sq),
         "split_half_transfer": transfer,
         "definition": "sigma* = sqrt(mean_over_pairs(mean_over_points(r^2))); an empirical "
-                      "normalisation scale fitted on one clean window and evaluated on another, "
-                      "NOT a per-frame chi-square noise model",
+                      "normalisation scale. The transfer check below is an interleaved even/odd "
+                      "PAIR split inside one window, not two disjoint time intervals: adjacent "
+                      "folds share scan endpoints and are temporally correlated, so it shows the "
+                      "residual scale is stable within the window, not that it generalises across "
+                      "windows or sequences. NOT a per-frame chi-square noise model.",
         "n_residuals_used": int(len(used)),
         "sigma_star_rms": sigma_star,
         "sigma_robust_mad": 1.4826 * float(np.median(np.abs(used - med))),

@@ -89,7 +89,11 @@
     "compared_frames": 598,
     "method": "per-frame raw buffer equality against the clean bag; no threshold",
     "hardcoded_value_was": 20.0,
-    "note": "the hard-coded 20.0 s was wrong; the injected span starts at 14.528393030166626 s, so six seconds of faulty frames had been treated as trusted"
+    "note": "the hard-coded 20.0 s was wrong; the injected span starts at 14.528393030166626 s, so six seconds of faulty frames had been treated as trusted The detector is an oracle: it needs the clean bag, so it is not evidence about online detection latency or recall. Raw-buffer difference means the bytes changed, not that every changed byte is the configured fault; the input hash chain covers identity.",
+    "start_abs_sec": 1627785275.607,
+    "end_abs_sec": 1627785295.546,
+    "role": "INJECTION_ORACLE (offline; requires the clean recording)",
+    "deployable_detector": false
   },
   "protocol": {
     "voxel_m": 0.1,

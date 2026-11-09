@@ -566,6 +566,12 @@ class OnlineRecoveryTransactionNode:
             head = np.asarray(repaired_poses[runs[0][0]], dtype=np.float64)
             if anchor_arr.shape == (4, 4) and head.shape == (4, 4):
                 first_run_jump = float(np.linalg.norm(head[:3, 3] - anchor_arr[:3, 3]))
+                dt0 = 0.0
+                if runs[0][0] in self._kf_timestamps and kf_sorted[0] in self._kf_timestamps:
+                    dt0 = max(0.0, (self._kf_timestamps[runs[0][0]]
+                                    - self._kf_timestamps[kf_sorted[0]]) * 1e-9)
+                if first_run_jump > jump_bound + 2.0 * dt0:
+                    boundary_ok = False
         # Without an independent relative-motion measurement the check is an elapsed-time speed
         # envelope, not geometric continuity; say so rather than presenting it as verified.
         boundary_basis = "BOUND_ONLY"

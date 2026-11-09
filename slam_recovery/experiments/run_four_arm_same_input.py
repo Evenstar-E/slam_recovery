@@ -223,10 +223,16 @@ def sheet_fraction(kf, lo=4.0, hi=4.6):
 
 
 def detect_onset(clean_bag, inj_bag, topic="/velodyne_points"):
-    """Exact onset: the two bags are byte-identical before the injection.
+    """INJECTION_ORACLE: locate the injected span by comparing against the clean bag.
+
+    This is an offline protocol-alignment tool, not an online fault detector: it needs the clean
+    recording, which a deployed system does not have. Its output must be labelled as an oracle in
+    any experiment that uses it, and it is not evidence about detection latency or recall.
 
     Pairs scans by header stamp and compares the raw buffers. No threshold, no smoothing, no
-    sampling noise -- the first and last differing frame bound the injection exactly.
+    sampling noise -- the first and last differing frame bound the injection exactly. A raw-buffer
+    difference means the bytes changed, not that every changed byte is the configured fault; the
+    conversion sidecar and input hashes carry that part of the provenance.
     """
     def load(bp):
         out = {}
@@ -236,14 +242,21 @@ def detect_onset(clean_bag, inj_bag, topic="/velodyne_points"):
         return out
     a, c = load(inj_bag), load(clean_bag)
     common = sorted(set(a) & set(c))
+    if not common:
+        raise RuntimeError("detect_onset: the two bags share no scan timestamps")
     t0 = common[0]
     diff = [t for t in common if a[t] != c[t]]
     if not diff:
-        return None, None, {}
+        raise RuntimeError("detect_onset: no scan differs; refusing to run an 'injection' replay")
     return (diff[0] - t0, diff[-1] - t0,
             {"start_rel_sec": round(diff[0] - t0, 3), "end_rel_sec": round(diff[-1] - t0, 3),
+             "start_abs_sec": diff[0], "end_abs_sec": diff[-1],
              "differing_frames": len(diff), "compared_frames": len(common),
-             "method": "per-frame raw buffer equality against the clean bag; no threshold"})
+             "missing_in_injected": len(set(c) - set(a)),
+             "missing_in_clean": len(set(a) - set(c)),
+             "method": "per-frame raw buffer equality against the clean bag; no threshold",
+             "role": "INJECTION_ORACLE (offline; requires the clean recording)",
+             "deployable_detector": False})
 
 def world_points(kf):
     T = kf["pose"]

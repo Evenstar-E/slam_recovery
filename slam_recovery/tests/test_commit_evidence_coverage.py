@@ -341,6 +341,11 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
         r2 = mgr.validate_and_resolve(cand(range(8, 12), (), mgr.trusted_version))
         self.assertTrue(r2.accepted)
         self.assertNotEqual(mgr.state, RecoveryState.HEALTHY)
+        # The receipt describes the remaining set, not this candidate's (empty) deferral.
+        self.assertEqual(r2.deferred_pose_keys, list(range(12, 20)))
+        self.assertEqual(r2.newly_deferred_pose_keys, [])
+        self.assertEqual(r2.remaining_pending_pose_keys, list(range(12, 20)))
+        self.assertTrue(r2.partial_commit)
         self.assertEqual(
             sorted(int(k) for k in mgr.active_quarantine.raw_frame_refs), list(range(12, 20))
         )
@@ -348,6 +353,8 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
         # Finish the set: now the quarantine can close.
         r3 = mgr.validate_and_resolve(cand(range(12, 20), (), mgr.trusted_version))
         self.assertTrue(r3.accepted)
+        self.assertEqual(r3.deferred_pose_keys, [])
+        self.assertFalse(r3.partial_commit)
         self.assertEqual(mgr.state, RecoveryState.HEALTHY)
         self.assertIsNone(mgr.active_quarantine)
 

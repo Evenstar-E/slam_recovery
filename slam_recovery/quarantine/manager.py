@@ -295,8 +295,15 @@ class TrustedMapTransactionManager:
                 self.active_quarantine = None
                 self.state = RecoveryState.HEALTHY
             # Make the commit auditable: which frames were written, and which stayed quarantined.
+            # The receipt must describe the *remaining pending set*, not only this candidate's
+            # deferrals: a retry that commits 8..11 while deferring nothing still leaves 12..19
+            # pending, and a receipt saying deferred=[] / partial_commit=False would tell the
+            # downstream consumer the quarantine is finished.
             report.committed_pose_keys = sorted(int(k) for k in candidate.repaired_poses.keys())
-            report.partial_commit = bool(report.deferred_pose_keys)
+            report.newly_deferred_pose_keys = sorted(int(k) for k in candidate.deferred_pose_keys)
+            report.remaining_pending_pose_keys = sorted(int(k) for k in pending)
+            report.deferred_pose_keys = sorted(int(k) for k in pending)
+            report.partial_commit = bool(pending)
             self.commit_history.append((self.trusted_version, candidate.candidate_id, report))
         elif report.mode in (RecoveryMode.MODE3_SOFT_BRIDGE_WAIT, RecoveryMode.MODE1_ONLINE_REWEIGHT):
             # Trusted map stays strictly invariant; system waits for delayed loop or auxiliary evidence

@@ -232,6 +232,8 @@ class ValidationReport:
     partial_commit: bool = False
     # See CandidateMap.boundary_basis; empty when the gate never reached a candidate.
     boundary_basis: str = ""
+    newly_deferred_pose_keys: Optional[List[int]] = None
+    remaining_pending_pose_keys: Optional[List[int]] = None
 
 
 @dataclass(frozen=True)
