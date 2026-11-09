@@ -45,6 +45,17 @@ class TestOutsideEquality(unittest.TestCase):
              "arms_match_original_indices": True, "row_counts_match": True}
         self.assertTrue(Q.check_outside_equals_filtered(_receipt(checks=c)))
 
+    def test_typed_counts_beat_an_empty_failure_list(self):
+        """A receipt that lists no failures but counts one must still be rejected."""
+        r = _receipt()
+        r["failure_counts"] = {"outside_mismatch": 1}
+        self.assertTrue(Q.check_outside_equals_filtered(r))
+
+    def test_typed_counts_of_zero_pass(self):
+        r = _receipt()
+        r["failure_counts"] = {"outside_mismatch": 0, "combined_mismatch": 0}
+        self.assertEqual(Q.check_outside_equals_filtered(r), [])
+
     def test_missing_failures_is_unverifiable_not_pass(self):
         r = {"frames": {"outside": 400}, "checks": {"outside_all_equal_filtered": True}}
         self.assertTrue(Q.check_outside_equals_filtered(r))
@@ -66,6 +77,11 @@ class TestCombinedCell(unittest.TestCase):
         c = {"outside_all_equal_filtered": True, "combined_equals_actual_in_window": False,
              "arms_match_original_indices": True, "row_counts_match": True}
         self.assertTrue(Q.check_combined_equals_filtered(_receipt(checks=c)))
+
+    def test_typed_counts_beat_an_empty_failure_list(self):
+        r = _receipt()
+        r["failure_counts"] = {"combined_mismatch": 2}
+        self.assertTrue(Q.check_combined_equals_filtered(r))
 
     def test_missing_check_key_is_rejected(self):
         c = {"outside_all_equal_filtered": True, "arms_match_original_indices": True,

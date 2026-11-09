@@ -18,6 +18,18 @@ def _verdict(bad):
     return "PASS" if not bad else bad[0]
 
 
+def _kind_count(receipt, kind):
+    """Typed counts are authoritative when present; the `why` text is only a fallback.
+
+    The verifier now emits `failure_counts`, so a rule that still keys off message prefixes would
+    repeat the weakness it was written to catch.
+    """
+    fc = receipt.get("failure_counts")
+    if isinstance(fc, dict) and kind in fc:
+        return int(fc[kind])
+    return None
+
+
 def check_outside_equals_filtered(receipt):
     """Every arm must reproduce the filtered bag outside the window -- and there must be frames.
 
@@ -34,7 +46,11 @@ def check_outside_equals_filtered(receipt):
         bad.append("no outside-window frame: the equality check is vacuously true")
     if "outside_all_equal_filtered" not in checks:
         bad.append("check `outside_all_equal_filtered` absent")
-    if any(str(f.get("why", "")).startswith("outside") for f in fails):
+    n_kind = _kind_count(receipt, "outside_mismatch")
+    if n_kind is not None:
+        if n_kind:
+            bad.append(f"{n_kind} outside_mismatch failures recorded")
+    elif any(str(f.get("why", "")).startswith("outside") for f in fails):
         bad.append("at least one arm differs from the filtered bag outside the window")
     if checks.get("outside_all_equal_filtered") is False:
         bad.append("verifier reported outside_all_equal_filtered = False")
@@ -54,7 +70,11 @@ def check_combined_equals_filtered(receipt):
         bad.append("no in-window frame: the combined-cell check is vacuously true")
     if "combined_equals_actual_in_window" not in checks:
         bad.append("check `combined_equals_actual_in_window` absent")
-    if any("combined cell" in str(f.get("why", "")) for f in fails):
+    n_kind = _kind_count(receipt, "combined_mismatch")
+    if n_kind is not None:
+        if n_kind:
+            bad.append(f"{n_kind} combined_mismatch failures recorded")
+    elif any("combined cell" in str(f.get("why", "")) for f in fails):
         bad.append("O+F-B differs from the filtered scan inside the window")
     if checks.get("combined_equals_actual_in_window") is False:
         bad.append("verifier reported combined_equals_actual_in_window = False")

@@ -61,6 +61,28 @@ if not np.array_equal(got["O_plus_F_minus_B"], fil_rows):
   verifier 本身不读取那份期望值；即 `single_factor_bags.json` 的 1,186,220 / 1,187,485 /
   1,162,613 / 1,163,878 与 receipt 的一致性没有被交叉核对。
 
+## 3b. 后续：`0057df3` 已修掉三处判定弱点
+
+复核该提交后确认：
+
+| 弱点 | 现状 |
+|---|---|
+| 空集自动通过 | `n_out==0` / `n_in==0` 分别记 `empty_outside` / `empty_window`，且对应 check 显式要求 `n_* > 0` |
+| 字符串前缀判据 | 失败改为 typed `kind` + 计数器，check 由 `failure_counts` 推出；`why` 保留为文本 |
+| 元数据未比对 | 窗内逐帧比 `(width, height, row_step, point_step)`，窗外比完整 `_meta`（含 `is_dense`） |
+| 短流无回执退出 | `StopIteration` 与任何异常都落 `missing_message` 并写 receipt，退出码非零 |
+
+receipt 另增 `frames_complete` 检查与 `preregistration` 块（`repetitions_per_cell=2`、
+`failure_threshold_ate_m=1.0`、四格、交互判据），并单独落
+`single_factor_preregistration.json`。
+
+**一处仍建议**：兜底 `except Exception` 复用 `kind="missing_message"`，其 `why` 是
+「某个包先于参考流结束」，与真正的致命异常语义不符；`error=repr(exc)` 带上了真相，但
+读 `failure_counts` 的人会把它误读成短流。建议单列 `kind="fatal"`。
+
+我的规则也随之改为**优先读 `failure_counts`**，仅在缺该字段时回退到 `why` 前缀——
+否则我自己就还在依赖被批评的那套判据。
+
 ## 4. 新增的验收规则（对 fixture 可跑）
 
 | 规则 | 作用 |
