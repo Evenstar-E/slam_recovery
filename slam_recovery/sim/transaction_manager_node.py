@@ -262,17 +262,22 @@ class OnlineRecoveryTransactionNode:
             else self.get_trusted_map_points(max_pts=1500)
         )
         paired_keys = [k for k in keys if k in self.scan_buffer_body and k in incumbent_poses]
-        # Evidence requirement scales with how much of the map the candidate would commit.
-        required_paired = (
+        # Evidence requirement scales with how much of the map the candidate would commit. This is
+        # a floor under both settings, so a caller that raises min_paired_observations above the
+        # large-candidate requirement cannot end up demanding *less* evidence for a bigger commit.
+        required_paired = max(
+            self.min_paired_observations,
             self.min_paired_observations_large_candidate
             if len(keys) >= self.large_candidate_keyframe_threshold
-            else self.min_paired_observations
+            else 0,
         )
         if len(ref_pts) == 0 or len(paired_keys) < required_paired:
             self.last_paired_evidence = {
                 "num_paired_frames": len(paired_keys),
                 "reason": "empty_trusted_reference" if len(ref_pts) == 0 else "insufficient_paired_frames",
-                "min_paired_observations": required_paired,
+                # Same key in the failure and success branches, so a MISSING verdict is as
+                # traceable as an accepted one.
+                "required_paired_frames": required_paired,
                 "candidate_keyframes": len(keys),
                 "reentry_pos_jump_m": reentry_jump,
             }

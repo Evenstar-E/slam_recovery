@@ -160,6 +160,55 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
         self.assertTrue(rep_ok.approved)
         self.assertGreaterEqual(rep_ok.wilson_lower_bound, 0.55)
 
+        # Boundary case that distinguishes the two historical bounds: 0.40 m sits between the old
+        # 0.35 m limit and the unified 0.50 m one. It must pass, otherwise the same physical
+        # quantity carries two thresholds again.
+        rep_mid = evaluate_paired_sequential_benefit(
+            inc, cand_good_frames, reentry_position_jump_m=0.40
+        )
+        self.assertTrue(rep_mid.approved)
+        self.assertNotEqual(rep_mid.reason, "reentry_position_discontinuity_exceeded")
+
+    def test_paired_evidence_requirement_scales_with_candidate_size(self) -> None:
+        """
+        A candidate that touches >= 8 keyframes must supply >= 8 paired frames. Four frames clear
+        the 0.55 Wilson bound by only 0.046, which is too thin for an irreversible map commit.
+        """
+        from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
+
+        node = OnlineRecoveryTransactionNode(confirmation_margin_sec=0.0)
+        rng = np.random.default_rng(0)
+        scan = rng.uniform(-1.0, 1.0, size=(40, 3))
+        repaired, incumbent = {}, {}
+        for k in range(8):
+            node.scan_buffer_body[k] = scan + 0.01 * k
+            repaired[k] = np.eye(4)
+            incumbent[k] = np.eye(4)
+        # Only six frames are usable as paired observations.
+        node.scan_buffer_body.pop(7)
+        node.scan_buffer_body.pop(6)
+        node.committed_map_points = [rng.uniform(-1.0, 1.0, size=(60, 3))]
+
+        paired_ok, wilson, _ = node._measure_paired_evidence(
+            repaired, incumbent_poses=incumbent, reentry_anchor_pose=np.eye(4)
+        )
+        self.assertIsNone(paired_ok)
+        self.assertIsNone(wilson)
+        ev = node.last_paired_evidence
+        self.assertEqual(ev["required_paired_frames"], 8)
+        self.assertEqual(ev["candidate_keyframes"], 8)
+        self.assertEqual(ev["num_paired_frames"], 6)
+        self.assertEqual(ev["reason"], "insufficient_paired_frames")
+
+        # The same evidence volume is enough for a small candidate.
+        small_repaired = {k: np.eye(4) for k in range(4)}
+        node._measure_paired_evidence(
+            small_repaired,
+            incumbent_poses={k: np.eye(4) for k in range(4)},
+            reentry_anchor_pose=np.eye(4),
+        )
+        self.assertEqual(node.last_paired_evidence["required_paired_frames"], 4)
+
     def test_r1_to_r6_audit_counterexamples_resolved(self) -> None:
         """Verify that all 6 bounded counterexamples (R1-R6) in docs/review_20261105/audit_review.py are resolved."""
         import copy

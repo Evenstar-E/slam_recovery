@@ -29,6 +29,8 @@
       ],
       "paired_evidence_diagnostics": {
         "num_paired_frames": 20,
+        "required_paired_frames": 8,
+        "candidate_keyframes": 20,
         "num_improved_frames": 20,
         "improved_fraction": 1.0,
         "wilson_lower_bound": 0.8808234818732034,
@@ -48,6 +50,8 @@
       ],
       "paired_evidence_diagnostics": {
         "num_paired_frames": 20,
+        "required_paired_frames": 8,
+        "candidate_keyframes": 20,
         "num_improved_frames": 20,
         "improved_fraction": 1.0,
         "wilson_lower_bound": 0.8808234818732034,

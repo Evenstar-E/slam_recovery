@@ -537,7 +537,7 @@ X^*=\arg\min_X\left(
    L_{\mathrm{Wilson}}(k, n; z) = \frac{\hat p + \frac{z^2}{2n} - z\sqrt{\frac{\hat p(1-\hat p)}{n} + \frac{z^2}{4n^2}}}{1 + \frac{z^2}{n}} \ge \underline{p}_{\min},
    \]
    从而防止少数帧的大幅残差下降掩盖其余帧的局部轨迹恶化。
-   **样本量 $N_{\min}$ 随候选规模自适应**（`transaction_manager_node.py`）：全数改善时 $n=3 \Rightarrow L=0.526$（不达标）、$n=4 \Rightarrow 0.596$（仅高出门限 $0.046$）、$n=8 \Rightarrow 0.747$。因此 $n \ge 4$ 只作为**下限**；当候选触及的关键帧 $\ge 8$ 时要求 $n \ge 8$——用 4 帧证据去授权一次不可逆的可信地图提交，统计上合法但证据过于单薄，而大规模候选本就没有理由只提供 4 帧。所有实际运行记录的 `num_paired_frames` 为 20，远高于两档阈值，故该规则不放宽、只收紧；
+   **样本量 $N_{\min}$ 随候选规模自适应**（`transaction_manager_node.py`）：全数改善时 $n=3 \Rightarrow L=0.526$（不达标）、$n=4 \Rightarrow 0.596$（仅高出门限 $0.046$）、$n=8 \Rightarrow 0.747$。因此 $n \ge 4$ 只作为**下限**；当候选触及的关键帧 $\ge 8$ 时要求 $n \ge 8$——用 4 帧证据去授权一次不可逆的可信地图提交，统计上合法但证据过于单薄，而大规模候选本就没有理由只提供 4 帧。目前已记录 `paired_evidence_diagnostics` 的运行（S1 仿真五个分支、`p10` E-Gap）中 `num_paired_frames` 均为 20，远高于两档阈值，故该规则对已有结论不放宽、只收紧；其余 manifest 没有该字段，不能据此类推。
 4. **重入边界几何连续性（Re-entry Continuity Gate）**：候选分支在隔离结束时刻 $t_{q,\mathrm{end}}$ 与后段健康轨迹的交接位置跳变 $\|\Delta p_{\mathrm{reentry}}\|_2 \le \tau_{p,\mathrm{reentry}}$、旋转跳变 $\|\Delta \theta_{\mathrm{reentry}}\| \le \tau_{\theta,\mathrm{reentry}}$，杜绝单端开环重放引发的尾部阶跃与 RPE 尖峰。**位置门限在全代码库统一为 $\tau_{p,\mathrm{reentry}} = 0.50\,\mathrm{m}$**（`GateThresholds.max_reentry_jump_m` 与 `wilson_validator` 的 `max_reentry_position_jump_m` 取同一数值；此前二者分别为 `0.50` 与 `0.35`，属同一物理量的两个阈值，会导致候选被一个论文从未声明的界拒绝）；
 5. **原弱方向的正交信息增益**：
    \[
@@ -1633,7 +1633,7 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
 |---|---|---|---:|---:|---:|---:|---:|---:|---|
 | **重度低光 (`gain=0.05`)** | **B0：真实单地图 (`ORB_SINGLE_MAP=1`)** | `INJECTION` | 4954 (**174**) | **1.3755** | 0.4030 | 1.1396 / 3.3810 | `0.0000` | — | [e3_orbslam3_b0_hall_01_severe_g005.json](slam_recovery/experiments/manifests/e3_orbslam3_b0_hall_01_severe_g005.json) |
 | **重度低光 (`gain=0.05`)** | **B2：原生 ORB-SLAM3 Atlas** | `INJECTION` | 5102 (**87**) | **2.1822** | 1.0461 | **6.8941 / 14.7115** | `-0.9427` | `0.0000` | [e3_orbslam3_b2_hall_01_severe_g005.json](slam_recovery/experiments/manifests/e3_orbslam3_b2_hall_01_severe_g005.json)；**关键真实现象**：原生 Atlas 盲目切出子图并在 148s 合并带歪斜的过渡关键帧，全局 ATE (`2.1822m`) 反而比直接等待 BoW 重定位的单地图 B0 (`1.3755m`) 污染更严重！ |
-| **重度低光 (`gain=0.05`)** | **B5：无独立锚点验证开环拼接** | `OFFLINE_CONSTRUCT` | 5228 (0) | 6.5554 | — | — | `-6.0531` | `-2.6306` | 因重入跳变 `0.92m > 0.50m`（与 `GateThresholds.max_reentry_jump_m` 同源，此前代码内另有 `0.35m` 的冗余阈值，已统一）与 Wilson 下界 `0.0` 被 Mode 2 拦截拒绝 |
+| **重度低光 (`gain=0.05`)** | **B5：无独立锚点验证开环拼接** | `OFFLINE_CONSTRUCT` | 5228 (0) | 6.5554 | — | — | `-6.0539` | `-2.6306` | 因重入跳变 **`4.519m > 0.50m`** 被 Mode 2 拦截（`rejection_reason: reentry_position_discontinuity_exceeded`）；Wilson 下界 `0.8061` 本身达标，拒绝来自重入连续性而非配对收益。数值以 `e3_orbslam3_second_host_benchmark.json` 为准 |
 | **重度低光 (`gain=0.05`)** | **B6：Ours（灰盒关键帧隔离 + 健康 LiDAR 双端锚定修复）** | `OFFLINE_CONSTRUCT` | **5228 (0)** | **0.9066** | **0.3730** | **0.7366 / 1.0249** | **`+0.5480`** | **`+0.7674`** (窗口 **`+0.9673`**) | [e3_orbslam3_b6_hall_01_severe_g005.json](slam_recovery/experiments/manifests/e3_orbslam3_b6_hall_01_severe_g005.json)；零真值泄漏，6×6 FIM $J_v^{\mathrm{after}}=121.68$，轨迹相关留出 $\mathrm{NIS}=2.0405 \le 2.5$，Wilson 下界 `0.9944` |
 | **中度低光 (`gain=0.20`)** | **B0：真实单地图 (`ORB_SINGLE_MAP=1`)** | `INJECTION` | 5012 (116) | 1.4747 | 0.4500 | 1.2840 / 4.6288 | `0.0000` | — | [e3_orbslam3_b0_hall_01_moderate_g020.json](slam_recovery/experiments/manifests/e3_orbslam3_b0_hall_01_moderate_g020.json) |
 | **中度低光 (`gain=0.20`)** | **B2：原生 ORB-SLAM3 Atlas** | `INJECTION` | 5228 (0) | 0.5390 | 0.2446 | 0.5316 / 1.2245 | `+0.9799` | `0.0000` | [e3_orbslam3_b2_hall_01_moderate_g020.json](slam_recovery/experiments/manifests/e3_orbslam3_b2_hall_01_moderate_g020.json) |
@@ -1854,7 +1854,7 @@ Foxglove 3D 同屏对比可视化包（同时包含主宿主 `GEO_DEGEN` 1008m �
   - `FAILED`（显式 `False`、非有限值、或越界）→ 拒绝；
   - `PASSED` → 才参与 `info_after ≥ τ_info`、`ΔJ > 0`、`D_holdout ≤ τ_val`、`‖P_after‖ ≤ σ_tol` 的联合判决。
 - **在线节点的真实证据来源**：新增 `OnlineRecoveryTransactionNode._measure_paired_evidence()`。
-  - 配对收益：在**同一参考点云**上分别用候选位姿与被隔离的宿主（incumbent）位姿计算每帧点面 NIS，再交给 `evaluate_paired_sequential_benefit` 求 Wilson 下界；`min_paired_observations=4`（n=3 时全票改善的 Wilson 下界为 0.526 < 0.55，n=4 时为 0.596，取最小可判别样本数，非人工放宽）。
+  - 配对收益：在**同一参考点云**上分别用候选位姿与被隔离的宿主（incumbent）位姿计算每帧点面 NIS，再交给 `evaluate_paired_sequential_benefit` 求 Wilson 下界；`min_paired_observations=4` 只是**下限**（n=3 时全票改善的 Wilson 下界 0.526 < 0.55，n=4 时为 0.596，取最小可判别样本数）；候选触及关键帧 $\ge 8$ 时要求 $n \ge 8$（Wilson 0.747），详见 §4.9 与 §13.14。
   - 重入连续性：以冻结的前置可信锚点位姿、按**实测**前兆速度外推到首个修复帧时刻，再与候选中该帧的平移比较（`reentry_anchor_pose` 由调用方给出，节点不臆造）。
   - 任一量无法测量即返回 `None`，门控按 `MISSING` 等待，绝不假定通过。每次测量结果写入 `node.last_paired_evidence` 并落盘进 manifest（帧数、改善帧数、Wilson 下界、incumbent/候选平均残差、重入跳变、判决理由）。
 
