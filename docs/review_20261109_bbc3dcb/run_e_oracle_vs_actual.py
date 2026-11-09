@@ -62,8 +62,19 @@ def main():
             ("oracle_report", ORACLE_REPORT))}
 
     rep = json.load(open(ORACLE_REPORT))
-    if rep.get("status") != "OK":
-        raise SystemExit("oracle bag report is not OK; refusing to score")
+    # identity, not just a status string
+    ident_ok = (rep.get("status") == "OK"
+                and rep.get("input_sha256") == sha["injected"]
+                and rep.get("clean_sha256") == sha["clean_scans"]
+                and rep.get("output_sha256") == sha["oracle_bag"])
+    if not ident_ok:
+        raise SystemExit(json.dumps({
+            "status": "STALE_ORACLE_REPORT",
+            "report": ORACLE_REPORT,
+            "report_status": rep.get("status"),
+            "input": [rep.get("input_sha256"), sha["injected"]],
+            "clean": [rep.get("clean_sha256"), sha["clean_scans"]],
+            "output": [rep.get("output_sha256"), sha["oracle_bag"]]}))
     onset_ns, end_ns = rep["window"]["onset_ns"], rep["window"]["end_ns"]
 
     inj_scans, _ = V.load_scans(INJ_SCANS, sha["injected"])
@@ -228,6 +239,7 @@ def main():
                       "sequence",
         "inputs_sha256": sha,
         "injection_window": {"onset_ns": onset_ns, "end_ns": end_ns},
+        "ate_label": "FULL_ALIGNMENT_DIAGNOSTIC",
         "frame_set": {"n_frames": len(frames), "n_keys": len(keys),
                       "missing_actual": [int(i) for i in keys if i not in pos_actual],
                       "missing_oracle": [int(i) for i in keys if i not in pos_oracle],

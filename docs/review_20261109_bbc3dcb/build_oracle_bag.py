@@ -60,6 +60,12 @@ def main():
     ap.add_argument("--clean", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--hybrid-with", default=None)
+    ap.add_argument("--mode", default="oracle",
+                    choices=["oracle", "hybrid", "x_add_fn", "y_drop_fp"],
+                    help="oracle: exact removal only; hybrid: oracle window + filter outside; "
+                         "x_add_fn: oracle + the injected rows the filter missed (residual "
+                         "contamination only); y_drop_fp: oracle + the background rows the filter "
+                         "wrongly dropped (false removal only)")
     a = ap.parse_args()
 
     inj, cln = _read(a.injected), _read(a.clean)
@@ -110,10 +116,19 @@ def main():
                 rows = buf.reshape(-1, step)
                 clean_rows = np.frombuffer(cln[ns][0], dtype=np.uint8).reshape(-1, step)
                 keep = ~(rows != clean_rows).any(axis=1)
-                if hyb is not None and not (onset_ns <= ns <= end_ns):
-                    kept_set = {_row_hash(x) for x in
-                                np.frombuffer(hyb[ns][0], np.uint8).reshape(-1, step)}
-                    keep = np.asarray([_row_hash(x) in kept_set for x in rows])
+                if hyb is not None:
+                    filter_kept = {_row_hash(x) for x in
+                                   np.frombuffer(hyb[ns][0], np.uint8).reshape(-1, step)}
+                    in_win = onset_ns <= ns <= end_ns
+                    if a.mode == "hybrid" and not in_win:
+                        keep = np.asarray([_row_hash(x) in filter_kept for x in rows])
+                    elif a.mode == "x_add_fn" and in_win:
+                        is_injected = (rows != clean_rows).any(axis=1)
+                        in_filter = np.asarray([_row_hash(x) in filter_kept for x in rows])
+                        keep = keep | (is_injected & in_filter)
+                    elif a.mode == "y_drop_fp" and in_win:
+                        in_filter = np.asarray([_row_hash(x) in filter_kept for x in rows])
+                        keep = keep & in_filter
                 kept = rows[keep].tobytes()
                 m.data = np.frombuffer(kept, dtype=np.uint8)
                 m.width = int(keep.sum())
@@ -131,7 +146,7 @@ def main():
     outw = [f for f in per_frame if not f["in_window"]]
     rep = {"status": "OK", "input": a.injected, "input_sha256": V._sha_file(a.injected),
            "clean": a.clean, "clean_sha256": V._sha_file(a.clean),
-           "hybrid_with": a.hybrid_with,
+           "hybrid_with": a.hybrid_with, "mode": a.mode,
            "output": a.out, "output_sha256": V._sha_file(a.out),
            "window": {"onset_ns": onset_ns, "end_ns": end_ns,
                       "differing_frames": len(differing)},
