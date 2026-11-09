@@ -115,6 +115,11 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
         self.assertEqual(support["committable_frames_after_prefix"], 5)
         self.assertNotEqual(report.mode, RecoveryMode.MODE2_ATOMIC_COMMIT)
         self.assertEqual(node.tx_mgr.trusted_poses, {})
+        # The blocked frames are still measured, but only as a diagnostic: the admission evidence
+        # stays the zero-length prefix and the commit set stays empty.
+        self.assertFalse(node.last_paired_evidence_committable["used_for_admission"])
+        self.assertEqual(node.last_paired_evidence_committable["num_paired_frames"], 5)
+        self.assertEqual(node.last_paired_evidence["reason"], "no_committable_prefix")
 
     def test_frame_in_reference_is_not_scored_against_itself(self) -> None:
         """Provenance must come from the map, not from a comment."""

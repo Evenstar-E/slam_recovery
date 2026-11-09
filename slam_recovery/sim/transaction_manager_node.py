@@ -82,6 +82,9 @@ class OnlineRecoveryTransactionNode:
         # Diagnostics of the most recent paired-benefit measurement, recorded verbatim into the
         # run manifests so every Mode 2 decision can be traced back to its measured evidence.
         self.last_paired_evidence: Dict[str, object] = {}
+        # Same measurement over every supportable frame (not only the committable prefix), for
+        # diagnosis only. ``used_for_admission`` is always False; the gate never reads this.
+        self.last_paired_evidence_committable: Dict[str, object] = {}
         self.tx_mgr = TrustedMapTransactionManager(
             confirmation_margin_ns=int(confirmation_margin_sec * 1e9),
             gate_thresholds=gate_thresholds,
@@ -572,6 +575,26 @@ class OnlineRecoveryTransactionNode:
             ),
             support_reference=support_ref,
         )
+        admission_evidence = dict(self.last_paired_evidence)
+
+        # Diagnostic only: when the prefix stops early, the frames it blocked were still
+        # supportable. Measure them too, but keep the result away from the admission decision --
+        # the gate must see the prefix, not the larger set, or the commit invariant reopens.
+        self.last_paired_evidence_committable = {}
+        if len(committable) > len(commit_keys):
+            committable_poses = {k: repaired_poses[k] for k in kf_sorted if k in committable}
+            self._measure_paired_evidence(
+                committable_poses,
+                incumbent_poses=incumbent_poses,
+                reentry_anchor_pose=reentry_anchor_pose,
+                reference_world=train_world,
+                reference_keys=reference_keys,
+                empty_reason="no_committable_frames",
+                support_reference=support_ref,
+            )
+            self.last_paired_evidence_committable = dict(self.last_paired_evidence)
+            self.last_paired_evidence_committable["used_for_admission"] = False
+            self.last_paired_evidence = admission_evidence
 
         cand = CandidateMap(
             candidate_id=candidate_id,
