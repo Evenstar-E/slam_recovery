@@ -155,10 +155,14 @@ quality. The 7,797,828-point base-support ROI gives 100.00% for both arms, but t
 the ROI is defined by distance to the shared base, so it cannot say anything about repair quality in
 either direction. The `24252d0` review is right to reject that inference.
 
-Required next, and not claimed here: a **fixed-frame native/raw versus repaired comparison** on the
-same 400 frames (raw host map vs filtered/re-estimated map), with error counts reported both for all
-added points and for the novel subset outside the base support. Until that exists, no ranking or
-net-benefit claim is made.
+Measured next by a fixed-frame comparison (`0f31e3b`): the same 400 frames (those with both
+filtered scans and rerun poses), ROI = the whole clean reference (pose-free). R (raw scans + host
+poses) covers 60.38% with 62.51% patch-unsupported; C3 covers 98.49% with 9.31%. C3 adds 42,227
+points of which 85.25% are supported (novel subset 10,581: 69.16%); of the 50,234 points R has and
+C3 does not, 95.14% were already unsupported. The pre-stated rule (novel supported > unsupported
+AND added-unsupported fraction <= R's) passes: 7,318 > 3,263 and 0.1475 <= 0.6251, verdict
+REPAIR_BENEFIT_SUPPORTED. The proxy is not GT, the frame set is 400/446, and C3 is
+OFFLINE_NATIVE_REESTIMATION, not a deployable loop.
 
 ### Pre-stated decision rule (written before applying it)
 
