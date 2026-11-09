@@ -1,0 +1,21 @@
+{
+ "r1": {
+  "coverage": 0.9987910724637681,
+  "unsupported": 0.006712074303405591,
+  "ate_full": 0.07220052350611146,
+  "mode": "GOOD"
+ },
+ "r2": {
+  "coverage": 0.693296115942029,
+  "unsupported": 0.6551950464396286,
+  "ate_full": 17.91012665404275,
+  "mode": "BAD"
+ },
+ "same_mode": false,
+ "aligned_first_pose_diff_m": 0.0019487795011121974,
+ "criterion": {
+  "same_mode": false,
+  "first_pose_under_5cm": true,
+  "verdict": "GO_TO_T3"
+ }
+}
