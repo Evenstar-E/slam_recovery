@@ -1,0 +1,72 @@
+{
+ "onset_s": 1627643759.5540829,
+ "field_definitions": {
+  "first_output_s": "first stamped pose in the output bag",
+  "first_scored_s": "first timestamp in the common matched stream (both runs)",
+  "gauge_fit": "single SE(3) fitted on common poses with stamp < onset",
+  "aligned_first_scored_m": "distance between the two poses at first_scored_s after applying that gauge",
+  "aligned_at_onset_m": "same distance evaluated at the onset frame; this is the quantity the T1/T2 results JSON reports"
+ },
+ "pairs": {
+  "T1": {
+   "run1_bag": "/tmp/fastlivo/res_T1_O_r1.bag",
+   "run2_bag": "/tmp/fastlivo/res_T1_O_r2.bag",
+   "run1_sha256": "49f7a23003b1562bf903e6d7658376f148d64dc78e917f7746d16191320f2cf7",
+   "run2_sha256": "b3273685e141193440dbbf588582ec7ebf6b55ca03c7909b67bed0baf6baf812",
+   "first_output_run1_s": 1627643742.844585,
+   "first_output_run2_s": 1627643741.5119612,
+   "first_scored_s": 1627643742.844585,
+   "common_ids": 769,
+   "common_ids_sha256": "f2e3aac4896de9f3286d8826fa60c7cb136d4e46dce2e4124021bd697da40293",
+   "gauge_prefix_ids": 249,
+   "gauge_prefix_range_s": [
+    1627643742.844585,
+    1627643759.5266588
+   ],
+   "gauge_residual_rmse_m": 0.015742512553985667,
+   "aligned_first_scored_m": 0.015112692829842275,
+   "onset_index": 248,
+   "aligned_at_onset_m": 0.008714856854047095,
+   "raw_first_output_delta_m": 0.006127622095215033,
+   "ate_run1_m": 0.3477579126938776,
+   "ate_run2_m": 300.27524615464887,
+   "first_aligned_over_0.05m_rel_onset_s": 0.371868371963501,
+   "first_aligned_over_0.1m_rel_onset_s": 0.6380486488342285,
+   "first_aligned_over_1m_rel_onset_s": 15.389373302459717,
+   "receipt_r1_first_stamp_s": 1627643742.844585,
+   "receipt_r1_output_sha256": "49f7a23003b1562bf903e6d7658376f148d64dc78e917f7746d16191320f2cf7",
+   "receipt_r2_first_stamp_s": 1627643741.5119612,
+   "receipt_r2_output_sha256": "b3273685e141193440dbbf588582ec7ebf6b55ca03c7909b67bed0baf6baf812"
+  },
+  "T2": {
+   "run1_bag": "/tmp/fastlivo/res_T2_O_r1.bag",
+   "run2_bag": "/tmp/fastlivo/res_T2_O_r2.bag",
+   "run1_sha256": "fcb0bff53c381f5f333ae0dc97aaf760f49675af43bdbcb22323cdbd64eb2051",
+   "run2_sha256": "094815c7398991e793a53841805a518f3700cfa6da07551eaf508b748d6a954f",
+   "first_output_run1_s": 1627643741.378685,
+   "first_output_run2_s": 1627643742.244886,
+   "first_scored_s": 1627643742.244886,
+   "common_ids": 778,
+   "common_ids_sha256": "279585d5676f342a42392a654fb566dd6b1c000c3b3c3eb1b033cdd5bbf36438",
+   "gauge_prefix_ids": 258,
+   "gauge_prefix_range_s": [
+    1627643742.244886,
+    1627643759.5266588
+   ],
+   "gauge_residual_rmse_m": 0.01433357177756487,
+   "aligned_first_scored_m": 0.007725599257149206,
+   "onset_index": 257,
+   "aligned_at_onset_m": 0.0038995943143811016,
+   "raw_first_output_delta_m": 0.01126355091204399,
+   "ate_run1_m": 0.08454816455594473,
+   "ate_run2_m": 18.51058907287804,
+   "first_aligned_over_0.05m_rel_onset_s": -6.352628469467163,
+   "first_aligned_over_0.1m_rel_onset_s": 15.389373302459717,
+   "first_aligned_over_1m_rel_onset_s": 16.654210090637207,
+   "receipt_r1_first_stamp_s": 1627643741.378685,
+   "receipt_r1_output_sha256": "fcb0bff53c381f5f333ae0dc97aaf760f49675af43bdbcb22323cdbd64eb2051",
+   "receipt_r2_first_stamp_s": 1627643742.244886,
+   "receipt_r2_output_sha256": "094815c7398991e793a53841805a518f3700cfa6da07551eaf508b748d6a954f"
+  }
+ }
+}
