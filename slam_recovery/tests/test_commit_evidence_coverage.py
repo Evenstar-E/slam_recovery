@@ -246,6 +246,36 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
         ratio = reports[0.12].holdout_nis / reports[0.24].holdout_nis
         self.assertAlmostEqual(ratio, 4.0, places=6)
 
+    def test_reentry_uses_the_boundary_frame_not_the_first_committed_one(self) -> None:
+        """Distance accumulated before the first committed frame is motion, not a jump."""
+        rng = np.random.default_rng(5)
+        cloud = np.column_stack(
+            [rng.uniform(-6, 6, 1200), rng.uniform(-6, 6, 1200), np.zeros(1200)]
+        )
+        node = _node_with_quarantine(cloud)
+        poses, incumbent = {}, {}
+        # Frame 0 sits exactly on the anchor but has no scan, so it can never be committed.
+        poses[0] = np.eye(4)
+        incumbent[0] = np.eye(4)
+        # Frames 1..5 are 3 m further along the plane: supported, but far from the anchor.
+        for k in range(1, 6):
+            node.scan_buffer_body[k] = cloud.copy()
+            poses[k] = np.eye(4)
+            poses[k][0, 3] = 3.0
+            incumbent[k] = np.eye(4)
+
+        node.evaluate_and_commit_candidate(
+            "boundary",
+            poses,
+            aux_or_loop_info_6x6=np.eye(6) * 100,
+            incumbent_poses=incumbent,
+            reentry_anchor_pose=np.eye(4),
+        )
+
+        # Old code measured the anchor-to-first-committed-frame distance (3 m); the boundary
+        # frame is frame 0, which is continuous with the anchor.
+        self.assertAlmostEqual(node.last_paired_evidence["reentry_pos_jump_m"], 0.0, places=6)
+
     def test_manager_refuses_a_candidate_with_unverified_frames(self) -> None:
         """Defence in depth: the manager enforces the invariant even for direct callers."""
         mgr = TrustedMapTransactionManager(confirmation_margin_ns=0)

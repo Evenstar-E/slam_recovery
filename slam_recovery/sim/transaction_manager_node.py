@@ -326,6 +326,7 @@ class OnlineRecoveryTransactionNode:
         reference_keys: Optional[set] = None,
         empty_reason: str = "no_repaired_poses",
         support_reference: Optional[np.ndarray] = None,
+        reentry_candidate_pose: Optional[np.ndarray] = None,
     ) -> Tuple[Optional[bool], Optional[float], Optional[float]]:
         """
         Measure the paired-benefit / re-entry evidence of a candidate against its incumbent.
@@ -341,7 +342,15 @@ class OnlineRecoveryTransactionNode:
             return None, None, None
 
         # (a) Re-entry continuity: translation jump between the frozen pre-onset anchor pose and
-        #     the candidate pose at the first frame re-entering the trusted timeline.
+        #     the candidate pose at the *boundary* frame -- the first candidate frame in time.
+        #
+        #     That frame is not necessarily committed: the commit set is every supportable frame,
+        #     and the first frames after an occlusion may be unsupported. Measuring the jump to
+        #     the first *committed* frame compares the anchor against a pose tens of seconds and
+        #     metres later, which is elapsed motion, not a discontinuity. The four-arm replay hit
+        #     exactly this: frame 0 sat 0.019 m from the anchor, the first committed frame sat
+        #     3.073 m away after 19.44 s, and the gate reported a 3.09 m "jump". Continuity is a
+        #     property of the candidate trajectory at the boundary, so the boundary frame is used.
         anchor = reentry_anchor_pose
         seg = self.tx_mgr.active_quarantine
         if anchor is None and seg is not None and seg.checkpoint.keyframe_poses:
@@ -349,7 +358,12 @@ class OnlineRecoveryTransactionNode:
         reentry_jump: Optional[float] = None
         if anchor is not None:
             anchor_arr = np.asarray(anchor, dtype=np.float64)
-            first_arr = np.asarray(repaired_poses[keys[0]], dtype=np.float64)
+            boundary_pose = (
+                reentry_candidate_pose
+                if reentry_candidate_pose is not None
+                else repaired_poses[keys[0]]
+            )
+            first_arr = np.asarray(boundary_pose, dtype=np.float64)
             if anchor_arr.shape == (4, 4) and first_arr.shape == (4, 4):
                 reentry_jump = float(np.linalg.norm(first_arr[:3, 3] - anchor_arr[:3, 3]))
 
@@ -583,6 +597,8 @@ class OnlineRecoveryTransactionNode:
                 "no_committable_frames" if (not commit_keys and kf_sorted) else "no_repaired_poses"
             ),
             support_reference=support_ref,
+            # The boundary frame of the *candidate*, independent of which frames are committable.
+            reentry_candidate_pose=(repaired_poses[kf_sorted[0]] if kf_sorted else None),
         )
 
         cand = CandidateMap(
