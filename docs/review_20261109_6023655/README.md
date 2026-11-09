@@ -35,3 +35,9 @@ oracle已标nondeployable，并处理无共同时间和无变化。绝对起止�
 - 41 tests覆盖收据，但未测绝对时间头缺失和raw/filtered扫描对照。
 
 下一步：保持隔离正结果与修复证据分开；建立host输入hash链；固定时间和key集合，先比较filtered观测再定位参考预算问题；不要以放大sigma或忽略污染点来恢复准入漂亮数字。
+
+## 审阅期间追加 1ab247f：研究文档与归档不符（P2）
+
+新 §13.19 表写 C_bad=194配对、0改善、Wilson0、FAILED，并称 incumbent=宿主隔离段位姿。当前 manifest gate_result_A3 实为194配对、159改善、Wilson0.769876、evidence_status=PASSED、mode=MODE3；脚本 caveat 明示 incumbent 是常速度外推。这是把另一个概念性对照写成当前实测，必须按同版本归档更正或单列新增真实对照。
+
+“输入哈希链”目前是四文件 hash 列表，尚无宿主运行消耗输入 hash 的关联。相同文件身份可复查，但运行关系还不能验证。新段再次称“唯一阻塞是600点预算”，仍需本文 raw/filtered/clean 对照，不能由一次高 NIS 定因果。
