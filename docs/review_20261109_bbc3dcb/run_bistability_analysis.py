@@ -102,6 +102,9 @@ def main():
 
         cov, uns = _metrics(ids)
         ids_c = [i for i in common_ids if i in w_by]
+        if len(ids_c) != len(common_ids):
+            raise SystemExit(f"{cell}: {len(common_ids) - len(ids_c)} common ids absent from "
+                             f"this run's scoring set")
         cov_c, uns_c = _metrics(ids_c) if ids_c else (None, None)
 
         def _mode(u):
@@ -134,13 +137,18 @@ def main():
                          "interleaving",
            "new_runs": {}, "earlier_2x2_runs": {}, "cells": {}}
 
-    all_paths = {k: p for k, p in list(NEW.items()) + list(EARLIER.items())
-                 if os.path.exists(p)}
+    # NEW and EARLIER both use (cell, rep); a plain dict merge silently drops four new runs.
+    all_paths = {("new",) + k: p for k, p in NEW.items() if os.path.exists(p)}
+    all_paths.update({("earlier",) + k: p for k, p in EARLIER.items() if os.path.exists(p)})
     ids_by_run = {k: set(i for i in keys if i in _poses(p)) for k, p in all_paths.items()}
     common_ids = sorted(set.intersection(*ids_by_run.values())) if ids_by_run else []
+    if len(all_paths) != len(NEW) + len(EARLIER):
+        raise SystemExit(f"run identity collision: {len(all_paths)} unique of "
+                         f"{len(NEW) + len(EARLIER)} declared paths")
     res["common_set"] = {"n": len(common_ids), "n_keys": len(keys),
-                         "per_run_available": {f"{c}#{i}": len(v)
-                                               for (c, i), v in ids_by_run.items()}}
+                         "n_runs": len(ids_by_run),
+                         "per_run_available": {f"{b}:{c}#{i}": len(v)
+                                               for (b, c, i), v in ids_by_run.items()}}
     for key, path in NEW.items():
         cell, i = key
         if not os.path.exists(path):

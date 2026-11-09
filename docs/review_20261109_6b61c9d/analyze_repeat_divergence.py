@@ -30,9 +30,9 @@ for _p in (_HERE, os.path.join(_REPO, "docs", "review_20261109_bbc3dcb"), _REPO)
 import verify_four_arm_independent as V                    # noqa: E402
 
 ONSET_S = 1627643759.554082870
-THRESHOLDS_M = (1e-3, 1e-2, 1e-1, 1.0)
+THRESHOLDS_M = (0.05, 0.1, 0.5, 1.0)
 ROT_THRESHOLD_RAD = 1e-3
-STEP_THRESHOLD_M = 1e-2
+STEP_THRESHOLD_M = 0.05
 ARMS = ("O", "O_plus_F", "O_minus_B", "O_plus_F_minus_B")
 RECEIPT = os.path.join(_HERE, "repeat_divergence.json")
 
@@ -59,7 +59,9 @@ def main():
            "rotation_threshold_rad": ROT_THRESHOLD_RAD,
            "step_threshold_m": STEP_THRESHOLD_M,
            "rule": "single SE(3) gauge fitted on common pre-onset poses; "
-                   "then first aligned divergence",
+                   "then first aligned divergence; thresholds start above the fit residual",
+           "threshold_note": "the gauge fit residual is ~1.3-1.5 cm, so 1 cm thresholds would fire "
+                             "at the first sample by construction; 5 cm and above are reported",
            "status": "POST_HOC_DESCRIPTIVE", "cells": {}}
     for arm in ARMS:
         a_ts, a_xyz, a_q = V.load_poses(_run(arm, 1))
@@ -119,8 +121,8 @@ def main():
             print(arm, r)
             continue
         print(arm, "gauge_rmse", round(r["gauge_prefix_residual_rmse_m"], 4),
-              "aligned_first_dp", round(r["aligned_first_position_delta_m"], 4),
-              "first>1cm", r["first_aligned_over_0.01m_rel_onset_s"],
+              "first>5cm", r["first_aligned_over_0.05m_rel_onset_s"],
+              "first>10cm", r["first_aligned_over_0.1m_rel_onset_s"],
               "first>1m", r["first_aligned_over_1m_rel_onset_s"],
               "first_step_diff", r["first_step_delta_over_threshold_rel_onset_s"])
 

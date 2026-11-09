@@ -285,11 +285,14 @@ both reject interaction, and after the frame fix they agree that the same two ru
 O+F−B#2) are good while the other six fail. The earlier "all eight fail the protocol" reading was
 an artifact of the missing transform.
 
-**Where the repeats first disagree**: comparing each cell's two pose streams directly (same input,
-same world frame), the first recorded pose already differs by 0.159–1.589 m and 0.017–0.122 rad,
-14–17 s before onset, and the first output stamps spread over 3.4 s (O pair 3.4 s, O+F/O-B pairs 0.4 s, O+F-B pair 2.0 s). The split is therefore seeded in
-initialisation/early tracking, before the injection window; later >1 m differences are its
-amplification, not evidence about the in-window rows. A pre-registered variance control then ran each of O and O+F−B four more times on the same bags,
+**Where the repeats first disagree**: after one SE(3) gauge fitted on the common pre-onset segment
+(fit residual 0.013–0.015 m), the first poses differ by 1.6–2.9 cm. Thresholds below the fit
+residual would fire at the first sample by construction, so they are not used. Above it, the first
+>5 cm divergence is at onset (one O+F run at −5.95 s, the other three at +0.24 to +0.37 s), >10 cm
+at +0.5–0.8 s, and >1 m at +15.5–17.9 s. The first output stamps spread over 3.4 s. Pre-onset
+differences are mostly at fit-noise level, so the earlier claim that initialisation had already
+seeded the split is withdrawn: the physically visible divergence begins around onset and grows
+inside the window, but this post-hoc, two-repeat comparison cannot establish causation. A variance control, declared in session but not verifiable from the repository, then ran each of O and O+F−B four more times on the same bags,
 config and runner, varying only the run order. Both cells crossed modes (O: BAD/GOOD/BAD/BAD;
 O+F−B: UNCLEAR/UNCLEAR/BAD/BAD), so the declared rule fires
 **`SEQUENCE_UNUSABLE_FOR_SINGLE_RUN`**. On the 323-frame common set the mode sequence is identical

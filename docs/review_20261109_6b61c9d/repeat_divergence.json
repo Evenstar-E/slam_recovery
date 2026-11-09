@@ -1,14 +1,15 @@
 {
  "onset_s": 1627643759.5540829,
  "thresholds_m": [
-  0.001,
-  0.01,
+  0.05,
   0.1,
+  0.5,
   1.0
  ],
  "rotation_threshold_rad": 0.001,
- "step_threshold_m": 0.01,
- "rule": "single SE(3) gauge fitted on common pre-onset poses; then first aligned divergence",
+ "step_threshold_m": 0.05,
+ "rule": "single SE(3) gauge fitted on common pre-onset poses; then first aligned divergence; thresholds start above the fit residual",
+ "threshold_note": "the gauge fit residual is ~1.3-1.5 cm, so 1 cm thresholds would fire at the first sample by construction; 5 cm and above are reported",
  "status": "POST_HOC_DESCRIPTIVE",
  "cells": {
   "O": {
@@ -24,18 +25,18 @@
    "aligned_first_rotation_delta_rad": 0.0036512553665932258,
    "aligned_max_position_delta_m": 33.126782850785084,
    "max_step_delta_m": 1.0437176799542425,
-   "first_aligned_over_0.001m_s": 1627643744.9767501,
-   "first_aligned_over_0.001m_rel_onset_s": -14.577332735061646,
-   "first_aligned_over_0.01m_s": 1627643744.9767501,
-   "first_aligned_over_0.01m_rel_onset_s": -14.577332735061646,
+   "first_aligned_over_0.05m_s": 1627643759.9259512,
+   "first_aligned_over_0.05m_rel_onset_s": 0.371868371963501,
    "first_aligned_over_0.1m_s": 1627643760.059047,
    "first_aligned_over_0.1m_rel_onset_s": 0.5049641132354736,
+   "first_aligned_over_0.5m_s": 1627643774.8104472,
+   "first_aligned_over_0.5m_rel_onset_s": 15.256364345550537,
    "first_aligned_over_1m_s": 1627643775.009955,
    "first_aligned_over_1m_rel_onset_s": 15.455872058868408,
    "first_aligned_rotation_over_threshold_s": 1627643744.9767501,
    "first_aligned_rotation_over_threshold_rel_onset_s": -14.577332735061646,
-   "first_step_delta_over_threshold_s": 1627643745.0433772,
-   "first_step_delta_over_threshold_rel_onset_s": -14.510705709457397
+   "first_step_delta_over_threshold_s": 1627643774.744043,
+   "first_step_delta_over_threshold_rel_onset_s": 15.189960241317749
   },
   "O_plus_F": {
    "status": "OK",
@@ -50,18 +51,18 @@
    "aligned_first_rotation_delta_rad": 0.011795416284612458,
    "aligned_max_position_delta_m": 2117.580450377392,
    "max_step_delta_m": 13.983779569744167,
-   "first_aligned_over_0.001m_s": 1627643742.244886,
-   "first_aligned_over_0.001m_rel_onset_s": -17.309196949005127,
-   "first_aligned_over_0.01m_s": 1627643742.244886,
-   "first_aligned_over_0.01m_rel_onset_s": -17.309196949005127,
+   "first_aligned_over_0.05m_s": 1627643753.600882,
+   "first_aligned_over_0.05m_rel_onset_s": -5.953200817108154,
    "first_aligned_over_0.1m_s": 1627643760.3917387,
    "first_aligned_over_0.1m_rel_onset_s": 0.837655782699585,
+   "first_aligned_over_0.5m_s": 1627643775.275913,
+   "first_aligned_over_0.5m_rel_onset_s": 15.721830129623413,
    "first_aligned_over_1m_s": 1627643775.67474,
    "first_aligned_over_1m_rel_onset_s": 16.120657205581665,
    "first_aligned_rotation_over_threshold_s": 1627643742.244886,
    "first_aligned_rotation_over_threshold_rel_onset_s": -17.309196949005127,
-   "first_step_delta_over_threshold_s": 1627643742.3114977,
-   "first_step_delta_over_threshold_rel_onset_s": -17.24258518218994
+   "first_step_delta_over_threshold_s": 1627643775.1429415,
+   "first_step_delta_over_threshold_rel_onset_s": 15.588858604431152
   },
   "O_minus_B": {
    "status": "OK",
@@ -76,18 +77,18 @@
    "aligned_first_rotation_delta_rad": 0.003928328613191796,
    "aligned_max_position_delta_m": 68.8848928153387,
    "max_step_delta_m": 0.8750310445851063,
-   "first_aligned_over_0.001m_s": 1627643742.6446872,
-   "first_aligned_over_0.001m_rel_onset_s": -16.909395694732666,
-   "first_aligned_over_0.01m_s": 1627643742.6446872,
-   "first_aligned_over_0.01m_rel_onset_s": -16.909395694732666,
+   "first_aligned_over_0.05m_s": 1627643759.8593993,
+   "first_aligned_over_0.05m_rel_onset_s": 0.3053164482116699,
    "first_aligned_over_0.1m_s": 1627643760.3252058,
    "first_aligned_over_0.1m_rel_onset_s": 0.771122932434082,
+   "first_aligned_over_0.5m_s": 1627643776.4090679,
+   "first_aligned_over_0.5m_rel_onset_s": 16.854984998703003,
    "first_aligned_over_1m_s": 1627643776.7437243,
    "first_aligned_over_1m_rel_onset_s": 17.18964147567749,
    "first_aligned_rotation_over_threshold_s": 1627643742.6446872,
    "first_aligned_rotation_over_threshold_rel_onset_s": -16.909395694732666,
-   "first_step_delta_over_threshold_s": 1627643742.711321,
-   "first_step_delta_over_threshold_rel_onset_s": -16.842761754989624
+   "first_step_delta_over_threshold_s": 1627643776.007532,
+   "first_step_delta_over_threshold_rel_onset_s": 16.453449010849
   },
   "O_plus_F_minus_B": {
    "status": "OK",
@@ -102,18 +103,18 @@
    "aligned_first_rotation_delta_rad": 0.004364032680771451,
    "aligned_max_position_delta_m": 1996.1395348678839,
    "max_step_delta_m": 13.443112976213405,
-   "first_aligned_over_0.001m_s": 1627643743.7107766,
-   "first_aligned_over_0.001m_rel_onset_s": -15.843306303024292,
-   "first_aligned_over_0.01m_s": 1627643743.7107766,
-   "first_aligned_over_0.01m_rel_onset_s": -15.843306303024292,
+   "first_aligned_over_0.05m_s": 1627643759.7928448,
+   "first_aligned_over_0.05m_rel_onset_s": 0.23876190185546875,
    "first_aligned_over_0.1m_s": 1627643760.3917387,
    "first_aligned_over_0.1m_rel_onset_s": 0.837655782699585,
+   "first_aligned_over_0.5m_s": 1627643775.608278,
+   "first_aligned_over_0.5m_rel_onset_s": 16.054195165634155,
    "first_aligned_over_1m_s": 1627643777.4103932,
    "first_aligned_over_1m_rel_onset_s": 17.85631036758423,
    "first_aligned_rotation_over_threshold_s": 1627643743.7107766,
    "first_aligned_rotation_over_threshold_rel_onset_s": -15.843306303024292,
-   "first_step_delta_over_threshold_s": 1627643743.7774086,
-   "first_step_delta_over_threshold_rel_onset_s": -15.776674270629883
+   "first_step_delta_over_threshold_s": 1627643765.7394185,
+   "first_step_delta_over_threshold_rel_onset_s": 6.185335636138916
   }
  }
 }
