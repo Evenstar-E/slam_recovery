@@ -99,6 +99,14 @@ def _expected_totals() -> dict:
 def main():
     if rosbag is None:
         raise SystemExit("run under the ROS python (/home/R26534/mm/ros/bin/python)")
+    # Bind the sidecar to the audit that produced it; a stale NPZ would otherwise build bags that
+    # silently disagree with the committed counts.
+    audit_path = os.path.join(_HERE, "room02_original_index_audit.json")
+    if os.path.exists(audit_path):
+        with open(audit_path, encoding="utf-8") as fh:
+            declared = (json.load(fh).get("index_sidecar") or {}).get("sha256")
+        if declared != _sha256(SIDECAR):
+            raise SystemExit(f"sidecar hash {_sha256(SIDECAR)} != audit's {declared}")
     side = np.load(SIDECAR)
     writers = {a: rosbag.Bag(os.path.join(OUT_DIR, f"room02_2x2_{a}.bag"), "w") for a in ARMS}
     counts = {a: {"cloud": 0, "in_window": 0, "rows_by_frame": []} for a in ARMS}

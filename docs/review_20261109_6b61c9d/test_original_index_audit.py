@@ -19,6 +19,7 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, _HERE)
 import room02_original_index_audit as A               # noqa: E402
 import build_single_factor_bags as B                  # noqa: E402
+import verify_single_factor_bags as V                # noqa: E402
 
 
 class OrderedSubsequenceTest(unittest.TestCase):
@@ -93,3 +94,43 @@ class FnrDenominatorTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SidecarArrayTest(unittest.TestCase):
+    """No-bag fixtures for the sidecar gates (review 61c99f9 / a0be9598)."""
+
+    def test_valid_array(self):
+        self.assertIsNone(V._array_problem(np.array([0, 2, 5], dtype=np.int32), 6))
+
+    def test_negative_index(self):
+        self.assertEqual(V._array_problem(np.array([0, -1, 5], dtype=np.int32), 6),
+                         "sidecar_bounds")
+
+    def test_out_of_bounds_index(self):
+        self.assertEqual(V._array_problem(np.array([0, 2, 6], dtype=np.int32), 6),
+                         "sidecar_bounds")
+
+    def test_unsorted_array(self):
+        self.assertEqual(V._array_problem(np.array([0, 5, 2], dtype=np.int32), 6),
+                         "sidecar_order")
+
+    def test_duplicate_index(self):
+        self.assertEqual(V._array_problem(np.array([0, 2, 2], dtype=np.int32), 6),
+                         "sidecar_order")
+
+    def test_non_integer_dtype(self):
+        self.assertEqual(V._array_problem(np.array([0.0, 2.0], dtype=np.float64), 6),
+                         "sidecar_dtype")
+
+    def test_empty_array_is_allowed(self):
+        self.assertIsNone(V._array_problem(np.array([], dtype=np.int32), 0))
+
+
+class ExtraStreamEofTest(unittest.TestCase):
+    """A trailing message after the reference stream ends must not pass unseen."""
+
+    def test_clean_eof(self):
+        self.assertFalse(V._extra_messages(iter([])))
+
+    def test_trailing_message(self):
+        self.assertTrue(V._extra_messages(iter([object()])))

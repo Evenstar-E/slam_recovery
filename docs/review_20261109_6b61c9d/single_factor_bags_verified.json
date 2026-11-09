@@ -33,12 +33,15 @@
   "arms_match_original_indices": true,
   "row_counts_match": true,
   "frames_complete": true,
+  "sidecar_valid": true,
+  "window_matches_sidecar": true,
   "sidecar_order_ok": true,
   "no_fatal": true
  },
  "failure_counts": {
   "stamp_mismatch": 0,
   "missing_message": 0,
+  "extra_messages": 0,
   "outside_mismatch": 0,
   "combined_mismatch": 0,
   "index_mismatch": 0,
@@ -47,6 +50,11 @@
   "empty_outside": 0,
   "empty_window": 0,
   "sidecar_order": 0,
+  "sidecar_dtype": 0,
+  "sidecar_bounds": 0,
+  "sidecar_missing_frame": 0,
+  "sidecar_hash_mismatch": 0,
+  "window_mismatch": 0,
   "fatal": 0
  },
  "failures": [],

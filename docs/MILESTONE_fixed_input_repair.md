@@ -258,10 +258,16 @@ condition — never as interaction by default. All four statuses and errors are 
 cells that fail. The oracle remains a mechanism diagnostic, not a deployable repair.
 
 **Current status**: the four bags are built from original indices and the equivalence checks pass
-on the real data (`b67a804`): outside-window arms are byte-identical to the filtered recording,
-each arm equals the indexed injected rows, and O+F−B is byte-identical to the actual filtered
-scan inside the window (599 frames, 0 failures; `single_factor_bags_verified.json`). Host reruns
-are the remaining step. Until they run, the existing E_actual vs E_oracle comparison changes both
+on the real data (`b67a804`, hardened through `4f5ed15`): outside-window arms are byte-identical
+to the filtered recording, each arm equals the indexed injected rows, and O+F−B is byte-identical
+to the actual filtered scan inside the window (599 frames, 0 failures, 9 checks;
+`single_factor_bags_verified.json`). The window is asserted against the audit's independent
+declaration and its `source`, not against the sidecar's own key set; every stream must reach EOF
+together; sidecar indices are gated on dtype, sign, bounds, ordering and missing frames; the
+sidecar hash is bound to the audit. The non-scan streams the bags inherit (IMU 8,313, images 884)
+are identical between the injected and filtered recordings, and the window contains no duplicate
+LiDAR rows, so the ordered-subsequence index is unique rather than one of several witnesses.
+Host reruns are the remaining step. Until they run, the existing E_actual vs E_oracle comparison changes both
 factors at once
 (1,265 retained + 23,607 dropped), and its hybrid arm only holds the outside-window policy fixed;
 it therefore does **not** yet establish which in-window factor matters. The 315.16 m ATE is a

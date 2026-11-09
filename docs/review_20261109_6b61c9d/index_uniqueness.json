@@ -1,0 +1,13 @@
+{
+ "input": "/tmp/fastlivo/room02_inj43.bag",
+ "window": {
+  "onset_ns": 1627643759554082870,
+  "end_ns": 1627643779393426895
+ },
+ "frames": 199,
+ "frames_with_duplicate_rows": 0,
+ "duplicate_rows": 0,
+ "max_multiplicity": 0,
+ "worst_frame_ns": null,
+ "mapping": "UNIQUE"
+}

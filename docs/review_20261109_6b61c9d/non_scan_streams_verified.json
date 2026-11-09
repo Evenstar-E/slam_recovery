@@ -1,0 +1,26 @@
+{
+ "inputs": {
+  "injected": "/tmp/fastlivo/room02_inj43.bag",
+  "filtered": "/tmp/fastlivo/room02_inj43_filtered.bag"
+ },
+ "streams": {
+  "/handsfree/imu": {
+   "injected": 8313,
+   "filtered": 8313,
+   "only_injected": 0,
+   "only_filtered": 0,
+   "differing": 0,
+   "first_differing": []
+  },
+  "/camera/color/image_raw": {
+   "injected": 884,
+   "filtered": 884,
+   "only_injected": 0,
+   "only_filtered": 0,
+   "differing": 0,
+   "first_differing": []
+  }
+ },
+ "failures": [],
+ "verdict": "IDENTICAL"
+}

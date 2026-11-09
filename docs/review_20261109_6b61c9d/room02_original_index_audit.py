@@ -172,7 +172,9 @@ def main():
         "window": {"onset_ns": ONSET_NS, "end_ns": END_NS,
                    "source": "per-frame buffer equality against the clean recording"},
         "method": {"row_identity": "original row index recovered as an in-order subsequence of "
-                                   "the injected scan; multiplicity preserved",
+                                   "the injected scan; multiplicity preserved; uniqueness checked "
+                                   "separately (199 window frames, 0 duplicate rows, so the "
+                                   "witness is the unique index)",
                    "background_match": "multiset match of row bytes against the clean scan",
                    "hash_set_matching": False},
         "frames_total": len(frames), "frames_ok": len(ok), "frames_unmatched": len(frames) - len(ok),
