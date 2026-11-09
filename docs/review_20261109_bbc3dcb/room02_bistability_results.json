@@ -13,89 +13,149 @@
  "new_runs": {
   "O#1": {
    "frames": 323,
+   "common_frames": 323,
    "coverage": 0.6810789565217391,
    "unsupported_fraction": 0.6751331269349845,
+   "common_coverage": 0.6810789565217391,
+   "common_unsupported_fraction": 0.6751331269349845,
    "ate_full_alignment_diagnostic_m": 31.844746559059057,
-   "mode": "BAD"
+   "mode": "BAD",
+   "mode_common": "BAD",
+   "output_sha256": "bb579d933e8f8eefbc3ec8bb63c24e1183172fbdc88718bfd18b681fa7602bac"
   },
   "O#2": {
    "frames": 323,
+   "common_frames": 323,
    "coverage": 0.9987878260869565,
    "unsupported_fraction": 0.007046439628482948,
+   "common_coverage": 0.9987878260869565,
+   "common_unsupported_fraction": 0.007046439628482948,
    "ate_full_alignment_diagnostic_m": 0.07372522095172873,
-   "mode": "GOOD"
+   "mode": "GOOD",
+   "mode_common": "GOOD",
+   "output_sha256": "a9ab16a9d0f846db29ca7cb0faaad79e6082252458b5322775c46fd9a0bef5f5"
   },
   "O#3": {
    "frames": 323,
+   "common_frames": 323,
    "coverage": 0.6932898550724638,
    "unsupported_fraction": 0.659640866873065,
+   "common_coverage": 0.6932898550724638,
+   "common_unsupported_fraction": 0.659640866873065,
    "ate_full_alignment_diagnostic_m": 565.7327521802735,
-   "mode": "BAD"
+   "mode": "BAD",
+   "mode_common": "BAD",
+   "output_sha256": "75feda067ec5fb056b535bbff79eb53207b9746d542fd4013ee905bb0b103a8b"
   },
   "O#4": {
    "frames": 323,
+   "common_frames": 323,
    "coverage": 0.6938508985507247,
    "unsupported_fraction": 0.6712693498452013,
+   "common_coverage": 0.6938508985507247,
+   "common_unsupported_fraction": 0.6712693498452013,
    "ate_full_alignment_diagnostic_m": 35.28380514079625,
-   "mode": "BAD"
+   "mode": "BAD",
+   "mode_common": "BAD",
+   "output_sha256": "77ae6ed5bc1dafcbdb60ae78e3f9797f7dbc8b0ac895a18dcbed65e414ee7582"
   },
   "O+F-B#1": {
    "frames": 326,
+   "common_frames": 323,
    "coverage": 0.8102899710144927,
    "unsupported_fraction": 0.11418404907975455,
+   "common_coverage": 0.810256115942029,
+   "common_unsupported_fraction": 0.11505882352941177,
    "ate_full_alignment_diagnostic_m": 0.6884083529967325,
-   "mode": "UNCLEAR"
+   "mode": "UNCLEAR",
+   "mode_common": "UNCLEAR",
+   "output_sha256": "7794388bc49e9f1c62dea902f79d9fa4b9f1159b5f66ade83a7258a1ba2c7c0c"
   },
   "O+F-B#2": {
    "frames": 326,
+   "common_frames": 323,
    "coverage": 0.6903728695652174,
    "unsupported_fraction": 0.1897791411042945,
+   "common_coverage": 0.6903491014492754,
+   "common_unsupported_fraction": 0.1912445820433436,
    "ate_full_alignment_diagnostic_m": 1.9288222786081775,
-   "mode": "UNCLEAR"
+   "mode": "UNCLEAR",
+   "mode_common": "UNCLEAR",
+   "output_sha256": "1e3c73ae10bf71334a6f0c482331ef46491ad9cfcea75d6f22b0a66aac495b03"
   },
   "O+F-B#3": {
    "frames": 326,
+   "common_frames": 323,
    "coverage": 0.6996848695652174,
    "unsupported_fraction": 0.6476564417177915,
+   "common_coverage": 0.6996430144927536,
+   "common_unsupported_fraction": 0.6533869969040247,
    "ate_full_alignment_diagnostic_m": 530.4036676488145,
-   "mode": "BAD"
+   "mode": "BAD",
+   "mode_common": "BAD",
+   "output_sha256": "abdaea94584d4d7f6d2f170befebf644fa0cee4e137573ed1404626d9619735e"
   },
   "O+F-B#4": {
    "frames": 326,
+   "common_frames": 323,
    "coverage": 0.693351768115942,
    "unsupported_fraction": 0.6608834355828221,
+   "common_coverage": 0.6933024927536232,
+   "common_unsupported_fraction": 0.6668111455108359,
    "ate_full_alignment_diagnostic_m": 14.317595893387054,
-   "mode": "BAD"
+   "mode": "BAD",
+   "mode_common": "BAD",
+   "output_sha256": "4ebc5336bdcf53e74b8ee54fba72d68976034032be8a9755ebead0db6110ad6f"
   }
  },
  "earlier_2x2_runs": {
   "O#earlier1": {
    "frames": 323,
+   "common_frames": 323,
    "coverage": 0.9987696231884058,
    "unsupported_fraction": 0.007318885448916457,
+   "common_coverage": 0.9987696231884058,
+   "common_unsupported_fraction": 0.007318885448916457,
    "ate_full_alignment_diagnostic_m": 0.07162458349543022,
-   "mode": "GOOD"
+   "mode": "GOOD",
+   "mode_common": "GOOD",
+   "output_sha256": "6dc3a18fe530043965ac33e8c853be7104cf3d3622b1a77db292f395e3521b2f"
   },
   "O#earlier2": {
    "frames": 323,
+   "common_frames": 323,
    "coverage": 0.6805496811594203,
    "unsupported_fraction": 0.6838390092879256,
+   "common_coverage": 0.6805496811594203,
+   "common_unsupported_fraction": 0.6838390092879256,
    "ate_full_alignment_diagnostic_m": 14.43858960214947,
-   "mode": "BAD"
+   "mode": "BAD",
+   "mode_common": "BAD",
+   "output_sha256": "d620df78f3f143de212da8b5f24ca7112ed559b07cb41ab62c0c6d1c9754b15b"
   },
   "O+F-B#earlier1": {
    "frames": 326,
+   "common_frames": 323,
    "coverage": 0.6963784347826087,
    "unsupported_fraction": 0.6400122699386503,
+   "common_coverage": 0.6963416811594203,
+   "common_unsupported_fraction": 0.6456222910216718,
    "ate_full_alignment_diagnostic_m": 553.3425314129262,
-   "mode": "BAD"
+   "mode": "BAD",
+   "mode_common": "BAD",
+   "output_sha256": "9550a9ad63c1c807c24dfa22e39ae7feea8db51d031ee04df6d19319dde0022c"
   },
   "O+F-B#earlier2": {
    "frames": 326,
+   "common_frames": 323,
    "coverage": 0.9987553623188405,
    "unsupported_fraction": 0.01044171779141101,
+   "common_coverage": 0.998751884057971,
+   "common_unsupported_fraction": 0.010167182662538687,
    "ate_full_alignment_diagnostic_m": 0.30016185650033056,
-   "mode": "GOOD"
+   "mode": "GOOD",
+   "mode_common": "GOOD",
+   "output_sha256": "d63a6e37662c8be1404c407fd05999851e0e6b1432f464a63858b53e7f34c2d4"
   }
  },
  "cells": {
@@ -106,7 +166,14 @@
     "BAD",
     "BAD"
    ],
+   "sequence_common_set": [
+    "BAD",
+    "GOOD",
+    "BAD",
+    "BAD"
+   ],
    "crosses_modes": true,
+   "crosses_good_and_bad": true,
    "good": 1,
    "bad": 3,
    "unclear": 0,
@@ -131,7 +198,14 @@
     "BAD",
     "BAD"
    ],
+   "sequence_common_set": [
+    "UNCLEAR",
+    "UNCLEAR",
+    "BAD",
+    "BAD"
+   ],
    "crosses_modes": true,
+   "crosses_good_and_bad": false,
    "good": 0,
    "bad": 2,
    "unclear": 2,
@@ -148,6 +222,20 @@
     "bad": 3
    },
    "verdict": "SEQUENCE_UNUSABLE_FOR_SINGLE_RUN"
+  }
+ },
+ "common_set": {
+  "n": 323,
+  "n_keys": 398,
+  "per_run_available": {
+   "O#1": 323,
+   "O#2": 323,
+   "O#3": 323,
+   "O#4": 323,
+   "O+F-B#1": 326,
+   "O+F-B#2": 326,
+   "O+F-B#3": 326,
+   "O+F-B#4": 326
   }
  }
 }

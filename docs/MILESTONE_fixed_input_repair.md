@@ -291,8 +291,10 @@ same world frame), the first recorded pose already differs by 0.159–1.589 m an
 initialisation/early tracking, before the injection window; later >1 m differences are its
 amplification, not evidence about the in-window rows. A pre-registered variance control then ran each of O and O+F−B four more times on the same bags,
 config and runner, varying only the run order. Both cells crossed modes (O: BAD/GOOD/BAD/BAD;
-O+F−B: UNCLEAR/UNCLEAR/BAD/BAD), so the pre-registered rule fires
-**`SEQUENCE_UNUSABLE_FOR_SINGLE_RUN`**. Pooled with the first two repeats, O is good in ~2/6 and
+O+F−B: UNCLEAR/UNCLEAR/BAD/BAD), so the declared rule fires
+**`SEQUENCE_UNUSABLE_FOR_SINGLE_RUN`**. On the 323-frame common set the mode sequence is identical
+to the per-run scoring; O+F−B contains UNCLEAR and BAD but no GOOD, so its crossing is between
+categories rather than a GOOD-vs-BAD crossing (`crosses_good_and_bad=False`). Pooled with the first two repeats, O is good in ~2/6 and
 O+F−B in ~1/6 runs (magnitude only). Two O+F−B runs are intermediate (unsupported 0.114/0.190,
 ATE 0.69/1.93 m), so this is a continuum with two ends, not a binary bistability. No single-run A/B
 on this sequence can compare factors; the four-cell answer stays **UNKNOWN** until the variance is
