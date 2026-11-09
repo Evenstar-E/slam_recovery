@@ -68,6 +68,8 @@ ONSET_ABS = None          # absolute stamps; the segment split uses these, not b
 INJ_END_ABS = None
 VOXEL = 0.10
 SURF_TOL = 0.15
+PROXY_VOXEL = 0.05      # scoring-surface resolution (one point per cube)
+PROXY_CELL = 0.25       # NearestGrid cell for that density; 0.40 scans ~2x more points/query
 MAX_KF_POINTS = 15000
 NEAR_DT = 0.020
 MAX_GAP = 0.075
@@ -384,6 +386,20 @@ def bootstrap_tail(kf_dists, thresholds=(0.25, 0.5, 1.0, 2.0), n_boot=1000, seed
     return out
 
 
+def voxel_downsample(points, size):
+    """One representative point per occupied cube.
+
+    Unlike a stride subsample, this keeps every part of the surface at full spatial coverage:
+    stride drops 98.6% of the points and inflates every distance measured against the surface.
+    """
+    pts = np.asarray(points, dtype=np.float64)
+    if len(pts) == 0:
+        return pts.reshape(0, 3)
+    keys = np.floor(pts / float(size)).astype(np.int64)
+    _, first = np.unique(keys, axis=0, return_index=True)
+    return pts[np.sort(first)]
+
+
 def voxels(points):
     if len(points) == 0:
         return set()
@@ -508,10 +524,19 @@ def main():
 
     align_residuals = _align_residuals(inj_kfs)
 
+    # Scoring surface. The 120k stride subsample is kept for comparability with the earlier
+    # manifests, but it is NOT the reference any more: at 1.4% of 8.49M points it inflates every
+    # distance measured against the surface (the "floor" was partly sampling, not the map).
     proxy_pts_all = to_gt_frame(cln_kfs, np.eye(3), np.zeros(3))
-    if len(proxy_pts_all) > 120000:
-        proxy_pts_all = proxy_pts_all[:: max(1, len(proxy_pts_all) // 120000)][:120000]
-    proxy_grid = NearestGrid(proxy_pts_all)
+    proxy_pts_120k = proxy_pts_all
+    if len(proxy_pts_120k) > 120000:
+        proxy_pts_120k = proxy_pts_120k[:: max(1, len(proxy_pts_120k) // 120000)][:120000]
+    proxy_pts_res = voxel_downsample(proxy_pts_all, PROXY_VOXEL)
+    proxy_grid = NearestGrid(proxy_pts_res, cell=PROXY_CELL)
+    proxy_grid_120k = NearestGrid(proxy_pts_120k)
+    print(f"proxy surface: {len(proxy_pts_all)} raw -> {len(proxy_pts_res)} at "
+          f"{PROXY_VOXEL*100:.0f} cm voxel (legacy stride subsample keeps {len(proxy_pts_120k)})",
+          flush=True)
     proxy_surface = voxels(to_gt_frame(cln_kfs, np.eye(3), np.zeros(3)))
 
     def _half_cloud(kfs, parity):
@@ -655,11 +680,12 @@ def main():
     good_map_pts = (np.vstack([(inj_kfs[len(pre) + i]["pts"] @ good[i][:3, :3].T + good[i][:3, 3])
                                for i in good_admitted]) @ R_ic.T + t_ic
                     if good_admitted else np.zeros((0, 3)))
+    cov_q = proxy_pts_res[:: max(1, len(proxy_pts_res) // 40000)][:40000]
+
     good_cov = {}
     if len(good_map_pts):
         _g = NearestGrid(good_map_pts)
-        _dq = proxy_grid  # reuse proxy points as query set
-        _dd = _g.query(proxy_pts_all[:: max(1, len(proxy_pts_all) // 40000)][:40000], max_r=2.5)
+        _dd = _g.query(cov_q, max_r=2.5)
         good_cov = {f"covered_within_{t}m": round(float(np.mean(_dd <= t)), 4) for t in (0.25, 0.5, 1.0, 2.0)}
 
     arms = {
@@ -686,27 +712,33 @@ def main():
             w = w[:: max(1, len(w) // cap)][:cap]
         return w
 
-    def per_kf_distances(ids):
-        return [proxy_grid.query(kf_points(i), max_r=2.5) for i in ids]
+    def per_kf_distances(ids, grid=None):
+        g = proxy_grid if grid is None else grid
+        return [g.query(kf_points(i), max_r=2.5) for i in ids]
 
     floor_ids = [i for i in range(len(inj_kfs)) if inj_kfs[i]["rel"] < ONSET_REL]
     floor_d = per_kf_distances(floor_ids)
     floor_flat = np.concatenate(floor_d) if floor_d else np.zeros(0)
     floor_stats = distance_stats(floor_flat)
     floor_boot = bootstrap_tail(floor_d)
+    floor_d_120k = per_kf_distances(floor_ids, proxy_grid_120k)
+    floor_stats_120k = distance_stats(np.concatenate(floor_d_120k) if floor_d_120k else np.zeros(0))
     floor_vox = voxels(np.vstack([world_points(inj_kfs[i]) for i in floor_ids]) @ R_ic.T + t_ic)
     floor_vox_unsup = unsupported_fraction(floor_vox, proxy_surface)
     floor_vox_cov = coverage_recall(proxy_surface, floor_vox)
     print(f"  distance floor: median={floor_stats.get('median_m')} "
-          f"tail0.5={floor_stats.get('tail_over_0.5m')}")
+          f"tail0.5={floor_stats.get('tail_over_0.5m')}  "
+          f"[120k subsample: median={floor_stats_120k.get('median_m')} "
+          f"tail0.5={floor_stats_120k.get('tail_over_0.5m')}]", flush=True)
 
-    cov_q = proxy_pts_all[:: max(1, len(proxy_pts_all) // 40000)][:40000]
     results = {}
     for name, ids in arms.items():
         kd = per_kf_distances(ids)
         flat = np.concatenate(kd) if kd else np.zeros(0)
         stats = distance_stats(flat)
         boot = bootstrap_tail(kd)
+        kd_120k = per_kf_distances(ids, proxy_grid_120k)
+        stats_120k = distance_stats(np.concatenate(kd_120k) if kd_120k else np.zeros(0))
 
         admitted_ts = np.asarray([inj_kfs[i]["ts"] for i in ids])
         admitted_xyz = np.asarray([inj_kfs[i]["pose"][:3, 3] for i in ids])
@@ -730,6 +762,7 @@ def main():
             "admitted_duration_sec": round(float(admitted_ts[-1] - admitted_ts[0]), 2) if len(ids) else 0.0,
             "distance_stats": stats,
             "distance_tail_bootstrap": boot,
+            "distance_stats_proxy_120k_subsample": stats_120k,
             "coverage_sweep": cov,
             "ate_on_common_support_m": round(ate_common, 4) if n_common else None,
             "ate_on_common_support_frames": n_common,
@@ -794,6 +827,21 @@ def main():
         "reference_surface": {
             "provenance": "REAL_HOST_CLEAN_PROXY",
             "gt_surface_contam_3d": "UNAVAILABLE (no hall_01 GT mesh; M2DGR provides trajectory only)",
+            "resolution": {
+                "raw_points": int(len(proxy_pts_all)),
+                "primary": "voxel_downsample",
+                "primary_voxel_m": PROXY_VOXEL,
+                "primary_points": int(len(proxy_pts_res)),
+                "primary_grid_cell_m": PROXY_CELL,
+                "legacy": "stride subsample, kept only for comparability with earlier manifests",
+                "legacy_points": int(len(proxy_pts_120k)),
+                "why": (
+                    "a stride subsample keeps 1.4% of 8.49M points and inflates every distance to "
+                    "the surface; the earlier 'floor' was partly sampling, not the map. Voxel "
+                    "downsampling keeps full spatial coverage at the stated resolution. Distances "
+                    "measured on the legacy surface are reported under `*_proxy_120k_subsample`."
+                ),
+            },
             "self_calibration": selfcal,
             "resolution_floor": {
                 "within_run_point_split": {

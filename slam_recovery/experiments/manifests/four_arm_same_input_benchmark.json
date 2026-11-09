@@ -85,15 +85,17 @@
   "onset_detection": {
     "start_rel_sec": 14.528,
     "end_rel_sec": 34.467,
+    "start_abs_sec": 1627785275.607409,
+    "end_abs_sec": 1627785295.546409,
     "differing_frames": 200,
     "compared_frames": 598,
+    "missing_in_injected": 0,
+    "missing_in_clean": 0,
     "method": "per-frame raw buffer equality against the clean bag; no threshold",
-    "hardcoded_value_was": 20.0,
-    "note": "the hard-coded 20.0 s was wrong; the injected span starts at 14.528393030166626 s, so six seconds of faulty frames had been treated as trusted The detector is an oracle: it needs the clean bag, so it is not evidence about online detection latency or recall. Raw-buffer difference means the bytes changed, not that every changed byte is the configured fault; the input hash chain covers identity.",
-    "start_abs_sec": 1627785275.607,
-    "end_abs_sec": 1627785295.546,
     "role": "INJECTION_ORACLE (offline; requires the clean recording)",
-    "deployable_detector": false
+    "deployable_detector": false,
+    "hardcoded_value_was": 20.0,
+    "note": "the hard-coded 20.0 s was wrong; the injected span starts at 14.528393030166626 s, so six seconds of faulty frames had been treated as trusted"
   },
   "protocol": {
     "voxel_m": 0.1,
@@ -107,6 +109,16 @@
   "reference_surface": {
     "provenance": "REAL_HOST_CLEAN_PROXY",
     "gt_surface_contam_3d": "UNAVAILABLE (no hall_01 GT mesh; M2DGR provides trajectory only)",
+    "resolution": {
+      "raw_points": 8490000,
+      "primary": "voxel_downsample",
+      "primary_voxel_m": 0.05,
+      "primary_points": 2422718,
+      "primary_grid_cell_m": 0.25,
+      "legacy": "stride subsample, kept only for comparability with earlier manifests",
+      "legacy_points": 120000,
+      "why": "a stride subsample keeps 1.4% of 8.49M points and inflates every distance to the surface; the earlier 'floor' was partly sampling, not the map. Voxel downsampling keeps full spatial coverage at the stated resolution. Distances measured on the legacy surface are reported under `*_proxy_120k_subsample`."
+    },
     "self_calibration": {
       "builds_from_even_points_scores_odd": {
         "unsupported_voxel_fraction": 0.0146,
@@ -141,22 +153,22 @@
     "model": "single rigid SE(3), clean<-injected, fitted on the pre-onset overlap only",
     "matched_pre_onset_poses": 121,
     "residual_by_window": {
-      "[0,14.5284)s": {
-        "n": 134,
-        "mean_m": 0.0401,
-        "p95_m": 0.3137,
-        "max_m": 0.7104
+      "pre_rel[-1627785262.38,13.23)s": {
+        "n": 121,
+        "mean_m": 0.006,
+        "p95_m": 0.0114,
+        "max_m": 0.0181
       },
-      "[14.5284,34.4674)s": {
-        "n": 198,
-        "mean_m": 4.0737,
-        "p95_m": 5.8976,
+      "injection_rel[13.23,33.16)s": {
+        "n": 199,
+        "mean_m": 3.8815,
+        "p95_m": 5.8973,
         "max_m": 5.9906
       },
-      "[34.4674,60)s": {
-        "n": 234,
-        "mean_m": 13.3499,
-        "p95_m": 19.5751,
+      "post_rel[33.16,999999998372214784.00)s": {
+        "n": 246,
+        "mean_m": 12.8565,
+        "p95_m": 19.568,
         "max_m": 19.67
       }
     },
@@ -268,6 +280,49 @@
       "admitted_duration_sec": 58.51,
       "distance_stats": {
         "n_points": 144500,
+        "n_beyond_search_radius": 2451,
+        "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
+        "quantiles_scope": "CONDITIONAL on finite distances; censored at the 2.0 m search radius",
+        "median_m": 0.0978,
+        "p90_m": 1.1477,
+        "p99_m": 2.5779,
+        "tail_over_0.25m": 0.3997,
+        "tail_over_0.5m": 0.2969,
+        "tail_over_1.0m": 0.1415,
+        "tail_over_2.0m": 0.0464
+      },
+      "distance_tail_bootstrap": {
+        "tail_over_0.25m": {
+          "mean": 0.3997,
+          "ci95": [
+            0.3804,
+            0.4196
+          ]
+        },
+        "tail_over_0.5m": {
+          "mean": 0.2969,
+          "ci95": [
+            0.2818,
+            0.311
+          ]
+        },
+        "tail_over_1.0m": {
+          "mean": 0.1415,
+          "ci95": [
+            0.134,
+            0.1496
+          ]
+        },
+        "tail_over_2.0m": {
+          "mean": 0.0464,
+          "ci95": [
+            0.0435,
+            0.0495
+          ]
+        }
+      },
+      "distance_stats_proxy_120k_subsample": {
+        "n_points": 144500,
         "n_beyond_search_radius": 4997,
         "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
         "quantiles_scope": "CONDITIONAL on finite distances; censored at the 2.0 m search radius",
@@ -279,42 +334,12 @@
         "tail_over_1.0m": 0.199,
         "tail_over_2.0m": 0.0898
       },
-      "distance_tail_bootstrap": {
-        "tail_over_0.25m": {
-          "mean": 0.5056,
-          "ci95": [
-            0.4837,
-            0.5282
-          ]
-        },
-        "tail_over_0.5m": {
-          "mean": 0.3647,
-          "ci95": [
-            0.3469,
-            0.3807
-          ]
-        },
-        "tail_over_1.0m": {
-          "mean": 0.199,
-          "ci95": [
-            0.1893,
-            0.2096
-          ]
-        },
-        "tail_over_2.0m": {
-          "mean": 0.0898,
-          "ci95": [
-            0.0848,
-            0.0952
-          ]
-        }
-      },
       "coverage_sweep": {
-        "covered_within_0.25m": 0.8262,
-        "covered_within_0.5m": 0.9496,
-        "covered_within_1.0m": 0.9804,
-        "covered_within_2.0m": 0.9979,
-        "median_m": 0.0993
+        "covered_within_0.25m": 0.6419,
+        "covered_within_0.5m": 0.8792,
+        "covered_within_1.0m": 0.9598,
+        "covered_within_2.0m": 0.9932,
+        "median_m": 0.1792
       },
       "ate_on_common_support_m": 0.0848,
       "ate_on_common_support_frames": 85,
@@ -335,6 +360,49 @@
         "n_beyond_search_radius": 9,
         "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
         "quantiles_scope": "CONDITIONAL on finite distances; censored at the 2.0 m search radius",
+        "median_m": 0.0276,
+        "p90_m": 0.0477,
+        "p99_m": 0.109,
+        "tail_over_0.25m": 0.0046,
+        "tail_over_0.5m": 0.0029,
+        "tail_over_1.0m": 0.0017,
+        "tail_over_2.0m": 0.0007
+      },
+      "distance_tail_bootstrap": {
+        "tail_over_0.25m": {
+          "mean": 0.0046,
+          "ci95": [
+            0.0002,
+            0.0167
+          ]
+        },
+        "tail_over_0.5m": {
+          "mean": 0.0029,
+          "ci95": [
+            0.0,
+            0.0085
+          ]
+        },
+        "tail_over_1.0m": {
+          "mean": 0.0017,
+          "ci95": [
+            0.0,
+            0.0051
+          ]
+        },
+        "tail_over_2.0m": {
+          "mean": 0.0007,
+          "ci95": [
+            0.0,
+            0.0022
+          ]
+        }
+      },
+      "distance_stats_proxy_120k_subsample": {
+        "n_points": 33250,
+        "n_beyond_search_radius": 9,
+        "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
+        "quantiles_scope": "CONDITIONAL on finite distances; censored at the 2.0 m search radius",
         "median_m": 0.0596,
         "p90_m": 0.1519,
         "p99_m": 0.4315,
@@ -343,42 +411,12 @@
         "tail_over_1.0m": 0.0023,
         "tail_over_2.0m": 0.0012
       },
-      "distance_tail_bootstrap": {
-        "tail_over_0.25m": {
-          "mean": 0.0355,
-          "ci95": [
-            0.0291,
-            0.0483
-          ]
-        },
-        "tail_over_0.5m": {
-          "mean": 0.0079,
-          "ci95": [
-            0.004,
-            0.0148
-          ]
-        },
-        "tail_over_1.0m": {
-          "mean": 0.0023,
-          "ci95": [
-            0.0002,
-            0.0062
-          ]
-        },
-        "tail_over_2.0m": {
-          "mean": 0.0012,
-          "ci95": [
-            0.0,
-            0.0035
-          ]
-        }
-      },
       "coverage_sweep": {
-        "covered_within_0.25m": 0.7463,
-        "covered_within_0.5m": 0.9199,
-        "covered_within_1.0m": 0.9682,
-        "covered_within_2.0m": 0.9851,
-        "median_m": 0.1207
+        "covered_within_0.25m": 0.5498,
+        "covered_within_0.5m": 0.8202,
+        "covered_within_1.0m": 0.931,
+        "covered_within_2.0m": 0.9723,
+        "median_m": 0.2224
       },
       "ate_on_common_support_m": 0.0848,
       "ate_on_common_support_frames": 85,
@@ -396,6 +434,49 @@
       "admitted_duration_sec": 58.51,
       "distance_stats": {
         "n_points": 144500,
+        "n_beyond_search_radius": 2451,
+        "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
+        "quantiles_scope": "CONDITIONAL on finite distances; censored at the 2.0 m search radius",
+        "median_m": 0.0978,
+        "p90_m": 1.1477,
+        "p99_m": 2.5779,
+        "tail_over_0.25m": 0.3997,
+        "tail_over_0.5m": 0.2969,
+        "tail_over_1.0m": 0.1415,
+        "tail_over_2.0m": 0.0464
+      },
+      "distance_tail_bootstrap": {
+        "tail_over_0.25m": {
+          "mean": 0.3997,
+          "ci95": [
+            0.3804,
+            0.4196
+          ]
+        },
+        "tail_over_0.5m": {
+          "mean": 0.2969,
+          "ci95": [
+            0.2818,
+            0.311
+          ]
+        },
+        "tail_over_1.0m": {
+          "mean": 0.1415,
+          "ci95": [
+            0.134,
+            0.1496
+          ]
+        },
+        "tail_over_2.0m": {
+          "mean": 0.0464,
+          "ci95": [
+            0.0435,
+            0.0495
+          ]
+        }
+      },
+      "distance_stats_proxy_120k_subsample": {
+        "n_points": 144500,
         "n_beyond_search_radius": 4997,
         "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
         "quantiles_scope": "CONDITIONAL on finite distances; censored at the 2.0 m search radius",
@@ -407,42 +488,12 @@
         "tail_over_1.0m": 0.199,
         "tail_over_2.0m": 0.0898
       },
-      "distance_tail_bootstrap": {
-        "tail_over_0.25m": {
-          "mean": 0.5056,
-          "ci95": [
-            0.4837,
-            0.5282
-          ]
-        },
-        "tail_over_0.5m": {
-          "mean": 0.3647,
-          "ci95": [
-            0.3469,
-            0.3807
-          ]
-        },
-        "tail_over_1.0m": {
-          "mean": 0.199,
-          "ci95": [
-            0.1893,
-            0.2096
-          ]
-        },
-        "tail_over_2.0m": {
-          "mean": 0.0898,
-          "ci95": [
-            0.0848,
-            0.0952
-          ]
-        }
-      },
       "coverage_sweep": {
-        "covered_within_0.25m": 0.8262,
-        "covered_within_0.5m": 0.9496,
-        "covered_within_1.0m": 0.9804,
-        "covered_within_2.0m": 0.9979,
-        "median_m": 0.0993
+        "covered_within_0.25m": 0.6419,
+        "covered_within_0.5m": 0.8792,
+        "covered_within_1.0m": 0.9598,
+        "covered_within_2.0m": 0.9932,
+        "median_m": 0.1792
       },
       "ate_on_common_support_m": 0.0848,
       "ate_on_common_support_frames": 85,
@@ -463,6 +514,49 @@
         "n_beyond_search_radius": 9,
         "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
         "quantiles_scope": "CONDITIONAL on finite distances; censored at the 2.0 m search radius",
+        "median_m": 0.0276,
+        "p90_m": 0.0477,
+        "p99_m": 0.109,
+        "tail_over_0.25m": 0.0046,
+        "tail_over_0.5m": 0.0029,
+        "tail_over_1.0m": 0.0017,
+        "tail_over_2.0m": 0.0007
+      },
+      "distance_tail_bootstrap": {
+        "tail_over_0.25m": {
+          "mean": 0.0046,
+          "ci95": [
+            0.0002,
+            0.0167
+          ]
+        },
+        "tail_over_0.5m": {
+          "mean": 0.0029,
+          "ci95": [
+            0.0,
+            0.0085
+          ]
+        },
+        "tail_over_1.0m": {
+          "mean": 0.0017,
+          "ci95": [
+            0.0,
+            0.0051
+          ]
+        },
+        "tail_over_2.0m": {
+          "mean": 0.0007,
+          "ci95": [
+            0.0,
+            0.0022
+          ]
+        }
+      },
+      "distance_stats_proxy_120k_subsample": {
+        "n_points": 33250,
+        "n_beyond_search_radius": 9,
+        "beyond_search_radius_definition": "no proxy point within 2.0 m; counted as exceeding every reported threshold",
+        "quantiles_scope": "CONDITIONAL on finite distances; censored at the 2.0 m search radius",
         "median_m": 0.0596,
         "p90_m": 0.1519,
         "p99_m": 0.4315,
@@ -471,42 +565,12 @@
         "tail_over_1.0m": 0.0023,
         "tail_over_2.0m": 0.0012
       },
-      "distance_tail_bootstrap": {
-        "tail_over_0.25m": {
-          "mean": 0.0355,
-          "ci95": [
-            0.0291,
-            0.0483
-          ]
-        },
-        "tail_over_0.5m": {
-          "mean": 0.0079,
-          "ci95": [
-            0.004,
-            0.0148
-          ]
-        },
-        "tail_over_1.0m": {
-          "mean": 0.0023,
-          "ci95": [
-            0.0002,
-            0.0062
-          ]
-        },
-        "tail_over_2.0m": {
-          "mean": 0.0012,
-          "ci95": [
-            0.0,
-            0.0035
-          ]
-        }
-      },
       "coverage_sweep": {
-        "covered_within_0.25m": 0.7463,
-        "covered_within_0.5m": 0.9199,
-        "covered_within_1.0m": 0.9682,
-        "covered_within_2.0m": 0.9851,
-        "median_m": 0.1207
+        "covered_within_0.25m": 0.5498,
+        "covered_within_0.5m": 0.8202,
+        "covered_within_1.0m": 0.931,
+        "covered_within_2.0m": 0.9723,
+        "median_m": 0.2224
       },
       "ate_on_common_support_m": 0.0848,
       "ate_on_common_support_frames": 85,
@@ -515,7 +579,7 @@
       "clean_interval_keyframes_not_admitted": 0,
       "appendix_voxel_unsupported": 0.0074,
       "appendix_voxel_coverage": 0.0313,
-      "runtime_sec": 14.8284
+      "runtime_sec": 16.697
     }
   },
   "caveats": [
@@ -523,6 +587,5 @@
     "Incumbent is a constant-velocity extrapolation, not a per-frame record, so the paired test asks whether the candidate beats 'no repair', not whether it is optimal.",
     "A0 and A2 write the identical keyframe set and therefore the same map; A2 differs only in having passed through quarantine before admitting everything.",
     "ATE on the admitted set is confounded by coverage; ate_on_common_support is the like-for-like number."
-  ],
-  "evidence_status_scope": "evidence_status describes the paired-benefit term only; the holdout-NIS term is reported separately as holdout_nis, and accepted=False means the candidate did not enter Mode 2."
+  ]
 }
