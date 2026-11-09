@@ -530,7 +530,8 @@
     "The 120k-point proxy subsample inflates both contamination tails; at full proxy resolution the values are 0.2966 (A0) and 0.0029 (A1), and the 0.0079 floor is two-thirds sampling.",
     "C_good attribution: the clean-scan control at the same reference scores median 16.2, so most of NIS 18.07 is the reference/alignment floor, not the un-stripped occluder; filtering the 4.0-4.6 m shell does not reduce it.",
     "C_good attribution, gate protocol: clean control 14.90 vs raw 15.26 (the statistic is insensitive to the occluder); oracle sector removal 25.05 (fewer points, worse fit); budget 2400 gives 12.05, still >> 2.5. The reference/alignment construction dominates; no single cause.",
-    "C_good attribution: at 600 reference points the clean control is 18.75 vs raw 20.42; at 4000 it is 6.51 vs 7.72. The reference construction dominates; cap alone and occluder alone are both insufficient explanations."
+    "C_good attribution: at 600 reference points the clean control is 18.75 vs raw 20.42; at 4000 it is 6.51 vs 7.72. The reference construction dominates; cap alone and occluder alone are both insufficient explanations.",
+    "The arm distance fields in this manifest are the 120k stride surface. A voxel-surface rerun (branch exp/four-arm, 762b533) gives 0.2969/0.0029; see voxel_surface_check."
   ],
   "evidence_status_scope": "evidence_status describes the paired-benefit term only; the holdout-NIS term is reported separately as holdout_nis, and accepted=False means the candidate did not enter Mode 2.",
   "time_bases": {
@@ -608,5 +609,31 @@
       "4000": 4000
     },
     "reading": "At the gate's 600-point budget the clean-scan control scores 18.75 against the raw candidate's 20.42, so the gate's 18.07 is dominated by the reference scale; the occluder adds about 1.7 NIS. At 4000 points the clean control is still 6.51 and raw 7.72, so raising the cap does not make the statistic usable either: the blocking factor is the reference/alignment construction, not the cap and not the occluder. The query populations differ between variants (raw, sector-removed, clean), so this is a sensitivity, not a pure occlusion effect."
+  },
+  "voxel_surface_check": {
+    "source_commit": "762b533 (branch exp/four-arm, pushed for provenance)",
+    "why": "the 120k stride proxy in this manifest keeps 1.4% of 8.49M clean points and inflates every distance; the branch reruns with a 5 cm voxel surface and reports both surfaces",
+    "surface": {
+      "raw_points": 8490000,
+      "primary": "voxel_downsample 0.05 m",
+      "primary_points": 2422718,
+      "primary_grid_cell_m": 0.25,
+      "legacy_points": 120000
+    },
+    "arms": {
+      "A0_A2": {
+        "voxel_median_m": 0.0978,
+        "voxel_tail_over_0.5m": 0.2969,
+        "legacy_median_m": 0.2352,
+        "legacy_tail_over_0.5m": 0.3647
+      },
+      "A1_A3": {
+        "voxel_median_m": 0.0276,
+        "voxel_tail_over_0.5m": 0.0029,
+        "legacy_median_m": 0.0596,
+        "legacy_tail_over_0.5m": 0.0079
+      }
+    },
+    "reading": "at full spatial coverage the A0/A1 tail gap is 0.2969 vs 0.0029; the 120k floor 0.0079 is about two-thirds sampling. The main manifest keeps the 120k fields it was generated with; the voxel values are this branch's rerun and are not merged into the arm rows."
   }
 }
