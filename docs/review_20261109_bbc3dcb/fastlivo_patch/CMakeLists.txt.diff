@@ -1,0 +1,19 @@
+--- /tmp/fastlivo_bin_backup/CMakeLists.txt.orig	2026-11-09 21:22:14.899913924 +0800
++++ CMakeLists.txt	2026-11-09 21:22:14.936775371 +0800
+@@ -44,8 +44,14 @@
+ ProcessorCount(N)
+ message(STATUS "Processor count: ${N}")
+ 
+-# Set the number of cores for multithreading
+-if(N GREATER 4)
++# Opt-in: -DNO_MP=ON compiles the parallel loops out, which removes the only place where the
++# same input, config and thread count can still give a different result (the OpenMP reduction in
++# vio.cpp). Default OFF so the historical build is unchanged.
++option(NO_MP "Disable OpenMP parallel loops (deterministic reductions)" OFF)
++if(NO_MP)
++  add_definitions(-DNO_MP -DMP_PROC_NUM=1)
++  message(STATUS "NO_MP=ON: OpenMP parallel loops disabled for determinism")
++elseif(N GREATER 4)
+   math(EXPR PROC_NUM "4")
+   add_definitions(-DMP_EN -DMP_PROC_NUM=${PROC_NUM})
+   message(STATUS "Multithreading enabled. Cores: ${PROC_NUM}")

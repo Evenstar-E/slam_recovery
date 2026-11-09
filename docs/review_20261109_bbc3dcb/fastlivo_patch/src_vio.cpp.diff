@@ -1,0 +1,11 @@
+--- /tmp/fastlivo_bin_backup/vio.cpp.orig	2026-11-09 21:22:38.264978821 +0800
++++ src/vio.cpp	2026-11-09 21:22:38.311580857 +0800
+@@ -1549,7 +1549,7 @@
+     // int desired_threads = std::min(max_threads, total_points);
+     // omp_set_num_threads(desired_threads);
+   
+-    #ifdef MP_EN
++    #if defined(MP_EN) && !defined(NO_MP)
+       omp_set_num_threads(MP_PROC_NUM);
+       #pragma omp parallel for reduction(+:error, n_meas)
+     #endif

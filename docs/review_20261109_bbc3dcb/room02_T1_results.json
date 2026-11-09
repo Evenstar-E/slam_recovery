@@ -1,0 +1,25 @@
+{
+ "r1": {
+  "coverage": 0.9466731594202898,
+  "unsupported": 0.09598761609907125,
+  "ate_full": 0.30921783934052743,
+  "mode": "GOOD"
+ },
+ "r2": {
+  "coverage": 0.6766870724637681,
+  "unsupported": 0.691343653250774,
+  "ate_full": 336.75038385404093,
+  "mode": "BAD"
+ },
+ "same_mode": false,
+ "aligned_first_pose_diff_m": 0.011347307742243145,
+ "first_stamps": {
+  "r1": 1627643759.5540829,
+  "r2": 1627643759.5540829
+ },
+ "criterion": {
+  "same_mode": false,
+  "first_pose_under_5cm": true,
+  "verdict": "GO_TO_T2"
+ }
+}

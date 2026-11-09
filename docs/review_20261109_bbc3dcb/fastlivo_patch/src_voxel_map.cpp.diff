@@ -1,0 +1,11 @@
+--- /tmp/fastlivo_bin_backup/voxel_map.cpp.orig	2026-11-09 21:22:38.266978827 +0800
++++ src/voxel_map.cpp	2026-11-09 21:22:38.324362564 +0800
+@@ -655,7 +655,7 @@
+     index[i] = i;
+     useful_ptpl[i] = false;
+   }
+-  #ifdef MP_EN
++  #if defined(MP_EN) && !defined(NO_MP)
+     omp_set_num_threads(MP_PROC_NUM);
+     #pragma omp parallel for
+   #endif

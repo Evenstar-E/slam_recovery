@@ -1,0 +1,38 @@
+{
+ "experiment": "T1 determinism control: MP_EN off, nothing else changed",
+ "source_patch": {
+  "files": [
+   "~/fast_livo2_ws/src/FAST-LIVO2/CMakeLists.txt",
+   "~/fast_livo2_ws/src/FAST-LIVO2/src/vio.cpp",
+   "~/fast_livo2_ws/src/FAST-LIVO2/src/voxel_map.cpp",
+   "~/fast_livo2_ws/src/FAST-LIVO2/src/LIVMapper.cpp"
+  ],
+  "what": "opt-in -DNO_MP=ON; the two '#ifdef MP_EN' parallel loops become '#if defined(MP_EN) && !defined(NO_MP)'; one startup ROS_INFO line reporting MP_EN/MP_PROC_NUM/omp_get_max_threads(). Nothing else: rate, config, prefix, bag and runner unchanged.",
+  "not_changed": [
+   "ros::Rate(5000)",
+   "imu_int_frame",
+   "config yaml",
+   "prefix logic",
+   "bags"
+  ]
+ },
+ "binary": {
+  "previous_sha256": "ca1959c45121a4b60fcae597a293e918c41df1df53efd08a79b1ccc8e6076a6a",
+  "previous_backup": "/tmp/fastlivo_bin_backup/fastlivo_mapping_0d2c034_default_MP4",
+  "new_sha256": "6e0a3e5722b02c9a6682cd69c5d8ae4428e5215a296da43e85ef58aa3da03d8e"
+ },
+ "runs": "cell O, two runs, same bag/runner/prefix/config; only MP_EN differs from the archived runs",
+ "criterion": {
+  "declared": "if both runs land on the same mode AND the aligned first-pose difference is < 0.05 m, S1 (OpenMP reduction order) is accepted as the main seed; otherwise go to T2 (taskset + nice + idle machine)",
+  "first_pose_alignment": "single SE(3) fitted on the common healthy prefix, then compare the first output pose of the two runs",
+  "thresholds": {
+   "same_mode": "both GOOD or both BAD by the unsupported rule (<0.10 / >0.50)",
+   "first_pose_m": 0.05
+  }
+ },
+ "expected_records": [
+  "MP_EN/MP_PROC_NUM/omp_get_max_threads from the node log",
+  "first /aft_mapped_to_init stamp and pose",
+  "binary sha in the run receipt"
+ ]
+}

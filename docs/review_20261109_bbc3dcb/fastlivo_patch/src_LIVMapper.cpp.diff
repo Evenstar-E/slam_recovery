@@ -1,0 +1,24 @@
+--- /tmp/fastlivo_bin_backup/LIVMapper.cpp.orig	2026-11-09 21:22:38.267978829 +0800
++++ src/LIVMapper.cpp	2026-11-09 21:23:06.448121224 +0800
+@@ -11,6 +11,7 @@
+ */
+ 
+ #include "LIVMapper.h"
++#include <omp.h>
+ 
+ LIVMapper::LIVMapper(ros::NodeHandle &nh)
+     : extT(0, 0, 0),
+@@ -214,6 +215,13 @@
+   pubImage = it.advertise("/rgb_img", 1);
+   pubImuPropOdom = nh.advertise<nav_msgs::Odometry>("/LIVO2/imu_propagate", 10000);
+   imu_prop_timer = nh.createTimer(ros::Duration(0.004), &LIVMapper::imu_prop_callback, this);
++#ifdef NO_MP
++  ROS_INFO("[DETERMINISM] build: NO_MP=ON (parallel loops compiled out), "
++           "omp_get_max_threads()=%d", omp_get_max_threads());
++#else
++  ROS_INFO("[DETERMINISM] build: MP_EN with MP_PROC_NUM=%d, omp_get_max_threads()=%d",
++           MP_PROC_NUM, omp_get_max_threads());
++#endif
+   voxelmap_manager->voxel_map_pub_= nh.advertise<visualization_msgs::MarkerArray>("/planes", 10000);
+ }
+ 
