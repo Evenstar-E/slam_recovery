@@ -377,6 +377,17 @@ def main():
         _REPO_ROOT, "slam_recovery", "experiments", "manifests", "four_arm_same_input_benchmark.json")
     os.makedirs(os.path.dirname(out_manifest), exist_ok=True)
 
+    _pt, _px, _ = load_poses(DEFAULT_INJ_POSES)
+    _tg, _xg, _ = load_tum_trajectory_se3(DEFAULT_GT)
+    _n = max(5, len(_pt) // 5)
+    _mt, _me, _mg = associate_trajectories(_pt[:_n], _px[:_n], _tg, _xg, 0.05)
+    if len(_me) >= 3:
+        _R, _t, _ = umeyama_se3_align(_me, _mg, with_scale=False)
+        INJ_POSE_ATE = round(float(np.sqrt(np.mean(np.sum(_me @ _R.T + _t - _mg, axis=1) ** 2))), 4)
+    else:
+        INJ_POSE_ATE = None
+    print(f"pose bag ATE (prefix) = {INJ_POSE_ATE}")
+
     print("loading injected run ...")
     inj_kfs, inj_stats = pair_keyframes(DEFAULT_INJ_SCANS, DEFAULT_INJ_POSES, args.ignore_rotation)
     print(f"  paired={inj_stats['paired']} interp={inj_stats['interpolated']} dropped={inj_stats['dropped']}")
@@ -665,6 +676,22 @@ def main():
 
     manifest = {
         "run_id": "four_arm_same_input_benchmark",
+        "supersedes": {
+            "previous": "db6a324 / 12a8687 / 0f24dc1 / 011414c",
+            "reason": (
+                "INVALID_INPUT_PAIRING: the scans came from hall01_inj43.bag (4.30 m injection) "
+                "while the poses came from res_hall01_inj_05x.bag, which is the 0.35 m "
+                "under-injection run (ATE 0.46 m against GT, barely degraded). Every map and "
+                "gate number produced with that pairing is void; a filename containing 'inj' is "
+                "not provenance and the pose bag must be checked against GT before use."
+            ),
+        },
+        "input_consistency": {
+            "inj_scans_bag": DEFAULT_INJ_SCANS,
+            "inj_poses_bag": DEFAULT_INJ_POSES,
+            "pose_bag_ate_against_gt_m": INJ_POSE_ATE,
+            "note": "pose bag ATE must match the injection severity of the scan bag",
+        },
         "provenance": "ARCHIVED_REAL_HOST_POSES + INJECTION_SCANS",
         "provenance_note": (
             "Replays a recorded FAST-LIVO2 run. The poses are archived, not produced for this "
