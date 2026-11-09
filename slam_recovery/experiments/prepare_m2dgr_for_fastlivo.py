@@ -128,10 +128,28 @@ def main() -> None:
                     help="low-light gain applied to the image stream inside the visual window")
     ap.add_argument("--visual-blur", type=int, default=None,
                     help="directional motion-blur kernel length applied inside the visual window")
+    ap.add_argument("--visual-seed", type=int, default=42)
     ap.add_argument("--visual-start-rel", type=float, default=None)
     ap.add_argument("--visual-end-rel", type=float, default=None)
     ap.add_argument("--max-frames", type=int, default=100000)
     args = ap.parse_args()
+
+    wants_visual = args.visual_gain is not None or args.visual_blur is not None
+    if wants_visual:
+        if args.visual_start_rel is None or args.visual_end_rel is None:
+            raise SystemExit(
+                "--visual-gain/--visual-blur need both --visual-start-rel and --visual-end-rel; "
+                "without them the conversion would silently emit clean images."
+            )
+        if args.visual_end_rel <= args.visual_start_rel:
+            raise SystemExit("--visual-end-rel must be greater than --visual-start-rel")
+        if args.visual_end_rel < 0 or args.visual_start_rel > args.duration:
+            raise SystemExit("the visual window does not overlap the conversion window")
+        if args.visual_blur is not None:
+            try:
+                import cv2  # noqa: F401
+            except Exception as exc:
+                raise SystemExit(f"--visual-blur needs OpenCV for the blur kernel: {exc}")
 
     os.makedirs(os.path.dirname(args.out) or ".", exist_ok=True)
     src = rosbag.Bag(args.bag, "r")
@@ -147,6 +165,7 @@ def main() -> None:
     counts = {CLOUD: 0, IMU: 0, IMG_OUT: 0}
     injected = 0
     visually_degraded = 0
+    n_visual = 0
     with rosbag.Bag(args.out, "w") as dst:
         for topic, msg, t in src.read_messages(topics=[IMU, CLOUD, IMG_IN]):
             ts = msg.header.stamp.to_sec()
@@ -174,11 +193,16 @@ def main() -> None:
                 if visual_window and (args.visual_gain is not None or args.visual_blur is not None):
                     visibly = arr
                     if args.visual_gain is not None:
-                        visibly = inject_visual_exposure_drop(visibly, gain_g=args.visual_gain, seed=42)
+                        # Per-frame seed: a fixed seed would replay the identical shot/read noise
+                        # field on every frame, which is a static pattern, not sensor noise.
+                        visibly = inject_visual_exposure_drop(
+                            visibly, gain_g=args.visual_gain, seed=args.visual_seed + n_visual
+                        )
                     if args.visual_blur is not None:
                         visibly = inject_visual_motion_blur(visibly, kernel_len=args.visual_blur, angle_deg=25.0)
                     arr = visibly
                     visually_degraded += 1
+                n_visual += 1
                 im = Image()
                 im.header = msg.header
                 im.height, im.width = int(arr.shape[0]), int(arr.shape[1])
@@ -194,6 +218,20 @@ def main() -> None:
 
     print(f"wrote {args.out} ({os.path.getsize(args.out) / 1e6:.1f} MB)")
     print(f"  window [{lo:.2f}, {hi:.2f}] s  ({args.duration:.0f} s)")
+    import json as _json
+
+    with open(os.path.splitext(args.out)[0] + ".conversion.json", "w", encoding="utf-8") as fh:
+        _json.dump({
+            "source_bag": args.bag, "window_start_sec": lo, "window_end_sec": hi,
+            "clouds": counts[CLOUD], "lidar_injected": injected, "imu": counts[IMU],
+            "images": counts[IMG_OUT], "visually_degraded": visually_degraded,
+            "lidar_injection": {"window_rel": [args.inject_start_rel, args.inject_end_rel],
+                                "occluded_azimuth_fraction": args.occlusion,
+                                "bag_distance_m": args.bag_distance},
+            "visual_degradation": {"window_rel": [args.visual_start_rel, args.visual_end_rel],
+                                   "gain": args.visual_gain, "blur_kernel": args.visual_blur,
+                                   "seed_base": args.visual_seed, "per_frame_seed": True},
+        }, fh, indent=2)
     print(f"  clouds={counts[CLOUD]} (lidar-injected {injected})  imu={counts[IMU]}  "
           f"images={counts[IMG_OUT]} (visually degraded {visually_degraded})")
 

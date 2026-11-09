@@ -49,14 +49,15 @@
   },
   "evaluation_protocol": {
     "association_max_dt_sec": 0.05,
-    "alignment": "rigid SE(3) fitted on the leading 20% of matched poses, never on the evaluation window",
-    "prefix_poses": 170
+    "alignment": "rigid SE(3) fitted on the leading 20% of each arm's own matched poses; the prefix count is recorded per arm as alignment_prefix_poses",
+    "note": "An earlier version of this manifest carried a single prefix_poses value taken from one room_02 arm and applied it to every run; it is superseded by the per-arm field.",
+    "gt_outlier_rejection_m": 0.5
   },
   "findings": [
     "With the injection at 4.30 m -- the distance every other use of this injector in the repository passes and the one the LiDAR-host runs used -- FAST-LIVO2 degrades by about 13x on both sequences: room_02 0.0771 -> 1.0313 m ATE, hall_01 0.3143 -> 4.2331 m ATE (window RMSE 0.4341 -> 4.5529 m).",
     "That is the same order as FAST-LIO2 under the same injection (0.1316 -> 1.2996 m, x9.9), so the fifth host is not special: a tightly-coupled LIVO does not rescue an 88% near-field occlusion once the occluder is placed where it actually looks like structure.",
     "The earlier 'close to immune' reading came from injecting at 0.35 m, which is retained in the under_scaled_arms block for the record and is explicitly not comparable.",
-    "The visual term contributes nothing in either regime: 4.2331 vs 4.1820 m at 4.30 m, 1.0313 vs 1.0481 m on room_02, and 0.0771 vs 0.0761 m on the clean control. The img_en=0 arms exist precisely to show this, and they show it in the degraded case, not only in the clean one.",
+    "Vision on/off is compared under the same injection, not extrapolated from the clean control: hall_01 at 4.30 m gives 4.2331 m (vision on) vs 4.1820 m (vision off), room_02 gives 1.0313 vs 1.0481 m. Whole-run ATE is insensitive to the visual term in both cases. That is not the same as showing the visual module is inert: the hall_01 both-modal arm has a window RMSE of 0.6752 m against 0.5868 m for LiDAR-only (+15%), so the degraded images do move the solution locally even though the whole-run ATE does not separate. Which frames the visual term contributes on, and whether the camera-LiDAR calibration is sound, are still unmeasured.",
     "Why the photometric term is inert is still unresolved. Candidates: img_point_cov=100 against dept_err=0.02 / beam_err=0.05, insufficient indoor texture, and an uncalibrated camera-LiDAR time offset. A lower img_point_cov is prepared (fastlivo2/m2dgr_vio10.yaml) but not yet run.",
     "Playback rate is part of the protocol: hall_01 must run at 0.5x. At 1.0x the node consumed only 35.6 s of the 60 s window and the truncated trajectory produced an ATE rising 0.09 -> 0.56 with time, which would have been reported as drift.",
     "M2DGR Mocap GT contains isolated corrupted samples (room_02 t=26.35 s moves 7.11 m for one sample); the evaluator rejects them and reports the count. hall_01 needed none."
@@ -75,7 +76,8 @@
           "ate_rmse_m": 0.0771,
           "ate_max_m": 0.1566,
           "rpe_trans_rmse_m": 0.0459,
-          "window_rmse_m": 0.1077
+          "window_rmse_m": 0.1077,
+          "alignment_prefix_poses": 170
         },
         "clean_lidar_inertial_only": {
           "provenance": "REAL_HOST",
@@ -85,7 +87,8 @@
           "ate_max_m": 0.1531,
           "rpe_trans_rmse_m": 0.0588,
           "window_rmse_m": 0.1063,
-          "note": "img_en=0 control"
+          "note": "img_en=0 control",
+          "alignment_prefix_poses": 113
         },
         "lidar_only_88pct_near_field_occlusion": {
           "provenance": "REAL_HOST",
@@ -94,7 +97,8 @@
           "ate_rmse_m": 0.0886,
           "ate_max_m": 0.2318,
           "rpe_trans_rmse_m": 0.07,
-          "window_rmse_m": 0.1287
+          "window_rmse_m": 0.1287,
+          "alignment_prefix_poses": 169
         },
         "lidar_88pct_at_4p30m_vision_on": {
           "provenance": "REAL_HOST",
@@ -102,7 +106,8 @@
           "ate_rmse_m": 1.0313,
           "ate_max_m": 1.8344,
           "rpe_trans_rmse_m": 0.4409,
-          "window_rmse_m": 1.2499
+          "window_rmse_m": 1.2499,
+          "alignment_prefix_poses": 169
         },
         "lidar_88pct_at_4p30m_vision_off": {
           "provenance": "REAL_HOST",
@@ -110,7 +115,8 @@
           "ate_rmse_m": 1.0481,
           "ate_max_m": 1.8993,
           "rpe_trans_rmse_m": 0.6394,
-          "window_rmse_m": 1.1589
+          "window_rmse_m": 1.1589,
+          "alignment_prefix_poses": 113
         }
       },
       "degradation": {
@@ -149,7 +155,8 @@
           "ate_rmse_m": 0.3143,
           "ate_max_m": 0.5467,
           "rpe_trans_rmse_m": 0.1059,
-          "window_rmse_m": 0.4341
+          "window_rmse_m": 0.4341,
+          "alignment_prefix_poses": 109
         },
         "lidar_only_88pct_near_field_occlusion_120_140s": {
           "provenance": "REAL_HOST",
@@ -158,7 +165,8 @@
           "ate_rmse_m": 0.3653,
           "ate_max_m": 0.7445,
           "rpe_trans_rmse_m": 0.2354,
-          "window_rmse_m": 0.5868
+          "window_rmse_m": 0.5868,
+          "alignment_prefix_poses": 110
         },
         "camera_degraded_only_120_140s": {
           "provenance": "REAL_HOST",
@@ -167,7 +175,8 @@
           "ate_rmse_m": 0.3148,
           "ate_max_m": 0.5538,
           "rpe_trans_rmse_m": 0.1057,
-          "window_rmse_m": 0.4399
+          "window_rmse_m": 0.4399,
+          "alignment_prefix_poses": 112
         },
         "lidar_and_camera_degraded_120_140s": {
           "provenance": "REAL_HOST",
@@ -176,7 +185,8 @@
           "ate_rmse_m": 0.3661,
           "ate_max_m": 0.8903,
           "rpe_trans_rmse_m": 0.2005,
-          "window_rmse_m": 0.6752
+          "window_rmse_m": 0.6752,
+          "alignment_prefix_poses": 111
         },
         "lidar_88pct_at_4p30m_vision_on": {
           "provenance": "REAL_HOST",
@@ -184,7 +194,8 @@
           "ate_rmse_m": 4.2331,
           "ate_max_m": 12.2886,
           "rpe_trans_rmse_m": 0.6485,
-          "window_rmse_m": 4.5529
+          "window_rmse_m": 4.5529,
+          "alignment_prefix_poses": 112
         },
         "lidar_88pct_at_4p30m_vision_off": {
           "provenance": "REAL_HOST",
@@ -192,7 +203,8 @@
           "ate_rmse_m": 4.182,
           "ate_max_m": 12.3339,
           "rpe_trans_rmse_m": 0.968,
-          "window_rmse_m": 4.5394
+          "window_rmse_m": 4.5394,
+          "alignment_prefix_poses": 73
         }
       },
       "degradation": {
@@ -216,5 +228,10 @@
     "There is no degraded + img_en=0 arm. Without it, 'vision saved it' and 'the LiDAR-inertial solution held' cannot be separated; the clean-only img_en=0 control does not answer it, because the visual term's contribution can differ between clean and degraded data, which is the very thing under test.",
     "The visual term is effectively inert on this data (clean 0.0771 m with vision vs 0.0761 m without), so these runs are closer to LiDAR-inertial runs than to LIVO runs. img_point_cov=100 against dept_err=0.02 / beam_err=0.05, indoor texture, and an uncalibrated camera-LiDAR time offset are all candidate causes and none has been ruled out."
   ],
-  "under_scaled_arms": "The arms injected at 0.35 m (the injector default) are retained for the record but must not be compared with the LiDAR-host plastic-bag runs, which use 4.30 m. At 0.35 m the sheet sits inside the near-field guard band of a voxel-map LIO and does not present convincing geometry; the resulting 'close to immune' reading was an artefact of that choice."
+  "under_scaled_arms": "The arms injected at 0.35 m (the injector default) are retained for the record but must not be compared with the LiDAR-host plastic-bag runs, which use 4.30 m. At 0.35 m the sheet sits inside the near-field guard band of a voxel-map LIO and does not present convincing geometry; the resulting 'close to immune' reading was an artefact of that choice.",
+  "open_items": [
+    "Per-frame visual contribution is not logged: no count of selected visual points, no valid photometric residual count, no state delta per update. Without them the visual term's role cannot be attributed from the outside.",
+    "Camera-LiDAR calibration has not been verified against the images; only the calibration file was copied.",
+    "img_point_cov and dept_err have different units, residual spaces and normalisations, so their numeric comparison is not a weight ratio and must not be used as one."
+  ]
 }
