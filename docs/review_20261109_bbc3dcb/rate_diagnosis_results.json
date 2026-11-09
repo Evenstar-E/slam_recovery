@@ -222,7 +222,7 @@
     "note": "sampled every 2 s; cpu = utime+stime deltas of fastlivo_mapping"
   },
   "judgement": {
-    "verdict": "CONTENTION_SUSPECTED",
+    "verdict": "CONTENTION_WEAKENED",
     "reason": "the host skipped publications while its inputs were continuous; load average was 258.1 against 128 cores, so the host was CPU-starved rather than missing data -- candidate only; the controlled rerun did not change the pattern",
     "input_holes_detected": false,
     "odom_stretch_detected": true,
@@ -252,7 +252,7 @@
     ],
     "original_verdict": "SCHEDULING_CONTENTION",
     "causal_status": "SUSPECTED",
-    "controlled_result": "7fe4c64: with the full prefix and the same input, pinning to 8 idle cores (load 102.4 vs 291.6) leaves the slow pattern bit-identical; contention is rejected and the publication change follows the injected content",
+    "controlled_result": "7fe4c64: full prefix, pinning to 8 idle cores (load 102.4 vs 291.6) left the slow-interval boolean mask (d>0.100 s) identical. The resource intervention did not remove the pattern; both runs had resource waits, so this weakens but does not exclude every scheduling effect. Mechanism UNKNOWN; onset correlation is not a content-causation proof (same clip, no clean/unfiltered control).",
     "unknown": [
       "runnable wait time",
       "IO/synchronisation blocking",
