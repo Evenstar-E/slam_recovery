@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import hashlib
 import sys
 import time
 
@@ -69,6 +70,15 @@ MAX_KF_POINTS = 15000
 NEAR_DT = 0.020
 MAX_GAP = 0.075
 EXTRAP_FRAMES = 5
+
+def _sha256(path: str) -> str:
+    """Content hash of an input bag: a path or an ATE is not an identity."""
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
 
 DT = np.dtype({
     "names": ["x", "y", "z", "intensity", "time", "ring"],
@@ -558,6 +568,9 @@ def main():
     node = OnlineRecoveryTransactionNode(confirmation_margin_sec=2.0, voxel_size_m=VOXEL, holdout_stride=5)
     node.committed_map_points = [ref_pts] if len(ref_pts) else []
     node.scan_buffer_body = {i: k["pts"] for i, k in enumerate(quar)}
+    # step_frame() is bypassed by this replay, so the timestamps the segment-boundary bound
+    # scales by must be supplied explicitly; without them every gap is judged against 0.5 m.
+    node._kf_timestamps = {i: int(k["ts"] * 1e9) for i, k in enumerate(quar)}
     node.tx_mgr = TrustedMapTransactionManager(confirmation_margin_ns=int(2.0e9))
     node.tx_mgr.trigger_quarantine(
         int(ONSET_REL * 1e9), int((ONSET_REL + 2.0) * 1e9),
@@ -586,6 +599,7 @@ def main():
     node_good = OnlineRecoveryTransactionNode(confirmation_margin_sec=2.0, voxel_size_m=VOXEL, holdout_stride=5)
     node_good.committed_map_points = [ref_pts] if len(ref_pts) else []
     node_good.scan_buffer_body = {i: k["pts"] for i, k in enumerate(quar)}
+    node_good._kf_timestamps = {i: int(k["ts"] * 1e9) for i, k in enumerate(quar)}
     node_good.tx_mgr = TrustedMapTransactionManager(confirmation_margin_ns=int(2.0e9))
     node_good.tx_mgr.trigger_quarantine(
         int(ONSET_REL * 1e9), int((ONSET_REL + 2.0) * 1e9),
@@ -731,6 +745,18 @@ def main():
             "injected_scans": DEFAULT_INJ_SCANS, "injected_poses": DEFAULT_INJ_POSES,
             "clean_scans_proxy_only": DEFAULT_CLN_SCANS, "clean_poses_proxy_only": DEFAULT_CLN_POSES,
             "gt_trajectory": DEFAULT_GT,
+        },
+        # Provenance chain: the scan/pose pair is identified by content, not by a filename.
+        # A healthy-prefix ATE cannot distinguish two injection distances because that prefix is
+        # identical in both runs.
+        "inputs_sha256": {
+            role: _sha256(path)
+            for role, path in (
+                ("injected_scans", DEFAULT_INJ_SCANS),
+                ("injected_poses", DEFAULT_INJ_POSES),
+                ("clean_scans_proxy_only", DEFAULT_CLN_SCANS),
+                ("clean_poses_proxy_only", DEFAULT_CLN_POSES),
+            )
         },
         "pairing": {"injected": inj_stats, "clean": cln_stats,
                     "near_dt_sec": NEAR_DT, "max_interp_gap_sec": MAX_GAP},
