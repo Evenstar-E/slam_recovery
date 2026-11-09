@@ -531,7 +531,8 @@
     "C_good attribution: the clean-scan control at the same reference scores median 16.2, so most of NIS 18.07 is the reference/alignment floor, not the un-stripped occluder; filtering the 4.0-4.6 m shell does not reduce it.",
     "C_good attribution, gate protocol: clean control 14.90 vs raw 15.26 (the statistic is insensitive to the occluder); oracle sector removal 25.05 (fewer points, worse fit); budget 2400 gives 12.05, still >> 2.5. The reference/alignment construction dominates; no single cause.",
     "C_good attribution: at 600 reference points the clean control is 18.75 vs raw 20.42; at 4000 it is 6.51 vs 7.72. The reference construction dominates; cap alone and occluder alone are both insufficient explanations.",
-    "The arm distance fields in this manifest are the 120k stride surface. A voxel-surface rerun (branch exp/four-arm, 762b533) gives 0.2969/0.0029; see voxel_surface_check."
+    "The arm distance fields in this manifest are the 120k stride surface. A voxel-surface rerun (branch exp/four-arm, 762b533) gives 0.2969/0.0029; see voxel_surface_check.",
+    "Attribution under the ns boundary: clean control 14.70 vs raw 15.83 at 600, and 6.81/8.03 at 4000; the reference construction dominates, no single cause."
   ],
   "evidence_status_scope": "evidence_status describes the paired-benefit term only; the holdout-NIS term is reported separately as holdout_nis, and accepted=False means the candidate did not enter Mode 2.",
   "time_bases": {
@@ -567,48 +568,43 @@
   },
   "good_candidate_attribution": {
     "probe": "docs/review_20261109_4598fb7/probe_c_good_attribution.py",
-    "statistic": "fixed frame set: gate committable keys (259), every 5th (52), mean",
+    "boundary": "integer nanoseconds (frozen M0, docs/milestone_m0_keys.json)",
+    "statistic": "fixed frame set: gate committable keys, every 5th, mean",
     "gate_path_reproduced": {
-      "committable": 259,
-      "holdout": 52,
-      "gate_holdout_nis_1500_ref": 18.0694
+      "committable": 252,
+      "holdout": 51,
+      "gate_holdout_nis_1500_ref": 16.0452
     },
     "query_population_note": "raw scan vs sector-removed scan vs clean scan are different point sets; differences mix observation and query sampling and are not a controlled causal attribution",
     "oracle_removal": "azimuth <= 2.3876 rad removed only inside the injection window (88% of the circle)",
     "sensitivity_at_600": {
-      "raw": 20.421,
-      "oracle": 19.498,
-      "clean": 18.749
+      "raw": 15.828,
+      "oracle": 14.823,
+      "clean": 14.698
     },
     "budget_sweep_means": {
       "600": {
-        "raw": 20.421,
-        "oracle": 19.498,
-        "clean": 18.749
+        "raw": 15.828,
+        "oracle": 14.823,
+        "clean": 14.698
       },
       "1200": {
-        "raw": 13.802,
-        "oracle": 12.582,
-        "clean": 11.999
+        "raw": 13.084,
+        "oracle": 12.053,
+        "clean": 11.89
       },
       "2400": {
-        "raw": 10.801,
-        "oracle": 9.184,
-        "clean": 8.914
+        "raw": 10.658,
+        "oracle": 9.535,
+        "clean": 9.352
       },
       "4000": {
-        "raw": 7.717,
-        "oracle": 6.617,
-        "clean": 6.506
+        "raw": 8.03,
+        "oracle": 6.935,
+        "clean": 6.814
       }
     },
-    "actual_ref_points": {
-      "600": 600,
-      "1200": 1200,
-      "2400": 2400,
-      "4000": 4000
-    },
-    "reading": "At the gate's 600-point budget the clean-scan control scores 18.75 against the raw candidate's 20.42, so the gate's 18.07 is dominated by the reference scale; the occluder adds about 1.7 NIS. At 4000 points the clean control is still 6.51 and raw 7.72, so raising the cap does not make the statistic usable either: the blocking factor is the reference/alignment construction, not the cap and not the occluder. The query populations differ between variants (raw, sector-removed, clean), so this is a sensitivity, not a pure occlusion effect."
+    "reading": "Under the ns boundary the gate construction gives 252 committable / 51 holdout and NIS 16.05 (the archived 18.07 came from the earlier float boundary). At 600 reference points the clean-scan control scores 14.70 against raw 15.83, so the scale is set by the reference; the occluder adds about 1.1. At 4000 points clean is still 6.81, far above 2.5: raising the cap does not make the statistic usable. The reference/alignment construction remains the blocker; query populations differ across variants, so this is a sensitivity, not a pure occlusion effect."
   },
   "voxel_surface_check": {
     "source_commit": "762b533 (branch exp/four-arm, pushed for provenance)",

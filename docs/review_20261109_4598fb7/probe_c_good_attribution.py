@@ -61,9 +61,9 @@ def main() -> None:
     inj, _ = pair_keyframes(DEFAULT_INJ_SCANS, DEFAULT_INJ_POSES, False)
     cln, _ = pair_keyframes(DEFAULT_CLN_SCANS, DEFAULT_CLN_POSES, False)
     _, _, ev = detect_onset(DEFAULT_CLN_SCANS, DEFAULT_INJ_SCANS)
-    onset_abs, end_abs = ev["start_abs_sec"], ev["end_abs_sec"]
-    pre = [k for k in inj if k["ts"] < onset_abs]
-    quar = [k for k in inj if k["ts"] >= onset_abs]
+    onset_ns, end_ns = ev["start_abs_ns"], ev["end_abs_ns"]
+    pre = [k for k in inj if k["ts_ns"] < onset_ns]
+    quar = [k for k in inj if k["ts_ns"] >= onset_ns]
 
     # Frozen reference at the four-arm construction: 4000 points, not the 1500 scoring cap.
     ref_full = np.vstack([world_points(k) for k in pre])
@@ -110,7 +110,7 @@ def main() -> None:
         if tag == "raw":
             return k["pts"]
         if tag == "oracle":
-            if onset_abs <= k["ts"] <= end_abs:
+            if onset_ns <= k["ts_ns"] <= end_ns:
                 az = np.arctan2(k["pts"][:, 1], k["pts"][:, 0])
                 return k["pts"][az > az_threshold]
             return k["pts"]           # healthy frame: untouched
@@ -142,7 +142,7 @@ def main() -> None:
         "query_population_note": ("raw scan vs sector-removed scan vs clean scan are different point "
                                   "sets; differences mix observation and query sampling and are not a "
                                   "controlled causal attribution"),
-        "injection_window_abs": {"start": onset_abs, "end": end_abs},
+        "injection_window_ns": {"start": onset_ns, "end": end_ns},
         "oracle_removal": (f"azimuth <= {az_threshold:.4f} rad removed only inside the injection "
                            f"window ({OCCLUSION_FRACTION:.0%} of the circle)"),
         "gate_path": {
