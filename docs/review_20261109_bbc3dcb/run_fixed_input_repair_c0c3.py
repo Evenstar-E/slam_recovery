@@ -110,6 +110,15 @@ def load_scan_ns(path, src_sha):
     return arr
 
 
+def fields_of(msg):
+    """Field table as a comparable string (name@offset:datatype, in message order)."""
+    return ",".join(f"{f.name}@{f.offset}:{f.datatype}" for f in msg.fields)
+
+
+def layout_of(msg):
+    return f"point_step={msg.point_step} fields=" + fields_of(msg)
+
+
 def oracle_bag_mask(body_xyz):
     """Returns the injector's sheet by its own geometry: azimuth sector <= -pi + 2*pi*0.88, and a
     range consistent with the tilted plane n^T p = 4.30.  Nothing here looks at the clean bag."""
@@ -397,12 +406,28 @@ def filter_audit(verify_bag=FILTERED_BAG):
            "per_frame": [], "verify": None}
     idx_parts, offs, nss = [], [0], []
 
+    # Read the output bag into an ns index first: joining by sequence number assumes the two
+    # bags have the same frames in the same order, which is exactly what this check is for.
     ver = None
+    ver_frames = None
     if verify_bag and os.path.exists(verify_bag):
-        ver = V.Reader(verify_bag)
-        ver.open()
-        ver_msgs = ver.messages(connections=[c for c in ver.connections
-                                             if c.topic == V.SCAN_TOPIC])
+        ver_frames = {}
+        with V.Reader(verify_bag) as vr:
+            vconns = [c for c in vr.connections if c.topic == V.SCAN_TOPIC]
+            for vc, _vt, vraw in vr.messages(connections=vconns):
+                vm = V.TYPESTORE.deserialize_ros1(vraw, vc.msgtype)
+                vbuf = np.asarray(vm.data, dtype=np.uint8)
+                vrows = vbuf.reshape(-1, int(vm.point_step))
+                vns = int(vm.header.stamp.sec) * 10**9 + int(vm.header.stamp.nanosec)
+                if vns in ver_frames:
+                    ver_frames[vns]["duplicate"] = True
+                ver_frames[vns] = {
+                    "n": int(len(vrows)),
+                    "sha256": hashlib.sha256(vrows.tobytes()).hexdigest(),
+                    "point_step": int(vm.point_step),
+                    "fields": fields_of(vm),
+                    "frame_id": str(vm.header.frame_id),
+                }
     try:
         with V.Reader(INJ_SCANS) as r:
             conns = [c for c in r.connections if c.topic == V.SCAN_TOPIC]
@@ -422,37 +447,51 @@ def filter_audit(verify_bag=FILTERED_BAG):
                        # the oracle count is taken here too, on the same full-resolution frame,
                        # so neither C2 nor C3 counts points off a subsampled array
                        "oracle_removed": int(oracle_bag_mask(pts[:, :3]).sum())}
-                if ver is not None:
-                    try:
-                        _vc, _vt, vraw = next(ver_msgs)
-                        vm = V.TYPESTORE.deserialize_ros1(vraw, _vc.msgtype)
-                        vbuf = np.asarray(vm.data, dtype=np.uint8)
-                        vrows = vbuf.reshape(-1, int(vm.point_step))
-                        rec["output_sha256"] = hashlib.sha256(vrows.tobytes()).hexdigest()
-                        rec["output_n"] = int(len(vrows))
-                        rec["binds"] = (rec["output_sha256"] == rec["kept_rows_sha256"]
-                                        and rec["output_n"] == rec["n_kept"])
-                    except StopIteration:
-                        rec["binds"] = None
+                if ver_frames is not None:
+                    hit = ver_frames.pop(ns, None)
+                    if hit is None:
+                        rec["output_sha256"] = None
+                        rec["output_n"] = None
+                        rec["binds"] = False
+                        rec["bind_error"] = "output frame with this header ns is missing"
+                    else:
+                        rec["output_sha256"] = hit["sha256"]
+                        rec["output_n"] = hit["n"]
+                        rec["layout_match"] = (hit["point_step"] == step
+                                               and hit["fields"] == fields_of(m))
+                        rec["frame_id_match"] = hit["frame_id"] == str(m.header.frame_id)
+                        rec["binds"] = (hit["sha256"] == rec["kept_rows_sha256"]
+                                        and hit["n"] == rec["n_kept"]
+                                        and rec["layout_match"])
                 out["per_frame"].append(rec)
                 idx_parts.append(idx.astype(np.int64))
                 offs.append(offs[-1] + len(idx))
                 nss.append(ns)
     finally:
-        if ver is not None:
-            ver.close()
+        pass
 
     kept = np.concatenate(idx_parts) if idx_parts else np.zeros(0, np.int64)
     out["global_keep_mask_sha256"] = hashlib.sha256(kept.astype("<i8").tobytes()).hexdigest()
     out["points_in"] = int(sum(f["n"] for f in out["per_frame"]))
     out["points_kept"] = int(len(kept))
     out["frames"] = len(out["per_frame"])
-    if ver is not None:
+    if ver_frames is not None:
         bound = [f.get("binds") for f in out["per_frame"]]
-        out["verify"] = {"bag": verify_bag, "bag_sha256": V._sha_file(verify_bag),
-                         "frames_compared": sum(1 for b in bound if b is not None),
-                         "frames_bound": sum(1 for b in bound if b is True),
-                         "frames_mismatched": sum(1 for b in bound if b is False)}
+        out["verify"] = {
+            "bag": verify_bag, "bag_sha256": V._sha_file(verify_bag),
+            "join_key": "exact header.stamp nanoseconds, not sequence number",
+            "frames_in_source": len(out["per_frame"]),
+            "frames_in_output": len(ver_frames) + sum(1 for b in bound if b is not None),
+            "frames_bound": sum(1 for b in bound if b is True),
+            "frames_mismatched": sum(1 for b in bound if b is False),
+            "frames_missing_from_output": sum(1 for b in bound if b is None),
+            "frames_extra_in_output": len(ver_frames),
+            "extra_ns": sorted(ver_frames)[:20],
+            "layout_mismatched": sum(1 for f in out["per_frame"]
+                                     if f.get("layout_match") is False),
+            "frame_id_mismatched": sum(1 for f in out["per_frame"]
+                                       if f.get("frame_id_match") is False),
+        }
     os.makedirs(V.CACHE, exist_ok=True)
     np.savez(AUDIT_NPZ, ns=np.asarray(nss, dtype=np.int64),
              offsets=np.asarray(offs, dtype=np.int64), keep_idx=kept)

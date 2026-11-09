@@ -119,17 +119,27 @@ C1/C2 有 12 帧、C3 有 46 帧无合格位姿，全部单列，不从分母静
 `node.log`、`play.log`、`ros_params.yaml`（实际加载的 ROS 参数 dump）、`receipt.json`（输入/配置/binary/
 脚本 hash、退出码、输出 hash、消息数、首末 stamp）。
 
-- **清理**：`trap cleanup EXIT`，按 PID 逆序 TERM→KILL，只杀自己启动的进程。
-- **失败判据**：master 60 s 未就绪、node 未启动/中途死亡、`rosbag play` 非 0、输出包缺失/为空/
-  `/aft_mapped_to_init` 消息数为 0，全部 `exit` 非 0，不再以 `stat` 成功结尾。
+- **启动前快照**：脚本/输入包/两份配置/binary 的 sha256 与 revision 在**启动前**写入
+  `pre_run.json`；结束时重新哈希并报告 `sources_changed_during_run`，不是退出时才去哈希。
+- **清理**：`trap ... EXIT` + `INT`/`TERM` 转成正常退出，`setsid` 启动每个进程，清理时按
+  **进程组**（`kill -- -PID`）逆序 TERM→KILL，roscore 的 rosmaster/rosout 子进程一并回收。
+- **退出码由输出判据决定**：`output_check.json` 要求包存在、非空、可解析、
+  `/aft_mapped_to_init` 消息数 >0、首末 stamp 有限且单调；recorder 非 0 或 drain 期间宿主退出同样判失败；
+  receipt 写失败也返回非 0。`STATUS=OK` 与 `exit 0` 绑定，不会再出现"shell 成功 / receipt 失败"。
+- **终止分类**：`PLANNED_KILL_AFTER_DRAIN` / `UNEXPECTED_NODE_DEATH` / `UNEXPECTED_PLAY_EXIT` /
+  `PLANNED_TEST_ABORT`，与失败原因分开记录。
 - **不覆盖**：输出路径已存在则失败，除非显式 `--overwrite`。
-- **mock 失败回归** `test_fl_run_cleanup.sh`：`FL_TEST_FAIL_AFTER_START=1` 让脚本在三个进程都起来后
-  失败，实测 `exit=3`、master 端口关闭、receipt 写 `FAIL`。
+- **mock 失败回归** `test_fl_run_cleanup.sh` 现在**断言**而非打印：runner 退出码 == 3、
+  master 端口关闭、receipt `status=FAIL` 且有 reason/termination、**每个受管 PID 都已消失**；
+  任一不满足即非 0 退出。实测 `CLEANUP TEST PASSED`。
 - 已用硬化后的运行器跑了一条 15 s **smoke**（`fixed_input_repair_smoke_receipt.json`，
   **SMOKE_NOT_FOR_NUMBERS**）：status `COMPLETE`，`rosbag_play=0`、`rosbag_record=0`、
   `fastlivo_node=137`（我们主动 KILL），197 条 odometry。
 - 归档 C3 的**实跑**发生在运行器入库前，故 `run_receipt.status = RETROSPECTIVE_PARTIAL`，
-  缺 `process exit codes`、`ROS parameter dump`、`wall-clock start` 三项，已显式列出。
+  缺 `process exit codes`、`ROS parameter dump`、`wall-clock start` 三项，已显式列出；
+  新的 smoke 不能补旧记录，只能作执行链的证据。
+- 过滤审计改为**按精确 header ns join**（不再按序号），并核对 `point_step`/字段表/`frame_id`：
+  源 598 帧、输出 598 帧、**598 绑定、0 不匹配、0 缺失、0 多余、0 布局不一致**。
 
 ## 8. 结论（有界指标下，读法收窄）
 
@@ -138,11 +148,43 @@ C1/C2 有 12 帧、C3 有 46 帧无合格位姿，全部单列，不从分母静
 3. 真实链路 C3 patch unsupported 0.093、覆盖 0.985；**接近但未达到**上限，代价 46 帧缺位姿。
 4. 有界指标能判坏 0.5 m / 5° 的错误候选，因此上面的数字不是"无界残差为 0"那种空转。
 
-## 9. 复现
+## 9. M3：同区域净正确几何（Q 对 C3）
+
+协议见主树 `docs/MILESTONE_fixed_input_repair.md` @ `8704370`；脚本 `run_m3_same_region.py`；
+区域导出 `m3_region_export.json`（在任何指标之前写出）；结果 `m3_same_region_results.json`。
+
+**区域**："两臂共同支撑" 实现为**可观测性**：干净代理面中，距 Q 的任一 pose ≤10 m **且** 距 C3 的任一
+pose ≤10 m 的点。若按字面理解为"被两臂地图同时支持的点"，两臂覆盖率都会**恒为 100%**，所以不采用；
+该退化值也一并报出。区域规模 5 m / 15 m 的敏感性见导出文件。
+
+区域：**5 191 379** 个代理点，index sha256 `df3ee0d5…`；Q key 132 帧、C3 key 446 帧的 ns 列表 hash 亦在导出文件中。
+
+| 项 | Q（仅隔离） | C3（真实修复） |
+|---|---:|---:|
+| 写入帧 / 声明帧 | 132 / 132 | **400 / 446** |
+| 缺失帧 ID | 无 | 46 个（全部列出） |
+| 地图点数 | 33 000 | 100 000 |
+| 覆盖代理点（NN ≤0.5 m） | 4 967 999 | 5 160 307 |
+| 覆盖率（区域内） | 0.9570 | **0.9940** |
+| patch unsupported 点数 | 1 874 | 9 309 |
+| patch unsupported 比例 | 0.0568 | 0.0931 |
+| patch 中位 | 0.0058 | 0.0069 |
+
+**C3 相对 Q 新增**（第 3 项，两侧绝对计数）：
+
+- 新覆盖代理点 **205 391**（占区域 0.0396）；
+- Q 在 0.5 m 内没有的地图点 **15 112**，其中 **supported 10 794 / unsupported 4 318**（71.4% 支持）。
+
+读法注意：两臂地图点数不同（33k 对 100k），所以 unsupported 的**绝对数**不能直接比；可比的是
+"C3 新增的点里有多少是 supported"（71.4%）与"新增了多少区域覆盖"（3.96 pp）。
+代理面是干净跑地图、不是 GT，因此这只是**同区域条件比较**，不是部署闭环，也不是独立 GT 收益。
+
+## 10. 复现
 
 ```bash
 python3 -B docs/review_20261109_bbc3dcb/run_fixed_input_repair_c0c3.py filter-audit
 python3 -B docs/review_20261109_bbc3dcb/run_fixed_input_repair_c0c3.py measure
+python3 -B docs/review_20261109_bbc3dcb/run_m3_same_region.py
 bash docs/review_20261109_bbc3dcb/fl_run_isolated.sh <bag> <new-out> 0.5 60
 bash docs/review_20261109_bbc3dcb/test_fl_run_cleanup.sh
 ```
