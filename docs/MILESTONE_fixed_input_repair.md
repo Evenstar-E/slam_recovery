@@ -317,6 +317,17 @@ exactly by a separate implementation). Serial reductions plus `taskset 0-7`, `ni
 The remaining candidates are the 5 kHz wall-clock frame grouping (S3) and the IMU initialisation
 window it determines (S4); they are to be tested as two separate single-factor controls.
 
+**T3a (deterministic grouping)**: switching to an `AsyncSpinner(1)` with a blocking condition
+variable (20 ms fallback, no busy-wait), everything else as in T2, still splits: build A gave two
+GOOD runs, while the same build B run four times gave BAD/BAD/GOOD/GOOD. The executable sha was
+identical across builds because the behaviour lives in `liblaser_mapping.so`; both hashes are now
+recorded. Single-factor controls for reduction order, scheduling/load and wall-clock phase are
+exhausted, and the host crosses modes on repeated identical runs at roughly half rate (magnitude
+only). Single-run factor comparison on room_02 is therefore invalid and the four-cell answer stays
+UNKNOWN. The next step is a bounded applicability check, not another mechanism exclusion: run the
+same build four times on the hall_01 clean sequence; if it also crosses, the instability is
+host/config-wide, and if it does not, room_02 is a sequence-specific degenerate case.
+
 **Initialisation proxy is negative**: the first-pose delay (first `/aft_mapped_to_init` minus the
 first LiDAR scan, read from the 16 existing output bags) does not separate modes — GOOD delays are
 1.864/4.196/5.462 s, BAD 1.397–3.130 s, and no threshold separates them: 1.864 s is a GOOD delay
