@@ -168,5 +168,10 @@
         }
       }
     }
-  }
+  },
+  "known_limitations": [
+    "The injected sheet sits at 0.35 m (injector default). Every other use of this injector in the repository -- run_identifiability_and_transformer_real_bags.py -- passes bag_distance_m=4.30, where the sheet reads as an ordinary wall rather than a near-field occluder. The FAST-LIVO2 arms are therefore NOT directly comparable with the LiDAR-host plastic-bag runs in this repository, and the 'close to immune' reading has to be re-tested at 4.30 m before it is used.",
+    "There is no degraded + img_en=0 arm. Without it, 'vision saved it' and 'the LiDAR-inertial solution held' cannot be separated; the clean-only img_en=0 control does not answer it, because the visual term's contribution can differ between clean and degraded data, which is the very thing under test.",
+    "The visual term is effectively inert on this data (clean 0.0771 m with vision vs 0.0761 m without), so these runs are closer to LiDAR-inertial runs than to LIVO runs. img_point_cov=100 against dept_err=0.02 / beam_err=0.05, indoor texture, and an uncalibrated camera-LiDAR time offset are all candidate causes and none has been ruled out."
+  ]
 }
