@@ -180,11 +180,18 @@ def main():
         verdict = "INPUT_HOLES"
         why = ("the input streams themselves have gaps longer than 1.5x their median inside the "
                "clip")
-    elif load_med is not None and load_med >= (os.cpu_count() or 1):
-        verdict = "SCHEDULING_CONTENTION"
+    elif load_med is not None and load_med >= (os.cpu_count() or 1) and od_slow:
+        # The controlled rerun (7fe4c64) keeps the slow pattern bit-identical at a third of the
+        # load, so contention is not the cause. Load average also counts uninterruptible tasks and
+        # is not a runnable-wait measurement; without a controlled contrast this is a correlation.
+        verdict = "CONTENTION_SUSPECTED"
         why = (f"the host skipped publications while its inputs were continuous; load average was "
-               f"{load_med} against {os.cpu_count()} cores, so the host was CPU-starved rather "
-               f"than missing data")
+               f"{load_med} against {os.cpu_count()} cores. A controlled same-prefix rerun did not "
+               f"change the pattern, so contention is a candidate only")
+    elif load_med is not None and load_med >= (os.cpu_count() or 1):
+        verdict = "RESOURCE_LOAD_HIGH_NO_PUBLICATION_STRETCH"
+        why = (f"load average was {load_med} against {os.cpu_count()} cores but the odometry "
+               f"cadence did not stretch")
     elif od_slow and not holes_input:
         verdict = "INTERNAL (input continuous, host publishes slower)"
         why = ("the LiDAR and IMU arrive at their normal cadence while /aft_mapped_to_init "
