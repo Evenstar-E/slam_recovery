@@ -305,6 +305,52 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             "retry", {k: poses[k] for k in range(8, 20)}, np.eye(6) * 100, incumbent, np.eye(4)
         )
 
+    def test_pending_set_survives_batch_retries(self) -> None:
+        """Committing part of the deferred set must not drop the rest of it."""
+        mgr = TrustedMapTransactionManager(confirmation_margin_ns=0)
+        mgr.trigger_quarantine(
+            estimated_onset_ns=int(1e9),
+            current_ns=int(2e9),
+            weak_direction_6d=np.array([0, 0, 0, 1, 0, 0]),
+            info_before_6x6=np.eye(6) * 2,
+            propagated_cov_norm=1.2,
+        )
+
+        def cand(committed, deferred, version):
+            return CandidateMap(
+                candidate_id=f"batch_{min(committed)}_{len(committed)}",
+                parent_map_version=version,
+                repaired_poses={int(k): np.eye(4) for k in committed},
+                info_after_6x6=np.eye(6) * 100,
+                cov_after_6x6=np.eye(6) * 0.01,
+                holdout_nis=0.0,
+                paired_benefit_approved=True,
+                wilson_lower_bound=0.9,
+                reentry_pos_jump_m=0.0,
+                verified_pose_keys=frozenset(int(k) for k in committed),
+                deferred_pose_keys=tuple(int(k) for k in deferred),
+            )
+
+        r1 = mgr.validate_and_resolve(cand(range(8), range(8, 20), mgr.trusted_version))
+        self.assertTrue(r1.accepted)
+        self.assertEqual(
+            sorted(int(k) for k in mgr.active_quarantine.raw_frame_refs), list(range(8, 20))
+        )
+
+        # Retry only four of the twelve: the other eight must stay pending.
+        r2 = mgr.validate_and_resolve(cand(range(8, 12), (), mgr.trusted_version))
+        self.assertTrue(r2.accepted)
+        self.assertNotEqual(mgr.state, RecoveryState.HEALTHY)
+        self.assertEqual(
+            sorted(int(k) for k in mgr.active_quarantine.raw_frame_refs), list(range(12, 20))
+        )
+
+        # Finish the set: now the quarantine can close.
+        r3 = mgr.validate_and_resolve(cand(range(12, 20), (), mgr.trusted_version))
+        self.assertTrue(r3.accepted)
+        self.assertEqual(mgr.state, RecoveryState.HEALTHY)
+        self.assertIsNone(mgr.active_quarantine)
+
     def test_each_segment_boundary_is_checked(self) -> None:
         """A 1.5 m tangential shift after a gap has zero point-to-plane residual but is a jump."""
         cloud = _plane_cloud()

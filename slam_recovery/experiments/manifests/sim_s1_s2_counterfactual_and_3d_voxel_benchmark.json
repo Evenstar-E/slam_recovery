@@ -177,6 +177,8 @@
           ],
           "segment_boundary_jumps_m": [],
           "segment_boundary_ok": true,
+          "first_run_jump_m": 0.007063119282843638,
+          "boundary_basis": "BOUND_ONLY",
           "first_deferred_reason": "no_reference_support"
         },
         "gt_nis_analytic_mean": 0.005302
@@ -232,6 +234,8 @@
           ],
           "segment_boundary_jumps_m": [],
           "segment_boundary_ok": true,
+          "first_run_jump_m": 0.007200713914068313,
+          "boundary_basis": "BOUND_ONLY",
           "first_deferred_reason": "no_reference_support"
         },
         "gt_nis_analytic_mean": 0.005272
@@ -287,6 +291,8 @@
           ],
           "segment_boundary_jumps_m": [],
           "segment_boundary_ok": true,
+          "first_run_jump_m": 0.008480263040338035,
+          "boundary_basis": "BOUND_ONLY",
           "first_deferred_reason": "no_reference_support"
         },
         "gt_nis_analytic_mean": 0.005594
@@ -342,6 +348,8 @@
           ],
           "segment_boundary_jumps_m": [],
           "segment_boundary_ok": true,
+          "first_run_jump_m": 0.0074500851482213,
+          "boundary_basis": "BOUND_ONLY",
           "first_deferred_reason": "no_reference_support"
         },
         "gt_nis_analytic_mean": 0.005437
@@ -397,6 +405,8 @@
           ],
           "segment_boundary_jumps_m": [],
           "segment_boundary_ok": true,
+          "first_run_jump_m": 0.007419211926453025,
+          "boundary_basis": "BOUND_ONLY",
           "first_deferred_reason": "no_reference_support"
         },
         "gt_nis_analytic_mean": 0.005431

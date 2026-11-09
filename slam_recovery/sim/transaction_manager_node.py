@@ -558,6 +558,17 @@ class OnlineRecoveryTransactionNode:
             boundary_jumps.append(jump)
             if jump > jump_bound + 2.0 * dt:
                 boundary_ok = False
+        # The first committed run is measured against the trusted anchor as well; the re-entry
+        # check above uses the candidate's boundary frame, which may not itself be committed.
+        first_run_jump: Optional[float] = None
+        if runs and reentry_anchor_pose is not None:
+            anchor_arr = np.asarray(reentry_anchor_pose, dtype=np.float64)
+            head = np.asarray(repaired_poses[runs[0][0]], dtype=np.float64)
+            if anchor_arr.shape == (4, 4) and head.shape == (4, 4):
+                first_run_jump = float(np.linalg.norm(head[:3, 3] - anchor_arr[:3, 3]))
+        # Without an independent relative-motion measurement the check is an elapsed-time speed
+        # envelope, not geometric continuity; say so rather than presenting it as verified.
+        boundary_basis = "BOUND_ONLY"
 
         holdout_kfs = [k for idx, k in enumerate(commit_keys) if idx % self.holdout_stride == 0]
         # Every committed frame already passed the support check, so no second filter is applied;
@@ -578,6 +589,8 @@ class OnlineRecoveryTransactionNode:
             "deferred_runs": self._contiguous_runs(deferred_keys),
             "segment_boundary_jumps_m": boundary_jumps,
             "segment_boundary_ok": boundary_ok,
+            "first_run_jump_m": first_run_jump,
+            "boundary_basis": boundary_basis,
             "first_deferred_reason": (
                 self._noncommittable_reason(
                     deferred_keys[0], reference_keys, incumbent_keys
@@ -639,6 +652,7 @@ class OnlineRecoveryTransactionNode:
             deferred_pose_keys=tuple(deferred_keys),
             boundary_continuity_ok=boundary_ok,
             boundary_jumps_m=boundary_jumps,
+            boundary_basis=boundary_basis,
             info_after_6x6=info_after,
             cov_after_6x6=cov_after,
             holdout_nis=mean_holdout_nis,

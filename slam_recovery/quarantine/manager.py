@@ -225,6 +225,7 @@ class TrustedMapTransactionManager:
             # just as clearly as a partial Mode 2 commit does.
             report.deferred_pose_keys = [int(k) for k in candidate.deferred_pose_keys]
             report.committed_pose_keys = []
+            report.boundary_basis = candidate.boundary_basis
 
         if report.mode == RecoveryMode.MODE2_ATOMIC_COMMIT and candidate is not None:
             if candidate.parent_map_version != self.trusted_version:
@@ -263,7 +264,20 @@ class TrustedMapTransactionManager:
             # next call fail with "No active quarantine segment to validate". Keep a segment that
             # resumes from the post-commit trusted map; only a full commit returns to HEALTHY.
             old_segment = self.active_quarantine
-            if candidate.deferred_pose_keys and old_segment is not None:
+            # The pending set is persistent, not "whatever this candidate happened to defer". A
+            # legal retry may commit four of the twelve deferred frames and defer none; ending the
+            # quarantine there would silently drop the other eight. pending = old - committed +
+            # newly deferred, and the quarantine ends only when it is empty.
+            old_pending = set()
+            if old_segment is not None:
+                for ref in old_segment.raw_frame_refs:
+                    try:
+                        old_pending.add(int(ref))
+                    except (TypeError, ValueError):
+                        continue
+            committed_keys = {int(k) for k in candidate.repaired_poses.keys()}
+            pending = (old_pending | {int(k) for k in candidate.deferred_pose_keys}) - committed_keys
+            if pending and old_segment is not None:
                 self.provisional_queue.clear()
                 self.active_quarantine = QuarantineSegment(
                     segment_id=f"{old_segment.segment_id}:deferred",
@@ -273,7 +287,7 @@ class TrustedMapTransactionManager:
                     weak_direction_6d=np.asarray(old_segment.weak_direction_6d, dtype=np.float64).copy(),
                     info_before_6x6=np.asarray(old_segment.info_before_6x6, dtype=np.float64).copy(),
                     propagated_cov_norm=float(old_segment.propagated_cov_norm),
-                    raw_frame_refs=[str(k) for k in candidate.deferred_pose_keys],
+                    raw_frame_refs=[str(k) for k in sorted(pending)],
                 )
                 self.state = RecoveryState.WAITING_FOR_EVIDENCE
             else:

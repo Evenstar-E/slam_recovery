@@ -200,6 +200,11 @@ class CandidateMap:
     # the first keyframe says nothing about a segment that begins 1.5 m away after a gap.
     boundary_continuity_ok: Optional[bool] = None
     boundary_jumps_m: Optional[List[float]] = None
+    # How the boundary was judged. "BOUND_ONLY" means an elapsed-time speed envelope, not an
+    # independent relative-motion measurement; a legitimate displacement and a wrong offset are
+    # indistinguishable in that regime, and the gate records the weaker basis rather than
+    # presenting it as continuity evidence.
+    boundary_basis: str = ""
 
 
 @dataclass
@@ -225,6 +230,8 @@ class ValidationReport:
     committed_pose_keys: Optional[List[int]] = None
     deferred_pose_keys: Optional[List[int]] = None
     partial_commit: bool = False
+    # See CandidateMap.boundary_basis; empty when the gate never reached a candidate.
+    boundary_basis: str = ""
 
 
 @dataclass(frozen=True)

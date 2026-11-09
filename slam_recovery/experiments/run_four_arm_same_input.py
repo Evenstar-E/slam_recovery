@@ -609,7 +609,7 @@ def main():
         "why_it_matters": ("rescoring by position is only valid while admission is a contiguous "
                            "prefix; it is not any more"),
     }
-    print(f"[PAIRS] n={len(_pairs)} better={_per_frame['candidate_better_frames']} diff_med={_per_frame['diff_median']}")
+    print(f"[PAIRS] {_per_frame['status']}")
     good_diag = {
         "candidate_dict_size": len(good),
         "support_diagnostics": _sup,
