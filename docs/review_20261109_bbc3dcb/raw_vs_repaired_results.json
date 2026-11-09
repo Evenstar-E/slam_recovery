@@ -72,6 +72,13 @@
    "ate_full_alignment_diagnostic_m": 0.3185291881794998,
    "ate_full_alignment_max_m": 0.6951030220155734,
    "ate_frozen_prefix_protocol_m": 0.49184380829384977
+  },
+  "population": {
+   "frame_set": 400,
+   "frame_set_keys": 446,
+   "gt_matched": 252,
+   "gt": "/home/R26534/M2DGR/GT/hall_01.txt",
+   "note": "ATE is computed on the GT-matched subset, not on all frames"
   }
  },
  "frame_set": {

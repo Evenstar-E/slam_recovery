@@ -71,5 +71,11 @@
    "unsupported": 0.001772163009404415,
    "ate_full": -0.04498757148735544
   }
+ },
+ "reference": {
+  "surface": "full clean reference",
+  "points": 8490000,
+  "downsampled": false,
+  "note": "the cost-table coverage uses the untruncated clean reference; the four-arm table uses a 120k-point proxy (0.6038/0.9849). The two are different populations, not a correction."
  }
 }

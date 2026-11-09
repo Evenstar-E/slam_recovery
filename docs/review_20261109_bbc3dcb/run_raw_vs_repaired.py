@@ -210,6 +210,11 @@ def main():
 
     trajectory = {"R": _trajectory(host_poses, R_h, t_h),
                   "C3": _trajectory(c3_poses, R_c, t_c)}
+    trajectory["population"] = {
+        "frame_set": len(frames), "frame_set_keys": len(keys),
+        "gt_matched": trajectory["R"].get("gt_matched"),
+        "gt": "/home/R26534/M2DGR/GT/hall_01.txt",
+        "note": "ATE is computed on the GT-matched subset, not on all frames"}
 
     res = {
         "protocol": "same-frame raw/native vs repaired, fixed frame set",
