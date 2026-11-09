@@ -102,8 +102,8 @@ def main():
         "healthy": _agg([f for f in frames if not f["in_window"]]),
         "per_frame": frames,
         "reading": "kept_injected is the false-negative count: injected geometry that survives the "
-                   "filter. Those rows are mutually consistent on the sheet, so a small number of "
-                   "them can still steer registration.",
+                   "filter. Whether those rows steer registration is what the single-factor 2x2 "
+                   "tests; this audit asserts no causal effect.",
     }
     with open(RESULTS, "w", encoding="utf-8") as fh:
         json.dump(res, fh, indent=1)

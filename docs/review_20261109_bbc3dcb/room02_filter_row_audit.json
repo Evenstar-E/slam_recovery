@@ -18,8 +18,10 @@
   "kept_injected": 1265,
   "dropped_background": 23607,
   "dropped_injected": 9072678,
-  "false_negative_rate": 0.0010664126384650403,
+  "injected_present": 9073943,
+  "false_negative_rate": 0.0001394101770310878,
   "false_positive_rate": 0.019901030163038895,
+  "kept_injected_over_background_present": 0.0010664126384650403,
   "rows_raw": 10260163
  },
  "healthy": {
@@ -29,8 +31,10 @@
   "kept_injected": 0,
   "dropped_background": 919702,
   "dropped_injected": 0,
-  "false_negative_rate": 0.0,
+  "injected_present": 0,
+  "false_negative_rate": null,
   "false_positive_rate": 0.04469611325932563,
+  "kept_injected_over_background_present": 0.0,
   "rows_raw": 20576778
  },
  "per_frame": [
@@ -6624,5 +6628,5 @@
    "dropped_injected": 0
   }
  ],
- "reading": "kept_injected is the false-negative count: injected geometry that survives the filter. Those rows are mutually consistent on the sheet, so a small number of them can still steer registration."
+ "reading": "kept_injected is the false-negative count: injected geometry that survives the filter. Whether those rows steer registration is what the single-factor 2x2 tests; this audit asserts no causal effect."
 }
