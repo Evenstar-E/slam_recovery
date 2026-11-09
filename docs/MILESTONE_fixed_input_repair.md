@@ -307,6 +307,14 @@ ATE 0.69/1.93 m), so this is a continuum with two ends, not a binary bistability
 on this sequence can compare factors; the four-cell answer stays **UNKNOWN** until the variance is
 controlled.
 
+**Determinism controls T1/T2 (REAL_HOST)**: compiling the OpenMP reduction out (NO_MP=ON, new
+binary `6e0a3e57…`, old binary backed up) still leaves cell O split (GOOD 0.309 m / BAD 336.75 m;
+aligned first-pose 1.13 cm). Serial reductions plus `taskset 0-7`, `nice` and a quiet machine
+(load 52/128) shrink the aligned first-pose difference to 1.9 mm and the cell still splits (GOOD
+0.072 m / BAD 17.910 m). Float-reduction order and CPU scheduling/load are therefore not the seed.
+The remaining candidates are the 5 kHz wall-clock frame grouping (S3) and the IMU initialisation
+window it determines (S4); they are to be tested as two separate single-factor controls.
+
 **Initialisation proxy is negative**: the first-pose delay (first `/aft_mapped_to_init` minus the
 first LiDAR scan, read from the 16 existing output bags) does not separate modes — GOOD delays are
 1.864/4.196/5.462 s, BAD 1.397–3.130 s, and no threshold separates them: 1.864 s is a GOOD delay
