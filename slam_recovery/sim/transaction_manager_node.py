@@ -53,7 +53,16 @@ class OnlineRecoveryTransactionNode:
         min_paired_observations: int = 4,
         large_candidate_keyframe_threshold: int = 8,
         min_paired_observations_large_candidate: int = 8,
+        sigma_meas_m: float = 0.12,
     ) -> None:
+        # Point-to-plane noise scale used by every holdout/paired NIS in this node.
+        #
+        # NIS scales as 1/sigma^2, so this constant decides verdicts and must be calibrated, not
+        # guessed: on room_dark_02 the clean run scores 0.77-0.99 at sigma=0.25 but 3.35-4.30 at
+        # 0.12, i.e. at the old default the gate rejects *healthy* data. The default is kept for
+        # backward compatibility with the simulator; any real host must pass the value obtained by
+        # setting the clean run's NIS to 1 (sigma* = RMS of its point-to-plane residuals).
+        self.sigma_meas_m = float(sigma_meas_m)
         self.voxel_size_m = float(voxel_size_m)
         self.holdout_stride = int(holdout_stride)
         # Smallest sample size at which a unanimous frame-wise improvement still clears the
@@ -388,7 +397,7 @@ class OnlineRecoveryTransactionNode:
                 sink.append(
                     float(
                         compute_disjoint_holdout_point_to_plane_nis(
-                            ref_pts, pts_w, delta_pose_se3=np.eye(4), sigma_meas_m=0.12
+                            ref_pts, pts_w, delta_pose_se3=np.eye(4), sigma_meas_m=self.sigma_meas_m
                         )
                     )
                 )
@@ -531,7 +540,7 @@ class OnlineRecoveryTransactionNode:
             pts_b = self.scan_buffer_body[k]
             pts_w = (pts_b @ T_k[:3, :3].T) + T_k[:3, 3]
             nis_k = compute_disjoint_holdout_point_to_plane_nis(
-                train_world, pts_w, delta_pose_se3=np.eye(4), sigma_meas_m=0.12
+                train_world, pts_w, delta_pose_se3=np.eye(4), sigma_meas_m=self.sigma_meas_m
             )
             holdout_nis_list.append(nis_k)
             fim_k, _, _, _, _ = compute_6dof_point_to_plane_fim(

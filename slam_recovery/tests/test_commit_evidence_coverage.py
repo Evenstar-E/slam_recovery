@@ -218,6 +218,33 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             node.scan_buffer_body[0] = scan
             self.assertTrue(node._frame_has_reference_support(0, node.support_reference(), pose))
 
+    def test_sigma_is_a_parameter_not_a_constant(self) -> None:
+        """NIS scales as 1/sigma^2, so a host must be able to pass its calibrated value."""
+        cloud = _plane_cloud()
+        reports = {}
+        for sigma in (0.12, 0.24):
+            node = OnlineRecoveryTransactionNode(confirmation_margin_sec=0, sigma_meas_m=sigma)
+            node.committed_map_points = [cloud]
+            node.tx_mgr.trigger_quarantine(
+                int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6) * 2, 1.2
+            )
+            posed = cloud.copy()
+            posed[:, 2] += 0.05  # keep the scan inside the support radius, give it a residual
+            poses, incumbent = {}, {}
+            for k in range(8):
+                node.scan_buffer_body[k] = posed
+                poses[k] = np.eye(4)
+                incumbent[k] = np.eye(4)
+            reports[sigma] = node.evaluate_and_commit_candidate(
+                "sigma_probe",
+                poses,
+                aux_or_loop_info_6x6=np.eye(6) * 100,
+                incumbent_poses=incumbent,
+                reentry_anchor_pose=np.eye(4),
+            )
+        ratio = reports[0.12].holdout_nis / reports[0.24].holdout_nis
+        self.assertAlmostEqual(ratio, 4.0, places=6)
+
     def test_manager_refuses_a_candidate_with_unverified_frames(self) -> None:
         """Defence in depth: the manager enforces the invariant even for direct callers."""
         mgr = TrustedMapTransactionManager(confirmation_margin_ns=0)
