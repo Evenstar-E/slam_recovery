@@ -300,8 +300,10 @@ controlled.
 
 **Initialisation proxy is negative**: the first-pose delay (first `/aft_mapped_to_init` minus the
 first LiDAR scan, read from the 16 existing output bags) does not separate modes — GOOD delays are
-1.864/4.196/5.462 s, BAD 1.397–3.130 s, overlapping at 1.86 s, and the delay drifts with the run
-batch (1.4–2.3 s for the first eight, 2.1–5.5 s for the last eight). Load/batch and mode are
+1.864/4.196/5.462 s, BAD 1.397–3.130 s, and no threshold separates them: 1.864 s is a GOOD delay
+and also the delay of two BAD runs. The batches differ in the opposite direction to load intuition:
+the earlier 2x2 batch (T121820–T123311) has delays 2.06–5.46 s, the later bist batch
+(T124630–T130047) 1.40–2.33 s. Load/batch and mode are
 confounded in this sample, so the proxy neither confirms nor rules out the initialisation-timing
 hypothesis; a controlled environment is required.
 
