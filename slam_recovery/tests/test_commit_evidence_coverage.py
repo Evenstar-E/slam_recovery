@@ -190,6 +190,34 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
         report = mgr.validate_and_resolve(cand)
         self.assertIn("non-finite", report.reason)
 
+    def test_support_reference_is_sampled_by_space_not_by_point_count(self) -> None:
+        """The coverage test must not flip just because the map got denser.
+
+        The four-arm replay found the same pose and scan scoring 0.82 support against a 4 000-point
+        reference and 0.29 against 1 500 points. A point cap is a budget, not a coverage
+        definition, so the support reference keeps one point per occupied voxel.
+        """
+        def grid(step: float) -> np.ndarray:
+            xs = np.arange(0.0, 1.0, step)
+            gx, gy = np.meshgrid(xs, xs, indexing="ij")
+            return np.column_stack([gx.ravel(), gy.ravel(), np.zeros(gx.size)])
+
+        coarse = OnlineRecoveryTransactionNode(confirmation_margin_sec=0)
+        coarse.committed_map_points = [grid(0.10)]
+        fine = OnlineRecoveryTransactionNode(confirmation_margin_sec=0)
+        fine.committed_map_points = [grid(0.025)]
+
+        n_coarse = len(coarse.support_reference())
+        n_fine = len(fine.support_reference())
+        self.assertLess(abs(n_coarse - n_fine), 0.5 * max(n_coarse, 1))
+        self.assertLess(n_fine, 60)
+
+        scan = grid(0.05)
+        pose = {0: np.eye(4)}
+        for node in (coarse, fine):
+            node.scan_buffer_body[0] = scan
+            self.assertTrue(node._frame_has_reference_support(0, node.support_reference(), pose))
+
     def test_manager_refuses_a_candidate_with_unverified_frames(self) -> None:
         """Defence in depth: the manager enforces the invariant even for direct callers."""
         mgr = TrustedMapTransactionManager(confirmation_margin_ns=0)

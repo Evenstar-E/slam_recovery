@@ -216,13 +216,19 @@ def _plane_neighbourhood_diagnostics(ref_pts, hold_world, k: int = 8) -> dict:
     }
 
 
-def _score_pose_set(node, ref_pts, key_ids, support_poses, score_poses, stride: int) -> dict:
-    """Score one pose set with the gate's own sampling/aggregation (stride holdout, mean NIS)."""
+def _score_pose_set(node, ref_pts, key_ids, support_poses, score_poses, stride: int,
+                    support_ref_pts=None) -> dict:
+    """Score one pose set with the gate's own sampling/aggregation (stride holdout, mean NIS).
+
+    Support is decided on `support_ref_pts` when given: the node's commit path asks coverage of a
+    spatially sampled reference, not of the point-capped cloud used for the NIS itself.
+    """
     holdout = _holdout_ids(key_ids, stride)
+    support_ref = ref_pts if support_ref_pts is None else support_ref_pts
     supported = [
         k for k in holdout
         if k in node.scan_buffer_body
-        and node._frame_has_reference_support(k, ref_pts, support_poses)
+        and node._frame_has_reference_support(k, support_ref, support_poses)
     ]
     per_frame = []
     for k in supported:
@@ -247,13 +253,16 @@ def _simulator_validity_snapshot(node, key_ids, gt_poses, candidate_poses, strid
                                  mesh_distance_fn) -> dict:
     """Snapshot-based validity: GT poses judged by the gate's statistic on a frozen reference."""
     ref = node.get_trusted_map_points(max_pts=1500).copy()
+    # Coverage is judged on the same spatially sampled reference the node's commit path uses; the
+    # 1500-point cloud above remains the scoring reference so the NIS stays comparable.
+    support_ref = node.support_reference()
     # Provenance of the reference, from the node itself: a frame whose own points are part of the
     # reference cannot be scored against it (self-agreement), so the key set has to be reported
     # rather than assumed.
     ref_keys = sorted(node.get_trusted_map_keys())
 
-    gt = _score_pose_set(node, ref, key_ids, gt_poses, gt_poses, stride)
-    cand = _score_pose_set(node, ref, key_ids, candidate_poses, candidate_poses, stride)
+    gt = _score_pose_set(node, ref, key_ids, gt_poses, gt_poses, stride, support_ref_pts=support_ref)
+    cand = _score_pose_set(node, ref, key_ids, candidate_poses, candidate_poses, stride, support_ref_pts=support_ref)
     gt_ids, cand_ids = set(gt["supported_ids"]), set(cand["supported_ids"])
 
     gt_holdout_world = np.vstack([
@@ -263,7 +272,7 @@ def _simulator_validity_snapshot(node, key_ids, gt_poses, candidate_poses, strid
     sweep = {}
     for cap in _SIM_VALIDITY_DENSITY_CAPS:
         ref_cap = node.get_trusted_map_points(max_pts=cap)
-        scored = _score_pose_set(node, ref_cap, key_ids, gt_poses, gt_poses, stride)
+        scored = _score_pose_set(node, ref_cap, key_ids, gt_poses, gt_poses, stride, support_ref_pts=support_ref)
         diag = _plane_neighbourhood_diagnostics(ref_cap, gt_holdout_world)
         sweep[str(cap)] = {
             "reference_points_returned": int(len(ref_cap)),
