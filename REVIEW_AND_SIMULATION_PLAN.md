@@ -369,7 +369,7 @@
 
 | ID | 级别 | 问题 | 证据位置 | 验收标准 |
 |---|---|---|---|---|
-| TD-01 | **P1** | 论文称 street_08 候选"三项同时被拒"，但第三项 `0.4042 ≤ 0.50` 是**通过** | `paper_submission_package/paper_main.tex:393` | 改为 "refused on two of the three criteria"，并重编 PDF |
+| TD-01 | ~~**P1**~~ **CLOSED** | 论文称 street_08 候选"三项同时被拒"，但第三项 `0.4042 ≤ 0.50` 是**通过** | `paper_submission_package/paper_main.tex:393` | 已由 `c1163c8` 改为 "passes the boundary-jump criterion ... both fail"，三份 tex 均已同步（PDF 正文未独立核验，见 `docs/review_20261109_6a5d842/`） |
 | TD-02 | P2 | 同一研究文档自相矛盾：540 行写自适应样本量，1857 行仍写 `min_paired_observations=4` | `SLAM_RECOVERY_RESEARCH.md` 及 `paper_submission_package/` 镜像 | 两处表述一致 |
 | TD-03 | P2 | 两项行为变更**零测试**：0.85/0.04 在 0.35 与 0.50 下行为相同；无 ≥8 关键帧用例 | `slam_recovery/tests/test_atomic_commit.py` | 新增 0.40 m 重入用例 + 8 关键帧自适应用例 |
 | TD-04 | P2 | `required_paired` 直接取值而非 `max(...)`：`min_paired_observations=10` 时大候选反而只需 8 | `transaction_manager_node.py:266-270` | 改为 `max()`，或证明非默认基线的使用场景不存在 |
@@ -385,6 +385,10 @@
 | TD-14 | P2 | 只有 `trusted_map_pollution_ratio`，**无地图覆盖率指标** | `run_e2_ablation_matrix.py:213` 等 | 新增修复段体素覆盖率 |
 | TD-15 | P2 | **无真实实时闭环证据**，真实宿主多为 `OFFLINE_CONSTRUCT` | manifests | 端到端 P50/P99 延迟 + ≥10 min 连续运行 |
 | TD-16 | P2 | 门控判决质量仅 n=1（street_08 一次拒绝） | — | 混淆矩阵：真阳性/假阳性/假阴性/真阴性 |
+
+> **2026-11-09 更新（`6a5d842` 探针复查）**：TD-04（`max` 反例：base=10 时 8 关键帧配 8 帧仍被放行）、TD-09（仅改强度，全部输出不变）、TD-11（200 点估 20.2% 全留，400 点估 40.5% 全删并误删 5 个真实点）、TD-12（确无在线退出判据）均已被独立复现确认。
+> **TD-14/TD-16 的合并结论更严重**：受控仿真中 B4（只隔离）与 B6（验证后准入）的 3D 体素污染率**同为 0%**（B0 为 43.25%），即当前实验设计无法证明"验证准入"优于"只隔离"；论文新摘要已如实写明该增量未解决。
+> **新增 P1**：`OnlineRecoveryTransactionNode` 的配对收益检验把候选自身的非留出扫描拼进了参考集（`transaction_manager_node.py:340-346,378`），而参与打分的帧覆盖全部可配对关键帧（`:264`），导致 4/5 的样本被系统性判为"候选改善"。详见 `docs/review_20261109_6a5d842/README.md` §三。
 
 ### 9.3 指标与证据体系
 
