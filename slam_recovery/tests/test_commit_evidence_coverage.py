@@ -80,6 +80,8 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
         self.assertEqual(report.deferred_pose_keys, [0])
         self.assertEqual(node._last_holdout_support["frames_missing_scan"], [0])
         self.assertEqual(node.tx_mgr.trusted_poses, {})
+        # A candidate whose first frame has no support must not be logged as an empty candidate.
+        self.assertEqual(node.last_paired_evidence["reason"], "no_committable_prefix")
 
     def test_frame_in_reference_is_not_scored_against_itself(self) -> None:
         """Provenance must come from the map, not from a comment."""

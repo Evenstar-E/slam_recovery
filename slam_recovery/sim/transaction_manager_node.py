@@ -265,6 +265,7 @@ class OnlineRecoveryTransactionNode:
         reentry_anchor_pose: Optional[np.ndarray] = None,
         reference_world: Optional[np.ndarray] = None,
         reference_keys: Optional[set] = None,
+        empty_reason: str = "no_repaired_poses",
     ) -> Tuple[Optional[bool], Optional[float], Optional[float]]:
         """
         Measure the paired-benefit / re-entry evidence of a candidate against its incumbent.
@@ -275,7 +276,7 @@ class OnlineRecoveryTransactionNode:
         atomic commit rather than assuming a pass (P1-1).
         """
         keys = sorted(repaired_poses.keys())
-        self.last_paired_evidence = {"num_paired_frames": 0, "reason": "no_repaired_poses"}
+        self.last_paired_evidence = {"num_paired_frames": 0, "reason": empty_reason}
         if not keys:
             return None, None, None
 
@@ -487,12 +488,18 @@ class OnlineRecoveryTransactionNode:
 
         # Paired-benefit evidence must be measured, never assumed; unmeasured components stay None
         # and force the gate to wait (Mode 3/4) instead of committing.
+        # The two ways the scored set can end up empty must not share one log string: an empty
+        # *input* candidate and a candidate whose first frame has no reference support (prefix
+        # length zero) send the operator to completely different places.
         paired_ok, wilson_lb, reentry_jump = self._measure_paired_evidence(
             candidate_poses,
             incumbent_poses=incumbent_poses,
             reentry_anchor_pose=reentry_anchor_pose,
             reference_world=train_world,
             reference_keys=reference_keys,
+            empty_reason=(
+                "no_committable_prefix" if (not commit_keys and kf_sorted) else "no_repaired_poses"
+            ),
         )
 
         cand = CandidateMap(
