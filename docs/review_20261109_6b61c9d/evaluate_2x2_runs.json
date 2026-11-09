@@ -1,0 +1,201 @@
+{
+ "design": {
+  "declared_before_results": true,
+  "declared_on": "2026-11-09",
+  "repetitions_per_cell": 2,
+  "failure_threshold_ate_m": 1.0,
+  "cells": [
+   "O",
+   "O_plus_F",
+   "O_minus_B",
+   "O_plus_F_minus_B"
+  ],
+  "outside_policy": "actual filtered rows in every cell",
+  "interaction_rule": "O+F-B fails in both repeats while O+F and O-B fail in neither; otherwise report run variance, inequivalent construction or a different actual condition, never interaction by default",
+  "status": "declared before any of the eight host runs"
+ },
+ "gt": "/home/R26534/M2DGR/GT/room_02.txt",
+ "threshold_ate_m": 1.0,
+ "cells": {
+  "O": [
+   {
+    "arm": "O",
+    "repeat": 1,
+    "bag": "/tmp/fastlivo/res_2x2_O_r1.bag",
+    "exists": true,
+    "poses": 739,
+    "span_s": [
+     1627643744.9767501,
+     1627643799.3622923
+    ],
+    "window_frames_with_pose_75ms": 199,
+    "window_frames": 199,
+    "matched": 732,
+    "ate_rmse_m": 0.082145177237581,
+    "ate_max_m": 0.19614785973745635,
+    "fail": false
+   },
+   {
+    "arm": "O",
+    "repeat": 2,
+    "bag": "/tmp/fastlivo/res_2x2_O_r2.bag",
+    "exists": true,
+    "poses": 784,
+    "span_s": [
+     1627643741.5785973,
+     1627643799.3622923
+    ],
+    "window_frames_with_pose_75ms": 199,
+    "window_frames": 199,
+    "matched": 777,
+    "ate_rmse_m": 15.440549408891952,
+    "ate_max_m": 21.723231727812532,
+    "fail": true
+   }
+  ],
+  "O_plus_F": [
+   {
+    "arm": "O_plus_F",
+    "repeat": 1,
+    "bag": "/tmp/fastlivo/res_2x2_O_plus_F_r1.bag",
+    "exists": true,
+    "poses": 783,
+    "span_s": [
+     1627643741.8451288,
+     1627643799.3622923
+    ],
+    "window_frames_with_pose_75ms": 199,
+    "window_frames": 199,
+    "matched": 776,
+    "ate_rmse_m": 521.7823425855235,
+    "ate_max_m": 1866.8590451426928,
+    "fail": true
+   },
+   {
+    "arm": "O_plus_F",
+    "repeat": 2,
+    "bag": "/tmp/fastlivo/res_2x2_O_plus_F_r2.bag",
+    "exists": true,
+    "poses": 781,
+    "span_s": [
+     1627643742.244886,
+     1627643799.3622923
+    ],
+    "window_frames_with_pose_75ms": 199,
+    "window_frames": 199,
+    "matched": 774,
+    "ate_rmse_m": 15.551372778173649,
+    "ate_max_m": 22.108441288175097,
+    "fail": true
+   }
+  ],
+  "O_minus_B": [
+   {
+    "arm": "O_minus_B",
+    "repeat": 1,
+    "bag": "/tmp/fastlivo/res_2x2_O_minus_B_r1.bag",
+    "exists": true,
+    "poses": 772,
+    "span_s": [
+     1627643742.6446872,
+     1627643799.3622923
+    ],
+    "window_frames_with_pose_75ms": 199,
+    "window_frames": 199,
+    "matched": 765,
+    "ate_rmse_m": 47.824181062147105,
+    "ate_max_m": 74.20653083393333,
+    "fail": true
+   },
+   {
+    "arm": "O_minus_B",
+    "repeat": 2,
+    "bag": "/tmp/fastlivo/res_2x2_O_minus_B_r2.bag",
+    "exists": true,
+    "poses": 778,
+    "span_s": [
+     1627643742.244886,
+     1627643799.3622923
+    ],
+    "window_frames_with_pose_75ms": 199,
+    "window_frames": 199,
+    "matched": 771,
+    "ate_rmse_m": 20.269444003741143,
+    "ate_max_m": 28.817332242371922,
+    "fail": true
+   }
+  ],
+  "O_plus_F_minus_B": [
+   {
+    "arm": "O_plus_F_minus_B",
+    "repeat": 1,
+    "bag": "/tmp/fastlivo/res_2x2_O_plus_F_minus_B_r1.bag",
+    "exists": true,
+    "poses": 785,
+    "span_s": [
+     1627643741.7118657,
+     1627643799.3622923
+    ],
+    "window_frames_with_pose_75ms": 199,
+    "window_frames": 199,
+    "matched": 778,
+    "ate_rmse_m": 484.92482822608275,
+    "ate_max_m": 1743.2619175288169,
+    "fail": true
+   },
+   {
+    "arm": "O_plus_F_minus_B",
+    "repeat": 2,
+    "bag": "/tmp/fastlivo/res_2x2_O_plus_F_minus_B_r2.bag",
+    "exists": true,
+    "poses": 759,
+    "span_s": [
+     1627643743.7107766,
+     1627643799.3622923
+    ],
+    "window_frames_with_pose_75ms": 199,
+    "window_frames": 199,
+    "matched": 752,
+    "ate_rmse_m": 0.2544002557826186,
+    "ate_max_m": 1.3809508476271823,
+    "fail": false
+   }
+  ]
+ },
+ "cell_verdicts": {
+  "O": {
+   "fails": [
+    false,
+    true
+   ],
+   "stable": false,
+   "cell_fails": false
+  },
+  "O_plus_F": {
+   "fails": [
+    true,
+    true
+   ],
+   "stable": true,
+   "cell_fails": true
+  },
+  "O_minus_B": {
+   "fails": [
+    true,
+    true
+   ],
+   "stable": true,
+   "cell_fails": true
+  },
+  "O_plus_F_minus_B": {
+   "fails": [
+    true,
+    false
+   ],
+   "stable": false,
+   "cell_fails": false
+  }
+ },
+ "reading": "NOT_A_CLEAN_INTERACTION",
+ "note": "full-alignment ATE, one SE(3) fit over the whole trajectory; diagnostic, not the frozen healthy-prefix protocol"
+}
