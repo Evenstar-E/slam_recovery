@@ -89,6 +89,51 @@ class TestCombinedCell(unittest.TestCase):
         self.assertTrue(Q.check_combined_equals_filtered(_receipt(checks=c)))
 
 
+class TestSidecarOrder(unittest.TestCase):
+    def test_clean_receipt_passes(self):
+        r = _receipt()
+        r["failure_counts"] = {"sidecar_order": 0}
+        self.assertEqual(Q.check_sidecar_order(r), [])
+
+    def test_shuffled_sidecar_is_rejected(self):
+        r = _receipt()
+        r["failure_counts"] = {"sidecar_order": 3}
+        self.assertTrue(Q.check_sidecar_order(r))
+
+    def test_missing_kind_is_unverifiable(self):
+        r = _receipt()
+        r["failure_counts"] = {}
+        self.assertTrue(Q.check_sidecar_order(r))
+
+    def test_missing_counts_is_unverifiable(self):
+        self.assertTrue(Q.check_sidecar_order(_receipt()))
+
+
+class TestFailuresGateTheVerdict(unittest.TestCase):
+    def test_clean_receipt_passes(self):
+        r = _receipt()
+        r["failure_counts"] = {"outside_mismatch": 0, "fatal": 0, "sidecar_order": 0}
+        self.assertEqual(Q.check_failures_gate_the_verdict(r), [])
+
+    def test_sidecar_failure_with_all_checks_true_is_rejected(self):
+        r = _receipt()                     # every check True
+        r["failure_counts"] = {"sidecar_order": 1}
+        self.assertTrue(Q.check_failures_gate_the_verdict(r))
+
+    def test_fatal_with_all_checks_true_is_rejected(self):
+        r = _receipt()
+        r["failure_counts"] = {"fatal": 1}
+        self.assertTrue(Q.check_failures_gate_the_verdict(r))
+
+    def test_gated_failure_passes_the_rule(self):
+        r = _receipt(checks={"outside_all_equal_filtered": False,
+                             "combined_equals_actual_in_window": True,
+                             "arms_match_original_indices": True,
+                             "row_counts_match": True})
+        r["failure_counts"] = {"outside_mismatch": 2}
+        self.assertEqual(Q.check_failures_gate_the_verdict(r), [])
+
+
 class TestPreregistration(unittest.TestCase):
     CELLS = ["O", "O_plus_F", "O_minus_B", "O_plus_F_minus_B"]
 

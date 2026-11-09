@@ -83,6 +83,31 @@ receipt 另增 `frames_complete` 检查与 `preregistration` 块（`repetitions_
 我的规则也随之改为**优先读 `failure_counts`**，仅在缺该字段时回退到 `why` 前缀——
 否则我自己就还在依赖被批评的那套判据。
 
+## 3c. `700c1b7` 的 sidecar 顺序断言：已加，但未接入判据
+
+`700c1b7` 在逐帧比较前先断言每帧 `k<ns>`/`b<ns>` 严格递增，违例记
+`kind="sidecar_order"` 并指向 sidecar——这是对的，乱序不再被算到臂上。
+
+**但它没有进入 `checks`**：`checks` 只由 `outside_mismatch / metadata_mismatch /
+combined_mismatch / index_mismatch / row_count / stamp_mismatch / missing_message` 推出，
+而退出码是 `return 0 if all(checks.values()) else 1`。因此：
+
+- `sidecar_order` 违例 → 计数加一、`failures` 有一条，但五项 check 仍全 True，**退出码 0**；
+- 同样地，兜底的 `kind="fatal"` 也不在任何 check 里，异常中止后若 `n_in/n_out` 已计数，
+  也可能以 0 退出。
+
+即：失败被**记录**了，但没有**门控**结论。今天的 receipt 全零，所以不触发。
+
+新增两条规则：
+
+| 规则 | 作用 |
+|---|---|
+| `check_sidecar_order` | `failure_counts` 必须含 `sidecar_order` 且为 0；缺字段判 UNVERIFIABLE |
+| `check_failures_gate_the_verdict` | 只要 `failure_counts` 有任何非零项，`checks` 就不能全为 True |
+
+建议修法（任选其一）：把 `sidecar_order` 与 `fatal` 纳入 `checks`，或让退出码改为
+`0 if not any(counts.values()) else 1`。
+
 ## 4. 新增的验收规则（对 fixture 可跑）
 
 | 规则 | 作用 |

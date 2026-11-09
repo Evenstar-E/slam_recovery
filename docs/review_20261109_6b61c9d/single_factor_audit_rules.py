@@ -87,6 +87,39 @@ def check_all_checks_present(receipt):
     return [f"missing check {c}" for c in missing]
 
 
+def check_sidecar_order(receipt):
+    """The sidecar's index arrays must be strictly increasing (hence unique).
+
+    The verifier now records `kind="sidecar_order"` before comparing any frame, so a shuffled
+    sidecar is blamed on the sidecar rather than on an arm.
+    """
+    fc = receipt.get("failure_counts")
+    if not isinstance(fc, dict):
+        return ["receipt lacks `failure_counts`: sidecar ordering cannot be verified"]
+    if "sidecar_order" not in fc:
+        return ["verifier does not report `sidecar_order`: the check is missing"]
+    n = int(fc["sidecar_order"])
+    return [] if n == 0 else [f"{n} sidecar arrays are not strictly increasing"]
+
+
+def check_failures_gate_the_verdict(receipt):
+    """Any recorded failure must make the overall verdict False.
+
+    The four booleans cover only their own kinds, so a recorded `fatal` or `sidecar_order`
+    failure leaves every check True and the verifier exits 0. This rule catches that.
+    """
+    fc = receipt.get("failure_counts") or {}
+    checks = receipt.get("checks") or {}
+    if not fc or not checks:
+        return ["receipt lacks `failure_counts` or `checks`"]
+    total = sum(int(v) for v in fc.values())
+    ungated = sorted(k for k, v in fc.items() if int(v) > 0)
+    if total and all(bool(v) for v in checks.values()):
+        return [f"{total} failures recorded ({', '.join(ungated)}) but every check is True: "
+                "the failure kinds are not covered by any check"]
+    return []
+
+
 def check_preregistration(design):
     """Two repetitions per cell and a 1.0 m ATE failure threshold, declared before the run.
 
