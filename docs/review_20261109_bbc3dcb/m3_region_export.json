@@ -1,31 +1,29 @@
 {
- "protocol": "docs/MILESTONE_fixed_input_repair.md @ 8704370",
- "region_definition": "proxy points with NN <= 10.0 m to at least one pose of each arm (observability, not map support)",
- "why_not_map_support": "the intersection of the two maps' support makes both coverage fractions 100 % by construction",
- "n_region_points": 5191379,
- "region_index_sha256": "df3ee0d53e83396c8ab6c12a2b24ec2ef70b73d1c0aaf2e7af20e1a5298f8c00",
- "region_aabb_min": [
-  -10.69732623067262,
-  -10.005364185057205,
-  -4.284838587527343
- ],
- "region_aabb_max": [
-  14.186612318830521,
-  13.863515414664043,
-  4.9836719649658505
- ],
- "q_keys_ns_sha256": "74995bb95de231820ef9696fa3e6b8501b3a47dc728fdfbb362987ab62268788",
- "c3_keys_ns_sha256": "89a8bfa10a6bf60d0c2ea8a50e4fd53b9771a9d0627b6e4aeaebcffad3235a3f",
- "q_frames": 132,
- "c3_frames": 446,
- "sensitivity_region_sizes": {
-  "5.0m": 1956661,
-  "15.0m": 7646524
+ "protocol": "docs/MILESTONE_fixed_input_repair.md (M3, recomputed)",
+ "arms": {
+  "Q": "trusted pre-onset base only (host poses, pre-onset keyframes)",
+  "C3": "the same base points + repaired post-onset frames (repository filter + FAST-LIVO2 re-run), i.e. the map the system actually holds"
+ },
+ "primary_roi": {
+  "definition": "the whole clean reference cloud; depends on the reference only, not on any evaluated pose",
+  "n_points": 8490000,
+  "index_sha256": "9e06296998e585a062643a73d8c0b026c40729ecbbccec6490cc279056295369",
+  "reference_sha256": "37cf7cb65d6b8ae9d3028ee23c0e4849f672f765418056a968fc10e473bef864"
+ },
+ "sensitivity_roi": {
+  "definition": "reference points within 0.5 m of the shared base map (identical in both arms, so it is a common region rather than a pose-dependent one)",
+  "n_points": 7797828,
+  "index_sha256": "37e932211988ccdc132eacad5f4a5e3c6b1c4ad17846aba5d27e37009f392d3a"
+ },
+ "key_lists": {
+  "q_ns_sha256": "74995bb95de231820ef9696fa3e6b8501b3a47dc728fdfbb362987ab62268788",
+  "c3_ns_sha256": "89a8bfa10a6bf60d0c2ea8a50e4fd53b9771a9d0627b6e4aeaebcffad3235a3f"
  },
  "inputs_sha256": {
   "injected_scans": "aa740037b01abae537d409a150d8a633fb4026d7474f6b8e766be2d508683aae",
   "injected_poses": "03e75983eefc0cfcd849694630cab720c5638c8f7bdd62355d4eafa4efd78123",
   "clean_scans_proxy_only": "905c6a15ed4134a53fc6bad6e18c6644957bf691b99612d30169bf2c80ca30b7",
   "clean_poses_proxy_only": "32f0bf4465e3dc1f7d06182e6b7c612e9128e5070684973de7a0d574417edc47"
- }
+ },
+ "filtered_bag_sha256": "c90300cb2911be53361645b037ba864f7aa9f9d1483905a9c5b757a4bd269178"
 }
