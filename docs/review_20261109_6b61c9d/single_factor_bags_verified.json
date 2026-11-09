@@ -31,7 +31,33 @@
   "outside_all_equal_filtered": true,
   "combined_equals_actual_in_window": true,
   "arms_match_original_indices": true,
-  "row_counts_match": true
+  "row_counts_match": true,
+  "frames_complete": true
  },
- "failures": []
+ "failure_counts": {
+  "stamp_mismatch": 0,
+  "missing_message": 0,
+  "outside_mismatch": 0,
+  "combined_mismatch": 0,
+  "index_mismatch": 0,
+  "row_count": 0,
+  "metadata_mismatch": 0,
+  "empty_outside": 0,
+  "empty_window": 0
+ },
+ "failures": [],
+ "preregistration": {
+  "declared_before_results": true,
+  "declared_on": "2026-11-09",
+  "repetitions_per_cell": 2,
+  "failure_threshold_ate_m": 1.0,
+  "cells": [
+   "O",
+   "O_plus_F",
+   "O_minus_B",
+   "O_plus_F_minus_B"
+  ],
+  "interaction_rule": "O+F-B fails in both repeats while O+F and O-B fail in neither",
+  "outside_policy": "actual filtered rows in every cell"
+ }
 }

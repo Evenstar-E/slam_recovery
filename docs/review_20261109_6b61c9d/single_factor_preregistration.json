@@ -1,0 +1,10 @@
+{
+ "declared_before_results": true,
+ "declared_on": "2026-11-09",
+ "repetitions_per_cell": 2,
+ "failure_threshold_ate_m": 1.0,
+ "cells": ["O", "O_plus_F", "O_minus_B", "O_plus_F_minus_B"],
+ "outside_policy": "actual filtered rows in every cell",
+ "interaction_rule": "O+F-B fails in both repeats while O+F and O-B fail in neither; otherwise report run variance, inequivalent construction or a different actual condition, never interaction by default",
+ "status": "declared before any of the eight host runs"
+}
