@@ -473,8 +473,9 @@ def main():
     # to the first *common* scan while pair_keyframes keys rel to each bag's first scan; the two
     # bases differ whenever a bag is missing head frames.
     ONSET_ABS, INJ_END_ABS = _ev["start_abs_sec"], _ev["end_abs_sec"]
-    # If the bags do not share a head frame, the two zero points differ; every segment decision
-    # below uses absolute stamps, and this offset records whether that case occurred.
+    # first paired scan minus first common scan. This includes any pairing drop at the head, so it
+    # is a pairing delay, not evidence that the two bags' heads differ; segment decisions use
+    # absolute stamps and are unaffected either way.
     _ev["head_frame_offset_sec"] = round(float(inj_kfs[0]["ts"] - _ev["first_common_abs_sec"]), 6)
     print(f"detected onset = {ONSET_REL} s, end = {INJ_END_REL} s")
     onset_evidence = dict(_ev)

@@ -94,9 +94,10 @@
     "end_abs_sec": 1627785295.546,
     "role": "INJECTION_ORACLE (offline; requires the clean recording)",
     "deployable_detector": false,
-    "first_common_abs_sec": 1627785261.079,
-    "head_frame_offset_sec": 0.0,
-    "segment_time_base": "pre/quar, alignment windows and floor_ids all compare absolute header stamps; this run shares all 598 head frames, so the relative and absolute bases coincide (offset 0.0)."
+    "first_common_abs_sec": 1627785261.079016,
+    "head_frame_offset_sec": 1.302695,
+    "segment_time_base": "pre/quar, alignment windows and floor_ids all compare absolute header stamps; this run shares all 598 head frames, so the relative and absolute bases coincide (offset 0.0).",
+    "head_frame_offset_meaning": "first paired scan minus first common scan = pairing delay at the head (not a bag-head difference)"
   },
   "protocol": {
     "voxel_m": 0.1,
@@ -529,10 +530,13 @@
   ],
   "evidence_status_scope": "evidence_status describes the paired-benefit term only; the holdout-NIS term is reported separately as holdout_nis, and accepted=False means the candidate did not enter Mode 2.",
   "time_bases": {
-    "first_raw_scan_abs_sec": 1627785261.079,
-    "first_paired_scan_abs_sec": 1627785261.079,
-    "first_common_scan_abs_sec": 1627785261.079,
-    "head_frame_offset_sec": 0.0,
-    "note": "All three coincide in this run (598/598 scans paired at the head). Segment membership is decided on absolute header stamps, so a future head mismatch or pairing drop cannot shift pre/quar or floor_ids; this block records the case rather than proving it absent by idleness."
+    "first_raw_scan_abs_sec": 1627785261.079016,
+    "first_paired_scan_abs_sec": 1627785262.381711,
+    "first_common_scan_abs_sec": 1627785261.079016,
+    "first_paired_minus_raw_sec": 1.302695,
+    "head_frame_offset_sec": 1.302695,
+    "meaning": "head_frame_offset_sec = first paired scan - first common scan, i.e. the pairing delay at the head, not a difference between the two bags' heads. The clean run's first paired scan is 1627785263.58389 (head dropped [0,2.4] s).",
+    "method": "measured by re-running pair_keyframes on the archived bags after the 3eb9408 review; the earlier zero values were hand-filled and wrong",
+    "note": "Segment membership (pre/quar, alignment windows, floor_ids) uses absolute header stamps, so this pairing delay does not shift any segment; it only means the first paired keyframe is 1.30 s after the first raw scan."
   }
 }
