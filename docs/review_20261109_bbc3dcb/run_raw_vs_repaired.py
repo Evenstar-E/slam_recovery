@@ -167,8 +167,59 @@ def main():
     verdict = ("REPAIR_BENEFIT_SUPPORTED" if (cond_a and cond_b)
                else "SAME_FRAME_COMPARISON_DOES_NOT_SUPPORT_NET_BENEFIT")
 
+    # ---- trajectory on the same fixed population, against GT ------------------------------
+    from slam_recovery.experiments.evaluation import load_tum_trajectory_se3, \
+        associate_trajectories
+    start_ns = int(m0["injection_window"]["start_ns"])
+    ts_gt, xyz_gt, _ = load_tum_trajectory_se3("/home/R26534/M2DGR/GT/hall_01.txt")
+    # One frozen clean-world -> GT transform, estimated on pre-onset clean keyframes.
+    cpre = cln_ts < start_ns * 1e-9
+    mtcg, mecg, mgcg = associate_trajectories(cln_ts[cpre], cln_xyz[cpre], ts_gt, xyz_gt, 0.05)
+    if len(mtcg) >= 10:
+        R_cg, t_cg = V.umeyama(mecg, mgcg)
+        clean_to_gt = {"matched": int(len(mtcg)),
+                       "residual_rmse_m": float(np.sqrt(np.mean(
+                           np.sum((mecg @ R_cg.T + t_cg - mgcg) ** 2, axis=1))))}
+    else:
+        R_cg = t_cg = None
+        clean_to_gt = {"matched": int(len(mtcg)), "status": "TOO_FEW"}
+
+    def _trajectory(poses, R_p, t_p):
+        ids = [i for i in frames if i in poses]
+        ts = np.asarray([inj_kfs[i]["ts"] for i in ids])
+        xyz = np.asarray([poses[i][:3, 3] for i in ids])
+        mt, me, mg = associate_trajectories(ts, xyz, ts_gt, xyz_gt, 0.05)
+        rec = {"frames_scored": len(ids), "gt_matched": int(len(mt))}
+        if len(mt) < 10:
+            rec["status"] = "TOO_FEW_GT"
+            return rec
+        Ru, tu = V.umeyama(me, mg)
+        err = np.linalg.norm(me @ Ru.T + tu - mg, axis=1)
+        rec["ate_full_alignment_diagnostic_m"] = float(np.sqrt(np.mean(err ** 2)))
+        rec["ate_full_alignment_max_m"] = float(err.max())
+        if R_cg is not None:
+            in_gt = (me @ R_p.T + t_p) @ R_cg.T + t_cg
+            e2 = np.linalg.norm(in_gt - mg, axis=1)
+            rec["ate_frozen_prefix_protocol_m"] = float(np.sqrt(np.mean(e2 ** 2)))
+        else:
+            rec["ate_frozen_prefix_protocol_m"] = None
+        return rec
+
+    trajectory = {"R": _trajectory(host_poses, R_h, t_h),
+                  "C3": _trajectory(c3_poses, R_c, t_c)}
+
     res = {
         "protocol": "same-frame raw/native vs repaired, fixed frame set",
+        "time_sync": {"rule": "nearest pose within 75 ms; bracketing interpolation",
+                      "frame_stamps_from": "injected scan header (ns)"},
+        "inputs": {"injected_scans": {"path": R.INJ_SCANS, "sha256": sha["injected_scans"]},
+                   "injected_poses": {"path": R.INJ_POSES, "sha256": sha["injected_poses"]},
+                   "clean_scans": {"path": R.CLN_SCANS, "sha256": sha["clean_scans_proxy_only"]},
+                   "clean_poses": {"path": R.CLN_POSES, "sha256": sha["clean_poses_proxy_only"]},
+                   "filtered_scans": {"path": R.FILTERED_BAG, "sha256": f_sha},
+                   "rerun_poses": {"path": R.RERUN_BAG, "sha256": V._sha_file(R.RERUN_BAG)}},
+        "clean_to_gt": clean_to_gt,
+        "trajectory": trajectory,
         "frame_set": {"definition": "keys whose repaired arm has both a filtered scan and a "
                                     "re-run pose",
                       "n_frames": len(frames), "n_keys": len(keys),
@@ -191,7 +242,12 @@ def main():
         "notes": ["The proxy is the clean run's map, not a GT surface.",
                   "Both arms use the same frames, so the trajectory-extent confound is removed.",
                   "Absolute unsupported counts are not comparable across arms of different size; "
-                  "the pre-declared criterion is used instead."],
+                  "the pre-declared criterion is used instead.",
+                  "Trajectory is evaluated on the same 400-frame population, but GT covers 252 of "
+                  "them; ATE is therefore a 252-frame diagnostic, not a 400-frame number.",
+                  "ate_frozen_prefix_protocol_m composes the prefix alignment with one frozen "
+                  "clean->GT transform estimated on 77 pre-onset clean keyframes (0.085 m residual).",
+                  "C3 is OFFLINE_NATIVE_REESTIMATION, not a deployable loop."],
     }
     with open(RESULT_JSON, "w", encoding="utf-8") as fh:
         json.dump(res, fh, indent=1, default=float)

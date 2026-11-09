@@ -162,7 +162,15 @@ points of which 85.25% are supported (novel subset 10,581: 69.16%); of the 50,23
 C3 does not, 95.14% were already unsupported. The pre-stated rule (novel supported > unsupported
 AND added-unsupported fraction <= R's) passes: 7,318 > 3,263 and 0.1475 <= 0.6251, verdict
 REPAIR_BENEFIT_SUPPORTED. The proxy is not GT, the frame set is 400/446, and C3 is
-OFFLINE_NATIVE_REESTIMATION, not a deployable loop. ### Next mainline (pre-registered choice, revised)
+OFFLINE_NATIVE_REESTIMATION, not a deployable loop.
+
+On the same 400-frame population the trajectory now completes the picture: GT covers 252 of the
+frames, and against it R has 1.909 m full-alignment ATE (max 3.959 m) and 10.929 m under the frozen
+clean->GT protocol, while C3 has 0.319 m (max 0.695 m) and 0.492 m. The frozen transform is fitted
+on 77 pre-onset clean keyframes with 0.085 m residual. Geometry and trajectory therefore agree on
+this sequence; the result remains single-sequence, GT-partial (252/400) and offline.
+
+### Next mainline (pre-registered choice, revised)
 
 Chosen: a short, receipt-backed rate diagnostic on the same frozen input, because
 PAIRING_RULE_MISSING is only the proximate reason for the 46 misses. The run records host

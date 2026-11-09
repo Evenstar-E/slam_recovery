@@ -1,5 +1,60 @@
 {
  "protocol": "same-frame raw/native vs repaired, fixed frame set",
+ "time_sync": {
+  "rule": "nearest pose within 75 ms; bracketing interpolation",
+  "frame_stamps_from": "injected scan header (ns)"
+ },
+ "inputs": {
+  "injected_scans": {
+   "path": "/tmp/fastlivo/hall01_inj43.bag",
+   "sha256": "aa740037b01abae537d409a150d8a633fb4026d7474f6b8e766be2d508683aae"
+  },
+  "injected_poses": {
+   "path": "/tmp/fastlivo/res_h1_inj43_vis.bag",
+   "sha256": "03e75983eefc0cfcd849694630cab720c5638c8f7bdd62355d4eafa4efd78123"
+  },
+  "clean_scans": {
+   "path": "/tmp/fastlivo/hall01_100_160.bag",
+   "sha256": "905c6a15ed4134a53fc6bad6e18c6644957bf691b99612d30169bf2c80ca30b7"
+  },
+  "clean_poses": {
+   "path": "/tmp/fastlivo/res_hall01_clean_05x.bag",
+   "sha256": "32f0bf4465e3dc1f7d06182e6b7c612e9128e5070684973de7a0d574417edc47"
+  },
+  "filtered_scans": {
+   "path": "/tmp/fastlivo/hall01_inj43_filtered.bag",
+   "sha256": "c90300cb2911be53361645b037ba864f7aa9f9d1483905a9c5b757a4bd269178"
+  },
+  "rerun_poses": {
+   "path": "/tmp/fastlivo/res_h1_inj43_filtered.bag",
+   "sha256": "1109fccf46abba4b5843d504899718a6e5616439766df6cedbc35e8879e18a36"
+  }
+ },
+ "clean_to_gt": {
+  "matched": 77,
+  "residual_rmse_m": 0.08521627705254621
+ },
+ "trajectory": {
+  "R": {
+   "frames_scored": 400,
+   "gt_matched": 252,
+   "ate_full_alignment_diagnostic_m": 1.9085491271221064,
+   "ate_full_alignment_max_m": 3.9585614664455155,
+   "ate_frozen_prefix_protocol_m": 10.928765092783461
+  },
+  "C3": {
+   "frames_scored": 400,
+   "gt_matched": 252,
+   "ate_full_alignment_diagnostic_m": 0.3185291881794998,
+   "ate_full_alignment_max_m": 0.6951030220155734,
+   "ate_frozen_prefix_protocol_m": 0.49184380829384977
+  },
+  "population": {
+   "frame_set": 400,
+   "gt_matched": 252,
+   "gt": "/home/R26534/M2DGR/GT/hall_01.txt"
+  }
+ },
  "frame_set": {
   "definition": "keys whose repaired arm has both a filtered scan and a re-run pose",
   "n_frames": 400,
@@ -126,6 +181,9 @@
  "notes": [
   "The proxy is the clean run's map, not a GT surface.",
   "Both arms use the same frames, so the trajectory-extent confound is removed.",
-  "Absolute unsupported counts are not comparable across arms of different size; the pre-declared criterion is used instead."
+  "Absolute unsupported counts are not comparable across arms of different size; the pre-declared criterion is used instead.",
+  "Trajectory is evaluated on the same 400-frame population, but GT covers 252 of them; ATE is therefore a 252-frame diagnostic, not a 400-frame number.",
+  "ate_frozen_prefix_protocol_m composes the prefix alignment with one frozen clean->GT transform estimated on 77 pre-onset clean keyframes (0.085 m residual).",
+  "C3 is OFFLINE_NATIVE_REESTIMATION, not a deployable loop."
  ]
 }
