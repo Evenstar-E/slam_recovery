@@ -41,7 +41,8 @@ BAGS = {a: f"/tmp/fastlivo/room02_2x2_{a}.bag"
 RECEIPT = os.path.join(_HERE, "single_factor_bags_verified.json")
 
 KINDS = ("stamp_mismatch", "missing_message", "outside_mismatch", "combined_mismatch",
-         "index_mismatch", "row_count", "metadata_mismatch", "empty_outside", "empty_window")
+         "index_mismatch", "row_count", "metadata_mismatch", "empty_outside", "empty_window",
+         "fatal")
 WHY = {
     "stamp_mismatch": "stamp mismatch between bags",
     "missing_message": "a bag ended before the reference stream",
@@ -52,6 +53,7 @@ WHY = {
     "metadata_mismatch": "message metadata disagrees with the reconstructed row set",
     "empty_outside": "no outside-window frame: equality would be vacuously true",
     "empty_window": "no in-window frame: equivalence would be vacuously true",
+    "fatal": "verifier aborted; the exception is in the error field",
 }
 
 
@@ -163,7 +165,7 @@ def main():
                 per_frame.append({"ns": ns, "in_window": False,
                                   "rows": {a: int(got[a].shape[0]) for a in BAGS}})
     except Exception as exc:                     # noqa: BLE001 - receipt must survive any failure
-        fail("missing_message", source="fatal", error=repr(exc))
+        fail("fatal", error=repr(exc))
     finally:
         inj_bag.close()
         fil_bag.close()
