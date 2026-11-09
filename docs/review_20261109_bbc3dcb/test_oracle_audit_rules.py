@@ -124,14 +124,11 @@ class TestR5FalseNegativeRate(unittest.TestCase):
 class TestRealArtefacts(unittest.TestCase):
     """Acceptance on what is committed today."""
 
-    @unittest.expectedFailure
     def test_r5_real_row_audit_is_correct(self):
-        """The script is fixed but the committed JSON predates it.
+        """The script and the committed JSON now agree.
 
-        room02_filter_row_audit.py now divides by kept_injected + dropped_injected, while the
-        JSON in the tree still carries the background-normalised value. This will report an
-        unexpected success as soon as the JSON is regenerated, which is the signal to drop the
-        marker.
+        room02_filter_row_audit.py divides by kept_injected + dropped_injected and the JSON was
+        regenerated, so the marker this test used to carry has been removed.
         """
         agg = _load("room02_filter_row_audit.json")["in_window"]
         self.assertEqual(agg["kept_injected"] + agg["dropped_injected"], 9073943)
