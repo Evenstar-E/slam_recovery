@@ -1,0 +1,673 @@
+{
+ "_meta": {
+  "what": "independent recomputation of the four-arm contamination numbers",
+  "script_version": "1.1.0",
+  "independence": {
+   "bag_reader": "rosbags + message PointField layout",
+   "nn": "scipy cKDTree (producer: hand-written hash grid)",
+   "alignment": "own Umeyama SVD",
+   "bootstrap": "own, keyframes resampled"
+  },
+  "shared_on_purpose": [
+   "inputs (sha256-checked)",
+   "scan filter 0.5..30 m",
+   "pairing rules",
+   "250-point keyframe cap",
+   "120000-point proxy cap",
+   "pre-onset alignment target"
+  ],
+  "sampling": "NO KEYFRAME SUBSAMPLING -- every keyframe of every arm was scored. This is not a full-point computation: within each keyframe the 250-point cap applies, the proxy keeps 120000 of 8490000 clean points, and coverage uses a 40000-point query budget.",
+  "bootstrap_scope": "keyframe-level conditional resampling: it measures sampling error conditional on this run pair. It is NOT a cross-run or deployment generalisation interval; that would need a block bootstrap over runs or repeated runs.",
+  "layout": {
+   "injected": "point_step=24 fields=x@0:7,y@4:7,z@8:7,intensity@12:7,time@16:7,ring@20:4",
+   "clean": "point_step=24 fields=x@0:7,y@4:7,z@8:7,intensity@12:7,time@16:7,ring@20:4"
+  },
+  "inputs_sha256": {
+   "injected_scans": "aa740037b01abae537d409a150d8a633fb4026d7474f6b8e766be2d508683aae",
+   "injected_poses": "03e75983eefc0cfcd849694630cab720c5638c8f7bdd62355d4eafa4efd78123",
+   "clean_scans_proxy_only": "905c6a15ed4134a53fc6bad6e18c6644957bf691b99612d30169bf2c80ca30b7",
+   "clean_poses_proxy_only": "32f0bf4465e3dc1f7d06182e6b7c612e9128e5070684973de7a0d574417edc47"
+  },
+  "onset_abs": 1627785275.607409,
+  "end_abs": 1627785295.546409,
+  "first_common": 1627785261.079016,
+  "pairing": {
+   "injected": {
+    "scans": 598,
+    "paired": 578,
+    "interpolated": 217,
+    "dropped": 20,
+    "dropped_time_ranges_rel_sec": [
+     [
+      0.0,
+      1.2
+     ],
+     [
+      57.41,
+      58.01
+     ]
+    ],
+    "first_raw_scan_abs_sec": 1627785261.0790162
+   },
+   "clean": {
+    "scans": 598,
+    "paired": 566,
+    "interpolated": 211,
+    "dropped": 32,
+    "dropped_time_ranges_rel_sec": [
+     [
+      0.0,
+      2.4
+     ],
+     [
+      57.41,
+      58.01
+     ]
+    ],
+    "first_raw_scan_abs_sec": 1627785261.0790162
+   }
+  },
+  "alignment": {
+   "n_pairs": 121,
+   "R": [
+    [
+     0.998426475718145,
+     -0.05518736619884718,
+     -0.009946215213732628
+    ],
+    [
+     0.055241566964366905,
+     0.9984591667953728,
+     0.005259422174610117
+    ],
+    [
+     0.009640636097526394,
+     -0.005800590859881261,
+     0.999936703637441
+    ]
+   ],
+   "t": [
+    -0.7411487169977775,
+    -0.0003793171130448414,
+    0.010595394502970153
+   ],
+   "residuals": {
+    "pre": {
+     "n": 121,
+     "mean_m": 0.0060239839298804046,
+     "p95_m": 0.011411569528302874,
+     "max_m": 0.01812813609265336
+    },
+    "injection": {
+     "n": 199,
+     "mean_m": 3.8815307352752852,
+     "p95_m": 5.8973484981341056,
+     "max_m": 5.990609373494408
+    },
+    "post": {
+     "n": 246,
+     "mean_m": 12.85646342863183,
+     "p95_m": 19.568022172780637,
+     "max_m": 19.670008462262206
+    }
+   }
+  },
+  "proxy_points_total": 8490000,
+  "proxy_points_used": 120000
+ },
+ "arms": {
+  "A0_A2_write_everything": {
+   "distance": {
+    "arm": "A0_A2_write_everything",
+    "n_keyframes": 578,
+    "n_points": 144500,
+    "n_beyond_search_radius": 9853,
+    "tail_over_0.25m": 0.505598615916955,
+    "tail_over_0.5m": 0.36474048442906576,
+    "tail_over_1.0m": 0.19901730103806228,
+    "tail_over_2.0m": 0.08984775086505191,
+    "median_m": 0.21589424460815945
+   },
+   "bootstrap_kf": {
+    "tail_over_0.25m": {
+     "mean": 0.505598615916955,
+     "ci95": [
+      0.4837410034602076,
+      0.5281858131487889
+     ]
+    },
+    "tail_over_0.5m": {
+     "mean": 0.36474048442906576,
+     "ci95": [
+      0.3468896193771626,
+      0.38074325259515573
+     ]
+    },
+    "tail_over_1.0m": {
+     "mean": 0.1990173010380623,
+     "ci95": [
+      0.18931314878892735,
+      0.2096046712802768
+     ]
+    },
+    "tail_over_2.0m": {
+     "mean": 0.08984775086505191,
+     "ci95": [
+      0.08480968858131488,
+      0.09515017301038063
+     ]
+    }
+   },
+   "bootstrap_point": {
+    "tail_over_0.5m": {
+     "ci95": [
+      0.3621719723183391,
+      0.3671010380622837
+     ]
+    }
+   },
+   "coverage": {
+    "covered_within_0.25m": 0.826175,
+    "covered_within_0.5m": 0.9496,
+    "covered_within_1.0m": 0.980375,
+    "covered_within_2.0m": 0.997875
+   },
+   "coverage_median_m": 0.0992517031120607,
+   "seconds": 2.5
+  },
+  "A1_pre_onset_only": {
+   "distance": {
+    "arm": "A1_pre_onset_only",
+    "n_keyframes": 133,
+    "n_points": 33250,
+    "n_beyond_search_radius": 26,
+    "tail_over_0.25m": 0.03554887218045113,
+    "tail_over_0.5m": 0.0078796992481203,
+    "tail_over_1.0m": 0.002255639097744361,
+    "tail_over_2.0m": 0.0011729323308270676,
+    "median_m": 0.059615829983368285
+   },
+   "bootstrap_kf": {
+    "tail_over_0.25m": {
+     "mean": 0.03554887218045113,
+     "ci95": [
+      0.029081954887218046,
+      0.04833233082706767
+     ]
+    },
+    "tail_over_0.5m": {
+     "mean": 0.0078796992481203,
+     "ci95": [
+      0.003969172932330828,
+      0.014766917293233085
+     ]
+    },
+    "tail_over_1.0m": {
+     "mean": 0.002255639097744361,
+     "ci95": [
+      0.0002105263157894737,
+      0.006196992481203006
+     ]
+    },
+    "tail_over_2.0m": {
+     "mean": 0.0011729323308270676,
+     "ci95": [
+      0.0,
+      0.0034586466165413532
+     ]
+    }
+   },
+   "bootstrap_point": {
+    "tail_over_0.5m": {
+     "ci95": [
+      0.006827067669172932,
+      0.00881203007518797
+     ]
+    }
+   },
+   "coverage": {
+    "covered_within_0.25m": 0.74635,
+    "covered_within_0.5m": 0.9199,
+    "covered_within_1.0m": 0.9682,
+    "covered_within_2.0m": 0.985075
+   },
+   "coverage_median_m": 0.12074102261355742,
+   "seconds": 0.6
+  }
+ },
+ "decomposition": {
+  "full": {
+   "arm": "full",
+   "n_keyframes": 578,
+   "n_points": 144500,
+   "n_beyond_search_radius": 9853,
+   "tail_over_0.25m": 0.505598615916955,
+   "tail_over_0.5m": 0.36474048442906576,
+   "tail_over_1.0m": 0.19901730103806228,
+   "tail_over_2.0m": 0.08984775086505191,
+   "median_m": 0.21589424460815945
+  },
+  "pre_onset_part": {
+   "arm": "pre",
+   "n_keyframes": 133,
+   "n_points": 33250,
+   "n_beyond_search_radius": 26,
+   "tail_over_0.25m": 0.03554887218045113,
+   "tail_over_0.5m": 0.0078796992481203,
+   "tail_over_1.0m": 0.002255639097744361,
+   "tail_over_2.0m": 0.0011729323308270676,
+   "median_m": 0.059615829983368285
+  },
+  "post_onset_part": {
+   "arm": "post",
+   "n_keyframes": 445,
+   "n_points": 111250,
+   "n_beyond_search_radius": 9827,
+   "tail_over_0.25m": 0.646085393258427,
+   "tail_over_0.5m": 0.47139775280898877,
+   "tail_over_1.0m": 0.2578247191011236,
+   "tail_over_2.0m": 0.11635056179775281,
+   "median_m": 0.376568157289803
+  },
+  "note": "A0's keyframe list is a superset of A1's; splitting A0 by segment shows how much of the 36 pp comes from the frames A1 never writes",
+  "coverage": {
+   "pre_onset_only": {
+    "covered_within_0.25m": 0.74635,
+    "covered_within_0.5m": 0.9199,
+    "covered_within_1.0m": 0.9682,
+    "covered_within_2.0m": 0.985075
+   },
+   "post_onset_frames_only": {
+    "covered_within_0.25m": 0.38675,
+    "covered_within_0.5m": 0.61605,
+    "covered_within_1.0m": 0.81605,
+    "covered_within_2.0m": 0.9503
+   },
+   "union": {
+    "covered_within_0.25m": 0.826175,
+    "covered_within_0.5m": 0.9496,
+    "covered_within_1.0m": 0.980375,
+    "covered_within_2.0m": 0.997875
+   },
+   "difference_A0_minus_A1_bootstrap": {
+    "mean": 0.0297,
+    "ci95": [
+     0.028075,
+     0.03135
+    ],
+    "note": "paired over the 40000 proxy query points; A0 minus A1"
+   },
+   "note": "coverage is monotone in map size; the +3 pp is what 445 polluted frames add"
+  }
+ },
+ "floor_check": {
+  "floor_definition_in_producer": "injected_run_pre_onset_keyframes",
+  "floor_ids": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27,
+   28,
+   29,
+   30,
+   31,
+   32,
+   33,
+   34,
+   35,
+   36,
+   37,
+   38,
+   39,
+   40,
+   41,
+   42,
+   43,
+   44,
+   45,
+   46,
+   47,
+   48,
+   49,
+   50,
+   51,
+   52,
+   53,
+   54,
+   55,
+   56,
+   57,
+   58,
+   59,
+   60,
+   61,
+   62,
+   63,
+   64,
+   65,
+   66,
+   67,
+   68,
+   69,
+   70,
+   71,
+   72,
+   73,
+   74,
+   75,
+   76,
+   77,
+   78,
+   79,
+   80,
+   81,
+   82,
+   83,
+   84,
+   85,
+   86,
+   87,
+   88,
+   89,
+   90,
+   91,
+   92,
+   93,
+   94,
+   95,
+   96,
+   97,
+   98,
+   99,
+   100,
+   101,
+   102,
+   103,
+   104,
+   105,
+   106,
+   107,
+   108,
+   109,
+   110,
+   111,
+   112,
+   113,
+   114,
+   115,
+   116,
+   117,
+   118,
+   119,
+   120,
+   121,
+   122,
+   123,
+   124,
+   125,
+   126,
+   127,
+   128,
+   129,
+   130,
+   131,
+   132
+  ],
+  "a1_ids": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27,
+   28,
+   29,
+   30,
+   31,
+   32,
+   33,
+   34,
+   35,
+   36,
+   37,
+   38,
+   39,
+   40,
+   41,
+   42,
+   43,
+   44,
+   45,
+   46,
+   47,
+   48,
+   49,
+   50,
+   51,
+   52,
+   53,
+   54,
+   55,
+   56,
+   57,
+   58,
+   59,
+   60,
+   61,
+   62,
+   63,
+   64,
+   65,
+   66,
+   67,
+   68,
+   69,
+   70,
+   71,
+   72,
+   73,
+   74,
+   75,
+   76,
+   77,
+   78,
+   79,
+   80,
+   81,
+   82,
+   83,
+   84,
+   85,
+   86,
+   87,
+   88,
+   89,
+   90,
+   91,
+   92,
+   93,
+   94,
+   95,
+   96,
+   97,
+   98,
+   99,
+   100,
+   101,
+   102,
+   103,
+   104,
+   105,
+   106,
+   107,
+   108,
+   109,
+   110,
+   111,
+   112,
+   113,
+   114,
+   115,
+   116,
+   117,
+   118,
+   119,
+   120,
+   121,
+   122,
+   123,
+   124,
+   125,
+   126,
+   127,
+   128,
+   129,
+   130,
+   131,
+   132
+  ],
+  "identical": true,
+  "a1_is_the_floor": true,
+  "why": "`floor_ids` and the A1 arm are built from the same predicate on the same keyframe list, so the cross-run floor is A1's own map. A1 cannot exceed its own floor, and overlapping CIs between them carry no information."
+ },
+ "sensitivity": {
+  "proxy_cap_120k_vs_all": {
+   "n_proxy_all": 8490000,
+   "n_proxy_capped": 120000,
+   "capped": {
+    "A0_A2_write_everything": 0.36474048442906576,
+    "A1_pre_onset_only": 0.0078796992481203
+   },
+   "uncapped": {
+    "A0_A2_write_everything": 0.29664359861591694,
+    "A1_pre_onset_only": 0.002887218045112782
+   },
+   "capped_ci0.5": {
+    "A0_A2_write_everything": [
+     0.3468896193771626,
+     0.38074325259515573
+    ],
+    "A1_pre_onset_only": [
+     0.003969172932330828,
+     0.014766917293233085
+    ]
+   },
+   "uncapped_ci0.5": {
+    "A0_A2_write_everything": [
+     0.2815904844290657,
+     0.3106444636678201
+    ],
+    "A1_pre_onset_only": [
+     3.007518796992481e-05,
+     0.008511278195488723
+    ]
+   },
+   "uncapped_ci_basis": "keyframe bootstrap, n_boot=1000, seed=0, same as the capped arm",
+   "keyframes": "all"
+  },
+  "kf_cap_250_vs_1000": {
+   "tail0.5_250": 0.0058,
+   "tail0.5_1000": 0.0055125,
+   "keyframes": 80
+  },
+  "time_base": {
+   "first_common_abs_sec": 1627785261.079016,
+   "first_raw_scan_abs_sec": 1627785261.0790162,
+   "first_keyframe_abs_sec": 1627785262.3817105,
+   "head_frame_offset_sec_recomputed": 1.30269455909729,
+   "head_frame_offset_sec_archived": 0.0,
+   "relative_and_absolute_rules_equivalent": true
+  }
+ },
+ "comparison": [
+  {
+   "arm": "A0_Host_Native",
+   "tail0.5_mine": 0.3647,
+   "tail0.5_archived": 0.3647,
+   "tail0.5_delta": 0.0,
+   "cov0.5_mine": 0.9496,
+   "cov0.5_archived": 0.9496,
+   "cov0.5_delta": 0.0,
+   "n_points_mine": 144500,
+   "n_points_archived": 144500,
+   "ci0.5_mine": [
+    0.3469,
+    0.3807
+   ],
+   "ci0.5_archived": [
+    0.3469,
+    0.3807
+   ]
+  },
+  {
+   "arm": "A1_Quarantine_Only",
+   "tail0.5_mine": 0.0079,
+   "tail0.5_archived": 0.0079,
+   "tail0.5_delta": -0.0,
+   "cov0.5_mine": 0.9199,
+   "cov0.5_archived": 0.9199,
+   "cov0.5_delta": 0.0,
+   "n_points_mine": 33250,
+   "n_points_archived": 33250,
+   "ci0.5_mine": [
+    0.004,
+    0.0148
+   ],
+   "ci0.5_archived": [
+    0.004,
+    0.0148
+   ]
+  }
+ ],
+ "separation": {
+  "delta_tail0.5": 0.3568,
+  "delta_cov0.5": -0.0297,
+  "ci_disjoint": true
+ }
+}

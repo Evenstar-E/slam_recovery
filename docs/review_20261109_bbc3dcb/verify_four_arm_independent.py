@@ -25,6 +25,16 @@ Run with the system python (has numpy, scipy, rosbags):
 Notes on independence that the report must carry: this is a *reimplementation* check, not new
 data.  It can catch implementation errors and sampling artefacts in the producer; it cannot make
 the underlying replay independent of the archived host poses.
+
+Scope and safety properties, so the output cannot be over-read:
+
+  * no keyframe subsampling -- every keyframe of every arm is scored; that is not a full-point
+    computation (250 points per keyframe, 120 000 of 8 490 000 proxy points, 40 000 coverage
+    queries), and the proxy-cap sensitivity is measured explicitly in the ``sensitivity`` block;
+  * the scan cache is keyed by source sha256 + filter parameters + script version and every hit
+    is re-validated field by field (``test_verify_four_arm_cache.py``);
+  * if any input sha256 differs from the archive the script writes ``status: INVALID_INPUT`` and
+    exits 2 before recomputing anything -- a different input is not this experiment.
 """
 
 from __future__ import annotations
@@ -62,7 +72,53 @@ COV_Q = 40000
 SEARCH_R = 2.5
 THRESHOLDS = (0.25, 0.5, 1.0, 2.0)
 
+# Bumped whenever the cache payload or the decode path changes: the cache key covers the source
+# sha256, this version and the filter parameters, so a stale entry can never be picked up by a
+# different input or a different filter.
+SCRIPT_VERSION = "1.1.0"
+RESULT_JSON = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                           "four_arm_independent_results.json")
+
 _PF = {1: "i1", 2: "u1", 3: "i2", 4: "u2", 5: "i4", 6: "u4", 7: "f4", 8: "f8"}
+
+
+def _sha_file(path):
+    """Content identity of a bag. Raises if the path does not exist -- before any cache lookup."""
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"input bag missing: {path}")
+    h = hashlib.sha256()
+    with open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 22), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _scan_params():
+    return {"topic": SCAN_TOPIC, "rmin": RMIN, "rmax": RMAX,
+            "max_points_per_scan": MAX_KF_POINTS, "script_version": SCRIPT_VERSION}
+
+
+def _cache_path(src_sha):
+    """Key = source content + filter parameters + script version. A changed bag or a changed
+    filter produces a different file, so there is no entry to hit by mistake."""
+    key = hashlib.sha256(
+        json.dumps({"sha": src_sha, **_scan_params()}, sort_keys=True).encode()).hexdigest()[:20]
+    return os.path.join(CACHE, f"scans_{key}.npz")
+
+
+def _cache_meta(src_sha, layout):
+    return json.dumps({"sha": src_sha, "layout": layout, **_scan_params()}, sort_keys=True)
+
+
+def _cache_is_valid(path, src_sha):
+    """Exact metadata match, field by field; anything else is a miss and the caller rebuilds."""
+    try:
+        with np.load(path, allow_pickle=False) as z:
+            meta = json.loads(str(z["meta"]))
+    except Exception:
+        return False
+    want = {"sha": src_sha, **_scan_params()}
+    return all(meta.get(k) == v for k, v in want.items()) and bool(meta.get("layout"))
 
 
 # --------------------------------------------------------------------------------------- bags
@@ -78,40 +134,50 @@ def _cloud_dtype(msg):
                      "itemsize": int(msg.point_step)})
 
 
-def load_scans(path):
-    """[(header_stamp_sec, xyz float64 filtered to 0.5..30 m and capped)] sorted by stamp."""
+def load_scans(path, src_sha):
+    """[(header_stamp_sec, xyz float64 filtered to 0.5..30 m and capped)] sorted by stamp.
+
+    The cache is keyed by the source sha256, the filter parameters and the script version, and
+    every hit is re-validated against the stored metadata; a miss or a mismatch rebuilds.
+    """
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"input bag missing: {path}")
     os.makedirs(CACHE, exist_ok=True)
-    tag = os.path.basename(path).replace(".bag", "")
-    npz = os.path.join(CACHE, f"scans_{tag}.npz")
-    if os.path.exists(npz):
-        z = np.load(npz)
-        starts, flat, stamps, layout = z["starts"], z["pts"], z["stamps"], str(z["layout"])
-    else:
-        out, stamps, layout = [], [], None
-        with Reader(path) as r:
-            conns = [c for c in r.connections if c.topic == SCAN_TOPIC]
-            for conn, _t, raw in r.messages(connections=conns):
-                m = TYPESTORE.deserialize_ros1(raw, conn.msgtype)
-                if layout is None:
-                    layout = (f"point_step={m.point_step} fields="
-                              + ",".join(f"{f.name}@{f.offset}:{f.datatype}" for f in m.fields))
-                a = np.frombuffer(np.asarray(m.data, dtype=np.uint8).tobytes(),
-                                  dtype=_cloud_dtype(m))
-                p = np.column_stack([a["x"], a["y"], a["z"]]).astype(np.float64)
-                rr = np.linalg.norm(p, axis=1)
-                p = p[(rr > RMIN) & (rr < RMAX)]
-                if len(p) > MAX_KF_POINTS:
-                    p = p[:: max(1, len(p) // MAX_KF_POINTS)][:MAX_KF_POINTS]
-                # header stamp, never the bag record clock
-                stamps.append(float(m.header.stamp.sec) + float(m.header.stamp.nanosec) * 1e-9)
-                out.append(p)
-        order = np.argsort(stamps)
-        n = [len(out[i]) for i in order]
-        starts = np.concatenate([[0], np.cumsum(n)])
-        flat = np.vstack([out[i] for i in order]) if out else np.zeros((0, 3))
-        stamps = np.asarray(stamps, float)[order]
-        np.savez(npz, starts=starts, pts=flat, stamps=stamps, layout=np.array(layout or ""))
-    return [(float(stamps[i]), flat[starts[i]:starts[i + 1]].copy()) for i in range(len(stamps))], layout
+    npz = _cache_path(src_sha)
+    if _cache_is_valid(npz, src_sha):
+        with np.load(npz, allow_pickle=False) as z:
+            starts, flat, stamps = z["starts"], z["pts"], z["stamps"]
+            layout = json.loads(str(z["meta"]))["layout"]
+        return ([(float(stamps[i]), flat[starts[i]:starts[i + 1]].copy())
+                 for i in range(len(stamps))], layout)
+
+    out, stamps, layout = [], [], None
+    with Reader(path) as r:
+        conns = [c for c in r.connections if c.topic == SCAN_TOPIC]
+        for conn, _t, raw in r.messages(connections=conns):
+            m = TYPESTORE.deserialize_ros1(raw, conn.msgtype)
+            if layout is None:
+                layout = (f"point_step={m.point_step} fields="
+                          + ",".join(f"{f.name}@{f.offset}:{f.datatype}" for f in m.fields))
+            a = np.frombuffer(np.asarray(m.data, dtype=np.uint8).tobytes(),
+                              dtype=_cloud_dtype(m))
+            p = np.column_stack([a["x"], a["y"], a["z"]]).astype(np.float64)
+            rr = np.linalg.norm(p, axis=1)
+            p = p[(rr > RMIN) & (rr < RMAX)]
+            if len(p) > MAX_KF_POINTS:
+                p = p[:: max(1, len(p) // MAX_KF_POINTS)][:MAX_KF_POINTS]
+            # header stamp, never the bag record clock
+            stamps.append(float(m.header.stamp.sec) + float(m.header.stamp.nanosec) * 1e-9)
+            out.append(p)
+    order = np.argsort(stamps)
+    n = [len(out[i]) for i in order]
+    starts = np.concatenate([[0], np.cumsum(n)])
+    flat = np.vstack([out[i] for i in order]) if out else np.zeros((0, 3))
+    stamps = np.asarray(stamps, float)[order]
+    np.savez(npz, starts=starts, pts=flat, stamps=stamps,
+             meta=np.array(_cache_meta(src_sha, layout or "")))
+    return [(float(stamps[i]), flat[starts[i]:starts[i + 1]].copy())
+            for i in range(len(stamps))], layout
 
 
 def load_poses(path):
@@ -285,20 +351,35 @@ def main():
     arms_a = archived["arms"]
 
     print("[] hashing inputs against the manifest")
-    sha = {}
+    sha, mismatch = {}, []
     for role, path in (("injected_scans", INJ_SCANS), ("injected_poses", INJ_POSES),
                        ("clean_scans_proxy_only", CLN_SCANS),
                        ("clean_poses_proxy_only", CLN_POSES)):
-        h = hashlib.sha256()
-        with open(path, "rb") as fh:
-            for chunk in iter(lambda: fh.read(1 << 22), b""):
-                h.update(chunk)
-        sha[role] = h.hexdigest()
-        print(f"   {role:26s} {h.hexdigest()}  match={h.hexdigest() == archived['inputs_sha256'][role]}")
+        sha[role] = _sha_file(path)
+        ok = sha[role] == archived["inputs_sha256"][role]
+        if not ok:
+            mismatch.append((role, path, sha[role], archived["inputs_sha256"][role]))
+        print(f"   {role:26s} {sha[role]}  match={ok}")
+
+    # A different input is not this experiment. Stop with a labelled status instead of writing a
+    # comparison that would be read as a reproduction.
+    if mismatch:
+        status = {
+            "status": "INVALID_INPUT",
+            "what": "input sha256 does not match four_arm_same_input_benchmark.json",
+            "mismatches": [{"role": r, "path": p, "sha256": s, "archived": a}
+                           for r, p, s, a in mismatch],
+            "script_version": SCRIPT_VERSION,
+        }
+        with open(RESULT_JSON, "w", encoding="utf-8") as fh:
+            json.dump(status, fh, indent=1)
+        print(f"\nINVALID_INPUT: {len(mismatch)} input(s) differ from the archive; "
+              f"nothing was recomputed. Wrote {RESULT_JSON}")
+        raise SystemExit(2)
 
     print("[] loading scans")
-    inj_scans, inj_layout = load_scans(INJ_SCANS)
-    cln_scans, cln_layout = load_scans(CLN_SCANS)
+    inj_scans, inj_layout = load_scans(INJ_SCANS, sha["injected_scans"])
+    cln_scans, cln_layout = load_scans(CLN_SCANS, sha["clean_scans_proxy_only"])
     print(f"   injected layout: {inj_layout}")
     print(f"   clean    layout: {cln_layout}")
 
@@ -358,12 +439,21 @@ def main():
     proxy_tree = cKDTree(proxy_cap)
     cov_q = proxy_cap[:: max(1, len(proxy_cap) // COV_Q)][:COV_Q]
 
-    # exactness of the independent NN: KD-tree vs brute force on 2000 random queries
+    # Exactness of the independent NN. Querying the proxy with its own points is useless -- the
+    # nearest neighbour is then the query itself at distance 0. Displace the queries off the
+    # cloud (0.3-1.6 m, random directions) and compare KD-tree against brute force at non-zero
+    # distance, where a grid or a truncated search would actually go wrong.
     rng = np.random.default_rng(0)
-    qsel = rng.choice(len(proxy_cap), size=2000, replace=False)
-    d_kd, _ = proxy_tree.query(proxy_cap[qsel], k=1)
-    d_bf = np.array([np.sqrt(((proxy_cap - proxy_cap[i]) ** 2).sum(1).min()) for i in qsel])
-    print(f"   NN exactness: max |KD-tree - brute force| = {np.abs(d_kd - d_bf).max():.2e} m")
+    n_q = 2000
+    base = proxy_cap[rng.choice(len(proxy_cap), size=n_q, replace=False)]
+    off = rng.normal(size=(n_q, 3))
+    off /= np.linalg.norm(off, axis=1, keepdims=True)
+    q_off = base + off * rng.uniform(0.3, 1.6, size=(n_q, 1))
+    d_kd, _ = proxy_tree.query(q_off, k=1)
+    d_bf = np.array([np.sqrt(((proxy_cap - q).__pow__(2)).sum(1).min()) for q in q_off])
+    print(f"   NN exactness on displaced queries (n={n_q}, 0.3-1.6 m off-cloud): "
+          f"max |KD-tree - brute force| = {np.abs(d_kd - d_bf).max():.2e} m, "
+          f"median distance {np.median(d_kd):.3f} m")
 
     def kf_pts(kf, cap=KF_CAP):
         w = world_pts(kf) @ R_ic.T + t_ic
@@ -379,6 +469,7 @@ def main():
 
     out = {"_meta": {
         "what": "independent recomputation of the four-arm contamination numbers",
+        "script_version": SCRIPT_VERSION,
         "independence": {"bag_reader": "rosbags + message PointField layout",
                          "nn": "scipy cKDTree (producer: hand-written hash grid)",
                          "alignment": "own Umeyama SVD",
@@ -386,7 +477,14 @@ def main():
         "shared_on_purpose": ["inputs (sha256-checked)", "scan filter 0.5..30 m",
                               "pairing rules", "250-point keyframe cap",
                               "120000-point proxy cap", "pre-onset alignment target"],
-        "sampling": "NONE -- every keyframe of every arm was scored, no subsampling",
+        "sampling": ("NO KEYFRAME SUBSAMPLING -- every keyframe of every arm was scored. This is "
+                     "not a full-point computation: within each keyframe the 250-point cap "
+                     "applies, the proxy keeps 120000 of 8490000 clean points, and coverage uses "
+                     "a 40000-point query budget."),
+        "bootstrap_scope": ("keyframe-level conditional resampling: it measures sampling error "
+                            "conditional on this run pair. It is NOT a cross-run or deployment "
+                            "generalisation interval; that would need a block bootstrap over "
+                            "runs or repeated runs."),
         "layout": {"injected": inj_layout, "clean": cln_layout},
         "inputs_sha256": sha,
         "onset_abs": onset_abs, "end_abs": end_abs, "first_common": first_common,
@@ -470,18 +568,26 @@ def main():
     # (a) proxy cap: the producer keeps 120 000 of 8 490 000 clean-run points (1.4 %). A coarse
     # proxy can only *inflate* the tail, so this bounds how much of A1's 0.0079 is sampling.
     proxy_big = cKDTree(proxy_all)
-    unc = {}
+    unc, unc_boot = {}, {}
     for tag, ids in (("A0_A2_write_everything", full_ids), ("A1_pre_onset_only", pre_ids)):
         dd = [proxy_big.query(kf_pts(inj_kfs[i]), k=1, distance_upper_bound=SEARCH_R)[0]
               for i in ids]
         unc[tag] = tail_stats(dd, tag)
-        print(f"   uncapped proxy {tag:24s} tail0.5={unc[tag]['tail_over_0.5m']:.4f}")
+        # Same keyframe bootstrap as the capped arm, so the full-proxy CI is measured here rather
+        # than borrowed from the 120k run.
+        unc_boot[tag] = bootstrap_kf(dd)
+        print(f"   uncapped proxy {tag:24s} tail0.5={unc[tag]['tail_over_0.5m']:.4f} "
+              f"ci={[round(v, 4) for v in unc_boot[tag]['tail_over_0.5m']['ci95']]}")
     sens["proxy_cap_120k_vs_all"] = {
         "n_proxy_all": int(len(proxy_all)),
         "n_proxy_capped": int(len(proxy_cap)),
         "capped": {k: v["tail_over_0.5m"] for k, v in
                    ((t, out["arms"][t]["distance"]) for t in unc)},
         "uncapped": {k: v["tail_over_0.5m"] for k, v in unc.items()},
+        "capped_ci0.5": {t: out["arms"][t]["bootstrap_kf"]["tail_over_0.5m"]["ci95"]
+                         for t in unc},
+        "uncapped_ci0.5": {t: unc_boot[t]["tail_over_0.5m"]["ci95"] for t in unc},
+        "uncapped_ci_basis": "keyframe bootstrap, n_boot=1000, seed=0, same as the capped arm",
         "keyframes": "all",
     }
     # (b) keyframe point cap
@@ -538,7 +644,7 @@ def main():
         "ci_disjoint": (cmp_rows[0]["ci0.5_mine"][0] > cmp_rows[1]["ci0.5_mine"][1]),
     }
 
-    dst = "/tmp/fourarm_independent.json"
+    dst = RESULT_JSON
     with open(dst, "w", encoding="utf-8") as fh:
         json.dump(out, fh, indent=1, default=float)
     print(f"\nsaved {dst}")
