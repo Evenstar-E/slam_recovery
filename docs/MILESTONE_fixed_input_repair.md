@@ -162,7 +162,16 @@ points of which 85.25% are supported (novel subset 10,581: 69.16%); of the 50,23
 C3 does not, 95.14% were already unsupported. The pre-stated rule (novel supported > unsupported
 AND added-unsupported fraction <= R's) passes: 7,318 > 3,263 and 0.1475 <= 0.6251, verdict
 REPAIR_BENEFIT_SUPPORTED. The proxy is not GT, the frame set is 400/446, and C3 is
-OFFLINE_NATIVE_REESTIMATION, not a deployable loop. The 400-frame set is conditional on C3 having both filtered scans and poses, the
+OFFLINE_NATIVE_REESTIMATION, not a deployable loop. ### Next mainline (pre-registered choice, revised)
+
+Chosen: a short, receipt-backed rate diagnostic on the same frozen input, because
+PAIRING_RULE_MISSING is only the proximate reason for the 46 misses. The run records host
+publication intervals, node/queue logs and input timing over the two missing segments (about 9.4 s
+and 0.2 s) to separate scheduling, input synchronisation and internal tracking. The 75 ms rule is not
+changed, and a fresh run must produce a complete receipt (pre-run hashes, output hash, message
+coverage, exit status). No new fault intensity and no threshold tuning.
+
+The 400-frame set is conditional on C3 having both filtered scans and poses, the
 rule is an analysis rule recorded in the same commit rather than an independently frozen protocol,
 and it does not bind lost good geometry, coverage, missing frames or cost. Counts are sampled
 geometric disagreement at 0.5 m, not original point-id edits.
