@@ -330,6 +330,17 @@ UNKNOWN. The next step is a bounded applicability check, not another mechanism e
 same build four times on the hall_01 clean sequence; if it also crosses, the instability is
 host/config-wide, and if it does not, room_02 is a sequence-specific degenerate case.
 
+**Applicability check (hall_01, same build B)**: four runs on the non-injected `hall01_100_160.bag`
+against the hall_01 clean proxy (2,422,718 points after 5 cm voxels), scored on one common frame
+set (562 of 566), give patch-unsupported 0.2282/0.2790/0.2427/0.2715, NN supported 1.0000, median
+0.008-0.010 m. The raw spread is 0.0508, against room_02's 0.007 vs 0.66-0.69 (spread 0.68). The
+0.10/0.50 mode rule labels all four UNCLEAR, so the stability reading rests on the raw values, not
+on a shared label: the rule's thresholds describe room_02's distribution and do not transfer.
+Verdict `STABLE_ON_HALL01_ROOM02_IS_SEQUENCE_SPECIFIC`: the host/config is stable on hall_01 and
+room_02 is a sequence-specific degenerate case. Room_02 is excluded from single-run factor
+comparison and its four cells stay UNKNOWN. This bounds the phenomenon; it does not explain the
+room_02 root cause.
+
 **Initialisation proxy is negative**: the first-pose delay (first `/aft_mapped_to_init` minus the
 first LiDAR scan, read from the 16 existing output bags) does not separate modes — GOOD delays are
 1.864/4.196/5.462 s, BAD 1.397–3.130 s, and no threshold separates them: 1.864 s is a GOOD delay
