@@ -284,6 +284,7 @@ python3 -B docs/review_20261109_bbc3dcb/run_fixed_input_repair_c0c3.py measure
 python3 -B docs/review_20261109_bbc3dcb/run_m3_same_region.py
 python3 -B docs/review_20261109_bbc3dcb/run_raw_vs_repaired.py
 python3 -B docs/review_20261109_bbc3dcb/run_m4_completeness.py
+python3 -B docs/review_20261109_bbc3dcb/run_rate_diagnosis.py
 bash docs/review_20261109_bbc3dcb/fl_run_isolated.sh <bag> <new-out> 0.5 60
 bash docs/review_20261109_bbc3dcb/test_fl_run_cleanup.sh
 ```
