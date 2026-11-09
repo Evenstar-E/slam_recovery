@@ -295,6 +295,20 @@
    "new:O+F-B#3",
    "new:O+F-B#4"
   ],
+  "expected": [
+   "earlier:O#1",
+   "earlier:O#2",
+   "earlier:O+F-B#1",
+   "earlier:O+F-B#2",
+   "new:O#1",
+   "new:O#2",
+   "new:O#3",
+   "new:O#4",
+   "new:O+F-B#1",
+   "new:O+F-B#2",
+   "new:O+F-B#3",
+   "new:O+F-B#4"
+  ],
   "common_frames": 323
  },
  "9_bist_runs": {

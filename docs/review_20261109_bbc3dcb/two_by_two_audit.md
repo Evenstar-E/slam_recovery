@@ -155,6 +155,18 @@ gauge 残差 1.32–1.54 cm，所以 1 cm 阈值确实会在首样本必然触�
 但也不被用来下结论——这与撤回该判断一致。建议在文档里把这层意思写明：
 「该点保留但当前不解读，它是唯一可能支持初始化假说的证据，也是将来若要重提该假说时必须先解释的点」。
 
+### 10 号检查的加固（审阅 dfa20d24）
+
+原版 `check_run_identity` 只比较两个内部列表的长度，因此 `check_run_identity({})` 会返回
+`PASS / runs=[] / common_frames=None`——**一个不可能失败的检查**。
+
+现在：空输入、无 run 记录、`protocol` 未声明 cells/repeats → **UNVERIFIABLE**；
+期望键集由 `protocol.cells × repeats_per_cell` 加两批 earlier 推导，缺一或多一 → **FAIL**；
+`common_set.per_run_available` 缺失、条数不符、缺批次前缀 → **FAIL**；`n_runs` 缺失或不等 → **FAIL**。
+
+7 项 fixture：完整集 PASS；`{}` 判 UNVERIFIABLE；缺 run、多 run、缺 `n_runs`、`n_runs` 不符、
+批次前缀丢失各自判 FAIL。
+
 ## 5b. R2 / R3 处置（同意你的提议）
 
 - **R2**：旧 `room02_hybrid_bag_report.json` 属已废弃的 X/Y 设计，2×2 已取代它。

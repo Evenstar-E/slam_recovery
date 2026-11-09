@@ -129,5 +129,66 @@ class TestIndependent(unittest.TestCase):
         self.assertEqual(r["verdict"], "FAIL")
 
 
+class TestRunIdentity(unittest.TestCase):
+    @staticmethod
+    def _bist(new=4, earlier=2, drop=None, extra=None, n_runs="auto"):
+        cells = ["O", "O+F-B"]
+        runs, pav = {}, {}
+        for c in cells:
+            for i in range(1, new + 1):
+                runs[f"{c}#{i}"] = {}
+                pav[f"new:{c}#{i}"] = 323
+            for i in (1, 2)[:earlier]:
+                runs[f"{c}#earlier{i}"] = {}
+                pav[f"earlier:{c}#{i}"] = 323
+        new_runs = {k: v for k, v in runs.items() if "earlier" not in k}
+        old = {k: v for k, v in runs.items() if "earlier" in k}
+        if drop:
+            new_runs.pop(drop, None)
+            pav.pop(f"new:{drop}", None)
+        if extra:
+            new_runs[extra] = {}
+            pav[f"new:{extra}"] = 323
+        return {"protocol": {"cells": cells, "repeats_per_cell": new},
+                "new_runs": new_runs, "earlier_2x2_runs": old,
+                "common_set": {"n": 323, "n_runs": len(new_runs) + len(old)
+                               if n_runs == "auto" else n_runs,
+                               "per_run_available": pav}}
+
+    def test_complete_set_passes(self):
+        self.assertEqual(A.check_run_identity(self._bist())["verdict"], "PASS")
+
+    def test_empty_input_is_unverifiable(self):
+        r = A.check_run_identity({})
+        self.assertEqual(r["verdict"], "UNVERIFIABLE")
+        self.assertEqual(r["runs"], [])
+
+    def test_missing_run_is_rejected(self):
+        r = A.check_run_identity(self._bist(drop="O#3"))
+        self.assertEqual(r["verdict"], "FAIL")
+        self.assertTrue(any("missing runs" in p for p in r["problems"]))
+
+    def test_unexpected_run_is_rejected(self):
+        r = A.check_run_identity(self._bist(extra="O#7"))
+        self.assertTrue(any("unexpected runs" in p for p in A.check_run_identity(
+            self._bist(extra="O#7"))["problems"]))
+
+    def test_missing_n_runs_is_rejected(self):
+        r = A.check_run_identity(self._bist(n_runs=None))
+        self.assertTrue(any("n_runs absent" in p for p in r["problems"]))
+
+    def test_wrong_n_runs_is_rejected(self):
+        r = A.check_run_identity(self._bist(n_runs=11))
+        self.assertTrue(any("n_runs 11" in p for p in r["problems"]))
+
+    def test_missing_batch_prefix_is_rejected(self):
+        b = self._bist()
+        b["common_set"]["per_run_available"] = {k.replace("new:", "").replace("earlier:", ""): v
+                                                for k, v in
+                                                b["common_set"]["per_run_available"].items()}
+        r = A.check_run_identity(b)
+        self.assertEqual(r["verdict"], "FAIL")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

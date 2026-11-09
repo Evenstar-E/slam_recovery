@@ -383,10 +383,26 @@ def check_run_output_hashes(bist, receipts):
     return {"verdict": "PASS" if not bad else "FAIL", "problems": bad, "checked": checked}
 
 
+def expected_run_labels(bist):
+    """The labels the protocol implies: R new repeats per cell plus the two pooled earlier ones."""
+    proto = bist.get("protocol") or {}
+    cells = proto.get("cells") or []
+    reps = int(proto.get("repeats_per_cell") or 0)
+    labels = {f"new:{c}#{i}" for c in cells for i in range(1, reps + 1)}
+    labels |= {f"earlier:{c}#{i}" for c in cells for i in (1, 2)}
+    return labels
+
+
 def check_run_identity(bist):
-    """Twelve runs, each with one unique (batch, cell, rep) label, and no silent shrinking."""
+    """Every analysed run must be present, uniquely labelled, and none may be silently missing.
+
+    An empty or unlabelled input is UNVERIFIABLE: the previous version compared two internal
+    lists and returned PASS for `{}`, which is a check that cannot fail.
+    """
+    if not bist or not (bist.get("new_runs") or bist.get("earlier_2x2_runs")):
+        return {"verdict": "UNVERIFIABLE", "problems": ["no run records to audit"],
+                "runs": [], "common_frames": None}
     bad = []
-    pav = (bist.get("common_set") or {}).get("per_run_available") or {}
     runs = {}
     for batch, grp in (("new", "new_runs"), ("earlier", "earlier_2x2_runs")):
         for key in (bist.get(grp) or {}):
@@ -395,18 +411,37 @@ def check_run_identity(bist):
             if label in runs:
                 bad.append(f"collision on {label}")
             runs[label] = grp
-    if len(pav) != len(runs):
-        bad.append(f"per_run_available lists {len(pav)} runs but {len(runs)} were analysed")
-    for label in runs:
-        if label not in pav:
-            bad.append(f"{label} missing from per_run_available")
-    for label in pav:
-        if label.split(":")[0] not in ("new", "earlier"):
-            bad.append(f"per_run_available entry {label} carries no batch prefix")
-    if (bist.get("common_set") or {}).get("n_runs") not in (None, len(runs)):
-        bad.append("common_set.n_runs disagrees with the run list")
+    expected = expected_run_labels(bist)
+    if not expected:
+        return {"verdict": "UNVERIFIABLE",
+                "problems": ["protocol declares no cells/repeats, so no expected set exists"],
+                "runs": sorted(runs), "common_frames": None}
+    missing = sorted(expected - set(runs))
+    extra = sorted(set(runs) - expected)
+    if missing:
+        bad.append(f"missing runs: {missing}")
+    if extra:
+        bad.append(f"unexpected runs: {extra}")
+    pav = (bist.get("common_set") or {}).get("per_run_available")
+    if not isinstance(pav, dict):
+        bad.append("common_set.per_run_available absent: coverage of the run list is unknown")
+    else:
+        if len(pav) != len(runs):
+            bad.append(f"per_run_available lists {len(pav)} runs but {len(runs)} were analysed")
+        for label in runs:
+            if label not in pav:
+                bad.append(f"{label} missing from per_run_available")
+        for label in pav:
+            if label.split(":")[0] not in ("new", "earlier"):
+                bad.append(f"per_run_available entry {label} carries no batch prefix")
+    n_runs = (bist.get("common_set") or {}).get("n_runs")
+    if n_runs is None:
+        bad.append("common_set.n_runs absent")
+    elif int(n_runs) != len(runs):
+        bad.append(f"common_set.n_runs {n_runs} != {len(runs)} analysed runs")
     return {"verdict": "PASS" if not bad else "FAIL", "problems": bad,
-            "runs": sorted(runs), "common_frames": (bist.get("common_set") or {}).get("n")}
+            "runs": sorted(runs), "expected": sorted(expected),
+            "common_frames": (bist.get("common_set") or {}).get("n")}
 
 
 def main():
