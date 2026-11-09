@@ -56,7 +56,7 @@ def decode_jpeg(data: bytes) -> np.ndarray:
             return np.asarray(im.convert("RGB"))[:, :, ::-1].copy()
 
 
-def convert_cloud(msg: PointCloud2, inject: bool, occlusion: float) -> PointCloud2:
+def convert_cloud(msg: PointCloud2, inject: bool, occlusion: float, bag_distance_m: float) -> PointCloud2:
     # PointField.datatype: 4 = UINT16 (ring), 7 = FLOAT32. Reading every field as float32 turns
     # the uint16 ring into NaN, so the dtype has to follow the message.
     _np_for = {1: "i1", 2: "u1", 3: "<i2", 4: "<u2", 5: "<i4", 6: "<u4", 7: "<f4", 8: "<f8"}
@@ -73,7 +73,10 @@ def convert_cloud(msg: PointCloud2, inject: bool, occlusion: float) -> PointClou
     pts = np.column_stack([raw["x"], raw["y"], raw["z"], raw["intensity"]]).astype(np.float64)
     if inject:
         pts, _ = inject_plastic_bag_near_field_occlusion(
-            np.column_stack([pts, np.zeros(len(pts))]), occluded_azimuth_fraction=occlusion, seed=42
+            np.column_stack([pts, np.zeros(len(pts))]),
+            occluded_azimuth_fraction=occlusion,
+            bag_distance_m=bag_distance_m,
+            seed=42,
         )
         pts = pts[:, :4]
 
@@ -118,6 +121,9 @@ def main() -> None:
     ap.add_argument("--inject-start-rel", type=float, default=None)
     ap.add_argument("--inject-end-rel", type=float, default=None)
     ap.add_argument("--occlusion", type=float, default=0.88)
+    ap.add_argument("--bag-distance", type=float, default=4.30,
+                    help="occluder distance from the sensor; the repository's other uses of this "
+                         "injector pass 4.30 m, where the sheet reads as an ordinary wall")
     ap.add_argument("--visual-gain", type=float, default=None,
                     help="low-light gain applied to the image stream inside the visual window")
     ap.add_argument("--visual-blur", type=int, default=None,
@@ -157,7 +163,7 @@ def main() -> None:
                     and args.inject_start_rel <= (ts - lo) <= args.inject_end_rel
                 )
                 injected += int(inject)
-                dst.write(CLOUD, convert_cloud(msg, inject, args.occlusion), t)
+                dst.write(CLOUD, convert_cloud(msg, inject, args.occlusion, args.bag_distance), t)
             else:
                 arr = decode_jpeg(bytes(msg.data))
                 visual_window = (

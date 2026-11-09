@@ -53,11 +53,12 @@
     "prefix_poses": 170
   },
   "findings": [
-    "Four-arm matrix on hall_01 [120,140] s: clean 0.3143 m ATE / 0.4341 m window; LiDAR-only occlusion 0.3653 / 0.5868; camera-only degradation 0.3148 / 0.4399; both 0.3661 / 0.6752.",
-    "The camera-only arm is indistinguishable from clean (ATE +0.2%), so the visual term is not carrying the solution on this sequence. Degrading both modalities gives essentially the LiDAR-only ATE (0.3661 vs 0.3653) with a worse window (0.6752 vs 0.5868, +15%).",
-    "Together with room_02 (0.0771 -> 0.0886 m) and the img_en=0 control (0.0761 vs 0.0771 m), this does not reproduce the cross-modal contamination mechanism Action Item 8.1 hypothesised: a tightly-coupled LIVO here behaves as a LiDAR-inertial system that tolerates single-modality near-field occlusion, and its visual term contributes ~nothing in either the clean or the degraded case.",
-    "The framework's case for this host therefore has to be made where the LiDAR-inertial solution itself fails (long geometric degeneracy, IMU saturation) or where an authoritative map must be protected, not where a polluted voxel map is expected to drag the photometric term down.",
-    "Playback rate is part of the protocol: hall_01 must run at 0.5x. At 1.0x the node consumed only 35.6 s of the 60 s window and the truncated trajectory produced an ATE that rose 0.09 -> 0.56 with time, which would have been reported as drift.",
+    "With the injection at 4.30 m -- the distance every other use of this injector in the repository passes and the one the LiDAR-host runs used -- FAST-LIVO2 degrades by about 13x on both sequences: room_02 0.0771 -> 1.0313 m ATE, hall_01 0.3143 -> 4.2331 m ATE (window RMSE 0.4341 -> 4.5529 m).",
+    "That is the same order as FAST-LIO2 under the same injection (0.1316 -> 1.2996 m, x9.9), so the fifth host is not special: a tightly-coupled LIVO does not rescue an 88% near-field occlusion once the occluder is placed where it actually looks like structure.",
+    "The earlier 'close to immune' reading came from injecting at 0.35 m, which is retained in the under_scaled_arms block for the record and is explicitly not comparable.",
+    "The visual term contributes nothing in either regime: 4.2331 vs 4.1820 m at 4.30 m, 1.0313 vs 1.0481 m on room_02, and 0.0771 vs 0.0761 m on the clean control. The img_en=0 arms exist precisely to show this, and they show it in the degraded case, not only in the clean one.",
+    "Why the photometric term is inert is still unresolved. Candidates: img_point_cov=100 against dept_err=0.02 / beam_err=0.05, insufficient indoor texture, and an uncalibrated camera-LiDAR time offset. A lower img_point_cov is prepared (fastlivo2/m2dgr_vio10.yaml) but not yet run.",
+    "Playback rate is part of the protocol: hall_01 must run at 0.5x. At 1.0x the node consumed only 35.6 s of the 60 s window and the truncated trajectory produced an ATE rising 0.09 -> 0.56 with time, which would have been reported as drift.",
     "M2DGR Mocap GT contains isolated corrupted samples (room_02 t=26.35 s moves 7.11 m for one sample); the evaluator rejects them and reports the count. hall_01 needed none."
   ],
   "sequences": {
@@ -94,10 +95,35 @@
           "ate_max_m": 0.2318,
           "rpe_trans_rmse_m": 0.07,
           "window_rmse_m": 0.1287
+        },
+        "lidar_88pct_at_4p30m_vision_on": {
+          "provenance": "REAL_HOST",
+          "matched_poses": 848,
+          "ate_rmse_m": 1.0313,
+          "ate_max_m": 1.8344,
+          "rpe_trans_rmse_m": 0.4409,
+          "window_rmse_m": 1.2499
+        },
+        "lidar_88pct_at_4p30m_vision_off": {
+          "provenance": "REAL_HOST",
+          "matched_poses": 565,
+          "ate_rmse_m": 1.0481,
+          "ate_max_m": 1.8993,
+          "rpe_trans_rmse_m": 0.6394,
+          "window_rmse_m": 1.1589
         }
       },
       "degradation": {
-        "ate_ratio_degraded_over_clean": 1.1492
+        "at_0p35m_under_scaled_injection": {
+          "ate_ratio": 1.1492,
+          "note": "NOT comparable with the LiDAR-host runs; see under_scaled_arms"
+        },
+        "at_4p30m_vision_on": {
+          "ate_ratio": 13.3761
+        },
+        "at_4p30m_vision_off": {
+          "ate_ratio": 13.594
+        }
       }
     },
     "hall_01_100_160s": {
@@ -151,20 +177,36 @@
           "ate_max_m": 0.8903,
           "rpe_trans_rmse_m": 0.2005,
           "window_rmse_m": 0.6752
+        },
+        "lidar_88pct_at_4p30m_vision_on": {
+          "provenance": "REAL_HOST",
+          "matched_poses": 562,
+          "ate_rmse_m": 4.2331,
+          "ate_max_m": 12.2886,
+          "rpe_trans_rmse_m": 0.6485,
+          "window_rmse_m": 4.5529
+        },
+        "lidar_88pct_at_4p30m_vision_off": {
+          "provenance": "REAL_HOST",
+          "matched_poses": 368,
+          "ate_rmse_m": 4.182,
+          "ate_max_m": 12.3339,
+          "rpe_trans_rmse_m": 0.968,
+          "window_rmse_m": 4.5394
         }
       },
       "degradation": {
-        "lidar_only": {
-          "ate_ratio": 1.1623,
-          "window_ratio": 1.3518
+        "at_0p35m_under_scaled": {
+          "lidar_only_ate_ratio": 1.1623,
+          "camera_only_ate_ratio": 1.0016,
+          "both_ate_ratio": 1.1648
         },
-        "camera_only": {
-          "ate_ratio": 1.0016,
-          "window_ratio": 1.0134
+        "at_4p30m_vision_on": {
+          "ate_ratio": 13.4683,
+          "window_ratio": 10.4881
         },
-        "both": {
-          "ate_ratio": 1.1648,
-          "window_ratio": 1.5554
+        "at_4p30m_vision_off": {
+          "ate_ratio": 13.3058
         }
       }
     }
@@ -173,5 +215,6 @@
     "The injected sheet sits at 0.35 m (injector default). Every other use of this injector in the repository -- run_identifiability_and_transformer_real_bags.py -- passes bag_distance_m=4.30, where the sheet reads as an ordinary wall rather than a near-field occluder. The FAST-LIVO2 arms are therefore NOT directly comparable with the LiDAR-host plastic-bag runs in this repository, and the 'close to immune' reading has to be re-tested at 4.30 m before it is used.",
     "There is no degraded + img_en=0 arm. Without it, 'vision saved it' and 'the LiDAR-inertial solution held' cannot be separated; the clean-only img_en=0 control does not answer it, because the visual term's contribution can differ between clean and degraded data, which is the very thing under test.",
     "The visual term is effectively inert on this data (clean 0.0771 m with vision vs 0.0761 m without), so these runs are closer to LiDAR-inertial runs than to LIVO runs. img_point_cov=100 against dept_err=0.02 / beam_err=0.05, indoor texture, and an uncalibrated camera-LiDAR time offset are all candidate causes and none has been ruled out."
-  ]
+  ],
+  "under_scaled_arms": "The arms injected at 0.35 m (the injector default) are retained for the record but must not be compared with the LiDAR-host plastic-bag runs, which use 4.30 m. At 0.35 m the sheet sits inside the near-field guard band of a voxel-map LIO and does not present convincing geometry; the resulting 'close to immune' reading was an artefact of that choice."
 }
