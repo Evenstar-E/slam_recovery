@@ -32,7 +32,31 @@
  },
  "clean_to_gt": {
   "matched": 77,
-  "residual_rmse_m": 0.08521627705254621
+  "residual_rmse_m": 0.08521627705254621,
+  "fitted_on": "clean keyframes with stamp < injection window start",
+  "start_ns": 1627785275607408524,
+  "R_cg": [
+   [
+    -0.2593611014759593,
+    0.965736607202604,
+    -0.009199160286727725
+   ],
+   [
+    0.9655151172782866,
+    0.25950133903146977,
+    0.020966958481636044
+   ],
+   [
+    0.022635753759784008,
+    -0.003443914876703842,
+    -0.9997378466888449
+   ]
+  ],
+  "t_cg": [
+   16.677070708606436,
+   10.839935488767425,
+   -4.23498692314135
+  ]
  },
  "trajectory": {
   "R": {
@@ -48,11 +72,6 @@
    "ate_full_alignment_diagnostic_m": 0.3185291881794998,
    "ate_full_alignment_max_m": 0.6951030220155734,
    "ate_frozen_prefix_protocol_m": 0.49184380829384977
-  },
-  "population": {
-   "frame_set": 400,
-   "gt_matched": 252,
-   "gt": "/home/R26534/M2DGR/GT/hall_01.txt"
   }
  },
  "frame_set": {

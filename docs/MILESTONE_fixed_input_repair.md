@@ -170,6 +170,15 @@ clean->GT protocol, while C3 has 0.319 m (max 0.695 m) and 0.492 m. The frozen t
 on 77 pre-onset clean keyframes with 0.085 m residual. Geometry and trajectory therefore agree on
 this sequence; the result remains single-sequence, GT-partial (252/400) and offline.
 
+Two B4 cells are filled from archived receipts without a new host run. Cost: R's output has no
+receipt (old `fl_record.sh`), so its 296 s is derived (58 s / 0.5 playback + 150 s drain + ~30 s
+startup), while C3's 122.9 s is measured (rate 1.0, drain 40); different rates and drains make the
+wall times not directly comparable, and peak RSS is unavailable for both. Missing sensitivity:
+excluding the 81 frames within 1 s of the 46 missing ones leaves 319 frames, where R moves to
+coverage 0.7977 / unsupported 0.4200 / ATE 1.617 m and C3 to 0.9759 / 0.0975 / 0.274 m. The
+ordering is unchanged, so the 46 missing frames do not carry the conclusion, although they
+disproportionately affect R.
+
 ### Next mainline (pre-registered choice, revised)
 
 Chosen: a short, receipt-backed rate diagnostic on the same frozen input, because

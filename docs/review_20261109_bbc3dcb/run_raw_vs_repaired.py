@@ -179,7 +179,10 @@ def main():
         R_cg, t_cg = V.umeyama(mecg, mgcg)
         clean_to_gt = {"matched": int(len(mtcg)),
                        "residual_rmse_m": float(np.sqrt(np.mean(
-                           np.sum((mecg @ R_cg.T + t_cg - mgcg) ** 2, axis=1))))}
+                           np.sum((mecg @ R_cg.T + t_cg - mgcg) ** 2, axis=1)))),
+                       "fitted_on": "clean keyframes with stamp < injection window start",
+                       "start_ns": start_ns,
+                       "R_cg": R_cg.tolist(), "t_cg": t_cg.tolist()}
     else:
         R_cg = t_cg = None
         clean_to_gt = {"matched": int(len(mtcg)), "status": "TOO_FEW"}
