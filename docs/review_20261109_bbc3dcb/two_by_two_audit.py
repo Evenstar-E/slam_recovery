@@ -28,6 +28,11 @@ BAGS = os.path.join(_REPO, "docs/review_20261109_6b61c9d/single_factor_bags.json
 EVAL = os.path.join(_REPO, "docs/review_20261109_6b61c9d/evaluate_2x2_runs.json")
 OUT = os.path.join(_HERE, "two_by_two_audit.json")
 BIST = os.path.join(_HERE, "room02_bistability_results.json")
+HALL01 = json.load(open(os.path.join(_HERE, "hall01_stability_results.json"), encoding="utf-8"))
+HALL01_RECEIPTS = [json.load(open(p, encoding="utf-8")) for p in sorted(
+    glob.glob(os.path.join(_HERE, "hall01_stab_receipt_fl_run_*.json")))]
+LIB_GAP = (json.load(open(os.path.join(_HERE, "library_hash_gap.json"), encoding="utf-8"))
+           if os.path.exists(os.path.join(_HERE, "library_hash_gap.json")) else {})
 T3A_RESULTS = json.load(open(os.path.join(_HERE, "room02_T3a_results.json"), encoding="utf-8"))
 T3A_ENRICHED = json.load(open(os.path.join(_HERE, "room02_T3a_enriched_results.json"),
                               encoding="utf-8"))
@@ -469,7 +474,7 @@ def check_verdict_scope(results, label=""):
             "scope": scope, "build": str(build)[:80] if build else None}
 
 
-def check_receipt_library(receipts, results=None):
+def check_receipt_library(receipts, results=None, registry=None, batch=None):
     """An executable hash that is identical across builds cannot identify a build.
 
     If the behaviour lives in a shared library, the receipt must hash that library too.
@@ -488,15 +493,84 @@ def check_receipt_library(receipts, results=None):
     if not missing:
         return {"verdict": "PASS", "problems": [], "receipts": len(receipts)}
     gap = (results or {}).get("provenance_gap") or {}
-    if gap.get("receipt_library_sha256") == "ABSENT":
+    reg = registry or {}
+    listed = batch is not None and batch in (reg.get("batches") or {})
+    if gap.get("receipt_library_sha256") == "ABSENT" or listed:
         return {"verdict": "RETROSPECTIVE_PARTIAL",
                 "problems": [f"{len(missing)}/{len(receipts)} receipts predate the requirement; "
                              "the gap is declared, not silently missing"],
-                "declared_gap": gap, "receipts": len(receipts)}
+                "declared_gap": gap if gap else (reg.get("batches", {}).get(batch) if listed
+                                                 else None),
+                "declared_by": "results" if gap else ("registry" if listed else None),
+                "receipts": len(receipts)}
     return {"verdict": "FAIL",
             "problems": [f"{len(missing)}/{len(receipts)} receipts record no loaded-library hash "
                          "and no declared gap explains it"],
             "receipts": len(receipts)}
+
+
+def check_batch_identity(receipts, expected_input_sha=None):
+    """Any batch: one binary, one config, one revision, one input, outputs matching disk."""
+    bad = []
+    if not receipts:
+        return {"verdict": "UNVERIFIABLE", "problems": ["no receipts"]}
+    for field, label in (("script", "runner script"), ("config_m2dgr", "m2dgr config"),
+                         ("config_camera", "camera config")):
+        vals = {r.get("pre_run", {}).get("sha256", {}).get(field) for r in receipts}
+        if len(vals) != 1:
+            bad.append(f"{label} differs across receipts: {sorted(map(str, vals))}")
+    for field, label in (("sha256", "binary sha"), ("source_revision", "revision")):
+        vals = {r.get("host", {}).get(field) for r in receipts}
+        if len(vals) != 1:
+            bad.append(f"{label} differs across receipts: {sorted(map(str, vals))}")
+    bags = {(r.get("pre_run", {}).get("paths", {}).get("input_bag"),
+             r.get("pre_run", {}).get("sha256", {}).get("input_bag")) for r in receipts}
+    if len(bags) != 1:
+        bad.append(f"input bag differs across receipts: {sorted(map(str, bags))}")
+    elif expected_input_sha and bags.pop()[1] != expected_input_sha:
+        bad.append("input bag sha != the one this batch claims")
+    for r in receipts:
+        if r.get("status") != "OK":
+            bad.append(f"status {r.get('status')}")
+            break
+        out = r.get("output", {})
+        if not out.get("sha256") or not out.get("bag"):
+            bad.append("a receipt has no output hash")
+            break
+        if os.path.exists(out["bag"]) and _sha256(out["bag"]) != out["sha256"]:
+            bad.append("an output bag does not match its recorded hash")
+            break
+    return {"verdict": "PASS" if not bad else "FAIL", "problems": bad,
+            "receipts": len(receipts)}
+
+
+def check_hall01_stability(results):
+    """The hall_01 applicability numbers, and whether the conclusion rests on labels or on values."""
+    bad = []
+    runs = results.get("runs") or {}
+    n_common = results.get("common_frames")
+    if len(runs) != 4:
+        bad.append(f"{len(runs)} runs, expected 4")
+    for key, r in runs.items():
+        if r.get("n_common") != n_common:
+            bad.append(f"{key}: n_common {r.get('n_common')} != common {n_common}")
+        if r.get("nn_supported_fraction") != 1.0:
+            bad.append(f"{key}: nn_supported {r.get('nn_supported_fraction')}")
+    u = [r.get("patch_unsupported_fraction") for r in runs.values()]
+    spread = (max(u) - min(u)) if u else None
+    declared = (results.get("source_spread") or {}).get("range")
+    if spread is not None and declared is not None and abs(spread - float(declared)) > 1e-9:
+        bad.append(f"spread {spread:.6f} != recorded {declared}")
+    modes = [r.get("mode") for r in runs.values()]
+    if len(set(modes)) != 1:
+        bad.append(f"modes are not uniform: {modes}")
+    # a uniform UNCLEAR is not stability evidence by itself
+    summary = results.get("summary") or {}
+    if set(modes) == {"UNCLEAR"} and not summary.get("note"):
+        bad.append("all runs UNCLEAR and no note explaining that the label is not the evidence")
+    return {"verdict": "PASS" if not bad else "FAIL", "problems": bad,
+            "common_frames": n_common, "spread": round(spread, 6) if spread else None,
+            "modes": modes}
 
 
 def main():
@@ -512,12 +586,19 @@ def main():
            "5_frozen_transform": audit_frozen_transform(results),
            "6_hash_chain": audit_hash_chain(results, manifest),
            "11_t3a": {
-               "receipt_library": check_receipt_library(T3A_RECEIPTS, T3A_RESULTS),
+               "receipt_library": check_receipt_library(T3A_RECEIPTS, T3A_RESULTS,
+                                                        LIB_GAP, "room02_T3a"),
                "verdict_scope": check_verdict_scope(T3A_RESULTS, "room02_T3a_results"),
                "enriched_scope": check_verdict_scope(T3A_ENRICHED, "room02_T3a_enriched_results"),
                "identity": audit_receipts(
                    manifest,
                    receipts=T3A_RECEIPTS, arms=("O",), expect_per_arm=6),
+           },
+           "12_hall01": {
+               "stability": check_hall01_stability(HALL01),
+               "identity": check_batch_identity(HALL01_RECEIPTS),
+               "receipt_library": check_receipt_library(HALL01_RECEIPTS, HALL01,
+                                                        LIB_GAP, "hall01_stab"),
            },
            "10_run_identity": check_run_identity(
                json.load(open(BIST, encoding="utf-8"))),
@@ -549,7 +630,13 @@ def main():
         json.dump(out, fh, indent=1, default=float)
     for k in ("1_protocol", "2_receipts", "3_independent", "4_ate_convention",
               "5_frozen_transform", "6_hash_chain", "7_diagnostic_unchanged",
-              "8_bistability", "9_bist_runs", "10_run_identity", "11_t3a"):
+              "8_bistability", "9_bist_runs", "10_run_identity", "11_t3a", "12_hall01"):
+        if k == "12_hall01":
+            print(k, {n: v["verdict"] for n, v in out[k].items()})
+            for n, v in out[k].items():
+                if v["verdict"] != "PASS":
+                    print("   ", n, v.get("problems", [])[:2])
+            continue
         if k == "11_t3a":
             print(k, {n: v["verdict"] for n, v in out[k].items()})
             for n, v in out[k].items():

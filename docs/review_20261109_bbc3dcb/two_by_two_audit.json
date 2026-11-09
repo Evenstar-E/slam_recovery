@@ -289,6 +289,7 @@
     "why": "the six T3a receipts record only the executable sha, which is identical across builds; the behaviour lives in liblaser_mapping.so",
     "fix_forward": "receipts must record library_path and library_sha256 read from the running process (/proc/<pid>/maps), not from a declared config"
    },
+   "declared_by": "results",
    "receipts": 6
   },
   "verdict_scope": {
@@ -495,6 +496,32 @@
      "match": true
     }
    ]
+  }
+ },
+ "12_hall01": {
+  "stability": {
+   "verdict": "PASS",
+   "problems": [],
+   "common_frames": 562,
+   "spread": 0.05079,
+   "modes": [
+    "UNCLEAR",
+    "UNCLEAR",
+    "UNCLEAR",
+    "UNCLEAR"
+   ]
+  },
+  "identity": {
+   "verdict": "PASS",
+   "problems": [],
+   "receipts": 4
+  },
+  "receipt_library": {
+   "verdict": "FAIL",
+   "problems": [
+    "4/4 receipts record no loaded-library hash and no declared gap explains it"
+   ],
+   "receipts": 4
   }
  },
  "10_run_identity": {

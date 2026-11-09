@@ -226,6 +226,45 @@ receipt_library 改为三分：新 receipt 缺库 hash → **FAIL**；**已声�
    `ldd` 解析出实际加载的 `.so`，而不是声明值）；
 2. 任何 `verdict` 旁附 `runs_analysed` 与 `build`，缺这两项时下游规则判 FAIL（已加入第 11 组检查）。
 
+## 11. hall_01 适用性（main 324b8db）
+
+| 项 | 结果 |
+|---|---|
+| 共同集与逐 run 计数 | **PASS**：`common_frames` 562，四次 `n_common` 全 562，`map_points` 全 140,500，`nn_supported_fraction` 全 1.0 |
+| 原始 unsupported | 0.2282 / 0.2790 / 0.2427 / 0.2715，跨度 **0.0508**，与记录一致 |
+| 身份 | **PASS**：四份 receipt 同一 input `905c6a15…`、同一 exec `76359f53…`、同一 config，全 `OK` |
+| **receipt 库 hash** | **FAIL（4/4）**：同 T3a 一样缺 `library_sha256`，而 `hall01_stability_results.json` **没有 `provenance_gap` 声明** |
+| 不得把「四次 UNCLEAR」当稳定证据 | **PASS**：Milestone 明写「the stability reading rests on the raw values, not on a shared label」，并说明 0.10/0.50 的阈值描述的是 room_02 的分布、不可迁移 |
+
+### 跨数据集比较的是"离散度"而不是"水平"
+
+hall_01 的 0.0508 与 room_02 的 0.68 比的是**同一统计量在各自数据集内的跨度**，不是把两个
+绝对水平放在一起比。这个比较是成立的，因为代理面不同、基线不同，水平不可比而离散度可比。
+文档现在的写法正是这个，无需改。
+
+### 库 hash 的两批需要同一份声明
+
+T3a 走的是结果文件内的 `provenance_gap`；hall_01 没有这个字段，所以现在判 **FAIL**。
+同一类历史缺口分两种判法会让规则失去一致性。已支持一份**批次注册表**：审计读
+`docs/review_20261109_bbc3dcb/library_hash_gap.json`，形如
+
+```json
+{"batches": {
+  "room02_T3a": {"reason": "receipts predate the requirement; behaviour lives in liblaser_mapping.so",
+                 "observed": "6/6 receipts carry only the cross-build executable sha"},
+  "hall01_stab": {"reason": "same batch requirement, same absence",
+                  "observed": "4/4 receipts carry only the executable sha"}}}
+```
+
+把它补进去，两批都会判 `RETROSPECTIVE_PARTIAL`，而**新** receipt 缺字段仍判 FAIL——
+注册表只覆盖列明的批次，不构成通用豁免。
+
+## 12. T3a verdict 冲突（已解）
+
+`criterion.verdict = S3_ACCEPTED_AS_SEED__SUPERSEDED_BY_BUILD_B_FOUR_RUNS`，
+同时保留 `runs_analysed ["r1","r2"]`、`build`、`scope.superseded_for_conclusion_by`
+与 `superseded_by.file`。三处指向同一事实，无矛盾。
+
 ## 5b. R2 / R3 处置（同意你的提议）
 
 - **R2**：旧 `room02_hybrid_bag_report.json` 属已废弃的 X/Y 设计，2×2 已取代它。
