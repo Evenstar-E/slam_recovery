@@ -105,46 +105,464 @@
   },
   "simulator_validity": {
     "status": "FAILED",
-    "criterion": "On the independent reference, the GROUND-TRUTH poses must satisfy the same holdout-NIS bound (tau_val_nis = 2.5) used to judge candidates. If GT cannot pass, the simulator cannot distinguish a good candidate from a bad one and no Mode 2 / Mode 3 verdict from S1/S2 may be cited.",
-    "gt_pose_nis_median_8nn_per_scenario": [
-      21.249,
-      26.498,
-      13.772,
-      10.499,
-      14.712
-    ],
-    "gt_pose_nis_median_analytic_per_scenario": [
-      0.005549,
-      0.005344,
-      0.005649,
-      0.005382,
-      0.005459
-    ],
-    "reference_density_sweep_8nn_median": {
-      "1500": [
-        21.249,
-        26.498,
-        13.772,
-        10.499,
-        14.712
-      ],
-      "20000": [
-        20.225,
-        14.77,
-        18.636,
-        9.482,
-        13.872
-      ],
-      "200000": [
-        20.225,
-        14.77,
-        18.636,
-        9.482,
-        13.872
-      ]
+    "status_counts": {
+      "PASSED": 0,
+      "FAILED": 5,
+      "INVALID": 0,
+      "MISSING": 0
     },
-    "finding": "GT poses score ~0.006 NIS against the analytic arena but 14-177 against the 8-nearest-neighbour plane fit on the same points. Geometry is consistent; the error is entirely in the local normal estimate, and raising the reference from 1500 to 200000 points does not change it (density is not the cause). The gate's holdout-NIS criterion is therefore not usable in this simulator.",
-    "second_finding": "The analytic value ~0.006 must NOT be read as 'the gate passes'. This simulator is effectively noise-free (0.01 m sampling jitter against sigma = 0.12 m), so the NIS scale carries no physical meaning. It means the simulator is not a valid test bed, not that the candidate is good."
+    "status_per_scenario": [
+      "FAILED",
+      "FAILED",
+      "FAILED",
+      "FAILED",
+      "FAILED"
+    ],
+    "criterion": "The GROUND-TRUTH poses must satisfy the gate's own holdout-NIS bound (tau = 2.5) when scored with the gate's own sampling and aggregation: holdout = every `holdout_stride`-th keyframe of the sorted key set, scorable only where the frozen reference supports the frame, statistic = MEAN point-to-plane NIS over the scorable frames. If GT cannot pass, the simulator cannot distinguish a good candidate from a bad one and no Mode 2 / Mode 3 verdict from S1/S2 may be cited. The reference is snapshotted before `evaluate_and_commit_candidate` so an accepted candidate cannot change the map GT is scored against.",
+    "gate_statistic_replicated": {
+      "holdout_stride": 5,
+      "aggregation": "mean over scorable holdout frames",
+      "sigma_meas_m": 0.12,
+      "support_rule": "GT poses (not repaired poses) decide support; candidate support is reported separately as a set difference"
+    },
+    "per_scenario": [
+      {
+        "seed": 42,
+        "status": "FAILED",
+        "gt_nis_mean": 18.8874,
+        "gt_n_scored": 2,
+        "gt_n_nonfinite": 0,
+        "gt_holdout_ids_sampled": [
+          20,
+          25,
+          30,
+          35
+        ],
+        "gt_supported_ids": [
+          20,
+          25
+        ],
+        "gt_nis_per_frame": [
+          16.3493,
+          21.4256
+        ],
+        "candidate_supported_ids": [
+          20,
+          25
+        ],
+        "candidate_nis_mean": 18.4685,
+        "gt_only_ids": [],
+        "candidate_only_ids": [],
+        "support_set_symmetric_difference": 0,
+        "reference_points_snapshot": 1500,
+        "reference_keyframes": [],
+        "holdout_overlapping_reference": [],
+        "reference_points_after_commit": 1500,
+        "reference_mutated_by_candidate": false,
+        "gate_holdout_nis_for_candidate": 18.468519163093497,
+        "gate_holdout_support": {
+          "holdout_frames_total": 2,
+          "holdout_frames_scorable": 2,
+          "candidate_frames_total": 20,
+          "candidate_frames_committable": 10,
+          "candidate_frames_committed": 10,
+          "candidate_frames_deferred": 10,
+          "frames_missing_scan": [],
+          "frames_in_reference": []
+        },
+        "gt_nis_analytic_mean": 0.005302
+      },
+      {
+        "seed": 43,
+        "status": "FAILED",
+        "gt_nis_mean": 21.995,
+        "gt_n_scored": 2,
+        "gt_n_nonfinite": 0,
+        "gt_holdout_ids_sampled": [
+          20,
+          25,
+          30,
+          35
+        ],
+        "gt_supported_ids": [
+          20,
+          25
+        ],
+        "gt_nis_per_frame": [
+          16.6384,
+          27.3517
+        ],
+        "candidate_supported_ids": [
+          20,
+          25
+        ],
+        "candidate_nis_mean": 21.9953,
+        "gt_only_ids": [],
+        "candidate_only_ids": [],
+        "support_set_symmetric_difference": 0,
+        "reference_points_snapshot": 1500,
+        "reference_keyframes": [],
+        "holdout_overlapping_reference": [],
+        "reference_points_after_commit": 1500,
+        "reference_mutated_by_candidate": false,
+        "gate_holdout_nis_for_candidate": 21.995252923488096,
+        "gate_holdout_support": {
+          "holdout_frames_total": 2,
+          "holdout_frames_scorable": 2,
+          "candidate_frames_total": 20,
+          "candidate_frames_committable": 10,
+          "candidate_frames_committed": 10,
+          "candidate_frames_deferred": 10,
+          "frames_missing_scan": [],
+          "frames_in_reference": []
+        },
+        "gt_nis_analytic_mean": 0.005272
+      },
+      {
+        "seed": 44,
+        "status": "FAILED",
+        "gt_nis_mean": 12.5934,
+        "gt_n_scored": 2,
+        "gt_n_nonfinite": 0,
+        "gt_holdout_ids_sampled": [
+          20,
+          25,
+          30,
+          35
+        ],
+        "gt_supported_ids": [
+          20,
+          25
+        ],
+        "gt_nis_per_frame": [
+          11.6442,
+          13.5426
+        ],
+        "candidate_supported_ids": [
+          20,
+          25
+        ],
+        "candidate_nis_mean": 12.5489,
+        "gt_only_ids": [],
+        "candidate_only_ids": [],
+        "support_set_symmetric_difference": 0,
+        "reference_points_snapshot": 1500,
+        "reference_keyframes": [],
+        "holdout_overlapping_reference": [],
+        "reference_points_after_commit": 1500,
+        "reference_mutated_by_candidate": false,
+        "gate_holdout_nis_for_candidate": 12.548923024307275,
+        "gate_holdout_support": {
+          "holdout_frames_total": 2,
+          "holdout_frames_scorable": 2,
+          "candidate_frames_total": 20,
+          "candidate_frames_committable": 10,
+          "candidate_frames_committed": 10,
+          "candidate_frames_deferred": 10,
+          "frames_missing_scan": [],
+          "frames_in_reference": []
+        },
+        "gt_nis_analytic_mean": 0.005594
+      },
+      {
+        "seed": 45,
+        "status": "FAILED",
+        "gt_nis_mean": 8.5839,
+        "gt_n_scored": 2,
+        "gt_n_nonfinite": 0,
+        "gt_holdout_ids_sampled": [
+          20,
+          25,
+          30,
+          35
+        ],
+        "gt_supported_ids": [
+          20,
+          25
+        ],
+        "gt_nis_per_frame": [
+          10.8822,
+          6.2857
+        ],
+        "candidate_supported_ids": [
+          20,
+          25
+        ],
+        "candidate_nis_mean": 8.6219,
+        "gt_only_ids": [],
+        "candidate_only_ids": [],
+        "support_set_symmetric_difference": 0,
+        "reference_points_snapshot": 1500,
+        "reference_keyframes": [],
+        "holdout_overlapping_reference": [],
+        "reference_points_after_commit": 1500,
+        "reference_mutated_by_candidate": false,
+        "gate_holdout_nis_for_candidate": 8.621922488014024,
+        "gate_holdout_support": {
+          "holdout_frames_total": 2,
+          "holdout_frames_scorable": 2,
+          "candidate_frames_total": 20,
+          "candidate_frames_committable": 10,
+          "candidate_frames_committed": 10,
+          "candidate_frames_deferred": 10,
+          "frames_missing_scan": [],
+          "frames_in_reference": []
+        },
+        "gt_nis_analytic_mean": 0.005437
+      },
+      {
+        "seed": 46,
+        "status": "FAILED",
+        "gt_nis_mean": 11.6873,
+        "gt_n_scored": 2,
+        "gt_n_nonfinite": 0,
+        "gt_holdout_ids_sampled": [
+          20,
+          25,
+          30,
+          35
+        ],
+        "gt_supported_ids": [
+          20,
+          25
+        ],
+        "gt_nis_per_frame": [
+          8.1624,
+          15.2122
+        ],
+        "candidate_supported_ids": [
+          20,
+          25
+        ],
+        "candidate_nis_mean": 11.5124,
+        "gt_only_ids": [],
+        "candidate_only_ids": [],
+        "support_set_symmetric_difference": 0,
+        "reference_points_snapshot": 1500,
+        "reference_keyframes": [],
+        "holdout_overlapping_reference": [],
+        "reference_points_after_commit": 1500,
+        "reference_mutated_by_candidate": false,
+        "gate_holdout_nis_for_candidate": 11.51242861120919,
+        "gate_holdout_support": {
+          "holdout_frames_total": 2,
+          "holdout_frames_scorable": 2,
+          "candidate_frames_total": 20,
+          "candidate_frames_committable": 10,
+          "candidate_frames_committed": 10,
+          "candidate_frames_deferred": 10,
+          "frames_missing_scan": [],
+          "frames_in_reference": []
+        },
+        "gt_nis_analytic_mean": 0.005431
+      }
+    ],
+    "gt_nis_mean_across_scenarios": 14.749,
+    "reference_provenance_note": "In this simulation the trusted reference is injected by setting `node.committed_map_points` directly, so the node's keyframe->points index is empty and `get_trusted_map_keys()` returns an empty set: reference provenance is not reconstructable here. That is a property of the test bed, not of the gate; on the real path the key set is populated and is reported per scenario below.",
+    "gt_nis_analytic_mean_across_scenarios": 0.005407,
+    "reference_density_sweep": {
+      "1500": {
+        "requested_cap": 1500,
+        "reference_points_returned_per_scenario": [
+          1500,
+          1500,
+          1500,
+          1500,
+          1500
+        ],
+        "gt_nis_mean_per_scenario": [
+          18.887,
+          21.995,
+          12.593,
+          8.584,
+          11.687
+        ],
+        "gt_nis_mean": 14.749,
+        "estimator_points_used": 600.0,
+        "nn_radius_m_mean": 2.1196,
+        "plane_thickness_rms_m_median": 0.0516,
+        "planarity_l0_over_sum_l_median": 0.0064,
+        "cross_plane_mixing_frac": 0.6693,
+        "residual_abs_median_m": 0.0384,
+        "residual_frac_gt_0p5m": 0.244,
+        "residual_frac_gt_2p0m": 0.1347,
+        "holdout_residual_coverage_ge_2m": 0.8653,
+        "nis_as_is_mean": 155.9473,
+        "nis_as_is_median": 0.1105,
+        "nis_thin_neighbourhoods_only": 0.0375,
+        "nis_mixed_neighbourhoods_only": 234.0081,
+        "thin_neighbourhood_fraction": 0.3307
+      },
+      "20000": {
+        "requested_cap": 20000,
+        "reference_points_returned_per_scenario": [
+          4592,
+          4592,
+          4592,
+          4592,
+          4592
+        ],
+        "gt_nis_mean_per_scenario": [
+          20.205,
+          14.367,
+          14.964,
+          8.527,
+          9.997
+        ],
+        "gt_nis_mean": 13.612,
+        "estimator_points_used": 600.0,
+        "nn_radius_m_mean": 1.92,
+        "plane_thickness_rms_m_median": 0.0259,
+        "planarity_l0_over_sum_l_median": 0.0039,
+        "cross_plane_mixing_frac": 0.6253,
+        "residual_abs_median_m": 0.0215,
+        "residual_frac_gt_0p5m": 0.232,
+        "residual_frac_gt_2p0m": 0.1293,
+        "holdout_residual_coverage_ge_2m": 0.8707,
+        "nis_as_is_mean": 127.1899,
+        "nis_as_is_median": 0.0328,
+        "nis_thin_neighbourhoods_only": 0.0121,
+        "nis_mixed_neighbourhoods_only": 206.5276,
+        "thin_neighbourhood_fraction": 0.3747
+      },
+      "200000": {
+        "requested_cap": 200000,
+        "reference_points_returned_per_scenario": [
+          4592,
+          4592,
+          4592,
+          4592,
+          4592
+        ],
+        "gt_nis_mean_per_scenario": [
+          20.205,
+          14.367,
+          14.964,
+          8.527,
+          9.997
+        ],
+        "gt_nis_mean": 13.612,
+        "estimator_points_used": 600.0,
+        "nn_radius_m_mean": 1.92,
+        "plane_thickness_rms_m_median": 0.0259,
+        "planarity_l0_over_sum_l_median": 0.0039,
+        "cross_plane_mixing_frac": 0.6253,
+        "residual_abs_median_m": 0.0215,
+        "residual_frac_gt_0p5m": 0.232,
+        "residual_frac_gt_2p0m": 0.1293,
+        "holdout_residual_coverage_ge_2m": 0.8707,
+        "nis_as_is_mean": 127.1899,
+        "nis_as_is_median": 0.0328,
+        "nis_thin_neighbourhoods_only": 0.0121,
+        "nis_mixed_neighbourhoods_only": 206.5276,
+        "thin_neighbourhood_fraction": 0.3747
+      }
+    },
+    "finding": "Scored with the gate's own statistic, GT poses sit at 18.89, 22.00, 12.59, 8.58, 11.69 (mean per scenario), one to two orders of magnitude above tau = 2.5, while the same GT poses against the analytic arena give 0.0054. Geometry is therefore self-consistent and the error lives in the local plane fit. On density: the 1500-point budget scores 14.749 and the 20000-point budget 13.612 (scenario means), so the score DOES move with the requested budget; but the reference returned at 20000 and 200000 is identical, and the production estimator truncates every reference to 600.0 points before the k-NN plane fit. Raising the budget above ~600 is arithmetically incapable of changing the result, so 'density is not the cause' is NOT supported: what the sweep excludes is only that budgets above 20000 matter in this simulator.",
+    "second_finding": "The analytic value must NOT be read as 'the gate passes'. This simulator is effectively noise-free (0.01 m sampling jitter against sigma = 0.12 m), so the NIS scale carries no physical meaning. It means the simulator is not a valid test bed, not that the candidate is good.",
+    "local_plane_diagnostics": {
+      "what_is_measured": "Neighbourhood radius, plane thickness (sqrt of the smallest covariance eigenvalue of the 8 nearest reference points), planarity, and the fraction of holdout neighbourhoods whose smallest direction is not thin (a proxy for a neighbourhood spanning two surfaces). All computed on the estimator's own 600/300 sub-sample.",
+      "by_budget": {
+        "1500": {
+          "requested_cap": 1500,
+          "reference_points_returned_per_scenario": [
+            1500,
+            1500,
+            1500,
+            1500,
+            1500
+          ],
+          "gt_nis_mean_per_scenario": [
+            18.887,
+            21.995,
+            12.593,
+            8.584,
+            11.687
+          ],
+          "gt_nis_mean": 14.749,
+          "estimator_points_used": 600.0,
+          "nn_radius_m_mean": 2.1196,
+          "plane_thickness_rms_m_median": 0.0516,
+          "planarity_l0_over_sum_l_median": 0.0064,
+          "cross_plane_mixing_frac": 0.6693,
+          "residual_abs_median_m": 0.0384,
+          "residual_frac_gt_0p5m": 0.244,
+          "residual_frac_gt_2p0m": 0.1347,
+          "holdout_residual_coverage_ge_2m": 0.8653,
+          "nis_as_is_mean": 155.9473,
+          "nis_as_is_median": 0.1105,
+          "nis_thin_neighbourhoods_only": 0.0375,
+          "nis_mixed_neighbourhoods_only": 234.0081,
+          "thin_neighbourhood_fraction": 0.3307
+        },
+        "20000": {
+          "requested_cap": 20000,
+          "reference_points_returned_per_scenario": [
+            4592,
+            4592,
+            4592,
+            4592,
+            4592
+          ],
+          "gt_nis_mean_per_scenario": [
+            20.205,
+            14.367,
+            14.964,
+            8.527,
+            9.997
+          ],
+          "gt_nis_mean": 13.612,
+          "estimator_points_used": 600.0,
+          "nn_radius_m_mean": 1.92,
+          "plane_thickness_rms_m_median": 0.0259,
+          "planarity_l0_over_sum_l_median": 0.0039,
+          "cross_plane_mixing_frac": 0.6253,
+          "residual_abs_median_m": 0.0215,
+          "residual_frac_gt_0p5m": 0.232,
+          "residual_frac_gt_2p0m": 0.1293,
+          "holdout_residual_coverage_ge_2m": 0.8707,
+          "nis_as_is_mean": 127.1899,
+          "nis_as_is_median": 0.0328,
+          "nis_thin_neighbourhoods_only": 0.0121,
+          "nis_mixed_neighbourhoods_only": 206.5276,
+          "thin_neighbourhood_fraction": 0.3747
+        },
+        "200000": {
+          "requested_cap": 200000,
+          "reference_points_returned_per_scenario": [
+            4592,
+            4592,
+            4592,
+            4592,
+            4592
+          ],
+          "gt_nis_mean_per_scenario": [
+            20.205,
+            14.367,
+            14.964,
+            8.527,
+            9.997
+          ],
+          "gt_nis_mean": 13.612,
+          "estimator_points_used": 600.0,
+          "nn_radius_m_mean": 1.92,
+          "plane_thickness_rms_m_median": 0.0259,
+          "planarity_l0_over_sum_l_median": 0.0039,
+          "cross_plane_mixing_frac": 0.6253,
+          "residual_abs_median_m": 0.0215,
+          "residual_frac_gt_0p5m": 0.232,
+          "residual_frac_gt_2p0m": 0.1293,
+          "holdout_residual_coverage_ge_2m": 0.8707,
+          "nis_as_is_mean": 127.1899,
+          "nis_as_is_median": 0.0328,
+          "nis_thin_neighbourhoods_only": 0.0121,
+          "nis_mixed_neighbourhoods_only": 206.5276,
+          "thin_neighbourhood_fraction": 0.3747
+        }
+      },
+      "finding": "Pooled over holdout points the mean NIS is 155.9 (1500-point budget) / 127.2 (full reference), but the MEDIAN is 0.111 / 0.033. Restricting to thin (single-surface) neighbourhoods gives 0.0375 / 0.0121, while the mixed neighbourhoods alone give 234.0 / 206.5. Only 33% / 37% of neighbourhoods are thin, and the mean is set entirely by the rest. GT poses are therefore accurate: the score is manufactured by 8-NN plane fits that span two surfaces (the 8th neighbour sits ~2.1 m away in a 6 m corridor). Raising the reference budget improves the thin fraction and the thin-only NIS but cannot move the mean, because the estimator truncates every reference to 600 points.",
+      "candidate_calibration": "DIAGNOSTIC ONLY - default values of compute_disjoint_holdout_point_to_plane_nis are deliberately left unchanged because they also drive already-published real-sequence holdout numbers. Candidate calibration to evaluate: (a) weight or reject neighbourhoods by planarity (drop the k-NN fit where the smallest eigenvalue exceeds ~0.05 x the middle one, i.e. where two surfaces mix); (b) report NIS as a robust quantile instead of a mean so mixed-plane frames do not dominate; (c) raise sigma to the actual surface sampling error measured on the analytic arena (~0.01 m) or, for real sequences, calibrate sigma per sensor; (d) scale the reference budget with the estimator cap rather than above it. Each of these changes reported numbers and needs the owner's sign-off."
+    }
   },
   "holdout_reference_truncation": {
     "where": "slam_recovery/validation/fim_and_holdout.py::compute_disjoint_holdout_point_to_plane_nis",

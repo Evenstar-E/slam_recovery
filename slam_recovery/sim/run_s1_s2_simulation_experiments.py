@@ -10,7 +10,8 @@ import sys
 from typing import Dict, List, Tuple
 import numpy as np
 
-sys.path.insert(0, "/home/R26534/MM-LINS")
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, _REPO_ROOT)
 from slam_recovery.core import GateThresholds, RecoveryMode
 from slam_recovery.quarantine import TrustedMapTransactionManager
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
@@ -127,6 +128,392 @@ class Arena3DMeshGroundTruth:
         return float(np.mean(dists > tau_map_m))
 
 
+# ---------------------------------------------------------------------------------------------
+# Simulator-validity scoring
+#
+# The gate judges a *candidate* by: holdout = every `holdout_stride`-th keyframe of the sorted key
+# set; a holdout frame is scorable only where `_frame_has_reference_support` says the reference
+# covers it; the statistic is the MEAN point-to-plane NIS over the scorable frames.
+#
+# The validity check must replicate that statistic exactly, otherwise "the gate cannot judge GT"
+# does not follow from it. It must also hold its own reference: `evaluate_and_commit_candidate`
+# mutates the committed map when it accepts, so the reference has to be snapshotted first.
+# ---------------------------------------------------------------------------------------------
+
+_SIM_VALIDITY_NIS_BOUND = 2.5
+_SIM_VALIDITY_DENSITY_CAPS = (1500, 20000, 200000)
+
+
+def _to_world(scan_body_xyz, pose_se3) -> np.ndarray:
+    pts = np.asarray(scan_body_xyz, dtype=np.float64)[:, :3]
+    T = np.asarray(pose_se3, dtype=np.float64)
+    return (pts @ T[:3, :3].T) + T[:3, 3]
+
+
+def _holdout_ids(key_ids, stride: int) -> List[int]:
+    ks = sorted(int(k) for k in key_ids)
+    return [k for idx, k in enumerate(ks) if idx % int(stride) == 0]
+
+
+def _plane_neighbourhood_diagnostics(ref_pts, hold_world, k: int = 8) -> dict:
+    """Report the neighbourhood structure the production estimator actually fits.
+
+    `compute_disjoint_holdout_point_to_plane_nis` sub-samples the reference to 600 points and the
+    holdout to 300 before the k-NN plane fit. Anything above that budget is discarded inside the
+    estimator, so the diagnostic has to look at the same sub-sample, not at the request.
+    """
+    ref = np.asarray(ref_pts, dtype=np.float64)[:, :3]
+    hold = np.asarray(hold_world, dtype=np.float64)[:, :3]
+    if len(ref) < 30 or len(hold) < 10:
+        return {"available": False}
+    t_sub = ref[:: max(1, len(ref) // 600)][:600]
+    h_sub = hold[:: max(1, len(hold) // 300)][:300]
+    kk = min(int(k), len(t_sub) - 1)
+    d2 = np.sum((h_sub[:, None, :] - t_sub[None, :, :]) ** 2, axis=-1)
+    nn_idx = np.argpartition(d2, kth=kk, axis=1)[:, :kk]
+    neighbours = t_sub[nn_idx]
+    mean_nn = neighbours.mean(axis=1)
+    centered = neighbours - mean_nn[:, None, :]
+    covs = np.einsum("mki,mkj->mij", centered, centered) / float(kk)
+    evals = np.linalg.eigvalsh(covs)              # ascending: l0 <= l1 <= l2
+    l0, l1, l2 = evals[:, 0], evals[:, 1], evals[:, 2]
+    radius = np.sqrt(np.max(d2[np.arange(len(h_sub))[:, None], nn_idx], axis=1))
+    thinness = np.sqrt(np.maximum(l0, 0.0)) / np.maximum(np.sqrt(np.maximum(l1, 1e-12)), 1e-12)
+
+    # Residuals exactly as the production estimator forms them, so the calibration proposal can be
+    # argued with the numbers the estimator actually sees (plane normal over the 8 neighbours).
+    evals_full, eigvecs = np.linalg.eigh(covs)
+    normals = eigvecs[:, :, 0]
+    residuals = np.abs(np.sum(normals * (h_sub - mean_nn), axis=1))
+    # Counterfactuals for the calibration proposal (diagnostic only: production defaults stay).
+    res_nis = (residuals / 0.12) ** 2
+    thin_mask = thinness <= 0.05
+    return {
+        "available": True,
+        "nis_as_is_mean": float(np.mean(res_nis)),
+        "nis_as_is_median": float(np.median(res_nis)),
+        "nis_thin_neighbourhoods_only": (
+            float(np.mean(res_nis[thin_mask])) if thin_mask.any() else None),
+        "nis_mixed_neighbourhoods_only": (
+            float(np.mean(res_nis[~thin_mask])) if (~thin_mask).any() else None),
+        "thin_neighbourhood_fraction": float(np.mean(thin_mask)),
+        "n_ref_points_returned": int(len(ref)),
+        "n_ref_points_used_by_estimator": int(len(t_sub)),
+        "n_holdout_points_used_by_estimator": int(len(h_sub)),
+        "knn": int(kk),
+        "nn_radius_m_mean": float(np.mean(radius)),
+        "nn_radius_m_p90": float(np.percentile(radius, 90)),
+        "plane_thickness_rms_m_median": float(np.median(np.sqrt(np.maximum(l0, 0.0)))),
+        "planarity_l0_over_sum_l_median": float(
+            np.median(l0 / np.maximum(l0 + l1 + l2, 1e-12))),
+        "normal_vs_lateral_spread_ratio_median": float(np.median(thinness)),
+        # a neighbourhood that is not thin in its smallest direction spans more than one surface
+        "cross_plane_mixing_frac": float(np.mean(thinness > 0.05)),
+        "residual_abs_median_m": float(np.median(residuals)),
+        "residual_frac_gt_0p5m": float(np.mean(residuals > 0.5)),
+        "residual_frac_gt_2p0m": float(np.mean(residuals > 2.0)),
+        "holdout_residual_coverage_ge_2m": float(np.mean(residuals < 2.0)),
+    }
+
+
+def _score_pose_set(node, ref_pts, key_ids, support_poses, score_poses, stride: int) -> dict:
+    """Score one pose set with the gate's own sampling/aggregation (stride holdout, mean NIS)."""
+    holdout = _holdout_ids(key_ids, stride)
+    supported = [
+        k for k in holdout
+        if k in node.scan_buffer_body
+        and node._frame_has_reference_support(k, ref_pts, support_poses)
+    ]
+    per_frame = []
+    for k in supported:
+        per_frame.append(float(compute_disjoint_holdout_point_to_plane_nis(
+            ref_pts,
+            _to_world(node.scan_buffer_body[k], score_poses[k]),
+            np.eye(4),
+            sigma_meas_m=0.12,
+        )))
+    finite = [v for v in per_frame if np.isfinite(v)]
+    return {
+        "holdout_ids_sampled": list(holdout),
+        "supported_ids": list(supported),
+        "nis_per_frame": [round(v, 4) for v in per_frame],
+        "n_scored": len(supported),
+        "n_nonfinite": len(per_frame) - len(finite),
+        "nis_mean": (round(float(np.mean(finite)), 4) if finite else None),
+    }
+
+
+def _simulator_validity_snapshot(node, key_ids, gt_poses, candidate_poses, stride: int,
+                                 mesh_distance_fn) -> dict:
+    """Snapshot-based validity: GT poses judged by the gate's statistic on a frozen reference."""
+    ref = node.get_trusted_map_points(max_pts=1500).copy()
+    # Provenance of the reference, from the node itself: a frame whose own points are part of the
+    # reference cannot be scored against it (self-agreement), so the key set has to be reported
+    # rather than assumed.
+    ref_keys = sorted(node.get_trusted_map_keys())
+
+    gt = _score_pose_set(node, ref, key_ids, gt_poses, gt_poses, stride)
+    cand = _score_pose_set(node, ref, key_ids, candidate_poses, candidate_poses, stride)
+    gt_ids, cand_ids = set(gt["supported_ids"]), set(cand["supported_ids"])
+
+    gt_holdout_world = np.vstack([
+        _to_world(node.scan_buffer_body[k], gt_poses[k]) for k in gt["supported_ids"]
+    ]) if gt["supported_ids"] else np.zeros((0, 3))
+
+    sweep = {}
+    for cap in _SIM_VALIDITY_DENSITY_CAPS:
+        ref_cap = node.get_trusted_map_points(max_pts=cap)
+        scored = _score_pose_set(node, ref_cap, key_ids, gt_poses, gt_poses, stride)
+        diag = _plane_neighbourhood_diagnostics(ref_cap, gt_holdout_world)
+        sweep[str(cap)] = {
+            "reference_points_returned": int(len(ref_cap)),
+            "gt_nis_mean": scored["nis_mean"],
+            "gt_n_scored": scored["n_scored"],
+            "gt_nis_per_frame": scored["nis_per_frame"],
+            "neighbourhood": diag,
+        }
+
+    analytic = []
+    for k in gt["supported_ids"]:
+        pts_w = _to_world(node.scan_buffer_body[k], gt_poses[k])
+        analytic.append(float(np.mean(
+            (np.asarray(mesh_distance_fn(pts_w), dtype=np.float64) / 0.12) ** 2)))
+    analytic_mean = round(float(np.mean(analytic)), 6) if analytic else None
+
+    return {
+        "gt": gt,
+        "candidate": cand,
+        "gt_only_ids": sorted(gt_ids - cand_ids),
+        "candidate_only_ids": sorted(cand_ids - gt_ids),
+        "support_set_delta": len(gt_ids ^ cand_ids),
+        "reference_points_snapshot": int(len(ref)),
+        "reference_keyframes": ref_keys,
+        "holdout_overlapping_reference": sorted(set(gt["supported_ids"]) & set(ref_keys)),
+        "density_sweep": sweep,
+        "gt_nis_analytic_mean": analytic_mean,
+        "n_holdout_sampled": len(gt["holdout_ids_sampled"]),
+        "holdout_stride": int(stride),
+    }
+
+
+def _simulator_validity_status(row) -> str:
+    """Per-scenario verdict. Missing evidence is never a pass."""
+    if row.get("n_holdout_sampled", 0) == 0:
+        return "MISSING"
+    gt = row["gt"]
+    if gt["n_scored"] == 0 or gt["nis_mean"] is None:
+        return "INVALID"
+    if gt["n_nonfinite"] > 0:
+        return "INVALID"
+    return "FAILED" if gt["nis_mean"] > _SIM_VALIDITY_NIS_BOUND else "PASSED"
+
+
+
+def _build_simulator_validity_block(rows: List[dict]) -> dict:
+    """Assemble the manifest block from per-scenario rows.
+
+    No cross-scenario average may turn a single-scenario failure into a pass: the status is the
+    worst per-scenario status, and every scenario keeps its own verdict and evidence count.
+    """
+    statuses = [r["status"] for r in rows]
+    counts = {k: statuses.count(k) for k in ("PASSED", "FAILED", "INVALID", "MISSING")}
+    if counts["FAILED"]:
+        overall = "FAILED"
+    elif counts["INVALID"]:
+        overall = "INVALID"
+    elif counts["MISSING"]:
+        overall = "MISSING"
+    elif rows:
+        overall = "PASSED"
+    else:
+        overall = "MISSING"
+
+    def _clean(v):
+        if isinstance(v, float) and not np.isfinite(v):
+            return None
+        return v
+
+    def _agg(key_path):
+        vals = []
+        for r in rows:
+            cur = r
+            for k in key_path:
+                cur = cur.get(k, {}) if isinstance(cur, dict) else None
+                if cur is None:
+                    break
+            if isinstance(cur, (int, float)) and np.isfinite(cur):
+                vals.append(float(cur))
+        return vals
+
+    per_cap = {}
+    for cap in _SIM_VALIDITY_DENSITY_CAPS:
+        key = str(cap)
+        scored = [r["density_sweep"][key]["gt_nis_mean"] for r in rows
+                  if r["density_sweep"][key]["gt_nis_mean"] is not None]
+        returned = [r["density_sweep"][key]["reference_points_returned"] for r in rows]
+        neigh = [r["density_sweep"][key]["neighbourhood"] for r in rows
+                 if r["density_sweep"][key]["neighbourhood"].get("available")]
+        def _nmean(field):
+            vals = [n[field] for n in neigh if field in n]
+            return round(float(np.mean(vals)), 4) if vals else None
+        per_cap[key] = {
+            "requested_cap": cap,
+            "reference_points_returned_per_scenario": returned,
+            "gt_nis_mean_per_scenario": [round(v, 3) for v in scored],
+            "gt_nis_mean": round(float(np.mean(scored)), 3) if scored else None,
+            "estimator_points_used": _nmean("n_ref_points_used_by_estimator"),
+            "nn_radius_m_mean": _nmean("nn_radius_m_mean"),
+            "plane_thickness_rms_m_median": _nmean("plane_thickness_rms_m_median"),
+            "planarity_l0_over_sum_l_median": _nmean("planarity_l0_over_sum_l_median"),
+            "cross_plane_mixing_frac": _nmean("cross_plane_mixing_frac"),
+            "residual_abs_median_m": _nmean("residual_abs_median_m"),
+            "residual_frac_gt_0p5m": _nmean("residual_frac_gt_0p5m"),
+            "residual_frac_gt_2p0m": _nmean("residual_frac_gt_2p0m"),
+            "holdout_residual_coverage_ge_2m": _nmean("holdout_residual_coverage_ge_2m"),
+            "nis_as_is_mean": _nmean("nis_as_is_mean"),
+            "nis_as_is_median": _nmean("nis_as_is_median"),
+            "nis_thin_neighbourhoods_only": _nmean("nis_thin_neighbourhoods_only"),
+            "nis_mixed_neighbourhoods_only": _nmean("nis_mixed_neighbourhoods_only"),
+            "thin_neighbourhood_fraction": _nmean("thin_neighbourhood_fraction"),
+        }
+
+    gt_means = [r["gt"]["nis_mean"] for r in rows if r["gt"]["nis_mean"] is not None]
+    analytic = [r["gt_nis_analytic_mean"] for r in rows if r["gt_nis_analytic_mean"] is not None]
+    sweep_1500 = per_cap["1500"]["gt_nis_mean"]
+    sweep_20000 = per_cap["20000"]["gt_nis_mean"]
+    same_high = per_cap["20000"]["reference_points_returned_per_scenario"] ==         per_cap["200000"]["reference_points_returned_per_scenario"]
+    estimator_cap = per_cap["1500"]["estimator_points_used"]
+
+    return {
+        "status": overall,
+        "status_counts": counts,
+        "status_per_scenario": statuses,
+        "criterion": (
+            "The GROUND-TRUTH poses must satisfy the gate's own holdout-NIS bound "
+            "(tau = 2.5) when scored with the gate's own sampling and aggregation: holdout = "
+            "every `holdout_stride`-th keyframe of the sorted key set, scorable only where the "
+            "frozen reference supports the frame, statistic = MEAN point-to-plane NIS over the "
+            "scorable frames. If GT cannot pass, the simulator cannot distinguish a good "
+            "candidate from a bad one and no Mode 2 / Mode 3 verdict from S1/S2 may be cited. "
+            "The reference is snapshotted before `evaluate_and_commit_candidate` so an accepted "
+            "candidate cannot change the map GT is scored against."
+        ),
+        "gate_statistic_replicated": {
+            "holdout_stride": int(rows[0]["holdout_stride"]) if rows else None,
+            "aggregation": "mean over scorable holdout frames",
+            "sigma_meas_m": 0.12,
+            "support_rule": "GT poses (not repaired poses) decide support; candidate support is "
+                            "reported separately as a set difference",
+        },
+        "per_scenario": [
+            {
+                "seed": r["seed"],
+                "status": r["status"],
+                "gt_nis_mean": r["gt"]["nis_mean"],
+                "gt_n_scored": r["gt"]["n_scored"],
+                "gt_n_nonfinite": r["gt"]["n_nonfinite"],
+                "gt_holdout_ids_sampled": r["gt"]["holdout_ids_sampled"],
+                "gt_supported_ids": r["gt"]["supported_ids"],
+                "gt_nis_per_frame": r["gt"]["nis_per_frame"],
+                "candidate_supported_ids": r["candidate"]["supported_ids"],
+                "candidate_nis_mean": r["candidate"]["nis_mean"],
+                "gt_only_ids": r["gt_only_ids"],
+                "candidate_only_ids": r["candidate_only_ids"],
+                "support_set_symmetric_difference": r["support_set_delta"],
+                "reference_points_snapshot": r["reference_points_snapshot"],
+                "reference_keyframes": r["reference_keyframes"],
+                "holdout_overlapping_reference": r["holdout_overlapping_reference"],
+                "reference_points_after_commit": r["reference_points_after_commit"],
+                "reference_mutated_by_candidate": r["reference_mutated_by_candidate"],
+                "gate_holdout_nis_for_candidate": _clean(r["gate_holdout_nis_candidate"]),
+                "gate_holdout_support": r["gate_holdout_support"],
+                "gt_nis_analytic_mean": r["gt_nis_analytic_mean"],
+            }
+            for r in rows
+        ],
+        "gt_nis_mean_across_scenarios": round(float(np.mean(gt_means)), 3) if gt_means else None,
+        "reference_provenance_note": (
+            "In this simulation the trusted reference is injected by setting "
+            "`node.committed_map_points` directly, so the node's keyframe->points index is empty "
+            "and `get_trusted_map_keys()` returns an empty set: reference provenance is not "
+            "reconstructable here. That is a property of the test bed, not of the gate; on the "
+            "real path the key set is populated and is reported per scenario below."
+        ),
+        "gt_nis_analytic_mean_across_scenarios": (
+            round(float(np.mean(analytic)), 6) if analytic else None),
+        "reference_density_sweep": per_cap,
+        "finding": (
+            "Scored with the gate's own statistic, GT poses sit at "
+            f"{', '.join('%.2f' % v for v in gt_means) if gt_means else 'n/a'} (mean per scenario), "
+            "one to two orders of magnitude above tau = 2.5, while the same GT poses against the "
+            f"analytic arena give {('%.4f' % float(np.mean(analytic))) if analytic else 'n/a'}. "
+            "Geometry is therefore self-consistent and the error lives in the local plane fit. "
+            "On density: the 1500-point budget scores "
+            f"{sweep_1500 if sweep_1500 is not None else 'n/a'} and the 20000-point budget "
+            f"{sweep_20000 if sweep_20000 is not None else 'n/a'} (scenario means), so the score "
+            "DOES move with the requested budget; but the reference returned at 20000 and 200000 "
+            f"is {'identical' if same_high else 'different'}, and the production estimator "
+            f"truncates every reference to {estimator_cap} points before the k-NN plane fit. "
+            "Raising the budget above ~%.0f is arithmetically incapable of changing the result, "
+            "so 'density is not the cause' is NOT supported: what the sweep excludes is only that "
+            "budgets above 20000 matter in this simulator." % (estimator_cap or 600)
+        ),
+        "second_finding": (
+            "The analytic value must NOT be read as 'the gate passes'. This simulator is "
+            "effectively noise-free (0.01 m sampling jitter against sigma = 0.12 m), so the NIS "
+            "scale carries no physical meaning. It means the simulator is not a valid test bed, "
+            "not that the candidate is good."
+        ),
+        "local_plane_diagnostics": {
+            "what_is_measured": (
+                "Neighbourhood radius, plane thickness (sqrt of the smallest covariance "
+                "eigenvalue of the 8 nearest reference points), planarity, and the fraction of "
+                "holdout neighbourhoods whose smallest direction is not thin (a proxy for a "
+                "neighbourhood spanning two surfaces). All computed on the estimator's own "
+                "600/300 sub-sample."
+            ),
+            "by_budget": per_cap,
+            "finding": (
+                "Pooled over holdout points the mean NIS is %.1f (1500-point budget) / %.1f "
+                "(full reference), but the MEDIAN is %.3f / %.3f. Restricting to thin "
+                "(single-surface) neighbourhoods gives %.4f / %.4f, while the mixed "
+                "neighbourhoods alone give %.1f / %.1f. Only %.0f%% / %.0f%% of neighbourhoods "
+                "are thin, and the mean is set entirely by the rest. GT poses are therefore "
+                "accurate: the score is manufactured by 8-NN plane fits that span two surfaces "
+                "(the 8th neighbour sits ~%.1f m away in a 6 m corridor). Raising the reference "
+                "budget improves the thin fraction and the thin-only NIS but cannot move the "
+                "mean, because the estimator truncates every reference to %s points."
+                % (
+                    per_cap["1500"]["nis_as_is_mean"] or 0.0,
+                    per_cap["20000"]["nis_as_is_mean"] or 0.0,
+                    per_cap["1500"]["nis_as_is_median"] or 0.0,
+                    per_cap["20000"]["nis_as_is_median"] or 0.0,
+                    per_cap["1500"]["nis_thin_neighbourhoods_only"] or 0.0,
+                    per_cap["20000"]["nis_thin_neighbourhoods_only"] or 0.0,
+                    per_cap["1500"]["nis_mixed_neighbourhoods_only"] or 0.0,
+                    per_cap["20000"]["nis_mixed_neighbourhoods_only"] or 0.0,
+                    100.0 * (per_cap["1500"]["thin_neighbourhood_fraction"] or 0.0),
+                    100.0 * (per_cap["20000"]["thin_neighbourhood_fraction"] or 0.0),
+                    per_cap["1500"]["nn_radius_m_mean"] or 0.0,
+                    int(estimator_cap or 600),
+                )
+            ),
+            "candidate_calibration": (
+                "DIAGNOSTIC ONLY - default values of compute_disjoint_holdout_point_to_plane_nis "
+                "are deliberately left unchanged because they also drive already-published real-"
+                "sequence holdout numbers. Candidate calibration to evaluate: (a) weight or "
+                "reject neighbourhoods by planarity (drop the k-NN fit where the smallest "
+                "eigenvalue exceeds ~0.05 x the middle one, i.e. where two surfaces mix); "
+                "(b) report NIS as a robust quantile instead of a mean so mixed-plane frames do "
+                "not dominate; (c) raise sigma to the actual surface sampling error measured on "
+                "the analytic arena (~0.01 m) or, for real sequences, calibrate sigma per sensor; "
+                "(d) scale the reference budget with the estimator cap rather than above it. "
+                "Each of these changes reported numbers and needs the owner's sign-off."
+            ),
+        },
+    }
+
+
 def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
     arena = Arena3DMeshGroundTruth()
     seeds = [42, 43, 44, 45, 46]
@@ -142,9 +529,8 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
     b6_point_evidence_list, b6_pg_evidence_list = [], []
     b6_point_mode_list, b6_point_committed_kfs_list = [], []
     b6_point_voxel_count_list, b6_point_contam_list = [], []
-    # Simulator-validity accumulators (see `simulator_validity` in the manifest).
-    val_8nn, val_analytic = [], []
-    val_density = {1500: [], 20000: [], 200000: []}
+    # Simulator-validity rows, one per scenario (see `simulator_validity` in the manifest).
+    sim_validity_rows: List[dict] = []
 
     # S2: 3D Voxel Contamination Ratio \mathrm{Contam}_{3D} across B0, B1, B2, B3, B4, B5, B6
     contam_3d = {"B0": [], "B1": [], "B2": [], "B3": [], "B4": [], "B5": [], "B6": []}
@@ -350,6 +736,18 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
         node_b6_pm.tx_mgr.trigger_quarantine(
             int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2
         )
+
+        # ---- simulator validity: reference must be frozen BEFORE the candidate is committed ----
+        # `evaluate_and_commit_candidate` mutates the committed map on acceptance, so reading the
+        # reference afterwards scores GT against a map the candidate already changed.
+        _validity = _simulator_validity_snapshot(
+            node_b6_pm,
+            r5_keys,
+            quar_poses_gt,
+            quar_poses_repaired_r5,
+            node_b6_pm.holdout_stride,
+            arena.compute_distance_to_gt_mesh,
+        )
         rep_b6_pm = node_b6_pm.evaluate_and_commit_candidate(
             "B6_point_mixture", quar_poses_repaired_r5, aux_or_loop_info_6x6=None,
             incumbent_poses={k: quar_poses_drifted_r4[k] for k in r5_keys},
@@ -363,36 +761,17 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
         b6_point_voxel_count_list.append(int(len(node_b6_pm.committed_voxel_set)))
         b6_point_contam_list.append(
             arena.compute_3d_voxel_contamination_ratio(node_b6_pm.committed_voxel_set))
-        # ---- simulator validity check -------------------------------------------------
-        # The gate can only be trusted to judge a *candidate* if it first judges the
-        # ground-truth poses correctly on exactly the same reference. We therefore score the
-        # GT-placed scans (not the repaired ones) against the independent reference and record
-        # the result. Two estimators are reported because they disagree by two orders of
-        # magnitude, which is itself the finding: see `simulator_validity` in the manifest.
-        _ref = node_b6_pm.get_trusted_map_points(max_pts=1500)
-        _v8, _va = [], []
-        for _k in r5_keys:
-            if _k not in node_b6_pm.scan_buffer_body:
-                continue
-            if not node_b6_pm._frame_has_reference_support(_k, _ref, quar_poses_repaired_r5):
-                continue
-            _Tgt = np.asarray(quar_poses_gt[_k], dtype=np.float64)
-            _pw = (node_b6_pm.scan_buffer_body[_k][:, :3] @ _Tgt[:3, :3].T) + _Tgt[:3, 3]
-            _v8.append(compute_disjoint_holdout_point_to_plane_nis(_ref, _pw, np.eye(4), sigma_meas_m=0.12))
-            _va.append(float(np.mean((arena.compute_distance_to_gt_mesh(_pw) / 0.12) ** 2)))
-        if _v8:
-            val_8nn.append(float(np.median(_v8)))
-            val_analytic.append(float(np.median(_va)))
-        for _cap in val_density:
-            _r = node_b6_pm.get_trusted_map_points(max_pts=_cap)
-            _kw = [compute_disjoint_holdout_point_to_plane_nis(_r, (node_b6_pm.scan_buffer_body[k][:, :3]
-                    @ np.asarray(quar_poses_gt[k], dtype=np.float64)[:3, :3].T)
-                    + np.asarray(quar_poses_gt[k], dtype=np.float64)[:3, 3], np.eye(4), sigma_meas_m=0.12)
-                   for k in r5_keys
-                   if k in node_b6_pm.scan_buffer_body
-                   and node_b6_pm._frame_has_reference_support(k, _ref, quar_poses_repaired_r5)]
-            if _kw:
-                val_density[_cap].append(float(np.median(_kw)))
+        # ---- simulator validity: record whether the commit mutated the reference --------------
+        _ref_after = node_b6_pm.get_trusted_map_points(max_pts=1500)
+        _validity["reference_points_after_commit"] = int(len(_ref_after))
+        _validity["reference_mutated_by_candidate"] = bool(
+            len(_ref_after) != _validity["reference_points_snapshot"])
+        _validity["seed"] = int(s)
+        _validity["status"] = _simulator_validity_status(_validity)
+        _validity["gate_holdout_nis_candidate"] = float(rep_b6_pm.holdout_nis)
+        _validity["gate_holdout_support"] = dict(
+            getattr(node_b6_pm, "_last_holdout_support", {}) or {})
+        sim_validity_rows.append(_validity)
 
 
         # S1 Case 5: B6 Aux Pose-Graph Bridge on LIO-SAM (with physical IMU/visual relative odometry Fisher prior \sigma_{rel}^{-2})
@@ -466,33 +845,7 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
                 "paired_evidence_status": sorted(set(b6_pg_evidence_list)),
             },
         },
-        "simulator_validity": {
-            "status": "FAILED" if (val_8nn and float(np.mean(val_8nn)) > 2.5) else "PASSED",
-            "criterion": (
-                "On the independent reference, the GROUND-TRUTH poses must satisfy the same "
-                "holdout-NIS bound (tau_val_nis = 2.5) used to judge candidates. If GT cannot "
-                "pass, the simulator cannot distinguish a good candidate from a bad one and no "
-                "Mode 2 / Mode 3 verdict from S1/S2 may be cited."
-            ),
-            "gt_pose_nis_median_8nn_per_scenario": [round(v, 3) for v in val_8nn],
-            "gt_pose_nis_median_analytic_per_scenario": [round(v, 6) for v in val_analytic],
-            "reference_density_sweep_8nn_median": {
-                str(cap): [round(v, 3) for v in vals] for cap, vals in val_density.items()
-            },
-            "finding": (
-                "GT poses score ~0.006 NIS against the analytic arena but 14-177 against the "
-                "8-nearest-neighbour plane fit on the same points. Geometry is consistent; the "
-                "error is entirely in the local normal estimate, and raising the reference from "
-                "1500 to 200000 points does not change it (density is not the cause). "
-                "The gate's holdout-NIS criterion is therefore not usable in this simulator."
-            ),
-            "second_finding": (
-                "The analytic value ~0.006 must NOT be read as 'the gate passes'. This simulator "
-                "is effectively noise-free (0.01 m sampling jitter against sigma = 0.12 m), so the "
-                "NIS scale carries no physical meaning. It means the simulator is not a valid "
-                "test bed, not that the candidate is good."
-            ),
-        },
+        "simulator_validity": _build_simulator_validity_block(sim_validity_rows),
         "holdout_reference_truncation": {
             "where": "slam_recovery/validation/fim_and_holdout.py::compute_disjoint_holdout_point_to_plane_nis",
             "limit": (
@@ -520,7 +873,10 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
         },
     }
 
-    man_path = "/home/R26534/MM-LINS/slam_recovery/experiments/manifests/sim_s1_s2_counterfactual_and_3d_voxel_benchmark.json"
+    man_path = os.path.join(
+        _REPO_ROOT,
+        "slam_recovery/experiments/manifests/sim_s1_s2_counterfactual_and_3d_voxel_benchmark.json",
+    )
     with open(man_path, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=2, ensure_ascii=False)
 
