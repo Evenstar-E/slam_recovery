@@ -22,7 +22,10 @@ def _receipt(n_in=199, n_out=400, checks=None, failures=None):
             "checks": checks if checks is not None else {
                 "outside_all_equal_filtered": True,
                 "combined_equals_actual_in_window": True,
-                "arms_match_original_indices": True, "row_counts_match": True},
+                "arms_match_original_indices": True, "row_counts_match": True,
+                "frames_complete": True, "sidecar_valid": True,
+                "window_matches_sidecar": True, "sidecar_order_ok": True,
+                "no_fatal": True},
             "failures": failures if failures is not None else []}
 
 
@@ -132,6 +135,72 @@ class TestFailuresGateTheVerdict(unittest.TestCase):
                              "row_counts_match": True})
         r["failure_counts"] = {"outside_mismatch": 2}
         self.assertEqual(Q.check_failures_gate_the_verdict(r), [])
+
+
+class TestEof(unittest.TestCase):
+    def test_clean_eof_passes(self):
+        r = _receipt()
+        r["failure_counts"] = {"extra_messages": 0}
+        self.assertEqual(Q.check_eof(r), [])
+
+    def test_trailing_message_is_rejected(self):
+        r = _receipt()
+        r["failure_counts"] = {"extra_messages": 2}
+        self.assertTrue(Q.check_eof(r))
+
+    def test_missing_kind_is_unverifiable(self):
+        r = _receipt()
+        r["failure_counts"] = {}
+        self.assertTrue(Q.check_eof(r))
+
+    def test_frames_complete_false_is_rejected(self):
+        r = _receipt(checks={"outside_all_equal_filtered": True,
+                             "combined_equals_actual_in_window": True,
+                             "arms_match_original_indices": True,
+                             "row_counts_match": True, "frames_complete": False})
+        r["failure_counts"] = {"extra_messages": 0}
+        self.assertTrue(Q.check_eof(r))
+
+
+class TestSidecarValidity(unittest.TestCase):
+    def _ok(self):
+        r = _receipt()
+        r["failure_counts"] = {k: 0 for k in Q.SIDECAR_KINDS}
+        r["checks"]["sidecar_valid"] = True
+        return r
+
+    def test_valid_sidecar_passes(self):
+        self.assertEqual(Q.check_sidecar_valid(self._ok()), [])
+
+    def test_each_kind_is_rejected_when_nonzero(self):
+        for kind in Q.SIDECAR_KINDS:
+            r = self._ok()
+            r["failure_counts"][kind] = 1
+            self.assertTrue(Q.check_sidecar_valid(r), kind)
+
+    def test_missing_kind_is_unverifiable(self):
+        r = self._ok()
+        del r["failure_counts"]["sidecar_bounds"]
+        self.assertTrue(Q.check_sidecar_valid(r))
+
+    def test_false_check_is_rejected(self):
+        r = self._ok()
+        r["checks"]["sidecar_valid"] = False
+        self.assertTrue(Q.check_sidecar_valid(r))
+
+
+class TestWindowBinding(unittest.TestCase):
+    def test_matching_window_passes(self):
+        r = _receipt()
+        r["failure_counts"] = {"window_mismatch": 0}
+        r["checks"]["window_matches_sidecar"] = True
+        self.assertEqual(Q.check_window_matches_sidecar(r), [])
+
+    def test_mismatch_is_rejected(self):
+        r = _receipt()
+        r["failure_counts"] = {"window_mismatch": 3}
+        r["checks"]["window_matches_sidecar"] = False
+        self.assertTrue(Q.check_window_matches_sidecar(r))
 
 
 class TestPreregistration(unittest.TestCase):

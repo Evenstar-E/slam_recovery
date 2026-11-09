@@ -120,6 +120,59 @@ def check_failures_gate_the_verdict(receipt):
     return []
 
 
+SIDECAR_KINDS = ("sidecar_order", "sidecar_dtype", "sidecar_bounds",
+                 "sidecar_missing_frame", "sidecar_hash_mismatch")
+
+
+def _require_kinds(receipt, kinds):
+    fc = receipt.get("failure_counts")
+    if not isinstance(fc, dict):
+        return ["receipt lacks `failure_counts`"], fc
+    return [f"verifier does not report `{k}`" for k in kinds if k not in fc], fc
+
+
+def check_eof(receipt):
+    """Every stream must end together: a trailing scan is a silent extra, not a pass.
+
+    The verifier used to stop when the reference stream ended, so an arm with leftover
+    messages was never compared. `extra_messages` now counts those.
+    """
+    bad, fc = _require_kinds(receipt, ("extra_messages",))
+    if bad:
+        return bad
+    n = int(fc["extra_messages"])
+    if n:
+        bad.append(f"{n} streams have scans after the filtered stream ended")
+    if receipt.get("checks", {}).get("frames_complete") is not True:
+        bad.append("checks.frames_complete is not True")
+    return bad
+
+
+def check_sidecar_valid(receipt):
+    """Sidecar indices must be integral, in range, ordered, complete and hash-bound."""
+    bad, fc = _require_kinds(receipt, SIDECAR_KINDS)
+    if bad:
+        return bad
+    for k in SIDECAR_KINDS:
+        if int(fc[k]):
+            bad.append(f"{fc[k]} {k} failures recorded")
+    if receipt.get("checks", {}).get("sidecar_valid") is not True:
+        bad.append("checks.sidecar_valid is not True")
+    return bad
+
+
+def check_window_matches_sidecar(receipt):
+    """The window must come from an independent declaration and agree with the sidecar frames."""
+    bad, fc = _require_kinds(receipt, ("window_mismatch",))
+    if bad:
+        return bad
+    if int(fc["window_mismatch"]):
+        bad.append(f"{fc['window_mismatch']} frames disagree with the declared window")
+    if receipt.get("checks", {}).get("window_matches_sidecar") is not True:
+        bad.append("checks.window_matches_sidecar is not True")
+    return bad
+
+
 def check_preregistration(design):
     """Two repetitions per cell and a 1.0 m ATE failure threshold, declared before the run.
 

@@ -108,6 +108,24 @@ combined_mismatch / index_mismatch / row_count / stamp_mismatch / missing_messag
 建议修法（任选其一）：把 `sidecar_order` 与 `fatal` 纳入 `checks`，或让退出码改为
 `0 if not any(counts.values()) else 1`。
 
+## 3d. `1fb8afd` 的增量与索引唯一性复核
+
+新增 `extra_messages`（EOF 假通过）、`sidecar_dtype/bounds/missing_frame/hash_mismatch`
+（sidecar 门禁不再只看 `diff > 0`）、`window_mismatch`（窗口来自独立声明并与 sidecar 帧集
+双向核对），以及非扫描流的独立 verifier。receipt 现有 **9 项 check**，全 True，计数全零。
+
+**索引唯一性**：我独立复算了 199 个窗内帧——
+
+| 量 | 审计记录 | 我的复算 |
+|---|---:|---:|
+| 含重复 kept 行的帧 | 0 | **0** |
+| 含重复 injected 行的帧 | 未记 | **0**（更强） |
+| 单行最大重数 | `max_multiplicity: 0` | **1** |
+
+结论成立：本序列窗内无重复行，按值恢复索引唯一。但 `max_multiplicity: 0` 与我算出的 1
+不一致——这个字段显然记的是「超出首份的额外份数」，而字段名读起来是「最大重数」。
+建议改名 `max_extra_copies`，或直接报 `max_multiplicity: 1`。数值本身不影响结论。
+
 ## 4. 新增的验收规则（对 fixture 可跑）
 
 | 规则 | 作用 |
@@ -115,6 +133,9 @@ combined_mismatch / index_mismatch / row_count / stamp_mismatch / missing_messag
 | `check_outside_equals_filtered` | 要求 `outside > 0`、`failures` 与 `checks` 字段存在、无 outside 失败、标志为 True。空集判违规。 |
 | `check_combined_equals_filtered` | 要求 `in_window > 0`、无 combined 失败、标志为 True。空集判违规。 |
 | `check_all_checks_present` | 四个 check 键必须齐全，缺一即违规。 |
+| `check_eof` | `extra_messages` 计数为 0 且 `frames_complete` 为 True；缺字段判 UNVERIFIABLE |
+| `check_sidecar_valid` | 五个 sidecar 类计数全部为 0 且 `sidecar_valid` 为 True |
+| `check_window_matches_sidecar` | `window_mismatch` 为 0 且 `window_matches_sidecar` 为 True |
 | `check_preregistration` | `declared_before_results=True`、`repetitions_per_cell >= 2`、`failure_threshold_ate_m == 1.0`、四格名称齐全。 |
 
 「缺字段」一律判 UNVERIFIABLE（返回违规），不当作通过。
