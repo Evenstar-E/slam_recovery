@@ -5,6 +5,10 @@ Adding a field once dropped `trajectory.population`; a prose note is not a guard
 the top-level and per-block key sets of the results that feed the paper's evidence, so a structure
 change that removes a protection fails here instead of surfacing in a later review.
 
+Convention: every check states what must be present (subset) AND, for block maps, that no
+unregistered block appears (whitelist). Adding a new block therefore requires editing the
+whitelist, and the failure names the unregistered block instead of printing a set diff.
+
     python3 -B -m unittest docs.review_20261109_6b61c9d.test_result_schemas
 """
 
@@ -34,7 +38,10 @@ class Hall01TrajectorySchemaTest(unittest.TestCase):
             self.assertIn(key, self.d)
 
     def test_trajectory_blocks(self):
-        self.assertEqual(set(self.d["trajectory"]), {"R", "C3", "population"})
+        expected = {"R", "C3", "population"}
+        actual = set(self.d["trajectory"])
+        self.assertLessEqual(expected, actual, f"missing trajectory blocks: {expected - actual}")
+        self.assertLessEqual(actual, expected, f"unregistered trajectory blocks: {actual - expected}")
         self.assertIn("gt_matched", self.d["trajectory"]["population"])
         self.assertIn("gt", self.d["trajectory"]["population"])
 
