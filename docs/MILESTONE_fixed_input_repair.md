@@ -292,7 +292,10 @@ residual would fire at the first sample by construction, so they are not used. A
 at +0.5–0.8 s, and >1 m at +15.5–17.9 s. The first output stamps spread over 3.4 s. Pre-onset
 differences are mostly at fit-noise level, so the earlier claim that initialisation had already
 seeded the split is withdrawn: the physically visible divergence begins around onset and grows
-inside the window, but this post-hoc, two-repeat comparison cannot establish causation. A variance control, declared in session but not verifiable from the repository, then ran each of O and O+F−B four more times on the same bags,
+inside the window, but this post-hoc, two-repeat comparison cannot establish causation. The single
+pre-onset >5 cm point (O+F, −5.95 s) is retained and deliberately not interpreted: it is the only
+observation that could support the initialisation hypothesis, so any future revival of that
+hypothesis must explain why it appears for one cell, once, while the mode remains unstable. A variance control, declared in session but not verifiable from the repository, then ran each of O and O+F−B four more times on the same bags,
 config and runner, varying only the run order. Both cells crossed modes (O: BAD/GOOD/BAD/BAD;
 O+F−B: UNCLEAR/UNCLEAR/BAD/BAD), so the declared rule fires
 **`SEQUENCE_UNUSABLE_FOR_SINGLE_RUN`**. On the 323-frame common set the mode sequence is identical
