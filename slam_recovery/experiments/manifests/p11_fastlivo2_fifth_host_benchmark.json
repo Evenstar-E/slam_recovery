@@ -1,0 +1,93 @@
+{
+  "run_id": "p11_fastlivo2_fifth_host_benchmark",
+  "host_system": "FAST-LIVO2 (tightly-coupled LiDAR-inertial-visual odometry)",
+  "provenance": "REAL_HOST / INJECTION",
+  "sequence": "M2DGR room_02, first 60 s of the raw bag",
+  "input_bag": "/home/R26534/M2DGR/raw/room_02.bag",
+  "conversion": {
+    "script": "slam_recovery/experiments/prepare_m2dgr_for_fastlivo.py",
+    "lidar_layout": "22-byte M2DGR (x,y,z,intensity,ring@16,time@18) -> 24-byte (x,y,z,intensity,time@16,ring@20), time>=0 s",
+    "images": 884,
+    "imu": "/handsfree/imu passed through",
+    "clouds": 599,
+    "imu_messages": 8313
+  },
+  "config": {
+    "file": "slam_recovery/experiments/fastlivo2/m2dgr.yaml",
+    "camera": "slam_recovery/experiments/fastlivo2/camera_m2dgr.yaml",
+    "lidar_type": 2,
+    "scan_line": 32,
+    "blind_m": 0.3,
+    "velodyne_time_scale": 1000.0,
+    "extrinsic_T_imu_to_lidar": [
+      -0.27255,
+      0.00053,
+      -0.17954
+    ],
+    "Rcl": [
+      0,
+      -1,
+      0,
+      0,
+      0,
+      -1,
+      1,
+      0,
+      0
+    ],
+    "Pcl": [
+      0.00065,
+      0.65376,
+      -0.30456
+    ],
+    "camera_intrinsics": {
+      "fx": 617.971050917033,
+      "fy": 616.44513152479,
+      "cx": 327.710279392468,
+      "cy": 253.976983707814
+    }
+  },
+  "evaluation_protocol": {
+    "association_max_dt_sec": 0.05,
+    "alignment": "rigid SE(3) fitted on the leading 20% of matched poses, never on the evaluation window",
+    "prefix_poses": 170
+  },
+  "results": {
+    "clean_vision_on": {
+      "provenance": "REAL_HOST",
+      "matched_poses": 852,
+      "gt_outlier_samples_rejected": 1,
+      "ate_rmse_m": 0.0771,
+      "ate_max_m": 0.1566,
+      "rpe_trans_rmse_m": 0.0459,
+      "window_20_40s_rmse_m": 0.1077
+    },
+    "clean_lidar_inertial_only": {
+      "provenance": "REAL_HOST",
+      "matched_poses": 569,
+      "gt_outlier_samples_rejected": 1,
+      "ate_rmse_m": 0.0761,
+      "ate_max_m": 0.1531,
+      "rpe_trans_rmse_m": 0.0588,
+      "window_20_40s_rmse_m": 0.1063,
+      "note": "img_en=0 control; isolates what the visual term contributes"
+    },
+    "lidar_only_88pct_near_field_occlusion_20_40s": {
+      "provenance": "REAL_HOST",
+      "matched_poses": 848,
+      "gt_outlier_samples_rejected": 1,
+      "ate_rmse_m": 0.0886,
+      "ate_max_m": 0.2318,
+      "rpe_trans_rmse_m": 0.07,
+      "window_20_40s_rmse_m": 0.1287,
+      "injection": "inject_plastic_bag_near_field_occlusion, occluded_azimuth_fraction=0.88, bag_distance=0.35 m, seed=42",
+      "injection_scope": "LiDAR stream only; the RGB stream is unchanged"
+    }
+  },
+  "findings": [
+    "On this sequence FAST-LIVO2 is essentially immune to a LiDAR-only 88% near-field occlusion: ATE 0.0771 -> 0.0886 m (+15%), window RMSE 0.1077 -> 0.1287 m.",
+    "The visual term contributes nothing on the clean run (0.0771 m with vision vs 0.0761 m LiDAR-inertial only), so the invariance comes from the LiDAR-inertial solution surviving, not from vision rescuing it.",
+    "This does not reproduce the cross-modal contamination mechanism hypothesised for FAST-LIVO2 (contaminated VoxelMap depth corrupting the photometric term). A sequence where the LiDAR degenerates for longer, or where the camera is also degraded, is still needed before claiming either way.",
+    "M2DGR Mocap GT contains isolated corrupted samples: one at room_02 t=26.35 s moves 7.11 m and returns 20 ms later, which alone inflated ATE from 0.077 to 0.254 m and ATE_max to 7.05 m. The evaluator now rejects such samples and reports the count."
+  ]
+}
