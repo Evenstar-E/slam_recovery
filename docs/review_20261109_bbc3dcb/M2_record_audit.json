@@ -1,0 +1,232 @@
+{
+  "subject": "M2 record-contract audit of the C3 filtered-bag run",
+  "audited_commit": "f2877c3",
+  "artifacts": {
+    "script": "/tmp/wt-fourarm/docs/review_20261109_bbc3dcb/run_fixed_input_repair_c0c3.py",
+    "results": "/tmp/wt-fourarm/docs/review_20261109_bbc3dcb/fixed_input_repair_c0c3_results.json",
+    "filter_report": "/tmp/wt-fourarm/docs/review_20261109_bbc3dcb/fixed_input_repair_filter_report.json"
+  },
+  "point_record": {
+    "checks": [
+      {
+        "item": "point layout (x,y,z,intensity,time,ring at 24 B)",
+        "verdict": "PASS",
+        "detail": "598 frames; point_step 24, field order and offsets unchanged"
+      },
+      {
+        "item": "header stamp + frame_id preserved",
+        "verdict": "PASS",
+        "detail": "every filtered frame matches a source frame by exact stamp"
+      },
+      {
+        "item": "ring/time carried with the retained points",
+        "verdict": "PASS",
+        "detail": "each retained row is byte-identical to a source row on the first 25 frames; the filter removes rows, it does not rewrite them"
+      },
+      {
+        "item": "retained count equals the filter report",
+        "verdict": "PASS",
+        "detail": "per-frame kept counts match fixed_input_repair_filter_report.json"
+      },
+      {
+        "item": "original point id preserved",
+        "verdict": "FAIL",
+        "detail": "topics: ['/camera/color/image_raw', '/handsfree/imu', '/velodyne_points']; no id field in the cloud and no side topic. A retained row can be matched by value against the source but cannot be named by its original index without re-deriving it. Blocking for replay-level attribution, not for the pose result."
+      }
+    ],
+    "frames": 598
+  },
+  "non_lidar": {
+    "checks": [
+      {
+        "item": "non-LiDAR topics byte-identical",
+        "verdict": "PASS",
+        "detail": "/camera/color/image_raw: 888 msgs compared; /handsfree/imu: 8599 msgs compared"
+      }
+    ],
+    "per_topic": {
+      "/camera/color/image_raw": {
+        "source_count": 888,
+        "filtered_count": 888,
+        "compared": 888,
+        "identical": true,
+        "first_mismatch_stamps": []
+      },
+      "/handsfree/imu": {
+        "source_count": 8599,
+        "filtered_count": 8599,
+        "compared": 8599,
+        "identical": true,
+        "first_mismatch_stamps": []
+      }
+    }
+  },
+  "chain": {
+    "checks": [
+      {
+        "item": "bag original_scans",
+        "path": "/tmp/fastlivo/hall01_inj43.bag",
+        "recorded": "aa740037b01abae537d409a150d8a633fb4026d7474f6b8e766be2d508683aae",
+        "actual": "aa740037b01abae537d409a150d8a633fb4026d7474f6b8e766be2d508683aae",
+        "verdict": "PASS"
+      },
+      {
+        "item": "bag converted_scans",
+        "path": "/tmp/fastlivo/hall01_inj43_filtered.bag",
+        "recorded": "c90300cb2911be53361645b037ba864f7aa9f9d1483905a9c5b757a4bd269178",
+        "actual": "c90300cb2911be53361645b037ba864f7aa9f9d1483905a9c5b757a4bd269178",
+        "verdict": "PASS"
+      },
+      {
+        "item": "bag replay_poses_out",
+        "path": "/tmp/fastlivo/res_h1_inj43_filtered.bag",
+        "recorded": "1109fccf46abba4b5843d504899718a6e5616439766df6cedbc35e8879e18a36",
+        "actual": "1109fccf46abba4b5843d504899718a6e5616439766df6cedbc35e8879e18a36",
+        "verdict": "PASS"
+      },
+      {
+        "item": "bag control_poses_out",
+        "path": "/tmp/fastlivo/res_h1_inj43_rerun_unfiltered.bag",
+        "recorded": "2a3880ad298a14934d3644f0cfa6adf19448a60b303d3c62054711c733c48307",
+        "actual": "2a3880ad298a14934d3644f0cfa6adf19448a60b303d3c62054711c733c48307",
+        "verdict": "PASS"
+      },
+      {
+        "item": "host binary",
+        "path": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+        "recorded": "ca1959c45121a4b60fcae597a293e918c41df1df53efd08a79b1ccc8e6076a6a",
+        "actual": "ca1959c45121a4b60fcae597a293e918c41df1df53efd08a79b1ccc8e6076a6a",
+        "verdict": "PASS"
+      },
+      {
+        "item": "host source revision",
+        "path": "/home/R26534/fast_livo2_ws/src/FAST-LIVO2",
+        "recorded": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+        "actual": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+        "verdict": "PASS"
+      },
+      {
+        "item": "config m2dgr.yaml",
+        "path": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+        "recorded": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+        "actual": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+        "verdict": "PASS"
+      },
+      {
+        "item": "config camera_m2dgr.yaml",
+        "path": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+        "recorded": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+        "actual": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+        "verdict": "PASS"
+      },
+      {
+        "item": "declared source_dir exists",
+        "path": "/home/R26534/fast_livo2_ws/src/FAST-LIVO2",
+        "recorded": "/home/R26534/fast_livo2_ws/src/FAST-LIVO2",
+        "actual": "/home/R26534/fast_livo2_ws/src/FAST-LIVO2",
+        "verdict": "PASS"
+      },
+      {
+        "item": "commands recorded",
+        "path": "n/a",
+        "recorded": 4,
+        "actual": 4,
+        "verdict": "PASS"
+      }
+    ]
+  },
+  "labels": {
+    "checks": [
+      {
+        "item": "C3 label is OFFLINE_NATIVE_REESTIMATION",
+        "recorded": "OFFLINE_NATIVE_REESTIMATION",
+        "verdict": "PASS"
+      },
+      {
+        "item": "frames without pose are listed, not dropped",
+        "recorded": 44,
+        "verdict": "PASS"
+      },
+      {
+        "item": "missing observations is explicit",
+        "recorded": null,
+        "verdict": "PASS"
+      }
+    ],
+    "c3_keys": [
+      "committed_ids",
+      "connectivity_voxel_0.10m",
+      "connectivity_voxel_0.20m",
+      "coverage",
+      "coverage_on_well_constrained_queries",
+      "keyframes_committed",
+      "keys_requested",
+      "label",
+      "label_note",
+      "missing_observation",
+      "missing_observation_ids",
+      "missing_pose",
+      "missing_pose_ids",
+      "n_points",
+      "own_pre_onset_alignment",
+      "plane_distance",
+      "pose_deviation_from_reference_m",
+      "removed_fraction_in_window",
+      "removed_fraction_of_input",
+      "removed_fraction_source",
+      "removed_points",
+      "trajectory_support",
+      "well_constrained_query_fraction"
+    ]
+  },
+  "control_reproduction": {
+    "recorded": {
+      "archived_poses": 868,
+      "rerun_poses": 741,
+      "matched": 741,
+      "alignment_translation_m": 4.2140754742468385,
+      "pre_onset": {
+        "n": 72,
+        "mean_m": 0.010796351795206877,
+        "p95_m": 0.021681549989917896,
+        "max_m": 0.02961941481264377
+      },
+      "in_window": {
+        "n": 299,
+        "mean_m": 0.028164621388270465,
+        "p95_m": 0.04857785353644793,
+        "max_m": 0.07423482225737944
+      },
+      "post": {
+        "n": 370,
+        "mean_m": 0.4883433278480661,
+        "p95_m": 1.1555791298276186,
+        "max_m": 1.1792708556543028
+      }
+    },
+    "recomputed": {
+      "archived_poses": 868,
+      "rerun_poses": 741,
+      "matched": 741,
+      "alignment_translation_m": 4.2141,
+      "pre_onset": {
+        "n": 72,
+        "mean_m": 0.010796,
+        "p95_m": 0.021682,
+        "max_m": 0.029619
+      },
+      "in_window": {
+        "n": 299,
+        "mean_m": 0.028165,
+        "p95_m": 0.048578,
+        "max_m": 0.074235
+      },
+      "post": {
+        "n": 370,
+        "mean_m": 0.488343,
+        "p95_m": 1.155579,
+        "max_m": 1.179271
+      }
+    }
+  }
+}
