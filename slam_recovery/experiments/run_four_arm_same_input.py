@@ -482,16 +482,12 @@ def main():
     pre = [k for k in inj_kfs if k["rel"] < ONSET_REL]
     quar = [k for k in inj_kfs if k["rel"] >= ONSET_REL]
 
-    tail = pre[-EXTRAP_FRAMES:]
-    dt_span = tail[-1]["ts"] - tail[0]["ts"]
-    v = (tail[-1]["pose"][:3, 3] - tail[0]["pose"][:3, 3]) / dt_span if dt_span > 1e-6 else np.zeros(3)
-    anchor_T = tail[-1]["pose"].copy()
-    anchor_t = tail[-1]["ts"]
-    incumbent = {}
-    for i, k in enumerate(quar):
-        T = anchor_T.copy()
-        T[:3, 3] = anchor_T[:3, 3] + v * (k["ts"] - anchor_t)
-        incumbent[i] = T
+    # Incumbent = what the system would have committed had it not repaired anything, i.e. the
+    # host's own poses for the quarantined keyframes ("host_quarantined_poses"). A constant-
+    # velocity extrapolation diverges over a 40 s quarantine, so every still-tracking trajectory
+    # beats it by >95% of frames and the comparison would measure "tracking vs divergence"
+    # rather than "repair vs no repair".
+    incumbent = {i: k["pose"].copy() for i, k in enumerate(quar)}
     candidate = {i: k["pose"].copy() for i, k in enumerate(quar)}
 
     ref_pts = np.vstack([world_points(k) for k in pre]) if pre else np.zeros((0, 3))
@@ -675,8 +671,8 @@ def main():
         "protocol": {
             "voxel_m": VOXEL, "surface_tolerance_m": SURF_TOL,
             "onset_rel_sec": ONSET_REL, "injection_end_rel_sec": INJ_END_REL,
-            "incumbent_model": "constant-velocity extrapolation of the last pre-onset keyframes",
-            "extrap_frames": EXTRAP_FRAMES,
+            "incumbent_model": "host_quarantined_poses (what the system would commit without repairing)",
+            
             "alignment": "single SE(3) fitted on the pre-onset keyframes of the host, applied to all arms",
         },
         "reference_surface": {
