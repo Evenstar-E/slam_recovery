@@ -53,11 +53,12 @@
     "prefix_poses": 170
   },
   "findings": [
-    "FAST-LIVO2 is close to immune to a LiDAR-only 88% near-field occlusion on both sequences: room_02 ATE 0.0771 -> 0.0886 m (+15%), hall_01 ATE 0.3143 -> 0.3653 m (+16%), hall_01 window RMSE 0.4341 -> 0.5868 m (+35%).",
-    "The visual term contributes nothing on the clean room_02 run (0.0771 m with vision vs 0.0761 m LiDAR-inertial only), so the invariance comes from the LiDAR-inertial solution surviving, not from vision rescuing it.",
-    "This does not reproduce the cross-modal contamination mechanism hypothesised for FAST-LIVO2 (a contaminated VoxelMap depth prior corrupting the photometric term). A tightly-coupled LIVO is already robust to single-modality near-field occlusion on these two sequences, so our framework's value for this host must be argued for the case where the camera is degraded too, or where the degeneracy outlasts the IMU bridge.",
-    "hall_01 needs 0.5x playback: at 1.0x the node consumed only 35.6 s of the 60 s window and the resulting ATE was a truncation artefact.",
-    "M2DGR Mocap GT contains isolated corrupted samples (room_02 t=26.35 s moves 7.11 m for one sample). The evaluator rejects them and reports the count; hall_01 needed none."
+    "Four-arm matrix on hall_01 [120,140] s: clean 0.3143 m ATE / 0.4341 m window; LiDAR-only occlusion 0.3653 / 0.5868; camera-only degradation 0.3148 / 0.4399; both 0.3661 / 0.6752.",
+    "The camera-only arm is indistinguishable from clean (ATE +0.2%), so the visual term is not carrying the solution on this sequence. Degrading both modalities gives essentially the LiDAR-only ATE (0.3661 vs 0.3653) with a worse window (0.6752 vs 0.5868, +15%).",
+    "Together with room_02 (0.0771 -> 0.0886 m) and the img_en=0 control (0.0761 vs 0.0771 m), this does not reproduce the cross-modal contamination mechanism Action Item 8.1 hypothesised: a tightly-coupled LIVO here behaves as a LiDAR-inertial system that tolerates single-modality near-field occlusion, and its visual term contributes ~nothing in either the clean or the degraded case.",
+    "The framework's case for this host therefore has to be made where the LiDAR-inertial solution itself fails (long geometric degeneracy, IMU saturation) or where an authoritative map must be protected, not where a polluted voxel map is expected to drag the photometric term down.",
+    "Playback rate is part of the protocol: hall_01 must run at 0.5x. At 1.0x the node consumed only 35.6 s of the 60 s window and the truncated trajectory produced an ATE that rose 0.09 -> 0.56 with time, which would have been reported as drift.",
+    "M2DGR Mocap GT contains isolated corrupted samples (room_02 t=26.35 s moves 7.11 m for one sample); the evaluator rejects them and reports the count. hall_01 needed none."
   ],
   "sequences": {
     "room_02_0_60s": {
@@ -109,7 +110,11 @@
       },
       "playback_rate": 0.5,
       "playback_rate_reason": "FAST-LIVO2 processes hall_01 slower than real time. At 1.0x the node had consumed only 35.6 s of the 60 s window when playback ended, so the recorded trajectory was truncated and its ATE (0.288 m, rising 0.09 -> 0.56 with time) was an artefact of the cut, not drift. At 0.5x the run covers 57.7 s of 60 s and is the number reported here.",
-      "injection": "88% azimuth, 0.35 m, seed 42, LiDAR stream only over sequence time [120, 140] s",
+      "injection": {
+        "lidar": "inject_plastic_bag_near_field_occlusion, 88% azimuth, 0.35 m, seed 42, over sequence time [120, 140] s",
+        "camera": "inject_visual_exposure_drop(gain_g=0.15) then inject_visual_motion_blur(kernel_len=15, angle=25 deg), over the same window",
+        "camera_measured_effect": "on a real hall_01 frame the image mean fell 120.6 -> 18.2 and the median 111 -> 17"
+      },
       "results": {
         "clean": {
           "provenance": "REAL_HOST",
@@ -128,11 +133,39 @@
           "ate_max_m": 0.7445,
           "rpe_trans_rmse_m": 0.2354,
           "window_rmse_m": 0.5868
+        },
+        "camera_degraded_only_120_140s": {
+          "provenance": "REAL_HOST",
+          "matched_poses": 562,
+          "gt_outlier_samples_rejected": 0,
+          "ate_rmse_m": 0.3148,
+          "ate_max_m": 0.5538,
+          "rpe_trans_rmse_m": 0.1057,
+          "window_rmse_m": 0.4399
+        },
+        "lidar_and_camera_degraded_120_140s": {
+          "provenance": "REAL_HOST",
+          "matched_poses": 558,
+          "gt_outlier_samples_rejected": 0,
+          "ate_rmse_m": 0.3661,
+          "ate_max_m": 0.8903,
+          "rpe_trans_rmse_m": 0.2005,
+          "window_rmse_m": 0.6752
         }
       },
       "degradation": {
-        "ate_ratio_degraded_over_clean": 1.1623,
-        "window_ratio_degraded_over_clean": 1.3518
+        "lidar_only": {
+          "ate_ratio": 1.1623,
+          "window_ratio": 1.3518
+        },
+        "camera_only": {
+          "ate_ratio": 1.0016,
+          "window_ratio": 1.0134
+        },
+        "both": {
+          "ate_ratio": 1.1648,
+          "window_ratio": 1.5554
+        }
       }
     }
   }

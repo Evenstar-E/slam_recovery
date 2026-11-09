@@ -133,6 +133,42 @@ def inject_visual_exposure_drop(
     return degraded
 
 
+def inject_visual_motion_blur(
+    image_u8: np.ndarray,
+    kernel_len: int = 15,
+    angle_deg: float = 0.0,
+    seed: int = 42,
+) -> np.ndarray:
+    """
+    Simulate directional motion blur (Section 8.5): convolve with a normalised line kernel.
+
+    Complements `inject_visual_exposure_drop`: the exposure drop removes photometric
+    information, the blur removes geometric information, and a tightly-coupled LIVO is affected
+    differently by the two.
+    """
+    img = np.asarray(image_u8)
+    if kernel_len < 3:
+        return img.copy()
+    length = int(kernel_len) | 1  # keep the kernel centred
+    kernel = np.zeros((length, length), dtype=np.float32)
+    kernel[length // 2, :] = 1.0
+    theta = np.deg2rad(float(angle_deg))
+    c, s = np.cos(theta), np.sin(theta)
+    # rotate the line kernel about the centre
+    rot = np.array([[c, -s, 0.0], [s, c, 0.0]], dtype=np.float32)
+    centre = (length - 1) / 2.0
+    rot[0, 2] = centre - (c * centre - s * centre)
+    rot[1, 2] = centre - (s * centre + c * centre)
+    import cv2
+
+    kernel = cv2.warpAffine(kernel, rot, (length, length))
+    total = float(kernel.sum())
+    if total <= 0:
+        return img.copy()
+    kernel /= total
+    return cv2.filter2D(img, -1, kernel)
+
+
 def inject_timestamp_offset(
     timestamps_ns: np.ndarray,
     offset_ms: float = 50.0,

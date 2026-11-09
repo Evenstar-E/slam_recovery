@@ -29,7 +29,11 @@ import numpy as np
 import rosbag
 from sensor_msgs.msg import Image, PointCloud2, PointField
 
-from ..experiments.injection.injectors import inject_plastic_bag_near_field_occlusion
+from ..experiments.injection.injectors import (
+    inject_plastic_bag_near_field_occlusion,
+    inject_visual_exposure_drop,
+    inject_visual_motion_blur,
+)
 
 IMG_IN = "/camera/color/image_raw/compressed"
 IMG_OUT = "/camera/color/image_raw"
@@ -114,6 +118,12 @@ def main() -> None:
     ap.add_argument("--inject-start-rel", type=float, default=None)
     ap.add_argument("--inject-end-rel", type=float, default=None)
     ap.add_argument("--occlusion", type=float, default=0.88)
+    ap.add_argument("--visual-gain", type=float, default=None,
+                    help="low-light gain applied to the image stream inside the visual window")
+    ap.add_argument("--visual-blur", type=int, default=None,
+                    help="directional motion-blur kernel length applied inside the visual window")
+    ap.add_argument("--visual-start-rel", type=float, default=None)
+    ap.add_argument("--visual-end-rel", type=float, default=None)
     ap.add_argument("--max-frames", type=int, default=100000)
     args = ap.parse_args()
 
@@ -130,6 +140,7 @@ def main() -> None:
 
     counts = {CLOUD: 0, IMU: 0, IMG_OUT: 0}
     injected = 0
+    visually_degraded = 0
     with rosbag.Bag(args.out, "w") as dst:
         for topic, msg, t in src.read_messages(topics=[IMU, CLOUD, IMG_IN]):
             ts = msg.header.stamp.to_sec()
@@ -149,6 +160,19 @@ def main() -> None:
                 dst.write(CLOUD, convert_cloud(msg, inject, args.occlusion), t)
             else:
                 arr = decode_jpeg(bytes(msg.data))
+                visual_window = (
+                    args.visual_start_rel is not None
+                    and args.visual_end_rel is not None
+                    and args.visual_start_rel <= (ts - lo) <= args.visual_end_rel
+                )
+                if visual_window and (args.visual_gain is not None or args.visual_blur is not None):
+                    visibly = arr
+                    if args.visual_gain is not None:
+                        visibly = inject_visual_exposure_drop(visibly, gain_g=args.visual_gain, seed=42)
+                    if args.visual_blur is not None:
+                        visibly = inject_visual_motion_blur(visibly, kernel_len=args.visual_blur, angle_deg=25.0)
+                    arr = visibly
+                    visually_degraded += 1
                 im = Image()
                 im.header = msg.header
                 im.height, im.width = int(arr.shape[0]), int(arr.shape[1])
@@ -164,7 +188,8 @@ def main() -> None:
 
     print(f"wrote {args.out} ({os.path.getsize(args.out) / 1e6:.1f} MB)")
     print(f"  window [{lo:.2f}, {hi:.2f}] s  ({args.duration:.0f} s)")
-    print(f"  clouds={counts[CLOUD]} (injected {injected})  imu={counts[IMU]}  images={counts[IMG_OUT]}")
+    print(f"  clouds={counts[CLOUD]} (lidar-injected {injected})  imu={counts[IMU]}  "
+          f"images={counts[IMG_OUT]} (visually degraded {visually_degraded})")
 
 
 if __name__ == "__main__":
