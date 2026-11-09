@@ -1,0 +1,233 @@
+{
+  "revision": "7fc67cf6ca7eb57ae48919de742f7773bd940045",
+  "rubric": "0 无符合本项主张的可验收证据；1 已有实现/方案/局部测试；2 有局部原生或条件性验证；3 冻结范围全部验收并可追溯复现。序数阶段分等权核算，仅用于本次差距清单，非工时/代码比例/论文录用概率。",
+  "prototype": [
+    {
+      "id": "A1",
+      "title": "输入数据与点身份",
+      "score": 2,
+      "remaining_stage_points": 1,
+      "evidence_at_baseline": "完整点记录、保留索引、输入输出哈希及部分逐帧检查",
+      "acceptance_for_score_3": "所有声明实验统一输入→过滤→宿主→输出身份；错误来源、重复 ID、缺对应项必须被拒绝；保存实际输入与对应清单"
+    },
+    {
+      "id": "A2",
+      "title": "宿主原生执行与运行身份",
+      "score": 2,
+      "remaining_stage_points": 1,
+      "evidence_at_baseline": "FAST-LIVO2 原生重估、重复运行及收据",
+      "acceptance_for_score_3": "batch/arm/repeat/run/二进制/config 一一绑定；记录实际消费消息的数量、时间和分组，以及输出数量和退出原因"
+    },
+    {
+      "id": "A3",
+      "title": "在线检测与起点估计",
+      "score": 1,
+      "remaining_stage_points": 2,
+      "evidence_at_baseline": "检测器、路由器及局部测试",
+      "acceptance_for_score_3": "在同一原生链路在线触发；报告事件召回、误报/小时、检测延迟 p50/p95、起点误差；clean/fault 标签只能用于离线评价，不能作为在线 oracle"
+    },
+    {
+      "id": "A4",
+      "title": "完整可信状态检查点",
+      "score": 1,
+      "remaining_stage_points": 2,
+      "evidence_at_baseline": "检查点、undo 与状态恢复结构",
+      "acceptance_for_score_3": "位姿、地图、因子、bias、必要缓存恢复到同一逻辑时刻；验证状态等价与依赖一致；拒绝分支不改变可信状态"
+    },
+    {
+      "id": "A5",
+      "title": "隔离缓冲与分批待处理",
+      "score": 1,
+      "remaining_stage_points": 2,
+      "evidence_at_baseline": "隔离队列与部分提交接口",
+      "acceptance_for_score_3": "首批只提交子集、后续来帧和多批次均完整记账；每帧有明确归宿，pending 丢失数为 0；不能靠候选自行声明决定待处理全集"
+    },
+    {
+      "id": "A6",
+      "title": "历史输入重处理与轨迹地图重建",
+      "score": 2,
+      "remaining_stage_points": 1,
+      "evidence_at_baseline": "实际过滤与离线原生重估，有条件正结果及独立负结果",
+      "acceptance_for_score_3": "从真实在线检查点接入；联合重建历史轨迹和地图；同时报告质量、覆盖、缺帧、失败与成本，而非仅重放成功"
+    },
+    {
+      "id": "A7",
+      "title": "独立证据准入",
+      "score": 1,
+      "remaining_stage_points": 2,
+      "evidence_at_baseline": "候选自参考入口已修、配对证据与拒绝测试",
+      "acceptance_for_score_3": "统一前后 FIM、协方差和弱方向的坐标/切空间；全局坐标重表达不改变决定；用独立评价验证有害拒绝和有益接纳"
+    },
+    {
+      "id": "A8",
+      "title": "原子公开提交与输出一致性",
+      "score": 1,
+      "remaining_stage_points": 2,
+      "evidence_at_baseline": "事务 API 与部分原子性测试",
+      "acceptance_for_score_3": "任一提交阶段异常均完整撤销；位姿、地图、版本、成功记录一致发布；半提交与版本不一致在声明故障测试空间中为 0"
+    },
+    {
+      "id": "A9",
+      "title": "多事件撤销与重武装",
+      "score": 1,
+      "remaining_stage_points": 2,
+      "evidence_at_baseline": "生命周期与后续回滚框架",
+      "acceptance_for_score_3": "已接纳修复进入可撤销历史；第二次迟到检测跨越首次修复时无地图/因子/bias 残留，或显式拒绝不支持的回溯范围"
+    },
+    {
+      "id": "A10",
+      "title": "原生接回后的持续运行",
+      "score": 1,
+      "remaining_stage_points": 2,
+      "evidence_at_baseline": "边界检查与仿真路径",
+      "acceptance_for_score_3": "同一次原生运行在提交后持续消费输入、建图并处理下一事件；记录接回跳变、中断、积压与后续恢复结果"
+    },
+    {
+      "id": "A11",
+      "title": "共同集合与同步评测",
+      "score": 2,
+      "remaining_stage_points": 1,
+      "evidence_at_baseline": "地图/轨迹指标、共同集合与空间 gauge 修正",
+      "acceptance_for_score_3": "唯一运行身份、完整共同集合、实际共同模式判定及时间同步；比较采用同一人口/时间支持，缺测不得静默删除"
+    },
+    {
+      "id": "A12",
+      "title": "复现封装与运行预算",
+      "score": 1,
+      "remaining_stage_points": 2,
+      "evidence_at_baseline": "脚本、配置和运行收据",
+      "acceptance_for_score_3": "固定环境与统一入口，消除对未说明私有路径的依赖；干净环境复现，实测 wall time、峰值内存、输出、吞吐与积压"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "B1",
+      "title": "失效问题与保护必要性",
+      "score": 2,
+      "remaining_stage_points": 1,
+      "evidence_at_baseline": "原生污染、失效及重复不稳定现象",
+      "acceptance_for_score_3": "冻结事件定义，测量污染发生、检测与扩散的时序，配正常对照，证明需要介入的持久状态损害"
+    },
+    {
+      "id": "B2",
+      "title": "可信状态保护正确性",
+      "score": 1,
+      "remaining_stage_points": 2,
+      "evidence_at_baseline": "实现与局部不变量测试",
+      "acceptance_for_score_3": "原生宿主及故障注入验证错误提交、状态泄漏、拒绝后污染；闭合事务缺陷，明确保障边界"
+    },
+    {
+      "id": "B3",
+      "title": "在线检测与定位能力",
+      "score": 1,
+      "remaining_stage_points": 2,
+      "evidence_at_baseline": "检测器与合成/局部实验",
+      "acceptance_for_score_3": "独立事件标签仅用于评价；完整报告召回、误报、延迟、起点误差，纳入漏检和迟检"
+    },
+    {
+      "id": "B4",
+      "title": "实际修复的净收益",
+      "score": 2,
+      "remaining_stage_points": 1,
+      "evidence_at_baseline": "hall_01 条件性正结果、room_02 独立确认负结果",
+      "acceptance_for_score_3": "固定完整评价人口；联合衡量新增正确/错误几何、正常几何损失、轨迹、缺测和成本；不能仅保留有输出子集的有利指标"
+    },
+    {
+      "id": "B5",
+      "title": "验证门的增量价值",
+      "score": 1,
+      "remaining_stage_points": 2,
+      "evidence_at_baseline": "有害候选拒绝、独立参考局部测试",
+      "acceptance_for_score_3": "同一候选流比较无条件接纳与门控；减少多少有害接纳、损失多少有益修复，独立离线标签与不确定性齐全"
+    },
+    {
+      "id": "B6",
+      "title": "失效和收益机制因果",
+      "score": 1,
+      "remaining_stage_points": 2,
+      "evidence_at_baseline": "因素分解与重复记录",
+      "acceptance_for_score_3": "先保证身份和评价有效；控制输入消费与估计条件，区分残留污染、健康点误删、状态重估和验证门的作用"
+    },
+    {
+      "id": "B7",
+      "title": "正常数据代价与有害修复风险",
+      "score": 1,
+      "remaining_stage_points": 2,
+      "evidence_at_baseline": "健康区误删统计、部分拒绝测试",
+      "acceptance_for_score_3": "正常段、退化段与恢复尾段分区；报告误干预、健康几何损失、错接纳/错拒绝、漏修、中断及安全拒绝后的持续运行"
+    },
+    {
+      "id": "B8",
+      "title": "重复稳定性与统计不确定性",
+      "score": 1,
+      "remaining_stage_points": 2,
+      "evidence_at_baseline": "多次运行暴露不稳定，但基线仍有集合/判定缺口",
+      "acceptance_for_score_3": "冻结重复方案，报告效应、区间、失败及运行方差；统计考虑序列/事件内相关性，不能把大量相关点当独立样本"
+    },
+    {
+      "id": "B9",
+      "title": "未参与开发环境的泛化边界",
+      "score": 1,
+      "remaining_stage_points": 2,
+      "evidence_at_baseline": "room_02 首次独立确认的负结果",
+      "acceptance_for_score_3": "hall/room 已用于开发；方法冻结后新增未参与调参的环境，报告增益、安全拒绝与失效边界"
+    },
+    {
+      "id": "B10",
+      "title": "公平完整基线比较",
+      "score": 0,
+      "remaining_stage_points": 3,
+      "evidence_at_baseline": "部分历史／构造对照，尚不足以满足此主张",
+      "acceptance_for_score_3": "同条件比较原生、仅隔离、无条件修复接纳、完整门控，并选择能力范围相符的外部基线；说明无法直接比较的部分"
+    },
+    {
+      "id": "B11",
+      "title": "同一原生在线链路与成本证据",
+      "score": 0,
+      "remaining_stage_points": 3,
+      "evidence_at_baseline": "离线原生运行与组件材料",
+      "acceptance_for_score_3": "单次运行贯通检测→回退/隔离→修复→验证→提交→接回；实测端到端恢复率、延迟、积压、资源及后续质量"
+    },
+    {
+      "id": "B12",
+      "title": "冻结版本的独立复现",
+      "score": 0,
+      "remaining_stage_points": 3,
+      "evidence_at_baseline": "代码、脚本与归档",
+      "acceptance_for_score_3": "可移植发布包、固定版本/环境/数据入口；独立干净环境复现核心表，核身份、指标与结论一致性"
+    }
+  ],
+  "scope": "单宿主、有限退化类别、允许安全拒绝的SLAM研究原型；不是多宿主全故障、真机导航或生产安全认证。基于已审阅冻结版本，不声明远端未有更新；不执行实验、不改变P0–P5或验收阈值。",
+  "evidence_sources": [
+    "https://github.com/Evenstar-E/slam_recovery/blob/7fc67cf6ca7eb57ae48919de742f7773bd940045/docs/review_20261109_bbc3dcb/raw_vs_repaired_results.json",
+    "https://github.com/Evenstar-E/slam_recovery/blob/7fc67cf6ca7eb57ae48919de742f7773bd940045/docs/review_20261109_bbc3dcb/room02_confirmation_results.json",
+    "https://github.com/Evenstar-E/slam_recovery/blob/7fc67cf6ca7eb57ae48919de742f7773bd940045/docs/MILESTONE_fixed_input_repair.md",
+    "https://github.com/Evenstar-E/slam_recovery/blob/7fc67cf6ca7eb57ae48919de742f7773bd940045/slam_recovery/quarantine/manager.py",
+    "https://github.com/Evenstar-E/slam_recovery/blob/7fc67cf6ca7eb57ae48919de742f7773bd940045/slam_recovery/sim/transaction_manager_node.py",
+    "https://github.com/Evenstar-E/slam_recovery/blob/7fc67cf6ca7eb57ae48919de742f7773bd940045/docs/review_20261109_bbc3dcb/run_bistability_analysis.py",
+    "https://github.com/Evenstar-E/slam_recovery/blob/7fc67cf6ca7eb57ae48919de742f7773bd940045/docs/review_20261109_6b61c9d/analyze_repeat_divergence.py",
+    "https://github.com/Evenstar-E/slam_recovery/blob/3fc10e995fa958365a02d73fb5f2419d69c9ec46/docs/review_20261109_7fc67cf/README.md"
+  ],
+  "summary": {
+    "prototype_points": 16,
+    "prototype_remaining_points": 20,
+    "evidence_points": 11,
+    "evidence_remaining_points": 25,
+    "per_axis_max": 36,
+    "strict_complete_packages_each": 0
+  },
+  "schema_version": 1,
+  "assessment_date": "2026-11-09",
+  "status": "FROZEN_HISTORICAL_ASSESSMENT_NOT_LATEST_MAIN_SCORE",
+  "publication_base_revision": "3fc10e995fa958365a02d73fb5f2419d69c9ec46",
+  "required_review_instruction": "every auto review needs read and plan to work on main line according to this table",
+  "standard_document": "MAINLINE_PROGRESS_STANDARD_20261109.md",
+  "score_levels": {
+    "0": "尚无满足本项主张的可验收证据，不表示没有代码或历史材料",
+    "1": "已有实现、方案或局部组件测试",
+    "2": "已有局部原生运行或条件性验证",
+    "3": "冻结范围内全部验收通过并可追溯复现"
+  },
+  "update_rule": "Preserve this baseline. Assess current source and evidence; record subsequent scores separately with revision, affected row IDs, evidence and remaining acceptance gaps. Partial reviews do not constitute a fully refreshed score.",
+  "authorization_boundary": "Read and plan only within current user authorization; does not resume automation or authorize experiments, retries, installation, commits or pushes."
+}

@@ -2,6 +2,8 @@
 
 Official repository for **`slam_recovery`**: a cross-host transactional recovery framework that protects persistent SLAM maps against intermediate perceptual degradation (`GEO_DEGEN`, `MEAS_CONTAM`, `SYNC_DRIFT`, `LOOP_OUTLIER`, and `AUX_DEGEN`) via delayed-commit quarantine buffering, interpretable mechanism routing, tiered repairers, and a four-mode information–uncertainty gate $\mathcal{D}(t)$.
 
+> **Mainline progress and acceptance:** Read the [two-axis progress standard and checklist](docs/MAINLINE_PROGRESS_STANDARD_20261109.md) before each automatic review. **every auto review needs read and plan to work on main line according to this table**. Its 16/36 prototype and 11/36 paper-evidence scores are a frozen assessment of `7fc67cf`, not a claim about later commits; subsequent reviews must assess current evidence and plan against the same row IDs. See [AGENTS.md](AGENTS.md).
+
 ![slam_recovery System Architecture](docs/review_20261105/figures/01_architecture.png)
 
 > **Architecture & Visual Bundle**: [Vector SVG](docs/review_20261105/figures/01_architecture.svg) · [PDF](docs/review_20261105/figures/01_architecture.pdf) · [Figure Descriptions](docs/review_20261105/FIGURES.md)
