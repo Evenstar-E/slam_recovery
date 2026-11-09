@@ -1,0 +1,161 @@
+{
+ "protocol": {
+  "source": "docs/MILESTONE_fixed_input_repair.md (2x2 single factor)",
+  "fail_rule": "full-alignment ATE > 1.0 m fails; both repeats must land on the same side to be stable",
+  "interaction_rule": "supported only if O+F-B fails both repeats while O+F and O-B do not"
+ },
+ "provenance": "REAL_HOST, two repeats per cell; proxy is the clean run map, not GT; single sequence",
+ "common_set": {
+  "n": 323,
+  "n_keys": 398,
+  "ns_sha256": "cddba0d620ad3b70818ed3cdf3ebd3f58720c85f684f6c0e82b9769e0253ab89"
+ },
+ "per_frame_available": {
+  "O#1": 323,
+  "O#2": 323,
+  "O+F#1": 326,
+  "O+F#2": 326,
+  "O-B#1": 323,
+  "O-B#2": 323,
+  "O+F-B#1": 326,
+  "O+F-B#2": 326
+ },
+ "cells": {
+  "O#1": {
+   "status": "OK",
+   "frames_scored": 323,
+   "poses_matched_gt": 317,
+   "coverage": 0.9987696231884058,
+   "unsupported_fraction": 0.007318885448916409,
+   "in_window_unsupported_fraction": 0.011258064516128985,
+   "healthy_unsupported_fraction": 0.0048643216080401785,
+   "ate_full_alignment_diagnostic_m": 0.07162458349543022,
+   "ate_frozen_prefix_protocol_m": 3.8123448824832122,
+   "fail": false
+  },
+  "O#2": {
+   "status": "OK",
+   "frames_scored": 323,
+   "poses_matched_gt": 317,
+   "coverage": 0.6805496811594203,
+   "unsupported_fraction": 0.6838390092879257,
+   "in_window_unsupported_fraction": 0.17645161290322575,
+   "healthy_unsupported_fraction": 1.0,
+   "ate_full_alignment_diagnostic_m": 14.43858960214947,
+   "ate_frozen_prefix_protocol_m": 24.423010866557135,
+   "fail": true
+  },
+  "O+F#1": {
+   "status": "OK",
+   "frames_scored": 323,
+   "poses_matched_gt": 317,
+   "coverage": 0.6899958260869565,
+   "unsupported_fraction": 0.6771021671826626,
+   "in_window_unsupported_fraction": 0.15890322580645166,
+   "healthy_unsupported_fraction": 1.0,
+   "ate_full_alignment_diagnostic_m": 593.0262141110676,
+   "ate_frozen_prefix_protocol_m": 742.8650587701793,
+   "fail": true
+  },
+  "O+F#2": {
+   "status": "OK",
+   "frames_scored": 323,
+   "poses_matched_gt": 317,
+   "coverage": 0.6933848115942028,
+   "unsupported_fraction": 0.6656470588235294,
+   "in_window_unsupported_fraction": 0.12906451612903225,
+   "healthy_unsupported_fraction": 1.0,
+   "ate_full_alignment_diagnostic_m": 14.872150834451231,
+   "ate_frozen_prefix_protocol_m": 24.584551754443208,
+   "fail": true
+  },
+  "O-B#1": {
+   "status": "OK",
+   "frames_scored": 323,
+   "poses_matched_gt": 317,
+   "coverage": 0.6949365797101449,
+   "unsupported_fraction": 0.6491888544891641,
+   "in_window_unsupported_fraction": 0.08619354838709681,
+   "healthy_unsupported_fraction": 1.0,
+   "ate_full_alignment_diagnostic_m": 48.84667762983906,
+   "ate_frozen_prefix_protocol_m": 75.13141143351287,
+   "fail": true
+  },
+  "O-B#2": {
+   "status": "OK",
+   "frames_scored": 323,
+   "poses_matched_gt": 317,
+   "coverage": 0.6949484057971015,
+   "unsupported_fraction": 0.656656346749226,
+   "in_window_unsupported_fraction": 0.10564516129032253,
+   "healthy_unsupported_fraction": 1.0,
+   "ate_full_alignment_diagnostic_m": 19.67264276177945,
+   "ate_frozen_prefix_protocol_m": 31.957210961213807,
+   "fail": true
+  },
+  "O+F-B#1": {
+   "status": "OK",
+   "frames_scored": 323,
+   "poses_matched_gt": 317,
+   "coverage": 0.6963416811594203,
+   "unsupported_fraction": 0.6456222910216718,
+   "in_window_unsupported_fraction": 0.07690322580645159,
+   "healthy_unsupported_fraction": 1.0,
+   "ate_full_alignment_diagnostic_m": 554.5608455651169,
+   "ate_frozen_prefix_protocol_m": 687.1975647075819,
+   "fail": true
+  },
+  "O+F-B#2": {
+   "status": "OK",
+   "frames_scored": 323,
+   "poses_matched_gt": 317,
+   "coverage": 0.998751884057971,
+   "unsupported_fraction": 0.0101671826625387,
+   "in_window_unsupported_fraction": 0.016709677419354807,
+   "healthy_unsupported_fraction": 0.006090452261306556,
+   "ate_full_alignment_diagnostic_m": 0.3005104007819498,
+   "ate_frozen_prefix_protocol_m": 3.736026195670787,
+   "fail": false
+  }
+ },
+ "summary": {
+  "O": {
+   "fail_repeats": [
+    false,
+    true
+   ],
+   "stable": false,
+   "fails_both": false,
+   "ok_both": false
+  },
+  "O+F": {
+   "fail_repeats": [
+    true,
+    true
+   ],
+   "stable": true,
+   "fails_both": true,
+   "ok_both": false
+  },
+  "O-B": {
+   "fail_repeats": [
+    true,
+    true
+   ],
+   "stable": true,
+   "fails_both": true,
+   "ok_both": false
+  },
+  "O+F-B": {
+   "fail_repeats": [
+    true,
+    false
+   ],
+   "stable": false,
+   "fails_both": false,
+   "ok_both": false
+  }
+ },
+ "interaction_supported": false,
+ "ate_note": "ate_full_alignment_diagnostic_m is a FULL_ALIGNMENT_DIAGNOSTIC and must not be merged into the frozen-prefix protocol table; ate_frozen_prefix_protocol_m is the protocol number"
+}

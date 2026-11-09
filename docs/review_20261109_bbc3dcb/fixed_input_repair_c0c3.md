@@ -290,6 +290,7 @@ python3 -B docs/review_20261109_bbc3dcb/run_room02_confirmation.py
 python3 -B docs/review_20261109_bbc3dcb/run_room02_decomposition.py
 python3 -B docs/review_20261109_bbc3dcb/room02_filter_row_audit.py
 python3 -B docs/review_20261109_bbc3dcb/run_e_oracle_vs_actual.py
+python3 -B docs/review_20261109_bbc3dcb/run_2x2_analysis.py
 bash docs/review_20261109_bbc3dcb/fl_run_isolated.sh <bag> <new-out> 0.5 60
 bash docs/review_20261109_bbc3dcb/test_fl_run_cleanup.sh
 ```
