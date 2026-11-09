@@ -498,6 +498,24 @@
    ]
   }
  },
+ "13_hall01_trajectory": {
+  "verdict": "PASS",
+  "problems": [
+   "clean_to_gt records matched/residual but not the fit window or the transform, so a reader cannot check that it was pre-onset"
+  ],
+  "gt_matched": 252,
+  "frame_set": 400,
+  "ate": {
+   "R": {
+    "full": 1.9085491271221064,
+    "prefix": 10.928765092783461
+   },
+   "C3": {
+    "full": 0.3185291881794998,
+    "prefix": 0.49184380829384977
+   }
+  }
+ },
  "12_hall01": {
   "stability": {
    "verdict": "PASS",

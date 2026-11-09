@@ -268,6 +268,25 @@ T3a 走的是结果文件内的 `provenance_gap`；hall_01 没有这个字段，
 同时保留 `runs_analysed ["r1","r2"]`、`build`、`scope.superseded_for_conclusion_by`
 与 `superseded_by.file`。三处指向同一事实，无矛盾。
 
+## 13. hall_01 轨迹项（main c458a22）
+
+| 项 | 结果 |
+|---|---|
+| 六个输入 sha | **PASS**：逐个与磁盘现算一致（`aa740037` / `03e75983` / `905c6a15` / `32f0bf44` / `c90300cb` / `1109fccf`） |
+| `frame_set.ns_sha256` | **PASS**：`8a53f296…` 与上一版**相同**，400 帧 / 446 keys / 46 missing 未变 |
+| 冻结 clean→GT | **PASS**：`cln_ts < onset_ns` 上拟合一次（77 匹配、0.085 m），在臂循环外计算，两臂共用 |
+| 每臂 run→clean | **PASS**：用 `healthy_prefix` 拟合，再复合 `(me @ R_p.T + t_p) @ R_cg.T + t_cg` |
+| 种群标注 | **PASS**：`trajectory.population = {frame_set 400, gt_matched 252, gt path}`；两臂 `gt_matched` 都是 252 |
+| 诊断 / 协议分列 | **PASS**：`ate_full_alignment_diagnostic_m` 与 `ate_frozen_prefix_protocol_m` 分字段，R 1.909/10.929、C3 0.319/0.492 |
+
+### 一处建议（不阻断）
+
+`clean_to_gt` 只记 `matched` 与 `residual_rmse_m`，**不记拟合窗口，也不记变换本身**。
+「在 onset 前 clean keyframes 上拟合」这句话只存在于代码注释与 note 字符串里，读者无法从 JSON
+验证，也无法复算。建议补三个字段：`fitted_on: "pre-onset clean keyframes"`、`start_ns`、
+以及 `R_cg`/`t_cg` 的数值。这与之前 `window.declared_from` 那次是同一类问题——**声明在文字里，
+不在数据里**。
+
 ## 5b. R2 / R3 处置（同意你的提议）
 
 - **R2**：旧 `room02_hybrid_bag_report.json` 属已废弃的 X/Y 设计，2×2 已取代它。

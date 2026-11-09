@@ -588,6 +588,43 @@ def check_hall01_stability(results):
             "modes": modes}
 
 
+def check_trajectory_population(results):
+    """Trajectory metrics must name the population they were computed on, arms included."""
+    bad, notes = [], []
+    tr = results.get("trajectory") or {}
+    pop = tr.get("population") or {}
+    fs = results.get("frame_set") or {}
+    arms = [a for a in ("R", "C3") if a in tr]
+    if len(arms) != 2:
+        bad.append(f"trajectory has {arms}, expected R and C3")
+    matched = {tr[a].get("gt_matched") for a in arms}
+    if len(matched) != 1:
+        bad.append(f"arms match different GT counts: {matched}")
+    m = matched.pop() if len(matched) == 1 else None
+    if m is not None and pop.get("gt_matched") != m:
+        bad.append(f"population.gt_matched {pop.get('gt_matched')} != arm match {m}")
+    if pop.get("frame_set") != fs.get("n_frames"):
+        bad.append(f"population.frame_set {pop.get('frame_set')} != frame_set "
+                   f"{fs.get('n_frames')}")
+    if m is not None and fs.get("n_frames") and m >= fs["n_frames"]:
+        bad.append("gt_matched equals the frame set: the GT subset is not recorded")
+    for a in arms:
+        if tr[a].get("ate_full_alignment_diagnostic_m") is None:
+            bad.append(f"{a}: no diagnostic ATE")
+        if tr[a].get("ate_frozen_prefix_protocol_m") is None:
+            bad.append(f"{a}: no protocol ATE")
+    cg = results.get("clean_to_gt") or {}
+    if int(cg.get("matched", 0)) < 10:
+        bad.append(f"clean->GT fitted on {cg.get('matched')} poses")
+    if not cg.get("fitted_on"):
+        notes.append("clean_to_gt records matched/residual but not the fit window or the "
+                     "transform, so a reader cannot check that it was pre-onset")
+    return {"verdict": "PASS" if not bad else "FAIL", "problems": bad + notes,
+            "gt_matched": m, "frame_set": fs.get("n_frames"),
+            "ate": {a: {"full": tr[a].get("ate_full_alignment_diagnostic_m"),
+                        "prefix": tr[a].get("ate_frozen_prefix_protocol_m")} for a in arms}}
+
+
 def main():
     results = json.load(open(RESULTS, encoding="utf-8"))
     prereg = json.load(open(PREREG, encoding="utf-8"))
@@ -609,6 +646,9 @@ def main():
                    manifest,
                    receipts=T3A_RECEIPTS, arms=("O",), expect_per_arm=6),
            },
+           "13_hall01_trajectory": check_trajectory_population(
+               json.load(open(os.path.join(_HERE, "raw_vs_repaired_results.json"),
+                              encoding="utf-8"))),
            "12_hall01": {
                "stability": check_hall01_stability(HALL01),
                "identity": check_batch_identity(HALL01_RECEIPTS),
@@ -645,7 +685,10 @@ def main():
         json.dump(out, fh, indent=1, default=float)
     for k in ("1_protocol", "2_receipts", "3_independent", "4_ate_convention",
               "5_frozen_transform", "6_hash_chain", "7_diagnostic_unchanged",
-              "8_bistability", "9_bist_runs", "10_run_identity", "11_t3a", "12_hall01"):
+              "8_bistability", "9_bist_runs", "10_run_identity", "11_t3a", "12_hall01", "13_hall01_trajectory"):
+        if k == "13_hall01_trajectory":
+            print(k, out[k]["verdict"], out[k]["problems"][:3], out[k]["ate"])
+            continue
         if k == "12_hall01":
             print(k, {n: v["verdict"] for n, v in out[k].items()})
             for n, v in out[k].items():
