@@ -383,6 +383,32 @@ def check_run_output_hashes(bist, receipts):
     return {"verdict": "PASS" if not bad else "FAIL", "problems": bad, "checked": checked}
 
 
+def check_run_identity(bist):
+    """Twelve runs, each with one unique (batch, cell, rep) label, and no silent shrinking."""
+    bad = []
+    pav = (bist.get("common_set") or {}).get("per_run_available") or {}
+    runs = {}
+    for batch, grp in (("new", "new_runs"), ("earlier", "earlier_2x2_runs")):
+        for key in (bist.get(grp) or {}):
+            # "O#earlier1" is the earlier batch's first repeat of cell O -> "earlier:O#1"
+            label = f"{batch}:{key.replace('#earlier', '#')}"
+            if label in runs:
+                bad.append(f"collision on {label}")
+            runs[label] = grp
+    if len(pav) != len(runs):
+        bad.append(f"per_run_available lists {len(pav)} runs but {len(runs)} were analysed")
+    for label in runs:
+        if label not in pav:
+            bad.append(f"{label} missing from per_run_available")
+    for label in pav:
+        if label.split(":")[0] not in ("new", "earlier"):
+            bad.append(f"per_run_available entry {label} carries no batch prefix")
+    if (bist.get("common_set") or {}).get("n_runs") not in (None, len(runs)):
+        bad.append("common_set.n_runs disagrees with the run list")
+    return {"verdict": "PASS" if not bad else "FAIL", "problems": bad,
+            "runs": sorted(runs), "common_frames": (bist.get("common_set") or {}).get("n")}
+
+
 def main():
     results = json.load(open(RESULTS, encoding="utf-8"))
     prereg = json.load(open(PREREG, encoding="utf-8"))
@@ -395,6 +421,8 @@ def main():
            "4_ate_convention": audit_ate_convention(results),
            "5_frozen_transform": audit_frozen_transform(results),
            "6_hash_chain": audit_hash_chain(results, manifest),
+           "10_run_identity": check_run_identity(
+               json.load(open(BIST, encoding="utf-8"))),
            "9_bist_runs": {
                "modes": check_common_mode_consistency(json.load(open(BIST, encoding="utf-8"))),
                "hashes": check_run_output_hashes(
@@ -423,7 +451,7 @@ def main():
         json.dump(out, fh, indent=1, default=float)
     for k in ("1_protocol", "2_receipts", "3_independent", "4_ate_convention",
               "5_frozen_transform", "6_hash_chain", "7_diagnostic_unchanged",
-              "8_bistability", "9_bist_runs"):
+              "8_bistability", "9_bist_runs", "10_run_identity"):
         if k == "9_bist_runs":
             print(k, {name: v["verdict"] for name, v in out[k].items()})
             continue
