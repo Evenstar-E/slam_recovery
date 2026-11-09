@@ -175,6 +175,8 @@
               39
             ]
           ],
+          "segment_boundary_jumps_m": [],
+          "segment_boundary_ok": true,
           "first_deferred_reason": "no_reference_support"
         },
         "gt_nis_analytic_mean": 0.005302
@@ -228,6 +230,8 @@
               39
             ]
           ],
+          "segment_boundary_jumps_m": [],
+          "segment_boundary_ok": true,
           "first_deferred_reason": "no_reference_support"
         },
         "gt_nis_analytic_mean": 0.005272
@@ -281,6 +285,8 @@
               39
             ]
           ],
+          "segment_boundary_jumps_m": [],
+          "segment_boundary_ok": true,
           "first_deferred_reason": "no_reference_support"
         },
         "gt_nis_analytic_mean": 0.005594
@@ -334,6 +340,8 @@
               39
             ]
           ],
+          "segment_boundary_jumps_m": [],
+          "segment_boundary_ok": true,
           "first_deferred_reason": "no_reference_support"
         },
         "gt_nis_analytic_mean": 0.005437
@@ -387,6 +395,8 @@
               39
             ]
           ],
+          "segment_boundary_jumps_m": [],
+          "segment_boundary_ok": true,
           "first_deferred_reason": "no_reference_support"
         },
         "gt_nis_analytic_mean": 0.005431

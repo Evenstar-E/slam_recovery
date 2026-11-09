@@ -195,6 +195,11 @@ class CandidateMap:
     # Candidate frames left out of the commit because they could not be independently scored.
     # They stay quarantined; they are not "rejected", they are "not yet verifiable".
     deferred_pose_keys: tuple = ()
+    # A commit set may be non-contiguous. Each contiguous run after the first starts at a hole,
+    # so its entry boundary must be checked independently: one global re-entry jump measured at
+    # the first keyframe says nothing about a segment that begins 1.5 m away after a gap.
+    boundary_continuity_ok: Optional[bool] = None
+    boundary_jumps_m: Optional[List[float]] = None
 
 
 @dataclass
@@ -374,6 +379,28 @@ def evaluate_four_mode_gate(
                 reason=(
                     "Refused Mode 2 atomic commit: holdout evidence MISSING "
                     "(no scorable holdout frame against the independent reference)"
+                ),
+                # The machine-readable status must not keep saying PASSED when the holdout half of
+                # the evidence is absent. Downstream consumers aggregate this field, and a
+                # paired-only pass is not a pass for admission.
+                evidence_status="MISSING",
+            )
+
+        # A non-contiguous commit is allowed, but every run after a gap must reconnect to the
+        # previously committed keyframe. One first-anchor jump cannot speak for those boundaries.
+        if candidate.boundary_continuity_ok is False:
+            return ValidationReport(
+                accepted=False,
+                mode=RecoveryMode.MODE3_SOFT_BRIDGE_WAIT if p_prop < thresholds.sigma_bridge else RecoveryMode.MODE4_HARD_SLEEP_SPLIT,
+                weak_dir_info_before=info_before,
+                weak_dir_info_after=info_after,
+                weak_dir_info_gain=info_gain,
+                holdout_nis=d_hold,
+                posterior_cov_norm=p_after,
+                propagated_cov_norm=p_prop,
+                reason=(
+                    "Refused Mode 2 atomic commit: a committed segment begins beyond the boundary "
+                    "jump bound (per-segment continuity failed)"
                 ),
                 evidence_status=evidence_status,
             )

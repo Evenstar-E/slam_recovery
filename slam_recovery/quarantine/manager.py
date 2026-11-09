@@ -258,9 +258,28 @@ class TrustedMapTransactionManager:
             if candidate.repaired_bias_gyr is not None:
                 self.trusted_bias_gyr = candidate.repaired_bias_gyr.copy()
             self.trusted_version += 1
-            self.provisional_queue.clear()
-            self.active_quarantine = None
-            self.state = RecoveryState.HEALTHY
+            # A partial commit does not end the quarantine. The deferred frames are still suspect,
+            # and clearing the segment would both discard their pending subtransaction and let the
+            # next call fail with "No active quarantine segment to validate". Keep a segment that
+            # resumes from the post-commit trusted map; only a full commit returns to HEALTHY.
+            old_segment = self.active_quarantine
+            if candidate.deferred_pose_keys and old_segment is not None:
+                self.provisional_queue.clear()
+                self.active_quarantine = QuarantineSegment(
+                    segment_id=f"{old_segment.segment_id}:deferred",
+                    checkpoint=self.create_checkpoint(timestamp_ns=old_segment.t_end_ns),
+                    t_start_ns=old_segment.t_start_ns,
+                    t_end_ns=old_segment.t_end_ns,
+                    weak_direction_6d=np.asarray(old_segment.weak_direction_6d, dtype=np.float64).copy(),
+                    info_before_6x6=np.asarray(old_segment.info_before_6x6, dtype=np.float64).copy(),
+                    propagated_cov_norm=float(old_segment.propagated_cov_norm),
+                    raw_frame_refs=[str(k) for k in candidate.deferred_pose_keys],
+                )
+                self.state = RecoveryState.WAITING_FOR_EVIDENCE
+            else:
+                self.provisional_queue.clear()
+                self.active_quarantine = None
+                self.state = RecoveryState.HEALTHY
             # Make the commit auditable: which frames were written, and which stayed quarantined.
             report.committed_pose_keys = sorted(int(k) for k in candidate.repaired_poses.keys())
             report.partial_commit = bool(report.deferred_pose_keys)
