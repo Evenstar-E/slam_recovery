@@ -1,69 +1,172 @@
 {
   "provenance": "ARCHIVED_REAL_HOST_POSES + INJECTION_SCANS; clean scans are ORACLE_CLEAN_SCANS",
-  "statistic": "gate holdout set: every 5th committable keyframe, mean of the estimator NIS",
-  "committable_keys": 250,
-  "holdout_keys": 50,
-  "gate_holdout_nis": 15.2567,
-  "reference_points": 1500,
-  "oracle_removal": "azimuth <= 2.3876 rad removed (injector's replaced sector, 88% of the circle)",
-  "variants": {
+  "statistic": "fixed frame set: gate committable keys, every 5th, mean estimator NIS",
+  "query_population_note": "raw scan vs sector-removed scan vs clean scan are different point sets; differences mix observation and query sampling and are not a controlled causal attribution",
+  "injection_window_abs": {
+    "start": 1627785275.607409,
+    "end": 1627785295.546409
+  },
+  "oracle_removal": "azimuth <= 2.3876 rad removed only inside the injection window (88% of the circle)",
+  "gate_path": {
+    "committable_keys": 259,
+    "holdout_keys": 52,
+    "gate_holdout_nis_1500_ref": 18.0694,
+    "gate_support": {
+      "holdout_frames_total": 52,
+      "holdout_frames_scorable": 52,
+      "candidate_frames_total": 445,
+      "candidate_frames_committable": 259,
+      "candidate_frames_committed": 259,
+      "candidate_frames_deferred": 186,
+      "frames_missing_scan": [],
+      "frames_in_reference": [],
+      "deferred_runs": [
+        [
+          13,
+          198
+        ]
+      ],
+      "segment_boundary_jumps_m": [
+        3.179638590090227
+      ],
+      "segment_boundary_ok": true,
+      "first_run_jump_m": 0.048953044840039685,
+      "boundary_basis": "BOUND_ONLY",
+      "first_deferred_reason": "no_reference_support"
+    },
+    "reference_points_frozen": 4000,
+    "reference_1500_points": 1500
+  },
+  "sensitivity_by_variant": {
     "raw": {
-      "n": 50,
-      "mean": 15.257,
-      "median": 14.366
+      "n": 52,
+      "missing_ids": [],
+      "mean": 20.421,
+      "median": 18.724,
+      "requested_cap": 600,
+      "actual_ref_points": 600
     },
     "oracle": {
-      "n": 50,
-      "mean": 25.046,
-      "median": 26.999
+      "n": 52,
+      "missing_ids": [],
+      "mean": 19.498,
+      "median": 18.724,
+      "requested_cap": 600,
+      "actual_ref_points": 600
     },
     "clean": {
-      "n": 50,
-      "mean": 14.895,
-      "median": 14.111
+      "n": 52,
+      "missing_ids": [],
+      "mean": 18.749,
+      "median": 18.402,
+      "requested_cap": 600,
+      "actual_ref_points": 600
     }
   },
   "budget_sweep": {
     "600": {
       "raw": {
-        "n": 50,
-        "mean": 15.257,
-        "median": 14.366
+        "n": 52,
+        "missing_ids": [],
+        "mean": 20.421,
+        "median": 18.724,
+        "requested_cap": 600,
+        "actual_ref_points": 600
+      },
+      "oracle": {
+        "n": 52,
+        "missing_ids": [],
+        "mean": 19.498,
+        "median": 18.724,
+        "requested_cap": 600,
+        "actual_ref_points": 600
       },
       "clean": {
-        "n": 50,
-        "mean": 14.895,
-        "median": 14.111
+        "n": 52,
+        "missing_ids": [],
+        "mean": 18.749,
+        "median": 18.402,
+        "requested_cap": 600,
+        "actual_ref_points": 600
       }
     },
     "1200": {
       "raw": {
-        "n": 50,
-        "mean": 12.545,
-        "median": 11.933
+        "n": 52,
+        "missing_ids": [],
+        "mean": 13.802,
+        "median": 12.206,
+        "requested_cap": 1200,
+        "actual_ref_points": 1200
+      },
+      "oracle": {
+        "n": 52,
+        "missing_ids": [],
+        "mean": 12.582,
+        "median": 12.206,
+        "requested_cap": 1200,
+        "actual_ref_points": 1200
       },
       "clean": {
-        "n": 50,
-        "mean": 12.163,
-        "median": 11.894
+        "n": 52,
+        "missing_ids": [],
+        "mean": 11.999,
+        "median": 12.039,
+        "requested_cap": 1200,
+        "actual_ref_points": 1200
       }
     },
     "2400": {
       "raw": {
-        "n": 50,
-        "mean": 12.046,
-        "median": 11.129
+        "n": 52,
+        "missing_ids": [],
+        "mean": 10.801,
+        "median": 9.362,
+        "requested_cap": 2400,
+        "actual_ref_points": 2400
+      },
+      "oracle": {
+        "n": 52,
+        "missing_ids": [],
+        "mean": 9.184,
+        "median": 9.322,
+        "requested_cap": 2400,
+        "actual_ref_points": 2400
       },
       "clean": {
-        "n": 50,
-        "mean": 11.769,
-        "median": 11.078
+        "n": 52,
+        "missing_ids": [],
+        "mean": 8.914,
+        "median": 9.243,
+        "requested_cap": 2400,
+        "actual_ref_points": 2400
+      }
+    },
+    "4000": {
+      "raw": {
+        "n": 52,
+        "missing_ids": [],
+        "mean": 7.717,
+        "median": 6.779,
+        "requested_cap": 4000,
+        "actual_ref_points": 4000
+      },
+      "oracle": {
+        "n": 52,
+        "missing_ids": [],
+        "mean": 6.617,
+        "median": 6.466,
+        "requested_cap": 4000,
+        "actual_ref_points": 4000
+      },
+      "clean": {
+        "n": 52,
+        "missing_ids": [],
+        "mean": 6.506,
+        "median": 6.466,
+        "requested_cap": 4000,
+        "actual_ref_points": 4000
       }
     }
-  },
-  "support": {
-    "committable": 250,
-    "deferred": 195,
-    "holdout_frames_total": 50
   }
 }
