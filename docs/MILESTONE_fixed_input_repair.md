@@ -200,6 +200,18 @@ lie outside the common region and measure trajectory extent, not repair quality.
 
 ## Independent confirmation (next mainline, pre-registered)
 
+Result (38ef313): **the benefit does not repeat**. On a clean reference rebuilt from the raw bag
+(599/599 stamps, 400 frames byte-identical, 199 differing over the 19.84 s injection window), the
+fixed 326-frame comparison gives R coverage 0.7672 / unsupported 0.4585 and C3 0.6952 / 0.6590; C3
+adds 53,027 novel points of which 60 are supported, and removes 15,028 supported points. Both
+criterion clauses fail (novel 60 vs 52,967; added-unsupported 0.8333 > R's 0.4585). Service
+completeness is 326/398; the 72 misses are all NO_RERUN_POSE under the 75 ms rule. Healthy-region
+deletions are 919,702 points (4.47%) over 52 frames, against zero on hall_01.
+
+Consequences: the hall_01 same-frame improvement is single-sequence and does not generalise; the
+filter's specificity is sequence-dependent; no cross-sequence or general repair-benefit claim is
+made. The hall_01 result stays as a conditional single-sequence observation.
+
 Sequence: `room_02`, 4.30 m injection (`/tmp/fastlivo/room02_inj43.bag`), the prepared window; the
 same filter, host config, runner and reconstruction. The injection window is measured by per-frame
 buffer equality against the clean `room_02` recording (oracle), not assumed.
