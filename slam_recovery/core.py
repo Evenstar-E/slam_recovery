@@ -326,12 +326,19 @@ def evaluate_four_mode_gate(
                 and bool(np.isfinite(candidate.repaired_bias_gyr).all())
             )
         )
+        # holdout_nis is excluded from the finite-state check on purpose. A candidate with no
+        # scorable holdout frame carries +inf by construction; treating that as a non-finite
+        # *state* mislabels "no evidence" as "invalid pose", which is the opposite of what the
+        # operator needs to see. Positive infinity is routed to its own MISSING reason below;
+        # NaN is a genuine numeric defect and stays in this rejection.
+        holdout_nis_value = float(candidate.holdout_nis)
+        holdout_missing = bool(np.isinf(holdout_nis_value))
         mats_finite = bool(
             np.asarray(candidate.info_after_6x6).shape == (6, 6)
             and np.asarray(candidate.cov_after_6x6).shape == (6, 6)
             and np.isfinite(candidate.info_after_6x6).all()
             and np.isfinite(candidate.cov_after_6x6).all()
-            and np.isfinite(candidate.holdout_nis)
+            and not np.isnan(holdout_nis_value)
         )
         if not (poses_valid and bias_acc_valid and bias_gyr_valid and mats_finite):
             return ValidationReport(
@@ -351,6 +358,25 @@ def evaluate_four_mode_gate(
         info_gain = info_after - info_before
         p_after = float(np.linalg.norm(candidate.cov_after_6x6, ord=2))
         d_hold = float(candidate.holdout_nis)
+
+        # No scorable holdout frame: the candidate supplied no cross-scan evidence at all. This is
+        # a wait, not a rejection of the poses, and the reason string must say so.
+        if holdout_missing:
+            return ValidationReport(
+                accepted=False,
+                mode=RecoveryMode.MODE3_SOFT_BRIDGE_WAIT if p_prop < thresholds.sigma_bridge else RecoveryMode.MODE4_HARD_SLEEP_SPLIT,
+                weak_dir_info_before=info_before,
+                weak_dir_info_after=info_after,
+                weak_dir_info_gain=info_gain,
+                holdout_nis=float("inf"),
+                posterior_cov_norm=p_after,
+                propagated_cov_norm=p_prop,
+                reason=(
+                    "Refused Mode 2 atomic commit: holdout evidence MISSING "
+                    "(no scorable holdout frame against the independent reference)"
+                ),
+                evidence_status=evidence_status,
+            )
 
         if evidence_status != "PASSED":
             return ValidationReport(

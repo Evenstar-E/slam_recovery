@@ -106,6 +106,55 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
         self.assertNotIn(0, node.tx_mgr.trusted_poses)
         self.assertEqual(node._last_holdout_support["frames_in_reference"], [0])
 
+    def test_infinite_holdout_is_missing_evidence_not_invalid_state(self) -> None:
+        """No scorable holdout frame must read as MISSING, not as a non-finite pose."""
+        mgr = TrustedMapTransactionManager(confirmation_margin_ns=0)
+        mgr.trigger_quarantine(
+            estimated_onset_ns=int(1e9),
+            current_ns=int(2e9),
+            weak_direction_6d=np.array([0, 0, 0, 1, 0, 0]),
+            info_before_6x6=np.eye(6) * 2,
+            propagated_cov_norm=1.2,
+        )
+        cand = CandidateMap(
+            candidate_id="no_holdout",
+            parent_map_version=mgr.trusted_version,
+            repaired_poses={0: np.eye(4)},
+            info_after_6x6=np.eye(6) * 100,
+            cov_after_6x6=np.eye(6) * 0.01,
+            holdout_nis=float("inf"),
+            paired_benefit_approved=True,
+            wilson_lower_bound=0.9,
+            reentry_pos_jump_m=0.0,
+        )
+        report = mgr.validate_and_resolve(cand)
+        self.assertIn(
+            report.mode,
+            (RecoveryMode.MODE3_SOFT_BRIDGE_WAIT, RecoveryMode.MODE4_HARD_SLEEP_SPLIT),
+        )
+        self.assertIn("holdout evidence MISSING", report.reason)
+        self.assertNotIn("non-finite", report.reason)
+
+    def test_nan_holdout_is_still_rejected_as_invalid(self) -> None:
+        mgr = TrustedMapTransactionManager(confirmation_margin_ns=0)
+        mgr.trigger_quarantine(
+            estimated_onset_ns=int(1e9),
+            current_ns=int(2e9),
+            weak_direction_6d=np.array([0, 0, 0, 1, 0, 0]),
+            info_before_6x6=np.eye(6) * 2,
+            propagated_cov_norm=1.2,
+        )
+        cand = CandidateMap(
+            candidate_id="nan_holdout",
+            parent_map_version=mgr.trusted_version,
+            repaired_poses={0: np.eye(4)},
+            info_after_6x6=np.eye(6) * 100,
+            cov_after_6x6=np.eye(6) * 0.01,
+            holdout_nis=float("nan"),
+        )
+        report = mgr.validate_and_resolve(cand)
+        self.assertIn("non-finite", report.reason)
+
     def test_manager_refuses_a_candidate_with_unverified_frames(self) -> None:
         """Defence in depth: the manager enforces the invariant even for direct callers."""
         mgr = TrustedMapTransactionManager(confirmation_margin_ns=0)
