@@ -1,0 +1,12 @@
+--- /tmp/fastlivo_bin_backup/IMU_Processing.cpp.orig_t3	2026-11-09 22:02:22.804705906 +0800
++++ src/IMU_Processing.cpp	2026-11-09 22:03:12.297215982 +0800
+@@ -570,6 +570,9 @@
+     {
+       // cov_acc *= pow(G_m_s2 / mean_acc.norm(), 2);
+       imu_need_init = false;
++#ifdef DET_SYNC
++      ROS_INFO("[DET_SYNC] imu_init_done iter=%d", init_iter_num);
++#endif
+       ROS_INFO("IMU Initials: Gravity: %.4f %.4f %.4f %.4f; acc covarience: "
+                "%.8f %.8f %.8f; gry covarience: %.8f %.8f %.8f \n",
+                stat.gravity[0], stat.gravity[1], stat.gravity[2], mean_acc.norm(), cov_acc[0], cov_acc[1], cov_acc[2], cov_gyr[0], cov_gyr[1],

@@ -1,0 +1,79 @@
+--- /tmp/fastlivo_bin_backup/LIVMapper.cpp.orig	2026-11-09 21:22:38.267978829 +0800
++++ src/LIVMapper.cpp	2026-11-09 22:03:04.946893017 +0800
+@@ -11,6 +11,7 @@
+ */
+ 
+ #include "LIVMapper.h"
++#include <omp.h>
+ 
+ LIVMapper::LIVMapper(ros::NodeHandle &nh)
+     : extT(0, 0, 0),
+@@ -214,6 +215,13 @@
+   pubImage = it.advertise("/rgb_img", 1);
+   pubImuPropOdom = nh.advertise<nav_msgs::Odometry>("/LIVO2/imu_propagate", 10000);
+   imu_prop_timer = nh.createTimer(ros::Duration(0.004), &LIVMapper::imu_prop_callback, this);
++#ifdef NO_MP
++  ROS_INFO("[DETERMINISM] build: NO_MP=ON (parallel loops compiled out), "
++           "omp_get_max_threads()=%d", omp_get_max_threads());
++#else
++  ROS_INFO("[DETERMINISM] build: MP_EN with MP_PROC_NUM=%d, omp_get_max_threads()=%d",
++           MP_PROC_NUM, omp_get_max_threads());
++#endif
+   voxelmap_manager->voxel_map_pub_= nh.advertise<visualization_msgs::MarkerArray>("/planes", 10000);
+ }
+ 
+@@ -535,14 +543,34 @@
+ void LIVMapper::run() 
+ {
+   ros::Rate rate(5000);
++#ifdef DET_SYNC
++  // Callbacks on their own thread; the main loop blocks on arrival instead of polling at 5 kHz,
++  // so a package is processed when it is ready rather than at the next poll tick.
++  ros::AsyncSpinner det_spinner(1);
++  det_spinner.start();
++  ROS_INFO("[DETERMINISM] DET_SYNC: async spinner(1), main loop blocks on arrival");
++#endif
+   while (ros::ok()) 
+   {
++#ifndef DET_SYNC
+     ros::spinOnce();
++#endif
+     if (!sync_packages(LidarMeasures)) 
+     {
++#ifdef DET_SYNC
++      std::unique_lock<std::mutex> det_lk(det_mtx_);
++      det_cv_.wait_for(det_lk, std::chrono::milliseconds(20));
++#else
+       rate.sleep();
++#endif
+       continue;
+     }
++#ifdef DET_SYNC
++    // observation, not intervention: one line per processed package
++    ROS_INFO("[DET_SYNC] pkg lid_stamp=%.6f queued_lidar=%zu imu_need_init=%d",
++             LidarMeasures.last_lio_update_time, lid_raw_data_buffer.size(),
++             (int)p_imu->imu_need_init);
++#endif
+     handleFirstFrame();
+ 
+     processImu();
+@@ -722,6 +750,9 @@
+ 
+   mtx_buffer.unlock();
+   sig_buffer.notify_all();
++#ifdef DET_SYNC
++  det_cv_.notify_one();
++#endif
+ }
+ 
+ void LIVMapper::livox_pcl_cbk(const livox_ros_driver::CustomMsg::ConstPtr &msg_in)
+@@ -765,6 +796,9 @@
+ 
+   mtx_buffer.unlock();
+   sig_buffer.notify_all();
++#ifdef DET_SYNC
++  det_cv_.notify_one();
++#endif
+ }
+ 
+ void LIVMapper::imu_cbk(const sensor_msgs::Imu::ConstPtr &msg_in)

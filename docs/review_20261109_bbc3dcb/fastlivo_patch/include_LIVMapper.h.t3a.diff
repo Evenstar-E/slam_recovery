@@ -1,0 +1,26 @@
+--- /tmp/fastlivo_bin_backup/LIVMapper.h.orig_t3	2026-11-09 22:02:22.804705906 +0800
++++ include/LIVMapper.h	2026-11-09 22:02:35.794397326 +0800
+@@ -20,6 +20,10 @@
+ #include <image_transport/image_transport.h>
+ #include <nav_msgs/Path.h>
+ #include <vikit/camera_loader.h>
++#ifdef DET_SYNC
++#include <condition_variable>
++#include <mutex>
++#endif
+ 
+ class LIVMapper
+ {
+@@ -30,6 +34,12 @@
+   void initializeComponents();
+   void initializeFiles();
+   void run();
++#ifdef DET_SYNC
++  // DET_SYNC: the main loop blocks until a lidar callback signals instead of polling at 5 kHz.
++  // Recorded, not adjusted: the processing itself is unchanged.
++  std::mutex det_mtx_;
++  std::condition_variable det_cv_;
++#endif
+   void gravityAlignment();
+   void handleFirstFrame();
+   void stateEstimationAndMapping();

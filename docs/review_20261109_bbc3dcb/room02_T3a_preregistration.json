@@ -1,0 +1,38 @@
+{
+ "experiment": "T3a: remove the wall-clock phase dependence only (S3), one variable from T2",
+ "change": {
+  "build_flags": "NO_MP=ON (as T1/T2) + DET_SYNC=ON (new)",
+  "source": [
+   "include/LIVMapper.h adds a mutex + condition_variable under DET_SYNC",
+   "src/LIVMapper.cpp: async spinner(1) takes the callbacks; the main loop waits on the condition variable with a 20 ms fallback instead of rate.sleep(); the two lidar callbacks notify after releasing the buffer lock",
+   "src/IMU_Processing.cpp: one log line when IMU init finishes (observation only)",
+   "CMakeLists.txt: option(DET_SYNC) OFF by default, add_definitions(-DDET_SYNC) when ON"
+  ],
+  "unchanged": [
+   "imu_int_frame",
+   "config yaml",
+   "ros::Rate value (kept in the non-DET_SYNC path)",
+   "prefix logic",
+   "bags",
+   "runner 0.5x playback and drain",
+   "ROI",
+   "thresholds"
+  ]
+ },
+ "runs": "cell O, two runs, taskset -c 0-7, same nice, quiet machine (as T2)",
+ "criterion": {
+  "declared": "if both runs land on the same mode, S3 (wall-clock phase) is accepted as the seed; if they still split, proceed to T3b (IMU initialisation window on absolute stamps, one variable again, NO_MP+DET_SYNC kept)",
+  "mode_rule": "GOOD unsupported < 0.10, BAD > 0.50, else UNCLEAR (same rule as the 2x2)",
+  "explicitly_not_used": "aligned first-pose difference -- T2 showed it can be 1.9 mm and still split"
+ },
+ "recorded": [
+  "per-package log line (lid_stamp, queued lidar, imu_need_init)",
+  "imu_init_done iter",
+  "binary sha",
+  "thread count from the determinism line"
+ ],
+ "binary": {
+  "t2_sha256": "6e0a3e5722b02c9a6682cd69c5d8ae4428e5215a296da43e85ef58aa3da03d8e",
+  "t3a_sha256": "76359f5387f75da3dcad7aa72372048c3feefd91b340ae0c40f92f6fb534a53b"
+ }
+}

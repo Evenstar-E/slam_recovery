@@ -1,0 +1,143 @@
+{
+ "runs": {
+  "r1": {
+   "score": {
+    "coverage": 0.6794693333333334,
+    "unsupported": 0.6795913312693498,
+    "ate_full": 24.17188371953432,
+    "mode": "BAD",
+    "scored_frames": 323
+   },
+   "init_iter": 37,
+   "packages": 1734,
+   "scans_in_pkg": {
+    "min": 1,
+    "max": 2,
+    "mean": 1.4994232987312572
+   },
+   "queued_lidar_max": 9,
+   "imu_in_pkg": {
+    "min": 0,
+    "max": 48,
+    "mean": 4.651672433679354
+   },
+   "img_in_pkg_max": 1,
+   "first_pkg": {
+    "lid_stamp": 1627643741.118071,
+    "pos": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "last_pkg": {
+    "lid_stamp": 1627643799.362292,
+    "pos": [
+     -52.989267,
+     -6.119036,
+     -2.113256
+    ]
+   },
+   "first_output_s": 1627643741.5119612
+  },
+  "r2": {
+   "score": {
+    "coverage": 0.6927867826086956,
+    "unsupported": 0.6636780185758514,
+    "ate_full": 17.355769013899632,
+    "mode": "BAD",
+    "scored_frames": 323
+   },
+   "init_iter": 73,
+   "packages": 1722,
+   "scans_in_pkg": {
+    "min": 1,
+    "max": 2,
+    "mean": 1.4994192799070847
+   },
+   "queued_lidar_max": 8,
+   "imu_in_pkg": {
+    "min": 0,
+    "max": 48,
+    "mean": 4.645180023228804
+   },
+   "img_in_pkg_max": 1,
+   "first_pkg": {
+    "lid_stamp": 1627643741.519202,
+    "pos": [
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   "last_pkg": {
+    "lid_stamp": 1627643799.362292,
+    "pos": [
+     -35.680663,
+     -13.514959,
+     -3.001746
+    ]
+   },
+   "first_output_s": 1627643742.244886
+  },
+  "r3": {
+   "score": {
+    "coverage": 0.9987708985507247,
+    "unsupported": 0.0074179566563467025,
+    "ate_full": 0.07062558376346979,
+    "mode": "GOOD"
+   }
+  },
+  "r4": {
+   "score": {
+    "coverage": 0.9987892173913043,
+    "unsupported": 0.007269349845201223,
+    "ate_full": 0.07255224644600478,
+    "mode": "GOOD"
+   }
+  }
+ },
+ "same_mode": true,
+ "criterion": {
+  "mode_rule": "GOOD unsupported<0.10 / BAD>0.50",
+  "verdict": "S3_ACCEPTED_AS_SEED",
+  "verdict_within_build_A": "S3_ACCEPTED_AS_SEED",
+  "verdict_within_build_B": "GO_TO_T3B",
+  "cross_build_consistent": false
+ },
+ "binary": {
+  "executable_sha256": "76359f5387f75da3dcad7aa72372048c3feefd91b340ae0c40f92f6fb534a53b",
+  "library_sha256": "6337ec0f8ba3ea33ca76bca15e24b567a2b93a422de98e110607e68937d58633",
+  "note": "the executable links liblaser_mapping.so; the behaviour lives in the library, so both shas are recorded"
+ },
+ "four_runs_same_build": {
+  "modes": [
+   "BAD",
+   "BAD",
+   "GOOD",
+   "GOOD"
+  ],
+  "good": 2,
+  "bad": 2,
+  "crosses": true
+ },
+ "build_comparison": {
+  "build_A_exec_76359f53_lib_X": {
+   "runs": 2,
+   "modes": [
+    "GOOD",
+    "GOOD"
+   ]
+  },
+  "build_B_exec_76359f53_lib_6337ec0f": {
+   "runs": 4,
+   "modes": [
+    "BAD",
+    "BAD",
+    "GOOD",
+    "GOOD"
+   ]
+  },
+  "note": "same criterion satisfied within each build, but the two builds disagree -- the literal 'same mode in two runs' rule is too weak to attribute the variance to S3"
+ }
+}

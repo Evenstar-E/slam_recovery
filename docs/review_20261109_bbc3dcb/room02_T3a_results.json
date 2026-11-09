@@ -1,0 +1,19 @@
+{
+ "r1": {
+  "coverage": 0.9987908405797101,
+  "unsupported": 0.006674922600619193,
+  "ate_full": 0.07271193779326567,
+  "mode": "GOOD"
+ },
+ "r2": {
+  "coverage": 0.9984582028985507,
+  "unsupported": 0.04397523219814237,
+  "ate_full": 0.31104605169317073,
+  "mode": "GOOD"
+ },
+ "same_mode": true,
+ "criterion": {
+  "mode_rule": "GOOD unsupported<0.10 / BAD>0.50",
+  "verdict": "S3_ACCEPTED_AS_SEED"
+ }
+}
