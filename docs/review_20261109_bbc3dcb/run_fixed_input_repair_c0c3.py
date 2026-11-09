@@ -62,6 +62,7 @@ ID_MSGTYPE = "std_msgs/msg/UInt32MultiArray"
 RERUN_BAG = "/tmp/fastlivo/res_h1_inj43_filtered.bag"
 C3_HOST_BAG = "/tmp/fastlivo/res_h1_inj43_rerun_unfiltered.bag"
 
+RUNNER = os.path.join(_HERE, "fl_run_isolated.sh")
 INJ_SCANS = V.INJ_SCANS
 INJ_POSES = V.INJ_POSES
 CLN_SCANS = V.CLN_SCANS
@@ -73,6 +74,9 @@ K_PLANE = 8                  # local PCA neighbourhood for point-to-plane distan
 PLANAR_RATIO = 0.10          # lambda_min / lambda_mid below this -> planar neighbourhood
 WELL_RMS_M = 0.02            # plane-fit RMS below this ...
 WELL_RADIUS_M = 0.30         # ... and an 8-NN radius below this -> well-constrained reference
+R_NN = 0.50                  # bounded nearest-neighbour radius; beyond it a point is UNSUPPORTED
+R_PATCH = 0.30               # local patch radius: larger neighbourhoods are not a usable plane
+PATCH_RMS = 0.02             # local plane-fit RMS ceiling for a usable patch
 COV_Q = 40000
 
 INJECTION_AZIMUTH_FRACTION = 0.88
@@ -267,7 +271,9 @@ def host_reproducibility(onset_abs, end_abs):
     pre = mt < onset_abs
     R, t = V.umeyama(b[pre], a[pre])
     err = np.linalg.norm(b @ R.T + t - a, axis=1)
-    out = {"archived_poses": int(len(t1)), "rerun_poses": int(len(t2)),
+    out = {"what": "position agreement only; rotation was not compared, so this is not a claim "
+                   "of full determinism",
+           "archived_poses": int(len(t1)), "rerun_poses": int(len(t2)),
            "matched": int(len(mt)), "alignment_translation_m": float(np.linalg.norm(t))}
     for lab, m in (("pre_onset", mt < onset_abs),
                    ("in_window", (mt >= onset_abs) & (mt <= end_abs)),
@@ -328,17 +334,219 @@ def c3_provenance():
             "isolation": "private ROS master on a free port; the wrapper kills only its own PIDs",
         },
         "configs": {name: {"path": path, "sha256": _sha(path)} for name, path in cfg.items()},
+        "runner": {"path": RUNNER, "sha256": _sha(RUNNER),
+                   "committed": os.path.exists(RUNNER)},
         "commands": [
             "python3 -B docs/review_20261109_bbc3dcb/run_fixed_input_repair_c0c3.py "
             "build-filtered-bag",
-            "bash /tmp/fl_run_isolated.sh /tmp/fastlivo/hall01_inj43_filtered.bag "
+            "bash docs/review_20261109_bbc3dcb/fl_run_isolated.sh "
+            "/tmp/fastlivo/hall01_inj43_filtered.bag "
             "/tmp/fastlivo/res_h1_inj43_filtered.bag 0.5 60",
-            "bash /tmp/fl_run_isolated.sh /tmp/fastlivo/hall01_inj43.bag "
-            "/tmp/fastlivo/res_h1_inj43_rerun_unfiltered.bag 0.5 60",
+            "bash docs/review_20261109_bbc3dcb/fl_run_isolated.sh "
+            "/tmp/fastlivo/hall01_inj43.bag /tmp/fastlivo/res_h1_inj43_rerun_unfiltered.bag 0.5 60",
             "python3 -B docs/review_20261109_bbc3dcb/run_fixed_input_repair_c0c3.py measure",
         ],
     }
+    rec["run_receipt"] = {
+        "status": "RETROSPECTIVE_PARTIAL",
+        "what": ("the C3 execution predates the committed runner: inputs, configs, binary and "
+                 "outputs are hashed and bound, but startup/exit records and the ROS parameter "
+                 "dump were not captured at the time"),
+        "missing_fields": ["process exit codes", "ROS parameter dump as loaded", "wall-clock start"],
+        "note": ("the runner is now committed and writes a per-run directory with every log, the "
+                 "input/config/binary hashes, the ROS parameter dump, exit codes and the output "
+                 "hash; a short smoke through it is recorded under `smoke`"),
+    }
+    smoke = "/tmp/c3_receipt_smoke.json"
+    if os.path.exists(smoke):
+        with open(smoke, encoding="utf-8") as fh:
+            rec["run_receipt"]["smoke"] = {
+                "receipt_path": smoke, "receipt_sha256": _sha(smoke),
+                "what": "SMOKE_NOT_FOR_NUMBERS -- 15 s clip through the committed runner, to close "
+                        "the execution chain, not to produce C3 numbers",
+                "content": json.load(fh)}
+    rec["run_receipt"]["message_coverage"] = {}
+    for tag, bag in (("c3_replay", RERUN_BAG), ("control_replay", C3_HOST_BAG)):
+        if os.path.exists(bag):
+            t, _x, _q = V.load_poses(bag)
+            rec["run_receipt"]["message_coverage"][tag] = {
+                "bag": bag, "odometry_messages": int(len(t)),
+                "first_pose_abs_sec": float(t.min()) if len(t) else None,
+                "last_pose_abs_sec": float(t.max()) if len(t) else None}
     return rec
+
+
+AUDIT_JSON = os.path.join(_HERE, "fixed_input_repair_filter_audit.json")
+AUDIT_NPZ = "/tmp/filtered_bag_keep_index.npz"
+
+
+def filter_audit(verify_bag=FILTERED_BAG):
+    """Per-frame keep mask by ORIGINAL ROW INDEX, bound to both bags by content.
+
+    Counts must not be taken as a difference of two independently subsampled arrays: the filter
+    sees full resolution, while the map path caps at 15000 points per scan.  Here every frame
+    records its own n / n_kept and the sha256 of the kept rows, and, when the filtered bag exists,
+    the same rows are read back from it and compared.
+    """
+    cfg = MixtureFilterConfig()
+    in_sha = V._sha_file(INJ_SCANS)
+    out = {"input": INJ_SCANS, "input_sha256": in_sha,
+           "filter": "MixtureFilterConfig() shipped defaults",
+           "encoding": "header.stamp ns + original row index; kept_rows_sha256 = sha256 of the "
+                       "concatenated kept 24-byte rows, in original order",
+           "per_frame": [], "verify": None}
+    idx_parts, offs, nss = [], [0], []
+
+    ver = None
+    if verify_bag and os.path.exists(verify_bag):
+        ver = V.Reader(verify_bag)
+        ver.open()
+        ver_msgs = ver.messages(connections=[c for c in ver.connections
+                                             if c.topic == V.SCAN_TOPIC])
+    try:
+        with V.Reader(INJ_SCANS) as r:
+            conns = [c for c in r.connections if c.topic == V.SCAN_TOPIC]
+            for conn, _t, raw in r.messages(connections=conns):
+                m = V.TYPESTORE.deserialize_ros1(raw, conn.msgtype)
+                buf = np.asarray(m.data, dtype=np.uint8)
+                step = int(m.point_step)
+                a = np.frombuffer(buf.tobytes(), dtype=V._cloud_dtype(m))
+                pts = np.column_stack([a["x"], a["y"], a["z"], a["intensity"]]).astype(np.float64)
+                keep, ratio, _eig, rep = filter_self_consistent_near_field_contaminants(pts, cfg)
+                idx = np.flatnonzero(keep)
+                rows = buf.reshape(len(a), step)[keep]
+                ns = int(m.header.stamp.sec) * 10**9 + int(m.header.stamp.nanosec)
+                rec = {"ns": ns, "n": int(len(a)), "n_kept": int(len(idx)),
+                       "kept_rows_sha256": hashlib.sha256(rows.tobytes()).hexdigest(),
+                       "contam_ratio": round(float(ratio), 6), "repairable": bool(rep),
+                       # the oracle count is taken here too, on the same full-resolution frame,
+                       # so neither C2 nor C3 counts points off a subsampled array
+                       "oracle_removed": int(oracle_bag_mask(pts[:, :3]).sum())}
+                if ver is not None:
+                    try:
+                        _vc, _vt, vraw = next(ver_msgs)
+                        vm = V.TYPESTORE.deserialize_ros1(vraw, _vc.msgtype)
+                        vbuf = np.asarray(vm.data, dtype=np.uint8)
+                        vrows = vbuf.reshape(-1, int(vm.point_step))
+                        rec["output_sha256"] = hashlib.sha256(vrows.tobytes()).hexdigest()
+                        rec["output_n"] = int(len(vrows))
+                        rec["binds"] = (rec["output_sha256"] == rec["kept_rows_sha256"]
+                                        and rec["output_n"] == rec["n_kept"])
+                    except StopIteration:
+                        rec["binds"] = None
+                out["per_frame"].append(rec)
+                idx_parts.append(idx.astype(np.int64))
+                offs.append(offs[-1] + len(idx))
+                nss.append(ns)
+    finally:
+        if ver is not None:
+            ver.close()
+
+    kept = np.concatenate(idx_parts) if idx_parts else np.zeros(0, np.int64)
+    out["global_keep_mask_sha256"] = hashlib.sha256(kept.astype("<i8").tobytes()).hexdigest()
+    out["points_in"] = int(sum(f["n"] for f in out["per_frame"]))
+    out["points_kept"] = int(len(kept))
+    out["frames"] = len(out["per_frame"])
+    if ver is not None:
+        bound = [f.get("binds") for f in out["per_frame"]]
+        out["verify"] = {"bag": verify_bag, "bag_sha256": V._sha_file(verify_bag),
+                         "frames_compared": sum(1 for b in bound if b is not None),
+                         "frames_bound": sum(1 for b in bound if b is True),
+                         "frames_mismatched": sum(1 for b in bound if b is False)}
+    os.makedirs(V.CACHE, exist_ok=True)
+    np.savez(AUDIT_NPZ, ns=np.asarray(nss, dtype=np.int64),
+             offsets=np.asarray(offs, dtype=np.int64), keep_idx=kept)
+    with open(AUDIT_JSON, "w", encoding="utf-8") as fh:
+        json.dump(out, fh, indent=1)
+    print(f"audit: {out['frames']} frames, kept {out['points_kept']}/{out['points_in']}, "
+          f"mask sha {out['global_keep_mask_sha256'][:16]}, verify={out['verify']}")
+    return out
+
+
+def bounded_metrics(q, ref_tree, ref_pts):
+    """Bounded surface metrics: an unbounded plane residual is not a surface accuracy statement.
+
+    A query far outside the map still gets an 8-NN plane, and its residual to that plane is 0 --
+    the review's counter-example is a query at (100,0,0) against a 0.2 m patch at the origin,
+    residual 0 and nearest-reference distance 99.9 m.  So distance to the reference is bounded at
+    R_NN (beyond it the point is UNSUPPORTED and excluded from the tails), and the local patch is
+    only used when the neighbourhood radius and its plane-fit RMS are both small.  The unbounded
+    point-to-plane number is kept, labelled auxiliary.
+    """
+    d_nn, _ = ref_tree.query(q, k=1, distance_upper_bound=R_NN)
+    nn_ok = np.isfinite(d_nn)
+    resid, _ratio, radius, rms = local_plane_residual(q, ref_tree, ref_pts)
+    patch_ok = nn_ok & (radius <= R_PATCH) & (rms <= PATCH_RMS)
+
+    def _t(d, m):
+        # thresholds stay below the support cap: a 0.5 m tail under a 0.5 m cap is identically
+        # zero by construction and would read as a perfect result
+        v = d[m]
+        return {"n_supported": int(m.sum()),
+                "unsupported_fraction": float(1.0 - float(m.mean())),
+                "tail_over_0.10m": float(np.mean(v > 0.10)) if len(v) else None,
+                "tail_over_0.25m": float(np.mean(v > 0.25)) if len(v) else None,
+                "median_m": float(np.median(v)) if len(v) else None,
+                "p90_m": float(np.percentile(v, 90)) if len(v) else None}
+
+    return {
+        "nn": {**_t(np.where(nn_ok, d_nn, np.inf), nn_ok), "cap_m": R_NN,
+               "tail_definition": "tails over SUPPORTED points only; beyond the cap is "
+                                  "reported as unsupported, never folded into a tail"},
+        "patch": {**_t(resid, patch_ok), "cap_radius_m": R_PATCH, "plane_rms_m": PATCH_RMS,
+                  "tail_definition": "supported = NN within cap AND patch radius/plane-RMS ok"},
+        "aux_point_to_plane_unbounded": {
+            "tail_over_0.25m": float(np.mean(resid > 0.25)),
+            "tail_over_0.5m": float(np.mean(resid > 0.5)),
+            "tail_over_1.0m": float(np.mean(resid > 1.0)),
+            "median_m": float(np.median(resid)),
+            "note": "AUXILIARY ONLY -- unbounded, a far-away query can score 0 here"},
+    }
+
+
+POSE_NEAR_DT = 0.020      # one rule for every condition: nearest within 20 ms,
+POSE_MAX_GAP = 0.075      # else interpolate across a gap <= 75 ms, else MISSING
+
+
+def pose_lookup(stream, ids, ts_of):
+    """The single pose-pairing protocol used by all four conditions.
+
+    Returns ({id: 4x4}, stats).  A key with no pose under the rule is MISSING and stays missing --
+    it is never quietly filled with the nearest frame, which is what made C1/C2 look better than
+    the protocol C0/C3 were held to.
+    """
+    ts, xyz, quat = stream
+    out, dt = {}, []
+    stats = {"nearest": 0, "interpolated": 0, "missing": 0}
+    for i in ids:
+        t = ts_of(i)
+        j = int(np.searchsorted(ts, t))
+        near = [k for k in (j - 1, j) if 0 <= k < len(ts)]
+        best = min(near, key=lambda k: abs(ts[k] - t)) if near else None
+        if best is not None and abs(ts[best] - t) <= POSE_NEAR_DT:
+            T = np.eye(4)
+            T[:3, :3] = V.quat_to_rot(quat[best])
+            T[:3, 3] = xyz[best]
+            out[i] = T
+            dt.append(abs(ts[best] - t))
+            stats["nearest"] += 1
+        elif 0 < j < len(ts) and (ts[j] - ts[j - 1]) <= POSE_MAX_GAP:
+            a = float((t - ts[j - 1]) / (ts[j] - ts[j - 1]))
+            T = np.eye(4)
+            T[:3, :3] = V.quat_to_rot(V.slerp(quat[j - 1], quat[j], a))
+            T[:3, 3] = (1.0 - a) * xyz[j - 1] + a * xyz[j]
+            out[i] = T
+            dt.append(0.0)
+            stats["interpolated"] += 1
+        else:
+            stats["missing"] += 1
+    d = np.asarray(dt) if dt else np.zeros(1)
+    stats.update({"dt_ms_p50": float(np.percentile(d, 50)) * 1e3,
+                  "dt_ms_p95": float(np.percentile(d, 95)) * 1e3,
+                  "dt_ms_max": float(d.max()) * 1e3,
+                  "interpolated_fraction": stats["interpolated"] / max(len(ids), 1),
+                  "rule": "nearest <=20 ms, else interpolate across a gap <=75 ms, else MISSING"})
+    return out, stats
 
 
 def main_measure():
@@ -451,11 +659,22 @@ def main_measure():
     T_inv = np.eye(4)
     T_inv[:3, :3] = R_ic.T
     T_inv[:3, 3] = -R_ic.T @ t_ic
-    ref_poses = {}
-    for i in pre + keys:
-        j = int(np.argmin(np.abs(cln_ts - inj_kfs[i]["ts"])))
-        ref_poses[i] = T_inv @ cln_kfs[j]["T"]
+    # ONE pairing protocol for all four conditions (see pose_lookup).  Previously C0 used the
+    # keyframe pairing (20 ms / 75 ms interp), C1/C2 took the nearest clean frame with no gap
+    # rule and no missing case, and C3 used 50 ms nearest -- three different protocols compared
+    # against each other.
+    _ts_of = lambda i: inj_kfs[i]["ts"]
+    host_stream = V.load_poses(INJ_POSES)
+    clean_stream = V.load_poses(CLN_POSES)
+    host_poses, host_stats = pose_lookup(host_stream, pre + keys, _ts_of)
+    cln_tgt, cln_stats = pose_lookup(clean_stream, pre + keys, _ts_of)
+    ref_poses = {i: T_inv @ T for i, T in cln_tgt.items()}
+    COND_POSES = {"C0": host_poses, "C1": ref_poses, "C2": ref_poses}
+    COND_PAIR = {"C0": host_stats, "C1": cln_stats, "C2": cln_stats}
     print(f"[] alignment from {len(mi)} pre-onset pairs; |t|={np.linalg.norm(t_ic):.4f} m")
+    print(f"[] pose pairing C0 {host_stats['nearest']}/{host_stats['interpolated']}/"
+          f"{host_stats['missing']}  C1/C2 {cln_stats['nearest']}/{cln_stats['interpolated']}/"
+          f"{cln_stats['missing']} (nearest/interp/missing)")
 
     # ---- reference surface ---------------------------------------------------------------
     proxy_all = np.vstack([V.world_pts(k) for k in cln_kfs])
@@ -486,19 +705,13 @@ def main_measure():
         f_sha = V._sha_file(FILTERED_BAG)
         f_scans, _ = V.load_scans(FILTERED_BAG, f_sha)
         c3_by_stamp = {round(t, 6): p for t, p in f_scans}
-        n_ts, n_xyz, n_q = V.load_poses(RERUN_BAG)
-        c3_poses = {}
-        for i in pre + keys:
-            j = int(np.argmin(np.abs(n_ts - inj_kfs[i]["ts"])))
-            if abs(n_ts[j] - inj_kfs[i]["ts"]) > 0.05:
-                continue
-            T = np.eye(4)
-            T[:3, :3] = V.quat_to_rot(n_q[j])
-            T[:3, 3] = n_xyz[j]
-            c3_poses[i] = T
+        c3_poses, c3_pair = pose_lookup(V.load_poses(RERUN_BAG), pre + keys, _ts_of)
+        COND_POSES["C3"] = c3_poses
+        COND_PAIR["C3"] = c3_pair
         c3_note = {"poses": "FAST-LIVO2 re-run on the filtered bag",
                    "filtered_bag_sha256": f_sha, "n_poses": len(c3_poses),
-                   "poses_bag": RERUN_BAG}
+                   "poses_bag": RERUN_BAG,
+                   "pairing": c3_pair}
     else:
         c3_note = {"poses": "UNAVAILABLE -- no host re-run on the filtered bag",
                    "missing": [f"{FILTERED_BAG} (filtered input bag)",
@@ -538,9 +751,16 @@ def main_measure():
                              "old_primary": {"C0": 0.3229, "C1": 0.2251, "C2": 0.0, "C3": 0.0013},
                              "status": "kept for the record only; do not cite",
                          },
+                         "map_construction": ("each keyframe contributes a 250-point stride "
+                                              "sidecar of its own scan posed by the condition's "
+                                              "pose; this is NOT the host's emitted registered "
+                                              "map"),
                          "thresholds": {"voxel_m": VOXEL, "gap_radius_m": GAP_R,
                                         "local_plane_k": K_PLANE,
-                                        "planar_ratio": PLANAR_RATIO},
+                                        "planar_ratio": PLANAR_RATIO,
+                                        "bounded_nn_m": R_NN,
+                                        "bounded_patch_radius_m": R_PATCH,
+                                        "bounded_patch_rms_m": PATCH_RMS},
                          "oracle_geometry": {
                              "azimuth_fraction": INJECTION_AZIMUTH_FRACTION,
                              "bag_distance_m": INJECTION_BAG_DISTANCE_M,
@@ -549,6 +769,8 @@ def main_measure():
                              "self_check": oracle_check}},
                "conditions": {}}
 
+    results["_meta"]["real_filter"] = {"status": "MISSING",
+                                       "expected": "/tmp/filtered_bag_report.json"}
     if os.path.exists("/tmp/filtered_bag_report.json"):
         with open("/tmp/filtered_bag_report.json", encoding="utf-8") as fh:
             fr = json.load(fh)
@@ -570,7 +792,7 @@ def main_measure():
             results["conditions"][cond] = {"status": "UNAVAILABLE", **c3_note}
             print(f"   {cond}: UNAVAILABLE (no re-run bag)")
             continue
-        poses_all = pose_injected_frame(cond, inj_kfs, pre + keys, ref_poses, c3_poses)
+        poses_all = COND_POSES[cond]
         # Each condition gets its own pre-onset SE(3) onto the clean frame, fitted on pre-onset
         # poses only -- the same rule for all four, so no condition is helped by a transform
         # fitted on the window it is being scored on.
@@ -633,6 +855,7 @@ def main_measure():
         resid, ratio, radius, rms = local_plane_residual(pts, ref_tree, proxy_all)
         planar = ratio < PLANAR_RATIO
         well = (rms < WELL_RMS_M) & (radius < WELL_RADIUS_M)
+        bounded = bounded_metrics(pts, ref_tree, proxy_all)
 
         tree = cKDTree(pts)
         dq, _ = tree.query(cov_q, k=1, distance_upper_bound=2.0)
@@ -654,6 +877,7 @@ def main_measure():
         results["conditions"][cond] = {
             "label": CONDITION_LABEL[cond],
             "label_note": CONDITION_NOTE[cond],
+            "pose_pairing": COND_PAIR.get(cond),
             "keys_requested": len(keys),
             "keyframes_committed": used,
             "committed_ids": sorted(by_key),
@@ -681,7 +905,11 @@ def main_measure():
             },
             "coverage": cov,
             "coverage_on_well_constrained_queries": cov_well,
-            "well_constrained_query_fraction": float(q_well.mean()),
+            "reference_query_well_fraction": float(q_well.mean()),
+            "reference_query_well_note": ("denominator is the 40000 clean-reference QUERY points, "
+                                          "not the arm's map points; a different quantity from "
+                                          "plane_distance.well_constrained_fraction"),
+            "bounded": bounded,
             "connectivity_voxel_0.10m": comp,
             "connectivity_voxel_0.20m": comp20,
             "trajectory_support": gap,
@@ -692,6 +920,105 @@ def main_measure():
               f"cov0.5={cov['covered_within_0.5m']:.4f} "
               f"comps={comp['n_components']} largest={comp['largest_fraction']:.3f} "
               f"gaps={gap['gap_keyframes']}")
+
+    # ---- adversarial regression: the bounded metric must fail a wrong candidate ---------
+    adv = {}
+    if "C1" in by_key_store:
+        sel = [i for i in keys if i in by_key_store["C1"]][:150]
+
+        def _map_with(T_err):
+            out = []
+            for i in sel:
+                T = T_err @ pose_store["C1"][i]
+                body = inj_kfs[i]["pts"]
+                w = body @ T[:3, :3].T + T[:3, 3]
+                w = w @ R_store["C1"].T + t_store["C1"]
+                if len(w) > V.KF_CAP:
+                    w = w[:: max(1, len(w) // V.KF_CAP)][:V.KF_CAP]
+                out.append(w)
+            return np.vstack(out)
+
+        for name, T_err in (("translation_0.5m", np.array(
+                                [[1, 0, 0, 0.5], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]],
+                                dtype=float)),
+                            ("rotation_5deg_yaw", None)):
+            if T_err is None:
+                a = np.radians(5.0)
+                T_err = np.array([[np.cos(a), -np.sin(a), 0, 0],
+                                  [np.sin(a), np.cos(a), 0, 0],
+                                  [0, 0, 1, 0], [0, 0, 0, 1]], dtype=float)
+            bm = bounded_metrics(_map_with(T_err), ref_tree, proxy_all)
+            adv[name] = {"nn_unsupported": bm["nn"]["unsupported_fraction"],
+                         "patch_unsupported": bm["patch"]["unsupported_fraction"],
+                         "patch_tail_over_0.25m": bm["patch"]["tail_over_0.25m"],
+                         "aux_plane_tail_over_0.5m": bm["aux_point_to_plane_unbounded"]
+                         ["tail_over_0.5m"],
+                         "verdict": "JUDGED_BAD" if bm["patch"]["unsupported_fraction"] > 0.5
+                         else "NOT_CAUGHT"}
+        adv["baseline_C1"] = {
+            "nn_unsupported": results["conditions"]["C1"]["bounded"]["nn"]
+            ["unsupported_fraction"],
+            "patch_unsupported": results["conditions"]["C1"]["bounded"]["patch"]
+            ["unsupported_fraction"]}
+        adv["definition"] = ("C1's map, rigidly displaced in the injected frame by the stated "
+                             "error, scored with the same bounded metric")
+    results["adversarial_regression"] = adv
+    print(f"[] adversarial: {json.dumps({k: v.get('verdict') for k, v in adv.items() if isinstance(v, dict) and 'verdict' in v})}")
+
+    # ---- filter counts by original row index, from the audit ----------------------------
+    if os.path.exists(AUDIT_JSON):
+        au = json.load(open(AUDIT_JSON, encoding="utf-8"))
+        per = {int(f["ns"]): f for f in au["per_frame"]}
+        ns_primary = [int(kf_ns[i]) for i in keys]
+        n_win = [int(kf_ns[i]) for i in keys if start_ns <= kf_ns[i] <= end_ns]
+
+        def _counts(ns_list, field):
+            have = [per[n] for n in ns_list if n in per]
+            total = sum(f["n"] for f in have)
+            if field == "filter":
+                rem = sum(f["n"] - f["n_kept"] for f in have)
+            else:
+                rem = sum(f["oracle_removed"] for f in have)
+            return {"points": total, "removed": rem,
+                    "fraction": (rem / total) if total else None}
+
+        results["_meta"]["filter_audit"] = {
+            "path": AUDIT_JSON, "sha256": V._sha_file(AUDIT_JSON),
+            "keep_index_npz": AUDIT_NPZ,
+            "global_keep_mask_sha256": au.get("global_keep_mask_sha256"),
+            "verify_bag": au.get("verify"),
+            "whole_bag": {"points_in": au.get("points_in"), "points_kept": au.get("points_kept")},
+            "cohort_primary_446": {"filter": _counts(ns_primary, "filter"),
+                                   "oracle": _counts(ns_primary, "oracle")},
+            "cohort_in_window": {"filter": _counts(n_win, "filter"),
+                                 "oracle": _counts(n_win, "oracle")},
+            "count_rule": ("per frame, full resolution, original row indices -- never the "
+                           "difference of two independently subsampled arrays"),
+        }
+        fa = results["_meta"]["filter_audit"]
+        if "C3" in results["conditions"]:
+            results["conditions"]["C3"]["removed_points"] = fa["cohort_primary_446"]["filter"]["removed"]
+            results["conditions"]["C3"]["removed_fraction_of_input"] = fa["cohort_primary_446"]["filter"]["fraction"]
+            results["conditions"]["C3"]["removed_fraction_in_window"] = fa["cohort_in_window"]["filter"]["fraction"]
+            results["conditions"]["C3"]["removed_counts_source"] = "filter_audit (row indices)"
+        if "C2" in results["conditions"]:
+            results["conditions"]["C2"]["removed_points"] = fa["cohort_primary_446"]["oracle"]["removed"]
+            results["conditions"]["C2"]["removed_fraction_of_input"] = fa["cohort_primary_446"]["oracle"]["fraction"]
+            results["conditions"]["C2"]["removed_fraction_in_window"] = fa["cohort_in_window"]["oracle"]["fraction"]
+            results["conditions"]["C2"]["removed_counts_source"] = "filter_audit (row indices)"
+        print(f"[] filter audit: cohort filter {fa['cohort_primary_446']['filter']['fraction']:.4f}, "
+              f"oracle {fa['cohort_primary_446']['oracle']['fraction']:.4f}")
+
+    # ---- frozen evaluation region -------------------------------------------------------
+    key_pos = np.asarray([ref_poses[i][:3, 3] for i in keys]) @ R_ic.T + t_ic
+    results["_meta"]["evaluation_region"] = {
+        "definition": "AABB of the frozen key poses and of the reference cloud, both in the clean frame",
+        "key_aabb_min": key_pos.min(axis=0).tolist(),
+        "key_aabb_max": key_pos.max(axis=0).tolist(),
+        "reference_aabb_min": proxy_all.min(axis=0).tolist(),
+        "reference_aabb_max": proxy_all.max(axis=0).tolist(),
+        "keys_sha256": _list_hash([int(kf_ns[i]) for i in keys]),
+    }
 
     # ---- common support and the diagnostic subset ---------------------------------------
     # C0-C2 commit all 445 keys; C3's re-run publishes no odometry for some of them, so the
@@ -719,6 +1046,7 @@ def main_measure():
                                    [inj_kfs[i]["ts"] for i in sel])
             block[c] = {
                 "n_points": int(len(pts_c)),
+                "bounded": bounded_metrics(pts_c, ref_tree, proxy_all),
                 "plane_distance_all": tail_stats(r_c),
                 "plane_distance_well": tail_stats(r_c[well_c]),
                 "well_fraction": float(well_c.mean()),
@@ -735,7 +1063,7 @@ def main_measure():
         # lengths are not comparable: the injected scans are capped at 15000 by the loader while
         # the filtered bag is full resolution, so take the ratio from the filter report.
         results["conditions"]["C3"]["removed_fraction_in_window"] = (
-            results["_meta"]["real_filter"]["strip_fraction_in_window"])
+            results["_meta"]["real_filter"].get("strip_fraction_in_window"))
         results["conditions"]["C3"]["removed_fraction_source"] = (
             "/tmp/filtered_bag_report.json per-frame counts (full resolution)")
 
@@ -840,5 +1168,7 @@ if __name__ == "__main__":
         main_measure()
     elif cmd == "build-filtered-bag":
         build_filtered_bag()
+    elif cmd == "filter-audit":
+        filter_audit()
     else:
         raise SystemExit(f"unknown subcommand {cmd}")

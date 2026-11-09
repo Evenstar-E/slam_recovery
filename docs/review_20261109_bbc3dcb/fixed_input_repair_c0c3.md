@@ -1,116 +1,150 @@
-# 固定输入的端到端修复测量 C0–C3（M0 协议，整数纳秒边界）
+# 固定输入的端到端修复测量 C0–C3（M1 修订版：有界几何 + 统一配对 + 真实运行链）
 
-序列与故障固定：`hall_01`，4.30 m 塑料布注入，输入 `hall01_inj43.bag`。key 集、参考面与评分规则
-来自 M0 冻结协议 `docs/milestone_m0_keys.json` @ `f36137b`（整数纳秒边界），本实验不再自选集合。
+序列与故障固定：`hall_01`，4.30 m 塑料布注入，输入 `hall01_inj43.bag`。key 集与评分规则来自
+M0 冻结协议 `docs/milestone_m0_keys.json` @ `f36137b`（整数纳秒边界），本实验不自选集合。
 
 - 脚本：`run_fixed_input_repair_c0c3.py`
-- 原始输出：`fixed_input_repair_c0c3_results.json`
-- 冻结 key（含 ns 与哈希复核）：`fixed_input_repair_frozen_keys.json`
-- 真实过滤器逐帧记录：`fixed_input_repair_filter_report.json`
+- 运行器：`fl_run_isolated.sh`（每次运行独立目录 + trap 清理 + 失败判据）
+- 清理回归：`test_fl_run_cleanup.sh`
+- 产物：`fixed_input_repair_c0c3_results.json`、`fixed_input_repair_frozen_keys.json`、
+  `fixed_input_repair_filter_report.json`、`fixed_input_repair_filter_audit.json`、
+  `fixed_input_repair_smoke_receipt.json`
 
-> 旧的 445/259/133（6 位浮点边界，commit `057c266`）结果已在结果 JSON 的
-> `superseded_by_ns_boundary` 里保留记录并标明**只作留档、不得引用**。浮点边界会把**第一帧注入扫描**
-> 划进 healthy prefix；本文件全部按整数纳秒重算。
+## 1. 本轮针对审阅的修改
 
-## 1. 冻结集合（M0 @ f36137b）
-
-| 集合 | 数量 | M0 sha256 | 本实验复核 |
-|---|---:|---|---|
-| primary（配对隔离扫描） | **446** | `89a8bfa1…d3235a3f` | **逐位复现**，且与 `ns >= start_ns` 集合相同 |
-| diagnostic subset | 252 | `2bb7fe3d…00101f5` | 逐位复现；四条件都有支撑的 **250** 帧 |
-| healthy prefix | 132 | `74995bb9…62268788` | 逐位复现；对齐用 120 对（12 帧在干净跑丢弃头部内） |
-| 配对规则外的原始扫描 | 20 | —（文件未给 hash） | 全部确实未被配对，**单列**，不进任何分母 |
-
-- 哈希编码按文件声明：整数 ns 排序后逗号连接再 sha256；本次用**从 bag header 读出的真实 ns**重算，
-  三个集合全部 `match=True`。
-- 关键帧身份不再经过浮点：`load_scan_ns()` 直读 `header.stamp.sec/nanosec`，缓存按内容 sha 键控。
-  理由写在代码里：1.6e9 s 处的 double 步长约 240 ns，6 位小数根本表示不了纳秒边界。
-
-## 2. 四个条件与标签
-
-| | 标签 | 扫描 | 位姿 | 说明 |
-|---|---|---|---|---|
-| **C0** | `REAL_HOST` | 污染 | 宿主（归档 FAST-LIVO2） | 无修复 |
-| **C1** | `OFFLINE_CONSTRUCT` | 污染 | 参考（干净位姿经注入前 SE(3) 搬入） | oracle/proxy 一致性控制，**不是** GT 准确度 |
-| **C2** | `ORACLE_CEILING` | oracle 去污 | 参考 | **仅上限**；不恢复遮挡背景，**不是**普适最优地图界 |
-| **C3** | `OFFLINE_NATIVE_REESTIMATION` | 仓库真实过滤 | 实际重估（宿主重跑） | **不叫 `DEPLOYABLE_REPAIR`** |
-
-每个条件都用自己的 pre-onset SE(3) 对齐到干净帧（120 对，只用注入前）：C0/C1/C2 `|t|=0.7413 m`，C3 `0.8444 m`。
-
-参考面：干净跑**全部 8 490 000 点，不截断**；每点距离是它自己 8 邻域 PCA 平面的**点到面**距离，
-不设全局 cap、不用 sigma。覆盖率查询点从干净点云随机抽 40 000 个。
-
-## 3. 结果（共同支撑 402 帧，四条件同一批 key）
-
-| 条件 | tail>0.25 | tail>0.5 | tail>1.0 | 中位 | well 比例 | 覆盖@0.5 | 分量@0.1m | 最大分量 | 缺口 |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| C0 | 0.4461 | **0.3138** | 0.1278 | 0.1771 | 0.375 | **0.6047** | 13494 | 0.169 | 0 |
-| C1 | 0.2518 | **0.1947** | 0.0937 | 0.0078 | 0.684 | **0.9864** | 27352 | 0.359 | 0 |
-| C2（上限） | 0.0000 | **0.0000** | 0.0000 | 0.0044 | 0.940 | **0.9840** | 11286 | 0.270 | 0 |
-| C3（真实链路） | 0.0032 | **0.0013** | 0.0011 | 0.0077 | 0.908 | **0.9856** | 12703 | 0.273 | 0 |
-
-"well 比例"＝落点邻域半径 <0.30 m 且参考平面拟合 RMS <0.02 m 的点占比，即**落在被充分采样的真实表面上的点占比**。
-
-按 primary 446 单独报（分母不同）：C0 0.3230 / 0.6146 / well 0.369；C1 0.2253 / 0.9878 / 0.643；
-C2 0.0000 / 0.9844 / 0.936；C3 0.0013 / 0.9856 / 0.908，但 C3 只有 **402/446** 帧有位姿
-（`missing_pose_ids` 44 个全部列出，缺观测 0）。
-
-诊断子集（250 帧）：C0 0.2658 / 0.5595；C1 0.0059 / 0.9674；C2 0.0000 / 0.9667；C3 0.0000 / 0.9673。
-子集上 C1 比 primary 低一个量级——该子集本身偏向有支撑的帧，只能作诊断。
-
-## 4. C3 记录（可复跑）
-
-| 项 | 值 |
+| 项 | 修改 |
 |---|---|
-| 原始扫描包 | `/tmp/fastlivo/hall01_inj43.bag` · `aa740037…` |
-| 转换（过滤）包 | `/tmp/fastlivo/hall01_inj43_filtered.bag` · `c90300cb…` |
-| 重跑位姿包（C3） | `/tmp/fastlivo/res_h1_inj43_filtered.bag` · `1109fccf…` |
-| 控制组位姿包 | `/tmp/fastlivo/res_h1_inj43_rerun_unfiltered.bag` · `2a3880ad…` |
-| 宿主 | FAST-LIVO2 · `fastlivo_mapping` · binary `ca1959c4…` |
-| 宿主源码 revision | `0d2c0346107b75b59934975adec9a6eeeb913c64` |
-| 配置 | `m2dgr.yaml` + `camera_m2dgr.yaml`（sha256 见 JSON） |
-| 运行参数 | rate 0.5，drain 60 s，录 `/aft_mapped_to_init`，私有 ROS master 端口 |
+| **无界点面残差不能证明表面准确** | 新增**有界**指标：到干净参考的 NN 距离（上限 0.5 m，超限记 **unsupported**）+ 局部**有界 patch** 距离（邻域半径 ≤0.30 m、平面拟合 RMS ≤0.02 m）。unsupported 比例单列，tail 只在 supported 内部统计。无界点面数保留为**辅助**，不再作为准确度主张。 |
+| **撤回"达到 oracle ceiling"** | 见 §5：有界指标下 C3 的 patch unsupported 是上限的 **1.57 倍**（0.0931 vs 0.0593）。该表述已撤回。 |
+| **四条件位姿配对不统一** | 统一为一条规则（20 ms 最近 / 75 ms 内插 / 否则 **MISSING**），四条件同一实现；报实际 dt 与内插比例（§4）。C1/C2 由此暴露 **12 帧**此前被"最近帧"静默顶替。 |
+| **运行记录只是快照** | 运行器入库，改为**每次运行一个目录**：日志、输入/配置/binary/脚本 hash、ROS 参数 dump、退出码、输出 hash 与消息覆盖。失败路径有 trap 清理，且有 mock 失败回归。 |
+| **过滤计数靠两个裁剪数组相减** | 新增 `filter-audit`：按**原始 row index** 逐帧、全分辨率计数，并导出 keep-index；C2/C3 的计数改由它提供（§6）。 |
+| **缺证据时 KeyError** | `_meta.real_filter` 缺失时显式写 `status: MISSING`，不再在后续索引处崩。 |
+| **命名混淆** | `well_constrained_query_fraction` → `reference_query_well_fraction`，并注明分母是 40 000 个**参考查询点**，与 arm 的 well 比例不是同一个量。 |
 
-四条完整命令见结果 JSON 的 `_meta.c3_record.commands`。
+## 2. 冻结集合与配对
 
-- **过滤器**：`filter_self_consistent_near_field_contaminants` + 出厂 `MixtureFilterConfig()`，
-  逐帧独立判定，**不看时间窗、不看干净包**：窗内 200 帧平均剔除 **0.8876**，窗外 398 帧 **0.0000**，
-  剔除 >10% 的帧恰好 200 个；同时 `repairable=false` 的有 **189/200** 帧。
-- **主机可复现性**：未过滤同包重跑 vs 归档位姿（pre-onset 对齐）：注入前 mean **0.011 m**、
-  窗内 mean **0.028 m**（p95 0.049）、窗后 0.488 m。窗内 3 cm 远小于要测的米级效应。
+| 集合 | 数量 | 复核 |
+|---|---:|---|
+| primary（配对隔离扫描） | 446 | ns 列表 hash 逐位复现 `89a8bfa1…`，且等于 `ns >= start_ns` |
+| diagnostic subset | 252 | `2bb7fe3d…`；四条件都有支撑的 250 |
+| healthy prefix | 132 | `74995bb9…`；对齐用 120 对 |
+| 配对规则外原始扫描 | 20 | 单列，不进分母 |
 
-## 5. C1/C2 的定位（按审阅限定）
+**位姿配对（四条件统一）**：最近 ≤20 ms → 用；否则若夹住目标的两帧间隔 ≤75 ms → 插值；否则 MISSING。
 
-- C1/C2 用**干净跑位姿**并对**干净跑地图**评分 → **oracle/proxy 一致性控制**，不是独立 GT 准确度。
-- C2 删点**不恢复被遮挡背景** → 不是"普适最优地图"的数学上界，只是"没有污染点"的上界。
-- oracle 污染 identity **只在绝对注入窗内评分**（窗内 30 个抽样帧标记率 0.890，与 88% 方位扇区一致）；
-  窗外同扇区被标记的点是**健康背景**，只报"若不设窗限的误删率"约 3.3%，**不计 true positive**。
+| 条件 | nearest | interpolated | missing | dt p95 |
+|---|---:|---:|---:|---:|
+| C0 | 361 | 217 | 0 | 18.53 ms |
+| C1 / C2 | 355 | 211 | **12** | 18.59 ms |
+| C3 | 317 | 215 | **46** | 18.71 ms |
 
-## 6. 连通性指标
+旧实现里 C1/C2 用"最近干净帧、无间隔上限、无缺测"，C3 用 50 ms 最近——三者不可比。现在同一规则下
+C1/C2 有 12 帧、C3 有 46 帧无合格位姿，全部单列，不从分母静默剔除。
 
-固定 0.10 m / 0.20 m 两档体素、26 邻接，单位为体素；**不作拓扑正确性的唯一判据**。
-C1 分量数最高（27352）、最大分量占比也不是最好，因为位姿准确的地图铺在更大的真实表面上，
-而每帧只留 250 点，稀疏度本身会抬高分量数。C2 与 C3 接近（11286/0.270 与 12703/0.273）。
-轨迹支撑（1.0 m 内、且必须来自**其他帧**的点）四条件全为 0，无区分度。
+## 3. 有界几何定义
 
-## 7. 结论（ns 边界重算后）
+- **NN（有界最近邻）**：到干净参考云（8 490 000 点，不截断）的最近距离；上限 **0.5 m**，超过即
+  **UNSUPPORTED** 并从 tail 中排除。上限以内只统计 `>0.10 m` 与 `>0.25 m`——在上限处统计 `>0.5 m`
+  恒为 0，会读成完美结果。
+- **patch（有界局部面）**：8 邻域 PCA 平面，且要求邻域半径 ≤**0.30 m**、平面拟合 RMS ≤**0.02 m**；
+  不满足或 NN 超限即 UNSUPPORTED。距离是该局部平面上的点到面距离。
+- **辅助**：无界点面残差照常报告，但明确标 AUXILIARY——审阅的反例（原点 0.2 m 平面片 vs 查询点
+  (100,0,0)，残差 0、最近距离 99.9 m）说明它单独不能主张表面准确。
 
-1. **位姿优先**：C0→C1，尾部 0.3138→0.1947，覆盖 0.6047→0.9864，well 比例 0.375→0.684。
-   C0 位姿相对参考轨迹中位偏差 5.85 m、p90 18.5 m、最大 19.7 m。
-2. **去污消掉剩余尾部**：C1→C2，尾部 0.1947→0.0000，well 比例 0.684→0.940，覆盖基本不变。
-3. **真实 C3 落在上限 0.1–3 pp 内**：尾部 0.0013、覆盖 0.9856、well 0.908；代价 44 帧缺位姿。
-4. 过滤器在这一条真实序列上判定近乎精确，但只是单一序列、单一注入器，且注入窗由 oracle 定义；
-   `repairable=false` 的 189 帧说明恢复后的可观测性并不总达标。
+## 4. 结果
 
-## 8. 复现
+### 4.1 共同支撑 400 帧（四条件同一批 key）
+
+| 条件 | 标签 | NN unsupported | patch unsupported | patch >0.10 (sup.) | patch >0.25 (sup.) | patch 中位 | 辅助无界 >0.5 | 覆盖@0.5 |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| C0 | `REAL_HOST` | 0.3755 | **0.6251** | 0.1811 | 0.0193 | 0.0180 | 0.3135 | 0.6047 |
+| C1 | `OFFLINE_CONSTRUCT` | 0.2147 | **0.3147** | 0.0400 | 0.0055 | 0.0042 | 0.1937 | 0.9864 |
+| C2 | `ORACLE_CEILING` | 0.0000 | **0.0593** | 0.0000 | 0.0000 | 0.0041 | 0.0000 | 0.9840 |
+| C3 | `OFFLINE_NATIVE_REESTIMATION` | 0.0015 | **0.0931** | 0.0140 | 0.0004 | 0.0069 | 0.0013 | 0.9849 |
+
+### 4.2 primary 446（分母不同，单列）
+
+| 条件 | 提交帧 | 缺位姿 | NN unsup | patch unsup | patch >0.25 | 覆盖@0.5 |
+|---|---:|---:|---:|---:|---:|---:|
+| C0 | 446 | 0 | 0.3845 | 0.6307 | 0.0199 | 0.6146 |
+| C1 | 446 | 0 | 0.2490 | 0.3567 | 0.0067 | 0.9878 |
+| C2 | 446 | 0 | 0.0000 | 0.0640 | 0.0000 | 0.9844 |
+| C3 | **400** | **46** | 0.0015 | 0.0931 | 0.0004 | 0.9849 |
+
+诊断子集 250：C0 0.3299/0.6001，C1 0.0066/0.0556，C2 0.0000/0.0475，C3 0.0000/0.0652（NN unsup / patch unsup）。
+
+### 4.3 反例回归（有界指标必须判坏）
+
+把 C1 的地图整体施加误差后，用同一有界指标评分：
+
+| 施加的误差 | NN unsupported | patch unsupported | 判定 |
+|---|---:|---:|---|
+| 无（C1 基线） | 0.2489 | 0.3567 | 正常 |
+| 平移 0.5 m | 0.539 | **0.743** | `JUDGED_BAD` |
+| 绕 z 转 5° | 0.557 | **0.755** | `JUDGED_BAD` |
+
+有界指标确实把错的候选判坏——这是"tail 为 0"不能单独证明的事。
+
+## 5. 撤回与限定
+
+- **撤回"C3 达到 oracle ceiling"**：有界 patch unsupported C3 = 0.0931、C2 = 0.0593，C3 是上限的
+  **1.57 倍**；patch 中位 0.0069 vs 0.0041；NN unsupported 0.0015 vs 0.0000。C3 很接近，但**没有达到**，
+  日志里的该表述已由审阅撤回，本文件不再使用。
+- **0.028 m 只说明该平移统计可重复**：未过滤重跑与归档位姿的对比**只比了位置**，没有比旋转，
+  也没有覆盖消息计数与窗后差异（窗后 mean 0.488 m）。因此这不是完整确定性的结论。
+- **重建是每帧 250 点的 sidecar，不是宿主输出的配准地图**：每个 keyframe 只取自身扫描的 250 点按
+  该条件位姿摆放；它衡量的是位姿+点源，不是 FAST-LIVO2 内部建图。
+- C1/C2 是 oracle/proxy 一致性控制，不是独立 GT 准确度；C2 删除污染点**不恢复被遮挡背景**，
+  不是普适最优地图的数学上界。
+- 连通性固定 0.10/0.20 m 体素、26 邻接，不作拓扑正确性判据；轨迹支撑缺口四条件均为 0，无区分度。
+
+## 6. 过滤计数与点身份
+
+`filter-audit` 对 598 帧逐帧、全分辨率执行**车间里真实的** `filter_self_consistent_near_field_contaminants`
+（`MixtureFilterConfig()` 默认值），记录每帧 `n / n_kept / oracle_removed` 与**原始 row index** 的 keep mask：
+
+- 全局 keep mask sha256：见 JSON `filter_audit.global_keep_mask_sha256`；
+- **与输出 bag 逐帧绑定**：598/598 帧的保留行字节 hash 与 `hall01_inj43_filtered.bag` 完全一致，
+  `frames_mismatched = 0`；
+- cohort 计数（不再用两个裁剪数组相减）：primary 446 帧上 filter 剔除 **0.3981**、oracle **0.4197**；
+  **注入窗内** filter **0.8876**、oracle **0.8855**；
+- 保存原始扫描的 keep index（`/tmp/filtered_bag_keep_index.npz`），可由输入 bag 重建输出。
+
+附带记录：`repairable=false` 的窗内帧 189/200。
+
+## 7. 运行收据
+
+`fl_run_isolated.sh` 每次运行写 `/tmp/fl_run_<utc>_<pid>/`：`command.txt`、`roscore.log`、`record.log`、
+`node.log`、`play.log`、`ros_params.yaml`（实际加载的 ROS 参数 dump）、`receipt.json`（输入/配置/binary/
+脚本 hash、退出码、输出 hash、消息数、首末 stamp）。
+
+- **清理**：`trap cleanup EXIT`，按 PID 逆序 TERM→KILL，只杀自己启动的进程。
+- **失败判据**：master 60 s 未就绪、node 未启动/中途死亡、`rosbag play` 非 0、输出包缺失/为空/
+  `/aft_mapped_to_init` 消息数为 0，全部 `exit` 非 0，不再以 `stat` 成功结尾。
+- **不覆盖**：输出路径已存在则失败，除非显式 `--overwrite`。
+- **mock 失败回归** `test_fl_run_cleanup.sh`：`FL_TEST_FAIL_AFTER_START=1` 让脚本在三个进程都起来后
+  失败，实测 `exit=3`、master 端口关闭、receipt 写 `FAIL`。
+- 已用硬化后的运行器跑了一条 15 s **smoke**（`fixed_input_repair_smoke_receipt.json`，
+  **SMOKE_NOT_FOR_NUMBERS**）：status `COMPLETE`，`rosbag_play=0`、`rosbag_record=0`、
+  `fastlivo_node=137`（我们主动 KILL），197 条 odometry。
+- 归档 C3 的**实跑**发生在运行器入库前，故 `run_receipt.status = RETROSPECTIVE_PARTIAL`，
+  缺 `process exit codes`、`ROS parameter dump`、`wall-clock start` 三项，已显式列出。
+
+## 8. 结论（有界指标下，读法收窄）
+
+1. 位姿仍是第一位的：C0→C1，patch unsupported 0.625→0.315，覆盖 0.605→0.986。
+2. 去污消掉剩余的几何错误：C1→C2，patch unsupported 0.315→0.059。
+3. 真实链路 C3 patch unsupported 0.093、覆盖 0.985；**接近但未达到**上限，代价 46 帧缺位姿。
+4. 有界指标能判坏 0.5 m / 5° 的错误候选，因此上面的数字不是"无界残差为 0"那种空转。
+
+## 9. 复现
 
 ```bash
-python3 -B docs/review_20261109_bbc3dcb/run_fixed_input_repair_c0c3.py build-filtered-bag   # 约 10 min
-bash /tmp/fl_run_isolated.sh /tmp/fastlivo/hall01_inj43_filtered.bag \
-     /tmp/fastlivo/res_h1_inj43_filtered.bag 0.5 60
-bash /tmp/fl_run_isolated.sh /tmp/fastlivo/hall01_inj43.bag \
-     /tmp/fastlivo/res_h1_inj43_rerun_unfiltered.bag 0.5 60
-python3 -B docs/review_20261109_bbc3dcb/run_fixed_input_repair_c0c3.py measure               # 约 1 min
+python3 -B docs/review_20261109_bbc3dcb/run_fixed_input_repair_c0c3.py filter-audit
+python3 -B docs/review_20261109_bbc3dcb/run_fixed_input_repair_c0c3.py measure
+bash docs/review_20261109_bbc3dcb/fl_run_isolated.sh <bag> <new-out> 0.5 60
+bash docs/review_20261109_bbc3dcb/test_fl_run_cleanup.sh
 ```
 
-未改 node/core/manager，未改 `fim_and_holdout.py` 默认值，未改已发表 manifest，未 push。
+未改 node/core/manager、未改 `fim_and_holdout.py` 默认值、未改已发表 manifest、未 push。
