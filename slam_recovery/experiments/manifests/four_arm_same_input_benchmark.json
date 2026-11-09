@@ -2442,6 +2442,22 @@
     "Candidate is the host's own quarantined trajectory; the archive holds no repaired candidate for this window, so A3 can only accept or reject the host poses.",
     "Incumbent is a constant-velocity extrapolation, not a per-frame record, so the paired test asks whether the candidate beats 'no repair', not whether it is optimal.",
     "A0 and A2 write the identical keyframe set and therefore the same map; A2 differs only in having passed through quarantine before admitting everything.",
-    "ATE on the admitted set is confounded by coverage; ate_on_common_support is the like-for-like number."
-  ]
+    "ATE on the admitted set is confounded by coverage; ate_on_common_support is the like-for-like number.",
+    "INVALID INPUT PAIRING: the 4.30 m scan bag was paired with poses from the 0.35 m under-scaled run (ATE 0.46 m vs clean 0.40 m). The host was therefore not degraded in this replay, which is why the 'good' candidate and the host coincide. All numbers here are superseded."
+  ],
+  "status": "INVALID_INPUT_PAIRING",
+  "provenance_validity": {
+    "status": "INVALID_INPUT_PAIRING",
+    "reason": "The injected scans are the 4.30 m occlusion bag (hall01_inj43.bag), but the poses are from the earlier 0.35 m under-scaled run (res_hall01_inj_05x.bag). The scan stream and the pose stream therefore describe two different injections.",
+    "evidence": {
+      "inj_scans_bag": "/tmp/fastlivo/hall01_inj43.bag (4.30 m injection)",
+      "inj_poses_bag_used": "/tmp/fastlivo/res_hall01_inj_05x.bag",
+      "inj_poses_bag_ate_m": 0.46,
+      "clean_run_ate_m": 0.4,
+      "correct_poses_bag": "/tmp/fastlivo/res_h1_inj43_vis.bag",
+      "correct_poses_bag_ate_m": 9.03,
+      "measurement": "ATE against M2DGR Leica GT, SE(3) aligned on the leading 20% of matched poses"
+    },
+    "consequence": "Every numerical result in this manifest is invalid and must be re-run with a matched scan/pose pair. The file is kept as a record of the defect, not as evidence."
+  }
 }

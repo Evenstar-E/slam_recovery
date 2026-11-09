@@ -2098,14 +2098,15 @@ S1/S2 不再提供任何 Mode 2 正面证据。当前 Mode 2 的全部证据来�
 
 σ* 之所以在 0.22–0.47 之间，是因为估计器内部把参考截到 600 点、8-NN 平面拟合误差被计入残差。因此 σ 标定只是**让判决在同一估计器下可比**，并不消除估计器本身的尺度问题；这与 §13.16 的仿真 validity 失败、以及四臂回放中好候选 NIS 仍为数百，是同一根因。要根治需改估计器的参考预算与平面拟合，而该改动会改变所有已报告数字，留待下一轮决策。
 
-## 13.19 前缀截断会让门控用最不利的子集判决：改为提交全部已验证帧（已验证）
+## 13.19 前缀截断会让门控用最不利的子集判决：改为提交全部已验证帧（结论保留，四臂数字作废）
 
-> 来源：同一输入四臂回放（`slam_recovery/experiments/run_four_arm_same_input.py`，归档回放，provenance `ARCHIVED_REAL_HOST_POSES + INJECTION_SCANS`）。
-> 复现：`python -B -m slam_recovery.experiments.run_four_arm_same_input`（需归档 bag）。
+> 来源：同一输入四臂回放（`slam_recovery/experiments/run_four_arm_same_input.py`）。
+> **重要更正**：该回放把 4.30 m 注入的扫描（`hall01_inj43.bag`）与 0.35 m 欠注入那次的位姿（`res_hall01_inj_05x.bag`，对 GT 的 ATE 仅 0.46 m，clean 为 0.40 m）配对，宿主在这份回放里**并没有真正退化**。因此下面§13.19 的全部**数字**作废（manifest 已标 `INVALID_INPUT_PAIRING`）；保留的只有**结构性结论**：单个不支持帧不应吞掉其后的可验证帧，评分集合必须等于提交集合。该结论不依赖这批数字。
+> 复现：`python -B -m slam_recovery.experiments.run_four_arm_same_input`（需**重新配对**后的归档 bag）。
 
 ### 1. 反例
 
-在四臂回放的 C_good 臂中，391 个隔离帧里有 **317 帧通过参考支撑**，但第 14 帧不支持。旧规则是"从第一帧开始的连续前缀"，于是：
+在四臂回放（输入错配，数字见上方更正，仅作机制说明）的 C_good 臂中，391 个隔离帧里有 317 帧通过参考支撑，但第 14 帧不支持。旧规则是"从第一帧开始的连续前缀"，于是：
 
 | 评测范围 | 配对帧 | 改善帧 | Wilson | 判决 |
 |---|---:|---:|---:|---|

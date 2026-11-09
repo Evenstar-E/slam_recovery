@@ -47,8 +47,13 @@ from slam_recovery.experiments.evaluation import (
     umeyama_se3_align,
 )
 
+# The scan bag and the pose bag must come from the SAME injection distance. An earlier run paired
+# hall01_inj43.bag (4.30 m occlusion) with res_hall01_inj_05x.bag, whose poses belong to the 0.35 m
+# under-scaled run (ATE 0.46 m against GT versus 0.40 m for the clean run) -- i.e. the "degraded"
+# host was not degraded at all. Keep the ATE in the manifest as the provenance check, not the
+# filename.
 DEFAULT_INJ_SCANS = "/tmp/fastlivo/hall01_inj43.bag"
-DEFAULT_INJ_POSES = "/tmp/fastlivo/res_hall01_inj_05x.bag"
+DEFAULT_INJ_POSES = "/tmp/fastlivo/res_h1_inj43_vis.bag"
 DEFAULT_CLN_SCANS = "/tmp/fastlivo/hall01_100_160.bag"
 DEFAULT_CLN_POSES = "/tmp/fastlivo/res_hall01_clean_05x.bag"
 DEFAULT_GT = "/home/R26534/M2DGR/GT/hall_01.txt"
