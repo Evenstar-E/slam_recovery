@@ -257,7 +257,12 @@ interaction" and is reported as run variance, inequivalent construction or a dif
 condition — never as interaction by default. All four statuses and errors are reported, including
 cells that fail. The oracle remains a mechanism diagnostic, not a deployable repair.
 
-**Current status**: the existing E_actual vs E_oracle comparison changes both factors at once
+**Current status**: the four bags are built from original indices and the equivalence checks pass
+on the real data (`b67a804`): outside-window arms are byte-identical to the filtered recording,
+each arm equals the indexed injected rows, and O+F−B is byte-identical to the actual filtered
+scan inside the window (599 frames, 0 failures; `single_factor_bags_verified.json`). Host reruns
+are the remaining step. Until they run, the existing E_actual vs E_oracle comparison changes both
+factors at once
 (1,265 retained + 23,607 dropped), and its hybrid arm only holds the outside-window policy fixed;
 it therefore does **not** yet establish which in-window factor matters. The 315.16 m ATE is a
 `FULL_ALIGNMENT_DIAGNOSTIC` (full-trajectory SE(3) fit), separate from the frozen healthy-prefix

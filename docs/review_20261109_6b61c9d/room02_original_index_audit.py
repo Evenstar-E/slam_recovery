@@ -192,7 +192,7 @@ def main():
         json.dump(res, fh, indent=1)
     print(json.dumps({k: res[k] for k in ("in_window", "healthy", "frames_unmatched")},
                      indent=1))
-    print("sidecar", res["index_sidecar"]["sha256"][:16], len(side), "frames")
+    print("sidecar", res["index_sidecar"]["sha256"][:16], len(side) // 2, "frames")
 
 
 if __name__ == "__main__":
