@@ -60,6 +60,15 @@ hashes alone identify files, not that the host consumed them. The first rerun fr
 prefix is labelled `OFFLINE_NATIVE_REESTIMATION`; `DEPLOYABLE_REPAIR` requires an online checkpoint
 and host map commit run, which is a separate milestone.
 
+### Runtime receipt and runner (M2)
+
+The wrapper that sets the playback rate, drain, recorded topic and `rosrun` invocation is now
+committed as `docs/review_20261109_bbc3dcb/fl_run_isolated.sh` (sha256
+`aba9b27e...629b588c94`, 1,558 bytes). The C3 record references this file and its hash; the runner
+launches with an isolated ROS master (private port, `ROS_HOME` under `/tmp`) and kills only its own
+processes. The remaining gap in the receipt is evidence that the host actually consumed the named
+filtered bag at run time; file hashes identify files, not consumption.
+
 ### State and full point-record contract (M2)
 
 - The filter must preserve ring, time, header stamp and the original point id; a filtered message
