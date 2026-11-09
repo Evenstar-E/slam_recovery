@@ -132,7 +132,10 @@ def main():
         a = np.frombuffer(raw_i, dtype=np.uint8).reshape(-1, step)
         b = np.frombuffer(raw_c, dtype=np.uint8).reshape(-1, step)
         if a.shape != b.shape:
-            return inj_kfs[i]["pts"]           # cannot split rows; fall back to the raw scan
+            # fail closed: a silent fallback would turn the oracle arm into the raw arm without
+            # any warning, which is exactly the failure mode a re-encode would introduce
+            raise RuntimeError(f"ORACLE_ROW_SHAPE_MISMATCH at ns {ns}: "
+                               f"{a.shape} vs {b.shape}; refusing to guess")
         keep_row = ~(a != b).any(axis=1)
         xyz = np.frombuffer(raw_i, dtype=dt)
         p = np.column_stack([xyz["x"], xyz["y"], xyz["z"]]).astype(np.float64)
@@ -144,7 +147,7 @@ def main():
         return p
 
     def _map(ids, poses, source):
-        out = []
+        out, labels = [], []
         for i in ids:
             if source == "RAW_INJECTED":
                 body = inj_kfs[i]["pts"]
@@ -156,7 +159,8 @@ def main():
             if len(w) > V.KF_CAP:
                 w = w[:: max(1, len(w) // V.KF_CAP)][:V.KF_CAP]
             out.append(w)
-        return np.vstack(out)
+            labels.append(np.full(len(w), i))
+        return np.vstack(out), np.concatenate(labels)
 
     proxy = np.vstack([V.world_pts(k) for k in cln_kfs])
     proxy_tree = cKDTree(proxy)
@@ -167,12 +171,26 @@ def main():
     for tag, (source, pose_src) in ARMS.items():
         poses = pose_for[pose_src]
         R_a, t_a = _align(poses)
-        pts = _map(frames, poses, source) @ R_a.T + t_a
+        pts, labels = _map(frames, poses, source)
+        pts = pts @ R_a.T + t_a
         tree = cKDTree(pts)
         d, _ = tree.query(proxy, k=1, distance_upper_bound=R.R_NN)
         covered = np.isfinite(d)
         bm = R.bounded_metrics(pts, proxy_tree, proxy)
         uns = int(round(bm["patch"]["unsupported_fraction"] * len(pts)))
+        in_win = np.isin(labels, [i for i in frames if onset_ns <= kf_ns[i] <= end_ns])
+        def _part(mask):
+            sub = pts[mask]
+            if not len(sub):
+                return {"map_points": 0, "unsupported_fraction": None,
+                        "unsupported_points": 0}
+            b = R.bounded_metrics(sub, proxy_tree, proxy)
+            u = int(round(b["patch"]["unsupported_fraction"] * len(sub)))
+            return {"map_points": int(len(sub)), "unsupported_points": u,
+                    "unsupported_fraction": float(u / len(sub))}
+        partition = {"in_window": _part(in_win), "healthy": _part(~in_win),
+                     "definition": "map points whose source keyframe lies inside / outside the "
+                                   "absolute injection window"}
         res_arms[tag] = {
             "scan_source": source, "pose_source": pose_src,
             "map_points": int(len(pts)),
@@ -181,6 +199,7 @@ def main():
             "patch_unsupported_points": uns,
             "patch_unsupported_fraction": float(uns / len(pts)),
             "patch_median_m": bm["patch"]["median_m"],
+            "partition": partition,
         }
         maps[tag] = pts
         print(f"   {tag} {source:14s}+{pose_src:20s} cover {covered.mean():.4f} "
@@ -193,8 +212,47 @@ def main():
             - res_arms[a]["proxy_coverage_fraction"],
             "unsupported_delta": res_arms[b]["patch_unsupported_fraction"]
             - res_arms[a]["patch_unsupported_fraction"],
+            "computed_on": "whole frame set (not the in-window subset)",
+            "in_window_only": {
+                "unsupported_delta": (res_arms[b]["partition"]["in_window"]
+                                      ["unsupported_fraction"] or 0.0)
+                - (res_arms[a]["partition"]["in_window"]["unsupported_fraction"] or 0.0)},
+            "healthy_only": {
+                "unsupported_delta": (res_arms[b]["partition"]["healthy"]
+                                      ["unsupported_fraction"] or 0.0)
+                - (res_arms[a]["partition"]["healthy"]["unsupported_fraction"] or 0.0)},
             "isolates": {"A->B": "pose", "B->C": "measurement (oracle ceiling)",
                          "C->D": "filter versus oracle", "D->E": "re-estimation"}[f"{a}->{b}"]}
+
+    # ---- retained echoes per partition ---------------------------------------------------
+    retained = {}
+    repath = os.path.join(_HERE, "room02_filter_report.json")
+    if os.path.exists(repath):
+        fr = json.load(open(repath))
+        ok = (fr.get("binding", {}).get("verdict") == "BOUND"
+              and fr.get("input_sha256") == sha["injected_scans"]
+              and fr.get("output_sha256") == sha["filtered_scans"])
+        if ok:
+            pf = fr["per_frame"]
+            inw = [f for f in pf if onset_ns - 5e5 <= f["t"] * 1e9 <= end_ns + 5e5]
+            outw = [f for f in pf if not (onset_ns - 5e5 <= f["t"] * 1e9 <= end_ns + 5e5)]
+            retained["ACTUAL_FILTER"] = {
+                "in_window": {"frames": len(inw),
+                              "kept_fraction": sum(f["kept"] for f in inw)
+                              / max(sum(f["n"] for f in inw), 1)},
+                "healthy": {"frames": len(outw),
+                            "kept_fraction": sum(f["kept"] for f in outw)
+                            / max(sum(f["n"] for f in outw), 1)}}
+        else:
+            retained["ACTUAL_FILTER"] = {"status": "STALE_AUDIT"}
+    rb = os.path.join(_HERE, "room02_oracle_bag_report.json")
+    if os.path.exists(rb):
+        ore = json.load(open(rb))
+        retained["ORACLE"] = {
+            "in_window": {"frames": ore["in_window"]["frames"],
+                          "kept_fraction": ore["in_window"]["kept_fraction"]},
+            "healthy": {"frames": ore["outside_window"]["frames"],
+                        "kept_fraction": ore["outside_window"]["kept_fraction"]}}
 
     # ---- healthy window: filter removal versus oracle removal ----------------------------
     rep = os.path.join(_HERE, "room02_filter_report.json")
@@ -202,7 +260,8 @@ def main():
     if os.path.exists(rep):
         fr = json.load(open(rep))
         ok = (fr.get("binding", {}).get("verdict") == "BOUND"
-              and fr.get("input_sha256") == sha["injected_scans"])
+              and fr.get("input_sha256") == sha["injected_scans"]
+              and fr.get("output_sha256") == sha["filtered_scans"])
         if not ok:
             healthy = {"status": "STALE_AUDIT"}
         else:
@@ -242,6 +301,7 @@ def main():
                       "ns_sha256": hashlib.sha256(",".join(str(int(kf_ns[i])) for i in
                                                           sorted(frames)).encode()).hexdigest()},
         "arms": res_arms, "deltas": deltas, "healthy_window": healthy,
+        "retained_echoes": retained,
     }
     with open(RESULTS, "w", encoding="utf-8") as fh:
         json.dump(res, fh, indent=1, default=float)

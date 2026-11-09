@@ -131,7 +131,20 @@
    "proxy_coverage_fraction": 0.7672199420289855,
    "patch_unsupported_points": 37370,
    "patch_unsupported_fraction": 0.4585276073619632,
-   "patch_median_m": 0.00930954671451457
+   "patch_median_m": 0.00930954671451457,
+   "partition": {
+    "in_window": {
+     "map_points": 31750,
+     "unsupported_points": 23046,
+     "unsupported_fraction": 0.7258582677165354
+    },
+    "healthy": {
+     "map_points": 49750,
+     "unsupported_points": 14324,
+     "unsupported_fraction": 0.28791959798994976
+    },
+    "definition": "map points whose source keyframe lies inside / outside the absolute injection window"
+   }
   },
   "B": {
    "scan_source": "RAW_INJECTED",
@@ -141,7 +154,20 @@
    "proxy_coverage_fraction": 0.998960231884058,
    "patch_unsupported_points": 23539,
    "patch_unsupported_fraction": 0.28882208588957053,
-   "patch_median_m": 0.0018960222304181238
+   "patch_median_m": 0.0018960222304181238,
+   "partition": {
+    "in_window": {
+     "map_points": 31750,
+     "unsupported_points": 23347,
+     "unsupported_fraction": 0.7353385826771653
+    },
+    "healthy": {
+     "map_points": 49750,
+     "unsupported_points": 192,
+     "unsupported_fraction": 0.0038592964824120603
+    },
+    "definition": "map points whose source keyframe lies inside / outside the absolute injection window"
+   }
   },
   "C": {
    "scan_source": "ORACLE_CLEAN",
@@ -151,7 +177,20 @@
    "proxy_coverage_fraction": 0.9987700869565217,
    "patch_unsupported_points": 491,
    "patch_unsupported_fraction": 0.006024539877300614,
-   "patch_median_m": 0.0018806726102357282
+   "patch_median_m": 0.0018806726102357282,
+   "partition": {
+    "in_window": {
+     "map_points": 31750,
+     "unsupported_points": 299,
+     "unsupported_fraction": 0.009417322834645669
+    },
+    "healthy": {
+     "map_points": 49750,
+     "unsupported_points": 192,
+     "unsupported_fraction": 0.0038592964824120603
+    },
+    "definition": "map points whose source keyframe lies inside / outside the absolute injection window"
+   }
   },
   "D": {
    "scan_source": "ACTUAL_FILTER",
@@ -161,7 +200,20 @@
    "proxy_coverage_fraction": 0.998799420289855,
    "patch_unsupported_points": 574,
    "patch_unsupported_fraction": 0.007042944785276074,
-   "patch_median_m": 0.0019204880474503346
+   "patch_median_m": 0.0019204880474503346,
+   "partition": {
+    "in_window": {
+     "map_points": 31750,
+     "unsupported_points": 351,
+     "unsupported_fraction": 0.01105511811023622
+    },
+    "healthy": {
+     "map_points": 49750,
+     "unsupported_points": 223,
+     "unsupported_fraction": 0.0044824120603015076
+    },
+    "definition": "map points whose source keyframe lies inside / outside the absolute injection window"
+   }
   },
   "E": {
    "scan_source": "ACTUAL_FILTER",
@@ -171,28 +223,69 @@
    "proxy_coverage_fraction": 0.6951544347826087,
    "patch_unsupported_points": 53705,
    "patch_unsupported_fraction": 0.6589570552147239,
-   "patch_median_m": 0.00334879230051792
+   "patch_median_m": 0.00334879230051792,
+   "partition": {
+    "in_window": {
+     "map_points": 31750,
+     "unsupported_points": 3955,
+     "unsupported_fraction": 0.12456692913385826
+    },
+    "healthy": {
+     "map_points": 49750,
+     "unsupported_points": 49750,
+     "unsupported_fraction": 1.0
+    },
+    "definition": "map points whose source keyframe lies inside / outside the absolute injection window"
+   }
   }
  },
  "deltas": {
   "A->B": {
    "coverage_delta": 0.23174028985507256,
    "unsupported_delta": -0.16970552147239265,
+   "computed_on": "whole frame set (not the in-window subset)",
+   "in_window_only": {
+    "unsupported_delta": 0.009480314960629954
+   },
+   "healthy_only": {
+    "unsupported_delta": -0.2840603015075377
+   },
    "isolates": "pose"
   },
   "B->C": {
    "coverage_delta": -0.00019014492753632872,
    "unsupported_delta": -0.2827975460122699,
+   "computed_on": "whole frame set (not the in-window subset)",
+   "in_window_only": {
+    "unsupported_delta": -0.7259212598425197
+   },
+   "healthy_only": {
+    "unsupported_delta": 0.0
+   },
    "isolates": "measurement (oracle ceiling)"
   },
   "C->D": {
    "coverage_delta": 2.9333333333325662e-05,
    "unsupported_delta": 0.00101840490797546,
+   "computed_on": "whole frame set (not the in-window subset)",
+   "in_window_only": {
+    "unsupported_delta": 0.0016377952755905513
+   },
+   "healthy_only": {
+    "unsupported_delta": 0.0006231155778894473
+   },
    "isolates": "filter versus oracle"
   },
   "D->E": {
    "coverage_delta": -0.3036449855072463,
    "unsupported_delta": 0.6519141104294478,
+   "computed_on": "whole frame set (not the in-window subset)",
+   "in_window_only": {
+    "unsupported_delta": 0.11351181102362204
+   },
+   "healthy_only": {
+    "unsupported_delta": 0.9955175879396985
+   },
    "isolates": "re-estimation"
   }
  },
@@ -205,5 +298,27 @@
   "real_filter_fraction": 0.04469611325932563,
   "oracle_removed": 0,
   "oracle_fraction": 0.0
+ },
+ "retained_echoes": {
+  "ACTUAL_FILTER": {
+   "in_window": {
+    "frames": 199,
+    "kept_fraction": 0.11343659939905439
+   },
+   "healthy": {
+    "frames": 400,
+    "kept_fraction": 0.9553038867406743
+   }
+  },
+  "ORACLE": {
+   "in_window": {
+    "frames": 199,
+    "kept_fraction": 0.1156141476504808
+   },
+   "healthy": {
+    "frames": 400,
+    "kept_fraction": 1.0
+   }
+  }
  }
 }
