@@ -2439,4 +2439,4 @@ oracle 是精确的：注入窗内逐行与同戳 clean 帧比对，不同的行
 
 **审计字段更正**：`false_negative_rate` 的分母应为 `kept_injected + dropped_injected = 9,073,943`，正确值为 **0.00013941（0.01394%）**；原字段 0.00106641 是以背景数归一化的残留率，字段名有误，标题 0.014% 与正确值一致。
 
-判定：**`FILTER_IS_THE_CAUSE (in-window removal)`**；健康区误删不是原因。下一步的两因素拆分（oracle 只补回 1,265 行 vs oracle 只多删 23,607 行）已预注册，见里程碑。
+判定字段（生产者原样）：编排器写 `FILTER_IS_THE_CAUSE (in-window removal)`；**对外不这样表述**——只说「窗内测量选择差异是重要因素，单因素尚未分离」，健康区误删不是原因。四格 2×2（O / O+F / O−B / O+F−B，原始索引、同 prefix/config、窗外同为 actual）已预注册，见里程碑；`FULL_ALIGNMENT_DIAGNOSTIC` 也不得与冻结 healthy-prefix 并表（本序列该协议 ATE 记 `UNAVAILABLE`）。

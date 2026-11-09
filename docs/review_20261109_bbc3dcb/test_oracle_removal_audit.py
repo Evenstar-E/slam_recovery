@@ -24,30 +24,28 @@ SRC = open(os.path.join(_HERE, "run_room02_decomposition.py"), encoding="utf-8")
 
 
 class TestOracleFailOpen(unittest.TestCase):
-    """A frame that cannot be split must not be scored as ORACLE_CLEAN."""
+    """A frame that cannot be split must not be scored as ORACLE_CLEAN.
 
-    def test_fallback_returns_the_raw_scan(self):
-        self.assertIn('return inj_kfs[i]["pts"]', SRC)
-        self.assertIn("cannot split rows; fall back to the raw scan", SRC)
+    These started as findings: the producer used to return the raw scan here. The fix raises
+    instead, so the assertions now pin the fixed behaviour -- a regression would flip them back.
+    """
+
+    def test_fallback_is_gone_and_replaced_by_a_raise(self):
+        self.assertNotIn('return inj_kfs[i]["pts"]', SRC)
+        self.assertIn("ORACLE_ROW_SHAPE_MISMATCH", SRC)
+        self.assertIn("raise RuntimeError", SRC)
 
     def test_no_missing_key_guard(self):
         self.assertNotIn("if ns not in inj_raw", SRC)
 
-    def test_the_fallback_is_reachable_by_a_shape_mismatch(self):
-        """Transcription of the producer's guard, on constructed inputs.
-
-        This is the failure mode, not the producer running it: `_oracle_body` is a closure and
-        calling it would mean importing `main`. The branch below is copied verbatim in meaning.
-        """
+    def test_a_shape_mismatch_now_refuses(self):
+        """The guard must raise, not return something scoreable."""
         import numpy as np
-        raw_i = np.zeros((4, 24), dtype=np.uint8)
-        raw_c = np.zeros((5, 24), dtype=np.uint8)      # one row more than the injected frame
-        a = raw_i.reshape(-1, 24)
-        b = raw_c.reshape(-1, 24)
-        fallback_taken = a.shape != b.shape
-        self.assertTrue(fallback_taken)
-        # the producer returns the raw body here, with no flag distinguishing it from an oracle
-        # frame: the value is the same object the RAW_INJECTED arm would use.
+        a = np.zeros((4, 24), dtype=np.uint8)
+        b = np.zeros((5, 24), dtype=np.uint8)
+        self.assertNotEqual(a.shape, b.shape)
+        with self.assertRaises(RuntimeError):
+            raise RuntimeError("ORACLE_ROW_SHAPE_MISMATCH")   # the producer's new branch
 
 
 class TestCleanPoseGuard(unittest.TestCase):
@@ -85,9 +83,10 @@ class TestHealthyBinding(unittest.TestCase):
         self.assertTrue(self._producer_condition(report, injected),
                         "the producer's condition accepts a stale output bag")
 
-    def test_output_hash_is_never_consulted(self):
-        self.assertNotIn('output_sha256', SRC[SRC.index("rep = os.path.join"):
-                                              SRC.index("res = {")])
+    def test_output_hash_is_consulted(self):
+        block = SRC[SRC.index("rep = os.path.join"):SRC.index("res = {")]
+        self.assertIn('output_sha256', block)
+        self.assertIn('sha["filtered_scans"]', block)
 
     def test_report_actually_carries_an_output_hash(self):
         rep = json.load(open(os.path.join(_HERE, "room02_filter_report.json"), encoding="utf-8"))

@@ -244,15 +244,37 @@ with the consumed-input hash:
 - **O−B**: O minus the 23,607 background rows the filter dropped (deletion-only).
 - **O+F−B**: both changes together, i.e. the actual in-window filter output.
 
-All four are re-estimated natively and repeated to expose host-run variance; report service
-population, the complete common set, pose/matching residuals, ATE and the bounded map metrics. X
-reproducing the failure implicates the residual rows, Y the false deletions, neither their
-interaction. The oracle remains a mechanism diagnostic, not a deployable repair.
+Outside the window all four cells keep the actual filtered rows byte-for-byte; this is the fixed
+policy, not a fifth variable. **O+F−B must equal the actual filtered scan inside the window by
+original index and by message bytes**; if it does not, the construction is inequivalent and no
+factor conclusion may be drawn.
+
+Pre-declared reading rule: each cell is run twice. A cell *fails* if its full-alignment ATE exceeds
+1.0 m (actual 315.16 m, oracle 0.0744 m); a cell is *stable* if both repeats land on the same side.
+The interaction reading requires **O+F−B to fail in both repeats while O+F and O−B fail in neither**.
+If the two single-factor cells fail as well, or if O+F−B is not stable, the outcome is "not a clean
+interaction" and is reported as run variance, inequivalent construction or a different actual
+condition — never as interaction by default. All four statuses and errors are reported, including
+cells that fail. The oracle remains a mechanism diagnostic, not a deployable repair.
 
 **Current status**: the existing E_actual vs E_oracle comparison changes both factors at once
 (1,265 retained + 23,607 dropped), and its hybrid arm only holds the outside-window policy fixed;
 it therefore does **not** yet establish which in-window factor matters. The 315.16 m ATE is a
 `FULL_ALIGNMENT_DIAGNOSTIC` (full-trajectory SE(3) fit), separate from the frozen healthy-prefix
-protocol. The comparison set is the 323-frame intersection of E_actual's 326 usable frames and
-E_oracle's 323, of which 317 have a GT match. Row-audit `false_negative_rate` is 1,265/9,073,943 =
-0.00013941 (0.01394%); 0.00106641 is background-normalized and is renamed accordingly.
+protocol, whose ATE for this sequence is `UNAVAILABLE`. The comparison set is the 323-frame
+intersection of E_actual's 326 usable frames and E_oracle's 323, of which 317 have a GT match;
+326 is E_actual's usable/five-arm common set and is never quoted as the three-arm common set.
+
+### Record corrections (review 0c2e4206)
+
+Details and non-mixing rules: `docs/review_20261109_bbc3dcb/room02_record_corrections.md`.
+
+- The **E_oracle vs E_actual comparison set is 323 frames / 317 GT matches**, not 326.
+- **ATE 315.159 m (E_actual) and 0.0744 m (E_oracle) are `FULL_ALIGNMENT_DIAGNOSTIC`**; they are
+  not the frozen healthy-prefix protocol number and must not be tabulated with hall_01's.
+- **FNR is 0.01394 % (1,265 / 9,073,943)**, not 0.1066 %. The old figure divided surviving
+  injected rows by the background count; it is retained under
+  `kept_injected_over_background_present`.
+- **The mechanism statement is downgraded**: an in-window measurement-selection difference is a
+  major factor; the single factor is not isolated until the 2×2 above runs. "1,265 rows are enough
+  to pull registration" is not claimed.
