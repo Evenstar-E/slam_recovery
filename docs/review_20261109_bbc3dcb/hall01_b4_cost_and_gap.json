@@ -1,0 +1,75 @@
+{
+ "cost": {
+  "R": {
+   "host_output": "/tmp/fastlivo/res_h1_inj43_vis.bag",
+   "run_identity": "/tmp/run43.sh line 14 -> /tmp/fl_record.sh (pre-runner, no receipt)",
+   "rate": 0.5,
+   "drain_s": 150,
+   "timeout_s": 900,
+   "wall_s": 296.0,
+   "wall_basis": "DERIVED_FROM_COMMAND (bag duration / rate + drain + ~30 s startup); not measured",
+   "peak_rss": "UNAVAILABLE",
+   "rss_basis": "the pre-runner script sampled nothing"
+  },
+  "C3": {
+   "host_output": "/tmp/fastlivo/res_h1_inj43_filtered.bag",
+   "run_identity": "/tmp/fl_run_20261109T105559Z_2414230/receipt.json (hardened runner)",
+   "rate": 1.0,
+   "drain_s": 40,
+   "wall_s": 122.9,
+   "wall_basis": "MEASURED from the run directory start (UTC in the name) to receipt.json mtime",
+   "peak_rss": "UNAVAILABLE",
+   "rss_basis": "the runner did not sample /proc/<pid>/status VmHWM"
+  }
+ },
+ "population": {
+  "frames_400": 400,
+  "gap_adjacent_within_1s": 81,
+  "remaining": 319,
+  "missing_frames": 46
+ },
+ "with_all_400": {
+  "R": {
+   "frames": 400,
+   "coverage": 0.6277749116607774,
+   "unsupported": 0.59863,
+   "ate_full": 1.9085491271221064,
+   "gt_matched": 252
+  },
+  "C3": {
+   "frames": 400,
+   "coverage": 0.9850048292108363,
+   "unsupported": 0.09572000000000003,
+   "ate_full": 0.3185291881794998,
+   "gt_matched": 252
+  }
+ },
+ "without_gap_neighbours": {
+  "R": {
+   "frames": 319,
+   "coverage": 0.7976745583038869,
+   "unsupported": 0.419987460815047,
+   "ate_full": 1.6169396188018745,
+   "gt_matched": 201
+  },
+  "C3": {
+   "frames": 319,
+   "coverage": 0.9759302709069494,
+   "unsupported": 0.09749216300940444,
+   "ate_full": 0.2735416166921444,
+   "gt_matched": 201
+  }
+ },
+ "delta": {
+  "R": {
+   "coverage": 0.16989964664310953,
+   "unsupported": -0.178642539184953,
+   "ate_full": -0.2916095083202319
+  },
+  "C3": {
+   "coverage": -0.009074558303886926,
+   "unsupported": 0.001772163009404415,
+   "ate_full": -0.04498757148735544
+  }
+ }
+}
