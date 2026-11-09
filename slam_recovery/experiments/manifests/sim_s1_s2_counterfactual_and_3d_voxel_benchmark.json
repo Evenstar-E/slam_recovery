@@ -9,7 +9,8 @@
       "holdout_nis": 133.686,
       "mode": "MODE3_SOFT_BRIDGE_WAIT",
       "paired_evidence_status": [
-        "FAILED"
+        "FAILED",
+        "MISSING"
       ]
     },
     "B5_Narrow_FoV_Filter_LIOSAM": {

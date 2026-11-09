@@ -162,6 +162,24 @@ class OnlineRecoveryTransactionNode:
         """
         return set(self._kf_map_points.keys())
 
+    def support_reference(self, voxel_m: float = 0.30) -> np.ndarray:
+        """Reference cloud for the coverage test, sampled by space rather than by a point cap.
+
+        `_frame_has_reference_support` asks whether the trusted map *covers* a scan. Handing it a
+        globally capped cloud answers a different question: the cap sets the point spacing, so a
+        fixed `max_pts` turns the same geometry from "covered" to "not covered" as the map grows.
+        In the four-arm replay this alone flipped a frame's support fraction from 0.82 at 4 000
+        points to 0.29 at 1 500 points, with identical poses and identical scans. Sampling one
+        point per occupied voxel fixes the spacing at `voxel_m` and lets the count follow the
+        mapped area instead of a constant.
+        """
+        pts = self.get_trusted_map_points(max_pts=1 << 30)
+        if len(pts) == 0:
+            return pts
+        q = np.floor(np.asarray(pts[:, :3], dtype=np.float64) / float(voxel_m)).astype(np.int64)
+        _, first = np.unique(q, axis=0, return_index=True)
+        return pts[np.sort(first)]
+
     def step_frame(
         self,
         kf_id: int,
@@ -255,8 +273,16 @@ class OnlineRecoveryTransactionNode:
             return False
         pts_w = (pts_b @ T[:3, :3].T) + T[:3, 3]
         q = pts_w[:: max(1, len(pts_w) // 200)][:200]
-        d = np.linalg.norm(q[:, None, :] - ref_pts[None, :, :], axis=-1)
-        return bool(np.mean(d.min(axis=1) <= radius_m) >= min_supported_fraction)
+        # Chunk the query points so the distance matrix stays bounded when the reference is the
+        # spatially sampled map rather than a 1500-point cap.
+        ref = np.asarray(ref_pts, dtype=np.float64)[:, :3]
+        r2 = radius_m * radius_m
+        nearest = np.empty(len(q), dtype=np.float64)
+        chunk = 25
+        for s in range(0, len(q), chunk):
+            d2 = np.sum((q[s:s + chunk, None, :] - ref[None, :, :]) ** 2, axis=-1)
+            nearest[s:s + chunk] = d2.min(axis=1)
+        return bool(np.mean(nearest <= r2) >= min_supported_fraction)
 
     def _measure_paired_evidence(
         self,
@@ -433,12 +459,16 @@ class OnlineRecoveryTransactionNode:
         # re-established at the cut rather than in the middle of the commit.
         incumbent_keys = set(incumbent_poses.keys()) if incumbent_poses is not None else None
         missing_scan_keys = [k for k in kf_sorted if k not in self.scan_buffer_body]
+        # The coverage test gets a spatially sampled reference, not the 1500-point cloud used for
+        # scoring: that cap is a point budget, and letting it decide coverage makes the answer a
+        # function of map size rather than of geometry (see support_reference()).
+        support_ref = self.support_reference()
         committable = {
             k
             for k in kf_sorted
             if k not in reference_keys
             and (incumbent_keys is None or k in incumbent_keys)
-            and self._frame_has_reference_support(k, train_world, repaired_poses)
+            and self._frame_has_reference_support(k, support_ref, repaired_poses)
         }
         commit_keys: List[int] = []
         stop_key: Optional[int] = None
