@@ -2,6 +2,7 @@
   "run_id": "four_arm_same_input_benchmark",
   "provenance": "ARCHIVED_REAL_HOST_POSES + INJECTION_SCANS",
   "provenance_note": "Replays a recorded FAST-LIVO2 run. The poses are archived, not produced for this experiment; this is not an independent reproduction of the host.",
+  "rotation_applied": true,
   "inputs": {
     "injected_scans": "/tmp/fastlivo/hall01_inj43.bag",
     "injected_poses": "/tmp/fastlivo/res_hall01_inj_05x.bag",
@@ -12,27 +13,66 @@
   "pairing": {
     "injected": {
       "scans": 598,
-      "paired": 357,
-      "dropped_dt": 241,
-      "dt_ms_p50": 11.067,
-      "dt_ms_p95": 19.18,
-      "dt_ms_max": 19.993
+      "paired": 569,
+      "interpolated": 212,
+      "dropped": 29,
+      "dt_ms_p50": 3.719,
+      "dt_ms_p95": 18.574,
+      "dt_ms_max": 19.993,
+      "dropped_time_ranges_rel_sec": [
+        [
+          0.0,
+          2.1
+        ],
+        [
+          57.41,
+          58.01
+        ]
+      ],
+      "pose_stream": {
+        "poses": 855,
+        "interval_ms_p50": 66.65,
+        "interval_ms_p95": 67.44,
+        "interval_ms_max": 796.18,
+        "gaps_over_50ms": 1
+      }
     },
     "clean": {
       "scans": 598,
-      "paired": 355,
-      "dropped_dt": 243,
-      "dt_ms_p50": 11.173,
-      "dt_ms_p95": 19.186,
-      "dt_ms_max": 19.993
+      "paired": 566,
+      "interpolated": 211,
+      "dropped": 32,
+      "dt_ms_p50": 3.656,
+      "dt_ms_p95": 18.587,
+      "dt_ms_max": 19.993,
+      "dropped_time_ranges_rel_sec": [
+        [
+          0.0,
+          2.4
+        ],
+        [
+          57.41,
+          58.01
+        ]
+      ],
+      "pose_stream": {
+        "poses": 850,
+        "interval_ms_p50": 66.65,
+        "interval_ms_p95": 67.45,
+        "interval_ms_max": 796.18,
+        "gaps_over_50ms": 1
+      }
     },
-    "max_dt_sec": 0.02
+    "near_dt_sec": 0.02,
+    "max_interp_gap_sec": 0.075
   },
   "protocol": {
     "voxel_m": 0.1,
     "surface_tolerance_m": 0.15,
     "onset_rel_sec": 20.0,
     "injection_end_rel_sec": 40.0,
+    "incumbent_model": "constant-velocity extrapolation of the last pre-onset keyframes",
+    "extrap_frames": 5,
     "alignment": "single SE(3) fitted on the pre-onset keyframes of the host, applied to all arms"
   },
   "reference_surface": {
@@ -40,22 +80,26 @@
     "gt_surface_contam_3d": "UNAVAILABLE (no hall_01 GT mesh; M2DGR provides trajectory only)",
     "self_calibration": {
       "builds_from_even_points_scores_odd": {
-        "unsupported_voxel_fraction": 0.0814,
-        "coverage_recall": 0.471,
-        "_n_map_voxels": 1342258,
-        "_n_surface_voxels": 1342661
+        "unsupported_voxel_fraction": 0.0146,
+        "coverage_recall": 0.7295
       },
       "builds_from_odd_points_scores_even": {
-        "unsupported_voxel_fraction": 0.0814,
-        "coverage_recall": 0.4711,
-        "_n_map_voxels": 1342661,
-        "_n_surface_voxels": 1342258
+        "unsupported_voxel_fraction": 0.0143,
+        "coverage_recall": 0.7297
       }
     },
     "resolution_floor": {
-      "unsupported_voxel_fraction": 0.0814,
-      "coverage_recall": 0.471,
-      "use": "differences between arms smaller than this are not findings"
+      "within_run_point_split": {
+        "unsupported_voxel_fraction": 0.0145,
+        "coverage_recall": 0.7296,
+        "what": "surface sampling noise within one run"
+      },
+      "across_run_pre_onset": {
+        "unsupported_voxel_fraction": 0.4638,
+        "coverage_recall": 0.2863,
+        "what": "injected pre-onset map vs aligned clean proxy (identical input, two runs)"
+      },
+      "use": "an arm difference must exceed the across-run floor to count as a finding"
     }
   },
   "validation_reference_source": {
@@ -64,11 +108,47 @@
     "A2_Unconditional_Admission": "none (admission is unconditional)",
     "A3_Verified_Admission": "injected_run_pre_onset_keyframes"
   },
+  "alignment": {
+    "model": "single rigid SE(3), clean<-injected, fitted on the pre-onset overlap only",
+    "matched_pre_onset_poses": 175,
+    "residual_by_window": {
+      "[0,20)s": {
+        "n": 197,
+        "mean_m": 0.1019,
+        "p95_m": 0.421,
+        "max_m": 0.6099
+      },
+      "[20,40)s": {
+        "n": 200,
+        "mean_m": 0.1502,
+        "p95_m": 0.4485,
+        "max_m": 0.4791
+      },
+      "[40,60)s": {
+        "n": 169,
+        "mean_m": 0.0584,
+        "p95_m": 0.0781,
+        "max_m": 0.0819
+      }
+    },
+    "note": "identical for every arm, so it cannot favour an admission policy; the post-injection residual grows, which bounds how far the proxy can be trusted downstream"
+  },
+  "interpolation": {
+    "samples": 122,
+    "neighbour_gap_ms": 466.6,
+    "translation_err_mean_m": 0.01353,
+    "translation_err_max_m": 0.0954,
+    "rotation_err_mean_deg": 0.5239,
+    "rotation_err_max_deg": 3.7566,
+    "note": "gap exceeds MAX_GAP, so this bounds the interpolator from above"
+  },
   "gate_result_A3": {
     "accepted": false,
     "mode": "MODE3_SOFT_BRIDGE_WAIT",
     "holdout_nis": Infinity,
     "reason": "Rejected candidate due to non-finite (NaN/Inf) state/bias or invalid SE(3) pose shape",
+    "evidence_status": "MISSING",
+    "paired_test_informative": true,
     "paired_evidence": {
       "num_paired_frames": 0,
       "reason": "no_repaired_poses"
@@ -76,65 +156,254 @@
   },
   "arms": {
     "A0_Host_Native": {
-      "admitted_keyframes": 357,
+      "admitted_keyframes": 569,
+      "admitted_quarantined_frames": 391,
       "deferred_keyframes": 0,
       "admitted_duration_sec": 57.61,
-      "committed_voxels": 2065357,
-      "unsupported_voxel_fraction_vs_clean_proxy": 0.1724,
-      "clean_proxy_coverage_recall": 0.4403,
-      "ate_on_common_support_m": 0.1431,
-      "ate_on_common_support_frames": 64,
-      "ate_on_admitted_set_m": 0.5273,
-      "ate_on_admitted_set_frames": 222,
+      "distance_stats": {
+        "n_points": 142250,
+        "median_m": 0.1044,
+        "p90_m": 1.2824,
+        "p99_m": NaN,
+        "tail_over_0.25m": 0.3015,
+        "tail_over_0.5m": 0.2146,
+        "tail_over_1.0m": 0.126,
+        "tail_over_2.0m": 0.0654
+      },
+      "distance_tail_bootstrap": {
+        "tail_over_0.25m": {
+          "mean": 0.3015,
+          "ci95": [
+            0.2743,
+            0.3344
+          ]
+        },
+        "tail_over_0.5m": {
+          "mean": 0.2146,
+          "ci95": [
+            0.1903,
+            0.2382
+          ]
+        },
+        "tail_over_1.0m": {
+          "mean": 0.126,
+          "ci95": [
+            0.112,
+            0.1407
+          ]
+        },
+        "tail_over_2.0m": {
+          "mean": 0.0654,
+          "ci95": [
+            0.0575,
+            0.0735
+          ]
+        }
+      },
+      "coverage_sweep": {
+        "covered_within_0.25m": 0.9408,
+        "covered_within_0.5m": 0.9913,
+        "covered_within_1.0m": 0.9993,
+        "covered_within_2.0m": 1.0,
+        "median_m": 0.0769
+      },
+      "ate_on_common_support_m": 0.1615,
+      "ate_on_common_support_frames": 113,
+      "ate_on_admitted_set_m": 0.5096,
+      "ate_on_admitted_set_frames": 359,
       "clean_interval_keyframes_not_admitted": 0,
+      "appendix_voxel_unsupported": 0.3232,
+      "appendix_voxel_coverage": 0.0811,
       "runtime_sec": null
     },
     "A1_Quarantine_Only": {
-      "admitted_keyframes": 103,
-      "deferred_keyframes": 254,
+      "admitted_keyframes": 178,
+      "admitted_quarantined_frames": 0,
+      "deferred_keyframes": 391,
       "admitted_duration_sec": 17.73,
-      "committed_voxels": 731891,
-      "unsupported_voxel_fraction_vs_clean_proxy": 0.1251,
-      "clean_proxy_coverage_recall": 0.1912,
-      "ate_on_common_support_m": 0.1431,
-      "ate_on_common_support_frames": 64,
-      "ate_on_admitted_set_m": 0.1431,
-      "ate_on_admitted_set_frames": 64,
+      "distance_stats": {
+        "n_points": 44500,
+        "median_m": 0.0892,
+        "p90_m": 1.1221,
+        "p99_m": NaN,
+        "tail_over_0.25m": 0.2563,
+        "tail_over_0.5m": 0.1781,
+        "tail_over_1.0m": 0.1087,
+        "tail_over_2.0m": 0.0591
+      },
+      "distance_tail_bootstrap": {
+        "tail_over_0.25m": {
+          "mean": 0.2563,
+          "ci95": [
+            0.2071,
+            0.3042
+          ]
+        },
+        "tail_over_0.5m": {
+          "mean": 0.1781,
+          "ci95": [
+            0.1399,
+            0.218
+          ]
+        },
+        "tail_over_1.0m": {
+          "mean": 0.1087,
+          "ci95": [
+            0.0843,
+            0.1344
+          ]
+        },
+        "tail_over_2.0m": {
+          "mean": 0.0591,
+          "ci95": [
+            0.0476,
+            0.0723
+          ]
+        }
+      },
+      "coverage_sweep": {
+        "covered_within_0.25m": 0.7654,
+        "covered_within_0.5m": 0.9321,
+        "covered_within_1.0m": 0.9823,
+        "covered_within_2.0m": 0.9951,
+        "median_m": 0.1256
+      },
+      "ate_on_common_support_m": 0.1615,
+      "ate_on_common_support_frames": 113,
+      "ate_on_admitted_set_m": 0.1615,
+      "ate_on_admitted_set_frames": 113,
       "clean_interval_keyframes_not_admitted": 0,
+      "appendix_voxel_unsupported": 0.2613,
+      "appendix_voxel_coverage": 0.0306,
       "runtime_sec": null
     },
     "A2_Unconditional_Admission": {
-      "admitted_keyframes": 357,
+      "admitted_keyframes": 569,
+      "admitted_quarantined_frames": 391,
       "deferred_keyframes": 0,
       "admitted_duration_sec": 57.61,
-      "committed_voxels": 2065357,
-      "unsupported_voxel_fraction_vs_clean_proxy": 0.1724,
-      "clean_proxy_coverage_recall": 0.4403,
-      "ate_on_common_support_m": 0.1431,
-      "ate_on_common_support_frames": 64,
-      "ate_on_admitted_set_m": 0.5273,
-      "ate_on_admitted_set_frames": 222,
+      "distance_stats": {
+        "n_points": 142250,
+        "median_m": 0.1044,
+        "p90_m": 1.2824,
+        "p99_m": NaN,
+        "tail_over_0.25m": 0.3015,
+        "tail_over_0.5m": 0.2146,
+        "tail_over_1.0m": 0.126,
+        "tail_over_2.0m": 0.0654
+      },
+      "distance_tail_bootstrap": {
+        "tail_over_0.25m": {
+          "mean": 0.3015,
+          "ci95": [
+            0.2743,
+            0.3344
+          ]
+        },
+        "tail_over_0.5m": {
+          "mean": 0.2146,
+          "ci95": [
+            0.1903,
+            0.2382
+          ]
+        },
+        "tail_over_1.0m": {
+          "mean": 0.126,
+          "ci95": [
+            0.112,
+            0.1407
+          ]
+        },
+        "tail_over_2.0m": {
+          "mean": 0.0654,
+          "ci95": [
+            0.0575,
+            0.0735
+          ]
+        }
+      },
+      "coverage_sweep": {
+        "covered_within_0.25m": 0.9408,
+        "covered_within_0.5m": 0.9913,
+        "covered_within_1.0m": 0.9993,
+        "covered_within_2.0m": 1.0,
+        "median_m": 0.0769
+      },
+      "ate_on_common_support_m": 0.1615,
+      "ate_on_common_support_frames": 113,
+      "ate_on_admitted_set_m": 0.5096,
+      "ate_on_admitted_set_frames": 359,
       "clean_interval_keyframes_not_admitted": 0,
+      "appendix_voxel_unsupported": 0.3232,
+      "appendix_voxel_coverage": 0.0811,
       "runtime_sec": null
     },
     "A3_Verified_Admission": {
-      "admitted_keyframes": 103,
-      "deferred_keyframes": 254,
+      "admitted_keyframes": 178,
+      "admitted_quarantined_frames": 0,
+      "deferred_keyframes": 391,
       "admitted_duration_sec": 17.73,
-      "committed_voxels": 731891,
-      "unsupported_voxel_fraction_vs_clean_proxy": 0.1251,
-      "clean_proxy_coverage_recall": 0.1912,
-      "ate_on_common_support_m": 0.1431,
-      "ate_on_common_support_frames": 64,
-      "ate_on_admitted_set_m": 0.1431,
-      "ate_on_admitted_set_frames": 64,
+      "distance_stats": {
+        "n_points": 44500,
+        "median_m": 0.0892,
+        "p90_m": 1.1221,
+        "p99_m": NaN,
+        "tail_over_0.25m": 0.2563,
+        "tail_over_0.5m": 0.1781,
+        "tail_over_1.0m": 0.1087,
+        "tail_over_2.0m": 0.0591
+      },
+      "distance_tail_bootstrap": {
+        "tail_over_0.25m": {
+          "mean": 0.2563,
+          "ci95": [
+            0.2071,
+            0.3042
+          ]
+        },
+        "tail_over_0.5m": {
+          "mean": 0.1781,
+          "ci95": [
+            0.1399,
+            0.218
+          ]
+        },
+        "tail_over_1.0m": {
+          "mean": 0.1087,
+          "ci95": [
+            0.0843,
+            0.1344
+          ]
+        },
+        "tail_over_2.0m": {
+          "mean": 0.0591,
+          "ci95": [
+            0.0476,
+            0.0723
+          ]
+        }
+      },
+      "coverage_sweep": {
+        "covered_within_0.25m": 0.7654,
+        "covered_within_0.5m": 0.9321,
+        "covered_within_1.0m": 0.9823,
+        "covered_within_2.0m": 0.9951,
+        "median_m": 0.1256
+      },
+      "ate_on_common_support_m": 0.1615,
+      "ate_on_common_support_frames": 113,
+      "ate_on_admitted_set_m": 0.1615,
+      "ate_on_admitted_set_frames": 113,
       "clean_interval_keyframes_not_admitted": 0,
-      "runtime_sec": 2.1082
+      "appendix_voxel_unsupported": 0.2613,
+      "appendix_voxel_coverage": 0.0306,
+      "runtime_sec": 4.3545
     }
   },
   "caveats": [
-    "The candidate is the host's own quarantined trajectory; the archive holds no repaired candidate for this window, so A3 can only accept or reject the host poses themselves.",
-    "A0 and A2 write the identical keyframe set and therefore produce the same map; they differ only in that A2 passed through quarantine before admitting everything.",
-    "ATE on the admitted set is confounded by coverage: arms that admit fewer keyframes are scored over less of the trajectory. ate_on_common_support is the like-for-like number; differences there are the only ones attributable to admission policy."
+    "Candidate is the host's own quarantined trajectory; the archive holds no repaired candidate for this window, so A3 can only accept or reject the host poses.",
+    "Incumbent is a constant-velocity extrapolation, not a per-frame record, so the paired test asks whether the candidate beats 'no repair', not whether it is optimal.",
+    "A0 and A2 write the identical keyframe set and therefore the same map; A2 differs only in having passed through quarantine before admitting everything.",
+    "ATE on the admitted set is confounded by coverage; ate_on_common_support is the like-for-like number."
   ]
 }
