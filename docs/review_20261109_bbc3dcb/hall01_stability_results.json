@@ -63,5 +63,10 @@
   "min": 0.22824911032028472,
   "max": 0.27903914590747336,
   "range": 0.05079003558718864
+ },
+ "qualifiers": {
+  "1_threshold_not_used_as_mode": "the preregistered 0.10/0.50 rule classifies all four hall_01 runs as UNCLEAR, so the stability conclusion rests on the RAW unsupported values (0.2282-0.2790, range 0.0508) and on NN-supported being 1.0000 in every run -- not on 'four runs share a mode'. The threshold is the shape of the room_02 distribution and must not be transplanted to another dataset.",
+  "2_scope": "hall_01, no injection, window 100-160 s, reference is the clean run's map (a proxy, not GT), n=4 runs, one host build (exec 76359f53 + lib 6337ec0f), NO_MP + DET_SYNC, taskset 0-7.",
+  "what_this_does_not_claim": "no root cause for the room_02 bimodality; the check only bounds where it does and does not appear."
  }
 }
