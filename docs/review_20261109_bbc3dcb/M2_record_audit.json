@@ -31,10 +31,173 @@
       {
         "item": "original point id preserved",
         "verdict": "FAIL",
-        "detail": "topics: ['/camera/color/image_raw', '/handsfree/imu', '/velodyne_points']; no id field in the cloud and no side topic. A retained row can be matched by value against the source but cannot be named by its original index without re-deriving it. Blocking for replay-level attribution, not for the pose result."
+        "detail": "topics=['/camera/color/image_raw', '/handsfree/imu', '/velodyne_points']; id field in cloud=[]; side topics=[]. Without either, a retained row can be matched by value but not named by its original index."
       }
     ],
     "frames": 598
+  },
+  "stripped_frames": {
+    "verdict": "PASS",
+    "sampled": 12,
+    "stripped_frames_total": 200,
+    "frames": [
+      {
+        "frame_index": 145,
+        "scan_ns": 1627785275607408640,
+        "strip_fraction": 0.8836,
+        "n_original": 50260,
+        "n_kept": 5852,
+        "rows_missing_from_source": 0,
+        "index_strictly_increasing": true,
+        "kept_indices_unique": true,
+        "count_matches_report": true,
+        "deleted_count": 44408,
+        "deleted_equals_complement": true
+      },
+      {
+        "frame_index": 165,
+        "scan_ns": 1627785277611365376,
+        "strip_fraction": 0.8841,
+        "n_original": 50322,
+        "n_kept": 5832,
+        "rows_missing_from_source": 0,
+        "index_strictly_increasing": true,
+        "kept_indices_unique": true,
+        "count_matches_report": true,
+        "deleted_count": 44490,
+        "deleted_equals_complement": true
+      },
+      {
+        "frame_index": 185,
+        "scan_ns": 1627785279615255296,
+        "strip_fraction": 0.8848,
+        "n_original": 50273,
+        "n_kept": 5793,
+        "rows_missing_from_source": 0,
+        "index_strictly_increasing": true,
+        "kept_indices_unique": true,
+        "count_matches_report": true,
+        "deleted_count": 44480,
+        "deleted_equals_complement": true
+      },
+      {
+        "frame_index": 205,
+        "scan_ns": 1627785281619167488,
+        "strip_fraction": 0.8827,
+        "n_original": 50273,
+        "n_kept": 5896,
+        "rows_missing_from_source": 0,
+        "index_strictly_increasing": true,
+        "kept_indices_unique": true,
+        "count_matches_report": true,
+        "deleted_count": 44377,
+        "deleted_equals_complement": true
+      },
+      {
+        "frame_index": 225,
+        "scan_ns": 1627785283623100416,
+        "strip_fraction": 0.8874,
+        "n_original": 50545,
+        "n_kept": 5692,
+        "rows_missing_from_source": 0,
+        "index_strictly_increasing": true,
+        "kept_indices_unique": true,
+        "count_matches_report": true,
+        "deleted_count": 44853,
+        "deleted_equals_complement": true
+      },
+      {
+        "frame_index": 245,
+        "scan_ns": 1627785285627027712,
+        "strip_fraction": 0.8915,
+        "n_original": 50334,
+        "n_kept": 5461,
+        "rows_missing_from_source": 0,
+        "index_strictly_increasing": true,
+        "kept_indices_unique": true,
+        "count_matches_report": true,
+        "deleted_count": 44873,
+        "deleted_equals_complement": true
+      },
+      {
+        "frame_index": 248,
+        "scan_ns": 1627785285927802880,
+        "strip_fraction": 0.902,
+        "n_original": 50387,
+        "n_kept": 4940,
+        "rows_missing_from_source": 0,
+        "index_strictly_increasing": true,
+        "kept_indices_unique": true,
+        "count_matches_report": true,
+        "deleted_count": 45447,
+        "deleted_equals_complement": true
+      },
+      {
+        "frame_index": 265,
+        "scan_ns": 1627785287631018752,
+        "strip_fraction": 0.8884,
+        "n_original": 50350,
+        "n_kept": 5621,
+        "rows_missing_from_source": 0,
+        "index_strictly_increasing": true,
+        "kept_indices_unique": true,
+        "count_matches_report": true,
+        "deleted_count": 44729,
+        "deleted_equals_complement": true
+      },
+      {
+        "frame_index": 285,
+        "scan_ns": 1627785289634854400,
+        "strip_fraction": 0.891,
+        "n_original": 50790,
+        "n_kept": 5534,
+        "rows_missing_from_source": 0,
+        "index_strictly_increasing": true,
+        "kept_indices_unique": true,
+        "count_matches_report": true,
+        "deleted_count": 45256,
+        "deleted_equals_complement": true
+      },
+      {
+        "frame_index": 305,
+        "scan_ns": 1627785291638760960,
+        "strip_fraction": 0.8928,
+        "n_original": 50890,
+        "n_kept": 5456,
+        "rows_missing_from_source": 0,
+        "index_strictly_increasing": true,
+        "kept_indices_unique": true,
+        "count_matches_report": true,
+        "deleted_count": 45434,
+        "deleted_equals_complement": true
+      },
+      {
+        "frame_index": 325,
+        "scan_ns": 1627785293642976768,
+        "strip_fraction": 0.8892,
+        "n_original": 50917,
+        "n_kept": 5640,
+        "rows_missing_from_source": 0,
+        "index_strictly_increasing": true,
+        "kept_indices_unique": true,
+        "count_matches_report": true,
+        "deleted_count": 45277,
+        "deleted_equals_complement": true
+      },
+      {
+        "frame_index": 344,
+        "scan_ns": 1627785295546408704,
+        "strip_fraction": 0.893,
+        "n_original": 50934,
+        "n_kept": 5452,
+        "rows_missing_from_source": 0,
+        "index_strictly_increasing": true,
+        "kept_indices_unique": true,
+        "count_matches_report": true,
+        "deleted_count": 45482,
+        "deleted_equals_complement": true
+      }
+    ]
   },
   "non_lidar": {
     "checks": [
@@ -143,13 +306,29 @@
         "verdict": "PASS"
       },
       {
-        "item": "frames without pose are listed, not dropped",
+        "item": "missing_pose count equals id list length",
+        "recorded": {
+          "count": 44,
+          "ids": 44
+        },
+        "verdict": "PASS"
+      },
+      {
+        "item": "missing_pose_ids enumerates every missing item",
         "recorded": 44,
         "verdict": "PASS"
       },
       {
-        "item": "missing observations is explicit",
-        "recorded": null,
+        "item": "missing_observation count equals id list length",
+        "recorded": {
+          "count": 0,
+          "ids": 0
+        },
+        "verdict": "PASS"
+      },
+      {
+        "item": "missing_observation_ids enumerates every missing item",
+        "recorded": 0,
         "verdict": "PASS"
       }
     ],

@@ -55,6 +55,10 @@ from slam_recovery.repair.point_mixture_repairer import (  # noqa: E402
 
 RESULT_JSON = os.path.join(_HERE, "fixed_input_repair_c0c3_results.json")
 FILTERED_BAG = "/tmp/fastlivo/hall01_inj43_filtered.bag"
+# Parallel topic carrying np.flatnonzero(keep) per scan (M2 point identity).
+# int32 keeps the mask at 4 B/point and cannot overflow a 32-bit scan index.
+ID_TOPIC = "/velodyne_points/kept_index"
+ID_MSGTYPE = "std_msgs/msg/UInt32MultiArray"
 RERUN_BAG = "/tmp/fastlivo/res_h1_inj43_filtered.bag"
 C3_HOST_BAG = "/tmp/fastlivo/res_h1_inj43_rerun_unfiltered.bag"
 
@@ -761,6 +765,7 @@ def build_filtered_bag(in_path=INJ_SCANS, out_path=FILTERED_BAG):
         try:
             conns = {c.topic: w.add_connection(c.topic, c.msgtype, typestore=V.TYPESTORE)
                      for c in r.connections}
+            id_conn = w.add_connection(ID_TOPIC, ID_MSGTYPE, typestore=V.TYPESTORE)
             for conn, t, raw in r.messages():
                 if conn.topic != V.SCAN_TOPIC:
                     w.write(conns[conn.topic], t, raw)
@@ -778,11 +783,28 @@ def build_filtered_bag(in_path=INJ_SCANS, out_path=FILTERED_BAG):
                 m.height = 1
                 m.row_step = int(step) * m.width
                 w.write(conns[conn.topic], t, V.TYPESTORE.serialize_ros1(m, conn.msgtype))
+                # Original point identity: the kept indices, written with the same bag
+                # timestamp as the cloud so the two are paired exactly, and hashed into the
+                # sidecar so a consumer can prove it rebuilt the same mask.
+                idx = np.flatnonzero(keep).astype(np.uint32)
+                scan_ns = int(m.header.stamp.sec) * 10 ** 9 + int(m.header.stamp.nanosec)
+                T = V.TYPESTORE.types
+                id_msg = T[ID_MSGTYPE](
+                    layout=T["std_msgs/msg/MultiArrayLayout"](
+                        dim=[T["std_msgs/msg/MultiArrayDimension"](
+                            label=f"scan_ns={scan_ns}", size=int(len(idx)), stride=4)],
+                        data_offset=0),
+                    data=idx)
+                w.write(id_conn, t, V.TYPESTORE.serialize_ros1(id_msg, ID_MSGTYPE))
+                mask_sha = hashlib.sha256(np.asarray(idx, dtype="<i4").tobytes()).hexdigest()
                 n_kept += int(keep.sum())
                 n_all += len(a)
                 per_frame.append({"t": round(float(m.header.stamp.sec
                                                   + m.header.stamp.nanosec * 1e-9), 3),
+                                  "scan_ns": scan_ns,
                                   "n": int(len(a)), "kept": int(keep.sum()),
+                                  "n_original": int(len(a)), "n_kept": int(keep.sum()),
+                                  "mask_sha256": mask_sha,
                                   "strip_fraction": round(float(np.mean(~keep)), 4),
                                   "contam_ratio": round(float(ratio), 4),
                                   "min_bg_eigenvalue": round(float(min_eig), 4),
@@ -790,15 +812,23 @@ def build_filtered_bag(in_path=INJ_SCANS, out_path=FILTERED_BAG):
         finally:
             w.close()
     side = {"input": in_path, "output": out_path, "filter": "MixtureFilterConfig() defaults",
+            "source_bag_sha256": V._sha_file(in_path),
+            "output_bag_sha256": V._sha_file(out_path),
+            "id_topic": ID_TOPIC, "id_msgtype": ID_MSGTYPE,
+            "id_encoding": ("uint32 original point indices, np.flatnonzero(keep); "
+                            "mask_sha256 is sha256 of the same indices as int32 little-endian "
+                            "C-order bytes"),
+            "id_payload_bytes": int(4 * n_kept),
             "points_in": n_all, "points_kept": n_kept,
             "global_strip_fraction": round(1.0 - n_kept / max(n_all, 1), 4),
             "frames": len(per_frame),
             "frames_stripping_gt_10pct": int(sum(1 for f in per_frame
                                                  if f["strip_fraction"] > 0.10)),
             "per_frame": per_frame}
-    with open("/tmp/filtered_bag_report.json", "w", encoding="utf-8") as fh:
+    report_path = os.environ.get("FILTER_REPORT_OUT", "/tmp/filtered_bag_report.json")
+    with open(report_path, "w", encoding="utf-8") as fh:
         json.dump(side, fh, indent=1)
-    print(f"wrote {out_path}: {len(per_frame)} frames, kept {n_kept}/{n_all} points "
+    print(f"wrote {out_path} (report {report_path}): {len(per_frame)} frames, kept {n_kept}/{n_all} points "
           f"({side['global_strip_fraction']:.1%} stripped), "
           f"{side['frames_stripping_gt_10pct']} frames stripped >10%")
     return side

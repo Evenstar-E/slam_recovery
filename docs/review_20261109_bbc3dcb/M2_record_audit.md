@@ -5,6 +5,10 @@
 `_meta.c3_record`，以及磁盘上由它产出的四个 bag。对应主树 `f2877c3`。
 脚本 `m2_record_audit.py`，结果 `M2_record_audit.json`。
 
+> **修订（同次提交）**：审阅指出原审计有两处漏洞——行验证只覆盖了前 25 帧（全部未过滤），
+> 以及 `missing_observation` 字段名读错导致缺失字段被判 PASS。两项均已修复，见
+> `M2_point_id_fix.md` 第 6 节 B。本文以下结论为修订后重跑的结果。
+
 **只读审计。** 没有改动主树、对端脚本或其产物；所有判定都可以用
 `python -I docs/review_20261109_bbc3dcb/m2_record_audit.py` 重跑。
 

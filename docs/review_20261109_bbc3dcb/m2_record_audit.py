@@ -190,24 +190,123 @@ def audit_chain():
 def audit_labels():
     results = json.loads(RESULTS.read_text())
     rec = results["_meta"]["c3_record"]
-    cond = results["conditions"]
-    c3 = cond.get("C3", {})
+    c3 = results["conditions"]["C3"]
     checks = []
+
     label = rec.get("label")
     checks.append({"item": "C3 label is OFFLINE_NATIVE_REESTIMATION",
-                   "recorded": label, "verdict": "PASS" if label == "OFFLINE_NATIVE_REESTIMATION" else "FAIL"})
-    missing = c3.get("missing_pose_ids") or rec.get("missing_pose_ids")
-    listed = c3.get("missing_pose_ids_listed", missing if isinstance(missing, list) else None)
-    checks.append({"item": "frames without pose are listed, not dropped",
-                   "recorded": (len(missing) if isinstance(missing, list) else missing),
-                   "verdict": "PASS" if isinstance(missing, list) else "UNVERIFIABLE"})
-    miss_obs = c3.get("missing_observations", rec.get("missing_observations"))
-    checks.append({"item": "missing observations is explicit",
-                   "recorded": miss_obs,
-                   "verdict": "PASS" if miss_obs in (0, [], None) else "FAIL"})
+                   "recorded": label,
+                   "verdict": "PASS" if label == "OFFLINE_NATIVE_REESTIMATION" else "FAIL"})
+
+    # The archive spells it `missing_observation` (singular) with `missing_observation_ids`.
+    # A missing field is UNVERIFIABLE, not zero: absence of evidence is not evidence of absence.
+    for singular, plural in (("missing_pose", "missing_pose_ids"),
+                             ("missing_observation", "missing_observation_ids")):
+        if singular not in c3:
+            checks.append({"item": f"{singular} declared", "recorded": None,
+                           "verdict": "UNVERIFIABLE",
+                           "detail": f"field `{singular}` absent from the C3 block"})
+            continue
+        count = c3.get(singular)
+        ids = c3.get(plural)
+        if not isinstance(ids, list):
+            checks.append({"item": f"{singular} ids listed", "recorded": ids,
+                           "verdict": "UNVERIFIABLE",
+                           "detail": f"`{plural}` is not a list"})
+            continue
+        consistent = (int(count) == len(ids))
+        checks.append({"item": f"{singular} count equals id list length",
+                       "recorded": {"count": count, "ids": len(ids)},
+                       "verdict": "PASS" if consistent else "FAIL"})
+        # A non-zero count must be enumerable, not just totalled.
+        checks.append({"item": f"{plural} enumerates every missing item",
+                       "recorded": len(ids),
+                       "verdict": "PASS" if (count == 0) == (len(ids) == 0) else "FAIL"})
     return {"checks": checks, "c3_keys": sorted(c3.keys())}
 
 
+def _iter_clouds(path):
+    with rosbag.Bag(str(path), "r") as b:
+        for _, m, _ in b.read_messages(topics=[LIDAR]):
+            yield (int(m.header.stamp.to_sec() * 1e9), m, bytes(m.data), int(m.point_step))
+
+def _ordered_match(filtered_rows, source_rows):
+    """Assign each filtered row to a distinct source index, preserving order.
+
+    Returns (indices, missing). Greedy earliest-unused-so-far: deterministic, one-to-one by
+    construction, and it reports `missing > 0` when a filtered row does not exist in the source.
+    """
+    pools = {}
+    for i, r in enumerate(source_rows):
+        pools.setdefault(r.tobytes(), []).append(i)
+    used, out, missing, prev = set(), [], 0, -1
+    for r in filtered_rows:
+        cands = pools.get(r.tobytes())
+        if not cands:
+            missing += 1
+            out.append(-1)
+            continue
+        pick = next((c for c in cands if c > prev and c not in used), None)
+        if pick is None:
+            pick = next((c for c in cands if c not in used), None)
+        if pick is None:
+            missing += 1
+            out.append(-1)
+            continue
+        used.add(pick)
+        out.append(pick)
+        prev = pick
+    return out, missing
+
+
+def verify_stripped_frames(n_sample=10):
+    """The audit must look at frames where the filter actually fired, not only healthy ones.
+
+    Sample: first stripped frame, last stripped frame, the frame with the largest strip
+    fraction, and `n_sample` more spread across the stripped population.
+    """
+    rep = json.loads(FILTER_REPORT.read_text())
+    per = rep["per_frame"]
+    stripped = [i for i, f in enumerate(per) if f["strip_fraction"] > 0]
+    if not stripped:
+        return {"verdict": "UNVERIFIABLE", "why": "no stripped frame in the filter report"}
+    picks = [stripped[0], stripped[-1],
+             max(stripped, key=lambda i: per[i]["strip_fraction"])]
+    step = max(1, len(stripped) // max(n_sample, 1))
+    picks += stripped[::step][:n_sample]
+    picks = sorted(set(picks))
+
+    src = {}
+    for ns, _m, buf, step_ in _iter_clouds(SRC):
+        src[ns] = (np.frombuffer(buf, dtype=np.uint8).reshape(-1, step_), step_)
+    out = []
+    for i, (ns, _m, buf, step_) in enumerate(_iter_clouds(FILT)):
+        if i not in picks:
+            continue
+        f_rows = np.frombuffer(buf, dtype=np.uint8).reshape(-1, step_)
+        s_rows, s_step = src[ns]
+        idx, missing = _ordered_match(f_rows, s_rows)
+        arr = np.asarray(idx, dtype=np.int64)
+        strictly_increasing = bool(np.all(np.diff(arr) > 0)) if len(arr) > 1 else True
+        deleted = sorted(set(range(len(s_rows))) - set(int(v) for v in arr if v >= 0))
+        rec = per[i]
+        out.append({
+            "frame_index": i, "scan_ns": int(ns),
+            "strip_fraction": rec["strip_fraction"],
+            "n_original": int(len(s_rows)), "n_kept": int(len(f_rows)),
+            "rows_missing_from_source": int(missing),
+            "index_strictly_increasing": strictly_increasing,
+            "kept_indices_unique": len(set(int(v) for v in arr)) == len(arr),
+            "count_matches_report": int(len(f_rows)) == int(rec["kept"]),
+            "deleted_count": len(deleted),
+            "deleted_equals_complement": len(deleted) == int(len(s_rows)) - int(len(f_rows)),
+        })
+    ok = all(r["rows_missing_from_source"] == 0 and r["index_strictly_increasing"]
+             and r["kept_indices_unique"] and r["count_matches_report"]
+             and r["deleted_equals_complement"] for r in out)
+    return {"verdict": "PASS" if ok else "FAIL",
+            "sampled": len(out), "stripped_frames_total": len(stripped),
+            "frames": out}
 
 def _load_poses_rosbag(path, topic="/aft_mapped_to_init"):
     """Independent pose loader (rosbag, not the producer's rosbags reader)."""
@@ -265,6 +364,8 @@ def main():
                          "results": str(RESULTS), "filter_report": str(FILTER_REPORT)}}
     out["point_record"] = audit_point_record()
     print("point record done", flush=True)
+    out["stripped_frames"] = verify_stripped_frames()
+    print("stripped frames done", flush=True)
     out["non_lidar"] = audit_non_lidar()
     print("non-lidar done", flush=True)
     chain = audit_chain()
@@ -280,20 +381,28 @@ def main():
     }
     print("control done", flush=True)
 
-    ids_present = False
+    # Point identity: decode what the bag actually carries. A topic whose name contains "id"
+    # is not evidence; the check is whether the cloud has an id field or a side topic whose
+    # payload maps one-to-one onto the retained rows.
+    id_evidence = {"cloud_id_field": None, "side_topics": [],
+                   "decoded": None}
     with rosbag.Bag(str(FILT), "r") as b:
-        topics = list(b.get_type_and_topic_info().topics)
+        topics = sorted(b.get_type_and_topic_info().topics)
+        id_evidence["all_topics"] = topics
         for _, m, _ in b.read_messages(topics=[LIDAR]):
-            ids_present = any(f.name in ("id", "index", "point_id") for f in m.fields)
+            id_evidence["cloud_id_field"] = [f.name for f in m.fields
+                                             if f.name in ("id", "index", "point_id")]
             break
+    cand = [t for t in topics if t not in (LIDAR, "/camera/color/image_raw",
+                                           "/handsfree/imu")]
+    id_evidence["side_topics"] = cand
+    ok = bool(id_evidence["cloud_id_field"]) or bool(cand)
     out["point_record"]["checks"].append({
         "item": "original point id preserved",
-        "verdict": "PASS" if ids_present or any("id" in t for t in topics) else "FAIL",
-        "detail": (f"topics: {topics}; no id field in the cloud and no side topic. "
-                   "A retained row can be matched by value against the source but cannot be "
-                   "named by its original index without re-deriving it. Blocking for replay-level "
-                   "attribution, not for the pose result."),
-    })
+        "verdict": "PASS" if ok else "FAIL",
+        "detail": (f"topics={topics}; id field in cloud={id_evidence['cloud_id_field']}; "
+                   f"side topics={cand}. Without either, a retained row can be matched by "
+                   "value but not named by its original index.")})
 
     OUT.write_text(json.dumps(out, indent=2), encoding="utf-8")
     print("wrote", OUT)
