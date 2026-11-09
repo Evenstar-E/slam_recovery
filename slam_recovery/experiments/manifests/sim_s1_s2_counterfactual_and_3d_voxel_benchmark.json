@@ -13,8 +13,8 @@
       ]
     },
     "B5_Narrow_FoV_Filter_LIOSAM": {
-      "weak_dir_info_after": 18.39,
-      "holdout_nis": 15.613,
+      "weak_dir_info_after": 20.67,
+      "holdout_nis": 17.856,
       "mode": "MODE3_SOFT_BRIDGE_WAIT",
       "paired_evidence_status": [
         "FAILED",
@@ -169,9 +169,13 @@
           "candidate_frames_deferred": 10,
           "frames_missing_scan": [],
           "frames_in_reference": [],
-          "prefix_stop_key": 30,
-          "prefix_stop_reason": "no_reference_support",
-          "committable_frames_after_prefix": 0
+          "deferred_runs": [
+            [
+              30,
+              39
+            ]
+          ],
+          "first_deferred_reason": "no_reference_support"
         },
         "gt_nis_analytic_mean": 0.005302
       },
@@ -218,9 +222,13 @@
           "candidate_frames_deferred": 10,
           "frames_missing_scan": [],
           "frames_in_reference": [],
-          "prefix_stop_key": 30,
-          "prefix_stop_reason": "no_reference_support",
-          "committable_frames_after_prefix": 0
+          "deferred_runs": [
+            [
+              30,
+              39
+            ]
+          ],
+          "first_deferred_reason": "no_reference_support"
         },
         "gt_nis_analytic_mean": 0.005272
       },
@@ -267,9 +275,13 @@
           "candidate_frames_deferred": 10,
           "frames_missing_scan": [],
           "frames_in_reference": [],
-          "prefix_stop_key": 30,
-          "prefix_stop_reason": "no_reference_support",
-          "committable_frames_after_prefix": 0
+          "deferred_runs": [
+            [
+              30,
+              39
+            ]
+          ],
+          "first_deferred_reason": "no_reference_support"
         },
         "gt_nis_analytic_mean": 0.005594
       },
@@ -316,9 +328,13 @@
           "candidate_frames_deferred": 10,
           "frames_missing_scan": [],
           "frames_in_reference": [],
-          "prefix_stop_key": 30,
-          "prefix_stop_reason": "no_reference_support",
-          "committable_frames_after_prefix": 0
+          "deferred_runs": [
+            [
+              30,
+              39
+            ]
+          ],
+          "first_deferred_reason": "no_reference_support"
         },
         "gt_nis_analytic_mean": 0.005437
       },
@@ -365,9 +381,13 @@
           "candidate_frames_deferred": 10,
           "frames_missing_scan": [],
           "frames_in_reference": [],
-          "prefix_stop_key": 30,
-          "prefix_stop_reason": "no_reference_support",
-          "committable_frames_after_prefix": 0
+          "deferred_runs": [
+            [
+              30,
+              39
+            ]
+          ],
+          "first_deferred_reason": "no_reference_support"
         },
         "gt_nis_analytic_mean": 0.005431
       }
