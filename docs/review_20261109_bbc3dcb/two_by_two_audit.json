@@ -517,10 +517,21 @@
    "receipts": 4
   },
   "receipt_library": {
-   "verdict": "FAIL",
+   "verdict": "RETROSPECTIVE_PARTIAL",
    "problems": [
-    "4/4 receipts record no loaded-library hash and no declared gap explains it"
+    "4/4 receipts predate the requirement; the gap is declared, not silently missing"
    ],
+   "declared_gap": {
+    "reason": "same requirement, same absence; the library hash is recorded per build in hall01_stability_results.json",
+    "observed": "4/4 receipts carry only the executable sha",
+    "records": [
+     "hall01_stab_receipt_fl_run_20261109T142548Z_2595833.json",
+     "hall01_stab_receipt_fl_run_20261109T142752Z_2599921.json",
+     "hall01_stab_receipt_fl_run_20261109T142955Z_2604503.json",
+     "hall01_stab_receipt_fl_run_20261109T143201Z_2609260.json"
+    ]
+   },
+   "declared_by": "registry",
    "receipts": 4
   }
  },

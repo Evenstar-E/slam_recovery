@@ -1,0 +1,22 @@
+{
+  "declared": "2026-11-09",
+  "scope": "historical receipts only; a batch not listed here still fails the library-hash rule",
+  "requirement": "receipts must record library_path and library_sha256 read from the running process (/proc/<pid>/maps), not from a declared config",
+  "batches": {
+    "room02_T3a": {
+      "reason": "the six receipts predate the requirement; behaviour lives in liblaser_mapping.so while the executable sha is identical across builds",
+      "observed": "6/6 receipts carry only the cross-build executable sha",
+      "records": ["room02_T3a_receipt_r1.json", "room02_T3a_receipt_r2.json",
+                  "room02_T3a2_receipt_r1.json", "room02_T3a2_receipt_r2.json",
+                  "room02_T3a2_receipt_r3.json", "room02_T3a2_receipt_r4.json"]
+    },
+    "hall01_stab": {
+      "reason": "same requirement, same absence; the library hash is recorded per build in hall01_stability_results.json",
+      "observed": "4/4 receipts carry only the executable sha",
+      "records": ["hall01_stab_receipt_fl_run_20261109T142548Z_2595833.json",
+                  "hall01_stab_receipt_fl_run_20261109T142752Z_2599921.json",
+                  "hall01_stab_receipt_fl_run_20261109T142955Z_2604503.json",
+                  "hall01_stab_receipt_fl_run_20261109T143201Z_2609260.json"]
+    }
+  }
+}
