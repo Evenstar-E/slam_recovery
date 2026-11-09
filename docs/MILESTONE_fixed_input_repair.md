@@ -162,7 +162,18 @@ points of which 85.25% are supported (novel subset 10,581: 69.16%); of the 50,23
 C3 does not, 95.14% were already unsupported. The pre-stated rule (novel supported > unsupported
 AND added-unsupported fraction <= R's) passes: 7,318 > 3,263 and 0.1475 <= 0.6251, verdict
 REPAIR_BENEFIT_SUPPORTED. The proxy is not GT, the frame set is 400/446, and C3 is
-OFFLINE_NATIVE_REESTIMATION, not a deployable loop.
+OFFLINE_NATIVE_REESTIMATION, not a deployable loop. The 400-frame set is conditional on C3 having both filtered scans and poses, the
+rule is an analysis rule recorded in the same commit rather than an independently frozen protocol,
+and it does not bind lost good geometry, coverage, missing frames or cost. Counts are sampled
+geometric disagreement at 0.5 m, not original point-id edits.
+
+### Next mainline (pre-registered choice)
+
+Chosen: frozen-446 service completeness and healthy-region cost on the same chain, using existing
+outputs. Pre-registered before running: (a) identify which of the 46 frames lack pose and why;
+(b) the real filter's false-removal rate on clean, non-injection intervals; (c) coverage and
+patch-unsupported on the frozen 446 with missing frames counted as missing, never dropped. No new
+fault intensity, no ROI/阈值 tuning; the same-frame result above is the baseline.
 
 ### Pre-stated decision rule (written before applying it)
 
