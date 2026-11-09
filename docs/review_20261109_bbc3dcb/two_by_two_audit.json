@@ -1,0 +1,215 @@
+{
+ "subject": "room_02 2x2 host results",
+ "read_only": true,
+ "1_protocol": {
+  "verdict": "PASS",
+  "problems": [],
+  "prereg": {
+   "threshold": 1.0,
+   "repeats": 2,
+   "declared_before_results": true
+  },
+  "results_protocol": {
+   "source": "docs/MILESTONE_fixed_input_repair.md (2x2 single factor)",
+   "fail_rule": "full-alignment ATE > 1.0 m fails; both repeats must land on the same side to be stable",
+   "interaction_rule": "supported only if O+F-B fails both repeats while O+F and O-B do not"
+  }
+ },
+ "2_receipts": {
+  "verdict": "PASS",
+  "problems": [],
+  "receipts": [
+   {
+    "receipt": "room02_2x2_receipt_fl_run_20261109T121820Z_2471820.json",
+    "arm": "O",
+    "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+    "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+    "status": "OK"
+   },
+   {
+    "receipt": "room02_2x2_receipt_fl_run_20261109T122034Z_2476238.json",
+    "arm": "O_plus_F",
+    "input_sha256": "f45d0cbe95ad28e509a451c93d39b978da1d891dc60c1757ed128f555e482b66",
+    "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+    "status": "OK"
+   },
+   {
+    "receipt": "room02_2x2_receipt_fl_run_20261109T122242Z_2479535.json",
+    "arm": "O_minus_B",
+    "input_sha256": "73f7bcdd2291a437d345523912139f09a5a2bb110017f45c969ed0df315d218e",
+    "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+    "status": "OK"
+   },
+   {
+    "receipt": "room02_2x2_receipt_fl_run_20261109T122447Z_2482360.json",
+    "arm": "O_plus_F_minus_B",
+    "input_sha256": "cd12dddbb8fb9707bda1b551d238f8d3b6525798a62638ee62f95986f11e6301",
+    "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+    "status": "OK"
+   },
+   {
+    "receipt": "room02_2x2_receipt_fl_run_20261109T122651Z_2485321.json",
+    "arm": "O",
+    "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+    "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+    "status": "OK"
+   },
+   {
+    "receipt": "room02_2x2_receipt_fl_run_20261109T122854Z_2488173.json",
+    "arm": "O_plus_F",
+    "input_sha256": "f45d0cbe95ad28e509a451c93d39b978da1d891dc60c1757ed128f555e482b66",
+    "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+    "status": "OK"
+   },
+   {
+    "receipt": "room02_2x2_receipt_fl_run_20261109T123103Z_2491100.json",
+    "arm": "O_minus_B",
+    "input_sha256": "73f7bcdd2291a437d345523912139f09a5a2bb110017f45c969ed0df315d218e",
+    "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+    "status": "OK"
+   },
+   {
+    "receipt": "room02_2x2_receipt_fl_run_20261109T123311Z_2494242.json",
+    "arm": "O_plus_F_minus_B",
+    "input_sha256": "cd12dddbb8fb9707bda1b551d238f8d3b6525798a62638ee62f95986f11e6301",
+    "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+    "status": "OK"
+   }
+  ],
+  "per_arm": {
+   "O": 2,
+   "O_plus_F": 2,
+   "O_minus_B": 2,
+   "O_plus_F_minus_B": 2
+  },
+  "bag_hashes_on_disk_match_manifest": {
+   "O": true,
+   "O_plus_F": true,
+   "O_minus_B": true,
+   "O_plus_F_minus_B": true
+  }
+ },
+ "3_independent": {
+  "verdict": "PASS",
+  "problems": [],
+  "per_run": [
+   {
+    "cell": "O",
+    "repeat": 1,
+    "host_full": 0.07162458349543022,
+    "host_prefix": 3.8123448824832122,
+    "independent": 0.082145177237581,
+    "delta_full_vs_independent": -0.010521
+   },
+   {
+    "cell": "O",
+    "repeat": 2,
+    "host_full": 14.43858960214947,
+    "host_prefix": 24.423010866557135,
+    "independent": 15.440549408891952,
+    "delta_full_vs_independent": -1.00196
+   },
+   {
+    "cell": "O_minus_B",
+    "repeat": 1,
+    "host_full": 48.84667762983906,
+    "host_prefix": 75.13141143351287,
+    "independent": 47.824181062147105,
+    "delta_full_vs_independent": 1.022497
+   },
+   {
+    "cell": "O_minus_B",
+    "repeat": 2,
+    "host_full": 19.67264276177945,
+    "host_prefix": 31.957210961213807,
+    "independent": 20.269444003741143,
+    "delta_full_vs_independent": -0.596801
+   },
+   {
+    "cell": "O_plus_F",
+    "repeat": 1,
+    "host_full": 593.0262141110676,
+    "host_prefix": 742.8650587701793,
+    "independent": 521.7823425855235,
+    "delta_full_vs_independent": 71.243872
+   },
+   {
+    "cell": "O_plus_F",
+    "repeat": 2,
+    "host_full": 14.872150834451231,
+    "host_prefix": 24.584551754443208,
+    "independent": 15.551372778173649,
+    "delta_full_vs_independent": -0.679222
+   },
+   {
+    "cell": "O_plus_F_minus_B",
+    "repeat": 1,
+    "host_full": 554.5608455651169,
+    "host_prefix": 687.1975647075819,
+    "independent": 484.92482822608275,
+    "delta_full_vs_independent": 69.636017
+   },
+   {
+    "cell": "O_plus_F_minus_B",
+    "repeat": 2,
+    "host_full": 0.3005104007819498,
+    "host_prefix": 3.736026195670787,
+    "independent": 0.2544002557826186,
+    "delta_full_vs_independent": 0.04611
+   }
+  ]
+ },
+ "4_ate_convention": {
+  "cells": {
+   "O": {
+    "fail_full_alignment": [
+     0.0,
+     1.0
+    ],
+    "fail_frozen_prefix": [
+     1.0,
+     1.0
+    ],
+    "same": false
+   },
+   "O_plus_F": {
+    "fail_full_alignment": [
+     1.0,
+     1.0
+    ],
+    "fail_frozen_prefix": [
+     1.0,
+     1.0
+    ],
+    "same": true
+   },
+   "O_minus_B": {
+    "fail_full_alignment": [
+     1.0,
+     1.0
+    ],
+    "fail_frozen_prefix": [
+     1.0,
+     1.0
+    ],
+    "same": true
+   },
+   "O_plus_F_minus_B": {
+    "fail_full_alignment": [
+     1.0,
+     0.0
+    ],
+    "fail_frozen_prefix": [
+     1.0,
+     1.0
+    ],
+    "same": false
+   }
+  },
+  "cells_where_conventions_disagree": [
+   "O",
+   "O_plus_F_minus_B"
+  ],
+  "verdict": "FINDING"
+ }
+}

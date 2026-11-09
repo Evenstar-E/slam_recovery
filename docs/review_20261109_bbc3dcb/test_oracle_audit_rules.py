@@ -138,10 +138,17 @@ class TestRealArtefacts(unittest.TestCase):
         self.assertAlmostEqual(agg["kept_injected_over_background_present"],
                                0.0010664126384650403, places=12)
 
-    @unittest.expectedFailure
-    def test_r2_real_hybrid_report_is_incomplete(self):
+    def test_r2_archived_hybrid_report_is_recorded_as_incomplete(self):
+        """R2 is closed as SUPERSEDED, not as fixed.
+
+        The hybrid report belongs to the abandoned X/Y design that the 2x2 replaced; it is not
+        used for any conclusion. The assertion records the fact that it lacks the two binding
+        fields, so the file cannot be mistaken for an accepted artefact later. The rule itself
+        stays live for future hybrid reports and is exercised by the fixtures above.
+        """
         rep = _load("room02_hybrid_bag_report.json")
-        self.assertEqual(Q.check_hybrid_report(rep), [])
+        self.assertTrue(Q.check_hybrid_report(rep),
+                        "archived report unexpectedly satisfies R2")
 
     @unittest.expectedFailure
     def test_r3_real_hybrid_window_is_derived(self):
