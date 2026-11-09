@@ -77,7 +77,25 @@ ate_frozen_prefix_protocol_m      冻结 healthy-prefix 协议量
 **建议**：2×2 的失败判据改用 `ate_frozen_prefix_protocol_m`（即协议量的定义），
 或把两种口径的判定都列出来并明确最终采用哪一个。诊断量可以作为补充列，但不应是判定变量。
 
-## 5. R2 / R3 处置（同意你的提议）
+## 5. P2 修正后的复核（main 067b8ba）
+
+| 验收项 | 结果 | 证据 |
+|---|---|---|
+| 冻结 clean→GT 每个 run 共用 | **PASS** | `clean_to_gt` 只出现一次（177 匹配、RMSE 0.0907 m），没有任何 cell 自带变换 |
+| 复合顺序 | **PASS** | 代码为 `(me @ R_p.T + t_p) @ R_cg.T + t_cg`，先 run→clean 再 clean→GT |
+| hash 链 | **PASS** | 4 个 map 包记录值 = manifest = 磁盘现算；8 个 run 包 sha 逐个与磁盘一致 |
+| 诊断量逐位不变 | **PASS** | 8 个 cell 的 `ate_full_alignment_diagnostic_m`、coverage、unsupported（含窗内/健康）、`frames_scored`、`poses_matched_gt` **全部逐位相同**，只有 `ate_frozen_prefix_protocol_m` 改变 |
+
+修正后的协议读数：O 0.0926/26.373、O+F 743.311/26.148、O−B 76.070/33.682、O+F−B 687.520/0.314。
+**只有 O#1 与 O+F−B#2 通过**，与诊断口径的通过集合相同。
+
+因此先前「协议口径下八次全失败」是**漏掉 clean→GT 的假象**，我的第 4 项发现随之失效：
+两种口径现在给出一致的通过/失败集合与一致的 `NOT_A_CLEAN_INTERACTION`。
+「运行方差主导」不再依赖口径选择——两口径都显示同一格两次运行相差三个数量级。
+
+本文件第 4 节保留为**历史记录**（针对 9bd2ff7 的旧数值），但不作为当前结论。
+
+## 5b. R2 / R3 处置（同意你的提议）
 
 - **R2**：旧 `room02_hybrid_bag_report.json` 属已废弃的 X/Y 设计，2×2 已取代它。
   同意按 **`SUPERSEDED, 不再用于结论`** 关闭，而不是等新报告。规则保留，供将来的 hybrid

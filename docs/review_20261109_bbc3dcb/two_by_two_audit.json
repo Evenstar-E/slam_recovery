@@ -87,7 +87,58 @@
    "O_plus_F": true,
    "O_minus_B": true,
    "O_plus_F_minus_B": true
-  }
+  },
+  "identity_shared": true,
+  "outputs": [
+   {
+    "bag": "/tmp/fastlivo/res_2x2_O_r1.bag",
+    "sha256": "6dc3a18fe530043965ac33e8c853be7104cf3d3622b1a77db292f395e3521b2f",
+    "on_disk": true,
+    "match": true
+   },
+   {
+    "bag": "/tmp/fastlivo/res_2x2_O_plus_F_r1.bag",
+    "sha256": "b095029adde04ce56a27a8be9d2e4c13b58ea4a5b6fbf33ccea626a7698404f6",
+    "on_disk": true,
+    "match": true
+   },
+   {
+    "bag": "/tmp/fastlivo/res_2x2_O_minus_B_r1.bag",
+    "sha256": "0a172bd8ee681569999ca729d7473af39c03c358098b323f6e6a17e61e23f927",
+    "on_disk": true,
+    "match": true
+   },
+   {
+    "bag": "/tmp/fastlivo/res_2x2_O_plus_F_minus_B_r1.bag",
+    "sha256": "9550a9ad63c1c807c24dfa22e39ae7feea8db51d031ee04df6d19319dde0022c",
+    "on_disk": true,
+    "match": true
+   },
+   {
+    "bag": "/tmp/fastlivo/res_2x2_O_r2.bag",
+    "sha256": "d620df78f3f143de212da8b5f24ca7112ed559b07cb41ab62c0c6d1c9754b15b",
+    "on_disk": true,
+    "match": true
+   },
+   {
+    "bag": "/tmp/fastlivo/res_2x2_O_plus_F_r2.bag",
+    "sha256": "740699c640d7610127658f091a465e66358aec712e270c5383136b9f962c54b1",
+    "on_disk": true,
+    "match": true
+   },
+   {
+    "bag": "/tmp/fastlivo/res_2x2_O_minus_B_r2.bag",
+    "sha256": "c2bffb1edf5b075c05f7d2ce64a40546bcdfbbc9d14e075409004379bc170108",
+    "on_disk": true,
+    "match": true
+   },
+   {
+    "bag": "/tmp/fastlivo/res_2x2_O_plus_F_minus_B_r2.bag",
+    "sha256": "d63a6e37662c8be1404c407fd05999851e0e6b1432f464a63858b53e7f34c2d4",
+    "on_disk": true,
+    "match": true
+   }
+  ]
  },
  "3_independent": {
   "verdict": "PASS",
@@ -97,7 +148,7 @@
     "cell": "O",
     "repeat": 1,
     "host_full": 0.07162458349543022,
-    "host_prefix": 3.8123448824832122,
+    "host_prefix": 0.09264491035181353,
     "independent": 0.082145177237581,
     "delta_full_vs_independent": -0.010521
    },
@@ -105,7 +156,7 @@
     "cell": "O",
     "repeat": 2,
     "host_full": 14.43858960214947,
-    "host_prefix": 24.423010866557135,
+    "host_prefix": 26.372984556112733,
     "independent": 15.440549408891952,
     "delta_full_vs_independent": -1.00196
    },
@@ -113,7 +164,7 @@
     "cell": "O_minus_B",
     "repeat": 1,
     "host_full": 48.84667762983906,
-    "host_prefix": 75.13141143351287,
+    "host_prefix": 76.07003376566831,
     "independent": 47.824181062147105,
     "delta_full_vs_independent": 1.022497
    },
@@ -121,7 +172,7 @@
     "cell": "O_minus_B",
     "repeat": 2,
     "host_full": 19.67264276177945,
-    "host_prefix": 31.957210961213807,
+    "host_prefix": 33.68205386132164,
     "independent": 20.269444003741143,
     "delta_full_vs_independent": -0.596801
    },
@@ -129,7 +180,7 @@
     "cell": "O_plus_F",
     "repeat": 1,
     "host_full": 593.0262141110676,
-    "host_prefix": 742.8650587701793,
+    "host_prefix": 743.3113232627709,
     "independent": 521.7823425855235,
     "delta_full_vs_independent": 71.243872
    },
@@ -137,7 +188,7 @@
     "cell": "O_plus_F",
     "repeat": 2,
     "host_full": 14.872150834451231,
-    "host_prefix": 24.584551754443208,
+    "host_prefix": 26.148378020286646,
     "independent": 15.551372778173649,
     "delta_full_vs_independent": -0.679222
    },
@@ -145,7 +196,7 @@
     "cell": "O_plus_F_minus_B",
     "repeat": 1,
     "host_full": 554.5608455651169,
-    "host_prefix": 687.1975647075819,
+    "host_prefix": 687.5204171734307,
     "independent": 484.92482822608275,
     "delta_full_vs_independent": 69.636017
    },
@@ -153,7 +204,7 @@
     "cell": "O_plus_F_minus_B",
     "repeat": 2,
     "host_full": 0.3005104007819498,
-    "host_prefix": 3.736026195670787,
+    "host_prefix": 0.3142783935483675,
     "independent": 0.2544002557826186,
     "delta_full_vs_independent": 0.04611
    }
@@ -167,10 +218,10 @@
      1.0
     ],
     "fail_frozen_prefix": [
-     1.0,
+     0.0,
      1.0
     ],
-    "same": false
+    "same": true
    },
    "O_plus_F": {
     "fail_full_alignment": [
@@ -201,15 +252,79 @@
     ],
     "fail_frozen_prefix": [
      1.0,
-     1.0
+     0.0
     ],
-    "same": false
+    "same": true
    }
   },
-  "cells_where_conventions_disagree": [
-   "O",
-   "O_plus_F_minus_B"
+  "cells_where_conventions_disagree": [],
+  "verdict": "PASS"
+ },
+ "5_frozen_transform": {
+  "verdict": "PASS",
+  "problems": [],
+  "matched": 177,
+  "residual_rmse_m": 0.09067429305577145,
+  "fitted_on": null
+ },
+ "6_hash_chain": {
+  "verdict": "PASS",
+  "problems": [],
+  "map_bags_on_disk": {
+   "O": true,
+   "O_plus_F": true,
+   "O_minus_B": true,
+   "O_plus_F_minus_B": true
+  },
+  "run_bags": 8
+ },
+ "7_diagnostic_unchanged": {
+  "verdict": "PASS",
+  "problems": [],
+  "per_cell": [
+   {
+    "cell": "O#1",
+    "changed_fields": []
+   },
+   {
+    "cell": "O#2",
+    "changed_fields": []
+   },
+   {
+    "cell": "O+F#1",
+    "changed_fields": []
+   },
+   {
+    "cell": "O+F#2",
+    "changed_fields": []
+   },
+   {
+    "cell": "O+F-B#1",
+    "changed_fields": []
+   },
+   {
+    "cell": "O+F-B#2",
+    "changed_fields": []
+   },
+   {
+    "cell": "O-B#1",
+    "changed_fields": []
+   },
+   {
+    "cell": "O-B#2",
+    "changed_fields": []
+   }
   ],
-  "verdict": "FINDING"
+  "protocol_field": "ate_frozen_prefix_protocol_m",
+  "protocol_values": {
+   "O#1": 0.09264491035181353,
+   "O#2": 26.372984556112733,
+   "O+F#1": 743.3113232627709,
+   "O+F#2": 26.148378020286646,
+   "O+F-B#1": 687.5204171734307,
+   "O+F-B#2": 0.3142783935483675,
+   "O-B#1": 76.07003376566831,
+   "O-B#2": 33.68205386132164
+  }
  }
 }

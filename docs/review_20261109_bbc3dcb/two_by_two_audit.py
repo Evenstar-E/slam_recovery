@@ -27,6 +27,7 @@ PREREG = os.path.join(_REPO, "docs/review_20261109_6b61c9d/single_factor_preregi
 BAGS = os.path.join(_REPO, "docs/review_20261109_6b61c9d/single_factor_bags.json")
 EVAL = os.path.join(_REPO, "docs/review_20261109_6b61c9d/evaluate_2x2_runs.json")
 OUT = os.path.join(_HERE, "two_by_two_audit.json")
+BEFORE = os.environ.get("TWOBY2_BEFORE", "/tmp/2x2_before.json")
 
 CELLS = ("O", "O_plus_F", "O_minus_B", "O_plus_F_minus_B")
 ARM_OF_BAG = {f"/tmp/fastlivo/room02_2x2_{c}.bag": c for c in CELLS}
@@ -65,44 +66,89 @@ def audit_protocol(results, prereg):
             "results_protocol": proto}
 
 
-def audit_receipts(manifest):
-    """Each receipt must bind the bag it ran and the runner identity; bag hashes must match."""
-    declared = {a: manifest["arms"][a]["sha256"] if "sha256" in manifest["arms"][a]
-                else manifest["arms"][a].get("bag_sha256") for a in manifest["arms"]}
-    receipts = sorted(glob.glob(os.path.join(_HERE, "room02_2x2_receipt_fl_run_*.json")))
+def audit_receipts(manifest, receipts=None, hasher=None, exists=None):
+    """Each receipt must bind its bag and the runner identity; the identity must be shared.
+
+    `receipts`, `hasher` and `exists` are injectable so the fixtures can exercise a mismatch
+    without fabricating a 1.3 GB bag.
+    """
+    hasher = hasher or _sha256
+    exists = exists or os.path.exists
+    if receipts is None:
+        paths = sorted(glob.glob(os.path.join(_HERE, "room02_2x2_receipt_fl_run_*.json")))
+        receipts = [json.load(open(p, encoding="utf-8")) for p in paths]
+        names = [os.path.basename(p) for p in paths]
+    else:
+        names = [r.get("_name", f"receipt{i}") for i, r in enumerate(receipts)]
+
+    declared = {a: manifest["arms"][a].get("sha256") for a in manifest["arms"]}
     rows, bad = [], []
-    for path in receipts:
-        rec = json.load(open(path, encoding="utf-8"))
+    for name, rec in zip(names, receipts):
         pre = rec.get("pre_run", {})
         bag = pre.get("paths", {}).get("input_bag")
         sha = pre.get("sha256", {}).get("input_bag")
         arm = ARM_OF_BAG.get(bag)
         if arm is None:
-            bad.append(f"{os.path.basename(path)}: input bag {bag} is not a 2x2 cell")
+            bad.append(f"{name}: input bag {bag} is not a 2x2 cell")
             continue
         if sha != declared.get(arm):
-            bad.append(f"{os.path.basename(path)}: {arm} sha {str(sha)[:12]} != manifest "
+            bad.append(f"{name}: {arm} sha {str(sha)[:12]} != manifest "
                        f"{str(declared.get(arm))[:12]}")
         if rec.get("status") != "OK":
-            bad.append(f"{os.path.basename(path)}: status {rec.get('status')}")
+            bad.append(f"{name}: status {rec.get('status')}")
         if pre.get("paths", {}).get("host_binary") != \
                 "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping":
-            bad.append(f"{os.path.basename(path)}: host binary not the expected one")
+            bad.append(f"{name}: host binary not the expected one")
         if not pre.get("host_revision"):
-            bad.append(f"{os.path.basename(path)}: no host revision")
-        rows.append({"receipt": os.path.basename(path), "arm": arm,
-                     "input_sha256": sha, "host_revision": pre.get("host_revision"),
+            bad.append(f"{name}: no host revision")
+        rows.append({"receipt": name, "arm": arm, "input_sha256": sha,
+                     "host_revision": pre.get("host_revision"),
                      "status": rec.get("status")})
+
     per_arm = {a: sum(1 for r in rows if r["arm"] == a) for a in CELLS}
     for a, n in per_arm.items():
         if n != 2:
             bad.append(f"{a} has {n} receipts, expected 2")
+
+    disk = {}
+    for a in CELLS:
+        path = f"/tmp/fastlivo/room02_2x2_{a}.bag"
+        if not exists(path):
+            disk[a] = None
+            bad.append(f"{a}: bag missing on disk, hash unverifiable")
+            continue
+        disk[a] = hasher(path) == declared.get(a)
+        if not disk[a]:
+            bad.append(f"{a}: bag sha on disk != manifest")
+
+    for field, label in (("script", "runner script"), ("config_m2dgr", "m2dgr config"),
+                         ("config_camera", "camera config")):
+        vals = {rec.get("pre_run", {}).get("sha256", {}).get(field) for rec in receipts}
+        if len(vals) != 1:
+            bad.append(f"{label} differs across receipts: {sorted(map(str, vals))}")
+    revs = {rec.get("pre_run", {}).get("host_revision") for rec in receipts}
+    if len(revs) != 1:
+        bad.append(f"host revision differs across receipts: {sorted(map(str, revs))}")
+
+    outputs = []
+    for name, rec in zip(names, receipts):
+        out = rec.get("output", {})
+        bag, sha = out.get("bag"), out.get("sha256")
+        present = bool(bag) and exists(bag)
+        match = (hasher(bag) == sha) if present and sha else None
+        if not sha:
+            bad.append(f"{name}: no output hash")
+        elif not present:
+            bad.append(f"{name}: output bag missing on disk, hash unverifiable")
+        elif not match:
+            bad.append(f"{name}: output bag sha does not match disk")
+        outputs.append({"bag": bag, "sha256": sha, "on_disk": present, "match": match})
+
     return {"verdict": "PASS" if not bad else "FAIL", "problems": bad,
             "receipts": rows, "per_arm": per_arm,
-            "bag_hashes_on_disk_match_manifest": {
-                a: (_sha256(f"/tmp/fastlivo/room02_2x2_{a}.bag") == declared.get(a)
-                    if os.path.exists(f"/tmp/fastlivo/room02_2x2_{a}.bag") else None)
-                for a in CELLS}}
+            "bag_hashes_on_disk_match_manifest": disk,
+            "identity_shared": not any("differs across receipts" in b for b in bad),
+            "outputs": outputs}
 
 
 DISPLAY = {"O": "O", "O+F": "O_plus_F", "O-B": "O_minus_B", "O+F-B": "O_plus_F_minus_B"}
@@ -129,6 +175,16 @@ def audit_independent(results, ev):
     """Do the two implementations disagree about any cell's side of the threshold?"""
     bad, rows = [], []
     host, ind = _host_runs(results), _eval_runs(ev)
+    expected = {(a, r) for a in CELLS for r in (1, 2)}
+    missing_host = sorted(expected - set(host))
+    missing_ind = sorted(expected - set(ind))
+    if missing_host or missing_ind:
+        problems = []
+        if missing_host:
+            problems.append(f"host missing {missing_host}")
+        if missing_ind:
+            problems.append(f"independent missing {missing_ind}")
+        return {"verdict": "UNVERIFIABLE", "problems": problems, "per_run": rows}
     for key in sorted(host):
         h = host[key]
         e = ind.get(key) or {}
@@ -167,6 +223,81 @@ def audit_ate_convention(results):
             "verdict": "PASS" if not disagree else "FINDING"}
 
 
+UNCHANGED_FIELDS = ("ate_full_alignment_diagnostic_m", "coverage", "unsupported_fraction",
+                    "in_window_unsupported_fraction", "healthy_unsupported_fraction",
+                    "frames_scored", "poses_matched_gt")
+
+
+def audit_frozen_transform(results):
+    """One clean->GT transform, fitted on pre-onset clean keyframes, reused by every run."""
+    bad = []
+    cg = results.get("clean_to_gt") or {}
+    if not cg.get("transform"):
+        bad.append("no clean->GT transform recorded")
+    if int(cg.get("matched", 0)) < 10:
+        bad.append(f"clean->GT fitted on {cg.get('matched')} poses: too few")
+    per_cell = [k for k, v in (results.get("cells") or {}).items() if v.get("clean_to_gt")]
+    if per_cell:
+        bad.append(f"{len(per_cell)} cells carry their own clean->GT, so it is not frozen")
+    return {"verdict": "PASS" if not bad else "FAIL", "problems": bad,
+            "matched": cg.get("matched"), "residual_rmse_m": cg.get("residual_rmse_m"),
+            "fitted_on": cg.get("fitted_on")}
+
+
+def audit_hash_chain(results, manifest):
+    """Recorded bag hashes must match the manifest and the files actually on disk."""
+    bad = []
+    m = results.get("inputs", {}).get("map_bags", {})
+    # the results name cells by display form ("O+F"); the manifest uses canonical names
+    by_display = {v: k for k, v in DISPLAY.items()}
+    for cell in CELLS:
+        rec = m.get(by_display.get(cell, cell)) or m.get(cell) or {}
+        want = manifest["arms"][cell].get("sha256")
+        if rec.get("sha256") != want:
+            bad.append(f"{cell}: recorded map sha != manifest")
+        path = rec.get("path")
+        if not path or not os.path.exists(path):
+            bad.append(f"{cell}: map bag missing on disk")
+        elif _sha256(path) != want:
+            bad.append(f"{cell}: map bag on disk != manifest")
+    runs = results.get("inputs", {}).get("run_bags", {})
+    if len(runs) != 8:
+        bad.append(f"{len(runs)} run bags recorded, expected 8")
+    for key, rec in runs.items():
+        path = rec.get("path") if isinstance(rec, dict) else None
+        sha = rec.get("sha256") if isinstance(rec, dict) else rec
+        if not path or not os.path.exists(path):
+            bad.append(f"{key}: run bag missing on disk")
+            continue
+        if _sha256(path) != sha:
+            bad.append(f"{key}: run bag sha differs from disk")
+    return {"verdict": "PASS" if not bad else "FAIL", "problems": bad,
+            "map_bags_on_disk": {c: os.path.exists(
+                ((m.get(by_display.get(c, c)) or m.get(c)) or {}).get("path", ""))
+                for c in CELLS},
+            "run_bags": len(runs)}
+
+
+def audit_diagnostic_unchanged(new, before):
+    """The fix may touch the protocol ATE only; the diagnostic and map fields must not move."""
+    bad, rows = [], []
+    n_cells = new.get("cells") or {}
+    b_cells = before.get("cells") or {}
+    for key in sorted(set(b_cells)):
+        if key not in n_cells:
+            bad.append(f"{key} disappeared")
+            continue
+        changed = [f for f in UNCHANGED_FIELDS
+                   if n_cells[key].get(f) != b_cells[key].get(f)]
+        rows.append({"cell": key, "changed_fields": changed})
+        if changed:
+            bad.append(f"{key}: {changed} changed")
+    return {"verdict": "PASS" if not bad else "FAIL", "problems": bad, "per_cell": rows,
+            "protocol_field": "ate_frozen_prefix_protocol_m",
+            "protocol_values": {k: v.get("ate_frozen_prefix_protocol_m")
+                                for k, v in sorted(n_cells.items())}}
+
+
 def main():
     results = json.load(open(RESULTS, encoding="utf-8"))
     prereg = json.load(open(PREREG, encoding="utf-8"))
@@ -176,12 +307,21 @@ def main():
            "1_protocol": audit_protocol(results, prereg),
            "2_receipts": audit_receipts(manifest),
            "3_independent": audit_independent(results, ev),
-           "4_ate_convention": audit_ate_convention(results)}
+           "4_ate_convention": audit_ate_convention(results),
+           "5_frozen_transform": audit_frozen_transform(results),
+           "6_hash_chain": audit_hash_chain(results, manifest),
+           "7_diagnostic_unchanged": (
+               audit_diagnostic_unchanged(results, json.load(open(BEFORE, encoding="utf-8")))
+               if os.path.exists(BEFORE) else
+               {"verdict": "UNVERIFIABLE", "problems": [f"no baseline at {BEFORE}"],
+                "per_cell": []})}
     with open(OUT, "w", encoding="utf-8") as fh:
         json.dump(out, fh, indent=1, default=float)
-    for k in ("1_protocol", "2_receipts", "3_independent", "4_ate_convention"):
-        print(k, out[k]["verdict"], out[k].get("problems", out[k].get(
-            "cells_where_conventions_disagree"))[:3])
+    for k in ("1_protocol", "2_receipts", "3_independent", "4_ate_convention",
+              "5_frozen_transform", "6_hash_chain", "7_diagnostic_unchanged"):
+        print(k, out[k]["verdict"], (out[k].get("problems")
+                                     or out[k].get("cells_where_conventions_disagree")
+                                     or [])[:3])
     print("wrote", OUT)
 
 
