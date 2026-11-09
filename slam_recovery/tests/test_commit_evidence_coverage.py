@@ -82,6 +82,39 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
         self.assertEqual(node.tx_mgr.trusted_poses, {})
         # A candidate whose first frame has no support must not be logged as an empty candidate.
         self.assertEqual(node.last_paired_evidence["reason"], "no_committable_prefix")
+        self.assertEqual(node._last_holdout_support["prefix_stop_key"], 0)
+        self.assertEqual(node._last_holdout_support["prefix_stop_reason"], "missing_scan")
+
+    def test_prefix_stop_is_reported_with_the_frames_it_blocks(self) -> None:
+        """One unsupported first frame truncates the prefix, but the blocked frames stay visible."""
+        cloud = _plane_cloud()
+        node = _node_with_quarantine(cloud)
+        poses, incumbent = {}, {}
+        for k in range(6):
+            node.scan_buffer_body[k] = cloud.copy()
+            poses[k] = np.eye(4)
+            incumbent[k] = np.eye(4)
+        # Frame 0 sits 100 m above the reference surface: not supportable. Frames 1..5 are fine.
+        poses[0] = np.eye(4)
+        poses[0][2, 3] = 100.0
+
+        report = node.evaluate_and_commit_candidate(
+            "bad_head",
+            poses,
+            aux_or_loop_info_6x6=np.eye(6) * 100,
+            incumbent_poses=incumbent,
+            reentry_anchor_pose=np.eye(4),
+        )
+
+        support = node._last_holdout_support
+        self.assertEqual(support["candidate_frames_total"], 6)
+        self.assertEqual(support["candidate_frames_committable"], 5)
+        self.assertEqual(support["candidate_frames_committed"], 0)
+        self.assertEqual(support["prefix_stop_key"], 0)
+        self.assertEqual(support["prefix_stop_reason"], "no_reference_support")
+        self.assertEqual(support["committable_frames_after_prefix"], 5)
+        self.assertNotEqual(report.mode, RecoveryMode.MODE2_ATOMIC_COMMIT)
+        self.assertEqual(node.tx_mgr.trusted_poses, {})
 
     def test_frame_in_reference_is_not_scored_against_itself(self) -> None:
         """Provenance must come from the map, not from a comment."""
