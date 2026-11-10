@@ -87,6 +87,9 @@ def sha(p):
             h.update(chunk)
     return h.hexdigest()
 
+load_path = os.path.join(rd, "machine_load.txt")
+load = open(load_path).read().strip() if os.path.exists(load_path) else None
+
 rec = {
     "status": status, "reason": reason, "termination": term,
     "run_id": os.path.basename(rd.rstrip("/")),
@@ -95,6 +98,7 @@ rec = {
                "config_m2dgr": cfg, "config_m2dgr_sha256": sha(cfg),
                "config_camera": cam, "config_camera_sha256": sha(cam),
                "recovery_node_source": os.path.join(rd, "recovery_node_source.sha256")},
+    "machine_load_at_launch": load,
     "launch": {"rate": rate, "drain_s": drain, "duration_s": duration,
                "max_pairs": max_pairs, "candidate_source": cand_src,
                "detection": detection, "sigma_meas_m": sigma,
@@ -162,6 +166,10 @@ echo "master=$ROS_MASTER_URI bag=$BAG rate=$RATE"
 
 sha256sum "$REPO/slam_recovery/ros/recovery_node.py" | cut -d' ' -f1 \
   > "$RUN_DIR/recovery_node_source.sha256"
+# Machine load, recorded because it decides how many frames the node gets through: on a loaded
+# box the quarantine window holds fewer frames, the paired-benefit sample shrinks and the Wilson
+# bound changes, without any change to the code or the bag.
+{ cat /proc/loadavg; echo "nproc=$(nproc)"; } > "$RUN_DIR/machine_load.txt"
 { "$PY" -V; echo "$PY"; } > "$RUN_DIR/python_version.txt" 2>&1
 
 setsid roscore -p "$PORT" > "$RUN_DIR/roscore.log" 2>&1 &
