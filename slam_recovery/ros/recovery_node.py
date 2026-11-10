@@ -46,7 +46,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
-from slam_recovery.core import BackendDelta, RecoveryState
+from slam_recovery.core import BackendDelta, RecoveryState, TangentFrame
 from slam_recovery.repair.pose_reregistration import ICP_CONFIG, reregister_segment
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
 from slam_recovery.validation import (
@@ -732,6 +732,13 @@ class NativeClosedLoop:
         # How many of the manager's lifecycle events this loop has already acted on. A re-arm is
         # the moment the host is allowed to write its map again.
         self._lifecycle_seen = 0
+        # CONTROLLED_INTERFACE_TEST: times (seconds from the first frame) at which the loop opens a
+        # quarantine itself, through the same manager entry the detector uses. No detector and no
+        # truth label is read; the run is labelled by what kind of trigger it used.
+        self.scripted_triggers_s: List[float] = []
+        self._scripted_done: List[bool] = []
+        self._first_frame_ts_ns: Optional[int] = None
+        self.scripted_fired: List[Dict[str, Any]] = []
         self.candidate_source = candidate_source
         self.detection_enabled = bool(detection_enabled)
         self.confirmation_margin_ns = int(
@@ -829,6 +836,16 @@ class NativeClosedLoop:
         status = "AVAILABLE" if available else "UNAVAILABLE"
         self.detection_counts[status] += 1
 
+        if self._maybe_scripted_trigger(kf_id, ts_ns, pose, scan_body):
+            # The frame opened the segment; it belongs to it, and the normal ingest must not run.
+            self.frames_fed += 1
+            self._record_diag(kf_id, ts_ns, value, source, reference,
+                              "SCRIPTED_TRIGGER", kfs_before, pts_before)
+            after = self.node.tx_mgr.active_quarantine
+            if after is not None:
+                self._open_episode(ts_ns, pose, after)
+            return
+
         before = self.node.tx_mgr.active_quarantine
         if available:
             if self.first_detected_kf is None:
@@ -856,6 +873,48 @@ class NativeClosedLoop:
             self._open.frames.append((kf_id, ts_ns, np.asarray(pose, dtype=np.float64).copy()))
             if ts_ns >= self._open.deadline_ns:
                 self.pending_decision = "confirmation_margin"
+
+    def _maybe_scripted_trigger(self, kf_id: int, ts_ns: int, pose: np.ndarray,
+                                scan_body: np.ndarray) -> bool:
+        """Open a quarantine at a pre-declared time, through the manager's own entry point.
+
+        This is the controlled interface test: it calls ``trigger_quarantine`` with the same
+        arguments the node's HEALTHY branch builds, then registers the frame exactly as that branch
+        does. It does not consult the detector and it never reads a fault label -- the trigger time
+        comes from the test declaration, not from the data.
+        """
+        if not self.scripted_triggers_s:
+            return False
+        if self._first_frame_ts_ns is None:
+            self._first_frame_ts_ns = int(ts_ns)
+            self._scripted_done = [False] * len(self.scripted_triggers_s)
+        elapsed_s = (int(ts_ns) - self._first_frame_ts_ns) / 1e9
+        for i, at_s in enumerate(self.scripted_triggers_s):
+            if self._scripted_done[i] or elapsed_s < at_s:
+                continue
+            if self.node.tx_mgr.state != RecoveryState.HEALTHY:
+                continue                      # a segment is already open; the time has passed
+            fim_6x6, cov_6x6, _min_r, _min_t, weak = compute_6dof_point_to_plane_fim(
+                scan_body, sigma_meas_m=0.075)
+            self.node.tx_mgr.trigger_quarantine(
+                estimated_onset_ns=int(ts_ns),
+                current_ns=int(ts_ns),
+                weak_direction_6d=np.asarray(weak, dtype=np.float64),
+                info_before_6x6=fim_6x6,
+                propagated_cov_norm=float(np.linalg.norm(cov_6x6, ord=2)),
+                weak_direction_frame=TangentFrame("body", "rot_trans", f"scan:{kf_id}"),
+                info_before_frame=TangentFrame("body", "rot_trans", f"scan:{kf_id}"),
+                anchor_pose_world=np.asarray(pose, dtype=np.float64).copy(),
+            )
+            self.node.tx_mgr.register_quarantined_frame(kf_id, int(ts_ns))
+            self._scripted_done[i] = True
+            self._first_alarm_ts_ns = int(ts_ns)
+            self.scripted_fired.append({
+                "declared_at_s": float(at_s), "actual_s": round(elapsed_s, 3),
+                "kf_id": int(kf_id), "ts_ns": int(ts_ns),
+                "basis": "CONTROLLED_INTERFACE_TEST (trigger_quarantine called directly)"})
+            return True
+        return False
 
     def _record_diag(self, kf_id: int, ts_ns: int, value: Optional[float], source: str,
                      reference: str, status: str, kfs_before: int, pts_before: int) -> None:
@@ -1265,6 +1324,15 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
             # A re-arm the host never heard would otherwise look like a re-arm that happened.
             "native_checkpoint_actions": loop.cp_actions,
         },
+        "run_mode": ("CONTROLLED_INTERFACE_TEST" if loop.scripted_triggers_s
+                     else "ONLINE_DETECTION"),
+        "scripted_triggers": {
+            "declared_s": list(loop.scripted_triggers_s),
+            "fired": loop.scripted_fired,
+            "note": ("the segment was opened by calling trigger_quarantine directly at a declared "
+                     "time; no detector output and no fault label was used, so this run says "
+                     "nothing about detection performance"),
+        },
         "native_checkpoint": (loop.cp.status() if loop.cp is not None
                               else {"enabled": False, "note": "no checkpoint directory was given"}),
         "native_checkpoint_actions": loop.cp_actions,
@@ -1552,6 +1620,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--detection", default="on", choices=("on", "off"),
                     help="off = diagnosis only: the map grows and the NIS is recorded, "
                          "but nothing is judged")
+    ap.add_argument("--scripted-triggers", default="",
+                    help="CONTROLLED_INTERFACE_TEST only: comma-separated seconds from the first "
+                         "frame at which the loop opens a quarantine through trigger_quarantine, "
+                         "without the detector. Empty = the detector decides, as in every other run")
     ap.add_argument("--checkpoint-dir", default="",
                     help="directory shared with the host's native checkpoint poll; empty = the "
                          "host is not asked to snapshot or restore anything")
@@ -1586,6 +1658,9 @@ def main(argv: Optional[List[str]] = None) -> int:
             CheckpointClient(args.checkpoint_dir, snapshot_period_s=args.checkpoint_period_sec)
             if args.checkpoint_dir else None),
     )
+    if args.scripted_triggers:
+        loop.scripted_triggers_s = [float(x) for x in args.scripted_triggers.split(",") if x.strip()]
+        loop._scripted_done = [False] * len(loop.scripted_triggers_s)
     driver = RosDriver(loop, args.pose_topic, args.scan_topic, args.status_topic)
 
     started = time.time()
