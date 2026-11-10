@@ -119,6 +119,33 @@ Mode 仍是 3。这与 S1 的判断一致（他事先指出边界不是唯一原
 `runner` 现在把 `/proc/loadavg` 与 `nproc` 写进 receipt（`machine_load_at_launch`），
 因为这是同一份代码给出不同 Wilson 的直接原因。
 
+## 4d. 空载对照：拒绝理由落到信息腿
+
+`/proc/loadavg` 1 分钟 load 回到 103 时再跑一趟（receipt `/tmp/fl_native_20261110T044830Z_3036955`）：
+
+```
+mode = MODE3_SOFT_BRIDGE_WAIT
+refusal_reason = Insufficient verified info; maintaining soft bridge while waiting for new evidence
+paired_benefit_status = PASSED   ← 证据腿通过
+wilson_lower_bound = 0.7591（20/22 帧改善）
+weak_dir_info_after = 4.661 < tau_info 25
+```
+
+**这就是 S1 预判的那条**：两处 re-entry 修完之后，拒绝落到"弱方向信息不足"，Mode 仍为 3。
+
+三次运行的对照（同一份代码、同一 bag）：
+
+| 运行 | load | 配对 | 候选帧 | 评分帧 | 改善 | Wilson | 拒绝腿 |
+|---|---|---|---|---|---|---|---|
+| `035825Z`（修前） | ~200 | 584/599 | 22 | 22 | 17 | 0.601 | re-entry 边界 |
+| `044250Z` | **338** | 369/599 | 22 | 22 | 13 | 0.418 | 证据（Wilson） |
+| `044830Z` | 103 | 516/599 | 22 | 22 | 20 | 0.759 | **信息** |
+
+**注意候选帧与评分帧三次都是 22——变的是"哪些帧"，不是"多少帧"。**
+所以负载影响的是评分人口的**组成**而不是大小，`min_paired_observations=4` 这类下限防不住它。
+报 Wilson 必须同时报 `num_paired_frames / candidate_keyframes` 与
+`machine_load_at_launch`，缺任一不可比。
+
 ## 5. 三条代价（按裁决必须写进 receipt）
 
 1. **该箱 n=2**，0.884 是两样本估计，不确定性大——不要当精确值；
