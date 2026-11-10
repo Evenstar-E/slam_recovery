@@ -1,0 +1,31 @@
+{
+ "runs": {
+  "ON#1": "20261110T015818Z_2883571",
+  "ON#2": "20261110T020104Z_2887395",
+  "OFF#1": "20261110T020811Z_2895919",
+  "OFF#2": "20261110T021034Z_2898380"
+ },
+ "libraries": {
+  "ON": "20df3d3f42400aec0c56387e55d027289f5117402837a712f2002da6e06c450f",
+  "OFF": "b5255dd399270b5f79ed2d66956edd549f7bb49d601cf6318c5c6774cc7cc374"
+ },
+ "odometry_divergence": {
+  "ON1-ON2": {
+   "matched": 800,
+   "median_m": 0.019,
+   "max_m": 355.16
+  },
+  "OFF1-OFF2": {
+   "matched": 800,
+   "median_m": 0.017,
+   "max_m": 729.002
+  },
+  "ON1-OFF1": {
+   "matched": 800,
+   "median_m": 0.019,
+   "max_m": 201.906
+  }
+ },
+ "reading": "OFF and OFF split as much as ON and ON (median 1.7-1.9 cm either way, maxima 355 m and 729 m), so the divergence is run variance, not a tracing perturbation",
+ "default_build": "NOT RUN"
+}
