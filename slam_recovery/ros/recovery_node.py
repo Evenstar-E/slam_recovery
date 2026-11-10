@@ -577,6 +577,7 @@ class CheckpointClient:
         # blocked the driver's main loop for 16.4 s and pushed a decision 18 s past its deadline.
         self.host_ready = False
         self.snapshot_ack_timeouts = 0
+        self.snapshots_superseded = 0
         self.snapshot_ack_s: List[float] = []
         self._last_snapshot_wall = 0.0
         self._stopped = False
@@ -647,12 +648,33 @@ class CheckpointClient:
         parts = line.split()
         return line if len(parts) >= 2 and parts[1] == cmd else ""
 
+    def _read_received_for(self, cmd: str) -> Optional[float]:
+        try:
+            with open(os.path.join(self.dir, "ack_received"), "r", encoding="utf-8") as fh:
+                line = fh.read().strip()
+        except OSError:
+            return None
+        parts = line.split()
+        if len(parts) >= 2 and parts[0] == "RECEIVED" and parts[1] == cmd:
+            for p in parts[2:]:
+                if p.startswith("wall="):
+                    try:
+                        return float(p[5:])
+                    except ValueError:
+                        return None
+        return None
+
     def poll(self) -> Optional[Dict[str, Any]]:
         """Account for a pending command without waiting. Never blocks the main loop."""
         with self._lock:
             if not self._pending:
                 return None
             event = self._pending[0]
+        if event.get("received_wall") is None:
+            rec = self._read_received_for(event["command"])
+            if rec:
+                event["received_wall"] = rec
+                event["received_s"] = round(rec - float(event.get("wall", rec)), 3)
         line = self._read_ack_for(event["command"])
         if not line:
             return None
@@ -694,18 +716,28 @@ class CheckpointClient:
         with self._lock:
             if self._pending and self._pending[0] is event:
                 self._pending.pop(0)
-        self.snapshot_ack_timeouts += 1
-        self.failures += 1
-        event.update(ok=False, error="snapshot_ack_timeout")
+        if age_s > 0:
+            self.snapshot_ack_timeouts += 1
+            self.failures += 1
+            event.update(ok=False, error="snapshot_ack_timeout")
+        else:
+            # Dropped to make room for a blocking command: superseded, not failed.
+            self.snapshots_superseded += 1
+            event.update(ok=False, error="superseded")
         self.events.append(event)
 
-    def _send(self, cmd: str) -> Dict[str, Any]:
-        # A blocking command must not inherit an unanswered snapshot's ack.
+    def _send(self, cmd: str, payload: str = "") -> Dict[str, Any]:
+        """Issue a command without waiting for it to be applied.
+
+        Blocking here was what cost 30 s when the host was slow inside one LIO frame; the caller now
+        gets the event back immediately and poll() fills in received/applied as they arrive.
+        """
         self.expire_pending(0.0)
-        event = self._write(cmd)
-        if event.get("ok") is False:
-            return event
-        return self.collect() or event
+        return self._write(cmd, payload=payload)
+
+    def pending(self) -> bool:
+        with self._lock:
+            return bool(self._pending)
 
     def hold(self) -> Optional[Dict[str, Any]]:
         """Stop the host writing its map, without waiting: this is called from a callback."""
@@ -742,6 +774,7 @@ class CheckpointClient:
         return self._send("resume")
 
     def set_state(self, pose) -> Dict[str, Any]:
+        # (async, like every other command: the ack is collected by poll())
         """Write an accepted pose back into the host, so it continues from there.
 
         ``pose`` is 4x4 body-to-world, the same convention as every other pose here.
@@ -752,10 +785,7 @@ class CheckpointClient:
         q = _rotation_to_quaternion(T[:3, :3])
         payload = " ".join(f"{v:.9f}" for v in
                            (T[0, 3], T[1, 3], T[2, 3], q[0], q[1], q[2], q[3]))
-        event = self._write("set_state", payload=payload)
-        if event.get("ok") is False:
-            return event
-        return self.collect() or event
+        return self._write("set_state", payload=payload)
 
     def stop(self) -> None:
         self._stopped = True
@@ -765,6 +795,7 @@ class CheckpointClient:
             "enabled": self.enabled,
             "host_ready": self.host_ready,
             "snapshot_ack_timeouts": self.snapshot_ack_timeouts,
+            "snapshots_superseded": self.snapshots_superseded,
             "snapshot_ack_s": list(self.snapshot_ack_s[-50:]),
             "dir": self.dir,
             "snapshot_period_s": self.period_s,
@@ -1256,15 +1287,15 @@ class NativeClosedLoop:
         # re-derived from that checkpoint through the host's own estimator. Both are recorded with
         # the host's ack, because "the command was sent" and "the host did it" are different facts.
         if self.cp is not None:
+            # The event object is the one poll() will account for; appending it here as well would
+            # list the same command twice.
             action = self.cp.reprocess() if row.get("accepted") is True else self.cp.restore()
-            self.cp_actions.append(action)
             ep.meta["native_checkpoint"] = action
             if row.get("accepted") is True and ep.frames:
                 # An accepted repair is only accepted if the host continues from it: the last
                 # repaired pose becomes the host's state, and the next frames propagate from there.
                 writeback = self.cp.set_state(ep.frames[-1][2])
                 writeback["trigger"] = "accepted_pose"
-                self.cp_actions.append(writeback)
                 ep.meta["native_writeback"] = writeback
             # The decision is made; the next event needs its own trusted checkpoint.
             self.cp._last_snapshot_wall = time.time()
@@ -1289,6 +1320,9 @@ class NativeClosedLoop:
         # pairing depends on.
         if self.cp is not None and self.node.tx_mgr.active_quarantine is None:
             self.cp.tick(time.time(), quiescent=True)
+        if self.cp is not None and self.cp.pending():
+            # A command is in flight: no new candidate is built until the host has applied it.
+            return None
         if self.pending_decision is None or self._open is None or self._open.decided:
             return None
         if backlog_limit and (len(self.pairer._poses) + len(self.pairer._scans)) > backlog_limit:
@@ -1308,7 +1342,6 @@ class NativeClosedLoop:
             if ev.get("event") == "rearm":
                 action = self.cp.resume()
                 action["trigger"] = "rearm"
-                self.cp_actions.append(action)
         self._lifecycle_seen = len(events)
 
     def finish(self) -> None:
