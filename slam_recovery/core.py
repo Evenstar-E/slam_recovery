@@ -415,7 +415,13 @@ class GateThresholds:
     """Thresholds for the unified four-mode gate D(t) in Section 4.8."""
 
     min_duration_sec: float = 1.0          # \Delta t_{min} for Mode 1 vs quarantine
-    tau_info: float = 25.0                 # Minimum information along weak direction v^T \Lambda_{after} v
+    # Information along the weak direction. An absolute bound alone is not scale-free: on one bag
+    # the trigger frame's own information ranged 1.10 to 40.23, so any constant floor inside that
+    # range decides the outcome by which frame happened to trigger. The criterion is therefore
+    # relative (the repair must increase the information by a factor) with an absolute floor that
+    # only rejects candidates carrying less information than the trigger geometry itself.
+    tau_abs_min: float = 3.0               # v^T \Lambda_{after} v >= this (measured floor, see prereg)
+    tau_info_kappa: float = 2.0            # and v^T \Lambda_{after} v >= kappa * v^T \Lambda_{before} v
     tau_val_nis: float = 2.5               # Maximum normalized holdout innovation squared D_{holdout}
     sigma_tol: float = 0.50                # Posterior covariance norm tolerance ||P_{after}||
     sigma_bridge: float = 4.00             # Bridge uncertainty upper bound \Sigma_{bridge}
@@ -670,7 +676,8 @@ def evaluate_four_mode_gate(
         wilson_ok = True  # evidence_status == "PASSED" is the only way to reach this point
 
         if (
-            info_after >= thresholds.tau_info
+            info_after >= thresholds.tau_abs_min
+            and info_after >= thresholds.tau_info_kappa * max(info_before, 1e-12)
             and info_gain > 0.0
             and d_hold <= thresholds.tau_val_nis
             and p_after <= thresholds.sigma_tol

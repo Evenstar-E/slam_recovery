@@ -92,7 +92,7 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
         """
         mgr = TrustedMapTransactionManager(
             confirmation_margin_ns=int(2.0 * 1e9),
-            gate_thresholds=GateThresholds(tau_info=25.0, tau_val_nis=2.5, sigma_tol=0.5, sigma_bridge=4.0),
+            gate_thresholds=GateThresholds(tau_abs_min=25.0, tau_val_nis=2.5, sigma_tol=0.5, sigma_bridge=4.0),
         )
         mgr.step_healthy(_make_delta(1.0, 1, 1.0))
         mgr.step_healthy(_make_delta(4.0, 2, 2.0))
@@ -193,7 +193,7 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
         #     and its weak-direction information gain is comfortably above tau_info.
         mgr = TrustedMapTransactionManager(
             confirmation_margin_ns=int(2.0 * 1e9),
-            gate_thresholds=GateThresholds(tau_info=25.0, tau_val_nis=2.5, sigma_tol=0.5, sigma_bridge=4.0),
+            gate_thresholds=GateThresholds(tau_abs_min=25.0, tau_val_nis=2.5, sigma_tol=0.5, sigma_bridge=4.0),
         )
         mgr.step_healthy(_make_delta(1.0, 1, 1.0))
         mgr.step_healthy(_make_delta(4.0, 2, 2.0))
@@ -212,7 +212,7 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
             candidate_id="self_fitting_candidate",
             parent_map_version=version_before,
             repaired_poses={2: np.eye(4)},
-            info_after_6x6=np.diag([60, 60, 60, 45.0, 60, 60]),  # passes tau_info=25.0
+            info_after_6x6=np.diag([60, 60, 60, 45.0, 60, 60]),  # passes tau_abs_min=25.0
             cov_after_6x6=np.eye(6) * 0.05,                       # passes sigma_tol=0.5
             holdout_nis=cand_self_nis,                            # passes tau_val_nis=2.5
             paired_benefit_approved=benefit.approved,
@@ -696,7 +696,7 @@ class TestAtomicPublish(unittest.TestCase):
     def _manager():
         mgr = TrustedMapTransactionManager(
             confirmation_margin_ns=int(2.0 * 1e9),
-            gate_thresholds=GateThresholds(tau_info=25.0, tau_val_nis=2.5,
+            gate_thresholds=GateThresholds(tau_abs_min=25.0, tau_val_nis=2.5,
                                            sigma_tol=0.5, sigma_bridge=4.0),
         )
         mgr.step_healthy(_make_delta(1.0, 1, 1.0))
