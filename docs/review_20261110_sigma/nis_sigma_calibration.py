@@ -85,6 +85,10 @@ def analyse(run_dir, onset):
             "alarm_free_subset_n": len(alarm_free),
             "alarm_free_status": ("SATISFIED" if len(alarm_free) >= 30 else "NOT_SATISFIABLE"),
         },
+        "reference_variant": (
+            "point_cap"
+            if len({f.get("map_points") for f in healthy}) == 1
+            else "spatial_sampling_or_other"),
         "reference_construction": {
             # Recorded because sigma* is coupled to it: a calibration on a different reference is a
             # different measurement, and the two must never be compared or carried across.
@@ -164,10 +168,36 @@ def main(argv):
             "not_done": ["no sigma changed", "no threshold changed", "no nis_allowance_k touch",
                          "no segment chosen to suppress the alarm"],
             "reference_construction_per_run": [r["reference_construction"] for r in results],
-            "coupling_caveat": ("sigma* absorbs whatever the reference construction produces. The "
-                                "NIS reference still comes from a point-capped map sample; if that "
-                                "is changed, sigma* must be recomputed, and the two causes must "
-                                "stay reported separately."),
+            "reference_variant_per_run": [r["reference_variant"] for r in results],
+            "variant_rule": ("a constant map_points over the healthy segment identifies the "
+                             "point-capped reference; a varying distribution identifies a "
+                             "sampling that tracks the map, so the two calibrations are different "
+                             "measurements and sigma* must not be carried between them"),
+            "coupling_caveat": ("sigma* absorbs whatever the reference construction produces. "
+                                "This calibration was taken on the point-capped reference "
+                                "(map_points constant 1500, one trusted keyframe); a later run with "
+                                "resolution-based spatial sampling measured a higher median, so "
+                                "sigma* must be recomputed on any other construction and must not "
+                                "be carried across."),
+            "attribution_correction": {
+                "date": "2026-11-10",
+                "source": "r11070-c3 measurement, relayed by the integration session",
+                "what": ("the point cap was replaced by 0.30 m resolution-based spatial sampling: "
+                         "1500 -> 931 points and the NIS median moved 21.57 -> 24.05, i.e. it did "
+                         "not fall"),
+                "withdrawn": ("the 'point cap thins the map and inflates NIS' half of the earlier "
+                              "attribution is withdrawn; this file's own numbers are unaffected "
+                              "but the explanation attached to them is"),
+                "remaining_candidates": [
+                    "the reference holds only two keyframes at first decision (confirmation "
+                    "margin 2 s), so the map is young irrespective of how it is sampled",
+                    "the residual between a scan and this 931-point reference is genuinely ~0.55 m",
+                ],
+                "open": ("r11070-c3 runs a detection-off pass to see whether NIS converges to "
+                         "O(1) as the map grows; convergence would move the fix to start "
+                         "conditions, non-convergence would bring it back to sigma / residual "
+                         "definition. Neither outcome may reuse 0.5538."),
+            },
         },
         "runs": results,
         "summary": {
