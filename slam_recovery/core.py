@@ -326,6 +326,10 @@ class CandidateMap:
     paired_benefit_approved: Optional[bool] = None
     wilson_lower_bound: Optional[float] = None
     reentry_pos_jump_m: Optional[float] = None
+    # How long the platform had to travel between the anchor and the boundary frame. Without it
+    # the jump is compared as if the two poses were instantaneous neighbours, which refuses every
+    # candidate on a moving platform once a confirmation margin exists.
+    reentry_elapsed_s: Optional[float] = None
     # The set of keyframes whose poses were actually scored against an independent reference.
     # Mode 2 commits exactly ``repaired_poses``, so this set is the commit invariant: a frame that
     # produced no evidence must never be committed alongside the frames that did. ``None`` means
@@ -515,10 +519,21 @@ def evaluate_four_mode_gate(
                 return True
             return f < bound if is_lower_bound else f > bound
 
+        # The re-entry leg is a *discontinuity* bound, so a distance that elapsed time can explain
+        # is not a failure. Same envelope as boundary_continuity_ok, otherwise one report would
+        # carry two definitions of the same boundary.
+        reentry_ok = True
+        if candidate.reentry_pos_jump_m is not None:
+            if candidate.reentry_elapsed_s is None:
+                reentry_ok = float(candidate.reentry_pos_jump_m) <= thresholds.max_reentry_jump_m
+            else:
+                reentry_ok = (
+                    float(candidate.reentry_pos_jump_m)
+                    <= thresholds.max_reentry_jump_m + 2.0 * max(0.0, candidate.reentry_elapsed_s))
         evidence_failed = bool(
             candidate.paired_benefit_approved is False
             or _bad_optional(candidate.wilson_lower_bound, thresholds.min_wilson_lower_bound, True)
-            or _bad_optional(candidate.reentry_pos_jump_m, thresholds.max_reentry_jump_m, False)
+            or not reentry_ok
         )
         evidence_missing = bool(
             candidate.paired_benefit_approved is None

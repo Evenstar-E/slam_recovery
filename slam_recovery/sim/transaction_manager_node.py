@@ -711,6 +711,11 @@ class OnlineRecoveryTransactionNode:
             info_after_frame=TangentFrame("world", "rot_trans", "world"),
             cov_after_frame=TangentFrame("world", "rot_trans", "world"),
             holdout_nis=mean_holdout_nis,
+            reentry_elapsed_s=(
+                None if (reentry_anchor_ts_ns is None or not kf_sorted
+                         or kf_sorted[0] not in self._kf_timestamps)
+                else max(0.0, (self._kf_timestamps[kf_sorted[0]]
+                               - int(reentry_anchor_ts_ns)) * 1e-9)),
             repairer_name=candidate_id,
             paired_benefit_approved=paired_ok,
             wilson_lower_bound=wilson_lb,
