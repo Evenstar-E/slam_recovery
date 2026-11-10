@@ -68,6 +68,7 @@ class OnlineRecoveryTransactionNode:
         large_candidate_keyframe_threshold: int = 8,
         min_paired_observations_large_candidate: int = 8,
         sigma_meas_m: float = 0.12,
+        wait_limit_sec: Optional[float] = None,
     ) -> None:
         # Point-to-plane noise scale used by every holdout/paired NIS in this node.
         #
@@ -99,6 +100,8 @@ class OnlineRecoveryTransactionNode:
         self.tx_mgr = TrustedMapTransactionManager(
             confirmation_margin_ns=int(confirmation_margin_sec * 1e9),
             gate_thresholds=gate_thresholds,
+            wait_limit_ns=(None if wait_limit_sec is None
+                           else int(float(wait_limit_sec) * 1e9)),
         )
         self.detector = JointHealthDetector(DetectorConfig(confirmation_margin_ns=int(confirmation_margin_sec * 1e9)))
         self.router = SignatureMatrixRouter()
@@ -240,6 +243,19 @@ class OnlineRecoveryTransactionNode:
             loop_residual_spike=loop_spike,
         )
         decision = self.detector.step(win)
+
+        # A wait that never ends is a run that can never see a second event. When the run declared
+        # a wait limit, close the segment here and re-arm; the frames it was holding are recorded
+        # as unresolved by the manager, and the current frame is ingested on the normal path.
+        if self.tx_mgr.maybe_close_waiting_segment(timestamp_ns) is not None:
+            self.detector.reset()
+            self.tx_mgr.rearm()
+        elif (self.tx_mgr.state == RecoveryState.ABORTED
+              and self.tx_mgr.active_quarantine is None):
+            # Mode 4 archived the map into sleeping submaps and left the manager terminal; the
+            # next frame starts a new segment rather than being dropped with nowhere to go.
+            self.detector.reset()
+            self.tx_mgr.rearm()
 
         if self.tx_mgr.state == RecoveryState.HEALTHY:
             if decision.state == RecoveryState.QUARANTINED:

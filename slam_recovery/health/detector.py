@@ -143,6 +143,17 @@ class JointHealthDetector:
             self.cusum_g = max(0.0, self.cusum_g + (normalized_nis - self.cfg.nis_allowance_k))
         return self.cusum_g
 
+    def reset(self) -> None:
+        """Forget the alarm history when a segment closes without evidence.
+
+        The CUSUM and dwell counters describe the segment that just ended. Carrying them into
+        the next one would make a second event's detection depend on how the first one ended.
+        """
+        self.cusum_g = 0.0
+        self.state = RecoveryState.HEALTHY
+        self.suspect_dwell = 0
+        self.suspect_onset_ns = None
+
     def step(self, window: HealthWindow) -> HealthDecision:
         g_t = self.update_cusum(window.nis_mean)
 
