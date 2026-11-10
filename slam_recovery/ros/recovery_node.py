@@ -463,10 +463,21 @@ class Episode:
     """One quarantine segment: its trigger frame and every frame registered while it is open."""
 
     def __init__(self, index: int, trigger_ts_ns: int, pose: np.ndarray,
-                 deadline_ns: int) -> None:
+                 deadline_ns: int, estimated_onset_ns: Optional[int] = None,
+                 first_alarm_ts_ns: Optional[int] = None,
+                 quarantine_start_ns: Optional[int] = None) -> None:
         self.index = index
         self.trigger_ts_ns = int(trigger_ts_ns)
         self.deadline_ns = int(deadline_ns)
+        # The detector's back-dated estimate of when the fault began, as the segment records it.
+        # Reporting only the frame that opened the quarantine conflates detection latency with
+        # the detector's onset backtracking, and those are separate errors.
+        self.estimated_onset_ns = estimated_onset_ns
+        self.first_alarm_ts_ns = first_alarm_ts_ns
+        # The segment's own t_start_ns is the *quarantine start*, i.e. its onset estimate minus
+        # the confirmation margin; reporting it as the estimate would overstate the error by
+        # exactly the margin. Both are kept so the arithmetic is checkable.
+        self.quarantine_start_ns = quarantine_start_ns
         self.pose = np.asarray(pose, dtype=np.float64).copy()
         self.frames: List[Tuple[int, int, np.ndarray]] = []   # (kf_id, ts_ns, pose)
         self.decided = False
@@ -518,6 +529,9 @@ class NativeClosedLoop:
         self.ingested_undetected = 0
         self.first_detected_kf: Optional[int] = None
         self.pose_convention_check: Dict[str, Any] = {"status": "NOT_REACHED"}
+        # The first frame at which the detector left HEALTHY. The quarantine opens one dwell
+        # window later, so the two timestamps measure different things.
+        self._first_alarm_ts_ns: Optional[int] = None
 
     # -- ingest -------------------------------------------------------------------------------
     def _fed(self, ts_ns: int) -> bool:
@@ -570,6 +584,9 @@ class NativeClosedLoop:
                 self.pose_convention_check = self._pose_convention_check(pose, scan_body, ts_ns)
             self.node.step_frame(kf_id, ts_ns, pose, scan_body, value)
             self.frames_fed += 1
+            det_state = getattr(self.node.detector.state, "value", self.node.detector.state)
+            if self._first_alarm_ts_ns is None and det_state != "HEALTHY":
+                self._first_alarm_ts_ns = int(ts_ns)
         else:
             self.ingested_undetected += 1
             self._ingest_without_detection(kf_id, ts_ns, pose, scan_body, value)
@@ -578,7 +595,7 @@ class NativeClosedLoop:
 
         after = self.node.tx_mgr.active_quarantine
         if before is None and after is not None:
-            self._open_episode(ts_ns, pose)
+            self._open_episode(ts_ns, pose, after)
         if self._open is not None and not self._open.decided:
             self._open.frames.append((kf_id, ts_ns, np.asarray(pose, dtype=np.float64).copy()))
             if ts_ns >= self._open.deadline_ns:
@@ -667,9 +684,18 @@ class NativeClosedLoop:
                                                <= out["nis_reversed_T_bw"]) else "REVERSED_SELECTED"
         return out
 
-    def _open_episode(self, ts_ns: int, pose: np.ndarray) -> None:
+    def _open_episode(self, ts_ns: int, pose: np.ndarray, segment=None) -> None:
+        estimated = None
+        q_start = None
+        if segment is not None:
+            q_start = int(getattr(segment, "t_start_ns", 0)) or None
+            if q_start is not None:
+                estimated = q_start + self.confirmation_margin_ns
         ep = Episode(len(self.episodes), ts_ns,
-                     pose, ts_ns + self.confirmation_margin_ns)
+                     pose, ts_ns + self.confirmation_margin_ns,
+                     estimated_onset_ns=estimated,
+                     first_alarm_ts_ns=self._first_alarm_ts_ns,
+                     quarantine_start_ns=q_start)
         self.episodes.append(ep)
         self._open = ep
 
@@ -802,6 +828,9 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
             "episode_detail": [
                 {"index": ep.index, "trigger_ts_ns": ep.trigger_ts_ns,
                  "deadline_ns": ep.deadline_ns, "decided": ep.decided,
+                 "estimated_onset_ns": ep.estimated_onset_ns,
+                 "quarantine_start_ns": ep.quarantine_start_ns,
+                 "first_alarm_ts_ns": ep.first_alarm_ts_ns,
                  "frames_registered": len(ep.frames), **(getattr(ep, "meta", {}) or {})}
                 for ep in loop.episodes
             ],
@@ -891,8 +920,13 @@ def nis_vs_map_size(diag: List[Dict[str, Any]]) -> Dict[str, Any]:
             return None
         sel.sort()
         n = len(sel)
+        # Linear interpolation, so a two-sample bin reports a median between its samples instead
+        # of whichever sample happens to sit at index n//2 (which also produced a p90 below the
+        # median for n < 3).
         return {"lo": lo_attr, "hi": (None if hi_attr >= 10 ** 9 else hi_attr), "n": n,
-                "median": float(sel[n // 2]), "p90": float(sel[int(0.9 * (n - 1))]),
+                "min": float(sel[0]),
+                "median": float(np.percentile(sel, 50)),
+                "p90": float(np.percentile(sel, 90)),
                 "max": float(sel[-1])}
 
     for lo, hi in bins:

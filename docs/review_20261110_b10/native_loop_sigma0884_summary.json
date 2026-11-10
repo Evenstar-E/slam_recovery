@@ -1,0 +1,242 @@
+{
+ "run_id": "fl_native_20261110T035825Z_3008585",
+ "detection_enabled": true,
+ "parameters": {
+  "confirmation_margin_ns": 2000000000,
+  "pair_window_ns": 40000000,
+  "scan_cap": 6000,
+  "nis_radius_m": 3.0,
+  "extrap_frames": 5,
+  "sigma_meas_m": 0.884
+ },
+ "pairing": {
+  "pair_window_ns": 40000000,
+  "poses_received": 800,
+  "scans_received": 599,
+  "paired": 584,
+  "poses_unpaired": 216,
+  "scans_unpaired": 15,
+  "paired_fraction_of_poses": 0.73,
+  "paired_fraction_of_scans": 0.9749582637729549,
+  "max_abs_dt_ns": 39824962,
+  "max_backlog_messages": 116,
+  "messages_considered": 1399,
+  "pairing_rule": "nearest pose within 40 ms, no pose reused"
+ },
+ "frames": {
+  "paired": 584,
+  "ingested": 584,
+  "fed_to_step_frame": 364,
+  "ingested_without_detection": 220,
+  "consumed_after_first_decision": 375,
+  "first_decision_ts_ns": 1627643761790611506
+ },
+ "warmup": {
+  "policy": "a frame the node cannot support against its own spatially sampled trusted map is ingested through the manager's healthy path but is NOT judged by the detector; it is recorded as detection_status=UNAVAILABLE. In diagnosis mode (detection=off) every frame is recorded as DISABLED_FOR_DIAGNOSIS and nothing is judged at all.",
+  "detection_status_counts": {
+   "AVAILABLE": 364,
+   "UNAVAILABLE": 220,
+   "DISABLED_FOR_DIAGNOSIS": 0
+  },
+  "frames_ingested_without_detection": 220,
+  "first_detected_kf": 19,
+  "not_an_assumption": "no frame is labelled healthy; UNAVAILABLE says the detector had no reference, which is a statement about the evidence, not about the frame"
+ },
+ "nis": {
+  "computed": 583,
+  "carried_forward": 0,
+  "unavailable": 1,
+  "reference_node_map": 365,
+  "reference_prev_scan": 218,
+  "reference_none": 1,
+  "nonfinite_estimator_output": 0,
+  "sigma_meas_m": 0.884
+ },
+ "quarantine": {
+  "episodes": 1,
+  "trigger_ts_ns": [
+   1627643759659727812
+  ],
+  "decisions": 1,
+  "second_and_later_events": 0,
+  "episode_detail": [
+   {
+    "index": 0,
+    "trigger_ts_ns": 1627643759659727812,
+    "deadline_ns": 1627643761659727812,
+    "decided": true,
+    "estimated_onset_ns": 1627643759426658773,
+    "quarantine_start_ns": 1627643757426658773,
+    "first_alarm_ts_ns": 1627643759526658773,
+    "frames_registered": 22,
+    "decision_basis": "confirmation_margin",
+    "candidate_frames": 22,
+    "incumbent_basis": {
+     "tail_frames_requested": 5,
+     "trusted_keyframes": 165,
+     "anchor_key": 164,
+     "velocity_mps": [
+      0.14485612259415198,
+      0.03299029073507005,
+      0.013336659550284834
+     ],
+     "rotation_held": true,
+     "status": "CONSTANT_VELOCITY",
+     "tail_keys": [
+      160,
+      161,
+      162,
+      163,
+      164
+     ],
+     "anchor_timestamp_ns": 1627643757330770969
+    },
+    "paired_evidence": {
+     "num_paired_frames": 22,
+     "required_paired_frames": 8,
+     "candidate_keyframes": 22,
+     "pairable_frames": 22,
+     "frames_without_independent_reference": 0,
+     "reference_frames_from_candidate": 165,
+     "num_improved_frames": 17,
+     "improved_fraction": 0.7727272727272727,
+     "wilson_lower_bound": 0.6009833871549518,
+     "approved": true,
+     "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+     "incumbent_mean_residual": 0.25274549939009483,
+     "candidate_mean_residual": 0.0913622396600189,
+     "reentry_pos_jump_m": 1.2506330558448835
+    },
+    "error": null,
+    "state_after": "WAITING_FOR_EVIDENCE",
+    "quarantine_still_open": true
+   }
+  ]
+ },
+ "gate": {
+  "accepted": 0,
+  "rejected": 1,
+  "errored": 0,
+  "modes": [
+   "MODE3_SOFT_BRIDGE_WAIT"
+  ],
+  "committed_key_total": 0,
+  "deferred_key_total": 0
+ },
+ "final_state": "WAITING_FOR_EVIDENCE",
+ "trusted_keyframes_at_exit": 165,
+ "runtime": {
+  "wall_sec": 75.193,
+  "peak_rss_kb": 386208,
+  "pose_messages": 800,
+  "scan_messages": 599,
+  "callback_error_count": 0
+ },
+ "nis_vs_map_size": {
+  "frames_with_node_map_nis": 365,
+  "bins_are_half_open": "lo <= k <= hi inclusive at both ends",
+  "by_trusted_keyframes": [
+   {
+    "lo": 1,
+    "hi": 2,
+    "n": 2,
+    "min": 0.9904377446707502,
+    "median": 0.9964592736055088,
+    "p90": 1.0012764967533156,
+    "max": 1.0024808025402674
+   },
+   {
+    "lo": 3,
+    "hi": 5,
+    "n": 2,
+    "min": 0.801296661525942,
+    "median": 0.8683913208895764,
+    "p90": 0.9220670483804838,
+    "max": 0.9354859802532106
+   },
+   {
+    "lo": 6,
+    "hi": 10,
+    "n": 6,
+    "min": 0.6845563576787097,
+    "median": 0.7332948387588478,
+    "p90": 0.7959137210846744,
+    "max": 0.8355611336404531
+   },
+   {
+    "lo": 11,
+    "hi": 20,
+    "n": 12,
+    "min": 0.45719241160853724,
+    "median": 0.5821117154801303,
+    "p90": 0.6398026741230206,
+    "max": 0.6576916840432357
+   },
+   {
+    "lo": 21,
+    "hi": 50,
+    "n": 30,
+    "min": 0.20844997005788493,
+    "median": 0.26078470121837666,
+    "p90": 0.3659586062027905,
+    "max": 0.43973766547109133
+   },
+   {
+    "lo": 51,
+    "hi": 100,
+    "n": 51,
+    "min": 0.164598963393938,
+    "median": 0.3237362356262704,
+    "p90": 0.4537451541214882,
+    "max": 0.5190010810365262
+   },
+   {
+    "lo": 101,
+    "hi": null,
+    "n": 262,
+    "min": 0.012110893081912112,
+    "median": 0.38564900128555735,
+    "p90": 19.218777832998857,
+    "max": 45.97258996560281
+   }
+  ],
+  "by_map_points": [
+   {
+    "lo": 501,
+    "hi": 1000,
+    "n": 5,
+    "min": 0.7093646112318382,
+    "median": 0.9354859802532106,
+    "p90": 0.9976635793924605,
+    "max": 1.0024808025402674
+   },
+   {
+    "lo": 1001,
+    "hi": 2000,
+    "n": 11,
+    "min": 0.5543065692986404,
+    "median": 0.6576916840432357,
+    "p90": 0.7562663085288956,
+    "max": 0.8355611336404531
+   },
+   {
+    "lo": 2001,
+    "hi": 5000,
+    "n": 71,
+    "min": 0.164598963393938,
+    "median": 0.2842226220199855,
+    "p90": 0.43973766547109133,
+    "max": 0.6124044354259803
+   },
+   {
+    "lo": 5001,
+    "hi": null,
+    "n": 278,
+    "min": 0.012110893081912112,
+    "median": 0.39558664785891273,
+    "p90": 18.628581230374785,
+    "max": 45.97258996560281
+   }
+  ]
+ }
+}
