@@ -22,7 +22,7 @@ sys.path.insert(0, "/home/R26534/MM-LINS")
 
 from sklearn.ensemble import GradientBoostingClassifier, IsolationForest
 
-from slam_recovery.core import BackendDelta, DegeneracyType, HealthWindow, RecoveryState
+from slam_recovery.core import BackendDelta, DegeneracyType, HealthWindow, RecoveryState, TangentFrame
 from slam_recovery.diagnosis import PhysicsGuidedCausalTransformer, SignatureMatrixRouter
 from slam_recovery.experiments.manifests import DataProvenance
 from slam_recovery.health import DetectorConfig, JointHealthDetector, MMLINSCovarianceDetector
@@ -270,6 +270,8 @@ def simulate_map_buffer_tail_pollution(
                 weak_direction_6d=w.weak_dir_6d,
                 info_before_6x6=np.eye(6) * w.min_eig_trans,
                 propagated_cov_norm=1.0,
+                weak_direction_frame=TangentFrame("body", "rot_trans", "e1_fixture"),
+                info_before_frame=TangentFrame("body", "rot_trans", "e1_fixture"),
             )
             break
         delta = BackendDelta(

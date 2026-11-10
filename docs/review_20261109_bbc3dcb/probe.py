@@ -5,12 +5,16 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import json
 import numpy as np
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
+from slam_recovery.core import TangentFrame
 
 rng = np.random.default_rng(1)
 cloud = np.column_stack([rng.uniform(-2, 2, 600), rng.uniform(-2, 2, 600), np.zeros(600)])
 node = OnlineRecoveryTransactionNode(confirmation_margin_sec=0)
 node.committed_map_points = [cloud]
-node.tx_mgr.trigger_quarantine(int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6) * 2, 1.2)
+node.tx_mgr.trigger_quarantine(int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6) * 2, 1.2,
+    weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
+    info_before_frame=TangentFrame("world", "rot_trans", "world"),
+)
 poses, incumbent = {}, {}
 for k in range(20):
     node.scan_buffer_body[k] = cloud.copy()

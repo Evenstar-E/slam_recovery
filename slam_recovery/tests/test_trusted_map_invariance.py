@@ -3,7 +3,7 @@
 import unittest
 import numpy as np
 
-from slam_recovery.core import GateThresholds, RecoveryMode, RecoveryState
+from slam_recovery.core import GateThresholds, RecoveryMode, RecoveryState, TangentFrame
 from slam_recovery.experiments.evaluation import compute_recovery_ratio_G
 from slam_recovery.quarantine import TrustedMapTransactionManager
 from slam_recovery.tests.test_atomic_commit import _make_delta
@@ -24,6 +24,8 @@ class TestTrustedMapInvariance(unittest.TestCase):
             weak_direction_6d=np.array([0, 0, 0, 1, 0, 0], dtype=np.float64),
             info_before_6x6=np.diag([50, 50, 50, 1.0, 50, 50]),
             propagated_cov_norm=1.5,  # < sigma_bridge (3.0)
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         snapshot = {k: v.copy() for k, v in mgr.trusted_poses.items()}
 

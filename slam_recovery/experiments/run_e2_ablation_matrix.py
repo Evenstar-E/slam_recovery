@@ -16,7 +16,7 @@ from mcap.reader import make_reader
 from mcap_ros1.decoder import DecoderFactory
 
 sys.path.insert(0, "/home/R26534/MM-LINS")
-from slam_recovery.core import BackendDelta
+from slam_recovery.core import BackendDelta, TangentFrame
 from slam_recovery.experiments.evaluation import (
     compute_recovery_ratio_G,
     recovery_ratio_G_rounded,
@@ -77,6 +77,8 @@ def compute_pollution_ratio_via_manager(
                 weak_direction_6d=np.array([0, 0, 0, 1, 0, 0], dtype=np.float64),
                 info_before_6x6=np.eye(6) * 2.0,
                 propagated_cov_norm=1.5,
+                weak_direction_frame=TangentFrame("body", "rot_trans", "e2_fixture"),
+                info_before_frame=TangentFrame("body", "rot_trans", "e2_fixture"),
             )
             break
         pose4 = np.eye(4)

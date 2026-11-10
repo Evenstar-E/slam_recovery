@@ -24,7 +24,7 @@ import rosbag
 
 sys.path.insert(0, "/home/R26534/MM-LINS")
 
-from slam_recovery.core import DegeneracyType, HealthWindow
+from slam_recovery.core import DegeneracyType, HealthWindow, TangentFrame
 from slam_recovery.diagnosis.causal_transformer import PhysicsGuidedCausalTransformer
 from slam_recovery.experiments.injection.injectors import (
     inject_plastic_bag_near_field_occlusion,
@@ -411,6 +411,8 @@ def evaluate_cross_sequence_causal_transformer() -> dict:
                     weak_direction_6d=w_al.weak_dir_6d,
                     info_before_6x6=np.eye(6) * w_al.min_eig_trans,
                     propagated_cov_norm=1.0,
+                    weak_direction_frame=TangentFrame("body", "rot_trans", "real_bags"),
+                    info_before_frame=TangentFrame("body", "rot_trans", "real_bags"),
                 )
                 leaked = len(set(gt_indices.tolist()).intersection(set(mgr.trusted_poses.keys())))
                 mae_s = abs(est_onset_ns - true_onset_ns) * 1e-9

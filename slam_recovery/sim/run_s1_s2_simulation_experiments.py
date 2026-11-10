@@ -12,7 +12,7 @@ import numpy as np
 
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, _REPO_ROOT)
-from slam_recovery.core import GateThresholds, RecoveryMode
+from slam_recovery.core import GateThresholds, RecoveryMode, TangentFrame
 from slam_recovery.quarantine import TrustedMapTransactionManager
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
 from slam_recovery.validation import compute_disjoint_holdout_point_to_plane_nis
@@ -668,7 +668,9 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
         node_b5.committed_map_points = list(node_r4.committed_map_points)
         node_b5.tx_mgr = TrustedMapTransactionManager(confirmation_margin_ns=int(2.0 * 1e9))
         node_b5.tx_mgr.trigger_quarantine(
-            int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.5
+            int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.5,
+            weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
+            info_before_frame=TangentFrame("world", "rot_trans", "world"),
         )
         rep_b5 = node_b5.evaluate_and_commit_candidate(
             "B5_narrow_fov", quar_poses_drifted_b5, aux_or_loop_info_6x6=None,
@@ -743,7 +745,9 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
         }
         node_b6_pm.tx_mgr = TrustedMapTransactionManager(confirmation_margin_ns=int(2.0 * 1e9))
         node_b6_pm.tx_mgr.trigger_quarantine(
-            int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2
+            int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2,
+            weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
+            info_before_frame=TangentFrame("world", "rot_trans", "world"),
         )
 
         # ---- simulator validity: reference must be frozen BEFORE the candidate is committed ----
@@ -792,7 +796,9 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
         node_b6_pg.scan_buffer_body = dict(node_r5.scan_buffer_body)
         node_b6_pg.tx_mgr = TrustedMapTransactionManager(confirmation_margin_ns=int(2.0 * 1e9))
         node_b6_pg.tx_mgr.trigger_quarantine(
-            int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2
+            int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2,
+            weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
+            info_before_frame=TangentFrame("world", "rot_trans", "world"),
         )
         rep_b6_pg = node_b6_pg.evaluate_and_commit_candidate(
             "B6_aux_pg", quar_poses_repaired_r5, aux_or_loop_info_6x6=aux_fim_physical,

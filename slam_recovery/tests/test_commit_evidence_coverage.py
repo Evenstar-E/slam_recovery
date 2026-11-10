@@ -11,7 +11,7 @@ import unittest
 
 import numpy as np
 
-from slam_recovery.core import CandidateMap, RecoveryMode, RecoveryState
+from slam_recovery.core import CandidateMap, RecoveryMode, RecoveryState, TangentFrame
 from slam_recovery.quarantine import TrustedMapTransactionManager
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
 
@@ -27,7 +27,9 @@ def _node_with_quarantine(cloud: np.ndarray) -> OnlineRecoveryTransactionNode:
     node = OnlineRecoveryTransactionNode(confirmation_margin_sec=0)
     node.committed_map_points = [cloud]
     node.tx_mgr.trigger_quarantine(
-        int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6) * 2, 1.2
+        int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6) * 2, 1.2,
+        weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
+        info_before_frame=TangentFrame("world", "rot_trans", "world"),
     )
     return node
 
@@ -151,6 +153,8 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             weak_direction_6d=np.array([0, 0, 0, 1, 0, 0]),
             info_before_6x6=np.eye(6) * 2,
             propagated_cov_norm=1.2,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         cand = CandidateMap(
             candidate_id="no_holdout",
@@ -162,6 +166,7 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             paired_benefit_approved=True,
             wilson_lower_bound=0.9,
             reentry_pos_jump_m=0.0,
+            info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         report = mgr.validate_and_resolve(cand)
         self.assertIn(
@@ -179,6 +184,8 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             weak_direction_6d=np.array([0, 0, 0, 1, 0, 0]),
             info_before_6x6=np.eye(6) * 2,
             propagated_cov_norm=1.2,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         cand = CandidateMap(
             candidate_id="nan_holdout",
@@ -187,6 +194,7 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             info_after_6x6=np.eye(6) * 100,
             cov_after_6x6=np.eye(6) * 0.01,
             holdout_nis=float("nan"),
+            info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         report = mgr.validate_and_resolve(cand)
         self.assertIn("non-finite", report.reason)
@@ -227,7 +235,9 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             node = OnlineRecoveryTransactionNode(confirmation_margin_sec=0, sigma_meas_m=sigma)
             node.committed_map_points = [cloud]
             node.tx_mgr.trigger_quarantine(
-                int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6) * 2, 1.2
+                int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6) * 2, 1.2,
+                weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
+                info_before_frame=TangentFrame("world", "rot_trans", "world"),
             )
             posed = cloud.copy()
             posed[:, 2] += 0.05  # keep the scan inside the support radius, give it a residual
@@ -314,6 +324,8 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             weak_direction_6d=np.array([0, 0, 0, 1, 0, 0]),
             info_before_6x6=np.eye(6) * 2,
             propagated_cov_norm=1.2,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
 
         def cand(committed, deferred, version):
@@ -329,6 +341,7 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
                 reentry_pos_jump_m=0.0,
                 verified_pose_keys=frozenset(int(k) for k in committed),
                 deferred_pose_keys=tuple(int(k) for k in deferred),
+                info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
             )
 
         r1 = mgr.validate_and_resolve(cand(range(8), range(8, 20), mgr.trusted_version))
@@ -391,6 +404,8 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             weak_direction_6d=np.array([0, 0, 0, 1, 0, 0]),
             info_before_6x6=np.eye(6) * 2,
             propagated_cov_norm=1.2,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         cand = CandidateMap(
             candidate_id="missing_holdout",
@@ -402,6 +417,7 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             paired_benefit_approved=True,
             wilson_lower_bound=0.9,
             reentry_pos_jump_m=0.0,
+            info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         report = mgr.validate_and_resolve(cand)
         self.assertFalse(report.accepted)
@@ -416,6 +432,8 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             weak_direction_6d=np.array([0, 0, 0, 1, 0, 0]),
             info_before_6x6=np.eye(6) * 2,
             propagated_cov_norm=1.2,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         cand = CandidateMap(
             candidate_id="unverified",
@@ -428,6 +446,7 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             wilson_lower_bound=0.9,
             reentry_pos_jump_m=0.0,
             verified_pose_keys=frozenset({0}),
+            info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         with self.assertRaises(RuntimeError):
             mgr.validate_and_resolve(cand)

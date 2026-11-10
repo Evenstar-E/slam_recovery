@@ -135,6 +135,110 @@ class Checkpoint:
         return h.hexdigest()
 
 
+TANGENT_ORDERS = ("rot_trans", "trans_rot")
+TANGENT_FRAMES = ("world", "body")
+
+
+class TangentFrameError(ValueError):
+    """A tangent quantity whose frame/parameterization is missing or not the one required."""
+
+
+class MissingTangentFrame(TangentFrameError):
+    """The producer did not say which frame and block order a 6D quantity is expressed in."""
+
+
+class TangentFrameMismatch(TangentFrameError):
+    """Two 6D quantities that are multiplied together live in different frames."""
+
+
+@dataclass(frozen=True)
+class TangentFrame:
+    """Where a 6D tangent quantity lives, and how its six blocks are ordered.
+
+    `frame`  "world" or "body"; `anchor` names *which* instance (a body frame is per scan, so
+             "body" alone does not identify a basis).
+    `order`  "rot_trans" ([rot(3), trans(3)], the convention of `compute_6dof_point_to_plane_fim`)
+             or "trans_rot".
+
+    A 6D information matrix and a weak direction may only be multiplied if their specs compare
+    equal. Nothing defaults: a quantity that does not say where it lives cannot be used.
+    """
+
+    frame: str
+    order: str = "rot_trans"
+    anchor: str = ""
+
+    def __post_init__(self) -> None:
+        if self.frame not in TANGENT_FRAMES:
+            raise TangentFrameError(f"frame must be one of {TANGENT_FRAMES}, got {self.frame!r}")
+        if self.order not in TANGENT_ORDERS:
+            raise TangentFrameError(f"order must be one of {TANGENT_ORDERS}, got {self.order!r}")
+        if not str(self.anchor).strip():
+            raise MissingTangentFrame(
+                "TangentFrame.anchor is required: 'world' or the scan/keyframe a body frame "
+                "belongs to -- 'body' on its own does not identify a basis"
+            )
+
+    def __str__(self) -> str:
+        return f"{self.frame}[{self.anchor}]/{self.order}"
+
+
+def _skew(t: np.ndarray) -> np.ndarray:
+    return np.array([[0.0, -t[2], t[1]],
+                     [t[2], 0.0, -t[0]],
+                     [-t[1], t[0], 0.0]], dtype=np.float64)
+
+
+def adjoint(T: np.ndarray, order: str = "rot_trans") -> np.ndarray:
+    """Ad_T for twists, block order given by `order`; T maps a point from A to B.
+
+    rot_trans:  [[R, 0], [[t]x R, R]]      trans_rot: P (.) P^T, P = block swap.
+    """
+    T = np.asarray(T, dtype=np.float64)
+    if T.shape != (4, 4):
+        raise ValueError(f"adjoint expects a 4x4 SE(3) matrix, got {T.shape}")
+    R = T[:3, :3]
+    Ad = np.zeros((6, 6), dtype=np.float64)
+    Ad[:3, :3] = R
+    if order == "rot_trans":
+        Ad[3:, :3] = _skew(T[:3, 3]) @ R
+        Ad[3:, 3:] = R
+    elif order == "trans_rot":
+        Ad[:3, :3] = R
+        Ad[:3, 3:] = _skew(T[:3, 3]) @ R
+        Ad[3:, 3:] = R
+    else:
+        raise TangentFrameError(f"order must be one of {TANGENT_ORDERS}, got {order!r}")
+    return Ad
+
+
+def transport(v: np.ndarray, T: np.ndarray, order: str = "rot_trans") -> np.ndarray:
+    """Move a 6D direction from frame A to frame B: v_B = Ad_{T_BA} v_A."""
+    return adjoint(T, order=order) @ np.asarray(v, dtype=np.float64).reshape(6)
+
+
+def transport_information(info: np.ndarray, T: np.ndarray, order: str = "rot_trans") -> np.ndarray:
+    """Move a 6x6 information matrix from A to B: L_B = Ad^-T L_A Ad^-1.
+
+    Chosen so the profiled scalar is invariant:  v_B^T L_B v_B == v_A^T L_A v_A.
+    """
+    Ad = adjoint(T, order=order)
+    Ad_inv = np.linalg.inv(Ad)
+    return Ad_inv.T @ np.asarray(info, dtype=np.float64).reshape(6, 6) @ Ad_inv
+
+
+def require_tangent_frame(spec: Optional[TangentFrame], where: str) -> TangentFrame:
+    """Refuse an undeclared quantity. There is no default frame."""
+    if spec is None:
+        raise MissingTangentFrame(
+            f"{where} carries no TangentFrame: a 6D quantity that does not declare its frame "
+            "and block order cannot be used -- fill it at the producer, do not assume one"
+        )
+    if not isinstance(spec, TangentFrame):
+        raise TangentFrameError(f"{where} must be a TangentFrame, got {type(spec).__name__}")
+    return spec
+
+
 @dataclass
 class QuarantineSegment:
     segment_id: str
@@ -146,6 +250,15 @@ class QuarantineSegment:
     propagated_cov_norm: float
     raw_frame_refs: List[str] = field(default_factory=list)
     provisional_factor_ids: List[int] = field(default_factory=list)
+    # A 6D direction and a 6x6 information matrix mean nothing on their own: the scalar the gate
+    # forms is only the information along a physical direction if both are expressed in the same
+    # basis, with the same block order. Both must be declared by the producer.
+    weak_direction_frame: Optional[TangentFrame] = None
+    info_before_frame: Optional[TangentFrame] = None
+
+    def __post_init__(self) -> None:
+        require_tangent_frame(self.weak_direction_frame, "QuarantineSegment.weak_direction_frame")
+        require_tangent_frame(self.info_before_frame, "QuarantineSegment.info_before_frame")
 
 
 @dataclass
@@ -175,6 +288,11 @@ class CandidateMap:
     info_after_6x6: np.ndarray
     cov_after_6x6: np.ndarray
     holdout_nis: float
+    # The basis `info_after_6x6` lives in. The gate profiles it along the segment's weak direction,
+    # so this must equal `QuarantineSegment.weak_direction_frame`; a repairer that assembles its
+    # information from world-frame points reports "world[world]/rot_trans", one that assembles it
+    # from a scan's own points reports that scan's body frame, and the two are not interchangeable.
+    info_after_frame: Optional[TangentFrame] = None
     used_evidence_refs: List[str] = field(default_factory=list)
     repairer_name: str = ""
     repaired_factor_ids: Optional[List[int]] = None
@@ -261,6 +379,32 @@ def evaluate_four_mode_gate(
       - Mode 3 (Soft Bridge / Wait): unverified/insufficient info, but ||P_prop|| < \Sigma_bridge
       - Mode 4 (Hard Sleep / Split): unverified/insufficient info and ||P_prop|| >= \Sigma_bridge
     """
+    # A 6D direction dotted with a 6x6 information matrix is only the information along a physical
+    # direction if both are expressed in the same basis with the same block order. That is checked
+    # here, at the entry, and it is a refusal rather than a correction: the gate does not own the
+    # transform that would reconcile two frames, so guessing one would produce a plausible number
+    # with no way to tell it is wrong. Producers use transport()/transport_information().
+    v_frame = require_tangent_frame(segment.weak_direction_frame,
+                                    "QuarantineSegment.weak_direction_frame")
+    info_before_frame = require_tangent_frame(segment.info_before_frame,
+                                              "QuarantineSegment.info_before_frame")
+    if v_frame != info_before_frame:
+        raise TangentFrameMismatch(
+            f"weak_direction is in {v_frame} but info_before is in {info_before_frame}: "
+            "v^T Lambda v would mix two bases. Transport one of them into the other's frame and "
+            "declare the result; the gate will not pick a frame for you."
+        )
+    info_after_frame = None
+    if candidate is not None:
+        info_after_frame = require_tangent_frame(candidate.info_after_frame,
+                                                 "CandidateMap.info_after_frame")
+        if info_after_frame != v_frame:
+            raise TangentFrameMismatch(
+                f"candidate info_after is in {info_after_frame} but the weak direction is in "
+                f"{v_frame}: the profiled information would mix two bases. Transport the "
+                "candidate information into the segment's frame before submitting it."
+            )
+
     v = np.asarray(segment.weak_direction_6d, dtype=np.float64).reshape(6)
     v_norm = np.linalg.norm(v)
     if v_norm > 1e-12:

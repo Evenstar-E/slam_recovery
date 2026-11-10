@@ -8,6 +8,7 @@ from slam_recovery.core import (
     CandidateMap,
     GateThresholds,
     RecoveryMode,
+TangentFrame,
 )
 from slam_recovery.quarantine import TrustedMapTransactionManager
 
@@ -38,6 +39,8 @@ class TestCheckpointRestoreAndRollbackTheory(unittest.TestCase):
             weak_direction_6d=np.array([0, 0, 0, 1, 0, 0], dtype=np.float64),
             info_before_6x6=info_degraded,
             propagated_cov_norm=1.1,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
 
         # B3 candidate: rollback + re-run on same degraded data -> info_after == info_before
@@ -48,6 +51,7 @@ class TestCheckpointRestoreAndRollbackTheory(unittest.TestCase):
             info_after_6x6=info_degraded.copy(),
             cov_after_6x6=np.eye(6) * 0.1,
             holdout_nis=0.9,
+            info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         report = mgr.validate_and_resolve(b3_candidate)
         self.assertFalse(report.accepted)

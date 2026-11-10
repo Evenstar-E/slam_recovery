@@ -13,7 +13,7 @@ import unittest
 
 import numpy as np
 
-from slam_recovery.core import BackendDelta, CandidateMap, RecoveryState
+from slam_recovery.core import BackendDelta, CandidateMap, RecoveryState, TangentFrame
 from slam_recovery.quarantine import TrustedMapTransactionManager
 
 
@@ -47,6 +47,7 @@ def _candidate(version: int, poses) -> CandidateMap:
         paired_benefit_approved=True,
         wilson_lower_bound=0.90,
         reentry_pos_jump_m=0.05,
+        info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
     )
 
 
@@ -62,6 +63,8 @@ class A5PendingRegistrationTest(unittest.TestCase):
             weak_direction_6d=np.array([0, 0, 0, 1, 0, 0], dtype=np.float64),
             info_before_6x6=np.eye(6) * 10.0,
             propagated_cov_norm=1.0,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         return mgr, seg
 

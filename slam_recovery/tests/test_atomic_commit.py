@@ -9,6 +9,7 @@ from slam_recovery.core import (
     GateThresholds,
     RecoveryMode,
     RecoveryState,
+TangentFrame,
 )
 from slam_recovery.quarantine import TrustedMapTransactionManager
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
@@ -71,6 +72,8 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
             weak_direction_6d=np.array([0, 0, 0, 1, 0, 0], dtype=np.float64),
             info_before_6x6=np.diag([50, 50, 50, 2.0, 50, 50]),
             propagated_cov_norm=1.2,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         self.assertEqual(mgr.state, RecoveryState.QUARANTINED)
         # Keyframes 3, 4, 5 (the drifted ones) must NOT be in trusted_poses!
@@ -99,6 +102,8 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
             weak_direction_6d=np.array([0, 0, 0, 1, 0, 0], dtype=np.float64),
             info_before_6x6=np.diag([60, 60, 60, 3.0, 60, 60]),
             propagated_cov_norm=1.8,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         version_before = mgr.trusted_version
 
@@ -110,6 +115,7 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
             info_after_6x6=np.diag([60, 60, 60, 40.0, 60, 60]),
             cov_after_6x6=np.eye(6) * 0.05,
             holdout_nis=6.4,  # Exceeds tau_val_nis=2.5
+            info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         rep1 = mgr.validate_and_resolve(bad_cand)
         self.assertFalse(rep1.accepted)
@@ -128,6 +134,7 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
             paired_benefit_approved=True,
             wilson_lower_bound=0.90,
             reentry_pos_jump_m=0.05,
+            info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         rep2 = mgr.validate_and_resolve(good_cand)
         self.assertTrue(rep2.accepted)
@@ -194,6 +201,8 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
             weak_direction_6d=np.array([0, 0, 0, 1, 0, 0], dtype=np.float64),
             info_before_6x6=np.diag([60, 60, 60, 3.0, 60, 60]),
             propagated_cov_norm=1.8,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         version_before = mgr.trusted_version
 
@@ -207,6 +216,7 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
             paired_benefit_approved=benefit.approved,
             wilson_lower_bound=benefit.wilson_lower_bound,
             reentry_pos_jump_m=0.0,
+            info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         self.assertLess(self_fitting.holdout_nis, 2.5)
         rep = mgr.validate_and_resolve(self_fitting)
@@ -259,6 +269,8 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
         node.tx_mgr.trigger_quarantine(
             int(10e9), int(20e9),
             np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2,
+            weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
+            info_before_frame=TangentFrame("world", "rot_trans", "world"),
         )
         version_before = node.tx_mgr.trusted_version
 
@@ -380,15 +392,23 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
         m = TrustedMapTransactionManager()
         for t in range(8, 15):
             m.step_healthy(_make_delta(t, t, t if t < 10 else 100 + t))
-        m.trigger_quarantine(int(10e9), int(14e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6), 1.0)
+        m.trigger_quarantine(int(10e9), int(14e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6), 1.0,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
+        )
         self.assertEqual([k for k in m.trusted_poses if k >= 10], [])
 
         # R3: Non-finite (NaN/Inf) candidate pose is rejected by the gate
         m = TrustedMapTransactionManager()
-        m.trigger_quarantine(int(10e9), int(14e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6), 1.0)
+        m.trigger_quarantine(int(10e9), int(14e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6), 1.0,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
+        )
         bad_pose = np.eye(4)
         bad_pose[0, 3] = np.nan
-        c_nan = CandidateMap("nonfinite_pose", m.trusted_version, {42: bad_pose}, np.eye(6) * 100, np.eye(6) * 0.01, 0.1)
+        c_nan = CandidateMap("nonfinite_pose", m.trusted_version, {42: bad_pose}, np.eye(6) * 100, np.eye(6) * 0.01, 0.1,
+            info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+        )
         rep_nan = m.validate_and_resolve(c_nan)
         self.assertFalse(rep_nan.accepted)
 
@@ -409,10 +429,14 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
         m = TrustedMapTransactionManager()
         m.trusted_poses[1] = np.eye(4)
         m.trusted_factors = [10]
-        m.trigger_quarantine(int(10e9), int(14e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6), 1.0)
+        m.trigger_quarantine(int(10e9), int(14e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6), 1.0,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
+        )
         c_ok = CandidateMap(
             "pose_and_factor", m.trusted_version, {2: np.eye(4)}, np.eye(6) * 100, np.eye(6) * 0.01, 0.1,
             paired_benefit_approved=True, wilson_lower_bound=0.90, reentry_pos_jump_m=0.05,
+            info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         rep_ok = m.validate_and_resolve(c_ok)
         self.assertTrue(rep_ok.accepted)
@@ -427,7 +451,10 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
 
         def resolve(**evidence):
             m = TrustedMapTransactionManager()
-            m.trigger_quarantine(int(10e9), int(14e9), np.array([0., 0., 0., 1., 0., 0.]), np.eye(6), 1.0)
+            m.trigger_quarantine(int(10e9), int(14e9), np.array([0., 0., 0., 1., 0., 0.]), np.eye(6), 1.0,
+                weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+                info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
+            )
             cand = CandidateMap(
                 candidate_id="evidence_probe",
                 parent_map_version=m.trusted_version,
@@ -436,6 +463,7 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
                 cov_after_6x6=np.eye(6) * 0.01,
                 holdout_nis=0.10,
                 **evidence,
+                info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
             )
             return m.validate_and_resolve(cand), m
 
@@ -492,7 +520,10 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
         self.assertTrue(all(isinstance(rec[1], int) for rec in m._promoted_before_images))
         # A full revocation must still restore the exact pre-onset factor set
         before = list(m.trusted_factors)
-        m.trigger_quarantine(0, 10**15, np.array([0., 0., 0., 1., 0., 0.]), np.eye(6), 1.0)
+        m.trigger_quarantine(0, 10**15, np.array([0., 0., 0., 1., 0., 0.]), np.eye(6), 1.0,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
+        )
         self.assertEqual(m.trusted_factors, [])
         self.assertTrue(all(isinstance(f, int) for f in before))
 
@@ -608,7 +639,10 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
 
         # Also verify unsafe_candidate_fields rejects both NaN bias and (2,2) invalid pose matrix
         m = TrustedMapTransactionManager()
-        m.trigger_quarantine(int(10e9), int(14e9), np.array([0.0, 0, 0, 1, 0, 0]), np.eye(6), 1.0)
+        m.trigger_quarantine(int(10e9), int(14e9), np.array([0.0, 0, 0, 1, 0, 0]), np.eye(6), 1.0,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
+        )
         r_nan_bias = m.validate_and_resolve(
             CandidateMap(
                 "nan_bias",
@@ -618,14 +652,20 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
                 np.eye(6) * 0.01,
                 0.1,
                 repaired_bias_acc=np.array([np.nan, 0.0, 0.0]),
+                info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
             )
         )
         self.assertFalse(r_nan_bias.accepted)
 
         m2 = TrustedMapTransactionManager()
-        m2.trigger_quarantine(int(10e9), int(14e9), np.array([0.0, 0, 0, 1, 0, 0]), np.eye(6), 1.0)
+        m2.trigger_quarantine(int(10e9), int(14e9), np.array([0.0, 0, 0, 1, 0, 0]), np.eye(6), 1.0,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
+        )
         r_bad_shape = m2.validate_and_resolve(
-            CandidateMap("bad_shape", m2.trusted_version, {42: np.eye(2)}, np.eye(6) * 100, np.eye(6) * 0.01, 0.1)
+            CandidateMap("bad_shape", m2.trusted_version, {42: np.eye(2)}, np.eye(6) * 100, np.eye(6) * 0.01, 0.1,
+                info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+            )
         )
         self.assertFalse(r_bad_shape.accepted)
         self.assertNotIn(42, m2.trusted_poses)
@@ -658,6 +698,8 @@ class TestAtomicPublish(unittest.TestCase):
             weak_direction_6d=np.array([0, 0, 0, 1, 0, 0], dtype=np.float64),
             info_before_6x6=np.diag([60, 60, 60, 3.0, 60, 60]),
             propagated_cov_norm=1.8,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         return mgr
 
@@ -677,7 +719,9 @@ class TestAtomicPublish(unittest.TestCase):
             reentry_pos_jump_m=0.05,
         )
         kwargs.update(overrides)
-        return CandidateMap(**kwargs)
+        return CandidateMap(**kwargs,
+            info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+        )
 
     def _snapshot(self, mgr):
         return {
