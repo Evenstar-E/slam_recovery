@@ -1,0 +1,80 @@
+{
+ "protocol": "recomputed from the four output bags (/aft_mapped_to_init, 800 msgs each) with rosbag; matched by index after confirming 0/800 header-stamp mismatches in every pair",
+ "runs": {
+  "ON#1": {
+   "bag": "/tmp/fastlivo/res_on1.bag",
+   "bag_sha256": "c5b098e0a9536cc73b56310da3821e4601659b57e08210c2279edbbd86eae697",
+   "library": "20df3d3f"
+  },
+  "ON#2": {
+   "bag": "/tmp/fastlivo/res_on2.bag",
+   "bag_sha256": "6e92986c80b41f5c8a4aaf087c57da47c842a4ccfb2ca3df6102ad078fad5cba",
+   "library": "20df3d3f"
+  },
+  "OFF#1": {
+   "bag": "/tmp/fastlivo/res_off1.bag",
+   "bag_sha256": "ed739f3691a142ad0a6106a6702ee10d947c122322dd1c456e94f7452d482526",
+   "library": "b5255dd3"
+  },
+  "OFF#2": {
+   "bag": "/tmp/fastlivo/res_off2.bag",
+   "bag_sha256": "f50fe87823bf6212a7be1fb179a7886e318b9956b0a13704ddf3f632f9c035e8",
+   "library": "b5255dd3"
+  }
+ },
+ "pairs": {
+  "ON1-ON2": {
+   "matched": 800,
+   "stamp_mismatch": 0,
+   "median_m": 0.0192,
+   "p95_m": 343.0163,
+   "max_m": 355.1595,
+   "frames_gt_1cm": 468,
+   "frames_gt_1m": 328
+  },
+  "OFF1-OFF2": {
+   "matched": 800,
+   "stamp_mismatch": 0,
+   "median_m": 0.0173,
+   "p95_m": 580.586,
+   "max_m": 729.0016,
+   "frames_gt_1cm": 487,
+   "frames_gt_1m": 330
+  },
+  "ON1-OFF1": {
+   "matched": 800,
+   "stamp_mismatch": 0,
+   "median_m": 0.0192,
+   "p95_m": 197.9338,
+   "max_m": 201.9062,
+   "frames_gt_1cm": 488,
+   "frames_gt_1m": 306
+  },
+  "ON2-OFF2": {
+   "matched": 800,
+   "stamp_mismatch": 0,
+   "median_m": 0.0169,
+   "p95_m": 633.534,
+   "max_m": 733.8402,
+   "frames_gt_1cm": 467,
+   "frames_gt_1m": 303
+  }
+ },
+ "verdict": "TRACING_IS_NOT_THE_MECHANISM",
+ "why": "two runs of the tracing-off build separate as far as two runs of the tracing-on build (max 729 m vs 355 m, p95 581 m vs 343 m), so the divergence exists without the trace",
+ "correction_to_delivered_reading": "the median (1.7-1.9 cm) is dominated by the early frames where every pair still agrees; from the p95 and the >1 m counts (306-330 of 800 frames) it is clear more than a third of the trajectory separates by metres. The conclusion does not change, but 'median 1.7-1.9 cm either way' must not be quoted alone",
+ "limits": {
+  "same_build_only": "ON-ON and OFF-OFF are same-build pairs; the cross-build pairs are reported for completeness and are not a control",
+  "no_reference": "still no GT/ATE for these four runs, so which run (if any) is near the reference is unknown",
+  "build_flags": "ON and OFF both carry NO_MP + DET_SYNC; the default build is not run"
+ },
+ "score_mapping": {
+  "rows": [
+   "A2",
+   "B6",
+   "B8"
+  ],
+  "change": "none",
+  "why": "one controlled negative result about tracing; B6/B8 still need the default build, repeated pairs and interval estimates"
+ }
+}
