@@ -150,19 +150,33 @@ python -I docs/review_20261110_a7/negctl_a7.py <prefix-tree> # 修前：same_dec
 ```bash
 # 1) 审阅侧原脚本：在修后代码上停在 MissingAnchorPose（旧契约不再静默出数）
 PYTHONPATH=. python -B -W ignore /tmp/a7rev/a7_gauge_probes.py
-# 2) 同一物理场景、新契约：
+# 2) 同一 physical fixture、新契约：
 python -I docs/review_20261110_a7/a7_gauge_probes_fixed.py
 # 3) 负控（两写法 + 无 anchor 拒绝）：
 python -I docs/review_20261110_a7/negctl_a7.py .
 ```
 
-| 场景 | 修前 | 修后 |
+**口径**：下表是**同一个 fixture、同一个现象**，不是同一组数字。绝对值取决于本机的
+numpy/BLAS 与随机流，审阅侧与我在同一 commit 上得到过不同的绝对量。可迁移的是**现象与机制**：
+2 m 平移使 world 弱向量范数变成 2.01、信息被除约 4 倍、mode 翻转；5 m 平移使 cov 谱范数
+0.2 → 0.628、mode 翻转。
+
+| 场景 | 修前（本机） | 修后（本机） |
 |---|---|---|
 | 真实 producer，world y 平移 0 m | before 20.0239，after 51.2612，cov 0.021666，MODE2 | 同左 |
 | 真实 producer，world y 平移 2 m | before **4.9464**，after **12.6627**，cov 0.114340，**MODE3** | before 20.0239，after 51.2612，cov 0.021666，**MODE2** |
 | 对角例，world y 平移 0 m | before 20，after 30，cov 0.2，MODE2 | 同左 |
 | 对角例，world y 平移 5 m | cov **0.628026**，**MODE3** | cov 0.200000，**MODE2** |
-| 真实 producer + 绕 z 转 30° + 平移 (0.5, 2, -1) | — | before/after/cov 与 0 m 例相同（1e-6/1e-9），MODE2 |
+| 真实 producer + 绕 z 转 30° + 平移 (0.5, 2, -1) | — | 与 0 m 例一致（1e-6/1e-9），MODE2 |
+
+审阅侧在 `4255cbe` 上独立跑出的是 before 19.0337 / after 48.7263 / 弱向量
+`[0.77557,-0.52541,-0.34990]`；本机同一 commit 是 20.0239 / 51.2612 / `[0.66195,-0.48780,-0.56909]`。
+两者**现象一致、绝对值不同**，所以这里只主张现象。
+
+**一条限定**：本脚本的协方差例是**往返**（body→world 用 `transport_covariance`，门再
+world→body 搬回来），构造上必然不变，**单靠它抓不到伴随写错**。非往返检查是另一件事——
+把点云真正变换到 world、用 producer 重新算 FIM 再求逆，与搬运后的协方差比较，相对误差 1e-4
+（信息侧 1.5e-8）。该检查由审阅侧加入，不在此脚本里；我不把它记成自己的证据。
 
 两个反例在修后 **mode 与门指标都不再随平移变化**；第三个是审阅要求的"真实 producer 旋转弱方向
 + 非零平移"新例，同样不变。

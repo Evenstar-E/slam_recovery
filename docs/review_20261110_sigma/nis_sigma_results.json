@@ -1,0 +1,226 @@
+{
+ "_meta": {
+  "what": "NIS sigma calibration on a pre-declared healthy segment; diagnostic only",
+  "written": "2026-11-10",
+  "onset_ns": 1627643759554082870,
+  "onset_source": "docs/review_20261109_bbc3dcb/room02_2x2_audit.json",
+  "proportionality": "NIS = mean((residual/sigma)^2) with a sigma-independent 2.0 m truncation and coverage gate, so NIS scales exactly as 1/sigma^2; sigma* = sigma_0 * sqrt(median NIS)",
+  "not_done": [
+   "no sigma changed",
+   "no threshold changed",
+   "no nis_allowance_k touch",
+   "no segment chosen to suppress the alarm"
+  ],
+  "reference_construction_per_run": [
+   {
+    "scan_cap": 6000,
+    "nis_radius_m": 3.0,
+    "pair_window_ns": 40000000,
+    "map_points_over_healthy": {
+     "n": 168,
+     "min": 1500.0,
+     "p10": 1500.0,
+     "median": 1500.0,
+     "p90": 1500.0,
+     "max": 1500.0
+    },
+    "trusted_keyframes_over_healthy": {
+     "n": 168,
+     "min": 1.0,
+     "p10": 1.0,
+     "median": 1.0,
+     "p90": 1.0,
+     "max": 1.0
+    }
+   },
+   {
+    "scan_cap": 6000,
+    "nis_radius_m": 3.0,
+    "pair_window_ns": 40000000,
+    "map_points_over_healthy": {
+     "n": 168,
+     "min": 1500.0,
+     "p10": 1500.0,
+     "median": 1500.0,
+     "p90": 1500.0,
+     "max": 1500.0
+    },
+    "trusted_keyframes_over_healthy": {
+     "n": 168,
+     "min": 1.0,
+     "p10": 1.0,
+     "median": 1.0,
+     "p90": 1.0,
+     "max": 1.0
+    }
+   }
+  ],
+  "coupling_caveat": "sigma* absorbs whatever the reference construction produces. The NIS reference still comes from a point-capped map sample; if that is changed, sigma* must be recomputed, and the two causes must stay reported separately."
+ },
+ "runs": [
+  {
+   "run": "fl_native_20261110T030931Z_2941380",
+   "run_id": "fl_native_20261110T030931Z_2941380",
+   "sigma_meas_m_used": 0.12,
+   "frames_total": 498,
+   "frames_node_map": 363,
+   "frames_prev_scan": 135,
+   "healthy_segment": {
+    "rule": "nis_reference == 'node_map' and ts_ns < onset_ns",
+    "n": 168,
+    "first_ts_ns": 1627643742711321115,
+    "last_ts_ns": 1627643759526658773,
+    "alarm_free_subset_n": 0,
+    "alarm_free_status": "NOT_SATISFIABLE"
+   },
+   "reference_construction": {
+    "scan_cap": 6000,
+    "nis_radius_m": 3.0,
+    "pair_window_ns": 40000000,
+    "map_points_over_healthy": {
+     "n": 168,
+     "min": 1500.0,
+     "p10": 1500.0,
+     "median": 1500.0,
+     "p90": 1500.0,
+     "max": 1500.0
+    },
+    "trusted_keyframes_over_healthy": {
+     "n": 168,
+     "min": 1.0,
+     "p10": 1.0,
+     "median": 1.0,
+     "p90": 1.0,
+     "max": 1.0
+    }
+   },
+   "before": {
+    "n": 168,
+    "min": 5.49117,
+    "p10": 14.495329,
+    "median": 21.301072,
+    "p90": 29.426072,
+    "max": 49.73168
+   },
+   "sigma_star_m": 0.553837,
+   "after": {
+    "n": 168,
+    "min": 0.257788,
+    "p10": 0.680498,
+    "median": 1.0,
+    "p90": 1.381436,
+    "max": 2.334703
+   },
+   "frames_above_detector_limit_before": 168,
+   "frames_above_detector_limit_after": 3,
+   "detector_nis_limit": 2.074074,
+   "archived_candidate": {
+    "candidate_id": "cand_0000",
+    "candidate_source": "host_poses",
+    "mode": "MODE3_SOFT_BRIDGE_WAIT",
+    "accepted": false,
+    "refusal_reason": "Refused Mode 2 atomic commit: a committed segment begins beyond the boundary jump bound (per-segment continuity failed)",
+    "holdout_nis_before": 29.719407,
+    "holdout_nis_after_rescale": 1.395207,
+    "tau_val_nis": 2.5,
+    "other_refusal_legs": {
+     "reentry_pos_jump_m": 0.6660190239577879,
+     "max_reentry_jump_m": 0.5,
+     "wilson_lower_bound": 0.12101823537662995,
+     "min_wilson_lower_bound": 0.55,
+     "weak_dir_info_gain": -5.75719
+    },
+    "mode_would_change": false,
+    "why": "the archived candidate is refused before the NIS comparison is ever decisive: boundary continuity fails (0.666 m > 0.5 m) and the paired evidence FAILED (wilson 0.121 < 0.55). Rescaling sigma moves only the holdout-NIS leg, which was not the leg that refused it."
+   }
+  },
+  {
+   "run": "fl_native_20261110T030656Z_2938083",
+   "run_id": "fl_native_20261110T030656Z_2938083",
+   "sigma_meas_m_used": 0.12,
+   "frames_total": 535,
+   "frames_node_map": 365,
+   "frames_prev_scan": 170,
+   "healthy_segment": {
+    "rule": "nis_reference == 'node_map' and ts_ns < onset_ns",
+    "n": 168,
+    "first_ts_ns": 1627643742711321115,
+    "last_ts_ns": 1627643759526658773,
+    "alarm_free_subset_n": 0,
+    "alarm_free_status": "NOT_SATISFIABLE"
+   },
+   "reference_construction": {
+    "scan_cap": 6000,
+    "nis_radius_m": 3.0,
+    "pair_window_ns": 40000000,
+    "map_points_over_healthy": {
+     "n": 168,
+     "min": 1500.0,
+     "p10": 1500.0,
+     "median": 1500.0,
+     "p90": 1500.0,
+     "max": 1500.0
+    },
+    "trusted_keyframes_over_healthy": {
+     "n": 168,
+     "min": 1.0,
+     "p10": 1.0,
+     "median": 1.0,
+     "p90": 1.0,
+     "max": 1.0
+    }
+   },
+   "before": {
+    "n": 168,
+    "min": 5.484772,
+    "p10": 13.912079,
+    "median": 21.172807,
+    "p90": 29.476343,
+    "max": 49.73168
+   },
+   "sigma_star_m": 0.552167,
+   "after": {
+    "n": 168,
+    "min": 0.259048,
+    "p10": 0.657073,
+    "median": 1.0,
+    "p90": 1.392179,
+    "max": 2.348847
+   },
+   "frames_above_detector_limit_before": 168,
+   "frames_above_detector_limit_after": 3,
+   "detector_nis_limit": 2.074074,
+   "archived_candidate": {
+    "candidate_id": "cand_0000",
+    "candidate_source": "host_poses",
+    "mode": "MODE3_SOFT_BRIDGE_WAIT",
+    "accepted": false,
+    "refusal_reason": "Refused Mode 2 atomic commit: a committed segment begins beyond the boundary jump bound (per-segment continuity failed)",
+    "holdout_nis_before": 29.728385,
+    "holdout_nis_after_rescale": 1.404083,
+    "tau_val_nis": 2.5,
+    "other_refusal_legs": {
+     "reentry_pos_jump_m": 0.6660190239577879,
+     "max_reentry_jump_m": 0.5,
+     "wilson_lower_bound": 0.12101823537662995,
+     "min_wilson_lower_bound": 0.55,
+     "weak_dir_info_gain": -5.757333
+    },
+    "mode_would_change": false,
+    "why": "the archived candidate is refused before the NIS comparison is ever decisive: boundary continuity fails (0.666 m > 0.5 m) and the paired evidence FAILED (wilson 0.121 < 0.55). Rescaling sigma moves only the holdout-NIS leg, which was not the leg that refused it."
+   }
+  }
+ ],
+ "summary": {
+  "sigma_star_m_per_run": [
+   0.553837,
+   0.552167
+  ],
+  "median_before_per_run": [
+   21.301072,
+   21.172807
+  ],
+  "healthy_rule_satisfies_no_alarm": false,
+  "note": "the 'no alarm' clause of the pre-declared health rule cannot be met here: the first judged frame already alarms, so 167 of 168 pre-onset frames carry detector_state QUARANTINED. Selecting only unalarmed frames would leave n=1 and would select on the outcome. The segment is therefore declared healthy by provenance (outside the injection window) and the clause is reported NOT_SATISFIABLE, not silently dropped."
+ }
+}
