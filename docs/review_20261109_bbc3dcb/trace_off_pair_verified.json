@@ -60,7 +60,7 @@
    "frames_gt_1m": 303
   }
  },
- "verdict": "TRACING_IS_NOT_THE_MECHANISM",
+ "verdict": "OFF_ALSO_DIVERGES__TRACE_NOT_NECESSARY",
  "why": "two runs of the tracing-off build separate as far as two runs of the tracing-on build (max 729 m vs 355 m, p95 581 m vs 343 m), so the divergence exists without the trace",
  "correction_to_delivered_reading": "the median (1.7-1.9 cm) is dominated by the early frames where every pair still agrees; from the p95 and the >1 m counts (306-330 of 800 frames) it is clear more than a third of the trajectory separates by metres. The conclusion does not change, but 'median 1.7-1.9 cm either way' must not be quoted alone",
  "limits": {
@@ -76,5 +76,7 @@
   ],
   "change": "none",
   "why": "one controlled negative result about tracing; B6/B8 still need the default build, repeated pairs and interval estimates"
- }
+ },
+ "superseded_reading": "TRACING_IS_NOT_THE_MECHANISM / 'run variance, not tracing perturbation' was too strong (review 2026-11-10, a7_review.md §OFF). The supported claim is narrower: severe run divergence appears with tracing off as well, so tracing is not a necessary condition for its appearance; the contribution, amplification or suppression by tracing, and the root cause, remain undetermined.",
+ "metric_warning": "the OFF-OFF 729 m maximum is Euclidean on bag odometry; the ON-ON 309.7 m maximum in trace_on_pair_results.json is a single-axis maximum on trace STATE rows. Different populations and metrics -- they are not corrections of each other and must not be placed in one table."
 }
