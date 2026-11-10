@@ -693,12 +693,13 @@ class OnlineRecoveryTransactionNode:
         # changing it. Build the covariance in the anchor body frame instead.
         segment = self.tx_mgr.active_quarantine
         frame_after = TangentFrame("world", "rot_trans", "world")
-        if fims_after and segment is not None and segment.anchor_pose_world is not None:
+        anchor_frame = (None if segment is None else segment.weak_direction_frame)
+        if (fims_after and segment is not None and segment.anchor_pose_world is not None
+                and anchor_frame is not None and anchor_frame.frame == "body"):
             T_body_world = np.linalg.inv(np.asarray(segment.anchor_pose_world,
                                                     dtype=np.float64))
             info_after = transport_information(np.mean(fims_after, axis=0), T_body_world)
-            frame_after = TangentFrame("body", "rot_trans",
-                                       segment.weak_direction_frame.anchor)
+            frame_after = TangentFrame("body", "rot_trans", anchor_frame.anchor)
         elif fims_after:
             info_after = np.mean(fims_after, axis=0)
         if fims_after:
