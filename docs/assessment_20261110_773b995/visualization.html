@@ -1,0 +1,56 @@
+<title>修复闭环验收图谱</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* 工程手册：流程、反例、验收账本。 */
+:root{--bg:#f5f8fb;--panel:#fff;--fg:#172b3a;--muted:#536a7a;--accent:#075a87;--line:#c4d2dc;--display:Georgia,'Songti SC',serif;--body:'Microsoft YaHei',system-ui,sans-serif}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101c25;--panel:#172a36;--fg:#e2eef5;--muted:#afc3d0;--accent:#88cdef;--line:#476273;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#101c25;--panel:#172a36;--fg:#e2eef5;--muted:#afc3d0;--accent:#88cdef;--line:#476273;color-scheme:dark}
+*{box-sizing:border-box}body{background:var(--bg);color:var(--fg);font-family:var(--body);line-height:1.8}.wrap{max-width:1050px;margin:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 60px}h1{font-family:var(--display);font-size:2rem}h2,h3{line-height:1.5;text-wrap:balance}section{padding-block:24px;border-top:1px solid var(--line)}p{max-width:80ch}.muted,figcaption{color:var(--muted)}a{color:var(--accent)}a:focus-visible,summary:focus-visible{outline:3px solid var(--accent)}.notice{background:var(--panel);border:1px solid var(--line);padding:20px}.scroll{overflow-x:auto;max-width:100%}table{border-collapse:collapse;width:100%;font-size:.88rem}td,th{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}figure{margin:20px 0}svg{width:100%;height:auto;max-width:100%;color:var(--fg)}svg rect{fill:var(--panel);stroke:currentColor}svg text{fill:currentColor;font-size:14px}svg line{stroke:currentColor;stroke-width:1.5}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--panel);padding:16px;border:1px solid var(--line)}nav{display:flex;flex-wrap:wrap;gap:18px;margin-block:20px}details{padding-block:12px;border-bottom:1px solid var(--line)}summary{cursor:pointer;font-weight:bold}
+</style>
+<main class="wrap">
+<p class="muted">版本快照 773b995 · 2026-11-10 · 审阅与受控反例，不是实时数据</p>
+<h1>修复闭环验收图谱</h1>
+<p>离线测量过滤与原生重估已出现有效链路。完整的原生在线恢复仍未完成。下文把已验证组件、缺失证据和可复现阻断分开。</p>
+<div class="notice"><strong>全部24项复验：A 16/36，B 12/36。完整闭合0项。</strong><br>相对7fc67cf基线，仅B8由1升至2。阶段分衡量证据成熟度，不是完成率、工时或录用概率。41核心＋25身份＋9结构测试通过；真实宿主结果为远端归档，本机未重跑。</div>
+<nav><a href="#flow">主线流程</a><a href="#done">已完成组件</a><a href="#blocks">四个技术阻断</a><a href="#ledger">24项账本</a><a href="#next">执行顺序</a></nav>
+<section id="flow"><h2>主线在哪里断开？</h2>
+<figure><svg viewBox="0 0 820 215" role="img" aria-label="离线过滤重估构图已执行，在线检查点和验证提交接回未完成">
+<rect x="10" y="20" width="180" height="65"/><text x="25" y="47">污染测量 → 过滤</text><text x="25" y="70">完整记录/点索引已有</text>
+<line x1="190" y1="50" x2="255" y2="50"/><text x="197" y="35">重跑</text>
+<rect x="255" y="20" width="220" height="65"/><text x="270" y="47">原生状态重估 → 构图</text><text x="270" y="70">离线归档：一正一负</text>
+<line x1="475" y1="50" x2="540" y2="50"/><text x="480" y="35">待接入</text>
+<rect x="540" y="20" width="265" height="65" stroke-dasharray="5 4"/><text x="555" y="47">独立验证 → 原子提交</text><text x="555" y="70">安全不变量尚有反例</text>
+<rect x="10" y="130" width="240" height="65" stroke-dasharray="5 4"/><text x="25" y="157">在线检测 → 完整检查点</text><text x="25" y="180">不是已知注入窗替代检测</text>
+<line x1="250" y1="160" x2="320" y2="160"/><text x="257" y="145">同进程</text>
+<rect x="320" y="130" width="485" height="65" stroke-dasharray="5 4"/><text x="335" y="157">提交后接回 → 持续输入 → 第二次故障恢复</text><text x="335" y="180">没有真实原生单次运行完整通过的证据</text>
+</svg><figcaption>实线框表示已有局部运行或实现；虚线框表示完整范围未验收。连接不代表已经接通。</figcaption></figure></section>
+<section id="done"><h2>已经完成到什么程度？</h2><ul><li>过滤导出保留PointCloud2完整记录；新索引包带scan_ns与原始索引。</li><li>FAST-LIVO2真实离线重估与sidecar地图重建已归档，未称原生地图检查点恢复。</li><li>有界地图评价能识别距有限平面片99.9米的错误点；旧无界准确度声明已撤回。</li><li>精确纳秒集合、批次身份、共同支持与clean→GT变换已有检查。</li><li>分批pending与收据的已建立集合重试修复通过，但初始登记仍不完整。</li><li>hall条件性收益与room负结果、重复不稳定均保留，没有删掉失败。</li></ul><p class="muted">hall：400/446条件帧，proxy覆盖60.38%→98.49%，不支持62.51%→9.31%。room：326/398条件帧，覆盖76.72%→69.52%，不支持45.85%→65.90%。这是归档读数，不是当前部署成功率。</p></section>
+<section id="blocks"><h2>四个技术阻断：机制、反例与解除条件</h2>
+<h3>① 初始待处理全集未由管理器登记 · A5</h3><pre>已隔离帧 [1,2,3]
+      ↓ 候选只提交 [1]，没有声明deferred
+管理器的pending起初为空
+      ↓
+状态 HEALTHY；[2,3]消失于待处理账本</pre><p>分批重试的并集差集修复有效，但它不能补救最初没有登记的帧。报警帧和之后的隔离来帧也需要权威记录。</p><p><strong>解除：</strong>pending由实际暂存/撤销/新到达帧生成，不由候选自行声明；两批次加新来帧回归必须零丢失。</p>
+<h3>② 提交中途异常留下半提交 · A8</h3><pre>公开pose42 → 追加factor999 → 抛异常
+已公开：pose42、factor999
+未更新：version、成功收据
+地图同步还在后续步骤</pre><p>本机真实manager路径注入异常后，version=0、history=0，位姿与因子却已改变。读者可能看到不同逻辑时刻的状态。</p><p><strong>解除：</strong>先校验并物化所有候选内容，暂存位姿/因子/bias/地图/版本/历史，再一致发布；每个阶段注入异常验证完全撤销。</p>
+<h3>③ 第二次回溯不能撤销已接纳修复 · A9</h3><pre>事件1：接纳 pose42 + factor420 + bias[1,1,1]
+事件2：估计起点早于事件1修复
+      ↓ 只撤销普通promotion历史
+pose42 / factor420 / bias仍留在可信状态</pre><p>修复写入没有进入相同的时间撤销历史。不是回滚代码完全没有，而是日志遗漏一种写入来源。</p><p><strong>解除：</strong>修复以时间范围进入undo；或者显式拒绝超出支持回溯范围。两事件重叠反例必须无残留。</p>
+<h3>④ before/after信息不在同一切空间 · A7</h3><pre>before：传感器机体系点云 → FIM / weak direction
+候选：世界系点云 → after FIM
+      ↓ 沿原向量直接投影比较
+原点平移/旋转可能改变数值，物理场景却没变</pre><p>例如点面旋转Jacobian依赖点的坐标。将地图原点移动100米，数值可显著变化；不能把坐标效应读成新增物理约束。</p><p><strong>解除：</strong>声明扰动约定，正确变换FIM、协方差、弱方向；全局坐标重表达必须保持判决一致。该项尚无原生判决翻转实测。</p>
+</section>
+<section id="ledger"><h2>完整账本：组件可用 ≠ 工作包闭合</h2><div class="scroll"><table><thead><tr><th>工作包</th><th>现分</th><th>还缺什么</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+<section id="next"><h2>三个后续关口</h2><ol><li><strong>同一次原生在线闭环：</strong>检测、完整宿主检查点、历史修复、公开提交、接回、第二事件；对应A3/A4/A6/A10、B11。</li><li><strong>论文增量证据：</strong>全人口净收益、相同候选门控增量、公平四策略及冻结后新环境；对应B4/B5/B9/B10。</li><li><strong>独立发布与成本：</strong>可移植入口、干净环境复现、真实耗时/内存/积压；对应A12/B12。hall成本曾引用room收据，现已撤回为不可用。</li></ol>
+<h3>唯一优先主线</h3><p>先闭合初始pending、异常原子提交、多事件修复撤销三反例，然后推进一条限定原生同进程链。切空间正确性同步验证。日志命名、报告格式和成本补档交旁支集中处理，不能令主线再次停在细节循环。</p><p>开发侧交接前必须自检：检查项、PASS/FAIL/BLOCKED/不适用、命令与证据、主线交付及旁支分工。没有证据不能升档；出现负结果也不能自动换模型。</p>
+<p><a href="https://github.com/Evenstar-E/slam_recovery/blob/773b995/docs/MAINLINE_PROGRESS_STANDARD_20261109.md" target="_blank" rel="noopener">冻结评分标准</a> · <a href="https://github.com/Evenstar-E/slam_recovery/tree/773b995" target="_blank" rel="noopener">源码目标773b995</a></p></section>
+<p class="muted">说明：当前快照的三个事务反例为本机受控代码实测；真实宿主成绩与收据是远端归档。后续提交须另验，不能继承本页状态。</p>
+</main>
+<script>
+const data=[['A1 输入与点身份',2,'并行索引/hash已有；所有历史运行消费链未统一'],['A2 原生运行身份',2,'收据存在；缺完整actual消费分组与库身份'],['A3 在线检测',1,'局部实现；原生实验仍oracle窗'],['A4 完整检查点',1,'Python子集；非完整native状态'],['A5 隔离pending',1,'重试组件已修；初始/来帧全集登记失败'],['A6 历史重处理',2,'离线原生重估；未在线检查点接入'],['A7 独立准入',1,'坐标/切空间未统一'],['A8 原子提交',1,'异常阶段半提交'],['A9 多事件撤销',1,'已接受repair不在undo历史'],['A10 原生接回',1,'无同进程持续输入/第二事件证据'],['A11 共同集合与同步',2,'局部修正；所有声明比较尚未统一支持'],['A12 复现与预算',1,'私有环境依赖、成本与资源记录不足'],['B1 损害必要性',2,'需同native事件时序正常控制'],['B2 可信保护',1,'受控反例仍失败，缺native故障注入'],['B3 检测定位证据',1,'合成/局部，不是完整原生事件指标'],['B4 实际修复净收益',2,'hall条件正、room负；总体/成本/独立GT不足'],['B5 门控增量',1,'无同候选stream的完整接纳损失比较'],['B6 因果机制',1,'对照有进展，根因未独立定位'],['B7 正常代价与风险',1,'分区局部统计，完整风险分母缺'],['B8 重复与不确定性',2,'唯一升档1→2；条件native重复，确认统计不足'],['B9 未开发泛化',1,'hall/room已开发使用，无方法冻结后新环境'],['B10 公平完整基线',0,'完整同输入四策略与外部基线不足'],['B11 原生在线链与成本',0,'离线run不代替单次完整链'],['B12 冻结独立复现',0,'独立实现复算不等于独立环境发布复现']];
+const root=document.getElementById('rows');for(const [name,score,gap] of data){const tr=document.createElement('tr');for(const s of [name,score+'/3',gap]){const td=document.createElement('td');td.textContent=s;tr.append(td)}root.append(tr)}
+</script>
