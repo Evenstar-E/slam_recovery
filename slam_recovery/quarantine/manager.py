@@ -74,6 +74,20 @@ class TrustedMapTransactionManager:
         item.provisional = False
         self.promoted_history.append(item)
 
+    def _insert_undo_entry(self, item: "BackendDelta", before_image) -> None:
+        """A9: put an undo entry in time order instead of appending.
+
+        promoted_history is a time-monotone stack that the rollback loops pop from the tail. A
+        repair can cover frames older than the newest promotions, so appending it would break the
+        invariant and stop the pop early. Inserting after every entry with an older timestamp keeps
+        the stack ordered, and equal timestamps resolve in insertion order.
+        """
+        idx = len(self.promoted_history)
+        while idx > 0 and self.promoted_history[idx - 1].timestamp_ns > item.timestamp_ns:
+            idx -= 1
+        self.promoted_history.insert(idx, item)
+        self._promoted_before_images.insert(idx, before_image)
+
     def create_checkpoint(self, timestamp_ns: int) -> Checkpoint:
         ckpt_id = f"ckpt_v{self.trusted_version}_{timestamp_ns}"
         ckpt = Checkpoint(
@@ -151,7 +165,10 @@ class TrustedMapTransactionManager:
         while self.promoted_history and self.promoted_history[-1].timestamp_ns >= t_q_start:
             item = self.promoted_history.pop()
             item.provisional = True
-            revoked_from_trusted.append(item)
+            # A repair undo entry is not a backend delta: it restores a frame the candidate wrote,
+            # so it must not be re-queued as provisional evidence.
+            if getattr(item, "undo_kind", "") != "repair":
+                revoked_from_trusted.append(item)
             if self._promoted_before_images:
                 prev_pose, prev_factor_len, prev_ba, prev_bg = self._promoted_before_images.pop()
                 if item.keyframe_id is not None:
@@ -159,8 +176,14 @@ class TrustedMapTransactionManager:
                         self.trusted_poses[item.keyframe_id] = prev_pose.copy()
                     else:
                         self.trusted_poses.pop(item.keyframe_id, None)
-                # Truncate the append-only factor log back to its pre-promotion length
-                del self.trusted_factors[int(prev_factor_len):]
+                if isinstance(prev_factor_len, list):
+                    # A9: a repair entry carries the exact pre-repair factor list. Truncating by
+                    # length would be wrong here, because the repair may sit in the middle of the
+                    # log rather than at its end.
+                    self.trusted_factors[:] = prev_factor_len
+                else:
+                    # Truncate the append-only factor log back to its pre-promotion length
+                    del self.trusted_factors[int(prev_factor_len):]
                 self.trusted_bias_acc = prev_ba.copy()
                 self.trusted_bias_gyr = prev_bg.copy()
             else:
@@ -353,6 +376,35 @@ class TrustedMapTransactionManager:
                 # same exception, and every piece of trusted state is as it was on entry.
                 self.state = state_before_attempt
                 raise
+
+            # ---- A9: make the repair visible to the undo log ------------------------------
+            # Until here a Mode 2 commit was invisible to promoted_history, so a later onset that
+            # reached back over a repaired frame could not undo it. Record one entry per committed
+            # keyframe, timestamped at the segment's close, with the pre-repair state.
+            _undo_ts = int(old_segment.t_end_ns) if old_segment is not None else 0
+            _pre_factors = list(self.trusted_factors)
+            _pre_ba = self.trusted_bias_acc.copy()
+            _pre_bg = self.trusted_bias_gyr.copy()
+            for _k in sorted(int(k) for k in committed_keys):
+                _prev_pose = (self.trusted_poses[_k].copy()
+                              if _k in self.trusted_poses else None)
+                _entry = BackendDelta(
+                    timestamp_ns=_undo_ts,
+                    frame_id="map",
+                    pose_se3=(_prev_pose.copy() if _prev_pose is not None else np.eye(4)),
+                    velocity=np.zeros(3),
+                    bias_acc=_pre_ba.copy(),
+                    bias_gyr=_pre_bg.copy(),
+                    cov_6x6=np.eye(6),
+                    info_6x6=np.eye(6),
+                    nis_value=0.0,
+                    nis_dof=6,
+                    factor_ids=[],
+                    keyframe_id=_k,
+                    provisional=False,
+                )
+                _entry.undo_kind = "repair"
+                self._insert_undo_entry(_entry, (_prev_pose, _pre_factors, _pre_ba, _pre_bg))
 
             # ---- publish ---------------------------------------------------------------------
             # Attribute assignments only: nothing here can fail on caller input.
