@@ -75,6 +75,29 @@ class TestParser(unittest.TestCase):
         with self.assertRaises(ValueError):
             self._parse([("GROUP", 1, 2, 3, 4, 5, None, "")])
 
+    def test_a_file_without_the_header_is_rejected(self):
+        """The 2026-11-10 v2 delivery had no header; the first row then reads as kind=''."""
+        p = _write([_group(1)])
+        body = open(p, encoding="utf-8").read().split("\n", 1)[1]
+        fh = tempfile.NamedTemporaryFile("w", suffix=".csv", delete=False, encoding="utf-8")
+        fh.write(body)
+        fh.close()
+        self.__class__._files = getattr(self.__class__, "_files", []) + [fh.name]
+        with self.assertRaises(ValueError):
+            T.parse(fh.name)
+
+    def test_empty_group_is_a_recorded_event(self):
+        """n_items=0 with sha256("") means 'a package with no IMU', not 'no row'."""
+        empty = ("GROUP", 1500, 900, 0, -1, -1,
+                 "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                 "mesures=1|img=0|img_stamp_ns=-1000000000|need_init=1")
+        tr = self._parse([empty])
+        ev = tr.of("GROUP")[0]
+        self.assertEqual(ev.n_items, 0)
+        self.assertEqual(ev.first_stamp_ns, -1)
+        self.assertEqual(ev.stamps_sha256[:8], "e3b0c442")
+        self.assertTrue(T.compare_groups(tr, self._parse([empty]))["identical"])
+
 
 class TestGroupComparison(unittest.TestCase):
     def test_identical_groups(self):

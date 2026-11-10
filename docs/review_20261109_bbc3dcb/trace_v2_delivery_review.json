@@ -1,0 +1,65 @@
+{
+ "delivery": {
+  "commit": "42c6c6d69a8c936acd57865a3c72893f38ed6f5c",
+  "branch": "exp/m0-updated",
+  "claimed": "TRACE_GROUP v2, pipe-only writer, int64 ns, single writer",
+  "merged": false,
+  "pushed": false,
+  "why_not_merged": "the C++ change itself is not in the delivery (four 0-byte diffs), and the trace cannot be parsed by the agreed reader"
+ },
+ "run_inputs": {
+  "bag": "/tmp/fastlivo/room02_2x2_O.bag",
+  "bag_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+  "matches_archived_2x2_O": true,
+  "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+  "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+  "exec_sha256": "76359f5387f75da3dcad7aa72372048c3feefd91b340ae0c40f92f6fb534a53b",
+  "script_sha256": "70c21a539d54242613e2c1a49bcf0245decf42f0110435cf4dd281860ce9472b"
+ },
+ "checks": [
+  {"id": "patch_delivered", "status": "FAIL",
+   "detail": "CMakeLists.txt.v2.diff, include_LIVMapper.h.v2.diff, src_IMU_Processing.cpp.v2.diff, src_LIVMapper.cpp.v2.diff are all 0 bytes; 'logging only / no new locks / single writer' is therefore unverified"},
+  {"id": "csv_header", "status": "FAIL",
+   "detail": "trace_v2_on.csv starts at the first ARRIVE row; trace_schema.md requires the header line, and trace_compare.py now rejects the file at line 1"},
+  {"id": "imuinit_sample_sha", "status": "FAIL",
+   "detail": "all four IMUINIT rows hash first||last only (n=5,9,10,48); schema requires every sample in consumption order, otherwise an interior swap is invisible"},
+  {"id": "group_sample_sha", "status": "PARTIAL",
+   "detail": "the 859 non-empty GROUP rows do not match any endpoint/stamp recipe tried, consistent with 'all samples', but the recipe cannot be confirmed without the patch"},
+  {"id": "arrive_sha", "status": "PASS", "detail": "579/579 rows equal sha256(int64_le(stamp_ns))"},
+  {"id": "empty_group_sha", "status": "PASS", "detail": "863/863 empty groups equal sha256(\"\") = e3b0c442..."},
+  {"id": "wall_monotone_per_kind", "status": "PASS", "detail": "ARRIVE, GROUP, IMUINIT, STATE each non-decreasing"},
+  {"id": "csv_sha", "status": "PASS", "detail": "trace_v2_on.csv sha256 5ff4829fa880d855... equals the value in trace_v2_perturbation.json"},
+  {"id": "receipt_runtime_library", "status": "FAIL",
+   "detail": "runtime_library is {path: null, sha256: null} in both receipts; runtime_lib.txt was never created in either run dir, and the ON library 3d566c83 no longer exists on disk (devel/lib/liblaser_mapping.so is now a60cb9e5), so the two library hashes in the commit message are unbound to their runs"},
+  {"id": "off_trace_present", "status": "FAIL",
+   "detail": "trace_v2_off_receipt.json has trace_file {path: null, sha256: null}; no OFF trace was delivered"},
+  {"id": "control_pair", "status": "FAIL",
+   "detail": "one ON trace only. ON and OFF already differ in output (odom 778 vs 753, per-frame timing lines 1555 vs 1505, packages 1722 vs 1670), so one ON/OFF pair cannot separate tracing perturbation from run-to-run variance"}
+ ],
+ "observations": {
+  "empty_imu_groups": {
+   "on_run": {"groups": 1722, "n_items_0": 863, "fraction": 0.5012, "n_items_0_after_init": 856},
+   "off_run": {"packages_logged": 1670, "imu_in_pkg_0": 836, "fraction": 0.5006},
+   "source": "ON from trace_v2_on.csv; OFF independently from DET_SYNC lines in /tmp/fl_run_20261110T012709Z_2861821/node.log",
+   "status": "REPRODUCED_ACROSS_TRACE_ON_OFF_WITHIN_ONE_BUILD_FAMILY",
+   "build_caveat": "both runs log 'NO_MP=ON' and 'DET_SYNC: async spinner(1)'; DET_SYNC changes the callback/main-loop interleaving rather than only logging, so the fraction is established for that control build and not yet for a default build",
+   "why_it_matters": "about half of all processed packages carry no IMU sample; it is not a tracing artifact, and it bears directly on the group-composition candidate",
+   "still_missing": "a run with default build flags, the exact sync_packages call path, and whether processImu is a no-op for these packages"
+  },
+  "perturbation_basis": {
+   "frames_logged_definition": "count of 'Current Total Time' lines in node.log (ON 1555, OFF 1505)",
+   "on_median_ms": 6.278, "on_p95_ms": 49.592,
+   "off_median_ms": 6.414, "off_p95_ms": 37.675,
+   "reported_delta": {"median_ms": -0.136, "p95_ms": 11.917},
+   "status": "CONFOUNDED_WITH_OUTPUT_DIVERGENCE"
+  }
+ },
+ "trace_rows": {"ARRIVE": 579, "GROUP": 1722, "IMUINIT": 4, "STATE": 1722},
+ "parser_fixtures": {"tests": 16, "status": "PASS", "added": ["file without header is rejected by name", "empty group is a recorded event"]},
+ "score_mapping": {
+  "rows": ["A2", "A11", "B6", "B8"],
+  "change": "none",
+  "why": "A2 needs run/binary/library binding and actual consumed grouping; the library is unbound and the patch is absent. B6/B8 need a controlled comparison, which one trace cannot provide. No score is promoted from a delivery that fails its own consistency checks.",
+  "next_acceptance": "2 x ON + 1 x OFF on room02 O with per-run runtime library sha, header-bearing CSVs, and IMUINIT full-sample sha"
+ }
+}
