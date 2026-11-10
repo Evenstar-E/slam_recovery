@@ -396,6 +396,17 @@ def test_nis_vs_map_size_bins_every_node_map_frame_once():
                          if d["nis"] is not None and d["nis_reference"] == "node_map")
 
 
+def test_nis_bins_report_real_quantiles_at_small_n():
+    diag = [{"nis": v, "nis_reference": "node_map", "trusted_keyframes": 2, "map_points": 900}
+            for v in (53.49, 55.045)]
+    t = nis_vs_map_size(diag)
+    b = t["by_trusted_keyframes"][0]
+    assert b["n"] == 2
+    assert b["min"] == 53.49 and b["max"] == 55.045
+    assert b["median"] == pytest.approx(54.2675)      # between the samples, not sel[n//2]
+    assert b["p90"] >= b["median"] >= b["min"]
+
+
 def test_no_quarantine_means_no_records_and_a_readable_summary():
     node = _FakeLoopNode(trigger_at=10 ** 9)
     loop = NativeClosedLoop(node, run_id="run")

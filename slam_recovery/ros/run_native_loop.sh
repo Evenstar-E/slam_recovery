@@ -21,7 +21,7 @@
 set -uo pipefail
 
 BAG="${1:-}"; shift || true
-RATE=1.0; DRAIN=20; DURATION=0; MAX_PAIRS=0; CAND_SRC=host_poses; DETECTION=on
+RATE=1.0; DRAIN=20; DURATION=0; MAX_PAIRS=0; CAND_SRC=host_poses; DETECTION=on; SIGMA=0.12
 while [ $# -gt 0 ]; do
   case "$1" in
     --rate) RATE="$2"; shift 2 ;;
@@ -30,6 +30,7 @@ while [ $# -gt 0 ]; do
     --max-pairs) MAX_PAIRS="$2"; shift 2 ;;
     --candidate-source) CAND_SRC="$2"; shift 2 ;;
     --detection) DETECTION="$2"; shift 2 ;;
+    --sigma-meas-m) SIGMA="$2"; shift 2 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
@@ -70,11 +71,11 @@ cleanup() {
 
 write_receipt() {
   env -u PYTHONPATH /usr/bin/python3 - "$RUN_DIR" "$STATUS" "$REASON" "$TERMINATION" \
-      "$BAG" "$RATE" "$DRAIN" "$DURATION" "$MAX_PAIRS" "$CAND_SRC" "$DETECTION" \
+      "$BAG" "$RATE" "$DRAIN" "$DURATION" "$MAX_PAIRS" "$CAND_SRC" "$DETECTION" "$SIGMA" \
       "$BIN" "$CFG" "$CAM" "$PLAY_EXIT" "$PAIR_EXIT" "$REC_EXIT" "$RC_EXIT" <<'PY'
 import hashlib, json, os, sys
 
-(rd, status, reason, term, bag, rate, drain, duration, max_pairs, cand_src, detection,
+(rd, status, reason, term, bag, rate, drain, duration, max_pairs, cand_src, detection, sigma,
  binp, cfg, cam, play_x, pair_x, rec_x, rc_x) = sys.argv[1:]
 
 def sha(p):
@@ -96,7 +97,7 @@ rec = {
                "recovery_node_source": os.path.join(rd, "recovery_node_source.sha256")},
     "launch": {"rate": rate, "drain_s": drain, "duration_s": duration,
                "max_pairs": max_pairs, "candidate_source": cand_src,
-               "detection": detection,
+               "detection": detection, "sigma_meas_m": sigma,
                "group_model": "host and recovery node are children of one setsid supervisor"},
     "exit_codes": {"play": play_x, "supervisor": pair_x, "recovery_node": rec_x,
                    "roscore": rc_x},
@@ -173,7 +174,7 @@ rosparam load "$CFG" / || { STATUS=FAIL; REASON="could not load $CFG"; exit 1; }
 rosparam load "$CAM" /laserMapping || { STATUS=FAIL; REASON="could not load $CAM"; exit 1; }
 
 # ---- one supervisor, one process group ------------------------------------------------------
-REC_ARGS=(--run-dir "$RUN_DIR" --candidate-source "$CAND_SRC" --scan-cap 6000 --detection "$DETECTION")
+REC_ARGS=(--run-dir "$RUN_DIR" --candidate-source "$CAND_SRC" --scan-cap 6000 --detection "$DETECTION" --sigma-meas-m "$SIGMA")
 [ "$DURATION" != "0" ] && REC_ARGS+=(--duration-sec "$DURATION")
 [ "$MAX_PAIRS" != "0" ] && REC_ARGS+=(--max-pairs "$MAX_PAIRS")
 
