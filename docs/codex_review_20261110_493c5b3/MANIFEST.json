@@ -1,0 +1,47 @@
+{
+  "author": "Codex",
+  "report_status": "REFERENCE_ONLY",
+  "reviewed_commit": "493c5b3d056e5050af1a0fe915a1f749b3a81dd8",
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 84,
+      "sha256": "4c3f0aaad20abad515fcd2f4bf51d11ab3b46d68a9068bfc6bfc86b000e69fd3"
+    },
+    {
+      "path": "acceptance_probes.py",
+      "bytes": 6423,
+      "sha256": "ce2c2f392cfe3374356df84a906f54bfe41a5f57a81659e5dac0b16237f6c77b"
+    },
+    {
+      "path": "acceptance_results.json",
+      "bytes": 7385,
+      "sha256": "39ac506d94f50f3c1d1c039fb2400d9926b60ed74d730792ce8119cb3009f702"
+    },
+    {
+      "path": "fixtures/normal_paths_original.py",
+      "bytes": 5260,
+      "sha256": "75bf357af187b3a6a88ab1d0f7929d945e17212e8060de56bc2bb7b62f7d95c3"
+    },
+    {
+      "path": "packaging_check.json",
+      "bytes": 7091,
+      "sha256": "3ce9d4556a997a5e932036c08e5d220419d8726d8c78a5a4e3e5f74321b890f5"
+    },
+    {
+      "path": "PROVENANCE.json",
+      "bytes": 2672,
+      "sha256": "44489e9f8c679f855f2d1d9819e9fe02ea005a2f8b60096cec12cf519e70b710"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3345,
+      "sha256": "fd31d5d58bb9103d1b105121fa23205478b7ccdc0744440175f5a1bc9fa06ffb"
+    },
+    {
+      "path": "REVIEW.md",
+      "bytes": 12708,
+      "sha256": "fce22ace9f36ea9925413140544d6a41f36bd426881154ad4b94a97f73a18b74"
+    }
+  ]
+}

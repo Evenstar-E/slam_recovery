@@ -1,0 +1,294 @@
+{
+  "tested_commit": "493c5b3d056e5050af1a0fe915a1f749b3a81dd8",
+  "scope": "Small, dataset-free review probes; no ROS, bag, build, or production mutation.\n\nThe historical normal-path probe is adapted only for the new required anchor API.\nMatrix examples disprove a claimed general bound; they are not field performance.\n",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "numpy": "2.3.5",
+  "historical_probe_adapter": {
+    "source_sha256": "75bf357af187b3a6a88ab1d0f7929d945e17212e8060de56bc2bb7b62f7d95c3",
+    "changes": [
+      "Point ROOT at reviewed checkout",
+      "Supply identity anchor required by current API"
+    ],
+    "note": "Manager fixtures carry supplied passing evidence; these checks do not validate candidate quality."
+  },
+  "normal_paths": {
+    "partial_retry": {
+      "passed": true,
+      "after_partial": {
+        "state": "WAITING_FOR_EVIDENCE",
+        "trusted": [
+          1,
+          2
+        ],
+        "pending": [
+          3,
+          4
+        ]
+      },
+      "after_retry": {
+        "state": "HEALTHY",
+        "trusted": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "pending": []
+      }
+    },
+    "second_event": {
+      "passed": true,
+      "expected_pending": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "observed": {
+        "state": "QUARANTINED",
+        "trusted": [],
+        "pending": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "lost_from_both": []
+    },
+    "late_arrival": {
+      "passed": true,
+      "arrival_ns": 400000000,
+      "onset_ns": 350000000,
+      "recorded_segment_end_ns": 400000000,
+      "repair_undo_entries": [
+        {
+          "key": 2,
+          "timestamp_ns": 400000000
+        },
+        {
+          "key": 3,
+          "timestamp_ns": 400000000
+        },
+        {
+          "key": 4,
+          "timestamp_ns": 400000000
+        }
+      ],
+      "expected_frame_4": "revoked and pending",
+      "observed": {
+        "state": "QUARANTINED",
+        "trusted": [
+          1
+        ],
+        "pending": [
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    },
+    "alarm_frame": {
+      "passed": true,
+      "alarm_key": 2,
+      "after_alarm": {
+        "state": "QUARANTINED",
+        "trusted": [
+          1
+        ],
+        "pending": [
+          2
+        ]
+      },
+      "after_following_frame": {
+        "state": "QUARANTINED",
+        "trusted": [
+          1
+        ],
+        "pending": [
+          2,
+          3
+        ]
+      },
+      "raw_scan_keys": [
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  "upstream_fixed_gauge_probe": {
+    "exit_code": 0,
+    "result": {
+      "scope": "gauge re-expression in the anchor body basis; no host run, no threshold change",
+      "weak_direction_translation": [
+        {
+          "world_y_m": 0.0,
+          "world_rotation_deg": null,
+          "info_before": 19.033712348072953,
+          "info_after": 48.72630205106676,
+          "covariance_norm": 0.023053432056869494,
+          "mode": "MODE2_ATOMIC_COMMIT",
+          "accepted": true
+        },
+        {
+          "world_y_m": 2.0,
+          "world_rotation_deg": null,
+          "info_before": 19.033712348072953,
+          "info_after": 48.726302051066746,
+          "covariance_norm": 0.023053432056869484,
+          "mode": "MODE2_ATOMIC_COMMIT",
+          "accepted": true
+        }
+      ],
+      "info_and_mode_invariant": true,
+      "covariance_origin_translation": [
+        {
+          "world_y_m": 0.0,
+          "world_rotation_deg": null,
+          "info_before": 20.0,
+          "info_after": 30.0,
+          "covariance_norm": 0.2,
+          "mode": "MODE3_SOFT_BRIDGE_WAIT",
+          "accepted": false
+        },
+        {
+          "world_y_m": 5.0,
+          "world_rotation_deg": null,
+          "info_before": 20.0,
+          "info_after": 30.0,
+          "covariance_norm": 0.20000000000000007,
+          "mode": "MODE3_SOFT_BRIDGE_WAIT",
+          "accepted": false
+        }
+      ],
+      "covariance_and_mode_invariant": true,
+      "rotated_anchor_with_translation": {
+        "world_y_m": 2.0,
+        "world_rotation_deg": 30.0,
+        "info_before": 19.033712348072953,
+        "info_after": 48.72630205106673,
+        "covariance_norm": 0.023053432056869494,
+        "mode": "MODE2_ATOMIC_COMMIT",
+        "accepted": true
+      },
+      "rotated_matches_untranslated": true
+    }
+  },
+  "gauge_positive_control": {
+    "passed": true,
+    "rows": [
+      {
+        "world_y_m": 0.0,
+        "world_rotation_deg": null,
+        "info_before": 1.0,
+        "info_after": 4.0,
+        "covariance_norm": 0.25,
+        "mode": "MODE2_ATOMIC_COMMIT",
+        "accepted": true
+      },
+      {
+        "world_y_m": 2.0,
+        "world_rotation_deg": null,
+        "info_before": 1.0,
+        "info_after": 4.0,
+        "covariance_norm": 0.25,
+        "mode": "MODE2_ATOMIC_COMMIT",
+        "accepted": true
+      },
+      {
+        "world_y_m": 5.0,
+        "world_rotation_deg": null,
+        "info_before": 1.0,
+        "info_after": 4.0,
+        "covariance_norm": 0.25,
+        "mode": "MODE2_ATOMIC_COMMIT",
+        "accepted": true
+      },
+      {
+        "world_y_m": 2.0,
+        "world_rotation_deg": null,
+        "info_before": 1.0,
+        "info_after": 3.9999999999999996,
+        "covariance_norm": 0.25,
+        "mode": "MODE2_ATOMIC_COMMIT",
+        "accepted": true
+      }
+    ],
+    "note": "Synthetic positive control avoids vacuous invariance by universal refusal."
+  },
+  "claimed_upper_bound_counterexample": {
+    "matrix_a": [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        5.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        5.0
+      ]
+    ],
+    "matrix_b": [
+      [
+        5.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        5.0
+      ]
+    ],
+    "max_per_frame_min_eigenvalue": 1.0,
+    "trigger_direction_before": 1.0,
+    "candidate_fixed_direction_after": 3.0,
+    "after_ge_twice_before": true,
+    "claimed_bound_violated": true,
+    "interpretation": "Refutes the general bound only; does not establish any archived candidate is good or accepted."
+  },
+  "unavailable_trusted_ingest": {
+    "detection_counts": {
+      "AVAILABLE": 0,
+      "UNAVAILABLE": 3,
+      "DISABLED_FOR_DIAGNOSIS": 0
+    },
+    "detector_frames_fed": 0,
+    "trusted_keys": [
+      0,
+      1,
+      2
+    ],
+    "diagnostics": [
+      {
+        "kf_id": 0,
+        "detection_status": "UNAVAILABLE",
+        "detector_state": "HEALTHY"
+      },
+      {
+        "kf_id": 1,
+        "detection_status": "UNAVAILABLE",
+        "detector_state": "HEALTHY"
+      },
+      {
+        "kf_id": 2,
+        "detection_status": "UNAVAILABLE",
+        "detector_state": "HEALTHY"
+      }
+    ],
+    "note": "Forced unavailable measurement, zero confirmation margin to isolate state policy. This is not a real-world false-alarm/contamination rate."
+  }
+}

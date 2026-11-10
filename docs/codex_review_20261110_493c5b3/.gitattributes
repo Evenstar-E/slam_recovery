@@ -1,0 +1,3 @@
+* text eol=lf
+acceptance_results.json -text
+fixtures/normal_paths_original.py -text

@@ -1,0 +1,71 @@
+{
+  "author": "Codex",
+  "status": "REFERENCE_ONLY",
+  "reviewed_commit": "493c5b3d056e5050af1a0fe915a1f749b3a81dd8",
+  "latest_main_observed_during_publication": "99e4eb03f18faf0f30c9c7c6a0f0438edb3c002a",
+  "latest_main_independently_accepted": false,
+  "original_local_manifest": {
+    "created_at": "2026-11-10T15:16:32.8669976+08:00",
+    "commit": "493c5b3d056e5050af1a0fe915a1f749b3a81dd8",
+    "scope": "local review only; no native execution",
+    "artifacts": [
+      {
+        "path": "REVIEW.md",
+        "sha256": "0771dc1896223f0d993662b5968cd1c9f4566cb4b1c4ced4916cf5318bc1e769",
+        "bytes": 12163
+      },
+      {
+        "path": "acceptance_probes.py",
+        "sha256": "87226c5226672bdc273dfc339d76d2fa245e040ad4fe4dfeecf3128be7beab85",
+        "bytes": 5968
+      },
+      {
+        "path": "acceptance_results.json",
+        "sha256": "39ac506d94f50f3c1d1c039fb2400d9926b60ed74d730792ce8119cb3009f702",
+        "bytes": 7385
+      }
+    ],
+    "sources": [
+      {
+        "path": "slam_recovery/core.py",
+        "sha256": "10c4b6cc83433db86631d6d368a2e6f42ff906261f51d13aa3a7c5019de96ab2"
+      },
+      {
+        "path": "slam_recovery/quarantine/manager.py",
+        "sha256": "8d2a285e1e3380e426e826d4a60b1e6cfc462f2a849d1e0db502d78b0d8b2c6f"
+      },
+      {
+        "path": "slam_recovery/sim/transaction_manager_node.py",
+        "sha256": "04426a76098f086e5741058014e90ad959a972a990a738c984d427a077a93430"
+      },
+      {
+        "path": "slam_recovery/ros/recovery_node.py",
+        "sha256": "5cf132cd9b740ad6913305e6cb9b7c273ff274e6d3363635eec5d2cc36d75918"
+      },
+      {
+        "path": "slam_recovery/validation/fim_and_holdout.py",
+        "sha256": "ae16f5c96e8bd0a675882217de8ddf3c9f5c3d6fc25a6851f6b5c3f41b391335"
+      },
+      {
+        "path": "docs/HANDOFF_20261110_gate_info_leg.md",
+        "sha256": "8a3670ff35752ead62ddde730dc74b0547c61e01daa2bd9264f670597bf19e5c"
+      },
+      {
+        "path": "docs/review_20261110_b10/native_loop_icp_summary.json",
+        "sha256": "a3bd1379640e46dcb02cb4479d164ae7803279dfb4076c51ead005a3773be3d3"
+      },
+      {
+        "path": "docs/review_20261110_b10/hall01_confirmation_run.md",
+        "sha256": "de3be8b6bf8042531c44304e9a5424abcd70f8ca8d83f244d15ff06bae020f9d"
+      }
+    ]
+  },
+  "packaging_changes": [
+    "Added Codex/reference-only/version boundary banner",
+    "Bundled original historical normal_paths fixture unchanged",
+    "Made probe paths repository-relative and added explicit non-overwriting output argument and source-diff guard",
+    "Preserved original acceptance_results.json bytes"
+  ],
+  "native_rerun": false,
+  "production_changes": false
+}
