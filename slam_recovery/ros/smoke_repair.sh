@@ -62,7 +62,11 @@ send snapshot 5 before_hold
 send hold 5 hold
 sleep 28           # the injector publishes into this window
 send status 5 before_reprocess
-send reprocess 60 reprocess
+# Control first: the same checkpoint and the same buffered frames, repairs not applied. Then the
+# treatment over exactly the same frames. The difference is the repair effect, in one instance.
+send reprocess_control 90 control
+send status 5 after_control
+send reprocess 90 reprocess
 send status 5 after_reprocess
 
 wait $PLAY 2>/dev/null
@@ -74,4 +78,38 @@ wait 2>/dev/null
 echo "--- injector ---"
 grep -c "published repaired scan" "$OUT/inject.log" 2>/dev/null
 echo "--- host repair lines ---"
-grep -n "NATIVE_REPAIR" "$OUT/host.log" | tail -5
+grep -n "NATIVE_REPAIR" "$OUT/host.log" | tail -3
+echo "--- replay spans ---"
+grep "reprocess #" "$OUT/host.log"
+
+echo "--- dropped classification ---"
+/home/R26534/mm/ros/bin/python3 - "$OUT" <<'PYEOF'
+import json, os, re, sys
+out = sys.argv[1]
+stamps = [int(x) for x in open(os.path.join(out, "inj_stamp.txt")).read().split()]
+spans = []
+for line in open(os.path.join(out, "host.log"), errors="ignore"):
+    m = re.search(r"reprocess #\d+: (\d+) frames replayed over \[([0-9.]+) \.\. ([0-9.]+)\]", line)
+    if m:
+        spans.append((int(m.group(1)), float(m.group(2)), float(m.group(3))))
+if not spans:
+    print(json.dumps({"status": "NO_REPLAY_SPAN"})); sys.exit(0)
+frames, lo, hi = spans[-1]
+# The checkpoint time is when the snapshot was taken; anything scanned before it was already
+# folded into the map and never entered the replay.
+cp = None
+for line in open(os.path.join(out, "host.log"), errors="ignore"):
+    m = re.search(r"snapshot stamp=([0-9.]+)", line)
+    if m:
+        cp = float(m.group(1))
+before = [s for s in stamps if cp is not None and s * 1e-9 < cp]
+after = [s for s in stamps if s * 1e-9 > hi]
+inside = [s for s in stamps if (cp is None or s * 1e-9 >= cp) and s * 1e-9 <= hi]
+res = {"published": len(stamps), "replay_frames": frames, "replay_span": [lo, hi],
+       "checkpoint_time": cp,
+       "before_checkpoint": len(before), "after_replay": len(after),
+       "inside_replay_window": len(inside),
+       "inside_stamps": [round(s * 1e-9, 6) for s in inside]}
+json.dump(res, open(os.path.join(out, "dropped_classification.json"), "w"), indent=1)
+print(json.dumps(res, indent=1))
+PYEOF
