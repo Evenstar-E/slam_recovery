@@ -158,3 +158,42 @@ class TestWaitClosesOnTheUndetectedPath(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestEpisodeOnAReopenedSegment(unittest.TestCase):
+    """A segment opened in the same call that closed the previous one still needs an episode.
+
+    Run 110042Z opened a third quarantine at +15.9 s in the frame where the second segment
+    re-armed. `_open_episode` was gated on `before is None`, and the previous segment was still
+    set at that moment, so the new segment got no episode: it was never decided, never closed,
+    and the trusted map stayed frozen for the remaining 370 frames -- E2 could not fire.
+    """
+
+    def test_a_segment_that_replaces_another_gets_an_episode(self):
+        from slam_recovery.tests.test_recovery_node import _FakeLoopNode, _scan
+
+        class _RearmingNode(_FakeLoopNode):
+            def step_frame(self, kf_id, ts_ns, pose, scan, nis):
+                self.calls.append((kf_id, ts_ns))
+                self.scan_buffer_body[kf_id] = scan
+                self._kf_timestamps[kf_id] = ts_ns
+                # The wait expired, the run re-armed, and this same frame triggered again.
+                self.tx_mgr.active_quarantine = object()
+                self.tx_mgr.state = RecoveryState.QUARANTINED
+                return None
+
+        node = _RearmingNode(trigger_at=10_000)
+        old_segment = object()
+        node.tx_mgr.active_quarantine = old_segment
+        node.tx_mgr.state = RecoveryState.WAITING_FOR_EVIDENCE
+        loop = NativeClosedLoop(node, run_id="t")
+
+        loop.on_pair(1_000_000_000, np.eye(4), _scan(200))
+
+        self.assertEqual(len(loop.episodes), 1,
+                         "the segment that replaced the waiting one has no episode")
+        self.assertIs(loop.episodes[0], loop._open)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
