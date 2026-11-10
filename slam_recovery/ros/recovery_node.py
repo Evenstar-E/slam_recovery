@@ -817,6 +817,16 @@ class NativeClosedLoop:
         kfs_before = int(len(self.node.tx_mgr.trusted_poses))
         pts_before = int(len(support_ref))
 
+        if self._maybe_scripted_trigger(kf_id, ts_ns, pose, scan_body):
+            # The frame opened the segment; it belongs to it, and the normal ingest must not run.
+            self.frames_fed += 1
+            self._record_diag(kf_id, ts_ns, value, source, reference,
+                              "SCRIPTED_TRIGGER", kfs_before, pts_before)
+            after = self.node.tx_mgr.active_quarantine
+            if after is not None:
+                self._open_episode(ts_ns, pose, after)
+            return
+
         if not self.detection_enabled:
             # Diagnosis mode: the map grows, the NIS is computed and recorded, and nothing is
             # judged. This is how the NIS-versus-map-size curve is obtained without a threshold.
@@ -825,6 +835,7 @@ class NativeClosedLoop:
             self._ingest_without_detection(kf_id, ts_ns, pose, scan_body, value)
             self._record_diag(kf_id, ts_ns, value, source, reference, status,
                               kfs_before, pts_before)
+            self._track_episode(kf_id, ts_ns, pose)
             return
 
         supported = self.node._frame_has_reference_support(
@@ -835,16 +846,6 @@ class NativeClosedLoop:
         available = bool(supported) and value is not None
         status = "AVAILABLE" if available else "UNAVAILABLE"
         self.detection_counts[status] += 1
-
-        if self._maybe_scripted_trigger(kf_id, ts_ns, pose, scan_body):
-            # The frame opened the segment; it belongs to it, and the normal ingest must not run.
-            self.frames_fed += 1
-            self._record_diag(kf_id, ts_ns, value, source, reference,
-                              "SCRIPTED_TRIGGER", kfs_before, pts_before)
-            after = self.node.tx_mgr.active_quarantine
-            if after is not None:
-                self._open_episode(ts_ns, pose, after)
-            return
 
         before = self.node.tx_mgr.active_quarantine
         if available:
@@ -869,6 +870,14 @@ class NativeClosedLoop:
         # never decided, never closed, and froze the map for the remaining 370 frames.
         if after is not None and after is not before:
             self._open_episode(ts_ns, pose, after)
+        self._track_episode(kf_id, ts_ns, pose)
+
+    def _track_episode(self, kf_id: int, ts_ns: int, pose: np.ndarray) -> None:
+        """Give the open segment this frame, and ask for a decision at its deadline.
+
+        This was a tail block of ``on_pair``, which the diagnosis branch returns before -- so with
+        detection off a forced segment got no frames at all and could only be decided at bag end.
+        """
         if self._open is not None and not self._open.decided:
             self._open.frames.append((kf_id, ts_ns, np.asarray(pose, dtype=np.float64).copy()))
             if ts_ns >= self._open.deadline_ns:
@@ -1324,7 +1333,12 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
             # A re-arm the host never heard would otherwise look like a re-arm that happened.
             "native_checkpoint_actions": loop.cp_actions,
         },
-        "run_mode": ("CONTROLLED_INTERFACE_TEST" if loop.scripted_triggers_s
+        # The label has to describe what actually happened, not what was asked for. A run that
+        # declared scripted triggers and fired none is an online run, and saying otherwise would
+        # let a detector-driven result be quoted as a controlled one.
+        "run_mode": ("CONTROLLED_INTERFACE_TEST" if (loop.scripted_triggers_s
+                                                    and len(loop.scripted_fired) == len(loop.scripted_triggers_s))
+                     else "CONTROLLED_TRIGGERS_NOT_FIRED" if loop.scripted_triggers_s
                      else "ONLINE_DETECTION"),
         "scripted_triggers": {
             "declared_s": list(loop.scripted_triggers_s),
