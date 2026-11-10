@@ -199,3 +199,9 @@ detection-off原summary/receipt/wiring及sigma分析已交，source原blob SHA�
 仅driver/node/tests增量，无新运行。接受首个committed run使用anchor自身时间，既有2m/s包络三个控制本机通过；仍BOUND_ONLY，不是独立正常运动证明。真实node集成反例：连续0.3m/s跨2.329s，boundary_ok和paired均通过，但raw reentry=.699m仍被core固定.5检查判evidence FAILED；0.1m/s控制evidence PASSED。两例cov仍高于默认门，不称完整接纳正例。见[bcadd9f核验](review_20261110_bcadd9f/README.md)。只统一这两处既有边界时间定义，非新增防御任务；不提高门/删检查/造零jump，不重开已修首段时间。
 
 主线S1/S2原生恢复写回及真实Mode3续处理/重武装/E2仍优先，S3/由S1指定接口写入责任并行最小评价修正；不以局部helper通过宣称运行候选将接纳。pytest环境缺失未重试，原核心/ICP测试不重复，无新完整A/B评分。
+
+## 18. f9ad688：重复边界证据拒绝局部解除，直接复用
+
+CandidateMap新增elapsed，node按anchor→候选首帧填写，core与segment采用同一既有2m/s时间包络；旧未日期/零elapsed仍固定.5。本机35项相关unittest通过，复用真实node两速度fixture：0.3m/s跨2.329s的raw .699m不再触发第二次evidence拒绝，两例evidence PASSED。**此限定范围接受，不重开或重造边界工具。**包络仍BOUND_ONLY，不是独立运动证明；fixture cov .513614仍高于.5，原真实候选info4.628仍低于25，不声称完整准入/原生运行通过。见[f9ad688核验](review_20261110_f9ad688/README.md)。
+
+无新宿主运行或恢复/E2证据。下一仍S1集成/S2实际恢复重处理与状态地图写回、真实Mode3续处理/终态/重武装，S3旧固定基正则最小修并行；已验收组件直接复用，不继续σ/边界说明循环。无完整A/B升档。

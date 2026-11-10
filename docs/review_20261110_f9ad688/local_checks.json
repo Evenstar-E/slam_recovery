@@ -1,0 +1,30 @@
+{
+  "target": "f9ad688b42cca607a35b766634b0e7a5a3a5f9f9",
+  "baseline": "bcadd9f6a03846589ef5a3ae73309c977f6d97c4",
+  "scope": "local modified admission path and reused synthetic integration fixture; no native run",
+  "reproduction_command": "python -B -W ignore docs/review_20261110_f9ad688/run_checks.py",
+  "actual_execution": "equivalent inline Python using the same selected unittest suites and in-memory prior-probe adaptations; runner file saved afterwards",
+  "unittest": {
+    "status": "PASS", "run": 35, "failures": 0, "errors": 0, "seconds": 1.322,
+    "suites": [
+      "slam_recovery.tests.test_transaction_normal_path.ReentryEvidenceLegTest",
+      "slam_recovery.tests.test_commit_evidence_coverage",
+      "slam_recovery.tests.test_a7_tangent_frames"
+    ]
+  },
+  "integration": {
+    "status": "PASS: previous duplicate raw-distance refusal removed",
+    "fixture": "reuse docs/review_20261110_bcadd9f/boundary_integration_probe.py without modifying its archived file; update source target and expected FAILED to PASSED in memory",
+    "source_identity": "core/node/fim fixed Git source SHA matched normalized checkout; loaded target module path printed",
+    "helper_three_controls": "PASS",
+    "rows": [
+      {"speed_mps": 0.3, "jump_m": 0.6986870529000001, "boundary_ok": true, "paired_approved": true, "evidence_status": "PASSED", "info_after": 62.982929840595105, "cov_norm": 0.513613665194515, "mode": "MODE3_SOFT_BRIDGE_WAIT", "accepted": false},
+      {"speed_mps": 0.1, "jump_m": 0.23289568430000004, "boundary_ok": true, "paired_approved": true, "evidence_status": "PASSED", "info_after": 62.98292984059512, "cov_norm": 0.513613665194515, "mode": "MODE3_SOFT_BRIDGE_WAIT", "accepted": false}
+    ],
+    "not_claimed": "complete gate acceptance, A7 actual-producer fix, independent motion verification or native recovery"
+  },
+  "pytest_driver_suite": "BLOCKED: known missing environment; no reinstall/shim/repeated failure",
+  "native_run_E2": "NOT_APPLICABLE: no new native archive and not run locally",
+  "full_core_and_ICP_rerun": "NOT_APPLICABLE: limited relevant suites only, existing ICP module unchanged",
+  "complete_AB_rescore": "NOT_APPLICABLE"
+}
