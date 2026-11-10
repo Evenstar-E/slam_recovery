@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import math
 import types
+import unittest
 
 import numpy as np
 import pytest
@@ -550,3 +551,18 @@ def test_the_loop_dates_the_anchor_it_passes():
         assert call["anchor_ts_ns"] == expected
     else:
         assert call["anchor_ts_ns"] is None
+
+
+def load_tests(loader, standard_tests, pattern):
+    """Make the module-level `test_*` functions visible to `unittest discover`.
+
+    This file was written pytest-style, and the repository's acceptance command is unittest:
+    discovery imported the module and collected nothing, so these tests were passing only under a
+    runner the acceptance path does not use. Wrapping them here leaves the functions unchanged and
+    puts them in the standard run; pytest still collects them as before.
+    """
+    suite = unittest.TestSuite()
+    for name, fn in sorted(globals().items()):
+        if name.startswith("test_") and callable(fn):
+            suite.addTest(unittest.FunctionTestCase(fn, description=name))
+    return suite
