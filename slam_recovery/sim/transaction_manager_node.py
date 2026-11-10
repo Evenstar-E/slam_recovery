@@ -16,6 +16,9 @@ Publishes:
 from __future__ import annotations
 
 from typing import Dict, List, Optional, Tuple
+import os
+import time
+
 import numpy as np
 
 from ..core import (
@@ -536,6 +539,17 @@ class OnlineRecoveryTransactionNode:
             and compute point-to-plane NIS against the trusted map \mathcal{M}_{trusted}
             and non-holdout anchor scans.
         """
+        # Decision latency is part of the experiment: this call runs inside the confirmation
+        # window, and the quarantine keeps registering frames while it runs. Env-gated so a run's
+        # log stays quiet; the numbers are what decide whether the window is even meetable.
+        _t = {"start": time.perf_counter()}
+
+        def _mark(name: str) -> None:
+            _t[name] = time.perf_counter()
+            if os.environ.get("SLAM_RECOVERY_DECISION_TIMING"):
+                print(f"[DECIDE_TIMING] {candidate_id} {name} "
+                      f"{1000.0 * (_t[name] - _t['start']):.1f} ms elapsed", flush=True)
+
         # P1-A: the validation reference must be independent of the candidate. It is built ONLY from
         # the trusted map as it stood before the quarantine opened. The candidate's non-holdout
         # scans used to be concatenated in here, which made the "independent holdout" partially
@@ -638,6 +652,7 @@ class OnlineRecoveryTransactionNode:
         # envelope, not geometric continuity; say so rather than presenting it as verified.
         boundary_basis = "BOUND_ONLY"
 
+        _mark("support_and_boundary")
         holdout_kfs = [k for idx, k in enumerate(commit_keys) if idx % self.holdout_stride == 0]
         # Every committed frame already passed the support check, so no second filter is applied;
         # the counters are kept so a MISSING verdict says how many frames were even considered.
@@ -683,6 +698,7 @@ class OnlineRecoveryTransactionNode:
             )
             fims_after.append(fim_k)
 
+        _mark("holdout_nis_and_fim")
         mean_holdout_nis = float(np.mean(holdout_nis_list)) if holdout_nis_list else float("inf")
         # The gate reads ||P_after|| against a fixed bound, and a covariance depends on where the
         # tangent-space origin is. The regulariser that builds it therefore has to be added in the
@@ -727,6 +743,7 @@ class OnlineRecoveryTransactionNode:
             reentry_candidate_pose=(repaired_poses[kf_sorted[0]] if kf_sorted else None),
         )
 
+        _mark("paired_evidence")
         cand = CandidateMap(
             candidate_id=candidate_id,
             parent_map_version=self.tx_mgr.trusted_version,
@@ -756,7 +773,9 @@ class OnlineRecoveryTransactionNode:
             wilson_lower_bound=wilson_lb,
             reentry_pos_jump_m=reentry_jump,
         )
+        _mark("candidate_built")
         report = self.tx_mgr.validate_and_resolve(cand)
+        _mark("gate_and_commit")
         if report.accepted:
             self._sync_spatial_map_with_trusted_poses()
             self.voxel_journal.commit_generation()
