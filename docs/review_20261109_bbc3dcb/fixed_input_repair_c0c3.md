@@ -369,9 +369,9 @@ E_hybrid 保留了过滤器在健康区的全部 919 702 点删除仍与 oracle 
 | O+F−B | 554.561 | 0.301 | 1/2 | 否 |
 
 预注册要求"O+F−B 两次 fail 且 O+F、O−B 都不 fail"才可称交互；实际 O+F 与 O−B 都 2/2 fail →
-**`NOT_A_CLEAN_INTERACTION`**，且 O 与 O+F−B 各自跨模式 → 运行方差主导，四格 UNKNOWN。
+**`NOT_A_CLEAN_INTERACTION`**，且 O 与 O+F−B 各自跨模式 → 预注册交互形态未获支持、重复不稳定；n=2 不足以声称"交互不存在"或"方差统计上压过所有因素"，四格保持 UNKNOWN。
 
-## 13f. 双稳概率（同一格 4 次，只改运行次序）
+## 13f. 方差对照（同一格 4 次，只改运行次序）
 
 | 格 | 4 次模式 | 跨模式 | 合并先前 2 次（n=6） |
 |---|---|---|---|
@@ -379,7 +379,7 @@ E_hybrid 保留了过滤器在健康区的全部 919 702 点删除仍与 oracle 
 | O+F−B | UNCLEAR, UNCLEAR, BAD, BAD | 是 | GOOD 1 / BAD 3 / UNCLEAR 2 |
 
 两格都跨模式 → **`SEQUENCE_UNUSABLE_FOR_SINGLE_RUN`**。不是非黑即白：O+F−B 的两次 UNCLEAR
-（unsupported 0.114 / 0.190，ATE 0.69 / 1.93）说明"双稳"是连续分布的两端。
+（unsupported 0.114 / 0.190，ATE 0.69 / 1.93）说明所谓"双稳"其实是连续分布的两端；该词已不再使用。
 
 ## 13g. 非确定性来源（源码阅读）
 
