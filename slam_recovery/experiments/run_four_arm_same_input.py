@@ -637,6 +637,7 @@ def main():
         np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2,
         weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
         info_before_frame=TangentFrame("world", "rot_trans", "world"),
+        anchor_pose_world=np.eye(4),
     )
 
     t0 = time.perf_counter()
@@ -668,6 +669,7 @@ def main():
         np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2,
         weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
         info_before_frame=TangentFrame("world", "rot_trans", "world"),
+        anchor_pose_world=np.eye(4),
     )
     report_good = node_good.evaluate_and_commit_candidate(
         "four_arm_A3_good", good, incumbent_poses=incumbent, reentry_anchor_pose=pre[-1]["pose"].copy())

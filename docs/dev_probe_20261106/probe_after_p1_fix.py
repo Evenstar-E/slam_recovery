@@ -43,6 +43,7 @@ def try_candidate(**evidence):
                              repaired_poses={42: np.eye(4)}, info_after_6x6=np.eye(6) * 100,
                              cov_after_6x6=np.eye(6) * .01, holdout_nis=.1, **evidence,
         info_after_frame=TangentFrame("body", "rot_trans", "probe"),
+        cov_after_frame=TangentFrame("body", "rot_trans", "probe"),
                              )
     report = m.validate_and_resolve(candidate)
     return {"accepted": bool(report.accepted),
@@ -90,6 +91,7 @@ def non_finite_evidence_is_not_treated_as_sufficient():
                              paired_benefit_approved=True, wilson_lower_bound=0.9,
                              reentry_pos_jump_m=0.01,
         info_after_frame=TangentFrame("body", "rot_trans", "probe"),
+        cov_after_frame=TangentFrame("body", "rot_trans", "probe"),
                              )
     report = m.validate_and_resolve(candidate)
     return {"accepted": bool(report.accepted), "mode": report.mode.value,

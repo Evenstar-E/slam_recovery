@@ -28,8 +28,9 @@ def _node_with_quarantine(cloud: np.ndarray) -> OnlineRecoveryTransactionNode:
     node.committed_map_points = [cloud]
     node.tx_mgr.trigger_quarantine(
         int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6) * 2, 1.2,
-        weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
-        info_before_frame=TangentFrame("world", "rot_trans", "world"),
+        weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+        info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
+        anchor_pose_world=np.eye(4),
     )
     return node
 
@@ -167,6 +168,7 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             wilson_lower_bound=0.9,
             reentry_pos_jump_m=0.0,
             info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+            cov_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         report = mgr.validate_and_resolve(cand)
         self.assertIn(
@@ -195,6 +197,7 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             cov_after_6x6=np.eye(6) * 0.01,
             holdout_nis=float("nan"),
             info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+            cov_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         report = mgr.validate_and_resolve(cand)
         self.assertIn("non-finite", report.reason)
@@ -236,8 +239,9 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             node.committed_map_points = [cloud]
             node.tx_mgr.trigger_quarantine(
                 int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6) * 2, 1.2,
-                weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
-                info_before_frame=TangentFrame("world", "rot_trans", "world"),
+                weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+                info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
+                anchor_pose_world=np.eye(4),
             )
             posed = cloud.copy()
             posed[:, 2] += 0.05  # keep the scan inside the support radius, give it a residual
@@ -342,6 +346,7 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
                 verified_pose_keys=frozenset(int(k) for k in committed),
                 deferred_pose_keys=tuple(int(k) for k in deferred),
                 info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+                cov_after_frame=TangentFrame("body", "rot_trans", "fixture"),
             )
 
         r1 = mgr.validate_and_resolve(cand(range(8), range(8, 20), mgr.trusted_version))
@@ -418,6 +423,7 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             wilson_lower_bound=0.9,
             reentry_pos_jump_m=0.0,
             info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+            cov_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         report = mgr.validate_and_resolve(cand)
         self.assertFalse(report.accepted)
@@ -447,6 +453,7 @@ class TestCommitEvidenceCoverage(unittest.TestCase):
             reentry_pos_jump_m=0.0,
             verified_pose_keys=frozenset({0}),
             info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+            cov_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         with self.assertRaises(RuntimeError):
             mgr.validate_and_resolve(cand)

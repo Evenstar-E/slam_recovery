@@ -97,6 +97,7 @@ def main() -> None:
         np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2,
         weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
         info_before_frame=TangentFrame("world", "rot_trans", "world"),
+        anchor_pose_world=np.eye(4),
     )
     report = node.evaluate_and_commit_candidate(
         "attribution", good, incumbent_poses=incumbent,

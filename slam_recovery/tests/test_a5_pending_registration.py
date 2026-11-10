@@ -48,6 +48,7 @@ def _candidate(version: int, poses) -> CandidateMap:
         wilson_lower_bound=0.90,
         reentry_pos_jump_m=0.05,
         info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+        cov_after_frame=TangentFrame("body", "rot_trans", "fixture"),
     )
 
 

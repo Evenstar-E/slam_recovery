@@ -47,6 +47,7 @@ def candidate(m, **kw):
     args.update(kw)
     return CandidateMap(**args,
         info_after_frame=TangentFrame("body", "rot_trans", "probe"),
+        cov_after_frame=TangentFrame("body", "rot_trans", "probe"),
     )
 
 

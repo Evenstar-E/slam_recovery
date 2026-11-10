@@ -26,6 +26,7 @@ def try_candidate(**evidence):
                              repaired_poses={42: np.eye(4)}, info_after_6x6=np.eye(6) * 100,
                              cov_after_6x6=np.eye(6) * .01, holdout_nis=.1, **evidence,
         info_after_frame=TangentFrame("body", "rot_trans", "probe"),
+        cov_after_frame=TangentFrame("body", "rot_trans", "probe"),
                              )
     report = m.validate_and_resolve(candidate)
     return {"accepted": bool(report.accepted), "pose_42_committed": 42 in m.trusted_poses}

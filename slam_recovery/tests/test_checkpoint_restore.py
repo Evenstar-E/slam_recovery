@@ -52,6 +52,7 @@ class TestCheckpointRestoreAndRollbackTheory(unittest.TestCase):
             cov_after_6x6=np.eye(6) * 0.1,
             holdout_nis=0.9,
             info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+            cov_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         report = mgr.validate_and_resolve(b3_candidate)
         self.assertFalse(report.accepted)

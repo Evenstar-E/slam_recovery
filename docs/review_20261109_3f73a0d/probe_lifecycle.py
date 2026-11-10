@@ -14,6 +14,7 @@ for case in ('tail', 'gap'):
     node.tx_mgr.trigger_quarantine(int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6) * 2, 1.2,
         weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
         info_before_frame=TangentFrame("world", "rot_trans", "world"),
+        anchor_pose_world=np.eye(4),
     )
     poses, incumbent = {}, {}
     for k in range(20):
@@ -44,12 +45,14 @@ node = OnlineRecoveryTransactionNode()
 node.tx_mgr.trigger_quarantine(int(1e9), int(2e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6) * 2, 1.2,
     weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
     info_before_frame=TangentFrame("world", "rot_trans", "world"),
+    anchor_pose_world=np.eye(4),
 )
 candidate = CandidateMap(candidate_id='missing_holdout', parent_map_version=node.tx_mgr.trusted_version,
                          repaired_poses={0: np.eye(4)}, info_after_6x6=np.eye(6) * 100,
                          cov_after_6x6=np.eye(6) * .01, holdout_nis=float('inf'),
                          paired_benefit_approved=True, wilson_lower_bound=.9, reentry_pos_jump_m=0.,
     info_after_frame=TangentFrame("world", "rot_trans", "world"),
+    cov_after_frame=TangentFrame("world", "rot_trans", "world"),
                          )
 report = node.tx_mgr.validate_and_resolve(candidate)
 print('missing_holdout:', 'accepted=', report.accepted, 'evidence_status=', report.evidence_status, 'reason=', report.reason)

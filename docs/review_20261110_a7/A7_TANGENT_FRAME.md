@@ -57,7 +57,7 @@ gate 自己**不选**参考系：它没有对应的 transform，猜一个只会�
 
 | 生产者 | 声明 | 依据 |
 |---|---|---|
-| `sim/transaction_manager_node.py` | segment `world[world]`，candidate `world[world]` | 见下 |
+| `sim/transaction_manager_node.py` | segment `body[scan:<kf>]` + `anchor_pose_world`，candidate `world[world]`（info 与 cov 同基） | 见 §6 |
 | `run_s1_s2_*`、`run_four_arm_*`、`review_20261109_bbc3dcb/probe.py` 等走 node 的调用 | `world[world]` | 它们经 `evaluate_and_commit_candidate` 构造 world 系候选 |
 | `e3_orbslam3/*`（两个脚本） | `body[ref_scan]` | FIM 由 `compute_6dof_point_to_plane_fim(pts_ref)` 直接算出 |
 | `run_e1` / `run_e2` / `real_bags` / 各单测 fixture | `body[<tag>]` | 合成矩阵，声明的是**设计参数化**，不是测量 |
@@ -124,3 +124,52 @@ python -m unittest slam_recovery.tests.test_a7_tangent_frames -v
 python -I docs/review_20261110_a7/negctl_a7.py .            # 修后：same_decision=true
 python -I docs/review_20261110_a7/negctl_a7.py <prefix-tree> # 修前：same_decision=false, exit 1
 ```
+
+
+## 6. 第二次修订：gauge 反例（2026-11-10，审阅 `docs/review_20261110_4255cbe/`）
+
+第一次修订的两个缺陷，都是**普通合法平移**就触发：
+
+1. **搬运后重新单位化**。Ad 含平移时不是正交变换，world 里的 `v` 不再单位长；gate 又按
+   world 欧氏长度除一次，等于再除 `‖Ad v‖²`。
+2. **协方差没有坐标契约**。`cov_after` 由 world FIM 求逆，谱范数不平移不变，却和一个固定
+   `sigma_tol` 比较。
+
+改法（只改评价基准，不改任何门限）：
+
+- 评价切空间**冻结在触发帧的 body 基**：segment 保留 `weak_direction_frame=body[scan:<kf>]`
+  与 `anchor_pose_world`（T_world_from_anchor）。
+- 候选的 **information 与 covariance 一起**搬回该 body 基（`transport_information` /
+  `transport_covariance`），再与原 body 单位弱方向、同基谱范数比较。
+- 单位化只在 body 基内进行（刚体、正交），不再发生在经过含平移伴随的坐标里。
+- 新增 `CandidateMap.cov_after_frame`，与世界系候选必须提供的 `anchor_pose_world`；
+  缺一即 `MissingTangentFrame` / `MissingAnchorPose`，不是默认。
+
+### 复现（命令 + 结果）
+
+```bash
+# 1) 审阅侧原脚本：在修后代码上停在 MissingAnchorPose（旧契约不再静默出数）
+PYTHONPATH=. python -B -W ignore /tmp/a7rev/a7_gauge_probes.py
+# 2) 同一物理场景、新契约：
+python -I docs/review_20261110_a7/a7_gauge_probes_fixed.py
+# 3) 负控（两写法 + 无 anchor 拒绝）：
+python -I docs/review_20261110_a7/negctl_a7.py .
+```
+
+| 场景 | 修前 | 修后 |
+|---|---|---|
+| 真实 producer，world y 平移 0 m | before 20.0239，after 51.2612，cov 0.021666，MODE2 | 同左 |
+| 真实 producer，world y 平移 2 m | before **4.9464**，after **12.6627**，cov 0.114340，**MODE3** | before 20.0239，after 51.2612，cov 0.021666，**MODE2** |
+| 对角例，world y 平移 0 m | before 20，after 30，cov 0.2，MODE2 | 同左 |
+| 对角例，world y 平移 5 m | cov **0.628026**，**MODE3** | cov 0.200000，**MODE2** |
+| 真实 producer + 绕 z 转 30° + 平移 (0.5, 2, -1) | — | before/after/cov 与 0 m 例相同（1e-6/1e-9），MODE2 |
+
+两个反例在修后 **mode 与门指标都不再随平移变化**；第三个是审阅要求的"真实 producer 旋转弱方向
++ 非零平移"新例，同样不变。
+
+### 仍未验收
+
+- 审阅侧要用**同一脚本**独立复现；本文只报我的运行结果，不代替他们的复现。
+- E3 的 `body[ref_scan]` 声明仍是旧 producer（多帧各自原点 FIM 直接平均）加新标签，
+  未闭合；当前事务/trace 不消费它，按审阅意见延期。
+- `aux_or_loop_info_6x6` 仍无 frame 声明。

@@ -27,8 +27,6 @@ from ..core import (
     RecoveryState,
     TangentFrame,
     ValidationReport,
-    transport,
-    transport_information,
 )
 from ..diagnosis import SignatureMatrixRouter
 from ..health import DetectorConfig, JointHealthDetector
@@ -233,22 +231,27 @@ class OnlineRecoveryTransactionNode:
         if self.tx_mgr.state == RecoveryState.HEALTHY:
             if decision.state == RecoveryState.QUARANTINED:
                 # `weak_dir` and `fim_6x6` are produced from this scan's own points, i.e. in the
-                # body frame of `kf_id`. The repaired candidate's information is assembled from
-                # world-frame points (see `_build_candidate`). The gate multiplies the weak
-                # direction by both, so they must share one declared basis: move the two segment
-                # quantities into the world frame here, once, using this keyframe's pose. The
-                # quadratic form v^T Lambda v is invariant under that transport, so the
-                # *before* information is unchanged; the repair's information is now profiled
-                # along the same physical direction as the one that is weak.
+                # body frame of `kf_id`, and that frame is kept as the gate's evaluation basis.
+                # The repaired candidate is assembled from world-frame points, so it carries the
+                # anchor pose and the gate brings the candidate's information and covariance back
+                # into this body frame. Transporting the *direction* into world instead would be
+                # the same physics in principle, but the world vector is not unit length (Ad is not
+                # orthogonal), and re-normalising it there rescales the information.
                 self.tx_mgr.trigger_quarantine(
                     estimated_onset_ns=decision.estimated_onset_ns,
                     current_ns=timestamp_ns,
-                    weak_direction_6d=transport(weak_dir, pose_se3),
-                    info_before_6x6=transport_information(fim_6x6, pose_se3),
+                    weak_direction_6d=weak_dir,
+                    info_before_6x6=fim_6x6,
                     propagated_cov_norm=float(np.linalg.norm(cov_6x6, ord=2)),
-                    weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
-                    info_before_frame=TangentFrame("world", "rot_trans", "world"),
+                    weak_direction_frame=TangentFrame("body", "rot_trans", f"scan:{kf_id}"),
+                    info_before_frame=TangentFrame("body", "rot_trans", f"scan:{kf_id}"),
+                    anchor_pose_world=pose_se3.copy(),
                 )
+                # A5 normal path: this frame set off the alarm, so it was never handed to
+                # step_healthy and therefore is not among the deltas the trigger rolled back.
+                # Without this line it belongs to no population at all -- not trusted, not
+                # pending -- and can never be resolved.
+                self.tx_mgr.register_quarantined_frame(kf_id, timestamp_ns)
                 self._sync_spatial_map_with_trusted_poses()
             else:
                 delta = BackendDelta(
@@ -679,8 +682,10 @@ class OnlineRecoveryTransactionNode:
             boundary_basis=boundary_basis,
             info_after_6x6=info_after,
             cov_after_6x6=cov_after,
-            # `fims_after` are computed from world-frame points and averaged in that one basis.
+            # `fims_after` are computed from world-frame points and averaged in that one basis;
+            # the covariance is the inverse of that same average, so it shares the basis.
             info_after_frame=TangentFrame("world", "rot_trans", "world"),
+            cov_after_frame=TangentFrame("world", "rot_trans", "world"),
             holdout_nis=mean_holdout_nis,
             repairer_name=candidate_id,
             paired_benefit_approved=paired_ok,

@@ -154,6 +154,7 @@ class TrustedMapTransactionManager:
         *,
         weak_direction_frame: "TangentFrame",
         info_before_frame: "TangentFrame",
+        anchor_pose_world: Optional[np.ndarray] = None,
     ) -> QuarantineSegment:
         """
         Roll back provisional updates starting at t_{q,start} = \hat{t}_{onset} - \Delta t_{margin},
@@ -166,13 +167,18 @@ class TrustedMapTransactionManager:
         # Undo-log rollback for late-detected faults (R2 & F5 fix): roll back in reverse chronological order
         # using recorded before-images so overwritten keys and initial biases are restored bit-for-bit!
         revoked_from_trusted: List[BackendDelta] = []
+        revoked_repair_keys: List[int] = []
         while self.promoted_history and self.promoted_history[-1].timestamp_ns >= t_q_start:
             item = self.promoted_history.pop()
             item.provisional = True
             # A repair undo entry is not a backend delta: it restores a frame the candidate wrote,
-            # so it must not be re-queued as provisional evidence.
+            # so it must not be re-queued as provisional evidence. The key it restored is still
+            # suspect, though: it leaves the trusted map here, so it has to be listed as pending
+            # or it ends up in no population at all (A5 normal path).
             if getattr(item, "undo_kind", "") != "repair":
                 revoked_from_trusted.append(item)
+            elif item.keyframe_id is not None:
+                revoked_repair_keys.append(int(item.keyframe_id))
             if self._promoted_before_images:
                 prev_pose, prev_factor_len, prev_ba, prev_bg = self._promoted_before_images.pop()
                 if item.keyframe_id is not None:
@@ -227,10 +233,13 @@ class TrustedMapTransactionManager:
             info_before_6x6=info_before_6x6.copy(),
             propagated_cov_norm=propagated_cov_norm,
             raw_frame_refs=[str(int(d.keyframe_id)) for d in quarantined_deltas
-                            if getattr(d, "keyframe_id", None) is not None],
+                            if getattr(d, "keyframe_id", None) is not None] +
+                           [str(k) for k in revoked_repair_keys],
             provisional_factor_ids=prov_factors,
             weak_direction_frame=weak_direction_frame,
             info_before_frame=info_before_frame,
+            anchor_pose_world=(None if anchor_pose_world is None
+                               else np.asarray(anchor_pose_world, dtype=np.float64).copy()),
         )
         self.active_quarantine.raw_frame_refs = sorted(
             set(self.active_quarantine.raw_frame_refs), key=lambda r: int(r))
@@ -241,12 +250,20 @@ class TrustedMapTransactionManager:
 
         The system, not the candidate, owns the pending population. Idempotent; the reference list
         stays sorted by integer key so the receipt is reproducible.
+
+        A frame that arrives while the segment is waiting also moves its end time: the segment
+        spans the frames it actually covers, so a receipt that keeps the trigger instant reads as
+        if nothing arrived after it. Timestamps of 0 are taken as "unknown" and leave the end
+        time alone, so a caller that has no clock cannot move it backwards.
         """
         if self.active_quarantine is None:
             return
         refs = {str(r) for r in self.active_quarantine.raw_frame_refs}
         refs.add(str(int(keyframe_id)))
         self.active_quarantine.raw_frame_refs = sorted(refs, key=lambda r: int(r))
+        if int(timestamp_ns) > 0:
+            self.active_quarantine.t_end_ns = max(int(self.active_quarantine.t_end_ns),
+                                                  int(timestamp_ns))
 
     def validate_and_resolve(
         self,
@@ -376,6 +393,7 @@ class TrustedMapTransactionManager:
                         # declared basis, it does not re-derive one.
                         weak_direction_frame=old_segment.weak_direction_frame,
                         info_before_frame=old_segment.info_before_frame,
+                        anchor_pose_world=old_segment.anchor_pose_world,
                     )
                 # The receipt describes the *remaining pending set*, not only this candidate's
                 # deferrals: a retry committing 8..11 while deferring nothing still leaves 12..19

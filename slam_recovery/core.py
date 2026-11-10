@@ -151,6 +151,10 @@ class TangentFrameMismatch(TangentFrameError):
     """Two 6D quantities that are multiplied together live in different frames."""
 
 
+class MissingAnchorPose(TangentFrameError):
+    """A world-declared quantity needs the anchor body frame's pose to be evaluated in it."""
+
+
 @dataclass(frozen=True)
 class TangentFrame:
     """Where a 6D tangent quantity lives, and how its six blocks are ordered.
@@ -227,6 +231,16 @@ def transport_information(info: np.ndarray, T: np.ndarray, order: str = "rot_tra
     return Ad_inv.T @ np.asarray(info, dtype=np.float64).reshape(6, 6) @ Ad_inv
 
 
+def transport_covariance(cov: np.ndarray, T: np.ndarray, order: str = "rot_trans") -> np.ndarray:
+    """Move a 6x6 covariance from A to B: P_B = Ad P_A Ad^T.
+
+    Information and covariance must move together and in opposite directions; transporting one and
+    not the other is how a gate ends up comparing a body covariance against a world threshold.
+    """
+    Ad = adjoint(T, order=order)
+    return Ad @ np.asarray(cov, dtype=np.float64).reshape(6, 6) @ Ad.T
+
+
 def require_tangent_frame(spec: Optional[TangentFrame], where: str) -> TangentFrame:
     """Refuse an undeclared quantity. There is no default frame."""
     if spec is None:
@@ -255,6 +269,12 @@ class QuarantineSegment:
     # basis, with the same block order. Both must be declared by the producer.
     weak_direction_frame: Optional[TangentFrame] = None
     info_before_frame: Optional[TangentFrame] = None
+    # T_world_from_anchor: maps a point from the *anchor* body frame to world. The gate evaluates
+    # in that body frame and needs this to bring a world-declared candidate's information and
+    # covariance back into it. Keeping the anchor (and its pose) is what makes the evaluation
+    # basis fixed: an origin-free tangent space does not exist, and the covariance norm in
+    # particular is not invariant to where the origin is.
+    anchor_pose_world: Optional[np.ndarray] = None
 
     def __post_init__(self) -> None:
         require_tangent_frame(self.weak_direction_frame, "QuarantineSegment.weak_direction_frame")
@@ -289,10 +309,12 @@ class CandidateMap:
     cov_after_6x6: np.ndarray
     holdout_nis: float
     # The basis `info_after_6x6` lives in. The gate profiles it along the segment's weak direction,
-    # so this must equal `QuarantineSegment.weak_direction_frame`; a repairer that assembles its
-    # information from world-frame points reports "world[world]/rot_trans", one that assembles it
-    # from a scan's own points reports that scan's body frame, and the two are not interchangeable.
+    # so this must be the same basis or be transportable into it.
     info_after_frame: Optional[TangentFrame] = None
+    # The basis `cov_after_6x6` lives in. It is compared against a fixed norm bound, and the
+    # spectral norm of a covariance depends on where the origin is, so the covariance has to
+    # declare its basis exactly as the information does.
+    cov_after_frame: Optional[TangentFrame] = None
     used_evidence_refs: List[str] = field(default_factory=list)
     repairer_name: str = ""
     repaired_factor_ids: Optional[List[int]] = None
@@ -354,6 +376,36 @@ class ValidationReport:
     remaining_pending_pose_keys: Optional[List[int]] = None
 
 
+def _into_basis(value, spec: Optional[TangentFrame], target: TangentFrame,
+                T_body_world: Optional[np.ndarray], what: str, kind: str):
+    """Move one 6D quantity into the fixed evaluation basis, or refuse.
+
+    `kind` is "direction", "information" or "covariance": information and covariance move in
+    opposite directions and must never be transported as if they were the same object.
+    `T_body_world` maps world points to the anchor body frame. It is only available when the
+    segment carried `anchor_pose_world`; without it a world-declared quantity cannot be evaluated
+    and is refused rather than read through a norm that silently depends on the origin.
+    """
+    spec = require_tangent_frame(spec, f"{what}_frame")
+    if spec.order != target.order:
+        raise TangentFrameMismatch(
+            f"{what} is declared with block order {spec.order!r} but the evaluation basis uses "
+            f"{target.order!r}")
+    if spec == target:
+        return np.asarray(value, dtype=np.float64)
+    if spec.frame == "world" and T_body_world is not None:
+        if kind == "information":
+            return transport_information(value, T_body_world, order=spec.order)
+        if kind == "covariance":
+            return transport_covariance(value, T_body_world, order=spec.order)
+        return transport(value, T_body_world, order=spec.order)
+    raise TangentFrameMismatch(
+        f"{what} is in {spec} but the gate evaluates in {target}: no transform is available to "
+        "reconcile them. Declare the quantity in the evaluation basis, or carry "
+        "QuarantineSegment.anchor_pose_world so it can be transported."
+    )
+
+
 @dataclass(frozen=True)
 class GateThresholds:
     """Thresholds for the unified four-mode gate D(t) in Section 4.8."""
@@ -379,11 +431,13 @@ def evaluate_four_mode_gate(
       - Mode 3 (Soft Bridge / Wait): unverified/insufficient info, but ||P_prop|| < \Sigma_bridge
       - Mode 4 (Hard Sleep / Split): unverified/insufficient info and ||P_prop|| >= \Sigma_bridge
     """
-    # A 6D direction dotted with a 6x6 information matrix is only the information along a physical
-    # direction if both are expressed in the same basis with the same block order. That is checked
-    # here, at the entry, and it is a refusal rather than a correction: the gate does not own the
-    # transform that would reconcile two frames, so guessing one would produce a plausible number
-    # with no way to tell it is wrong. Producers use transport()/transport_information().
+    # The evaluation basis is FIXED: the trigger scan's body frame. Every 6D quantity the gate
+    # multiplies is brought into that one basis before anything is computed, because the quantities
+    # the gate compares are not origin-free. A weak direction carried into a translated world frame
+    # no longer has unit length there (Ad is not orthogonal when the translation is non-zero), so
+    # re-normalising it in world silently rescales the information; and a covariance's spectral
+    # norm is not invariant to the origin either. Evaluating in the anchor body frame removes both
+    # by construction rather than by remembering not to normalise.
     v_frame = require_tangent_frame(segment.weak_direction_frame,
                                     "QuarantineSegment.weak_direction_frame")
     info_before_frame = require_tangent_frame(segment.info_before_frame,
@@ -394,25 +448,45 @@ def evaluate_four_mode_gate(
             "v^T Lambda v would mix two bases. Transport one of them into the other's frame and "
             "declare the result; the gate will not pick a frame for you."
         )
-    info_after_frame = None
-    if candidate is not None:
-        info_after_frame = require_tangent_frame(candidate.info_after_frame,
-                                                 "CandidateMap.info_after_frame")
-        if info_after_frame != v_frame:
-            raise TangentFrameMismatch(
-                f"candidate info_after is in {info_after_frame} but the weak direction is in "
-                f"{v_frame}: the profiled information would mix two bases. Transport the "
-                "candidate information into the segment's frame before submitting it."
+    target = TangentFrame("body", v_frame.order,
+                          v_frame.anchor if v_frame.frame == "body" else "anchor")
+    T_body_world = None
+    if v_frame.frame == "world" or (candidate is not None
+                                    and candidate.info_after_frame is not None
+                                    and candidate.info_after_frame.frame == "world"):
+        if segment.anchor_pose_world is None:
+            raise MissingAnchorPose(
+                "the gate evaluates in the trigger scan's body frame, and a world-declared "
+                "quantity needs QuarantineSegment.anchor_pose_world (T_world_from_anchor) to be "
+                "brought there; the origin of the tangent space cannot be left unnamed"
             )
+        T_body_world = np.linalg.inv(np.asarray(segment.anchor_pose_world, dtype=np.float64))
 
-    v = np.asarray(segment.weak_direction_6d, dtype=np.float64).reshape(6)
+    v = _into_basis(segment.weak_direction_6d, v_frame, target, T_body_world,
+                    "weak_direction", kind="direction")
+    info_before_basis = _into_basis(segment.info_before_6x6, info_before_frame, target,
+                                    T_body_world, "info_before", kind="information")
+    v = np.asarray(v, dtype=np.float64).reshape(6)
+    # Safe now: the vector is in the (rigid, orthonormal) anchor body frame, not in a frame reached
+    # through a translation-bearing adjoint.
     v_norm = np.linalg.norm(v)
     if v_norm > 1e-12:
         v = v / v_norm
     else:
         v = np.array([0.0, 0.0, 0.0, 1.0, 0.0, 0.0], dtype=np.float64)
 
-    info_before = float(v.T @ segment.info_before_6x6 @ v)
+    info_before = float(v.T @ np.asarray(info_before_basis, dtype=np.float64) @ v)
+
+    # The candidate's information and covariance are brought into the same basis before either is
+    # used. Before this, the covariance was compared against a fixed bound in whatever basis its
+    # producer happened to work in, and a plain translation moved that number.
+    info_after_basis = None
+    cov_after_basis = None
+    if candidate is not None:
+        info_after_basis = _into_basis(candidate.info_after_6x6, candidate.info_after_frame,
+                                       target, T_body_world, "info_after", kind="information")
+        cov_after_basis = _into_basis(candidate.cov_after_6x6, candidate.cov_after_frame,
+                                      target, T_body_world, "cov_after", kind="covariance")
     duration_sec = max(0.0, (segment.t_end_ns - segment.t_start_ns) * 1e-9)
     p_prop = float(segment.propagated_cov_norm)
 
@@ -492,10 +566,10 @@ def evaluate_four_mode_gate(
         holdout_nis_value = float(candidate.holdout_nis)
         holdout_missing = bool(np.isinf(holdout_nis_value))
         mats_finite = bool(
-            np.asarray(candidate.info_after_6x6).shape == (6, 6)
-            and np.asarray(candidate.cov_after_6x6).shape == (6, 6)
-            and np.isfinite(candidate.info_after_6x6).all()
-            and np.isfinite(candidate.cov_after_6x6).all()
+            np.asarray(info_after_basis).shape == (6, 6)
+            and np.asarray(cov_after_basis).shape == (6, 6)
+            and np.isfinite(info_after_basis).all()
+            and np.isfinite(cov_after_basis).all()
             and not np.isnan(holdout_nis_value)
         )
         if not (poses_valid and bias_acc_valid and bias_gyr_valid and mats_finite):
@@ -512,9 +586,9 @@ def evaluate_four_mode_gate(
                 evidence_status=evidence_status,
             )
 
-        info_after = float(v.T @ candidate.info_after_6x6 @ v)
+        info_after = float(v.T @ np.asarray(info_after_basis, dtype=np.float64) @ v)
         info_gain = info_after - info_before
-        p_after = float(np.linalg.norm(candidate.cov_after_6x6, ord=2))
+        p_after = float(np.linalg.norm(np.asarray(cov_after_basis, dtype=np.float64), ord=2))
         d_hold = float(candidate.holdout_nis)
 
         # No scorable holdout frame: the candidate supplied no cross-scan evidence at all. This is
