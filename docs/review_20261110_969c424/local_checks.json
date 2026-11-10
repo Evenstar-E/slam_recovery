@@ -1,0 +1,41 @@
+{
+  "target": "969c424aefdf8732e0f379bc6097357fac5ccbde",
+  "scope": "Source binding, developer-report arithmetic, synthetic prose-rule control; no native/ROS/bag execution",
+  "command": "python -B docs/review_20261110_969c424/run_checks.py",
+  "exit": 0,
+  "published_host_patch": {
+    "sha256": "f5efce7160e45933f84b23c365f08b9a51798aeb9c201c4e48a5ba026e2c2f21",
+    "unchanged": true,
+    "capture": "replay_buffer_.push_back(LidarMeasures)",
+    "replay_assignment": "LidarMeasures = replay_buffer_[i]",
+    "deep_copy_fix": "BLOCKED_NOT_PUBLISHED"
+  },
+  "driver_unchanged": true,
+  "reported_distances": {
+    "control_live_m": 0.07239080951336312,
+    "treatment_control_m": 0.028829304986420043,
+    "origin": "Developer-reported rounded positions; not independently measured and not a quality metric",
+    "acceptance_tolerance": "UNDECLARED_FOR_REPLAY_FIDELITY"
+  },
+  "matching_control": {
+    "status": "SYNTHETIC_PROSE_RULE_COUNTEREXAMPLE",
+    "group_raw_stamp_ns": 100000000000,
+    "group_end_stamp_ns": 100090000000,
+    "queued_repair_stamps_ns": [99900000000],
+    "selected_stamp_ns": 99900000000,
+    "same_scan": false,
+    "limit": "Count and proximity alone do not prove scan identity; not an observed mismatch in the reported 20 replacements"
+  },
+  "upstream_source_checks": {
+    "revision": "0d2c034",
+    "cloud_pointer_declaration": "include/common_lib.h:75-99",
+    "cloud_mutation": "src/LIVMapper.cpp:1001-1002",
+    "empty_cloud_early_return": "src/LIVMapper.cpp:343-346",
+    "method": "Read-only HTTPS source excerpts; no upstream code executed",
+    "limit": "Supports aliasing risk, not the deployed run's configuration or causal log"
+  },
+  "host_poses_run": "NOT_ALGORITHMIC_REPAIR_EVIDENCE",
+  "old_eight_frame_pass": "DEVELOPER_REQUESTED_RECHECK_NOT_YET_DELIVERED",
+  "native_full_two_event": "BLOCKED",
+  "publication": "LOCAL_ONLY_PRIOR_PUSH_DENIAL_NOT_RETRIED"
+}

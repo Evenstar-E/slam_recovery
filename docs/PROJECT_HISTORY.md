@@ -365,3 +365,9 @@ main已提出原rawheader/组成员身份替换最低修，方向接受但尚未
 [核验](review_20261110_d5f7d8f/README.md)保留开发同实例control/treatment负观察：426group、12替换/8未匹配；报告算术x差14.231m、vox差6565、points差46369本机核过，非本机宿主测量。撤回修复效应PASS合理，但旧运行live与本次control不同时间/实例，z注入与x非线性响应也不能单凭量级定位根因；本次保真度/效应归因UNKNOWN/BLOCKED。新版host patch/log/receipt及同末stamp live/control/treatment尚未交，旧patch未变，完整写回→接回→E2仍未闭合。
 
 分类脚本读全部20发布戳而非实际8未匹配，inside下界用cp不使用replay lo。本机提取原表达式单个合成时间控制cp10、replay[12,14]、stamp11仍inside；cp缺失亦将早戳算inside。仅证明分类标签边界，不猜实际8帧根因。最低归档已有同次三终态/实际host source及matched戳、统一撤PASS范围，不扩大匹配窗/矩阵。S1/S2原生主线、S3独立研究/旧参数停保持；局部审阅不升完整A/B。run_checks.py及bash-n退出0，无ROS/原bag；此前push拒绝未重试/绕过，记录只本地，远端review仍3965299。
+
+## 40. 969c424：浅拷贝诊断有源依据，同stamp表补交，实际修法与scan归属待验（仅本地）
+
+[核验](review_20261110_969c424/README.md)接受开发撤14.23m效果、补同末stamp live/control/treatment和深拷贝修后报告，较跨run比较实质推进。旧capture/replay值拷贝+固定上游三个云Ptr与原地swap支持别名风险；actual深拷贝/匹配代码和log/receipt仍未交，不把诊断报告当独立宿主PASS。读数欧氏差本机核为7.239cm/2.883cm，非算法质量/完整状态保真指标；旧8帧PASS待复核，不改历史数字，复用下一实质运行点数/地图原件而非大矩阵。
+
+新≤0.2s取最大前戳只保证近邻；本机按文字单个合成正常缺当前repair例，会把前一scan repair匹配当前group，非本次20条实际错配证明。最低已有20条原header/group归属，20/20不当身份PASS，不再宽窗。冻结host_poses源码只复用旧host候选，可验编排/拒绝/E2但不是实际修复，旧sigma配置不重开调参。S1/S2下一仍真实修复驱动内部重估/地图写回→接回→E2或预算断点，S3并行/参数停；旧写回/命令source未改不重测。完整A/B不升，脚本本机退出0/无ROS原bag，记录仅本地，push拒绝未解除/未绕过，remote review仍3965299。
