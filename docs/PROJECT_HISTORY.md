@@ -329,3 +329,9 @@ B前缀冻结/滚动规则不读未来，尺度最大987.3306及49.894倍轨迹�
 [C核验](review_20261110_adff0b0/C_RESEARCH_REVIEW.md)保留同扫描重复控制四位小数一致、新体素/半径producer实际实现，不再称C未交。新截取字典序最前1200体素新增坐标人口差，本机三正交平面1875点/90°旋转/固定物理方向控制：旧92.592594→92.592594，C2→88.888890约4%差。删planarity/邻域自身/筛后支持及原契约不全，不能说只改两处精确修掉；示意patch不能git apply --check。旧方向40.911→25.582与各自弱向→1.121不同，不自动证明κ比值校准继承或授权重导floor。
 
 A/B旧基线/输入标签错误未修。仓库A不删/B搁置/C集成侧定/S3收口只记录开发状态，非本会话用户选择，尚不能盲选或自动部署。S3有限纠正既有研究/解释，真实候选效益继续BLOCKED并复用主线自然产物；参数手调继续暂停、生产不集成，S1/S2不等研究。
+
+## 34. f2bbbb5：hold生命周期接线新增，命令与评分归属仍需最小修
+
+[本轮核验](review_20261110_f2bbbb5/README.md)接受Python开段hold/rearm→resume接线、候选输入sidecar和unittest发现修正为局部组件增量，不能当完整链。宿主hold新增测量表和smoke_hold诊断入口，但actual hold patch/log/result未交，发布host diff与adff相同；最低保存已有部署源码/原件，不重跑矩阵、不把报告表当本机PASS。
+
+本机5选定测试通过；确定性正常命令控制：hold→restore覆盖一格cmd，一个OK restore ack被两次collect计成hold/restore成功；短50ms poll丢pending后迟到OK hold又可计restore成功。最低现通道单in-flight、短poll保持pending、匹配ack消费一次，不造RPC框架。完整accepted→HEALTHY无rearm事件，Python仅hold→reprocess不resume；实际host是否内部释放因新patch未交BLOCKED，明确全接纳与partial隔离语义。实际node7帧输入6verified/仅1与7进info_after，sidecar仍1…7：接受输入归档、不称实际评分集，最低现node归档真实verified/holdout/anchor而不从拒绝committed空集猜。producer/manager/core未变，旧正常任务复用不重跑。S1/S2仍交实际修复→内部写回→接回→E2，S3独立研究与参数暂停保持，不升完整A/B分。

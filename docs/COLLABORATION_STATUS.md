@@ -383,3 +383,12 @@ S1/S2报告当前具体改动/已启动运行，沿原预算收尾并保存代�
 - **S2宿主**：沿现循环无group也服务控制、重放旧cloud等公开输出门控；当前隔离仍写图/捕获原云重放未注入修复测量/restore后时间线未闭合。最小接通实际修复输入支配原生重估和内部地图、再接回/E2；不是把ICP位姿直接写_state。双事件包准备不等运行，沿原预算保存失败/完整人口与尾段结果。
 - **S3专用研究**：C有实际新增，重复控制局部接受但新坐标采样控制FAIL约4%；两因素消融不纯、κ自动保留无证、示意patch不能apply。A/B旧基线/输入标签错误未纠正；先有限纠正并保持真实候选效益BLOCKED，不重导floor/调旧参数/集成生产。不把仓库裁决当本会话用户已选，S3收口是开发状态而非研究已验收。
 - **S4本机**：只读源码/归档和小正常控制，未代跑ROS/原bag或改算法。局部进度不升完整A/B，总链首次真实完成仍单独报告；原件缺失和源码断点分开，不说“没有任何进展”。
+
+## 36. repair-f3核f2bbbb5：hold编排/测试发现推进，不等实际两事件
+
+[版本化核验](review_20261110_f2bbbb5/README.md)接受Python开段hold/rearm-resume接线、候选输入归档、unittest入口修正；host hold表是开发报告，新实际patch与ack/log/result尚未提交，旧host diff不识别hold/resume。完整两事件仍未运行，不升完整A/B。
+
+- **S1最低接线修**：事件队列不保护单cmd/ack，本机正常确定性控制错计两次成功及迟到hold→restore；沿现通道单in-flight、短poll不终结、匹配ack消费一次。完整接纳HEALTHY没有rearm event，Python不发resume；与S2明确实际成功reprocess后的解除契约、partial仍隔离，不无条件放写。sidecar区分输入全集与真实verified/holdout/anchor，复用现node评价处，不为研究补字段延迟宿主。
+- **S2宿主**：保存已运行hold源码patch/完整ack/log/result及binary/config绑定，不重跑矩阵。map计数不证明状态与地图同stamp；修复注入/原生重估/同时间线接回/E2及旧无组control/旧cloud公开正常修沿既定budget直接交付，失败按已选宿主范围回报，不无限绑定。
+- **S3研究**：不由候选输入sidecar宣布完整after/P/独立质量已获证，沿旧最低纠正并行，不调旧参数、不部署未选生产方法，不要求主线重跑旧人口。
+- **S4本机**：5选定测试PASS、正常控制FAIL/BLOCKED如实归档；pytest未装/全discover不跑、不install/shim、不因测试数量增加称闭环。私人文件保持不提交，本机不修算法/跑ROS。下一实质交付仍实际写回→接回→第二事件，首次完成立即单独汇报。
