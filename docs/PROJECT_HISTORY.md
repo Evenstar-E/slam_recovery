@@ -419,3 +419,9 @@ runner savedPGID与receipt写成功exit0保留JSON FAIL且整体exit非零静态
 [核验](review_20261110_9862ad5/README.md)接受27邻格+原距离阈值索引复用，查询人口/支持阈值/生产门不改；3测试含20随机/精确边界及actual support正负控制本机PASS0.143s，新建/共享索引与暴力法一致，无新正常缺陷，不扩极端矩阵。开发4356.5→842.9ms成本观察保留，前后16/13candidate不当纯5.168倍测量、不新矩阵确认精确倍数；4.36s非旧18s解释、轮询ack不当host真实时延方向接受。
 
 wait_start/decision消息时间差减evaluate墙钟耗时不证明独立前置阶段2.2s，保留未对齐差额，沿下一实质运行最小入口/调用/记录时刻分时钟，不需消除才跑两事件。S1/S2复用旧正常归属最低修，下一唯一actual修复→原生写回→接回→E2/尾段或原预算断点，S3独立/旧参数停。A12支持效率局部推进、完整A/B不升，无ROS原bag/全suite/大性能矩阵；记录仅本地、push拒绝未解除未绕过、remote review3965299。
+
+## 49. 95b0d97：原生动作超时负结果保留，首次资格计时被正常帧覆盖（仅本地）
+
+[核验](review_20261110_95b0d97/README.md)保留受控两触发/拒绝run128.8s、restore/hold ack_timeout、355帧消费，完整链未完成、超时不证明动作未应用。新_pending_decision_wall每个到期帧重写，本机actual跟踪控制首次100/后帧124/125进入公式1s却首次资格25s；最低同episode只记首次/新段重置，不改旧数字、不扩计时矩阵。post_eval不含native动作，不能叫整体后段成本。
+
+旧公开poll中restore→status→写ack在下一LIO前，报告“恢复后慢LIO导致该restore ack超时”仍需actual新source/cmd应用ack原件，不猜唯一因果。独立接收线程只早received、主循环applied仍可慢，仓库S1提案非本会话用户新架构选择；先最低命令归属/具体断点，超出设计按用户规则报告，不无限控制框架。S1/S2下一真实修复→原生写回→接回→E2/尾段或900s首断点，S3独立/旧参数停。完整A/B不升，本机小control exit0无ROS原bag，记录仅本地push拒绝未解除未绕过、remote review3965299。

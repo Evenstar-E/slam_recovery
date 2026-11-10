@@ -1,0 +1,15 @@
+{
+  "target": "95b0d979de2bdd2ea03ac0b28ac870895151a0e7",
+  "scope": "Synthetic normal episode frame tracking with supplied wall times; no ROS/native/bag/tuning",
+  "command": "python -B -W ignore docs/review_20261110_95b0d97/run_checks.py", "exit": 0,
+  "scheduler_clock": {
+    "status": "FAIL_REPRODUCED_LOCAL", "first_eligible_wall": 100.0,
+    "stored_pending_wall_after_next_frame": 124.0, "synthetic_decide_entry_wall": 125.0,
+    "reported_formula_delay_s": 1.0, "first_eligibility_delay_s": 25.0,
+    "limit": "Proves timestamp overwrite, not the actual 24.126 s delay in the reported run"
+  },
+  "native_timeout": "DEVELOPER_REPORTED_ACK_TIMEOUT_NOT_PROOF_OF_OPERATION_NOT_APPLIED",
+  "host_thread_proposal": "NOT_IMPLEMENTED_IN_THIS_REVISION_NOT_USER_METHOD_SELECTION",
+  "native_full_two_event": "NOT_COMPLETED",
+  "publication": "LOCAL_ONLY_PRIOR_PUSH_DENIAL_NOT_RETRIED"
+}
