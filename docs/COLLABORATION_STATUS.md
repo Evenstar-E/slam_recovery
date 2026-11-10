@@ -361,3 +361,18 @@ S1/S2报告当前具体改动/已启动运行，沿原预算收尾并保存代�
 | 裁决 | C 补丁**暂不集成**（版本化后再入，确认性运行前重导 floor）；A 不删；B 搁置。S3 研究任务收口 |
 | 主链状态 | `main@5bae7bf`；双事件包 `/tmp/fastlivo/hall01_two_event_v1.bag`（`c3e905da…`）保留；原生两事件**尚未开始** |
 | 已知交付缺陷 | `test_checkpoint_client.py` 为 pytest 风格，`unittest discover` 发现 0 项；已要求 S2 改为 TestCase |
+
+## 34. 20:12 实质交付：受控两事件整链完成；在线链仍 BLOCKED 在上游检测
+
+以下均为实际运行/提交，不是任务发布。main `d35671f`。
+
+| 项 | 实际状态 |
+|---|---|
+| 受控两事件整链 | **完成**（`fl_native_20261110T115717Z_3390402`）：两段触发 15.08/42.43（声明 14.6/42.0）、决策 17.28/45.24、关闭+rearm 22.55/49.06、`hold→restore→resume` ×2 全 ack、终态 HEALTHY、`candidates_detail.jsonl` 2 行、两事件间消费 368 帧。run_mode 标 `CONTROLLED_INTERFACE_TEST` |
+| 控制通道 | 已移出 LIO 主循环（独立线程 + 原子标志，`bd87db8`）：received/applied 0.001–0.005 / 0.196–0.592 s，**调度延迟 24.1 s → 0.006 / 0.119 s** |
+| 决策耗时 | 索引优化后 **4356.5 → 842.9 ms**（support 273 / holdout 275 / paired 294 / gate 0.6），五段无一 >1 s |
+| 等待上限 | `e3a60e7` 修好"隔离路径从不求值"；`466f1a3` 修好"替换式开段无 episode"；wait 固定 2.0 s（一个确认裕度） |
+| LIO 单帧 | restore 前后 2–18 ms / 1–16 ms（中位 12 ms，单次 1.066 s 离群）——**restore 不变慢**，旧的 30 s 超时解释已撤回 |
+| 在线自动链 | **BLOCKED（上游检测）**：38 s 内多次假警报 → 反复 restore → 位姿/地图不再一致 → E2 窗口 87 帧全 UNAVAILABLE。受控结论不能替代它 |
+| S3 门研究 | `exp/gate-method-research@3e9f947`，A/B/C + 门控形态 Part 1/2 已交付并推送；C-2 补丁因旋转不不变性**撤回集成**；S3 待命 |
+| 已知限制 | 30 次滚动快照 7 次 ack 超时（0.5 s 预算，单列）；受控触发的 MODE2 接纳是机制证据、非修复质量 |
