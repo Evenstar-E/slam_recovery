@@ -139,6 +139,21 @@ checkpoint 继续增长（不是跳回 265706）。
 `3.60 → 6.68` 漂移（同期正常运动约 0.67 m/3 s）。所以 hold 保护的是**地图**，不是**估计**；
 restore 会把估计一起回滚，输入恢复时这就是**声明过的轨迹不连续**。
 
+## 3c. 宿主侧重武装钩子（第二断点，已做）
+
+`resume` 与 `hold` 共用同一标志位，由驱动侧在**管理器 re-arm 时**调用：
+
+- `recovery_node.py::CheckpointClient.hold()` 在 `_open_episode()`（订阅回调线程）里**只写命令不等 ack**，
+  避免深拷贝/等待阻塞配对；ack 由主线程 `service()` 收取。
+- `_apply_lifecycle()` 在每次 `service()` 里检查 `tx_mgr.lifecycle_events` 新增项，遇到 `rearm`
+  就发 `resume`，并且每个事件**只处理一次**（`_lifecycle_seen`）。
+- 事件落在 `run_summary.json` 的 `lifecycle.native_checkpoint_actions`
+  （plus 原有 `lifecycle.events`），所以"宿主没收到 resume"不会被记成"重武装发生过"。
+
+单测（验收命令 `python -B -m unittest discover -s slam_recovery/tests -t .`）：**90 passed**
+（原 83 + 本项 7），其中 `test_opening_a_segment_holds_the_host_map`、
+`test_a_re_arm_writes_resume`、`test_lifecycle_events_are_only_acted_on_once` 直接覆盖本钩子。
+
 ## 4. 边界
 
 - 没有跑两事件；没有调门、没有调 σ、没有重跑检测或候选矩阵。

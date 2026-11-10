@@ -97,5 +97,64 @@ class CheckpointClientTest(unittest.TestCase):
         self.assertEqual(client.events, [])
 
 
+
+class CheckpointWiringTest(unittest.TestCase):
+    """The loop must hold the host's map when a segment opens and release it on re-arm."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.dir = self._tmp.name
+        self.host = _FakeHost(self.dir)
+        self.host.start()
+
+    def tearDown(self):
+        self.host.stop()
+        self._tmp.cleanup()
+
+    def _wait_seen(self, n, timeout_s=2.0):
+        deadline = time.time() + timeout_s
+        while time.time() < deadline and len(self.host.seen) < n:
+            time.sleep(0.005)
+        return list(self.host.seen)
+
+    def _loop(self, client):
+        import numpy as np
+
+        from slam_recovery.ros.recovery_node import NativeClosedLoop
+        from slam_recovery.tests.test_recovery_node import _FakeLoopNode
+
+        node = _FakeLoopNode(trigger_at=10 ** 9)      # no automatic trigger
+        loop = NativeClosedLoop(node, run_id="run", checkpoint_client=client)
+        loop._open_episode(1_000_000_000, np.eye(4))
+        return loop, node
+
+    def test_opening_a_segment_holds_the_host_map(self):
+        client = CheckpointClient(self.dir, ack_timeout_s=5.0)
+        self._loop(client)
+        # The host consumes the command on its own thread; the assertion waits for it rather than
+        # racing it.
+        self.assertEqual(self._wait_seen(1), ["hold"])
+
+    def test_a_re_arm_writes_resume(self):
+        client = CheckpointClient(self.dir, ack_timeout_s=5.0)
+        loop, node = self._loop(client)
+        client.collect(timeout_s=5.0)                 # account for the hold before the next command
+        node.tx_mgr.lifecycle_events.append({"event": "rearm"})
+        loop._apply_lifecycle()
+        self.assertEqual(self._wait_seen(2), ["hold", "resume"])
+        self.assertEqual(client.resumes, 1)
+
+    def test_lifecycle_events_are_only_acted_on_once(self):
+        client = CheckpointClient(self.dir, ack_timeout_s=5.0)
+        loop, node = self._loop(client)
+        client.collect(timeout_s=5.0)
+        node.tx_mgr.lifecycle_events.append({"event": "rearm"})
+        loop._apply_lifecycle()
+        loop._apply_lifecycle()
+        self.assertEqual(self._wait_seen(2), ["hold", "resume"])
+        time.sleep(0.05)
+        self.assertEqual(self.host.seen, ["hold", "resume"])
+
+
 if __name__ == "__main__":
     unittest.main()
