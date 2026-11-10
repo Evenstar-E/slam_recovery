@@ -1,0 +1,69 @@
+{
+ "question": "is the ~50% empty-IMU-group fraction a property of the host sync path, or an artifact of the DET_SYNC control build?",
+ "answer": "host property: the default build reproduces it exactly",
+ "runs": {
+  "DEFAULT": {
+   "build": "TRACE_GROUP only (NO_MP=OFF, DET_SYNC=OFF)",
+   "library_sha256": "6aeef0321066e4345228adb4a9a5320fa04a3748123600de520829bf0fe224a7",
+   "executable_sha256": "6e0a3e5722b02c9a6682cd69c5d8ae4428e5215a296da43e85ef58aa3da03d8e",
+   "trace": "trace_default_emit_fixed.csv",
+   "trace_sha256": "5fcccddcb7e2b43dabe8d957b761a4bdf9610d7062d221359578a545c1bf642a",
+   "receipt": "trace_20261110T023139Z_2912547_receipt.json",
+   "odometry_messages": 800,
+   "output_bag_sha256": "2a2d3ce12cd1195657032dbfdf6e09860e09f1471dd00f9de500ffcc1cf8f566"
+  },
+  "ON_reference": {
+   "build": "TRACE_GROUP + NO_MP + DET_SYNC",
+   "library_sha256": "20df3d3f…",
+   "trace": "on1.csv"
+  }
+ },
+ "trace_integrity": {
+  "header": true,
+  "rows": {
+   "ARRIVE": 599,
+   "GROUP": 1766,
+   "IMUINIT": 5,
+   "STATE": 1766
+  },
+  "arrive_sha_ok": "599/599",
+  "empty_group_sha_is_sha256_empty": true
+ },
+ "empty_groups": {
+  "default": {
+   "count": 884,
+   "total": 1766,
+   "fraction": 0.50057
+  },
+  "det_sync": {
+   "count": 884,
+   "total": 1766,
+   "fraction": 0.50057
+  },
+  "verdict": "IDENTICAL_FRACTION"
+ },
+ "default_vs_on": {
+  "groups_identical": true,
+  "group_differences": 0,
+  "imuinit_identical": true,
+  "first_state_divergence": {
+   "index": 75,
+   "max_axis_delta_m": 0.001104
+  },
+  "max_state_delta_m": 424.6,
+  "frames_gt_0.1m": 732,
+  "reading": "the default build neither changes the grouping nor tracks the DET_SYNC run; the state separation is of the same order as the same-build run pairs, which is the run-variance regime already established"
+ },
+ "instrumentation_defect_fixed": "ARRIVE/GROUP used to be emitted inside #ifdef DET_SYNC, so the first default run (library c65f134c) wrote only 5 IMUINIT rows; the emission now sits under #if defined(DET_SYNC) || defined(TRACE_GROUP) and this run is the evidence it works",
+ "provenance_note": "the executable sha is 6e0a3e57 here, not 76359f53 as in the ON/OFF runs: relinking needed LIBRARY_PATH=/home/R26534/mm/ros/lib:/home/R26534/fast_livo2_deps/build/Sophus (the earlier executable had been deleted by a failed link with the older libstdc++). The node source is unchanged; the executable is main.cpp only, and the behaviour under test lives in liblaser_mapping.so, whose sha is recorded per run",
+ "patch_set": "fastlivo_patch/*.v2.diff regenerated from this source; applying them to the *.pre_trace base reproduces the built tree byte-for-byte",
+ "score_mapping": {
+  "rows": [
+   "A2",
+   "B6",
+   "B8"
+  ],
+  "change": "none",
+  "why": "the grouping observation now holds for the default configuration, but it is still one sequence and one pair; no work package closes"
+ }
+}

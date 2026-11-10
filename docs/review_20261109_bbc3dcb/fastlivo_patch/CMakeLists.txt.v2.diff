@@ -1,0 +1,14 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -49,6 +49,11 @@
+ # vio.cpp). Default OFF so the historical build is unchanged.
+ option(NO_MP "Disable OpenMP parallel loops (deterministic reductions)" OFF)
+ option(DET_SYNC "Block on message arrival instead of polling at 5 kHz (T3a)" OFF)
++option(TRACE_GROUP "Write per-arrival / per-group / per-init trace lines (observation only)" OFF)
++if(TRACE_GROUP)
++  add_definitions(-DTRACE_GROUP)
++  message(STATUS "TRACE_GROUP=ON: grouping trace lines are written to $TRACE_GROUP_FILE")
++endif()
+ if(DET_SYNC)
+   add_definitions(-DDET_SYNC)
+   message(STATUS "DET_SYNC=ON: main loop blocks on arrival instead of wall-clock polling")

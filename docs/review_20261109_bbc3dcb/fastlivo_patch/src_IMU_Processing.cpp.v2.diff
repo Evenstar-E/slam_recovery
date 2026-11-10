@@ -1,0 +1,31 @@
+--- a/src/IMU_Processing.cpp
++++ b/src/IMU_Processing.cpp
+@@ -11,6 +11,13 @@
+ */
+ 
+ #include "IMU_Processing.h"
++#include <vector>
++#ifdef TRACE_GROUP
++#include <cstdint>
++// implemented in LIVMapper.cpp; called on the main processing thread only
++void trace_emit_imuinit(const int64_t *stamps, int64_t n, int iter, int maxc);
++#endif
++
+ 
+ ImuProcess::ImuProcess() : Eye3d(M3D::Identity()),
+                            Zero3d(0, 0, 0), b_first_frame(true), imu_need_init(true)
+@@ -106,6 +113,14 @@
+   /** 1. initializing the gravity, gyro bias, acc and gyro covariance
+    ** 2. normalize the acceleration measurenments to unit gravity **/
+   ROS_INFO("IMU Initializing: %.1f %%", double(N) / MAX_INI_COUNT * 100);
++#ifdef TRACE_GROUP
++  {
++    std::vector<int64_t> _st;
++    _st.reserve(meas.imu.size());
++    for (auto &im : meas.imu) _st.push_back((int64_t)im->header.stamp.toNSec());
++    trace_emit_imuinit(_st.data(), (int64_t)_st.size(), (int)N, (int)MAX_INI_COUNT);
++  }
++#endif
+   V3D cur_acc, cur_gyr;
+ 
+   if (b_first_frame)
