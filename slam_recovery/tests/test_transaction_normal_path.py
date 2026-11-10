@@ -118,3 +118,34 @@ class WaitingSegmentTimeTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ReentryEvidenceLegTest(unittest.TestCase):
+    """The gate's re-entry leg and the boundary check must use one definition.
+
+    A 1.2506 m displacement 2.329 s after the anchor is 0.54 m/s of motion. Before the fix the
+    boundary check learned that and the evidence leg did not, so the same run failed twice on the
+    same number under two names.
+    """
+
+    def _report(self, elapsed):
+        from slam_recovery.core import evaluate_four_mode_gate
+
+        mgr = TrustedMapTransactionManager(confirmation_margin_ns=0)
+        for k in (1, 2, 3):
+            mgr.step_healthy(_delta(k, k * 100_000_000, 0.1 * k))
+        seg = _trigger(mgr, 2 * 100_000_000, 3 * 100_000_000)
+        cand = _candidate(seg.checkpoint.map_version, {2: np.eye(4)})
+        cand.reentry_pos_jump_m = 1.2506
+        cand.reentry_elapsed_s = elapsed
+        return evaluate_four_mode_gate(seg, cand)
+
+    def test_motion_over_the_margin_is_not_a_discontinuity(self):
+        rep = self._report(2.329)
+        self.assertNotEqual(rep.evidence_status, "FAILED")
+
+    def test_the_same_jump_with_no_elapsed_time_is_refused(self):
+        self.assertEqual(self._report(0.0).evidence_status, "FAILED")
+
+    def test_an_undated_jump_keeps_the_strict_reading(self):
+        self.assertEqual(self._report(None).evidence_status, "FAILED")
