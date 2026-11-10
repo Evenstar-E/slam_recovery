@@ -1,0 +1,641 @@
+{
+  "scope": "Local Python integration and archived CSV, no native runs",
+  "head": "39eac2f337eaf2b9df28aa0e9b015b36d0ecf34d",
+  "branch": "codex/independent-reproduction-20261110",
+  "production_tree": "b147adc5d82e6c0f2bd24b237c07feeffd04f186",
+  "production_diff": "",
+  "git_status": "?? docs/independent_reproduction_20261110_codex/\n",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "executable": "C:\\Users\\仝正睿\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+  "numpy": "2.3.5",
+  "import_path": "C:\\Users\\仝正睿\\Documents\\paper\\fast_livo2_advanced\\repo_reviews\\slam_recovery_independent_20261110_codex\\slam_recovery\\__init__.py",
+  "source_sha256": {
+    "slam_recovery/core.py": {
+      "git_blob_sha256": "95e574a61cbd40cecc244991e5296346837841998bf59edbe489e95dffc02360",
+      "loaded_file_sha256": "63ca7222474bff04c0b6e55e209f881035dc7383803ea9c84404f69d5e49399b"
+    },
+    "slam_recovery/quarantine/manager.py": {
+      "git_blob_sha256": "f5ea32238f0fe00e2cf8351f731c15d40a38c2a55d63e2552514b8f35f38f20d",
+      "loaded_file_sha256": "22768671cdeecfef8bda0a251eaf3e619804aa811578c62c794549c853d2b55b"
+    },
+    "slam_recovery/sim/transaction_manager_node.py": {
+      "git_blob_sha256": "2e78e2f4be73fdf902b1b3b4ac9ae23b14ca92d48ee89227bd648b25e2628e09",
+      "loaded_file_sha256": "20a0cc5672d6248086a0447dc73ce0c96035e499615e81cc0037210126260287"
+    },
+    "slam_recovery/tests/test_a9_repair_undo.py": {
+      "git_blob_sha256": "83e11cf57390c49ee496882d6c684c6818383964498204754471c1c9ccea1dfa",
+      "loaded_file_sha256": "ae01ed3923a301e2a6ba6398617b7e3d5c27951ef08f65d24d5ffebd89525fc5"
+    },
+    "a7_acceptance.py": {
+      "file_sha256": "329f92ec3d395166cb880fb4bbe744977ec0bbf4425b72c0df8052fa80eaf350"
+    },
+    "normal_paths.py": {
+      "file_sha256": "75bf357af187b3a6a88ab1d0f7929d945e17212e8060de56bc2bb7b62f7d95c3"
+    },
+    "run_checks.py": {
+      "file_sha256": "e46973441e0d85a4cd73bd504ef17b0b3a41eaee5de4329f664866d46edee601"
+    },
+    "test_trace_events.py": {
+      "file_sha256": "0db158b3b2a8cd9de37a928a652075bbd21912f43c22110e66f6935a8b8628e9"
+    },
+    "trace_events.py": {
+      "file_sha256": "4c838eb4e459b6f2a15c7a9cdeaed897db9c294379bb6ee421d8a0d34bfdb706"
+    },
+    "upstream_a7_gauge_probes.py": {
+      "file_sha256": "846682fafb1a2a2915a16c879ef917e0187cdb270a0618c152bdd01dca586924"
+    },
+    "upstream_verify_trace_pair.py": {
+      "file_sha256": "3afcf98c0578cf2d332898fb5a66dd1c568a8530615d5430c5934dea18c20d57"
+    }
+  },
+  "checks": {
+    "core_tests": {
+      "command": [
+        "C:\\Users\\仝正睿\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-X",
+        "utf8",
+        "-W",
+        "ignore::SyntaxWarning",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "slam_recovery/tests"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 1.9432698000018718,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "4f36c0019ca5ed4e48bee54284c071520a13106b7319f1e915662fff66f01d1d"
+    },
+    "normal_paths": {
+      "command": [
+        "C:\\Users\\仝正睿\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-X",
+        "utf8",
+        "-W",
+        "ignore::SyntaxWarning",
+        "-B",
+        "C:\\Users\\仝正睿\\Documents\\paper\\fast_livo2_advanced\\repo_reviews\\slam_recovery_independent_20261110_codex\\docs\\independent_reproduction_20261110_codex\\normal_paths.py"
+      ],
+      "returncode": 1,
+      "elapsed_seconds": 0.3239000000030501,
+      "stdout_sha256": "bbc6d147b745728d73610f24821fd54f8922f4491258aa1398870ec9b4b3dbad",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {
+        "scope": "Dataset-free A5/A9 acceptance probes. Exit 1 means the desired invariant fails.\n\nManager cases use supplied passing candidate evidence from the existing A9 fixture;\nthey do not test geometry quality. The node case supplies a detector decision only\nto exercise the alarm ingest branch; detection accuracy is outside this test.\n",
+        "checks": {
+          "partial_retry": {
+            "passed": true,
+            "after_partial": {
+              "state": "WAITING_FOR_EVIDENCE",
+              "trusted": [
+                1,
+                2
+              ],
+              "pending": [
+                3,
+                4
+              ]
+            },
+            "after_retry": {
+              "state": "HEALTHY",
+              "trusted": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "pending": []
+            },
+            "status": "PASS"
+          },
+          "second_event": {
+            "passed": false,
+            "expected_pending": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "observed": {
+              "state": "QUARANTINED",
+              "trusted": [],
+              "pending": [
+                1,
+                4
+              ]
+            },
+            "lost_from_both": [
+              2,
+              3
+            ],
+            "status": "FAIL"
+          },
+          "late_arrival": {
+            "passed": false,
+            "arrival_ns": 400000000,
+            "onset_ns": 350000000,
+            "recorded_segment_end_ns": 300000000,
+            "repair_undo_entries": [
+              {
+                "key": 2,
+                "timestamp_ns": 300000000
+              },
+              {
+                "key": 3,
+                "timestamp_ns": 300000000
+              },
+              {
+                "key": 4,
+                "timestamp_ns": 300000000
+              }
+            ],
+            "expected_frame_4": "revoked and pending",
+            "observed": {
+              "state": "QUARANTINED",
+              "trusted": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "pending": [
+                5
+              ]
+            },
+            "status": "FAIL"
+          },
+          "alarm_frame": {
+            "passed": false,
+            "alarm_key": 2,
+            "after_alarm": {
+              "state": "QUARANTINED",
+              "trusted": [
+                1
+              ],
+              "pending": []
+            },
+            "after_following_frame": {
+              "state": "QUARANTINED",
+              "trusted": [
+                1
+              ],
+              "pending": [
+                3
+              ]
+            },
+            "raw_scan_keys": [
+              1,
+              2,
+              3
+            ],
+            "qualification": "Raw data are retained, but alarm frame lacks pending membership.",
+            "status": "FAIL"
+          }
+        },
+        "passed": false
+      }
+    },
+    "a7_acceptance": {
+      "command": [
+        "C:\\Users\\仝正睿\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-X",
+        "utf8",
+        "-W",
+        "ignore::SyntaxWarning",
+        "-B",
+        "C:\\Users\\仝正睿\\Documents\\paper\\fast_livo2_advanced\\repo_reviews\\slam_recovery_independent_20261110_codex\\docs\\independent_reproduction_20261110_codex\\a7_acceptance.py"
+      ],
+      "returncode": 1,
+      "elapsed_seconds": 0.18459189999703085,
+      "stdout_sha256": "10ac440286ee539bb37b48715ec92b2bbd11d0bcf5badf658cbba2c46348d0dd",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {
+        "checks": {
+          "weak_direction": {
+            "status": "FAIL",
+            "passed": false,
+            "gate": [
+              {
+                "translation_y_m": 0.0,
+                "weak_vector_norm": 1.0,
+                "info_before": 19.033712348072953,
+                "info_after": 48.72630205106676,
+                "covariance_norm": 0.023053432056869494,
+                "mode": "MODE2_ATOMIC_COMMIT"
+              },
+              {
+                "translation_y_m": 2.0,
+                "weak_vector_norm": 1.973767734727552,
+                "info_before": 4.885751917119907,
+                "info_after": 12.507524507391487,
+                "covariance_norm": 0.12136163722893588,
+                "mode": "MODE3_SOFT_BRIDGE_WAIT"
+              }
+            ],
+            "raw_quadratic_form": [
+              48.72630205106676,
+              48.72630205106674
+            ],
+            "algebra_control_passed": true,
+            "max_covariance_roundtrip_error": 1.0408340855860843e-17
+          },
+          "covariance_origin": {
+            "status": "FAIL",
+            "passed": false,
+            "gate": [
+              {
+                "translation_y_m": 0.0,
+                "weak_vector_norm": 1.0,
+                "info_before": 20.0,
+                "info_after": 30.0,
+                "covariance_norm": 0.2,
+                "mode": "MODE2_ATOMIC_COMMIT"
+              },
+              {
+                "translation_y_m": 5.0,
+                "weak_vector_norm": 1.0,
+                "info_before": 20.0,
+                "info_after": 30.0,
+                "covariance_norm": 0.6280256948711568,
+                "mode": "MODE3_SOFT_BRIDGE_WAIT"
+              }
+            ],
+            "raw_quadratic_form": [
+              30.0,
+              30.0
+            ],
+            "algebra_control_passed": true,
+            "max_covariance_roundtrip_error": 5.551115123125783e-17
+          }
+        },
+        "passed": false
+      }
+    },
+    "trace_pairing_tests": {
+      "command": [
+        "C:\\Users\\仝正睿\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-X",
+        "utf8",
+        "-W",
+        "ignore::SyntaxWarning",
+        "-B",
+        "C:\\Users\\仝正睿\\Documents\\paper\\fast_livo2_advanced\\repo_reviews\\slam_recovery_independent_20261110_codex\\docs\\independent_reproduction_20261110_codex\\test_trace_events.py"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.1092551999972784,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "46a59d823d772c3809446eba836399e2612ba33924b6c71abe8e15b736b8f4b7"
+    },
+    "trace_events": {
+      "command": [
+        "C:\\Users\\仝正睿\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "-X",
+        "utf8",
+        "-W",
+        "ignore::SyntaxWarning",
+        "-B",
+        "C:\\Users\\仝正睿\\Documents\\paper\\fast_livo2_advanced\\repo_reviews\\slam_recovery_independent_20261110_codex\\docs\\independent_reproduction_20261110_codex\\trace_events.py"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 0.2921892000013031,
+      "stdout_sha256": "2a2eb9676b9570fa67d7627471c8081cf59f248686bc06fe3d53b7fef518c8b8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {
+        "source_revision": "39eac2f337eaf2b9df28aa0e9b015b36d0ecf34d",
+        "status": "PASS_ARCHIVE_RECOMPUTATION",
+        "runs": {
+          "default": {
+            "csv": "trace_default_emit_fixed.csv",
+            "rows": {
+              "ARRIVE": 599,
+              "GROUP": 1766,
+              "STATE": 1766,
+              "IMUINIT": 5
+            },
+            "csv_receipt_sha_verified": true,
+            "runner_sha_verified": true,
+            "blob_sha256": "5fcccddcb7e2b43dabe8d957b761a4bdf9610d7062d221359578a545c1bf642a",
+            "checkout_sha256": "0e02c8266df889498a27c742358f8f4270102a5ed595ab217762dc58a18e1433",
+            "checkout_identical": false,
+            "newline_normalized_identical": true,
+            "empty_imu_groups": 884,
+            "empty_with_image": 883,
+            "distinct_image_ids": 883,
+            "complete_empty_nonempty_pairs": 882,
+            "initial_nonimage_packages": 1,
+            "incomplete_image_packages": [
+              {
+                "image_ns": 1627643799362292290,
+                "stages_and_imu_counts": [
+                  [
+                    1,
+                    0
+                  ]
+                ]
+              }
+            ],
+            "group_to_state_stamp_mismatches": 878,
+            "receipt_status": "OK",
+            "termination": "PLANNED_KILL_AFTER_DRAIN",
+            "process_exit": {
+              "rosbag_play": 0,
+              "rosbag_record": 0,
+              "fastlivo_node": 137
+            },
+            "native_rerun": false,
+            "odom_messages_receipt_only": 800,
+            "runtime_binary_sha": "6e0a3e5722b02c9a6682cd69c5d8ae4428e5215a296da43e85ef58aa3da03d8e",
+            "runtime_library_sha": "6aeef0321066e4345228adb4a9a5320fa04a3748123600de520829bf0fe224a7",
+            "cpu_affinity": "",
+            "imuinit_signatures": [
+              [
+                "0",
+                "5",
+                "1627643739606910944",
+                "1627643739639729977",
+                "fafbac113fb8ef748aa2ad10ca64a640241b7cdd287bb94e33302274a8056556",
+                "iter=1|max=30"
+              ],
+              [
+                "0",
+                "8",
+                "1627643739647188902",
+                "1627643739707449913",
+                "81e9a83768fb764ac4cc2e438cfde79e7f33009e38ebe4ded952ac5832dbee96",
+                "iter=6|max=30"
+              ],
+              [
+                "0",
+                "7",
+                "1627643739713268995",
+                "1627643739767296076",
+                "5aafc764fad848eee0479087b4de39cf9511ecf462879df8f60922aac88a22f2",
+                "iter=14|max=30"
+              ],
+              [
+                "0",
+                "8",
+                "1627643739780714989",
+                "1627643739841775894",
+                "086cada2da845843906b18dc8b4496c83c64b3115bb8accf0a970e0b28f03453",
+                "iter=21|max=30"
+              ],
+              [
+                "0",
+                "84",
+                "1627643739847517967",
+                "1627643740439779997",
+                "2b45e66145137ad3c22bddea5ca9837f77c71a9130b3b8a467d43f73ce8761b1",
+                "iter=29|max=30"
+              ]
+            ]
+          },
+          "on1": {
+            "csv": "on1.csv",
+            "rows": {
+              "ARRIVE": 599,
+              "GROUP": 1766,
+              "STATE": 1766,
+              "IMUINIT": 5
+            },
+            "csv_receipt_sha_verified": true,
+            "runner_sha_verified": true,
+            "blob_sha256": "00af7948aa8dd06e5439c3ef184dbd8abaa31fa631c6dd75e5469b19c8b7f7c5",
+            "checkout_sha256": "f4ea9687d06773ffaa43a3d8c32b23efac39de1a455484a58e18f956110b14a1",
+            "checkout_identical": false,
+            "newline_normalized_identical": true,
+            "empty_imu_groups": 884,
+            "empty_with_image": 883,
+            "distinct_image_ids": 883,
+            "complete_empty_nonempty_pairs": 882,
+            "initial_nonimage_packages": 1,
+            "incomplete_image_packages": [
+              {
+                "image_ns": 1627643799362292290,
+                "stages_and_imu_counts": [
+                  [
+                    1,
+                    0
+                  ]
+                ]
+              }
+            ],
+            "group_to_state_stamp_mismatches": 0,
+            "receipt_status": "OK",
+            "termination": "PLANNED_KILL_AFTER_DRAIN",
+            "process_exit": {
+              "rosbag_play": 0,
+              "rosbag_record": 0,
+              "fastlivo_node": 137
+            },
+            "native_rerun": false,
+            "odom_messages_receipt_only": 800,
+            "runtime_binary_sha": "76359f5387f75da3dcad7aa72372048c3feefd91b340ae0c40f92f6fb534a53b",
+            "runtime_library_sha": "20df3d3f42400aec0c56387e55d027289f5117402837a712f2002da6e06c450f",
+            "cpu_affinity": "taskset -c 0-7",
+            "imuinit_signatures": [
+              [
+                "0",
+                "5",
+                "1627643739606910944",
+                "1627643739639729977",
+                "fafbac113fb8ef748aa2ad10ca64a640241b7cdd287bb94e33302274a8056556",
+                "iter=1|max=30"
+              ],
+              [
+                "0",
+                "8",
+                "1627643739647188902",
+                "1627643739707449913",
+                "81e9a83768fb764ac4cc2e438cfde79e7f33009e38ebe4ded952ac5832dbee96",
+                "iter=6|max=30"
+              ],
+              [
+                "0",
+                "7",
+                "1627643739713268995",
+                "1627643739767296076",
+                "5aafc764fad848eee0479087b4de39cf9511ecf462879df8f60922aac88a22f2",
+                "iter=14|max=30"
+              ],
+              [
+                "0",
+                "8",
+                "1627643739780714989",
+                "1627643739841775894",
+                "086cada2da845843906b18dc8b4496c83c64b3115bb8accf0a970e0b28f03453",
+                "iter=21|max=30"
+              ],
+              [
+                "0",
+                "84",
+                "1627643739847517967",
+                "1627643740439779997",
+                "2b45e66145137ad3c22bddea5ca9837f77c71a9130b3b8a467d43f73ce8761b1",
+                "iter=29|max=30"
+              ]
+            ]
+          },
+          "on2": {
+            "csv": "on2.csv",
+            "rows": {
+              "ARRIVE": 599,
+              "GROUP": 1766,
+              "STATE": 1766,
+              "IMUINIT": 5
+            },
+            "csv_receipt_sha_verified": true,
+            "runner_sha_verified": true,
+            "blob_sha256": "edb804c48c19e1a667684a3123fa27ade8afc3fb0de273d32f679ccc2d62aec3",
+            "checkout_sha256": "159e7924c628093224ec9a84677e67fb8429a5cddec38277512ae43aaeecdfae",
+            "checkout_identical": false,
+            "newline_normalized_identical": true,
+            "empty_imu_groups": 884,
+            "empty_with_image": 883,
+            "distinct_image_ids": 883,
+            "complete_empty_nonempty_pairs": 882,
+            "initial_nonimage_packages": 1,
+            "incomplete_image_packages": [
+              {
+                "image_ns": 1627643799362292290,
+                "stages_and_imu_counts": [
+                  [
+                    1,
+                    0
+                  ]
+                ]
+              }
+            ],
+            "group_to_state_stamp_mismatches": 0,
+            "receipt_status": "OK",
+            "termination": "PLANNED_KILL_AFTER_DRAIN",
+            "process_exit": {
+              "rosbag_play": 0,
+              "rosbag_record": 0,
+              "fastlivo_node": 137
+            },
+            "native_rerun": false,
+            "odom_messages_receipt_only": 800,
+            "runtime_binary_sha": "76359f5387f75da3dcad7aa72372048c3feefd91b340ae0c40f92f6fb534a53b",
+            "runtime_library_sha": "20df3d3f42400aec0c56387e55d027289f5117402837a712f2002da6e06c450f",
+            "cpu_affinity": "taskset -c 0-7",
+            "imuinit_signatures": [
+              [
+                "0",
+                "5",
+                "1627643739606910944",
+                "1627643739639729977",
+                "fafbac113fb8ef748aa2ad10ca64a640241b7cdd287bb94e33302274a8056556",
+                "iter=1|max=30"
+              ],
+              [
+                "0",
+                "8",
+                "1627643739647188902",
+                "1627643739707449913",
+                "81e9a83768fb764ac4cc2e438cfde79e7f33009e38ebe4ded952ac5832dbee96",
+                "iter=6|max=30"
+              ],
+              [
+                "0",
+                "7",
+                "1627643739713268995",
+                "1627643739767296076",
+                "5aafc764fad848eee0479087b4de39cf9511ecf462879df8f60922aac88a22f2",
+                "iter=14|max=30"
+              ],
+              [
+                "0",
+                "8",
+                "1627643739780714989",
+                "1627643739841775894",
+                "086cada2da845843906b18dc8b4496c83c64b3115bb8accf0a970e0b28f03453",
+                "iter=21|max=30"
+              ],
+              [
+                "0",
+                "84",
+                "1627643739847517967",
+                "1627643740439779997",
+                "2b45e66145137ad3c22bddea5ca9837f77c71a9130b3b8a467d43f73ce8761b1",
+                "iter=29|max=30"
+              ]
+            ]
+          }
+        },
+        "source_blob_sha256": {
+          "fl_run_isolated.sh": "59500116b8fee2b871184609135df8d838cfc516fd1c76b1aa3bf5def5e2b9d3",
+          "trace_default_emit_fixed.csv": "5fcccddcb7e2b43dabe8d957b761a4bdf9610d7062d221359578a545c1bf642a",
+          "trace_20261110T023139Z_2912547_receipt.json": "8cdfb01ad394167e4efa8fd5412ffcecfbb473031aa42bf928a34402d124d84f",
+          "on1.csv": "00af7948aa8dd06e5439c3ef184dbd8abaa31fa631c6dd75e5469b19c8b7f7c5",
+          "trace_20261110T015818Z_2883571_receipt.json": "729157b17995d3d6d705cbceda38dfb3cf15c9c1b3b34de03ccfbec56220b6b2",
+          "on2.csv": "edb804c48c19e1a667684a3123fa27ade8afc3fb0de273d32f679ccc2d62aec3",
+          "trace_20261110T020104Z_2887395_receipt.json": "60605b94f0ad6da214dfd45368289702f5e02deee5ed58d4fb57e338ae6f5781"
+        },
+        "on1_on2": {
+          "common_packages": 1766,
+          "missing_packages": 0,
+          "group_signatures_equal": true,
+          "state_timestamp_mismatches": 0,
+          "first_over_1mm": {
+            "package_index_zero_based": 87,
+            "image_stage_key": [
+              1627643743244344711,
+              1
+            ],
+            "max_axis_delta_m": 0.0011919999999999995,
+            "left_state_ns": "1627643743244344711",
+            "right_state_ns": "1627643743244344711",
+            "left_csv_lines": [
+              222,
+              223
+            ],
+            "right_csv_lines": [
+              222,
+              223
+            ]
+          },
+          "maximum_max_axis_delta_m": 309.70619899999997,
+          "meaning": "Difference at matched package stage; not ATE/RPE or GT error. STATE timestamp equality is reported separately, not assumed."
+        },
+        "default_on1": {
+          "common_packages": 1766,
+          "missing_packages": 0,
+          "group_signatures_equal": true,
+          "state_timestamp_mismatches": 878,
+          "first_over_1mm": {
+            "package_index_zero_based": 75,
+            "image_stage_key": [
+              1627643742844584942,
+              1
+            ],
+            "max_axis_delta_m": 0.001104,
+            "left_state_ns": "1627643742844584942",
+            "right_state_ns": "1627643742844584942",
+            "left_csv_lines": [
+              197,
+              198
+            ],
+            "right_csv_lines": [
+              197,
+              198
+            ]
+          },
+          "maximum_max_axis_delta_m": 424.605314,
+          "meaning": "Difference at matched package stage; not ATE/RPE or GT error. STATE timestamp equality is reported separately, not assumed."
+        },
+        "limits": [
+          "No raw input/output bags or GT independently measured.",
+          "IMU hash covers stamps; raw sensor values are not verified.",
+          "Measures stages are observed trace identities, not an inferred count of LiDAR scans.",
+          "Build and CPU affinity both differ; this is not a single-factor causal test.",
+          "Receipt status OK includes planned native kill code 137, not native exit 0."
+        ]
+      }
+    }
+  },
+  "all_acceptance_checks_passed": false
+}

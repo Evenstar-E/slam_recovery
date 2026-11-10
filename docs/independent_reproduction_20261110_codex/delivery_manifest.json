@@ -1,0 +1,133 @@
+{
+  "files": {
+    ".gitattributes": {
+      "bytes": 173,
+      "sha256": "9ca952404dcbc695bc0b836e782a17036771c967a7660382fc8f8c62924c3689"
+    },
+    "a7_acceptance.py": {
+      "bytes": 2111,
+      "sha256": "329f92ec3d395166cb880fb4bbe744977ec0bbf4425b72c0df8052fa80eaf350"
+    },
+    "a7_upstream.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "a7_upstream.stdout.txt": {
+      "bytes": 1299,
+      "sha256": "d1f2103d4457b7ad6dfe58c49615ad65623de52e0e8564321d42bf4b8dd384a4"
+    },
+    "command_receipts.json": {
+      "bytes": 2039,
+      "sha256": "9a875682e42fe0555c74a55e7116c52142bc7cd4f957eb608b879f9823a951ce"
+    },
+    "core_tests.stderr.txt": {
+      "bytes": 164,
+      "sha256": "d51878cf808582c3c0691cdcc7ffb0dfc7ea152ca8fd2442116a7239a467767d"
+    },
+    "core_tests.stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "normal_paths.json": {
+      "bytes": 2508,
+      "sha256": "bbc6d147b745728d73610f24821fd54f8922f4491258aa1398870ec9b4b3dbad"
+    },
+    "normal_paths.py": {
+      "bytes": 5260,
+      "sha256": "75bf357af187b3a6a88ab1d0f7929d945e17212e8060de56bc2bb7b62f7d95c3"
+    },
+    "normal_paths.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "on_pair_upstream.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "on_pair_upstream.stdout.txt": {
+      "bytes": 2051,
+      "sha256": "e7c1430fcc04d68e848c4e50e00e625a5ac556b39777df005d521550450e9cae"
+    },
+    "README.md": {
+      "bytes": 11958,
+      "sha256": "bc0bf6fd021793d90970ccad23decebacbfbdce773a4e63724508a429822392b"
+    },
+    "run_01/a7_acceptance.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "run_01/a7_acceptance.stdout.txt": {
+      "bytes": 1689,
+      "sha256": "10ac440286ee539bb37b48715ec92b2bbd11d0bcf5badf658cbba2c46348d0dd"
+    },
+    "run_01/core_tests.stderr.txt": {
+      "bytes": 164,
+      "sha256": "4f36c0019ca5ed4e48bee54284c071520a13106b7319f1e915662fff66f01d1d"
+    },
+    "run_01/core_tests.stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "run_01/normal_paths.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "run_01/normal_paths.stdout.txt": {
+      "bytes": 2508,
+      "sha256": "bbc6d147b745728d73610f24821fd54f8922f4491258aa1398870ec9b4b3dbad"
+    },
+    "run_01/result.json": {
+      "bytes": 24363,
+      "sha256": "d77b947abab96f20562e83d14362f94ed4f67873f146ad5f06487939d09f8b30"
+    },
+    "run_01/trace_events.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "run_01/trace_events.stdout.txt": {
+      "bytes": 10846,
+      "sha256": "2a2eb9676b9570fa67d7627471c8081cf59f248686bc06fe3d53b7fef518c8b8"
+    },
+    "run_01/trace_pairing_tests.stderr.txt": {
+      "bytes": 108,
+      "sha256": "46a59d823d772c3809446eba836399e2612ba33924b6c71abe8e15b736b8f4b7"
+    },
+    "run_01/trace_pairing_tests.stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "run_checks.py": {
+      "bytes": 4182,
+      "sha256": "e46973441e0d85a4cd73bd504ef17b0b3a41eaee5de4329f664866d46edee601"
+    },
+    "test_trace_events.py": {
+      "bytes": 1591,
+      "sha256": "0db158b3b2a8cd9de37a928a652075bbd21912f43c22110e66f6935a8b8628e9"
+    },
+    "trace_events.json": {
+      "bytes": 10846,
+      "sha256": "2a2eb9676b9570fa67d7627471c8081cf59f248686bc06fe3d53b7fef518c8b8"
+    },
+    "trace_events.py": {
+      "bytes": 8517,
+      "sha256": "4c838eb4e459b6f2a15c7a9cdeaed897db9c294379bb6ee421d8a0d34bfdb706"
+    },
+    "trace_events.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "upstream_a7_gauge_probes.py": {
+      "bytes": 3091,
+      "sha256": "846682fafb1a2a2915a16c879ef917e0187cdb270a0618c152bdd01dca586924"
+    },
+    "upstream_sources.json": {
+      "bytes": 503,
+      "sha256": "f4d203c41eb7f11157f26017850bc949545f6b6a5707c403242a2260db02d13f"
+    },
+    "upstream_verify_trace_pair.py": {
+      "bytes": 4723,
+      "sha256": "3afcf98c0578cf2d332898fb5a66dd1c568a8530615d5430c5934dea18c20d57"
+    }
+  },
+  "qualification": "Hashes bind local delivery bytes; generated after final documentation. No native experiment."
+}

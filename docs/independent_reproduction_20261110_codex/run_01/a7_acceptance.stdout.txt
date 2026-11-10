@@ -1,0 +1,61 @@
+{
+  "checks": {
+    "weak_direction": {
+      "status": "FAIL",
+      "passed": false,
+      "gate": [
+        {
+          "translation_y_m": 0.0,
+          "weak_vector_norm": 1.0,
+          "info_before": 19.033712348072953,
+          "info_after": 48.72630205106676,
+          "covariance_norm": 0.023053432056869494,
+          "mode": "MODE2_ATOMIC_COMMIT"
+        },
+        {
+          "translation_y_m": 2.0,
+          "weak_vector_norm": 1.973767734727552,
+          "info_before": 4.885751917119907,
+          "info_after": 12.507524507391487,
+          "covariance_norm": 0.12136163722893588,
+          "mode": "MODE3_SOFT_BRIDGE_WAIT"
+        }
+      ],
+      "raw_quadratic_form": [
+        48.72630205106676,
+        48.72630205106674
+      ],
+      "algebra_control_passed": true,
+      "max_covariance_roundtrip_error": 1.0408340855860843e-17
+    },
+    "covariance_origin": {
+      "status": "FAIL",
+      "passed": false,
+      "gate": [
+        {
+          "translation_y_m": 0.0,
+          "weak_vector_norm": 1.0,
+          "info_before": 20.0,
+          "info_after": 30.0,
+          "covariance_norm": 0.2,
+          "mode": "MODE2_ATOMIC_COMMIT"
+        },
+        {
+          "translation_y_m": 5.0,
+          "weak_vector_norm": 1.0,
+          "info_before": 20.0,
+          "info_after": 30.0,
+          "covariance_norm": 0.6280256948711568,
+          "mode": "MODE3_SOFT_BRIDGE_WAIT"
+        }
+      ],
+      "raw_quadratic_form": [
+        30.0,
+        30.0
+      ],
+      "algebra_control_passed": true,
+      "max_covariance_roundtrip_error": 5.551115123125783e-17
+    }
+  },
+  "passed": false
+}

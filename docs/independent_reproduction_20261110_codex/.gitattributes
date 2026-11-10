@@ -1,0 +1,5 @@
+# Preserve exact evidence bytes across platforms.
+* -text
+# Captured logs/receipts retain native line endings; do not rewrite evidence.
+*.txt -whitespace
+*.json -whitespace

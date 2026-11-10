@@ -1,0 +1,332 @@
+{
+  "source_revision": "39eac2f337eaf2b9df28aa0e9b015b36d0ecf34d",
+  "status": "PASS_ARCHIVE_RECOMPUTATION",
+  "runs": {
+    "default": {
+      "csv": "trace_default_emit_fixed.csv",
+      "rows": {
+        "ARRIVE": 599,
+        "GROUP": 1766,
+        "STATE": 1766,
+        "IMUINIT": 5
+      },
+      "csv_receipt_sha_verified": true,
+      "runner_sha_verified": true,
+      "blob_sha256": "5fcccddcb7e2b43dabe8d957b761a4bdf9610d7062d221359578a545c1bf642a",
+      "checkout_sha256": "0e02c8266df889498a27c742358f8f4270102a5ed595ab217762dc58a18e1433",
+      "checkout_identical": false,
+      "newline_normalized_identical": true,
+      "empty_imu_groups": 884,
+      "empty_with_image": 883,
+      "distinct_image_ids": 883,
+      "complete_empty_nonempty_pairs": 882,
+      "initial_nonimage_packages": 1,
+      "incomplete_image_packages": [
+        {
+          "image_ns": 1627643799362292290,
+          "stages_and_imu_counts": [
+            [
+              1,
+              0
+            ]
+          ]
+        }
+      ],
+      "group_to_state_stamp_mismatches": 878,
+      "receipt_status": "OK",
+      "termination": "PLANNED_KILL_AFTER_DRAIN",
+      "process_exit": {
+        "rosbag_play": 0,
+        "rosbag_record": 0,
+        "fastlivo_node": 137
+      },
+      "native_rerun": false,
+      "odom_messages_receipt_only": 800,
+      "runtime_binary_sha": "6e0a3e5722b02c9a6682cd69c5d8ae4428e5215a296da43e85ef58aa3da03d8e",
+      "runtime_library_sha": "6aeef0321066e4345228adb4a9a5320fa04a3748123600de520829bf0fe224a7",
+      "cpu_affinity": "",
+      "imuinit_signatures": [
+        [
+          "0",
+          "5",
+          "1627643739606910944",
+          "1627643739639729977",
+          "fafbac113fb8ef748aa2ad10ca64a640241b7cdd287bb94e33302274a8056556",
+          "iter=1|max=30"
+        ],
+        [
+          "0",
+          "8",
+          "1627643739647188902",
+          "1627643739707449913",
+          "81e9a83768fb764ac4cc2e438cfde79e7f33009e38ebe4ded952ac5832dbee96",
+          "iter=6|max=30"
+        ],
+        [
+          "0",
+          "7",
+          "1627643739713268995",
+          "1627643739767296076",
+          "5aafc764fad848eee0479087b4de39cf9511ecf462879df8f60922aac88a22f2",
+          "iter=14|max=30"
+        ],
+        [
+          "0",
+          "8",
+          "1627643739780714989",
+          "1627643739841775894",
+          "086cada2da845843906b18dc8b4496c83c64b3115bb8accf0a970e0b28f03453",
+          "iter=21|max=30"
+        ],
+        [
+          "0",
+          "84",
+          "1627643739847517967",
+          "1627643740439779997",
+          "2b45e66145137ad3c22bddea5ca9837f77c71a9130b3b8a467d43f73ce8761b1",
+          "iter=29|max=30"
+        ]
+      ]
+    },
+    "on1": {
+      "csv": "on1.csv",
+      "rows": {
+        "ARRIVE": 599,
+        "GROUP": 1766,
+        "STATE": 1766,
+        "IMUINIT": 5
+      },
+      "csv_receipt_sha_verified": true,
+      "runner_sha_verified": true,
+      "blob_sha256": "00af7948aa8dd06e5439c3ef184dbd8abaa31fa631c6dd75e5469b19c8b7f7c5",
+      "checkout_sha256": "f4ea9687d06773ffaa43a3d8c32b23efac39de1a455484a58e18f956110b14a1",
+      "checkout_identical": false,
+      "newline_normalized_identical": true,
+      "empty_imu_groups": 884,
+      "empty_with_image": 883,
+      "distinct_image_ids": 883,
+      "complete_empty_nonempty_pairs": 882,
+      "initial_nonimage_packages": 1,
+      "incomplete_image_packages": [
+        {
+          "image_ns": 1627643799362292290,
+          "stages_and_imu_counts": [
+            [
+              1,
+              0
+            ]
+          ]
+        }
+      ],
+      "group_to_state_stamp_mismatches": 0,
+      "receipt_status": "OK",
+      "termination": "PLANNED_KILL_AFTER_DRAIN",
+      "process_exit": {
+        "rosbag_play": 0,
+        "rosbag_record": 0,
+        "fastlivo_node": 137
+      },
+      "native_rerun": false,
+      "odom_messages_receipt_only": 800,
+      "runtime_binary_sha": "76359f5387f75da3dcad7aa72372048c3feefd91b340ae0c40f92f6fb534a53b",
+      "runtime_library_sha": "20df3d3f42400aec0c56387e55d027289f5117402837a712f2002da6e06c450f",
+      "cpu_affinity": "taskset -c 0-7",
+      "imuinit_signatures": [
+        [
+          "0",
+          "5",
+          "1627643739606910944",
+          "1627643739639729977",
+          "fafbac113fb8ef748aa2ad10ca64a640241b7cdd287bb94e33302274a8056556",
+          "iter=1|max=30"
+        ],
+        [
+          "0",
+          "8",
+          "1627643739647188902",
+          "1627643739707449913",
+          "81e9a83768fb764ac4cc2e438cfde79e7f33009e38ebe4ded952ac5832dbee96",
+          "iter=6|max=30"
+        ],
+        [
+          "0",
+          "7",
+          "1627643739713268995",
+          "1627643739767296076",
+          "5aafc764fad848eee0479087b4de39cf9511ecf462879df8f60922aac88a22f2",
+          "iter=14|max=30"
+        ],
+        [
+          "0",
+          "8",
+          "1627643739780714989",
+          "1627643739841775894",
+          "086cada2da845843906b18dc8b4496c83c64b3115bb8accf0a970e0b28f03453",
+          "iter=21|max=30"
+        ],
+        [
+          "0",
+          "84",
+          "1627643739847517967",
+          "1627643740439779997",
+          "2b45e66145137ad3c22bddea5ca9837f77c71a9130b3b8a467d43f73ce8761b1",
+          "iter=29|max=30"
+        ]
+      ]
+    },
+    "on2": {
+      "csv": "on2.csv",
+      "rows": {
+        "ARRIVE": 599,
+        "GROUP": 1766,
+        "STATE": 1766,
+        "IMUINIT": 5
+      },
+      "csv_receipt_sha_verified": true,
+      "runner_sha_verified": true,
+      "blob_sha256": "edb804c48c19e1a667684a3123fa27ade8afc3fb0de273d32f679ccc2d62aec3",
+      "checkout_sha256": "159e7924c628093224ec9a84677e67fb8429a5cddec38277512ae43aaeecdfae",
+      "checkout_identical": false,
+      "newline_normalized_identical": true,
+      "empty_imu_groups": 884,
+      "empty_with_image": 883,
+      "distinct_image_ids": 883,
+      "complete_empty_nonempty_pairs": 882,
+      "initial_nonimage_packages": 1,
+      "incomplete_image_packages": [
+        {
+          "image_ns": 1627643799362292290,
+          "stages_and_imu_counts": [
+            [
+              1,
+              0
+            ]
+          ]
+        }
+      ],
+      "group_to_state_stamp_mismatches": 0,
+      "receipt_status": "OK",
+      "termination": "PLANNED_KILL_AFTER_DRAIN",
+      "process_exit": {
+        "rosbag_play": 0,
+        "rosbag_record": 0,
+        "fastlivo_node": 137
+      },
+      "native_rerun": false,
+      "odom_messages_receipt_only": 800,
+      "runtime_binary_sha": "76359f5387f75da3dcad7aa72372048c3feefd91b340ae0c40f92f6fb534a53b",
+      "runtime_library_sha": "20df3d3f42400aec0c56387e55d027289f5117402837a712f2002da6e06c450f",
+      "cpu_affinity": "taskset -c 0-7",
+      "imuinit_signatures": [
+        [
+          "0",
+          "5",
+          "1627643739606910944",
+          "1627643739639729977",
+          "fafbac113fb8ef748aa2ad10ca64a640241b7cdd287bb94e33302274a8056556",
+          "iter=1|max=30"
+        ],
+        [
+          "0",
+          "8",
+          "1627643739647188902",
+          "1627643739707449913",
+          "81e9a83768fb764ac4cc2e438cfde79e7f33009e38ebe4ded952ac5832dbee96",
+          "iter=6|max=30"
+        ],
+        [
+          "0",
+          "7",
+          "1627643739713268995",
+          "1627643739767296076",
+          "5aafc764fad848eee0479087b4de39cf9511ecf462879df8f60922aac88a22f2",
+          "iter=14|max=30"
+        ],
+        [
+          "0",
+          "8",
+          "1627643739780714989",
+          "1627643739841775894",
+          "086cada2da845843906b18dc8b4496c83c64b3115bb8accf0a970e0b28f03453",
+          "iter=21|max=30"
+        ],
+        [
+          "0",
+          "84",
+          "1627643739847517967",
+          "1627643740439779997",
+          "2b45e66145137ad3c22bddea5ca9837f77c71a9130b3b8a467d43f73ce8761b1",
+          "iter=29|max=30"
+        ]
+      ]
+    }
+  },
+  "source_blob_sha256": {
+    "fl_run_isolated.sh": "59500116b8fee2b871184609135df8d838cfc516fd1c76b1aa3bf5def5e2b9d3",
+    "trace_default_emit_fixed.csv": "5fcccddcb7e2b43dabe8d957b761a4bdf9610d7062d221359578a545c1bf642a",
+    "trace_20261110T023139Z_2912547_receipt.json": "8cdfb01ad394167e4efa8fd5412ffcecfbb473031aa42bf928a34402d124d84f",
+    "on1.csv": "00af7948aa8dd06e5439c3ef184dbd8abaa31fa631c6dd75e5469b19c8b7f7c5",
+    "trace_20261110T015818Z_2883571_receipt.json": "729157b17995d3d6d705cbceda38dfb3cf15c9c1b3b34de03ccfbec56220b6b2",
+    "on2.csv": "edb804c48c19e1a667684a3123fa27ade8afc3fb0de273d32f679ccc2d62aec3",
+    "trace_20261110T020104Z_2887395_receipt.json": "60605b94f0ad6da214dfd45368289702f5e02deee5ed58d4fb57e338ae6f5781"
+  },
+  "on1_on2": {
+    "common_packages": 1766,
+    "missing_packages": 0,
+    "group_signatures_equal": true,
+    "state_timestamp_mismatches": 0,
+    "first_over_1mm": {
+      "package_index_zero_based": 87,
+      "image_stage_key": [
+        1627643743244344711,
+        1
+      ],
+      "max_axis_delta_m": 0.0011919999999999995,
+      "left_state_ns": "1627643743244344711",
+      "right_state_ns": "1627643743244344711",
+      "left_csv_lines": [
+        222,
+        223
+      ],
+      "right_csv_lines": [
+        222,
+        223
+      ]
+    },
+    "maximum_max_axis_delta_m": 309.70619899999997,
+    "meaning": "Difference at matched package stage; not ATE/RPE or GT error. STATE timestamp equality is reported separately, not assumed."
+  },
+  "default_on1": {
+    "common_packages": 1766,
+    "missing_packages": 0,
+    "group_signatures_equal": true,
+    "state_timestamp_mismatches": 878,
+    "first_over_1mm": {
+      "package_index_zero_based": 75,
+      "image_stage_key": [
+        1627643742844584942,
+        1
+      ],
+      "max_axis_delta_m": 0.001104,
+      "left_state_ns": "1627643742844584942",
+      "right_state_ns": "1627643742844584942",
+      "left_csv_lines": [
+        197,
+        198
+      ],
+      "right_csv_lines": [
+        197,
+        198
+      ]
+    },
+    "maximum_max_axis_delta_m": 424.605314,
+    "meaning": "Difference at matched package stage; not ATE/RPE or GT error. STATE timestamp equality is reported separately, not assumed."
+  },
+  "limits": [
+    "No raw input/output bags or GT independently measured.",
+    "IMU hash covers stamps; raw sensor values are not verified.",
+    "Measures stages are observed trace identities, not an inferred count of LiDAR scans.",
+    "Build and CPU affinity both differ; this is not a single-factor causal test.",
+    "Receipt status OK includes planned native kill code 137, not native exit 0."
+  ]
+}

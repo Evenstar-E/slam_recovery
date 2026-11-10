@@ -1,0 +1,12 @@
+{
+  "upstream_a7_gauge_probes.py": {
+    "commit": "bd85346a42c2540dc80dcbd5ca301cac3659e386",
+    "path": "docs/review_20261110_4255cbe/a7_gauge_probes.py",
+    "sha256": "846682fafb1a2a2915a16c879ef917e0187cdb270a0618c152bdd01dca586924"
+  },
+  "upstream_verify_trace_pair.py": {
+    "commit": "bd85346a42c2540dc80dcbd5ca301cac3659e386",
+    "path": "docs/review_20261110_4255cbe/verify_trace_pair.py",
+    "sha256": "3afcf98c0578cf2d332898fb5a66dd1c568a8530615d5430c5934dea18c20d57"
+  }
+}

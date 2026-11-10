@@ -1,0 +1,114 @@
+{
+  "scope": "Dataset-free A5/A9 acceptance probes. Exit 1 means the desired invariant fails.\n\nManager cases use supplied passing candidate evidence from the existing A9 fixture;\nthey do not test geometry quality. The node case supplies a detector decision only\nto exercise the alarm ingest branch; detection accuracy is outside this test.\n",
+  "checks": {
+    "partial_retry": {
+      "passed": true,
+      "after_partial": {
+        "state": "WAITING_FOR_EVIDENCE",
+        "trusted": [
+          1,
+          2
+        ],
+        "pending": [
+          3,
+          4
+        ]
+      },
+      "after_retry": {
+        "state": "HEALTHY",
+        "trusted": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "pending": []
+      },
+      "status": "PASS"
+    },
+    "second_event": {
+      "passed": false,
+      "expected_pending": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "observed": {
+        "state": "QUARANTINED",
+        "trusted": [],
+        "pending": [
+          1,
+          4
+        ]
+      },
+      "lost_from_both": [
+        2,
+        3
+      ],
+      "status": "FAIL"
+    },
+    "late_arrival": {
+      "passed": false,
+      "arrival_ns": 400000000,
+      "onset_ns": 350000000,
+      "recorded_segment_end_ns": 300000000,
+      "repair_undo_entries": [
+        {
+          "key": 2,
+          "timestamp_ns": 300000000
+        },
+        {
+          "key": 3,
+          "timestamp_ns": 300000000
+        },
+        {
+          "key": 4,
+          "timestamp_ns": 300000000
+        }
+      ],
+      "expected_frame_4": "revoked and pending",
+      "observed": {
+        "state": "QUARANTINED",
+        "trusted": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "pending": [
+          5
+        ]
+      },
+      "status": "FAIL"
+    },
+    "alarm_frame": {
+      "passed": false,
+      "alarm_key": 2,
+      "after_alarm": {
+        "state": "QUARANTINED",
+        "trusted": [
+          1
+        ],
+        "pending": []
+      },
+      "after_following_frame": {
+        "state": "QUARANTINED",
+        "trusted": [
+          1
+        ],
+        "pending": [
+          3
+        ]
+      },
+      "raw_scan_keys": [
+        1,
+        2,
+        3
+      ],
+      "qualification": "Raw data are retained, but alarm frame lacks pending membership.",
+      "status": "FAIL"
+    }
+  },
+  "passed": false
+}

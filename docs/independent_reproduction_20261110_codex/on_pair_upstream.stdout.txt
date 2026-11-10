@@ -1,0 +1,77 @@
+{
+  "source_revision": "4255cbe601263e458e772c08f9fce83bc36307e3",
+  "scope": "Archived CSV recomputation, not native rerun",
+  "runs": [
+    {
+      "csv": "on1.csv",
+      "sha256": "00af7948aa8dd06e5439c3ef184dbd8abaa31fa631c6dd75e5469b19c8b7f7c5",
+      "rows": {
+        "ARRIVE": 599,
+        "GROUP": 1766,
+        "STATE": 1766,
+        "IMUINIT": 5
+      },
+      "empty_groups": 884,
+      "status": "OK",
+      "odom_messages": 800
+    },
+    {
+      "csv": "on2.csv",
+      "sha256": "edb804c48c19e1a667684a3123fa27ade8afc3fb0de273d32f679ccc2d62aec3",
+      "rows": {
+        "ARRIVE": 599,
+        "GROUP": 1766,
+        "STATE": 1766,
+        "IMUINIT": 5
+      },
+      "empty_groups": 884,
+      "status": "OK",
+      "odom_messages": 800
+    }
+  ],
+  "group_and_imuinit_record_fields_identical": true,
+  "state_stamps_identical": true,
+  "thresholds": [
+    {
+      "threshold_m": 0.001,
+      "index": 87,
+      "elapsed_s": 3.7293787,
+      "max_axis_delta_m": 0.0011919999999999995
+    },
+    {
+      "threshold_m": 0.01,
+      "index": 119,
+      "elapsed_s": 4.928720474,
+      "max_axis_delta_m": 0.012267000000000028
+    },
+    {
+      "threshold_m": 0.1,
+      "index": 1036,
+      "elapsed_s": 35.494988918,
+      "max_axis_delta_m": 0.11796000000000001
+    },
+    {
+      "threshold_m": 1,
+      "index": 1096,
+      "elapsed_s": 37.496442318,
+      "max_axis_delta_m": 1.004317
+    },
+    {
+      "threshold_m": 10,
+      "index": 1222,
+      "elapsed_s": 41.701759577,
+      "max_axis_delta_m": 10.042473000000001
+    },
+    {
+      "threshold_m": 100,
+      "index": 1480,
+      "elapsed_s": 50.301020861,
+      "max_axis_delta_m": 100.89807400000001
+    }
+  ],
+  "final_max_axis_delta_m": 293.591943,
+  "maximum_max_axis_delta_m": 309.70619899999997,
+  "samples_over_1mm": 1609,
+  "samples_over_0_1m": 726,
+  "limits": "No raw consumed IMU contents; full-sample hash recipe not regenerated; no OFF control, GT/ATE or full-state comparison."
+}

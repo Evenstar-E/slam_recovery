@@ -1,0 +1,71 @@
+{
+  "core_tests": {
+    "command": [
+      "C:\\Users\\\u4edd\u6b63\u777f\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-X",
+      "utf8",
+      "-W",
+      "ignore::SyntaxWarning",
+      "-B",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "slam_recovery/tests"
+    ],
+    "returncode": 0,
+    "elapsed_seconds": 2.341121799996472
+  },
+  "a7_upstream": {
+    "command": [
+      "C:\\Users\\\u4edd\u6b63\u777f\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-X",
+      "utf8",
+      "-W",
+      "ignore::SyntaxWarning",
+      "-B",
+      "docs\\independent_reproduction_20261110_codex\\upstream_a7_gauge_probes.py"
+    ],
+    "returncode": 0,
+    "elapsed_seconds": 0.21772799999598647
+  },
+  "on_pair_upstream": {
+    "command": [
+      "C:\\Users\\\u4edd\u6b63\u777f\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-X",
+      "utf8",
+      "-W",
+      "ignore::SyntaxWarning",
+      "-B",
+      "docs\\independent_reproduction_20261110_codex\\upstream_verify_trace_pair.py"
+    ],
+    "returncode": 0,
+    "elapsed_seconds": 0.2200379999994766
+  },
+  "normal_paths": {
+    "command": [
+      "C:\\Users\\\u4edd\u6b63\u777f\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-X",
+      "utf8",
+      "-W",
+      "ignore::SyntaxWarning",
+      "-B",
+      "docs\\independent_reproduction_20261110_codex\\normal_paths.py"
+    ],
+    "returncode": 1,
+    "elapsed_seconds": 0.3444104999944102
+  },
+  "trace_events": {
+    "command": [
+      "C:\\Users\\\u4edd\u6b63\u777f\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "-X",
+      "utf8",
+      "-W",
+      "ignore::SyntaxWarning",
+      "-B",
+      "docs\\independent_reproduction_20261110_codex\\trace_events.py"
+    ],
+    "returncode": 0,
+    "elapsed_seconds": 0.30178300000261515
+  }
+}
