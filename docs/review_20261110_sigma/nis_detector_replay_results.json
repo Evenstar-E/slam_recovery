@@ -1,0 +1,178 @@
+{
+ "_meta": {
+  "what": "detector replay over archived per-frame NIS at several sigma",
+  "written": "2026-11-10",
+  "onset_ns": 1627643759554082870,
+  "rule": "first_alarm_any_state is the first SUSPECT; first_quarantined is the frame the dwell rule turns it into a quarantine. Both are relative to the injection onset and may straddle it at the crossover sigma.",
+  "assumptions": [
+   "only nis_reference == 'node_map' frames are judged, matching the node's warm-up policy (no reference -> not judged)",
+   "nis_q90 = nis * 1.35, as the node sets it",
+   "the archived diagnostics carry no FIM, so the geometric branch is held below its thresholds: this replays the NIS branch only"
+  ],
+  "not_done": [
+   "no sigma, threshold or config changed"
+  ]
+ },
+ "runs": [
+  {
+   "run": "fl_native_20261110T033802Z_2974473",
+   "sigma0_used_by_run": 0.12,
+   "sigma_replayed": 0.4405,
+   "frames_judged": 364,
+   "first_alarm_any_state": {
+    "ts_ns": 1627643742711321115,
+    "kf_id": 19,
+    "state": "SUSPECT",
+    "nis_scaled": 4.084932
+   },
+   "first_quarantined": {
+    "ts_ns": 1627643742844584942,
+    "kf_id": 20,
+    "nis_scaled": 3.969592,
+    "cusum": 5.354525
+   },
+   "first_alarm_rel_onset_s": -16.843,
+   "first_quarantined_rel_onset_s": -16.709
+  },
+  {
+   "run": "fl_native_20261110T033802Z_2974473",
+   "sigma0_used_by_run": 0.12,
+   "sigma_replayed": 0.5329,
+   "frames_judged": 364,
+   "first_alarm_any_state": {
+    "ts_ns": 1627643742711321115,
+    "kf_id": 19,
+    "state": "SUSPECT",
+    "nis_scaled": 2.791163
+   },
+   "first_quarantined": {
+    "ts_ns": 1627643742844584942,
+    "kf_id": 20,
+    "nis_scaled": 2.712354,
+    "cusum": 2.803517
+   },
+   "first_alarm_rel_onset_s": -16.843,
+   "first_quarantined_rel_onset_s": -16.709
+  },
+  {
+   "run": "fl_native_20261110T033802Z_2974473",
+   "sigma0_used_by_run": 0.12,
+   "sigma_replayed": 0.605,
+   "frames_judged": 364,
+   "first_alarm_any_state": {
+    "ts_ns": 1627643742711321115,
+    "kf_id": 19,
+    "state": "SUSPECT",
+    "nis_scaled": 2.165539
+   },
+   "first_quarantined": {
+    "ts_ns": 1627643742844584942,
+    "kf_id": 20,
+    "nis_scaled": 2.104394,
+    "cusum": 1.569932
+   },
+   "first_alarm_rel_onset_s": -16.843,
+   "first_quarantined_rel_onset_s": -16.709
+  },
+  {
+   "run": "fl_native_20261110T033802Z_2974473",
+   "sigma0_used_by_run": 0.12,
+   "sigma_replayed": 0.61,
+   "frames_judged": 364,
+   "first_alarm_any_state": {
+    "ts_ns": 1627643742711321115,
+    "kf_id": 19,
+    "state": "SUSPECT",
+    "nis_scaled": 2.130184
+   },
+   "first_quarantined": {
+    "ts_ns": 1627643765672286034,
+    "kf_id": 247,
+    "nis_scaled": 2.991087,
+    "cusum": 2.789191
+   },
+   "first_alarm_rel_onset_s": -16.843,
+   "first_quarantined_rel_onset_s": 6.118
+  },
+  {
+   "run": "fl_native_20261110T033802Z_2974473",
+   "sigma0_used_by_run": 0.12,
+   "sigma_replayed": 0.62,
+   "frames_judged": 364,
+   "first_alarm_any_state": {
+    "ts_ns": 1627643765538050652,
+    "kf_id": 246,
+    "state": "SUSPECT",
+    "nis_scaled": 2.134005
+   },
+   "first_quarantined": {
+    "ts_ns": 1627643765672286034,
+    "kf_id": 247,
+    "nis_scaled": 2.895379,
+    "cusum": 2.58115
+   },
+   "first_alarm_rel_onset_s": 5.984,
+   "first_quarantined_rel_onset_s": 6.118
+  },
+  {
+   "run": "fl_native_20261110T033802Z_2974473",
+   "sigma0_used_by_run": 0.12,
+   "sigma_replayed": 0.7,
+   "frames_judged": 364,
+   "first_alarm_any_state": {
+    "ts_ns": 1627643765672286034,
+    "kf_id": 247,
+    "state": "SUSPECT",
+    "nis_scaled": 2.271395
+   },
+   "first_quarantined": {
+    "ts_ns": 1627643765739418507,
+    "kf_id": 248,
+    "nis_scaled": 2.225554,
+    "cusum": 1.963775
+   },
+   "first_alarm_rel_onset_s": 6.118,
+   "first_quarantined_rel_onset_s": 6.185
+  },
+  {
+   "run": "fl_native_20261110T033802Z_2974473",
+   "sigma0_used_by_run": 0.12,
+   "sigma_replayed": 0.884,
+   "frames_judged": 364,
+   "first_alarm_any_state": {
+    "ts_ns": 1627643765940027237,
+    "kf_id": 250,
+    "state": "SUSPECT",
+    "nis_scaled": 9.254402
+   },
+   "first_quarantined": {
+    "ts_ns": 1627643766073510170,
+    "kf_id": 251,
+    "nis_scaled": 13.952256,
+    "cusum": 20.590045
+   },
+   "first_alarm_rel_onset_s": 6.386,
+   "first_quarantined_rel_onset_s": 6.519
+  },
+  {
+   "run": "fl_native_20261110T033802Z_2974473",
+   "sigma0_used_by_run": 0.12,
+   "sigma_replayed": 1.2,
+   "frames_judged": 364,
+   "first_alarm_any_state": {
+    "ts_ns": 1627643765940027237,
+    "kf_id": 250,
+    "state": "SUSPECT",
+    "nis_scaled": 5.022158
+   },
+   "first_quarantined": {
+    "ts_ns": 1627643766073510170,
+    "kf_id": 251,
+    "nis_scaled": 7.571579,
+    "cusum": 9.893738
+   },
+   "first_alarm_rel_onset_s": 6.386,
+   "first_quarantined_rel_onset_s": 6.519
+  }
+ ]
+}
