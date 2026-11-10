@@ -360,6 +360,40 @@ run `/tmp/fl_native_20261110T104511Z_3336818`，host 与 recovery node 同 pgid 
 这是**状态机断点**，不是本次运行的偶发。按三类归属，本次属于 **"仅接线"**：E1 的原生 hold/restore
 真的执行了（地图 8776→7422 回滚），但**第二事件没有发生**，不能算完整流程。
 
+## 3l. 两事件重跑：等待上限与重武装生效，**E2 仍未触发**（下一个断点在检测可用性）
+
+S1 修好调用图后（`e3a60e7`）用同一套参数重跑。run `/tmp/fl_native_20261110T105118Z_3341023`，
+pgid `3342097`，wall 104.9 s，peak RSS 721 MB，binary `26a9f2e6…`。
+
+| 项 | 实测 |
+|---|---|
+| pose / scan；配对 | 471 / 598；312（扫描侧 52.2%） |
+| E1 trigger / 决策 | 1627785263.808（bag **+2.7 s**，假警报）/ 1627785265.674（+1.87 s），`MODE3_SOFT_BRIDGE_WAIT` 拒绝 |
+| 原生动作 | `hold` → `restore #1` → **`resume`**（全部 ack OK）；滚动快照 38 次 |
+| `lifecycle.events` | **`wait_limit_closed`**（closed 1627785275.681，即 bag +14.6 s，正是真实注入起点）+ **`rearm`** |
+| 未决帧 | **143** 帧（`unresolved_segments=1`），终态 `HEALTHY` |
+| 重武装后帧数 | 169 帧，全部 `UNAVAILABLE` |
+| 重武装后地图 | 0 → **108501 points / 169 kfs**（地图确实在长） |
+| 重武装后 NIS | 0.43 – **164.01**，中位 16.86（真实注入窗口的 NIS 很大） |
+| 重武装后参考来源 | **prev_scan ×169，node_map ×0** |
+| E2 | **未触发** |
+
+### 断点在哪一步（不是终态，是路径）
+
+1. 等待上限求值 → **通过**（`wait_limit_closed`）；
+2. `rearm` → **通过**（事件出现，native `resume` 已 ack）；
+3. 检测重武装 → `detector.reset()`，状态回 `HEALTHY` → **通过**；
+4. **之后没有任何一帧进入检测器**：`fed_to_step_frame` 全程停在 **5**。原因不是没 P 值（NIS 一路算到 164），
+   而是参考**永远是 `prev_scan`**，`reference_node_map` 全程 **5 次**，于是 `supported=false`，
+   帧被记为 UNAVAILABLE 并走 `step_healthy`。
+
+**这是一次回归，不是旧有状态**：同一 bag、同一 σ 的早期 hall 运行 `054559Z` 是
+`reference_node_map=397 / AVAILABLE=440`。现在变成 `5 / 5`。变化发生在宿主侧移植（hold/restore/
+深拷贝/修复通道）与驱动侧 checkpoint 接线之间；**具体是哪一个尚未定位**，我没有把它写成"已知原因"。
+
+按三类归属：**仍是"仅接线"**——E1 的原生 hold/restore/resume 全执行了、等待上限与重武装也真的发生了，
+但第二事件没有开出来。
+
 ## 4. 边界
 
 - 没有跑两事件；没有调门、没有调 σ、没有重跑检测或候选矩阵。
