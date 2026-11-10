@@ -1,0 +1,134 @@
+{
+ "run_id": "fl_native_20261110T044250Z_3031393",
+ "detection_enabled": true,
+ "parameters": {
+  "confirmation_margin_ns": 2000000000,
+  "pair_window_ns": 40000000,
+  "scan_cap": 6000,
+  "nis_radius_m": 3.0,
+  "extrap_frames": 5,
+  "sigma_meas_m": 0.884
+ },
+ "pairing": {
+  "pair_window_ns": 40000000,
+  "poses_received": 480,
+  "scans_received": 599,
+  "paired": 369,
+  "poses_unpaired": 111,
+  "scans_unpaired": 230,
+  "paired_fraction_of_poses": 0.76875,
+  "paired_fraction_of_scans": 0.6160267111853088,
+  "max_abs_dt_ns": 39824962,
+  "max_backlog_messages": 237,
+  "messages_considered": 1079,
+  "pairing_rule": "nearest pose within 40 ms, no pose reused"
+ },
+ "frames": {
+  "paired": 369,
+  "ingested": 369,
+  "fed_to_step_frame": 351,
+  "ingested_without_detection": 18,
+  "consumed_after_first_decision": 163,
+  "first_decision_ts_ns": 1627643761790611506
+ },
+ "warmup": {
+  "policy": "a frame the node cannot support against its own spatially sampled trusted map is ingested through the manager's healthy path but is NOT judged by the detector; it is recorded as detection_status=UNAVAILABLE. In diagnosis mode (detection=off) every frame is recorded as DISABLED_FOR_DIAGNOSIS and nothing is judged at all.",
+  "detection_status_counts": {
+   "AVAILABLE": 351,
+   "UNAVAILABLE": 18,
+   "DISABLED_FOR_DIAGNOSIS": 0
+  },
+  "frames_ingested_without_detection": 18,
+  "first_detected_kf": 18,
+  "not_an_assumption": "no frame is labelled healthy; UNAVAILABLE says the detector had no reference, which is a statement about the evidence, not about the frame"
+ },
+ "nis": {
+  "computed": 368,
+  "carried_forward": 0,
+  "unavailable": 1,
+  "reference_node_map": 351,
+  "reference_prev_scan": 17,
+  "reference_none": 1,
+  "nonfinite_estimator_output": 0,
+  "sigma_meas_m": 0.884
+ },
+ "quarantine": {
+  "episodes": 1,
+  "trigger_ts_ns": [
+   1627643759659727812
+  ],
+  "decisions": 1,
+  "second_and_later_events": 0,
+  "episode_detail": [
+   {
+    "index": 0,
+    "trigger_ts_ns": 1627643759659727812,
+    "deadline_ns": 1627643761659727812,
+    "decided": true,
+    "estimated_onset_ns": 1627643759426658773,
+    "quarantine_start_ns": 1627643757426658773,
+    "first_alarm_ts_ns": 1627643759526658773,
+    "frames_registered": 22,
+    "decision_basis": "confirmation_margin",
+    "candidate_frames": 22,
+    "incumbent_basis": {
+     "tail_frames_requested": 5,
+     "trusted_keyframes": 162,
+     "anchor_key": 161,
+     "velocity_mps": [
+      0.12277251390952322,
+      0.027395838641520797,
+      0.011805947164731647
+     ],
+     "rotation_held": true,
+     "status": "CONSTANT_VELOCITY",
+     "tail_keys": [
+      157,
+      158,
+      159,
+      160,
+      161
+     ],
+     "anchor_timestamp_ns": 1627643757330770969
+    },
+    "paired_evidence": {
+     "num_paired_frames": 22,
+     "required_paired_frames": 8,
+     "candidate_keyframes": 22,
+     "pairable_frames": 22,
+     "frames_without_independent_reference": 0,
+     "reference_frames_from_candidate": 162,
+     "num_improved_frames": 13,
+     "improved_fraction": 0.5909090909090909,
+     "wilson_lower_bound": 0.41792987463389836,
+     "approved": false,
+     "reason": "wilson_sequential_benefit_lower_bound_failed",
+     "incumbent_mean_residual": 0.13836557103825786,
+     "candidate_mean_residual": 0.09422530299278077,
+     "reentry_pos_jump_m": 1.2518281051918458
+    },
+    "error": null,
+    "state_after": "WAITING_FOR_EVIDENCE",
+    "quarantine_still_open": true
+   }
+  ]
+ },
+ "gate": {
+  "accepted": 0,
+  "rejected": 1,
+  "errored": 0,
+  "modes": [
+   "MODE3_SOFT_BRIDGE_WAIT"
+  ],
+  "committed_key_total": 0,
+  "deferred_key_total": 0
+ },
+ "final_state": "WAITING_FOR_EVIDENCE",
+ "runtime": {
+  "wall_sec": 80.658,
+  "peak_rss_kb": 496544,
+  "pose_messages": 480,
+  "scan_messages": 599,
+  "callback_error_count": 0
+ }
+}
