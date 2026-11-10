@@ -95,6 +95,26 @@ class TestTransportAlgebra(unittest.TestCase):
             info2 = transport_information(info, T)
             self.assertAlmostEqual(float(v @ info @ v), float(v2 @ info2 @ v2), places=9)
 
+    def test_transport_matches_the_fim_the_producer_computes(self):
+        """Invariance alone is an algebraic identity; this pins the adjoint to the real FIM.
+
+        A wrong adjoint still satisfies v'^T L' v' == v^T L (it holds for any invertible map), so
+        the invariance test cannot catch a convention error. Recomputing the same point-to-plane
+        information from the transformed points can: if the adjoint moves into the wrong basis,
+        the two numbers differ. Measured agreement on this fixture is 6e-9 relative.
+        """
+        from slam_recovery.validation.fim_and_holdout import compute_6dof_point_to_plane_fim
+
+        rng = np.random.default_rng(0)
+        pts = rng.normal(size=(400, 3))
+        T = _se3(_rot_z(40.0), [2.0, -1.0, 0.5])
+        pts_world = pts @ T[:3, :3].T + T[:3, 3]
+        info_body = compute_6dof_point_to_plane_fim(pts, sigma_meas_m=0.05)[0]
+        info_world = compute_6dof_point_to_plane_fim(pts_world, sigma_meas_m=0.05)[0]
+        moved = transport_information(info_body, T)
+        self.assertLess(float(np.linalg.norm(moved - info_world)
+                              / np.linalg.norm(info_world)), 1e-6)
+
     def test_transport_composes(self):
         T1 = _se3(_rot_z(30.0), [0.4, -1.2, 0.7])
         T2 = _se3(_rot_z(-75.0), [2.0, 0.1, -0.5])
