@@ -199,7 +199,7 @@
   }
  ],
  "runtime_library_probe": {
-  "status": "BLOCKED",
+  "status": "RESOLVED_IN_CODE, ONE_HARDENING_PENDING",
   "symptom": "ON run FAILed at startup: 'no /proc/<pid>/maps entry for liblaser_mapping.so'",
   "peer_hypothesis": "the check ran too early (3 s after start); move it to after the drain",
   "root_cause": "pid resolution, not timing: liblaser_mapping.so is a DT_NEEDED entry of fastlivo_mapping (readelf -d), so ld.so maps it before main; there is no window in which the node runs without it",
@@ -209,7 +209,18 @@
    "pgrep -f fastlivo_mapping also matches the rosrun wrapper, whose maps has no such entry"
   ],
   "required_fix": "iterate every pgrep candidate, skip the ones without the maps entry, retry for up to 30 s, and record pid + cmdline alongside path + sha in the run dir and receipt",
-  "why_not_move_to_end": "a fail-closed check at the end turns a few-seconds abort into a wasted full drain, which is the cost just paid"
+  "why_not_move_to_end": "a fail-closed check at the end turns a few-seconds abort into a wasted full drain, which is the cost just paid",
+  "fix_commit": "25bcc2b",
+  "probe_receipt": "/tmp/fl_run_20261110T014236Z_2870893/receipt.json",
+  "probe_verified": {
+   "status": "OK",
+   "path": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+   "sha256": "20df3d3f42400aec0c56387e55d027289f5117402837a712f2002da6e06c450f",
+   "pid": "2872220",
+   "cmdline": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping"
+  },
+  "fail_closed_control": "/tmp/fl_run_20261110T014109Z_2869028/receipt.json keeps path/sha null with status FAIL",
+  "hardening_pending": "pgrep -f matches the whole machine; a leftover node from an earlier SIGKILLed run has the library mapped and would be accepted with a different build's hash -- restrict to the launched process group (pgrep -g \"$(ps -o pgid= -p $NODE)\") or check the pid's start time"
  },
  "current_build": {
   "library_sha256": "20df3d3f42400aec0c56387e55d027289f5117402837a712f2002da6e06c450f",
