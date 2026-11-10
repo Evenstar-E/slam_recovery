@@ -1,0 +1,24 @@
+{
+  "main": "e2db4b3cfc2edda324c98a94e651f57888364719",
+  "research": "3e9f9475b9baac9545bf0857fdc1c8e455585e5b",
+  "command": "python -B -W ignore docs/review_20261110_e2db4b3/fixed_direction_control.py",
+  "exit": 0,
+  "scope": "Exact SPD transport arithmetic only; no raw producer/bag/ROS experiment",
+  "mainline_increment": "NO_NEW_NATIVE_SOURCE_OR_RUN",
+  "accepted": ["Rotation control now in script and JSON", "Loewner definition saved", "Reading text matches rank data", "C2 non-integration maintained"],
+  "control": {
+    "direction": "rz", "information_diagonal": [10, 20, 1, 40, 50, 60],
+    "rotation_z_deg": 30, "translation": [2, -1, 0.5],
+    "original_projection": 1.0,
+    "transported_physical_projection": 1.000000000000016,
+    "transported_direction_norm": 2.449489742783178,
+    "research_renormalized_projection": 0.16666666666666766,
+    "pure_rotation_projection": 1.0,
+    "verdict": "FAIL_GENERAL_FIXED_PHYSICAL_DIRECTION_CLAIM",
+    "limit": "Does not attribute all archive percentages to normalization or reverse C2 non-integration"
+  },
+  "archive_rotation_sources": 2,
+  "candidate_effectiveness": "BLOCKED",
+  "native_full_chain": "BLOCKED",
+  "not_applicable": ["Native host or raw bag runs", "Existing unchanged regression suite", "Full A/B score update", "Parameter tuning or new model implementation"]
+}
