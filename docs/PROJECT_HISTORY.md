@@ -229,3 +229,9 @@ S1集成/S2下一仍一次实际恢复→接回→E2或第一宿主文件/函数
 新真实ICP分支本机4帧actual loop/node接线通过，不再称根本未调用；回调请求、主循环service执行，预算截断逐帧记录。开发报23帧/13s/3产出及七run时戳/pose差，未新增该尝试原receipt/detail或对照，归档独立验证UNAVAILABLE。当前buffer6000经sample_scan实际2000，不能仅凭日志长度断言违反§9并要求重跑；段级刚体建议改变模型自由度/人口，须声明新假设，不因数值参数同就称不变实验。
 
 service延后正常反例：同一deadline3.0s输入，立即service候选1帧，3.2s service候选3帧；pending均完整。最低冻结截止输入或声明变长窗，不扩线程框架。新summary A7_CLEARED主张不成立：复用旧实际producer反例仍cov .513614→.469490、Mode3→2，未改门；只沿旧S3正则最小修，不重开正确transport/边界。详见[5f59f47核验](review_20261110_5f59f47/README.md)。S1/S2下一仍实际宿主恢复重处理写回与Mode3续处理/重武装/E2，现代码接线直接复用，无新完整评分。
+
+## 23. 9e0a36c：段ICP真实运行接受，不从两次低info推阈值错误
+
+新run051744Z原件与driver SHA核过，段级一次ICP11.828s、2000求解点/19039参考点、25候选/25改善、Wilson.902331，仍info4.470<冻结25/0接纳/E2零/WAITING。本机16既有函数通过；接受实际求解尝试，6000buffer误读已纠正。单刚体是新的模型/拟合人口，不称逐帧实验不变；共享拟合scan/reference的残差/Wilson不证明独立净收益，原完整ΔT/候选未归档。详见[9e0a36c核验](review_20261110_9e0a36c/README.md)。
+
+host与ICP都低于25仅证明当前候选没过，不证明阈值错尺度，不为G≠Q调门或新增FIM扫描挡接口。新增实际wrapper正常参考不足反例：solver REFERENCE_TOO_SMALL仍返回全部旧host poses贴ICP来源；最低沿原失败无候选语义修，不加fallback/门。旧A7正则/service窗范围仍保留，不重开已通过项。S1/S2下一仍实际宿主恢复写回与Mode3续处理/重武装/E2，S3必要最小修并行，无完整A/B升档。

@@ -1,0 +1,48 @@
+{
+  "target": "9e0a36c98b30d7244e5d5208bcb3dfc23edc9a05",
+  "baseline": "5f59f47d22242140f5e65ecc4a5966e182f1a853",
+  "scope": "fixed Git archived run, actual Python candidate wrapper on synthetic normal inputs, existing tests; no local ROS or tuning",
+  "native_archive": {
+    "status": "PASS: run IDs, driver source SHA and counts agree",
+    "run_id": "fl_native_20261110T051744Z_3059939",
+    "driver_sha256": "e5bc98f01e434711645ca5019a7243f79ec69b7a05281d761aff0fee03c49516",
+    "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+    "paired_scans": 584, "scan_total": 599, "unpaired_scans": 15,
+    "poses": 800, "unpaired_poses": 216,
+    "candidate_n": 25, "paired_evidence_n": 25, "improved_n": 25,
+    "wilson_lower_bound": 0.9023308107171635,
+    "wilson_arithmetic": "PASS existing one-sided z=1.645",
+    "info_after": 4.470129267922591,
+    "tau_info": 25.0,
+    "ICP_seconds": 11.827733919024467,
+    "ICP_status": "ITERATION_LIMIT",
+    "scan_points_used": 2000, "reference_points_used": 19039,
+    "segment_points_before_sampling": 150000,
+    "correction_translation_m": 0.45918547105573193,
+    "correction_rotation_deg": 3.728982266332218,
+    "deadline_to_input_decision_s": 0.535016775,
+    "accepted": 0, "E2": 0,
+    "final_state": "WAITING_FOR_EVIDENCE",
+    "source_caveat": "receipt pins driver but not all repair/core/node dependency hashes; run provenance interpreted within recorded scope",
+    "output_caveat": "archive has correction magnitudes, not full delta SE3 or complete repaired poses; independent candidate reconstruction not available"
+  },
+  "existing_ICP_tests": {
+    "status": "PASS", "passed": 16, "failed": 0, "seconds": 13.634,
+    "runner": "target test_pose_reregistration direct invocation of all test_* functions, no pytest",
+    "actual_command": "python -B -W ignore inline; sys.path target root; inspect.getmembers(module, inspect.isfunction), call each test_*",
+    "new_segment_tests": ["test_segment_registration_recovers_one_rigid_correction", "test_segment_registration_is_one_registration_not_one_per_frame", "test_segment_registration_without_frames_reports_it"]
+  },
+  "wrapper_probe": {
+    "fixture": "reuse setup from docs/review_20261110_5f59f47/live_integration_probe.py in memory; change only source target; old archive not changed",
+    "source_identity": "target driver/repair/node/core normalized checkout SHA256 matched fixed Git",
+    "normal": {"status": "ITERATION_LIMIT", "candidate_keys": [1,2,3,4], "scan_points_used": 1600, "reference_points_used": 100},
+    "reference_too_small": {"status": "REFERENCE_TOO_SMALL", "candidate_keys": [1,2,3,4], "scan_points_used": 1600, "reference_points_used": 10, "poses_equal_original_host_poses": true},
+    "verdict": "FAIL normal missing-reference semantics: unsuccessful fit still returns all original poses under ICP source; not asserted to commit in this fixture"
+  },
+  "syntax": "PASS bash -n runner; changed Python AST checked before publish",
+  "independent_gate_evidence": "not established: segment fit uses all frame scans and trusted reference also used for scoring; residual/Wilson are within-fit consistency, not independent accuracy or net benefit",
+  "A7_and_service_window": "known unchanged limitations retained, not rerun this round",
+  "pytest_driver": "BLOCKED known missing pytest; not repeated or installed",
+  "native_state_restore_writeback_reentry_E2": "not delivered; actual sidecar candidate attempt only",
+  "complete_AB_rescore": "NOT_APPLICABLE"
+}

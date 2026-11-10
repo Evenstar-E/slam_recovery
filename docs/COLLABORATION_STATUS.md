@@ -270,3 +270,9 @@ S1集成/S2下一直接实际宿主恢复重处理/地图写回＋Mode3续处理
 driver已调用ICP，本机actual node4帧接线核过；执行方最新尝试与七run对照只有日报、未交原件。当前6000缓冲再采样2000，违反冻结采样未证明；段刚体是新模型/人口假说，不立即换法或跑矩阵。service延后改变候选窗有最小正常例，新A7 cleared标签仍被旧actual producer反例否定；详见[5f59f47核验](review_20261110_5f59f47/README.md)。
 
 S1集成/明确共享入口责任，S2复用新接线优先实际宿主restore/reprocess/internal map writeback及真实Mode3续处理/终态/重武装/E2，S3旧正则最小修并行；窗口最低snapshot/能力声明不扩线程防御框架。Codex/KITTI后继不挡接口，实际checkout/编辑/运行/收到最新任务仍待直接回报，不以代码call或日报数字代完整恢复。
+
+## 23. 9e0a36c段级ICP实际运行已核，下一不得转调tau_info循环
+
+新真实run原件身份、25候选/25改善、11.8s求解成本核过，16相关函数本机通过；仍0接纳/E2零/WAITING。接受部分求解进展，不称宿主恢复写回；[9e0a36c核验](review_20261110_9e0a36c/README.md)。两个info均低于25不能证明门错，独立质量/完整候选未交。参考不足失败fit仍封装旧host pose贴ICP，S1指定最小失败语义修随接线处理，不扩fallback或测试矩阵。
+
+S1集成/S2优先宿主恢复重处理/internal map writeback与Mode3续处理/终态/重武装/E2，S3旧正则及现公式尺度最小核并行，不调门或新增FIM日志/分布扫描挡开工；Codex/KITTI后继。实际checkout/工作树/正在运行及最新任务接收仍待直接回报，不由新侧路run推接口已实施。
