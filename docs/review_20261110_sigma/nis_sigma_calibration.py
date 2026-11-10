@@ -122,6 +122,88 @@ def analyse(run_dir, onset):
     }
 
 
+def diagnosis_analysis(run_dir, onset):
+    """A detection-off run: NIS measured while the map grows, so it is read per keyframe bin.
+
+    The bins are the comparison unit because a whole-segment median over a growing map mixes "the
+    map got bigger" with "the detector started too early". Within a bin the reference size is
+    fixed, so sigma* is well defined there and nowhere else.
+    """
+    with open(os.path.join(run_dir, "run_summary.json"), encoding="utf-8") as fh:
+        summary = json.load(fh)
+    sigma0 = float(summary["parameters"]["sigma_meas_m"])
+    frames = [f for f in summary["frame_diagnostics"]
+              if f.get("nis_reference") == "node_map"
+              and f.get("nis") is not None and np.isfinite(f["nis"])]
+    edges = [(1, 2), (3, 5), (6, 10), (11, 20), (21, 50), (51, 100), (101, None)]
+    bins = []
+    for lo, hi in edges:
+        members = [f for f in frames if lo <= f["trusted_keyframes"] and
+                   (hi is None or f["trusted_keyframes"] <= hi)]
+        if not members:
+            continue
+        values = np.array([f["nis"] for f in members])
+        median = float(np.median(values))
+        sigma_star = sigma0 * median ** 0.5
+        scale = (sigma0 / sigma_star) ** 2
+        tail = [f for f in members if f["nis"] * scale > DETECTOR_NIS_LIMIT]
+        # Where in time the above-threshold frames sit. A tail that is a bounded interval after
+        # the injection onset is degradation; one spread evenly over the run is coverage/pairing.
+        profile = []
+        for t0 in range(0, 24, 2):
+            seg = [f for f in members
+                   if t0 <= (f["ts_ns"] - onset) / 1e9 < t0 + 2]
+            if seg:
+                profile.append({
+                    "t_rel_onset_s": [t0, t0 + 2], "n": len(seg),
+                    "above_after_rescale": sum(1 for f in seg
+                                               if f["nis"] * scale > DETECTOR_NIS_LIMIT),
+                    "median_raw": round(float(np.median([f["nis"] for f in seg])), 3),
+                })
+        pre = [f["nis"] for f in members if f["ts_ns"] < onset]
+        bins.append({
+            "lo": lo, "hi": hi, "n": len(members), "before": distribution(values),
+            # Calibrating only on pre-onset frames is the honest check that the degradation does
+            # not drive sigma*: if the two agree, the value is a property of the reference size,
+            # not of the fault.
+            "sigma_star_pre_onset_only_m": (
+                round(sigma0 * float(np.median(pre)) ** 0.5, 6) if len(pre) >= 10 else None),
+            "n_pre_onset": len(pre),
+            "post_onset_profile": profile,
+            "sigma_star_m": round(sigma_star, 6),
+            "after": distribution(values * scale),
+            "frames_above_detector_limit_after": len(tail),
+            "tail": {
+                "n": len(tail),
+                "first_ts_rel_onset_s": (round((min(f["ts_ns"] for f in tail) - onset) / 1e9, 3)
+                                         if tail else None),
+                "all_after_onset": (all(f["ts_ns"] >= onset for f in tail) if tail else None),
+                "kf_range": ([min(f["kf_id"] for f in tail), max(f["kf_id"] for f in tail)]
+                             if tail else None),
+                "map_points_range": ([min(f["map_points"] for f in tail),
+                                      max(f["map_points"] for f in tail)] if tail else None),
+            },
+        })
+    return {
+        "run": os.path.basename(run_dir),
+        "detection_enabled": summary.get("detection_enabled"),
+        "sigma_meas_m_used": sigma0,
+        "reference_variant": (
+            "point_cap" if len({f.get("map_points") for f in frames}) == 1
+            else "spatial_sampling_or_other"),
+        "frames_with_node_map_nis": len(frames),
+        "map_points_range": [min(f["map_points"] for f in frames),
+                             max(f["map_points"] for f in frames)],
+        "bins": bins,
+        "not_available": {
+            "position_distribution": ("the archived diagnostics carry no pose; the tail is "
+                                      "characterised by time, keyframe id and map size only. "
+                                      "Recovering position would need the host output bag, which "
+                                      "this run did not record (receipt.output is null)."),
+        },
+    }
+
+
 def archived_candidate(run_dir, scale):
     path = os.path.join(run_dir, "candidates.jsonl")
     if not os.path.exists(path):
@@ -155,7 +237,32 @@ def archived_candidate(run_dir, scale):
 
 
 def main(argv):
-    runs = argv[1:] or DEFAULT_RUNS
+    args = [a for a in argv[1:] if not a.startswith("--")]
+    if "--diagnosis" in argv:
+        onset = onset_ns()
+        diags = [diagnosis_analysis(run_dir, onset) for run_dir in args]
+        out = {
+            "_meta": {
+                "what": "detection-off diagnosis: sigma* per trusted-keyframe bin, and the tail",
+                "written": "2026-11-10",
+                "onset_ns": onset,
+                "onset_source": os.path.relpath(ONSET_SOURCE, ROOT),
+                "comparison_rule": ("bins are the unit; a whole-segment median over a growing map "
+                                    "is not comparable with a frozen-reference calibration"),
+                "not_done": ["no sigma changed", "no threshold changed",
+                             "no attempt to suppress the tail with sigma"],
+            },
+            "runs": diags,
+        }
+        os.makedirs(OUT_DIR, exist_ok=True)
+        path = os.path.join(OUT_DIR, "nis_sigma_diagnosis_results.json")
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(out, fh, indent=1)
+        print(json.dumps({"sigma_star_by_bin": [
+            [(b["lo"], b["hi"], b["sigma_star_m"]) for b in r["bins"]] for r in diags],
+            "out": os.path.relpath(path, ROOT)}, indent=1))
+        return 0
+    runs = args or DEFAULT_RUNS
     onset = onset_ns()
     results = []
     for run_dir in runs:
