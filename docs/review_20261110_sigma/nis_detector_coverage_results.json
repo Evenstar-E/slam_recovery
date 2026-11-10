@@ -1,0 +1,202 @@
+{
+ "refusals": [
+  "NIS branch only",
+  "prev_scan frames not judged",
+  "no threshold changed"
+ ],
+ "run": "fl_native_20261110T033802Z_2974473",
+ "sigma_replayed": 0.884,
+ "window": {
+  "onset_ns": 1627643759554082870,
+  "end_ns": 1627643779393426895,
+  "duration_s": 19.839
+ },
+ "frames_in_window": 197,
+ "frames_judged_in_window": 196,
+ "coverage_all": 0.3553,
+ "coverage_judged": 0.3571,
+ "flagged_all": 70,
+ "flagged_judged": 70,
+ "buckets": [
+  {
+   "t_rel_onset_s": 0,
+   "frames_all": 10,
+   "flagged_all": 0,
+   "coverage_all": 0.0,
+   "frames_judged": 10,
+   "flagged_judged": 0,
+   "coverage_judged": 0.0
+  },
+  {
+   "t_rel_onset_s": 1,
+   "frames_all": 9,
+   "flagged_all": 0,
+   "coverage_all": 0.0,
+   "frames_judged": 9,
+   "flagged_judged": 0,
+   "coverage_judged": 0.0
+  },
+  {
+   "t_rel_onset_s": 2,
+   "frames_all": 11,
+   "flagged_all": 0,
+   "coverage_all": 0.0,
+   "frames_judged": 11,
+   "flagged_judged": 0,
+   "coverage_judged": 0.0
+  },
+  {
+   "t_rel_onset_s": 3,
+   "frames_all": 10,
+   "flagged_all": 0,
+   "coverage_all": 0.0,
+   "frames_judged": 10,
+   "flagged_judged": 0,
+   "coverage_judged": 0.0
+  },
+  {
+   "t_rel_onset_s": 4,
+   "frames_all": 10,
+   "flagged_all": 0,
+   "coverage_all": 0.0,
+   "frames_judged": 10,
+   "flagged_judged": 0,
+   "coverage_judged": 0.0
+  },
+  {
+   "t_rel_onset_s": 5,
+   "frames_all": 10,
+   "flagged_all": 0,
+   "coverage_all": 0.0,
+   "frames_judged": 10,
+   "flagged_judged": 0,
+   "coverage_judged": 0.0
+  },
+  {
+   "t_rel_onset_s": 6,
+   "frames_all": 10,
+   "flagged_all": 7,
+   "coverage_all": 0.7,
+   "frames_judged": 10,
+   "flagged_judged": 7,
+   "coverage_judged": 0.7
+  },
+  {
+   "t_rel_onset_s": 7,
+   "frames_all": 10,
+   "flagged_all": 10,
+   "coverage_all": 1.0,
+   "frames_judged": 10,
+   "flagged_judged": 10,
+   "coverage_judged": 1.0
+  },
+  {
+   "t_rel_onset_s": 8,
+   "frames_all": 10,
+   "flagged_all": 10,
+   "coverage_all": 1.0,
+   "frames_judged": 10,
+   "flagged_judged": 10,
+   "coverage_judged": 1.0
+  },
+  {
+   "t_rel_onset_s": 9,
+   "frames_all": 9,
+   "flagged_all": 9,
+   "coverage_all": 1.0,
+   "frames_judged": 9,
+   "flagged_judged": 9,
+   "coverage_judged": 1.0
+  },
+  {
+   "t_rel_onset_s": 10,
+   "frames_all": 10,
+   "flagged_all": 10,
+   "coverage_all": 1.0,
+   "frames_judged": 10,
+   "flagged_judged": 10,
+   "coverage_judged": 1.0
+  },
+  {
+   "t_rel_onset_s": 11,
+   "frames_all": 10,
+   "flagged_all": 10,
+   "coverage_all": 1.0,
+   "frames_judged": 10,
+   "flagged_judged": 10,
+   "coverage_judged": 1.0
+  },
+  {
+   "t_rel_onset_s": 12,
+   "frames_all": 11,
+   "flagged_all": 11,
+   "coverage_all": 1.0,
+   "frames_judged": 11,
+   "flagged_judged": 11,
+   "coverage_judged": 1.0
+  },
+  {
+   "t_rel_onset_s": 13,
+   "frames_all": 10,
+   "flagged_all": 2,
+   "coverage_all": 0.2,
+   "frames_judged": 10,
+   "flagged_judged": 2,
+   "coverage_judged": 0.2
+  },
+  {
+   "t_rel_onset_s": 14,
+   "frames_all": 10,
+   "flagged_all": 0,
+   "coverage_all": 0.0,
+   "frames_judged": 10,
+   "flagged_judged": 0,
+   "coverage_judged": 0.0
+  },
+  {
+   "t_rel_onset_s": 15,
+   "frames_all": 9,
+   "flagged_all": 0,
+   "coverage_all": 0.0,
+   "frames_judged": 9,
+   "flagged_judged": 0,
+   "coverage_judged": 0.0
+  },
+  {
+   "t_rel_onset_s": 16,
+   "frames_all": 10,
+   "flagged_all": 0,
+   "coverage_all": 0.0,
+   "frames_judged": 10,
+   "flagged_judged": 0,
+   "coverage_judged": 0.0
+  },
+  {
+   "t_rel_onset_s": 17,
+   "frames_all": 10,
+   "flagged_all": 0,
+   "coverage_all": 0.0,
+   "frames_judged": 10,
+   "flagged_judged": 0,
+   "coverage_judged": 0.0
+  },
+  {
+   "t_rel_onset_s": 18,
+   "frames_all": 10,
+   "flagged_all": 0,
+   "coverage_all": 0.0,
+   "frames_judged": 10,
+   "flagged_judged": 0,
+   "coverage_judged": 0.0
+  },
+  {
+   "t_rel_onset_s": 19,
+   "frames_all": 8,
+   "flagged_all": 1,
+   "coverage_all": 0.125,
+   "frames_judged": 7,
+   "flagged_judged": 1,
+   "coverage_judged": 0.1429
+  }
+ ]
+}

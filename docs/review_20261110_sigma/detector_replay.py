@@ -33,9 +33,14 @@ from slam_recovery.health import DetectorConfig, JointHealthDetector  # noqa: E4
 ONSET_SOURCE = os.path.join(ROOT, "docs/review_20261109_bbc3dcb/room02_2x2_audit.json")
 
 
-def onset_ns():
+def _window():
     with open(ONSET_SOURCE, encoding="utf-8") as fh:
-        return int(json.load(fh)["window"]["onset_ns"])
+        window = json.load(fh)["window"]
+    return int(window["onset_ns"]), int(window["end_ns"])
+
+
+def onset_ns():
+    return _window()[0]
 
 
 def replay(run_dir, sigma, onset):
@@ -85,12 +90,96 @@ def replay(run_dir, sigma, onset):
     }
 
 
+def coverage(run_dir, sigma):
+    """Per-frame detector state at this sigma, bucketed by second inside the injection window.
+
+    Two denominators are reported because they answer different questions: over *all* frames in the
+    window (what an operator would experience) and over *judged* frames only (what the estimator
+    could actually see). The gap between them is the frames the warm-up policy never judges.
+    """
+    onset, end = _window()
+    with open(os.path.join(run_dir, "run_summary.json"), encoding="utf-8") as fh:
+        summary = json.load(fh)
+    sigma0 = float(summary["parameters"]["sigma_meas_m"])
+    scale = (sigma0 / sigma) ** 2
+    frames = sorted(summary["frame_diagnostics"], key=lambda f: f["ts_ns"])
+    in_window = [f for f in frames if onset <= f["ts_ns"] <= end]
+    judged = [f for f in in_window if f.get("nis_reference") == "node_map"
+              and f.get("nis") is not None and np.isfinite(f["nis"])]
+
+    detector = JointHealthDetector(DetectorConfig())
+    state_by_ts = {}
+    for f in frames:                                  # state evolves over the whole run
+        if f.get("nis_reference") != "node_map" or f.get("nis") is None or not np.isfinite(f["nis"]):
+            state_by_ts[f["ts_ns"]] = None            # not judged: no state change
+            continue
+        nis = float(f["nis"]) * scale
+        decision = detector.step(HealthWindow(
+            t_start_ns=int(f["ts_ns"]), t_end_ns=int(f["ts_ns"]),
+            min_eig_rot=1e9, min_eig_trans=1e9, max_eig_rot_cov=0.0, max_eig_trans_cov=0.0,
+            weak_dir_6d=np.zeros(6), nis_mean=nis, nis_q90=nis * 1.35, nis_cusum=0.0,
+            loso_primary_conflict=0.5, loso_aux_conflict=0.5, Cross_corr_lag_sec=0.0,
+            loop_residual_spike=0.3,
+        ))
+        state_by_ts[f["ts_ns"]] = decision.state.value
+
+    def flagged(state):
+        return state in (RecoveryState.SUSPECT.value, RecoveryState.QUARANTINED.value)
+
+    buckets = []
+    for t0 in range(0, int((end - onset) / 1e9) + 1):
+        seg = [f for f in in_window if t0 <= (f["ts_ns"] - onset) / 1e9 < t0 + 1]
+        if not seg:
+            continue
+        seg_judged = [f for f in seg if f["ts_ns"] in state_by_ts
+                      and state_by_ts[f["ts_ns"]] is not None]
+        n_flag_all = sum(1 for f in seg if flagged(state_by_ts.get(f["ts_ns"])))
+        n_flag_judged = sum(1 for f in seg_judged if flagged(state_by_ts[f["ts_ns"]]))
+        buckets.append({
+            "t_rel_onset_s": t0,
+            "frames_all": len(seg), "flagged_all": n_flag_all,
+            "coverage_all": round(n_flag_all / len(seg), 4),
+            "frames_judged": len(seg_judged), "flagged_judged": n_flag_judged,
+            "coverage_judged": (round(n_flag_judged / len(seg_judged), 4) if seg_judged else None),
+        })
+    tot_all = len(in_window)
+    tot_flag_all = sum(1 for f in in_window if flagged(state_by_ts.get(f["ts_ns"])))
+    tot_judged = len(judged)
+    tot_flag_judged = sum(1 for f in judged if flagged(state_by_ts.get(f["ts_ns"])))
+    return {
+        "run": os.path.basename(run_dir),
+        "sigma_replayed": sigma,
+        "window": {"onset_ns": onset, "end_ns": end,
+                   "duration_s": round((end - onset) / 1e9, 3)},
+        "frames_in_window": tot_all,
+        "frames_judged_in_window": tot_judged,
+        "coverage_all": round(tot_flag_all / tot_all, 4) if tot_all else None,
+        "coverage_judged": round(tot_flag_judged / tot_judged, 4) if tot_judged else None,
+        "flagged_all": tot_flag_all,
+        "flagged_judged": tot_flag_judged,
+        "buckets": buckets,
+    }
+
+
 def main(argv):
     args = [a for a in argv[1:] if not a.startswith("--")]
     expect = None
     if "--expect-trigger-ns" in argv:
         expect = int(argv[argv.index("--expect-trigger-ns") + 1])
         args.remove(str(expect))
+    if "--coverage" in argv:
+        run_dir = args[0]
+        sigma = float(args[1])
+        out = coverage(run_dir, sigma)
+        os.makedirs(OUT_DIR, exist_ok=True)
+        path = os.path.join(OUT_DIR, "nis_detector_coverage_results.json")
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump({"refusals": ["NIS branch only", "prev_scan frames not judged",
+                                    "no threshold changed"], **out}, fh, indent=1)
+        print(json.dumps({k: out[k] for k in
+                          ("sigma_replayed", "frames_in_window", "frames_judged_in_window",
+                           "coverage_all", "coverage_judged")}, indent=1))
+        return 0
     if "--sweep" in argv:
         run_dir = args[0]
         sigmas = [float(x) for x in args[1:]]
