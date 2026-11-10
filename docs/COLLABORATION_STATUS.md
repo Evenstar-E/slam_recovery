@@ -194,3 +194,13 @@ Codex接续沿自己包做新anchor/cov最小适配与正常集成复验，不�
 首个报告断点为warm-up后0.3s即隔离、比注入早16.7s；sigma诊断绑定1500参考点/1关键帧。归档.55是等效归一化，不作新修复参数，也不据此独断cap为唯一根因。候选结果汇总已提到cand_0000拒绝，不应称零候选记录；但目标故障段完整流、原生恢复/接回/E2仍未交。
 
 [增量意见](review_20261110_6631da8/README.md)：S1集成；S2最小核参考空间支持/更新时间，回到实际恢复与E2；S3不继续sigma说明或调参，处理已给实际A7正则反例；Codex/KITTI/B10旁支不挡开工。现驱动和原小型收据随实际交付提供，不为补字段单独重跑。
+
+## 12. 2a7d447驱动已归档，主线分工收窄到两个实际缺口
+
+此前649d504不可取得的状态由新merge解除，ROS recovery_node/run_native_loop及stage1b原receipt/wiring/candidate已入main。本机核fixed source SHA256与receipt一致、runID相同；归档584/599配对、独立host/recovery PID同PGID、一次拒绝、最终WAITING。
+
+责任仍沿现S1/S2/S3：S1集成，S2接**原生内部恢复/重处理/状态地图写回**及**真实Mode3后续证据/返回终态/重武装处理E2**；现driver仅缓存旧host pose/发布status，未实现这两点。后续消费不是接回成功，禁止仅改来源标签称ICP。S3并行最小A7固定基正则，Codex独立核集成而非开工前置；KITTI备用不占本次主线。
+
+[本轮核验](review_20261110_2a7d447/README.md)记录本机69-entry unittest有pytest缺失ERROR1（原68无断言失败），新adapter pytest未执行；runner语法通过，无ROS重跑。未知工作树/当前运行仍需执行侧直接回报，不能由driver归档推当前进程仍活。
+
+用户新增随机实验按趋势复现：总体方向、效果量级、失败范围相容即可，不逐值/逐次苛求同结论；小样本保留证据不足。不豁免身份/帧归属/接口和坐标不变量，不改冻结门、不挑好运行。规则入口已更新AGENTS、REVIEW§10.11、PROJECT_HISTORY§2；下次实际交付一起应用，不另造“收到”周期。
