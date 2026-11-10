@@ -395,3 +395,9 @@ runner savedPGID与receipt写成功exit0保留JSON FAIL且整体exit非零静态
 [核验](review_20261110_4b47249/README.md)接受新run154.3s/5段有episode及拒绝-close/rearm/原生动作开发报告，真实E2窗87全部UNAVAILABLE、未完成实际修复链；wiring/receipt OK不当机械全验收。仅文档增量、旧帧/decision/释放/ack/写回正常source未改不重测。检测支持实际1m/60%、3m是NIS选参考半径；表中decision→close2.14/3.15/5.67/4.68/5.60s只是算术，不推timer失效。5×恢复旧stamp不自动等累计轨迹回退10秒/同区重走，末特征与残差不定位唯一根因。
 
 声明+14.6/+42测试触发的CONTROLLED_INTERFACE_TEST符合既有接口探索范围，需实际内部恢复/同stamp接回/E2与尾段，不当自动检测/算法修复收益；不据上游BLOCKED全停已恢复原生开发。S1最低旧段释放/归属修、S2原预算下一两事件机制或断点并最终真实修复→原生写回→接回→E2，S3独立/旧参数停，新支持/保图模型需证据和用户选择。原件待交，完整A/B不升；本机仅静态/算术无ROS原bag、记录只本地、push拒绝未解除未绕过、remote review3965299。
+
+## 45. fafbd0c：受控两次拒绝回滚已有报告，trigger帧与撤销参考同步缺口（仅本地）
+
+[核验](review_20261110_fafbd0c/README.md)保留同实例受控14.678/42.022s两次开段/拒绝restore及间隔216帧消费报告，终态第二WAIT未释放，无actual修复重处理/成功写回/完整E2尾段，非用户整链完成。scripted开episode本机PASS，但trigger当帧pending已登记却candidate frames空；新分支没同步node空间参考，manager撤key7后reference仍含7/100点、下一隔离来帧仍残留。最低复用_track_episode和_sync_spatial_map，不造新系统。
+
+连续来帧不重置wait_started本机PASS，接受日报否定旧解释；晚设起点实际原因UNKNOWN，沿下一窗口最小三处诊断，不新锁框架/调wait。summary未fired标签正确，receipt只按声明仍误记CONTROLLED_INTERFACE_TEST，单表达式控制证实，最低requested/actual取summary分开，非本次两fired失败。脚本/语法exit0、无ROS原bag/开发suite，A/B不升；S1最低归属/同步修，S2最终实际修复→原生写回→接回→E2/尾段或预算断点，S3独立/旧参数停。只本地归档、push拒绝未解除未绕过、remote review3965299。

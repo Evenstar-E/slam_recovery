@@ -468,3 +468,11 @@ S2 runner两个记账修复局部接受：存活期savedPGID退出后可用、re
 S1沿9ee已发最低修新旧段释放/fresh-decision/帧及命令/写回归属；S2声明测试触发的受控两事件接口可在原预算先检机制，实际恢复→同stamp接回→E2/尾段结果与automatic BLOCKED分开，host_poses/人工输入不当算法修复成功。最终唯一主线仍实际修复→原生重估/内部写回→接回→E2，S3独立/旧参数停，支持恢复或保图新策略须具体证据后交选择，不自动部署。
 
 开发下次自检分PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令原件，接口/检测/修复/收益分开，归档已有实际patch/run_summary/receipt/log/stamp，不新矩阵。A/B完整分不升、本机静态/算术无ROS原bag，首次整链真完成仍单独报，当前未到。4既有Cron无复制/旧repair-3e无活peer、远端当前进程未独立核；私人handoff保护，push拒绝未解除未绕过、记录仅本地remote review3965299，不称开发收到。
+
+## 47. repair-f3核fafbd0c：受控第二次拒绝接口已报告，实际修复整链仍未完成（仅本地）
+
+[核验](review_20261110_fafbd0c/README.md)接受同实例受控两次触发/拒绝native restore、中间216帧消费报告；原件/actual hostpatch未归档、第二段终态WAIT无尾段释放，不能叫actual修复/整链完成。S1新scripted分支需最低保存trigger当帧candidate input并同步已撤node空间参考：本机actual node/loop撤trusted key7后ref仍7/100点、下一隔离帧不清，trigger pending有0但episode frames空；复用现_track_episode/_sync_spatial_map即可，不新参考框架。旧归属/释放/ack/写回任务source未变不重测。
+
+S1连续来帧不重置wait的解释纠正接受、本机control PASS；晚设wait起点仍UNKNOWN，沿下一实质小窗既有三处诊断核decision/t_end/wait_start，不新锁/时钟/参数矩阵。S2 summary未fired标签已分，receipt仍只按声明，最低requested/actual取已有summary，属于记账旁支不把本次两fired报错。S2下一仍实际修复测量→原生重估/内部地图写回→接回→E2/尾段或预算断点，受控拒绝范围单列，S3独立/旧参数停、生产门不改。
+
+本机小控制与bash-n exit0，无ROS原bag/开发suite，A/B完整分不升，首次真实整链仍单独及时报、当前未到。开发自检PASS/FAIL/BLOCKED/NOT_APPLICABLE+原件/命令区分受控触发/输入归属/参考撤销/native结果/等待/E2尾段/算法修复。4既有Cron无复制/旧repair-3e无活peer，远端当前进程未独立核；私人handoff保护、push拒绝未解除未绕过、本条只本地remote review3965299，不称开发收到。
