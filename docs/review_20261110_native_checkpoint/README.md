@@ -474,6 +474,36 @@ wiring **all_ok**（含修好的 `same_process_group`），receipt status OK。
 另记一条小观察：本轮有 **2 次滚动快照 ack 超时**（`snapshot ack_timeout`），都发生在 restore
 密集的时段；它不影响任何决策，但说明快照与重放会在主循环上撞车。
 
+## 3o. 受控接口测试：两段都按声明时刻打开，恢复链走完（CONTROLLED_INTERFACE_TEST）
+
+标注：**CONTROLLED_INTERFACE_TEST**。触发由测试脚本在声明时刻直接调用 `trigger_quarantine`，
+不经过检测器、不读故障标签；本运行**不能**用于评价检测。
+
+run `/tmp/fl_native_20261110T112059Z_3361446`，pgid `3362679`，wall 104.6 s，`--detection off`、
+σ=0.884、host_poses、`--wait-limit-sec 2.0`、声明时刻 **14.6 / 42.0 s**。
+
+| 项 | 实测 |
+|---|---|
+| 触发 1 | 声明 14.6 → 实际 **14.678 s**（kf 145），门在 17.882 s 决策 |
+| 触发 2 | 声明 42.0 → 实际 **42.022 s**（kf 376），门在 44.830 s 决策 |
+| 两段结果 | 都是 `MODE3_SOFT_BRIDGE_WAIT` **拒绝**，`candidates_detail.jsonl` 2 行 |
+| 原生动作 | `hold→restore` ×2、`resume` ×1，全部 ack OK |
+| E1 决策 → E2 触发之间 | **216 帧**实际消费 |
+| 地图/关键帧 | E1 时 22545 pts / 126 kfs → E2 时 **46218 pts / 239 kfs** |
+| 终态 | `WAITING_FOR_EVIDENCE`（第二段的等待未在运行结束前关闭） |
+
+**结论口径**：恢复链的**机制可执行** —— 隔离 → 候选 → 门（拒绝）→ 原生 hold/restore → 接回 →
+第二次触发 → 第二次恢复，全程在同一实例、同一条输入时间线上完成。**在线链仍然 BLOCKED（上游检测）**，
+两者不混。
+
+### 一条需要 S1 看的观察（不在我的文件里）
+
+E1 的段在**决策后 13.1 s** 才关闭（31.026 s），不是声明的 2 s；`frames_unresolved` 134。
+原因看代码是 `wait_started_ns = active_quarantine.t_end_ns`（`manager.py:466/471`）——
+而 `t_end_ns` 每来一帧就被 `register_quarantined_frame` 往后推，所以**帧流不断时等待计时器一直在重置**，
+只有在出现 ≥2 s 的帧间隔时才真正到期。本运行恰好在 31 s 附近出现了一个间隙。
+这是读代码得到的解释、未经实验确认，我没有改。
+
 ## 4. 边界
 
 - 没有跑两事件；没有调门、没有调 σ、没有重跑检测或候选矩阵。

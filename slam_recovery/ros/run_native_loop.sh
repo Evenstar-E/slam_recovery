@@ -22,7 +22,7 @@ set -uo pipefail
 
 BAG="${1:-}"; shift || true
 RATE=1.0; DRAIN=20; DURATION=0; MAX_PAIRS=0; CAND_SRC=host_poses; DETECTION=on; SIGMA=0.12
-WAIT_LIMIT="${WAIT_LIMIT:-0}"; SNAP_PERIOD="${SNAP_PERIOD:-2.0}"
+WAIT_LIMIT="${WAIT_LIMIT:-0}"; SNAP_PERIOD="${SNAP_PERIOD:-2.0}"; SCRIPTED="${SCRIPTED:-}"
 while [ $# -gt 0 ]; do
   case "$1" in
     --rate) RATE="$2"; shift 2 ;;
@@ -75,11 +75,11 @@ cleanup() {
 write_receipt() {
   env -u PYTHONPATH /usr/bin/python3 - "$RUN_DIR" "$STATUS" "$REASON" "$TERMINATION" \
       "$BAG" "$RATE" "$DRAIN" "$DURATION" "$MAX_PAIRS" "$CAND_SRC" "$DETECTION" "$SIGMA" \
-      "$BIN" "$CFG" "$CAM" "$PLAY_EXIT" "$PAIR_EXIT" "$REC_EXIT" "$RC_EXIT" <<'PY'
+      "$BIN" "$CFG" "$CAM" "$PLAY_EXIT" "$PAIR_EXIT" "$REC_EXIT" "$RC_EXIT" "$SCRIPTED" <<'PY'
 import hashlib, json, os, sys
 
 (rd, status, reason, term, bag, rate, drain, duration, max_pairs, cand_src, detection, sigma,
- binp, cfg, cam, play_x, pair_x, rec_x, rc_x) = sys.argv[1:]
+ binp, cfg, cam, play_x, pair_x, rec_x, rc_x, scripted) = sys.argv[1:]
 
 def sha(p):
     if not p or not os.path.exists(p):
@@ -105,6 +105,8 @@ rec = {
     "launch": {"rate": rate, "drain_s": drain, "duration_s": duration,
                "max_pairs": max_pairs, "candidate_source": cand_src,
                "detection": detection, "sigma_meas_m": sigma,
+               "scripted_triggers_s": scripted,
+               "run_mode": ("CONTROLLED_INTERFACE_TEST" if scripted else "ONLINE_DETECTION"),
                "group_model": "host and recovery node are children of one setsid supervisor"},
     "exit_codes": {"play": play_x, "supervisor": pair_x, "recovery_node": rec_x,
                    "roscore": rc_x},
@@ -193,6 +195,8 @@ CPDIR="$RUN_DIR/host_control"
 mkdir -p "$CPDIR"
 REC_ARGS=(--run-dir "$RUN_DIR" --candidate-source "$CAND_SRC" --scan-cap 6000 --detection "$DETECTION" --sigma-meas-m "$SIGMA" --icp-time-budget-sec "${ICP_BUDGET:-0}" --checkpoint-dir "$CPDIR" --checkpoint-period-sec "$SNAP_PERIOD")
 [ "$WAIT_LIMIT" != "0" ] && REC_ARGS+=(--wait-limit-sec "$WAIT_LIMIT")
+# CONTROLLED_INTERFACE_TEST: the declared trigger times replace the detector for this run.
+[ -n "$SCRIPTED" ] && REC_ARGS+=(--scripted-triggers "$SCRIPTED")
 [ "$DURATION" != "0" ] && REC_ARGS+=(--duration-sec "$DURATION")
 [ "$MAX_PAIRS" != "0" ] && REC_ARGS+=(--max-pairs "$MAX_PAIRS")
 
