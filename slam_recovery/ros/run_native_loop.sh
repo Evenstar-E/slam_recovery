@@ -264,6 +264,8 @@ checks["pairing"] = {
     "max_abs_dt_ns": p.get("max_abs_dt_ns"),
     "ok": bool(p.get("paired")),
 }
+_diag_only = not bool(s.get("detection_enabled", True))
+_det = s.get("warmup", {}).get("detection_status_counts", {})
 checks["nis_provenance"] = {
     "computed": n.get("computed"), "carried_forward": n.get("carried_forward"),
     "unavailable": n.get("unavailable"),
@@ -271,9 +273,13 @@ checks["nis_provenance"] = {
     "reference_prev_scan": n.get("reference_prev_scan"),
     "fed_to_step_frame": f.get("fed_to_step_frame"),
     "ingested_without_detection": f.get("ingested_without_detection"),
-    "detection_status": s.get("warmup", {}).get("detection_status_counts"),
-    "ok": bool(f.get("fed_to_step_frame")),
+    "detection_status": _det,
+    # With detection off, zero frames reach step_frame by design; the evidence that the pipeline
+    # ran is that frames were recorded as DISABLED_FOR_DIAGNOSIS and the NIS still got a source.
+    "ok": (bool(_det.get("DISABLED_FOR_DIAGNOSIS")) if _diag_only
+           else bool(f.get("fed_to_step_frame"))),
 }
+detection_on = bool(s.get("detection_enabled", True))
 checks["gate_reachable"] = {
     "episodes": q.get("episodes"), "decisions": q.get("decisions"),
     "accepted": g.get("accepted"), "rejected": g.get("rejected"),
@@ -282,7 +288,10 @@ checks["gate_reachable"] = {
                         for e in q.get("episode_detail", [])],
     "evidence_reasons": [e.get("paired_evidence", {}).get("reason")
                          for e in q.get("episode_detail", [])],
-    "ok": bool(q.get("decisions")),
+    # In diagnosis mode the gate is deliberately never reached: zero decisions is the correct
+    # outcome, not a wiring failure.
+    "status": "APPLICABLE" if detection_on else "NOT_APPLICABLE_DETECTION_OFF",
+    "ok": bool(q.get("decisions")) if detection_on else True,
 }
 checks["same_process_group"] = {
     "recovery_pid": int(rec_pid) if rec_pid.isdigit() else None,

@@ -1,0 +1,50 @@
+{
+ "checks": {
+  "both_topics_received": {
+   "pose_messages": 513,
+   "scan_messages": 599,
+   "ok": true
+  },
+  "pairing": {
+   "paired": 393,
+   "fraction_of_poses": 0.7660818713450293,
+   "fraction_of_scans": 0.656093489148581,
+   "max_abs_dt_ns": 39824962,
+   "ok": true
+  },
+  "nis_provenance": {
+   "computed": 392,
+   "carried_forward": 0,
+   "unavailable": 1,
+   "reference_node_map": 364,
+   "reference_prev_scan": 28,
+   "fed_to_step_frame": 0,
+   "ingested_without_detection": 0,
+   "detection_status": {
+    "AVAILABLE": 0,
+    "UNAVAILABLE": 0,
+    "DISABLED_FOR_DIAGNOSIS": 393
+   },
+   "ok": true
+  },
+  "gate_reachable": {
+   "episodes": 0,
+   "decisions": 0,
+   "accepted": 0,
+   "rejected": 0,
+   "errored": 0,
+   "incumbent_basis": [],
+   "evidence_reasons": [],
+   "status": "NOT_APPLICABLE_DETECTION_OFF",
+   "ok": true
+  },
+  "same_process_group": {
+   "recovery_pid": 2975847,
+   "host_pid": 2975846,
+   "recovery_pgid": 2975844,
+   "host_pgid": 2975844,
+   "ok": true
+  }
+ },
+ "all_ok": true
+}

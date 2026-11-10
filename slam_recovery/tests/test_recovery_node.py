@@ -379,6 +379,10 @@ def test_detection_off_grows_the_map_and_judges_nothing():
     assert len(node.tx_mgr.trusted_poses) > 0, "the map still grows"
     assert loop.records == []
     assert all(d["detection_status"] == "DISABLED_FOR_DIAGNOSIS" for d in loop.diag)
+    s = build_summary(loop, {})          # the summary must be writable with no decision at all
+    assert s["detection_enabled"] is False
+    assert s["quarantine"]["decisions"] == 0
+    assert s["pose_convention"]["one_frame_check"]["status"] == "NOT_REACHED"
 
 
 def test_nis_vs_map_size_bins_every_node_map_frame_once():

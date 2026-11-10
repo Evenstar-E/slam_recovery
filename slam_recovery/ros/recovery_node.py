@@ -517,6 +517,7 @@ class NativeClosedLoop:
         self.detection_counts = {"AVAILABLE": 0, "UNAVAILABLE": 0, "DISABLED_FOR_DIAGNOSIS": 0}
         self.ingested_undetected = 0
         self.first_detected_kf: Optional[int] = None
+        self.pose_convention_check: Dict[str, Any] = {"status": "NOT_REACHED"}
 
     # -- ingest -------------------------------------------------------------------------------
     def _fed(self, ts_ns: int) -> bool:
