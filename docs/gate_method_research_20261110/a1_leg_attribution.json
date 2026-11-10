@@ -14,7 +14,18 @@
  },
  "self_check": {
   "rows": 18,
-  "reproduced": 18,
+  "reproduced": 17,
+  "blocked_under_old_criterion": [
+   {
+    "run": "fl_native_20261110T054559Z_3073038",
+    "archived_reason": "Insufficient verified info; maintaining soft bridge while wa",
+    "replayed_leg": "mode2_if_cov_passes",
+    "accepted": null,
+    "reproduced": false,
+    "assumed_elapsed_s": 0.4398241260949126,
+    "blocked_under_old_criterion": true
+   }
+  ],
   "failed": [],
   "detail": [
    {
@@ -23,7 +34,8 @@
     "replayed_leg": "non_finite",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": null
+    "assumed_elapsed_s": null,
+    "blocked_under_old_criterion": false
    },
    {
     "run": "fl_native_20261110T030300Z_2932931",
@@ -31,7 +43,8 @@
     "replayed_leg": "non_finite",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": null
+    "assumed_elapsed_s": null,
+    "blocked_under_old_criterion": false
    },
    {
     "run": "fl_native_20261110T030656Z_2938083",
@@ -39,7 +52,8 @@
     "replayed_leg": "boundary",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": null
+    "assumed_elapsed_s": null,
+    "blocked_under_old_criterion": false
    },
    {
     "run": "fl_native_20261110T030931Z_2941380",
@@ -47,7 +61,8 @@
     "replayed_leg": "boundary",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": null
+    "assumed_elapsed_s": null,
+    "blocked_under_old_criterion": false
    },
    {
     "run": "fl_native_20261110T031851Z_2949682",
@@ -55,7 +70,8 @@
     "replayed_leg": "boundary",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": null
+    "assumed_elapsed_s": null,
+    "blocked_under_old_criterion": false
    },
    {
     "run": "fl_native_20261110T032515Z_2954170",
@@ -63,7 +79,8 @@
     "replayed_leg": "boundary",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": null
+    "assumed_elapsed_s": null,
+    "blocked_under_old_criterion": false
    },
    {
     "run": "fl_native_20261110T035239Z_3002102",
@@ -71,7 +88,8 @@
     "replayed_leg": "boundary",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": null
+    "assumed_elapsed_s": null,
+    "blocked_under_old_criterion": false
    },
    {
     "run": "fl_native_20261110T035544Z_3005906",
@@ -79,7 +97,8 @@
     "replayed_leg": "boundary",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": null
+    "assumed_elapsed_s": null,
+    "blocked_under_old_criterion": false
    },
    {
     "run": "fl_native_20261110T035825Z_3008585",
@@ -87,7 +106,8 @@
     "replayed_leg": "boundary",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": null
+    "assumed_elapsed_s": null,
+    "blocked_under_old_criterion": false
    },
    {
     "run": "fl_native_20261110T042426Z_3020861",
@@ -95,7 +115,8 @@
     "replayed_leg": "evidence_failed",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": null
+    "assumed_elapsed_s": null,
+    "blocked_under_old_criterion": false
    },
    {
     "run": "fl_native_20261110T043148Z_3025639",
@@ -103,7 +124,8 @@
     "replayed_leg": "evidence_failed",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": null
+    "assumed_elapsed_s": null,
+    "blocked_under_old_criterion": false
    },
    {
     "run": "fl_native_20261110T044250Z_3031393",
@@ -111,7 +133,8 @@
     "replayed_leg": "evidence_failed",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": null
+    "assumed_elapsed_s": null,
+    "blocked_under_old_criterion": false
    },
    {
     "run": "fl_native_20261110T044830Z_3036955",
@@ -119,7 +142,8 @@
     "replayed_leg": "info",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": 0.37862473612385805
+    "assumed_elapsed_s": 0.37862473612385805,
+    "blocked_under_old_criterion": false
    },
    {
     "run": "fl_native_20261110T050737Z_3052527",
@@ -127,7 +151,8 @@
     "replayed_leg": "evidence_missing",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": 0.2578996416190722
+    "assumed_elapsed_s": 0.2578996416190722,
+    "blocked_under_old_criterion": false
    },
    {
     "run": "fl_native_20261110T051542Z_3057611",
@@ -135,7 +160,8 @@
     "replayed_leg": "info",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": 0.37572771127709026
+    "assumed_elapsed_s": 0.37572771127709026,
+    "blocked_under_old_criterion": false
    },
    {
     "run": "fl_native_20261110T051744Z_3059939",
@@ -143,15 +169,17 @@
     "replayed_leg": "info",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": 0.4331221699941341
+    "assumed_elapsed_s": 0.4331221699941341,
+    "blocked_under_old_criterion": false
    },
    {
     "run": "fl_native_20261110T054559Z_3073038",
     "archived_reason": "Insufficient verified info; maintaining soft bridge while wa",
-    "replayed_leg": "cov_certified_by_archive",
-    "accepted": false,
-    "reproduced": true,
-    "assumed_elapsed_s": 0.4398241260949126
+    "replayed_leg": "mode2_if_cov_passes",
+    "accepted": null,
+    "reproduced": false,
+    "assumed_elapsed_s": 0.4398241260949126,
+    "blocked_under_old_criterion": true
    },
    {
     "run": "fl_native_20261110T054753Z_3075620",
@@ -159,7 +187,8 @@
     "replayed_leg": "non_finite",
     "accepted": false,
     "reproduced": true,
-    "assumed_elapsed_s": null
+    "assumed_elapsed_s": null,
+    "blocked_under_old_criterion": false
    }
   ]
  },
@@ -174,6 +203,7 @@
    "A_leg": "non_finite",
    "A_decision": false,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": null
   },
   {
@@ -186,6 +216,7 @@
    "A_leg": "non_finite",
    "A_decision": false,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": null
   },
   {
@@ -198,6 +229,7 @@
    "A_leg": "boundary",
    "A_decision": false,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": null
   },
   {
@@ -210,6 +242,7 @@
    "A_leg": "boundary",
    "A_decision": false,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": null
   },
   {
@@ -222,6 +255,7 @@
    "A_leg": "boundary",
    "A_decision": false,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": null
   },
   {
@@ -234,6 +268,7 @@
    "A_leg": "boundary",
    "A_decision": false,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": null
   },
   {
@@ -246,6 +281,7 @@
    "A_leg": "boundary",
    "A_decision": false,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": null
   },
   {
@@ -258,6 +294,7 @@
    "A_leg": "boundary",
    "A_decision": false,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": null
   },
   {
@@ -270,6 +307,7 @@
    "A_leg": "boundary",
    "A_decision": false,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": null
   },
   {
@@ -282,6 +320,7 @@
    "A_leg": "evidence_failed",
    "A_decision": false,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": null
   },
   {
@@ -294,6 +333,7 @@
    "A_leg": "evidence_failed",
    "A_decision": false,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": null
   },
   {
@@ -306,6 +346,7 @@
    "A_leg": "evidence_failed",
    "A_decision": false,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": null
   },
   {
@@ -318,6 +359,7 @@
    "A_leg": "mode2_if_cov_passes",
    "A_decision": null,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": "posterior_cov_norm"
   },
   {
@@ -330,6 +372,7 @@
    "A_leg": "evidence_missing",
    "A_decision": false,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": null
   },
   {
@@ -342,6 +385,7 @@
    "A_leg": "mode2_if_cov_passes",
    "A_decision": null,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": "posterior_cov_norm"
   },
   {
@@ -354,6 +398,7 @@
    "A_leg": "mode2_if_cov_passes",
    "A_decision": null,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": "posterior_cov_norm"
   },
   {
@@ -363,10 +408,11 @@
    "info_after": 45.98877320108639,
    "current_leg": "info",
    "current_decision": false,
-   "A_leg": "cov_certified_by_archive",
-   "A_decision": false,
+   "A_leg": "mode2_if_cov_passes",
+   "A_decision": null,
    "changes": false,
-   "blocked_on": null
+   "moved_to_blocked": true,
+   "blocked_on": "posterior_cov_norm"
   },
   {
    "run": "fl_native_20261110T054753Z_3075620",
@@ -378,6 +424,7 @@
    "A_leg": "non_finite",
    "A_decision": false,
    "changes": false,
+   "moved_to_blocked": false,
    "blocked_on": null
   }
  ],
@@ -392,17 +439,17 @@
   },
   "A_gate": {
    "boundary": 7,
-   "cov_certified_by_archive": 1,
    "evidence_failed": 3,
    "evidence_missing": 1,
-   "mode2_if_cov_passes": 3,
+   "mode2_if_cov_passes": 4,
    "non_finite": 3
   },
   "changed_decisions": [],
   "blocked_on_cov": [
    "fl_native_20261110T044830Z_3036955",
    "fl_native_20261110T051542Z_3057611",
-   "fl_native_20261110T051744Z_3059939"
+   "fl_native_20261110T051744Z_3059939",
+   "fl_native_20261110T054559Z_3073038"
   ]
  }
 }

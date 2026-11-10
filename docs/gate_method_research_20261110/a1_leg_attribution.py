@@ -97,7 +97,7 @@ def info_leg(row, rule):
     raise ValueError(rule)
 
 
-def decide(row, rule, assume_elapsed_s, cov_certified_failed=False):
+def decide(row, rule, assume_elapsed_s):
     """Three-valued: True accepted, False refused, None BLOCKED on the unarchived covariance.
 
     Leg order follows core.py: boundary, evidence, finite state, holdout, then Mode 2.
@@ -116,11 +116,6 @@ def decide(row, rule, assume_elapsed_s, cov_certified_failed=False):
         return False, "holdout"
     if not info_leg(row, rule):
         return False, "info"
-    if cov_certified_failed:
-        # Under the old criterion every other leg passed and the row was still refused, so the
-        # covariance leg is the one that refused it: ||P_after||_2 > sigma_tol is certified by the
-        # archived outcome even though the number itself was never recorded.
-        return False, "cov_certified_by_archive"
     return None, "mode2_if_cov_passes"      # ||P_after||_2 was never archived
 
 
@@ -147,35 +142,29 @@ def main(argv):
             if jump is not None and float(jump) > 0.5:
                 elapsed = (float(jump) - 0.5) / 2.0
         accepted, leg = decide(r, "old_absolute25", elapsed)
-        cov_failed = False
-        if accepted is None:
-            # Old gate reached the covariance leg and still refused -> the covariance leg is what
-            # refused. That resolves the otherwise-missing number, by inference from the outcome.
-            accepted, leg, cov_failed = False, "cov_certified_by_archive", True
-            r["_cov_certified_failed"] = True
-        reproduced = (
+        # Reaching the conjunction means every leg before the covariance passed. The row is then
+        # BLOCKED, not "covariance certified": the archived reason names no leg, and it is equally
+        # explainable by a covariance failure and by the record having been produced under a
+        # different criterion. Inferring "covariance failed" from that reason would be circular.
+        blocked_old = accepted is None
+        reproduced = not blocked_old and (
             (not accepted and leg == "info" and "Insufficient verified info" in archived)
             or (not accepted and leg == "boundary" and "beyond the boundary jump bound" in archived)
             or (not accepted and leg == "non_finite" and "non-finite" in archived)
             or (not accepted and leg == "evidence_failed" and "evidence FAILED" in archived)
             or (not accepted and leg == "evidence_missing" and "evidence MISSING" in archived)
-            # The Mode-2 fallback reason names no leg: it is what the gate prints when the
-            # conjunction fails, and the covariance leg is one of its terms. Reached-and-refused on
-            # the covariance leg therefore reproduces it.
-            or (not accepted and leg == "cov_certified_by_archive"
-                and "Insufficient verified info" in archived)
         )
         checks.append({"run": r["_run"], "archived_reason": archived[:60],
                        "replayed_leg": leg, "accepted": accepted, "reproduced": reproduced,
-                       "assumed_elapsed_s": elapsed})
+                       "assumed_elapsed_s": elapsed,
+                       "blocked_under_old_criterion": blocked_old})
 
     # --- current frozen gate vs A, on the same rows ---
     comparisons = []
     for r, chk in zip(rows, checks):
         elapsed = chk["assumed_elapsed_s"]
-        cov_failed = bool(r.get("_cov_certified_failed", False))
-        cur_acc, cur_leg = decide(r, "current", elapsed, cov_failed)
-        a_acc, a_leg = decide(r, "A_no_info", elapsed, cov_failed)
+        cur_acc, cur_leg = decide(r, "current", elapsed)
+        a_acc, a_leg = decide(r, "A_no_info", elapsed)
         comparisons.append({
             "run": r["_run"],
             "candidate_id": r.get("candidate_id"),
@@ -183,7 +172,11 @@ def main(argv):
             "info_after": r.get("weak_dir_info_after"),
             "current_leg": cur_leg, "current_decision": cur_acc,
             "A_leg": a_leg, "A_decision": a_acc,
-            "changes": (cur_acc != a_acc),
+            # A flip is a decision that goes from accepted to refused or back. Moving from
+            # "refused" to "unknown" is not a flip: the row is admitted only if the unarchived
+            # covariance passes, and that cannot be asserted either way.
+            "changes": (cur_acc is not None and a_acc is not None and cur_acc != a_acc),
+            "moved_to_blocked": (cur_acc is False and a_acc is None),
             "blocked_on": ("posterior_cov_norm" if (cur_acc is None or a_acc is None) else None),
         })
 
@@ -202,7 +195,10 @@ def main(argv):
         "self_check": {
             "rows": len(rows),
             "reproduced": sum(1 for c in checks if c["reproduced"]),
-            "failed": [c for c in checks if not c["reproduced"]],
+            "blocked_under_old_criterion": [c for c in checks
+                                            if c["blocked_under_old_criterion"]],
+            "failed": [c for c in checks if not c["reproduced"]
+                       and not c["blocked_under_old_criterion"]],
             "detail": checks,
         },
         "comparison": comparisons,
