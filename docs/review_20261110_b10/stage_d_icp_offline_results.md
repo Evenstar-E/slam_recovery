@@ -125,3 +125,14 @@ python3 -B docs/review_20261110_b10/run_icp_candidate_offline.py
 `icp_converged`、`icp_inliers`、`displacement_from_init_m`、`rotation_from_init_deg`、`status`，
 以及按状态分离的汇总 `summary_split_by_status`（该汇总由逐帧行事后重算，因为全量跑用的是
 分离汇总之前的版本）。
+
+## 6. B11 限制清单（三项，按裁决写定，不再找时效路径）
+
+1. **段级重配准 11.8 s，约为 2 s 确认边距的 6 倍。** 决策能完成但不实时；
+   压到 2 s 只有"改 §9"或"异步预计算"两条路，两者都改变实验定义，属新实验。
+2. **`ITERATION_LIMIT`，1e-6 在这套参考下达不到。** 残差停在参考分辨率下限
+   （离线 4–5 cm、线上 3.8 cm），`converged` 只作计数，不作质量指标。
+3. **修正量 0.459 m / 3.73° 是"对齐量"，不是"改进量"。** 过滤后那趟没有 GT，
+   位移不等于靠近真值；离线尾部（>1 m 15 帧、旋转 p99 21°）保持 `UNCONFIRMED`。
+
+范围说明：以上为 B11 的成本与有效性边界。**不据此下调任何阈值、不改 §9 六项参数。**
