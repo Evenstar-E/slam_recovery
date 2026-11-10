@@ -197,5 +197,22 @@
    "defect_found": "llround(d*1e9) multiplies into a 256 ns grid (ULP of d*1e9 at 1.6e18) while the double spacing at 1.6e9 s is 238 ns, so 274 of 4000 adjacent double pairs collapse to the same integer ns; the floor/frac split collapses 0 of 4000",
    "action": "to_ns_exact(): sec*1e9 + llround((d-sec)*1e9); ARRIVE keeps msg->header.stamp.toNSec(); optional extra key lid_dbl=<hex bits>"
   }
- ]
+ ],
+ "runtime_library_probe": {
+  "status": "BLOCKED",
+  "symptom": "ON run FAILed at startup: 'no /proc/<pid>/maps entry for liblaser_mapping.so'",
+  "peer_hypothesis": "the check ran too early (3 s after start); move it to after the drain",
+  "root_cause": "pid resolution, not timing: liblaser_mapping.so is a DT_NEEDED entry of fastlivo_mapping (readelf -d), so ld.so maps it before main; there is no window in which the node runs without it",
+  "evidence": [
+   "readelf -d fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping | grep NEEDED -> [liblaser_mapping.so]",
+   "ldd -> /home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+   "pgrep -f fastlivo_mapping also matches the rosrun wrapper, whose maps has no such entry"
+  ],
+  "required_fix": "iterate every pgrep candidate, skip the ones without the maps entry, retry for up to 30 s, and record pid + cmdline alongside path + sha in the run dir and receipt",
+  "why_not_move_to_end": "a fail-closed check at the end turns a few-seconds abort into a wasted full drain, which is the cost just paid"
+ },
+ "current_build": {
+  "library_sha256": "20df3d3f42400aec0c56387e55d027289f5117402837a712f2002da6e06c450f",
+  "verified_on_disk": true
+ }
 }
