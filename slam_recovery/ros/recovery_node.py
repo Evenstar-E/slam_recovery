@@ -123,6 +123,38 @@ def pose_to_matrix(translation, quaternion) -> np.ndarray:
     return T
 
 
+def _rotation_to_quaternion(R: np.ndarray) -> List[float]:
+    """Rotation matrix -> (x, y, z, w) without a scipy dependency."""
+    m = np.asarray(R, dtype=np.float64)
+    tr = m[0, 0] + m[1, 1] + m[2, 2]
+    if tr > 0.0:
+        s = np.sqrt(tr + 1.0) * 2.0
+        w = 0.25 * s
+        x = (m[2, 1] - m[1, 2]) / s
+        y = (m[0, 2] - m[2, 0]) / s
+        z = (m[1, 0] - m[0, 1]) / s
+    elif m[0, 0] > m[1, 1] and m[0, 0] > m[2, 2]:
+        s = np.sqrt(1.0 + m[0, 0] - m[1, 1] - m[2, 2]) * 2.0
+        w = (m[2, 1] - m[1, 2]) / s
+        x = 0.25 * s
+        y = (m[0, 1] + m[1, 0]) / s
+        z = (m[0, 2] + m[2, 0]) / s
+    elif m[1, 1] > m[2, 2]:
+        s = np.sqrt(1.0 + m[1, 1] - m[0, 0] - m[2, 2]) * 2.0
+        w = (m[0, 2] - m[2, 0]) / s
+        x = (m[0, 1] + m[1, 0]) / s
+        y = 0.25 * s
+        z = (m[1, 2] + m[2, 1]) / s
+    else:
+        s = np.sqrt(1.0 + m[2, 2] - m[0, 0] - m[1, 1]) * 2.0
+        w = (m[1, 0] - m[0, 1]) / s
+        x = (m[0, 2] + m[2, 0]) / s
+        y = (m[1, 2] + m[2, 1]) / s
+        z = 0.25 * s
+    q = np.array([x, y, z, w], dtype=np.float64)
+    return list(q / np.linalg.norm(q))
+
+
 def subsample(pts: np.ndarray, cap: int) -> np.ndarray:
     """Uniform stride subsample, so the retained index set is reproducible and order-preserving."""
     if len(pts) <= cap:
@@ -545,7 +577,7 @@ class CheckpointClient:
         if self.enabled:
             os.makedirs(self.dir, exist_ok=True)
 
-    def _write(self, cmd: str) -> Dict[str, Any]:
+    def _write(self, cmd: str, payload: str = "") -> Dict[str, Any]:
         """Write one command file. Fast enough for a callback thread; the ack is collected later."""
         path = os.path.join(self.dir, "cmd")
         ack = os.path.join(self.dir, "ack")
@@ -555,7 +587,7 @@ class CheckpointClient:
                 os.unlink(ack)
             tmp = path + ".tmp"
             with open(tmp, "w", encoding="utf-8") as fh:
-                fh.write(cmd + "\n")
+                fh.write(cmd + "\n" + payload + "\n")
             os.replace(tmp, path)
         except OSError as exc:
             event.update(ok=False, error=f"write: {exc}")
@@ -637,6 +669,22 @@ class CheckpointClient:
     def resume(self) -> Dict[str, Any]:
         """Let the host write its map again; the host side of the recovery loop's re-arm."""
         return self._send("resume")
+
+    def set_state(self, pose) -> Dict[str, Any]:
+        """Write an accepted pose back into the host, so it continues from there.
+
+        ``pose`` is 4x4 body-to-world, the same convention as every other pose here.
+        """
+        import numpy as np
+
+        T = np.asarray(pose, dtype=np.float64)
+        q = _rotation_to_quaternion(T[:3, :3])
+        payload = " ".join(f"{v:.9f}" for v in
+                           (T[0, 3], T[1, 3], T[2, 3], q[0], q[1], q[2], q[3]))
+        event = self._write("set_state", payload=payload)
+        if event.get("ok") is False:
+            return event
+        return self.collect() or event
 
     def stop(self) -> None:
         self._stopped = True
@@ -1034,6 +1082,13 @@ class NativeClosedLoop:
             action = self.cp.reprocess() if row.get("accepted") is True else self.cp.restore()
             self.cp_actions.append(action)
             ep.meta["native_checkpoint"] = action
+            if row.get("accepted") is True and ep.frames:
+                # An accepted repair is only accepted if the host continues from it: the last
+                # repaired pose becomes the host's state, and the next frames propagate from there.
+                writeback = self.cp.set_state(ep.frames[-1][2])
+                writeback["trigger"] = "accepted_pose"
+                self.cp_actions.append(writeback)
+                ep.meta["native_writeback"] = writeback
             # The decision is made; the next event needs its own trusted checkpoint.
             self.cp._last_snapshot_wall = time.time()
         return row
