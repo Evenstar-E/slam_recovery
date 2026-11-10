@@ -1,0 +1,120 @@
+{
+ "run_id": "fl_native_20261110T054559Z_3073038",
+ "parameters": {
+  "confirmation_margin_ns": 2000000000,
+  "pair_window_ns": 40000000,
+  "scan_cap": 6000,
+  "nis_radius_m": 3.0,
+  "extrap_frames": 5,
+  "sigma_meas_m": 0.884
+ },
+ "pairing": {
+  "pair_window_ns": 40000000,
+  "poses_received": 777,
+  "scans_received": 598,
+  "paired": 515,
+  "poses_unpaired": 262,
+  "scans_unpaired": 83,
+  "paired_fraction_of_poses": 0.6628056628056628,
+  "paired_fraction_of_scans": 0.8612040133779264,
+  "max_abs_dt_ns": 39959192,
+  "max_backlog_messages": 82,
+  "messages_considered": 1375,
+  "pairing_rule": "nearest pose within 40 ms, no pose reused"
+ },
+ "frames": {
+  "paired": 515,
+  "ingested": 515,
+  "fed_to_step_frame": 440,
+  "ingested_without_detection": 75,
+  "consumed_after_first_decision": 454,
+  "first_decision_ts_ns": 1627785267405517101
+ },
+ "quarantine": {
+  "episodes": 1,
+  "trigger_ts_ns": [
+   1627785265208036184
+  ],
+  "decisions": 1,
+  "second_and_later_events": 0,
+  "episode_detail": [
+   {
+    "index": 0,
+    "trigger_ts_ns": 1627785265208036184,
+    "deadline_ns": 1627785267208036184,
+    "decided": true,
+    "estimated_onset_ns": 1627785264974404716,
+    "quarantine_start_ns": 1627785262974404716,
+    "first_alarm_ts_ns": 1627785265074404716,
+    "frames_registered": 22,
+    "decision_basis": "confirmation_margin",
+    "candidate_frames": 22,
+    "incumbent_basis": {
+     "tail_frames_requested": 5,
+     "trusted_keyframes": 7,
+     "anchor_key": 6,
+     "velocity_mps": [
+      0.6051634257730792,
+      -0.04711279768798445,
+      -0.0057687656052618505
+     ],
+     "rotation_held": true,
+     "status": "CONSTANT_VELOCITY",
+     "tail_keys": [
+      2,
+      3,
+      4,
+      5,
+      6
+     ],
+     "anchor_timestamp_ns": 1627785262942770720
+    },
+    "paired_evidence": {
+     "num_paired_frames": 22,
+     "required_paired_frames": 8,
+     "candidate_keyframes": 22,
+     "pairable_frames": 22,
+     "frames_without_independent_reference": 0,
+     "reference_frames_from_candidate": 7,
+     "num_improved_frames": 22,
+     "improved_fraction": 1.0,
+     "wilson_lower_bound": 0.8904710490659667,
+     "approved": true,
+     "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+     "incumbent_mean_residual": 0.8738653140964522,
+     "candidate_mean_residual": 0.22970986632136353,
+     "reentry_pos_jump_m": 1.3796482521898252
+    },
+    "error": null,
+    "state_after": "WAITING_FOR_EVIDENCE",
+    "quarantine_still_open": true
+   }
+  ]
+ },
+ "gate": {
+  "accepted": 0,
+  "rejected": 1,
+  "errored": 0,
+  "modes": [
+   "MODE3_SOFT_BRIDGE_WAIT"
+  ],
+  "committed_key_total": 0,
+  "deferred_key_total": 0
+ },
+ "final_state": "WAITING_FOR_EVIDENCE",
+ "candidate_source": "host_poses",
+ "candidate_source_detail": {
+  "candidate_source": "host_poses",
+  "icp_seconds_total": 0.0,
+  "icp_candidates": 0,
+  "note": "the frozen 18-key stream stays at 18 keys; the ICP fields are written to icp_detail.jsonl and repeated here, because adding keys to some rows would break every consumer that parses by key",
+  "details": []
+ },
+ "runtime": {
+  "wall_sec": 83.363,
+  "peak_rss_kb": 321320,
+  "pose_messages": 777,
+  "scan_messages": 598,
+  "callback_error_count": 0
+ }
+}

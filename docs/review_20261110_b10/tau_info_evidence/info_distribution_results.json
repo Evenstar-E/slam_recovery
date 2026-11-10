@@ -1,0 +1,77 @@
+{
+ "protocol": "per-frame v^T Lambda v on each frame's own cloud, node preprocessing",
+ "fim_sigma_m": 0.075,
+ "scan_cap": 6000,
+ "tau_abs_min_under_test": 3.0,
+ "bags": {
+  "room02_2x2_O": {
+   "bag": {
+    "path": "/tmp/fastlivo/room02_2x2_O.bag",
+    "sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d"
+   },
+   "frames": 599,
+   "weak_dir_info": {
+    "min": 0.9086834315907766,
+    "p10": 2.1345973134135394,
+    "median": 30.12399219832064,
+    "p90": 36.233230790149506,
+    "max": 44.969399497351354,
+    "span_max_over_min": 49.488521451993655
+   },
+   "min_eig_rot": {
+    "min": 1.6078928415998184,
+    "median": 100.52982142931592,
+    "max": 213.9219984639387
+   },
+   "min_eig_trans": {
+    "min": 0.9086834315907821,
+    "median": 30.12399219832064,
+    "max": 44.96939949735135
+   },
+   "tau_abs_min_position": {
+    "value": 3.0,
+    "frames_below": 119,
+    "fraction_below": 0.1986644407345576,
+    "percentile_of_threshold": 19.86644407345576,
+    "reading": "threshold sits inside the range: 119 of 599 frames are below it"
+   }
+  },
+  "hall01_inj43_filtered": {
+   "bag": {
+    "path": "/tmp/fastlivo/hall01_inj43_filtered.bag",
+    "sha256": "c90300cb2911be53361645b037ba864f7aa9f9d1483905a9c5b757a4bd269178"
+   },
+   "frames": 598,
+   "weak_dir_info": {
+    "min": 1.6801548357689318,
+    "p10": 3.252508439094255,
+    "median": 40.43945915841262,
+    "p90": 45.63576067062318,
+    "max": 49.782182906337766,
+    "span_max_over_min": 29.62952095040377
+   },
+   "min_eig_rot": {
+    "min": 38.430710695222366,
+    "median": 837.3814514586138,
+    "max": 1467.363944454497
+   },
+   "min_eig_trans": {
+    "min": 1.6801548357689204,
+    "median": 40.43945915841262,
+    "max": 49.782182906337745
+   },
+   "tau_abs_min_position": {
+    "value": 3.0,
+    "frames_below": 46,
+    "fraction_below": 0.07692307692307693,
+    "percentile_of_threshold": 7.6923076923076925,
+    "reading": "threshold sits inside the range: 46 of 598 frames are below it"
+   }
+  }
+ },
+ "cross_bag": {
+  "median_ratio_hall_over_room": 1.3424335955267923,
+  "max_ratio_hall_over_room": 1.107023519610705,
+  "note": "if the two bags occupy different ranges, an absolute floor cannot serve both"
+ }
+}
