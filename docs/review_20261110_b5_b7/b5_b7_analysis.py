@@ -29,11 +29,20 @@ ROOT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else
 OUT_DIR = os.path.join(ROOT, "docs/review_20261110_b5_b7")
 ARCHIVE = os.path.join(ROOT, "docs/review_20261109_bbc3dcb")
 
-# What a per-candidate record must carry for B5/B7 to be computable at all.
-REQUIRED_FIELDS = ("candidate_id", "gate_accept", "gate_reject_reason", "independent_label")
+# The per-candidate record is frozen by r11070-c3 at docs/review_20261110_b10/
+# candidate_stream_schema.md (commit f20a546). B5/B7 consume it; they do not define their own.
+RECORD_SCHEMA = {
+    "path": "docs/review_20261110_b10/candidate_stream_schema.md",
+    "commit": "f20a546",
+    "decision_keys": ["candidate_id", "run_id", "mode", "accepted", "refusal_reason"],
+    "label_discipline": ("weak_dir_info_*, holdout_nis, paired_benefit_status are produced by the "
+                         "gate and are NOT labels"),
+}
+# Detection sets: deliberately broader than the frozen schema, so that "a decision exists but no
+# label does" is visible instead of being filtered out before it can be counted.
 ID_FIELDS = {"candidate_id", "candidate", "cand_id", "id"}
-DECISION_FIELDS = {"accepted", "accept", "rejected", "reject", "gate_accepted", "decision"}
-REASON_FIELDS = {"reason", "rejection_reason", "refusal_reason", "gate_reason"}
+DECISION_FIELDS = {"accepted", "accept", "rejected", "reject", "gate_accepted", "decision", "mode"}
+REASON_FIELDS = {"refusal_reason", "reason", "rejection_reason", "gate_reason"}
 LABEL_FIELDS = {"independent_label", "label", "gt_label", "quality_label", "harmful", "beneficial"}
 
 
@@ -198,10 +207,17 @@ def main():
             "confusion_matrix": "NOT COMPUTED (would require exactly the records that are absent)",
             "harmful_rejected": "UNAVAILABLE",
             "beneficial_rejected": "UNAVAILABLE",
-            "next_native_run_must_record": list(REQUIRED_FIELDS),
-            "note_on_scope": ("these four fields are the whole requirement: candidate identity, the "
-                              "gate's decision, its reason, and an independent label. No threshold, "
-                              "score or extra telemetry is needed."),
+            "record_schema": RECORD_SCHEMA,
+            "gaps_against_the_frozen_schema": [
+                "the frozen record carries the gate's decision (candidate_id, mode, accepted, "
+                "refusal_reason) but no independent label field, and no label file is named; the "
+                "label must be a separate artifact joined on (run_id, candidate_id), with its own "
+                "provenance, or the join becomes an unwritten convention",
+                "B7 additionally needs the segment a candidate sits in (normal / degraded / "
+                "recovery tail); no field carries it",
+            ],
+            "note_on_scope": ("the record format and the label discipline are frozen elsewhere; "
+                              "this analysis defines neither"),
         },
         "B7": {
             "status": "BLOCKED",

@@ -34,22 +34,22 @@
 `hall01_b4_cost_and_gap.json` 的 C3 侧 `wall_s = null`（provenance error：被引用的
 `/tmp/fl_run_...2414230` 其实是 room_02 的 filtered run），所以"中断"的耗时侧也不能引用。
 
-## 下一个原生运行必须补的记录（B5：就这四项，一项也不要多）
+## 下一个原生运行要补的记录
 
-每条候选一行：
+格式不在本文定义：r11070-c3 已冻结在
+`docs/review_20261110_b10/candidate_stream_schema.md`（`f20a546`），
+`candidate_id` / `mode` / `accepted` / `refusal_reason` 等都是那里的键，取那里的名字。
+该 schema 的三条纪律（门自己的 `weak_dir_info_*` / `holdout_nis` / `paired_benefit_status`
+不是标签；缺字段写 `null` 并计数；不为它新增计算）就是本文的口径，本文不再复述。
 
-| 字段 | 说明 |
-|---|---|
-| `candidate_id` | 候选标识 |
-| `gate_accept` | 门的决定，布尔 |
-| `gate_reject_reason` | 拒绝原因（门自己给出的字符串） |
-| `independent_label` | 独立标签（来自 GT 或独立 clean-run proxy，**不得**由门自己的 `info_after` / `holdout_nis` 生成） |
+对照该 schema，B5/B7 还差两处，且都不是"再加一套遥测"：
 
-B5 到此即可闭合：有害被拒 = `label=harmful & gate_accept=false`，有益被拒 = `label=beneficial & gate_accept=false`，
-两者都能给计数 + Wilson 区间（脚本里已有 `wilson(k, n, z=1.645)`，样本不足时只报 `k/n`）。
-
-B7 需要的是同一批记录，**外加这一行属于哪个段**（正常 / 退化 / 恢复尾）。没有段标签，
-即使四项齐全，B7 的分区仍然做不出来——这是 B7 与 B5 唯一的数据差别，不是第二套遥测。
+1. **标签没有落地字段**。schema 里没有 `independent_label`，也没有指明标签文件的路径/来源。
+   纪律 1 说标签来自 GT 或独立 clean-run proxy，但这份记录本身不带它。可行做法是按
+   `(run_id, candidate_id)` 与一个独立标签产物做 join，并把该产物的 provenance 写进结果；
+   否则"标签从哪来"又会变成一条口头约定。
+2. **没有段标签**。B7 要按 正常 / 退化 / 恢复尾 分区，schema 里没有任何键表示一个候选属于哪一段。
+   B5 不受影响，B7 不能分区。
 
 ## 复现
 
@@ -58,4 +58,10 @@ python -I docs/review_20261110_b5_b7/b5_b7_analysis.py .
 # B5 BLOCKED / decision_and_label_records=0 / decision_only_records=1 / B7 BLOCKED
 ```
 
-脚本是只读的：不写归档、不改阈值、不生成任何替代标签。
+脚本是只读的：不写归档、不改阈值、不生成任何替代标签；重跑逐字节一致。
+
+## 计数分母
+
+本项目里"计数"与"帧数"不是一回事：LIVO 每帧切两次（一次带 IMU、一次只带图像），
+`GROUP` 数不等于帧数。B5 的分母是**独立标签判为有害/有益的候选数**，B7 的分母是**某段的候选数**，
+两者的分母都由记录本身给出并写进结果，不从其它计数换算。样本不足时只报 `k/n`，不报比例。

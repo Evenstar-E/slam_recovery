@@ -33,13 +33,23 @@
   "confusion_matrix": "NOT COMPUTED (would require exactly the records that are absent)",
   "harmful_rejected": "UNAVAILABLE",
   "beneficial_rejected": "UNAVAILABLE",
-  "next_native_run_must_record": [
-   "candidate_id",
-   "gate_accept",
-   "gate_reject_reason",
-   "independent_label"
+  "record_schema": {
+   "path": "docs/review_20261110_b10/candidate_stream_schema.md",
+   "commit": "f20a546",
+   "decision_keys": [
+    "candidate_id",
+    "run_id",
+    "mode",
+    "accepted",
+    "refusal_reason"
+   ],
+   "label_discipline": "weak_dir_info_*, holdout_nis, paired_benefit_status are produced by the gate and are NOT labels"
+  },
+  "gaps_against_the_frozen_schema": [
+   "the frozen record carries the gate's decision (candidate_id, mode, accepted, refusal_reason) but no independent label field, and no label file is named; the label must be a separate artifact joined on (run_id, candidate_id), with its own provenance, or the join becomes an unwritten convention",
+   "B7 additionally needs the segment a candidate sits in (normal / degraded / recovery tail); no field carries it"
   ],
-  "note_on_scope": "these four fields are the whole requirement: candidate identity, the gate's decision, its reason, and an independent label. No threshold, score or extra telemetry is needed."
+  "note_on_scope": "the record format and the label discipline are frozen elsewhere; this analysis defines neither"
  },
  "B7": {
   "status": "BLOCKED",
