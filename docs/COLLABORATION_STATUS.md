@@ -347,3 +347,17 @@ S4已将真实裁决写入共同入口并发布，不代跑/不选方案；本�
 S1/S2报告当前具体改动/已启动运行，沿原预算收尾并保存代码/结果；未开工直接转，已BLOCKED给具体断点不无限等。随后核已有FAST-LIO2/MM-LINS/FAST-LIVO2真实checkpoint/重处理/内部地图写回/接回重武装调用点，选择最低真实新增工作且可验证的一个宿主；不按好ATE挑有利结果，不等检测/门全部完善，不新起多宿主矩阵。S1集成/manager单写责任保持，S2选定宿主实现与运行，S3门实验独立继续不挡主线。
 
 下一实质交付附在手任务结果、实际接口表/选定理由及实现，或第一具体断点；受控接口两事件测试与自动原生链严格分开，完整流程首次完成单独汇报。本机本次是首次发布该转向，不宣称远端已收尾/转向/换宿主；实际会话branch/未提交/进程/收到要求仍待回报。
+
+## 33. 17:20 实质交付：checkpoint 冒烟 PASS、宿主选定 LIVO、A/B/C 收口
+
+以下均为实际提交/实测，不是任务发布。
+
+| 项 | 实际状态 |
+|---|---|
+| S2 原生 checkpoint | `590aa50`（合入 `4aac70c`）：深拷贝 10734 voxels / 21349 nodes / 210985 pts（ack 0.086 s）；回滚逐值相同；8 帧重放走 `processImu`+`handleLIO`+`UpdateVoxelMap` 0.358 s。**未实现**：修复测量注入、隔离期停写图 |
+| 宿主选择 | S1 `055b200`：继续 FAST-LIVO2（LIO 主路径）。理由：唯一已有实测 checkpoint/restore/reprocess；视觉地图 LIO 模式不读；MM-LINS 组件齐全但未跑通。重开条件写在文档里 |
+| 第一断点 | **隔离期宿主仍写图**：`restore` 只在回滚瞬间成立，下一帧 `UpdateVoxelMap` 把污染写回。S2 下一步（`handleLIO` 门控 + `sync_packages` 处置） |
+| A/B/C | 分支 `exp/gate-method-research@545340f` 已推远端。A 0 翻转/4 BLOCKED；B 两版负结论（吸收比 49.9×、覆盖 0.291）；C 定位到评价样本，补丁使复制输入逐位不变（1.121），但 `min_eig_trans` 40.91→1.12（−36×）⇒ `tau_abs_min` 必须重导 |
+| 裁决 | C 补丁**暂不集成**（版本化后再入，确认性运行前重导 floor）；A 不删；B 搁置。S3 研究任务收口 |
+| 主链状态 | `main@5bae7bf`；双事件包 `/tmp/fastlivo/hall01_two_event_v1.bag`（`c3e905da…`）保留；原生两事件**尚未开始** |
+| 已知交付缺陷 | `test_checkpoint_client.py` 为 pytest 风格，`unittest discover` 发现 0 项；已要求 S2 改为 TestCase |
