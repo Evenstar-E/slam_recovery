@@ -278,6 +278,188 @@ query 样本相同。脚本 `run_raw_vs_repaired.py`，结果 `raw_vs_repaired_r
 
 
 
+
+## 12. 速率诊断（第一版，已作废）
+
+> 结论 `SCHEDULING_CONTENTION` 已撤回：那段 30 s 片段从 `1627785269.996` 起，跳过约 8.92 s 健康前缀，
+> 宿主是冷启动重新初始化的；而且只报了 load average，没有记录可运行等待。以下 §12b 为准。
+
+## 12b. 受控 vs 非受控重做（完整前缀）
+
+脚本 `run_rate_diagnosis.py` / `run_rate_controlled.py`，结果 `rate_controlled_results.json`。
+片段从**原始输入起点** `1627785261.0` 起（39 s），覆盖两段缺帧区间与邻段。A 非受控（load 中位 291.6，
+procs_running 峰 117），B 受控（`taskset` 到启动时最空闲的 8 核，load 中位 102.4）。
+
+| | A 非受控 | B 受控 |
+|---|---:|---:|
+| odom 中位间隔 | 66.66 ms | 66.66 ms |
+| 慢间隔（>100 ms） | 63 / 503 | 63 / 503 |
+| 段1内 / 邻段慢比例 | 43.30% / 4.70% | 43.30% / 4.70% |
+| 慢间隔**布尔掩码** | — | **与 A 相同**（不是完整序列逐位） |
+| 节点运行队列等待占比 | 1.19% | 2.06% |
+
+注入起点两侧（两次运行一致）：之前 **0.0%**，之后 **20.86%**，首个慢间隔在 onset + 0.274 s。
+
+**判定：`CONTENTION_WEAKENED`** —— 受控运行下慢发布没有消失，故不支持调度争用；慢间隔随注入内容出现，
+内容效应只记 **SUSPECTED**（同一 filtered clip，无 clean/未过滤对照），不在此链上继续排障。
+
+## 13b. room_02 独立序列确认（结论：不支持净收益）
+
+协议 `docs/MILESTONE_fixed_input_repair.md` @ 107c05a。参考面 **`CLEAN_RUN_FROM_RAW_WINDOW`**：
+从 `M2DGR/raw/room_02.bag`（sha `ee621ccb…`）同转换、同窗口、零注入重建 clean 窗口（sha `809b98f1…`），
+再跑 FAST-LIVO2（标准带图像 config，receipt `room02_clean_run_receipt.json`，864 条 odometry，OK）。
+
+oracle 窗（逐帧 buffer 相等）：599 帧中 **199 帧不同**，`1627643759.554–1627643779.393`；窗外 400 帧字节相同。
+冻结总体：primary scans 599、healthy prefix 171、quarantine keys 398、frame set **326**（缺 72，全部
+`NO_RERUN_POSE_UNDER_THE_75MS_RULE`）。
+
+| | R（原始+宿主） | C3（过滤+重估） |
+|---|---:|---:|
+| 覆盖代理点 / 比例 | 6 617 272 / 0.7672 | 5 995 707 / **0.6952** |
+| patch unsupported | 37 370 / 0.4585 | 53 705 / **0.6590** |
+
+新增 64 315（10 724 sup / 53 591 unsup），其中 novel 53 027（**60 / 52 967**）；lost 49 160（15 028 sup）。
+服务完整度 326/398 = 0.8191；健康区删除 919 702 / 20 576 778（4.47%，52 帧）。
+判据两条都不满足 → **`SAME_FRAME_COMPARISON_DOES_NOT_SUPPORT_NET_BENEFIT`**。
+
+## 13c. 五臂分解（按时间分区）
+
+脚本 `run_room02_decomposition.py`，结果 `room02_decomposition_results.json`。
+oracle 为逐行 diff（注入帧与同戳 clean 帧不同的行即注入点），精确而非几何模型。
+
+| 臂 | 扫描 | 位姿 | 窗内 unsup | 窗外 unsup | 覆盖 |
+|---|---|---|---:|---:|---:|
+| A | raw | 宿主 | 0.7259 | 0.2879 | 0.7672 |
+| B | raw | clean 参考 | 0.7353 | 0.0039 | 0.9990 |
+| C | oracle | clean 参考 | **0.0094** | 0.0039 | 0.9988 |
+| D | filter | clean 参考 | **0.0111** | 0.0045 | 0.9988 |
+| E | filter | 重估 | 0.1246 | **1.0000** | 0.6952 |
+
+Delta（全集 / 窗内 / 窗外）：A→B −0.1697 / +0.0095 / −0.2841；B→C −0.2828 / **−0.7259** / 0.0000；
+C→D +0.0010 / +0.0016 / +0.0006；D→E +0.6519 / +0.1135 / **+0.9955**。
+
+读法限定：E 的窗外 1.0000 是轨迹崩掉后的后果，不是独立的窗外分区发现；失效起点是窗内 0.1246。
+C/D 用 clean 参考位姿、与评价 proxy 同源，绕过宿主从 actual-filter 观测估计状态，因此**不能据此排除"过滤器→状态"**。
+
+## 13d. E_actual vs E_oracle vs E_hybrid
+
+脚本 `run_e_oracle_vs_actual.py`，结果 `room02_e_oracle_results.json`。共同集 **323 帧**（不是 326），
+GT 匹配 317。ATE 为 **`FULL_ALIGNMENT_DIAGNOSTIC`**，冻结前缀协议数字单列。
+
+| 臂 | 覆盖 | unsupported | ATE（FULL_ALIGNMENT_DIAGNOSTIC） |
+|---|---:|---:|---:|
+| E_actual | 0.6951 | 0.6649 | 315.16 m |
+| E_oracle | 0.9988 | 0.0073 | 0.074 m |
+| E_hybrid（窗内 oracle + 窗外 filter） | 0.9988 | **0.0069** | — |
+
+E_hybrid 保留了过滤器在健康区的全部 919 702 点删除仍与 oracle 等价 → 健康区误删不是原因。
+逐行审计（窗内）：背景行 1 186 220，过滤器保留 1 162 613（98.0%）、误删 23 607（1.99%）、
+漏掉注入行 1 265（FNR = 1 265 / 9 073 943 = **0.00013941**；旧量 1 265/1 186 220 改名为
+`background_normalized_residual_rate`）。
+
+## 13e. 单因素 2×2（每格 2 次）
+
+四包由预注册流程生成并经等价核验；本机同 runner/prefix/config 每格 2 次，8 份 receipt 入库。
+
+| 格 | rep1 ATE | rep2 ATE | fail 次数 | 稳定 |
+|---|---:|---:|---:|---|
+| O | 0.072 | 14.439 | 1/2 | 否 |
+| O+F | 593.026 | 14.872 | 2/2 | 是 |
+| O−B | 48.847 | 19.673 | 2/2 | 是 |
+| O+F−B | 554.561 | 0.301 | 1/2 | 否 |
+
+预注册要求"O+F−B 两次 fail 且 O+F、O−B 都不 fail"才可称交互；实际 O+F 与 O−B 都 2/2 fail →
+**`NOT_A_CLEAN_INTERACTION`**，且 O 与 O+F−B 各自跨模式 → 运行方差主导，四格 UNKNOWN。
+
+## 13f. 双稳概率（同一格 4 次，只改运行次序）
+
+| 格 | 4 次模式 | 跨模式 | 合并先前 2 次（n=6） |
+|---|---|---|---|
+| O | BAD, GOOD, BAD, BAD | 是 | GOOD 2 / BAD 4 |
+| O+F−B | UNCLEAR, UNCLEAR, BAD, BAD | 是 | GOOD 1 / BAD 3 / UNCLEAR 2 |
+
+两格都跨模式 → **`SEQUENCE_UNUSABLE_FOR_SINGLE_RUN`**。不是非黑即白：O+F−B 的两次 UNCLEAR
+（unsupported 0.114 / 0.190，ATE 0.69 / 1.93）说明"双稳"是连续分布的两端。
+
+## 13g. 非确定性来源（源码阅读）
+
+详见 `FAST_LIVO2_variance_sources.md`：
+S1 `src/vio.cpp:1554` OpenMP 归约（浮点求和顺序随调度）；S2 `CMakeLists.txt:46-58` 自动开 `MP_EN`、
+`omp_set_num_threads()` 写死使 `OMP_NUM_THREADS` 无效；S3 `src/LIVMapper.cpp:537` 5 kHz 墙钟轮询 +
+`sync_packages`；S4 `imu_int_frame: 30` 的 IMU 初始化窗口由 S3 决定；S5 4 ms 墙钟定时器；
+S6 无随机数、队列 200000 不丢消息、odometry 时间戳非墙钟。
+
+## 13h. T1：关掉 OpenMP 并行（只改 MP_EN）
+
+`option(NO_MP)` 默认 OFF，两处 `#ifdef MP_EN` → `#if defined(MP_EN) && !defined(NO_MP)`，加一行启动日志。
+旧 binary `ca1959c4…` 已备份；新 binary `6e0a3e57…`；rate/config/prefix/bag/runner 未动。
+
+同格 O 两次：r1 GOOD（0.9467 / 0.0960 / 0.309 m），r2 BAD（0.6767 / 0.6913 / 336.75 m）。
+对齐首帧差 1.13 cm（且两次首帧 stamp 相同，均为 onset 帧），但**跨模式** → `GO_TO_T2`。
+注：`first_stamps` 记的是 onset 帧，首输出应看 receipt 的 `output.first_stamp_sec`。
+
+## 13i. T2：串行 + 固定核 + 低负载
+
+`taskset -c 0-7` + 同 nice + 机器空闲（load 中位 52.1 / 128 核）。r1 GOOD（0.9988 / 0.0067 / 0.072 m），
+r2 BAD（0.6933 / 0.6552 / 17.910 m）。对齐首帧差 **1.9 mm**，仍跨模式 → `GO_TO_T3`。
+
+三组对照：归档 1.6–2.9 cm、T1 1.13 cm、T2 1.9 mm，首帧压到毫米级仍分叉 → 种子不是归约顺序、不是调度/负载。
+
+## 13j. T3a：去掉墙钟相位依赖（`DET_SYNC`）
+
+`AsyncSpinner(1)` 接管回调，主循环在条件变量上阻塞（20 ms 兜底），lidar 回调释放锁后 notify；
+`option(DET_SYNC)` 默认 OFF。其余保持 T2。
+
+| build | runs | 模式 | ATE |
+|---|---|---|---|
+| A（exec `76359f53` + lib X） | 2 | GOOD, GOOD | 0.073 / 0.311 m |
+| B（exec `76359f53` + lib `6337ec0f`） | **4** | **BAD, BAD, GOOD, GOOD** | 24.17 / 17.36 / 0.071 / 0.073 m |
+
+同一 build 跑四次再次分叉 → S3 未被确立为种子。provenance 教训：两轮可执行文件 sha 相同，行为在
+`liblaser_mapping.so` 里，receipt 只记 exec sha 不够，结果中已补 `library_sha256`。
+`room02_T3a_results.json` 的 `S3_ACCEPTED_AS_SEED` 指 build A 两次，已标 `superseded_by`。
+
+**止损触发**：T1/T2/T3a 三个单变量控制都做完方差仍在，停止"剩下的只有 X"的排除法。
+
+## 13k. 适用性检查：hall_01 干净序列 4 次
+
+同 build B、同 `NO_MP`+`DET_SYNC`、`taskset 0-7`、低负载，在不注入的 `hall01_100_160.bag` 上跑 4 次；
+参考面为 hall_01 干净跑地图 5 cm 体素降采样（2 422 718 点 / 8 490 000），四次同一共同帧集（562/566）。
+
+| run | NN supported | patch unsupported |
+|---|---:|---:|
+| r1 | 1.0000 | 0.2282 |
+| r2 | 1.0000 | 0.2790 |
+| r3 | 1.0000 | 0.2427 |
+| r4 | 1.0000 | 0.2715 |
+
+四次按 0.10/0.50 都是 UNCLEAR（阈值对 hall_01 太粗），但原始值只跨 **0.0508**，NN supported 全 1.0000；
+对照 room_02 的 0.007 vs 0.66–0.69（跨度 0.68）→ **`STABLE_ON_HALL01_ROOM02_IS_SEQUENCE_SPECIFIC`**。
+限定：该阈值是 room_02 分布的形状，不能跨数据集硬套；结论基于原始值与 NN，不是"四次同 mode"；
+hall_01 无注入、窗口 100–160 s、参考是干净跑 proxy 非 GT、n=4；只界定现象不解释根因。
+
+## 13l. hall_01 B4：运行成本与缺测敏感性
+
+| 臂 | 运行身份 | rate / drain | wall time | 峰值内存 |
+|---|---|---|---:|---|
+| R | `/tmp/run43.sh:14` → `fl_record.sh`（pre-runner，无 receipt） | 0.5 / 150 s | 296 s（*派生*） | UNAVAILABLE |
+| C3 | `fl_run_20261109T105559Z_2414230/receipt.json` | 1.0 / 40 s | 122.9 s（*实测*） | UNAVAILABLE |
+
+峰值内存两项不可得（旧脚本不采样、硬化 runner 未采 `VmHWM`），列为待补字段，不回填。
+
+缺测敏感性（剔除与 46 个缺测帧相距 <1 s 的 81 帧，400 → 319）：
+
+| 臂 | coverage | patch unsupported | full-ATE |
+|---|---|---|---|
+| R 全部 400 → 319 | 0.6278 → 0.7977 | 0.5986 → 0.4200 | 1.909 → 1.617 m |
+| C3 全部 400 → 319 | 0.9850 → 0.9759 | 0.0957 → 0.0975 | 0.319 → 0.274 m |
+
+缺测邻域只占 81 帧却把 R 拉高 0.18 / 0.29 m，C3 几乎不动 → **排序不变，46 帧缺测不承担结论**。
+本表 coverage 用不截断的完整干净参考面（0.6278→0.9850），四臂表用 12 万点 proxy（0.6038→0.9849）。
+
+
+## 14. 复现
+
 ```bash
 python3 -B docs/review_20261109_bbc3dcb/run_fixed_input_repair_c0c3.py filter-audit
 python3 -B docs/review_20261109_bbc3dcb/run_fixed_input_repair_c0c3.py measure
