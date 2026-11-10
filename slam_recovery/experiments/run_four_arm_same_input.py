@@ -70,6 +70,9 @@ ONSET_NS = None           # integer nanoseconds: the segment split uses these
 INJ_END_NS = None
 VOXEL = 0.10
 SURF_TOL = 0.15
+# Auxiliary surface check only: the primary metrics stay on the 120k stride surface.
+PROXY_VOXEL = 0.05
+PROXY_CELL = 0.25
 MAX_KF_POINTS = 15000
 NEAR_DT = 0.020
 MAX_GAP = 0.075
@@ -394,6 +397,20 @@ def bootstrap_tail(kf_dists, thresholds=(0.25, 0.5, 1.0, 2.0), n_boot=1000, seed
     return out
 
 
+def voxel_downsample(points, size):
+    """One representative point per occupied cube, for the auxiliary surface check.
+
+    A stride subsample keeps 1.4% of the cloud; this keeps every part of the surface at the
+    stated resolution, so distances measured against it are not inflated by sampling.
+    """
+    pts = np.asarray(points, dtype=np.float64)
+    if len(pts) == 0:
+        return pts.reshape(0, 3)
+    keys = np.floor(pts / float(size)).astype(np.int64)
+    _, first = np.unique(keys, axis=0, return_index=True)
+    return pts[np.sort(first)]
+
+
 def voxels(points):
     if len(points) == 0:
         return set()
@@ -528,6 +545,10 @@ def main():
         proxy_pts_all = proxy_pts_all[:: max(1, len(proxy_pts_all) // 120000)][:120000]
     proxy_grid = NearestGrid(proxy_pts_all)
     proxy_surface = voxels(to_gt_frame(cln_kfs, np.eye(3), np.zeros(3)))
+    # Auxiliary: the same measurements on a surface that is not 98.6% discarded. Reported
+    # beside the primary numbers, never in place of them.
+    aux_pts = voxel_downsample(to_gt_frame(cln_kfs, np.eye(3), np.zeros(3)), PROXY_VOXEL)
+    aux_grid = NearestGrid(aux_pts, cell=PROXY_CELL)
 
     def _half_cloud(kfs, parity):
         return to_gt_frame(kfs, np.eye(3), np.zeros(3))[parity::2]
@@ -711,6 +732,9 @@ def main():
     floor_flat = np.concatenate(floor_d) if floor_d else np.zeros(0)
     floor_stats = distance_stats(floor_flat)
     floor_boot = bootstrap_tail(floor_d)
+    floor_d_aux = [aux_grid.query(kf_points(i), max_r=2.5) for i in floor_ids]
+    floor_stats_aux = distance_stats(np.concatenate(floor_d_aux) if floor_d_aux
+                                     else np.zeros(0))
     floor_vox = voxels(np.vstack([world_points(inj_kfs[i]) for i in floor_ids]) @ R_ic.T + t_ic)
     floor_vox_unsup = unsupported_fraction(floor_vox, proxy_surface)
     floor_vox_cov = coverage_recall(proxy_surface, floor_vox)
@@ -724,6 +748,8 @@ def main():
         flat = np.concatenate(kd) if kd else np.zeros(0)
         stats = distance_stats(flat)
         boot = bootstrap_tail(kd)
+        kd_aux = [aux_grid.query(kf_points(i), max_r=2.5) for i in ids]
+        stats_aux = distance_stats(np.concatenate(kd_aux) if kd_aux else np.zeros(0))
 
         admitted_ts = np.asarray([inj_kfs[i]["ts"] for i in ids])
         admitted_xyz = np.asarray([inj_kfs[i]["pose"][:3, 3] for i in ids])
@@ -747,6 +773,7 @@ def main():
             "admitted_duration_sec": round(float(admitted_ts[-1] - admitted_ts[0]), 2) if len(ids) else 0.0,
             "distance_stats": stats,
             "distance_tail_bootstrap": boot,
+            "distance_stats_voxel_surface": stats_aux,
             "coverage_sweep": cov,
             "ate_on_common_support_m": round(ate_common, 4) if n_common else None,
             "ate_on_common_support_frames": n_common,
@@ -821,6 +848,19 @@ def main():
                 "across_run_pre_onset": cross_floor,
                 "use": "an arm difference must exceed the across-run floor to count as a finding",
             },
+        },
+        "auxiliary_surface_check": {
+            "what": ("the same distance measurements on a 5 cm voxel surface instead of the 120k "
+                     "stride surface; the primary coverage/unsupported numbers are unchanged and "
+                     "this block does not replace them"),
+            "voxel_m": PROXY_VOXEL, "grid_cell_m": PROXY_CELL,
+            "surface_points": int(len(aux_pts)),
+            "legacy_surface_points": int(len(proxy_pts_all)),
+            "floor": {"legacy": floor_stats, "voxel": floor_stats_aux},
+            "why": ("the stride surface keeps 1.4% of 8.49M points, which inflates every distance "
+                    "to it; the voxel surface bounds how much of the floor was sampling"),
+            "fields": {"distance_stats": "primary, 120k stride surface",
+                       "distance_stats_voxel_surface": "auxiliary, 5 cm voxel surface"},
         },
         "validation_reference_source": {
             "A0_Host_Native": "none (no gate)",
