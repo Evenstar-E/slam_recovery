@@ -30,12 +30,32 @@
 |---|---|---|
 | 深拷贝 | 10734 voxels / 21349 nodes / **210985 points**，ack 0.086 s | **PASS** |
 | 恢复回滚 | live 10773 voxels / 212255 points → **10734 / 210985**（与快照逐值相同），状态回到 `2.007873,1.127087,0.097816` | **PASS** |
-| 重放 | 8 帧经宿主 `handleLIO` 重新估计并写回 map，0.358 s | **PASS** |
+| 重放 | 8 帧经宿主 `handleLIO` 重新估计并写回 map，0.358 s。**该 PASS 已被 §2b 的重复实验取代**（当时未记录逐帧点数） | **SUPERSEDED** |
 | 修复测量注入 | 未实现：宿主只吃自己预处理出的点云 | **NOT_IMPLEMENTED** |
 | 隔离期间地图停写 | 未实现：host 仍在每帧 `UpdateVoxelMap` | **NOT_IMPLEMENTED** |
 
 耗时说明：ack 延迟含宿主 20 ms 轮询间隔，是拷贝本体的**上界**；2 s 滚动周期下开销可忽略。
 产物：`/tmp/s2_native_checkpoint/{host_smoke.log,smoke_results.json,fastlivo2_worktree.diff,native_checkpoint.h,native_checkpoint.cpp}`。
+
+## 2b. 对上面那条"重放 PASS"的复核（浅拷贝修复之后）
+
+§3g 发现捕获是浅拷贝之前，"8 帧重放 PASS"没有记录**逐帧点数**——而这正是空跑与真跑的分界。
+深拷贝修好后用同一条 `smoke_checkpoint.sh` 重跑：
+
+| 项 | 实测 |
+|---|---|
+| 重放帧数 | 8（**LIO 4 帧 + VIO 4 帧**） |
+| LIO 帧中有点云的 | **4 / 4**（empty=0） |
+| 去畸变点总数 | 143780 |
+| 重放前地图（restore #2 之后） | 10281 voxels / 202023 points |
+| 重放后地图 | **10484 voxels / 206751 points**（+203 / +4728） |
+| 重放耗时 | §2 记录 0.358 s；本轮未单独计时 |
+
+结论要精确，不能一刀切：
+
+- **旧的 8 帧 PASS 不是空跑**——当时地图确实从 10734 增到 11284 voxels，说明帧里有被处理的点；
+- **但它是未经验证的**：当时没有逐帧点数，而浅拷贝 bug 已在同一条路径上被证明存在（§3g 的 control 一个顶点都没写）；
+- 因此 §2 那条 **标记为 SUPERSEDED**，由本节的重复实验替代，数字不悄悄改。
 
 ## 3. FAST-LIVO2 接口事实表（只给事实）
 
@@ -295,6 +315,50 @@ control 重放终态 **−12.644**，而同刻 live 是 **6.49** —— 差 19 m
 所以 217–230 = **整趟被并进各组的扫描总数**，`multi_scan_groups = 0` = **没有任何一组合并 ≥2 条**——
 两者并不矛盾：217 条扫描分散在 217 个各自只并 1 条的组里。但这两个计数是**整趟累计**，不是
 按重放窗口统计；用它们排除"合并假设"只在本窗口有效。
+
+## 3j. 重放路径与 live 路径**不完全一致**（必须写明的差异）
+
+"7.3 cm"是**保真**，不是**复现**。已知差异：
+
+1. **累积舍入与线程**：宿主是 `MP_EN`（OpenMP 4 线程）构建，同一输入不保证 bit-exact 归约顺序；
+2. **重放时的地图已含 live 期间的全部观测**（restore 只回到 checkpoint，之后 live 又处理的部分在回滚时被丢弃，重放走的是同一条确定性路径，但地图的插入顺序与 live 不完全相同）；
+3. **IMU 预处理只恢复四个跨帧量**（`last_imu`、`last_prop_end_time`、`acc_s_last`、`angvel_last`），`IMUpose` 只用于输出、不参与传播；若将来把 `IMUpose` 接入估计，这项差异会变化；
+4. **VIO 组不重放点云**：重放里的 VIO 帧没有 lidar（构造如此），视觉后续只在 live 上发生——本报告不声称重放了视觉。
+
+因此本文件一律写"保真 7.3 cm"，不写"完全复现"。
+
+## 3k. 同实例两事件运行：E1 走到终态，**E2 未触发**（状态机断点）
+
+输入 `hall01_two_event_v1.bag`（`c3e905da…`，E1 在 +14.6 s、E2 在 +42…52 s），
+rate 1.0、drain 30、σ=0.884、`--candidate-source host_poses`、`--wait-limit-sec 10`，墙钟 102.7 s。
+run `/tmp/fl_native_20261110T104511Z_3336818`，host 与 recovery node 同 pgid `3337883`。
+
+| 项 | 实测 |
+|---|---|
+| host binary / runtime lib | `26a9f2e6…` / 见 receipt |
+| pose / scan | 817 / 598 |
+| 配对 | 542（扫描侧 90.6%） |
+| **E1 trigger** | 1627785263.808（bag **+2.7 s**，远早于真实注入 +14.6 s） |
+| **E1 决策** | 1627785265.874（trigger +2.07 s） |
+| Mode / 结果 | `MODE3_SOFT_BRIDGE_WAIT`，拒绝（候选为空，22 个 key 进 deferred） |
+| 原生动作 | `snapshot×3`（frame 19：7422 voxels/140114 points）→ `hold` → **`restore #1`：live 8776 → 7422 voxels** |
+| 决策后继续消费 | 498 帧 |
+| **E2** | **未触发** |
+| 最终状态 | `WAITING_FOR_EVIDENCE`，quarantine 仍开，`lifecycle.events = []` |
+
+### 断点（不在我这边，报给 S1）
+
+`maybe_close_waiting_segment()` 的**唯一调用点在 `step_frame`**（`transaction_manager_node.py:250`）。
+隔离期间帧走的是 `_ingest_without_detection()`，它在 `state != HEALTHY` 时**直接**
+`register_quarantined_frame` 并 `return`，**不经过 `step_frame`**。于是：
+
+- 等待上限这一条根本不会被求值 → `wait_limit_closed` / `rearm` 永不发生；
+- 而隔离期间 NIS 又因为参考停在冻结的地图上而大面积 `UNAVAILABLE`（本次 `fed_to_step_frame=5`，
+  其余 537 帧 UNAVAILABLE），所以 `step_frame` 也不会因为别的路径被调用；
+- 结果：段永远开着，**E2 结构上不可能触发**。
+
+这是**状态机断点**，不是本次运行的偶发。按三类归属，本次属于 **"仅接线"**：E1 的原生 hold/restore
+真的执行了（地图 8776→7422 回滚），但**第二事件没有发生**，不能算完整流程。
 
 ## 4. 边界
 
