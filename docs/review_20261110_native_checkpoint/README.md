@@ -360,6 +360,83 @@ run `/tmp/fl_native_20261110T104511Z_3336818`，host 与 recovery node 同 pgid 
 这是**状态机断点**，不是本次运行的偶发。按三类归属，本次属于 **"仅接线"**：E1 的原生 hold/restore
 真的执行了（地图 8776→7422 回滚），但**第二事件没有发生**，不能算完整流程。
 
+## 3l. 两事件重跑：等待上限与重武装生效，**E2 仍未触发**（下一个断点在检测可用性）
+
+S1 修好调用图后（`e3a60e7`）用同一套参数重跑。run `/tmp/fl_native_20261110T105118Z_3341023`，
+pgid `3342097`，wall 104.9 s，peak RSS 721 MB，binary `26a9f2e6…`。
+
+| 项 | 实测 |
+|---|---|
+| pose / scan；配对 | 471 / 598；312（扫描侧 52.2%） |
+| E1 trigger / 决策 | 1627785263.808（bag **+2.7 s**，假警报）/ 1627785265.674（+1.87 s），`MODE3_SOFT_BRIDGE_WAIT` 拒绝 |
+| 原生动作 | `hold` → `restore #1` → **`resume`**（全部 ack OK）；滚动快照 38 次 |
+| `lifecycle.events` | **`wait_limit_closed`**（closed 1627785275.681，即 bag +14.6 s，正是真实注入起点）+ **`rearm`** |
+| 未决帧 | **143** 帧（`unresolved_segments=1`），终态 `HEALTHY` |
+| 重武装后帧数 | 169 帧，全部 `UNAVAILABLE` |
+| 重武装后地图 | 0 → **108501 points / 169 kfs**（地图确实在长） |
+| 重武装后 NIS | 0.43 – **164.01**，中位 16.86（真实注入窗口的 NIS 很大） |
+| 重武装后参考来源 | **prev_scan ×169，node_map ×0** |
+| E2 | **未触发** |
+
+### 断点在哪一步（不是终态，是路径）
+
+1. 等待上限求值 → **通过**（`wait_limit_closed`）；
+2. `rearm` → **通过**（事件出现，native `resume` 已 ack）；
+3. 检测重武装 → `detector.reset()`，状态回 `HEALTHY` → **通过**；
+4. **之后没有任何一帧进入检测器**：`fed_to_step_frame` 全程停在 **5**。原因不是没 P 值（NIS 一路算到 164），
+   而是参考**永远是 `prev_scan`**，`reference_node_map` 全程 **5 次**，于是 `supported=false`，
+   帧被记为 UNAVAILABLE 并走 `step_healthy`。
+
+**这是一次回归，不是旧有状态**：同一 bag、同一 σ 的早期 hall 运行 `054559Z` 是
+`reference_node_map=397 / AVAILABLE=440`。现在变成 `5 / 5`。变化发生在宿主侧移植（hold/restore/
+深拷贝/修复通道）与驱动侧 checkpoint 接线之间；**具体是哪一个尚未定位**，我没有把它写成"已知原因"。
+
+按三类归属：**仍是"仅接线"**——E1 的原生 hold/restore/resume 全执行了、等待上限与重武装也真的发生了，
+但第二事件没有开出来。
+
+## 3m. 定位：回归从哪一帧开始（同 kf 对照）
+
+早期 `054559Z` vs 本次 `105118Z`，同 kf 21–40：
+
+| kf | 早期：status / ref / nis / kfs / pts | 本次：status / ref / nis / kfs / pts |
+|---|---|---|
+| 21 | AVAILABLE / prev_scan / 0.22 / 1 / 923 | AVAILABLE / node_map / 13.41 / 1 / 926 |
+| 25 | AVAILABLE / prev_scan / 0.14 / 5 / 923 | AVAILABLE / node_map / 14.40 / 5 / 926 |
+| **26** | AVAILABLE / node_map / 0.85 / **5** / **3237** | UNAVAILABLE / prev_scan / 0.19 / **0** / **0** |
+| 27–40 | AVAILABLE / node_map / ~1.0 / 7 / 3237→4071 | UNAVAILABLE / prev_scan / ~0.2 / **0** / **0** |
+
+**分叉点就是 kf 26**：本次运行在这一帧 `trusted_poses` 从 5 个变成 **0 个**、`support_reference()`
+长度从 926 变成 **0**，此后整趟再没恢复（直到 rearm 后地图重建）。参考长度一旦为 0，
+`_frame_has_reference_support` 恒 False，匹配只能退回 `prev_scan`，`fed_to_step_frame` 就此停在 5。
+
+清空发生在**隔离开启那一刻**：`trigger_quarantine`（`manager.py:156`）按
+`t_q_start = 估计 onset − 裕度` 回滚 `promoted_history`，而本次 `t_q_start` 落在几乎全部已提升帧
+之后，于是把它们全部撤销；早期运行的脏触发落在帧序更晚的位置，回滚没扫到已建的地图。
+**"恢复哪一个 checkpoint / 回滚窗口是否该覆盖全部已提升帧"是下一步要定的**，我没有改。
+
+### 宿主输出的变化（回答第 1 问）
+
+| 项 | 早期 054559Z | 本次 105118Z |
+|---|---:|---:|
+| host.log 中 `Update Voxel Map` | 780 | **408** |
+| LIO 有效特征数（末帧） | 15027 | **426** |
+| 平均残差 | 0.051 | **0.113** |
+| 发布位姿数 | 777 | **471** |
+| 配对 | 515 | **312** |
+
+408 vs 780 里有 185 帧是 hold 期间被挡下的写入，剩下是真实下降；**有效特征 15027 → 426、残差
+0.051 → 0.113** 说明 restore 之后宿主是在一张与当前位姿不再对齐的地图上匹配——这正是"声明过的
+轨迹不连续"的代价，不是发布链路本身坏了。
+
+**逐帧扫描点数**：两趟都没有归档这个字段（`frame_diagnostics` 只记
+`map_points`/`trusted_keyframes`），所以现在给不出，要么加字段、要么不报——我没有为了补数去跑新实验。
+
+### 配对 312 vs 515（第 2 问）
+
+位姿数 471 vs 777 已经解释了大半（配对上限就是位姿数），剩下的差来自本次 `max_backlog=282`：
+主循环每 2 s 要等一次快照 ack，期间配对队列在堆。**快照没有丢弃消息**（`scan_messages` 两趟都是 598），
+但它确实降低了主循环的推进速度。
+
 ## 4. 边界
 
 - 没有跑两事件；没有调门、没有调 σ、没有重跑检测或候选矩阵。
