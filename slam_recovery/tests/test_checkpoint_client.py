@@ -32,7 +32,9 @@ class _FakeHost(threading.Thread):
             path = os.path.join(self.dir, "cmd")
             if os.path.exists(path):
                 with open(path, encoding="utf-8") as fh:
-                    cmd = fh.read().strip()
+                    # The host reads the command from the first line; the second, when present, is
+                    # the payload. Reading the whole file would hide that distinction.
+                    cmd = fh.readline().strip()
                 os.rename(path, os.path.join(self.dir, "cmd.done"))
                 self.seen.append(cmd)
                 time.sleep(self.delay)
@@ -158,3 +160,52 @@ class CheckpointWiringTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class WritebackTest(unittest.TestCase):
+    """An accepted repair must reach the host as a state, not only as a decision."""
+
+    def test_identity_rotation_is_the_identity_quaternion(self):
+        import numpy as np
+
+        from slam_recovery.ros.recovery_node import _rotation_to_quaternion
+
+        q = _rotation_to_quaternion(np.eye(3))
+        self.assertEqual([round(v, 9) for v in q], [0.0, 0.0, 0.0, 1.0])
+
+    def test_ninety_degrees_about_z(self):
+        import math
+
+        import numpy as np
+
+        from slam_recovery.ros.recovery_node import _rotation_to_quaternion
+
+        c, s = math.cos(math.pi / 2), math.sin(math.pi / 2)
+        R = np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]])
+        q = _rotation_to_quaternion(R)
+        # x, y, z, w with a positive w; the axis is +z
+        self.assertAlmostEqual(q[3], math.cos(math.pi / 4), places=9)
+        self.assertAlmostEqual(q[2], math.sin(math.pi / 4), places=9)
+
+    def test_set_state_sends_the_pose_in_seven_numbers(self):
+        import tempfile
+
+        import numpy as np
+
+        with tempfile.TemporaryDirectory() as d:
+            host = _FakeHost(d)
+            host.start()
+            try:
+                client = CheckpointClient(d, ack_timeout_s=5.0)
+                T = np.eye(4)
+                T[:3, 3] = [1.0, -2.0, 3.0]
+                event = client.set_state(T)
+                self.assertTrue(event["ok"])
+                self.assertEqual(host.seen, ["set_state"])
+                with open(os.path.join(d, "cmd.done"), encoding="utf-8") as fh:
+                    lines = [ln.strip() for ln in fh if ln.strip()]
+                self.assertEqual(len(lines), 2)
+                values = [float(v) for v in lines[1].split()]
+                self.assertEqual([round(v, 6) for v in values[:3]], [1.0, -2.0, 3.0])
+            finally:
+                host.stop()
