@@ -116,6 +116,7 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
             cov_after_6x6=np.eye(6) * 0.05,
             holdout_nis=6.4,  # Exceeds tau_val_nis=2.5
             info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+            cov_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         rep1 = mgr.validate_and_resolve(bad_cand)
         self.assertFalse(rep1.accepted)
@@ -135,6 +136,7 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
             wilson_lower_bound=0.90,
             reentry_pos_jump_m=0.05,
             info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+            cov_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         rep2 = mgr.validate_and_resolve(good_cand)
         self.assertTrue(rep2.accepted)
@@ -217,6 +219,7 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
             wilson_lower_bound=benefit.wilson_lower_bound,
             reentry_pos_jump_m=0.0,
             info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+            cov_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         self.assertLess(self_fitting.holdout_nis, 2.5)
         rep = mgr.validate_and_resolve(self_fitting)
@@ -269,8 +272,9 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
         node.tx_mgr.trigger_quarantine(
             int(10e9), int(20e9),
             np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2,
-            weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
-            info_before_frame=TangentFrame("world", "rot_trans", "world"),
+            weak_direction_frame=TangentFrame("body", "rot_trans", "fixture"),
+            info_before_frame=TangentFrame("body", "rot_trans", "fixture"),
+            anchor_pose_world=np.eye(4),
         )
         version_before = node.tx_mgr.trusted_version
 
@@ -408,6 +412,7 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
         bad_pose[0, 3] = np.nan
         c_nan = CandidateMap("nonfinite_pose", m.trusted_version, {42: bad_pose}, np.eye(6) * 100, np.eye(6) * 0.01, 0.1,
             info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+            cov_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         rep_nan = m.validate_and_resolve(c_nan)
         self.assertFalse(rep_nan.accepted)
@@ -437,6 +442,7 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
             "pose_and_factor", m.trusted_version, {2: np.eye(4)}, np.eye(6) * 100, np.eye(6) * 0.01, 0.1,
             paired_benefit_approved=True, wilson_lower_bound=0.90, reentry_pos_jump_m=0.05,
             info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+            cov_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
         rep_ok = m.validate_and_resolve(c_ok)
         self.assertTrue(rep_ok.accepted)
@@ -464,6 +470,7 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
                 holdout_nis=0.10,
                 **evidence,
                 info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+                cov_after_frame=TangentFrame("body", "rot_trans", "fixture"),
             )
             return m.validate_and_resolve(cand), m
 
@@ -653,6 +660,7 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
                 0.1,
                 repaired_bias_acc=np.array([np.nan, 0.0, 0.0]),
                 info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+                cov_after_frame=TangentFrame("body", "rot_trans", "fixture"),
             )
         )
         self.assertFalse(r_nan_bias.accepted)
@@ -665,6 +673,7 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
         r_bad_shape = m2.validate_and_resolve(
             CandidateMap("bad_shape", m2.trusted_version, {42: np.eye(2)}, np.eye(6) * 100, np.eye(6) * 0.01, 0.1,
                 info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+                cov_after_frame=TangentFrame("body", "rot_trans", "fixture"),
             )
         )
         self.assertFalse(r_bad_shape.accepted)
@@ -721,6 +730,7 @@ class TestAtomicPublish(unittest.TestCase):
         kwargs.update(overrides)
         return CandidateMap(**kwargs,
             info_after_frame=TangentFrame("body", "rot_trans", "fixture"),
+            cov_after_frame=TangentFrame("body", "rot_trans", "fixture"),
         )
 
     def _snapshot(self, mgr):

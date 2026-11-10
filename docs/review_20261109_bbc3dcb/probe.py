@@ -14,6 +14,7 @@ node.committed_map_points = [cloud]
 node.tx_mgr.trigger_quarantine(int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0]), np.eye(6) * 2, 1.2,
     weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
     info_before_frame=TangentFrame("world", "rot_trans", "world"),
+    anchor_pose_world=np.eye(4),
 )
 poses, incumbent = {}, {}
 for k in range(20):

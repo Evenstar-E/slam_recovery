@@ -154,6 +154,7 @@ class TrustedMapTransactionManager:
         *,
         weak_direction_frame: "TangentFrame",
         info_before_frame: "TangentFrame",
+        anchor_pose_world: Optional[np.ndarray] = None,
     ) -> QuarantineSegment:
         """
         Roll back provisional updates starting at t_{q,start} = \hat{t}_{onset} - \Delta t_{margin},
@@ -237,6 +238,8 @@ class TrustedMapTransactionManager:
             provisional_factor_ids=prov_factors,
             weak_direction_frame=weak_direction_frame,
             info_before_frame=info_before_frame,
+            anchor_pose_world=(None if anchor_pose_world is None
+                               else np.asarray(anchor_pose_world, dtype=np.float64).copy()),
         )
         self.active_quarantine.raw_frame_refs = sorted(
             set(self.active_quarantine.raw_frame_refs), key=lambda r: int(r))
@@ -390,6 +393,7 @@ class TrustedMapTransactionManager:
                         # declared basis, it does not re-derive one.
                         weak_direction_frame=old_segment.weak_direction_frame,
                         info_before_frame=old_segment.info_before_frame,
+                        anchor_pose_world=old_segment.anchor_pose_world,
                     )
                 # The receipt describes the *remaining pending set*, not only this candidate's
                 # deferrals: a retry committing 8..11 while deferring nothing still leaves 12..19

@@ -335,6 +335,7 @@ def main() -> None:
         wilson_lower_bound=wilson_b6.wilson_lower_bound,
         reentry_pos_jump_m=reentry_jump_b6,
         info_after_frame=TangentFrame("body", "rot_trans", "ref_scan"),
+        cov_after_frame=TangentFrame("body", "rot_trans", "ref_scan"),
     )
     val_report = tx_mgr.validate_and_resolve(candidate=cand)
 

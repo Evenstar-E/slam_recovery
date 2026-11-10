@@ -60,6 +60,7 @@ def main():
     c = CandidateMap('nonfinite_pose', m.trusted_version, {42:pose}, np.eye(6)*100,
                      np.eye(6)*0.01, 0.1,
         info_after_frame=TangentFrame("body", "rot_trans", "probe"),
+        cov_after_frame=TangentFrame("body", "rot_trans", "probe"),
                      )
     rep = m.validate_and_resolve(c)
     observations.append(dict(id='R3', issue='nonfinite_pose_can_be_committed',
@@ -88,6 +89,7 @@ def main():
     c = CandidateMap('pose_only', m.trusted_version, {2:np.eye(4)}, np.eye(6)*100,
                      np.eye(6)*.01, .1,
         info_after_frame=TangentFrame("body", "rot_trans", "probe"),
+        cov_after_frame=TangentFrame("body", "rot_trans", "probe"),
                      )
     rep = m.validate_and_resolve(c)
     observations.append(dict(id='R6', issue='commit_updates_poses_without_candidate_factor_or_bias_transaction',

@@ -671,6 +671,7 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.5,
             weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
             info_before_frame=TangentFrame("world", "rot_trans", "world"),
+            anchor_pose_world=np.eye(4),
         )
         rep_b5 = node_b5.evaluate_and_commit_candidate(
             "B5_narrow_fov", quar_poses_drifted_b5, aux_or_loop_info_6x6=None,
@@ -748,6 +749,7 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2,
             weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
             info_before_frame=TangentFrame("world", "rot_trans", "world"),
+            anchor_pose_world=np.eye(4),
         )
 
         # ---- simulator validity: reference must be frozen BEFORE the candidate is committed ----
@@ -799,6 +801,7 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             int(10e9), int(20e9), np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2,
             weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
             info_before_frame=TangentFrame("world", "rot_trans", "world"),
+            anchor_pose_world=np.eye(4),
         )
         rep_b6_pg = node_b6_pg.evaluate_and_commit_candidate(
             "B6_aux_pg", quar_poses_repaired_r5, aux_or_loop_info_6x6=aux_fim_physical,
