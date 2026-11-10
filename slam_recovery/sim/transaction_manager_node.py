@@ -254,6 +254,11 @@ class OnlineRecoveryTransactionNode:
                 )
                 self.tx_mgr.step_healthy(delta)
                 self._sync_spatial_map_with_trusted_poses()
+        elif self.tx_mgr.active_quarantine is not None:
+            # A5: a frame that arrives while the quarantine is open belongs to it whether or not
+            # any candidate ever names it. step_frame is the single ingest path, so the
+            # registration goes here rather than at each caller.
+            self.tx_mgr.register_quarantined_frame(kf_id, timestamp_ns)
         return None
 
     def _frame_has_reference_support(

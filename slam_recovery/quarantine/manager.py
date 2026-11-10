@@ -187,6 +187,10 @@ class TrustedMapTransactionManager:
 
         self.provisional_queue = quarantined_deltas
         self.state = RecoveryState.QUARANTINED
+        # A5: the population of the quarantine is registered here, from the frames the system
+        # itself rolled back -- not left empty for a candidate to declare later. Without this, a
+        # candidate that commits one frame and declares no deferrals makes the pending set empty
+        # and the manager returns to HEALTHY, silently dropping the rest.
         self.active_quarantine = QuarantineSegment(
             segment_id=f"quar_{ckpt.map_version}_{t_q_start}",
             checkpoint=ckpt,
@@ -195,9 +199,25 @@ class TrustedMapTransactionManager:
             weak_direction_6d=weak_direction_6d.copy(),
             info_before_6x6=info_before_6x6.copy(),
             propagated_cov_norm=propagated_cov_norm,
+            raw_frame_refs=[str(int(d.keyframe_id)) for d in quarantined_deltas
+                            if getattr(d, "keyframe_id", None) is not None],
             provisional_factor_ids=prov_factors,
         )
+        self.active_quarantine.raw_frame_refs = sorted(
+            set(self.active_quarantine.raw_frame_refs), key=lambda r: int(r))
         return self.active_quarantine
+
+    def register_quarantined_frame(self, keyframe_id: int, timestamp_ns: int = 0) -> None:
+        """A5: record a frame that arrives while a quarantine is open.
+
+        The system, not the candidate, owns the pending population. Idempotent; the reference list
+        stays sorted by integer key so the receipt is reproducible.
+        """
+        if self.active_quarantine is None:
+            return
+        refs = {str(r) for r in self.active_quarantine.raw_frame_refs}
+        refs.add(str(int(keyframe_id)))
+        self.active_quarantine.raw_frame_refs = sorted(refs, key=lambda r: int(r))
 
     def validate_and_resolve(
         self,
