@@ -1,0 +1,18 @@
+{
+  "source_revision": "fc062fe0366693fb30aff3118c0576c2c4ec411a",
+  "scope": "Fixed-revision parser fixtures loaded from git into memory; no ROS/bag, remote original trace or receipt access",
+  "parser_fixtures": {"count": 16, "failures": 0, "errors": 0, "elapsed_s": 0.040},
+  "headerless_probe": "REJECTED_AS_EXPECTED",
+  "header_only_probe": "NO_DIVERGENCE; previously reported missing-evidence gap remains",
+  "double_conversion_probe": {
+    "start_sec": 1600000000.0,
+    "adjacent_double_pairs": 4000,
+    "direct_round_collisions": 275,
+    "floor_fraction_collisions": 0,
+    "published_direct_count": 274,
+    "interpretation": "Numerical mechanism corroborated, published exact 274 count not independently reproduced; no additional host rerun required for count difference"
+  },
+  "native_transaction_or_map_results": "NOT_APPLICABLE",
+  "remote_trace_receipt_patch_originals": "UNAVAILABLE_LOCALLY",
+  "full_ab_rescoring": "NOT_APPLICABLE"
+}

@@ -1,0 +1,12 @@
+{
+  "source_revision": "41035074f63fe1d9e77b9b8f0643f757bb191eab",
+  "scope": "Local source-bound Python regression and in-memory fault probes; no ROS/bag runs",
+  "core_tests": {"count": 47, "status": "PASS", "elapsed_s": 2.749},
+  "boundary_probes": {
+    "revoked_repair_population": {"status": "FAIL", "trusted_keys": [], "pending_refs": ["1", "4"], "missing_revoked_frame_keys": [2, 3]},
+    "later_arrival_old_segment_end": {"status": "FAIL", "frame_4_event_ns": 400000000, "frame_4_undo_ns": 300000000, "second_onset_ns": 350000000, "frame_4_remains_trusted": true},
+    "undo_insert_failure": {"status": "FAIL", "before_log_lengths": [1, 1], "after_log_lengths": [2, 2], "version_before_after": [4, 4], "state_before": "QUARANTINED", "state_after": "VALIDATING"}
+  },
+  "new_native_results": "NOT_APPLICABLE",
+  "full_ab_reassessment": "NOT_APPLICABLE"
+}
