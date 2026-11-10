@@ -1,0 +1,115 @@
+{
+ "_meta": {
+  "what": "B-1 health-prefix conditional scale, causal replay",
+  "written": "2026-11-10",
+  "frozen_rule": {
+   "K_MIN": 20,
+   "M_MIN": 3000,
+   "PREFIX_N": 30,
+   "spike": 2.074074,
+   "dwell": 2,
+   "scale": "prefix median NIS",
+   "frozen_after_prefix": true,
+   "no_future_data": true
+  },
+  "not_done": [
+   "no host run",
+   "no threshold changed",
+   "no bag quantile used"
+  ],
+  "candidate_admission_half": "BLOCKED: B's second question is admission calibration, which needs a candidate stream with per-candidate scale; the archive has none"
+ },
+ "runs": [
+  {
+   "run": "fl_native_20261110T033802Z_2974473",
+   "sigma0": 0.12,
+   "baseline": {
+    "frames": 364,
+    "first_suspect": {
+     "ts_ns": 1627643742711321115,
+     "rel_onset_s": -16.843,
+     "kf_id": 19,
+     "normalised_nis": 3822.5371,
+     "cusum": 3821.1871,
+     "spike_triggered": true
+    },
+    "first_quarantine": {
+     "ts_ns": 1627643742844584942,
+     "rel_onset_s": -16.709,
+     "kf_id": 20,
+     "normalised_nis": 3714.606,
+     "cusum": 7534.443,
+     "spike_triggered": true
+    },
+    "pre_onset_judged": 168,
+    "pre_onset_frames": 168,
+    "pre_onset_flagged": 168,
+    "window_frames": 196,
+    "window_flagged": 196,
+    "window_coverage": 1.0,
+    "unjudged_span_s": 0.0
+   },
+   "B_v1": {
+    "frames": 364,
+    "first_suspect": {
+     "ts_ns": 1627643751337318659,
+     "rel_onset_s": -8.217,
+     "kf_id": 104,
+     "normalised_nis": 2.1118,
+     "cusum": 0.7618,
+     "spike_triggered": true
+    },
+    "first_quarantine": {
+     "ts_ns": 1627643752335870981,
+     "rel_onset_s": -7.218,
+     "kf_id": 114,
+     "normalised_nis": 1.9571,
+     "cusum": 4.9033,
+     "spike_triggered": false
+    },
+    "pre_onset_judged": 111,
+    "pre_onset_frames": 168,
+    "pre_onset_flagged": 42,
+    "window_frames": 196,
+    "window_flagged": 88,
+    "window_coverage": 0.449,
+    "unjudged_span_s": 5.739,
+    "prefix": {
+     "prefix_start_ts_ns": 1627643745643044710,
+     "prefix_end_ts_ns": 1627643748517613888,
+     "prefix_median_nis": 13.265515,
+     "prefix_kf_range": [
+      27,
+      56
+     ]
+    }
+   },
+   "negative_control_contaminated_prefix": {
+    "scale": 1374.902009,
+    "frames": 364,
+    "first_suspect": null,
+    "first_quarantine": null,
+    "pre_onset_judged": 0,
+    "pre_onset_frames": 168,
+    "pre_onset_flagged": 0,
+    "window_frames": 196,
+    "window_flagged": 0,
+    "window_coverage": 0.0,
+    "unjudged_span_s": 25.761,
+    "prefix": {
+     "prefix_start_ts_ns": 1627643765672286034,
+     "prefix_end_ts_ns": 1627643768538468838,
+     "prefix_median_nis": 1374.902009,
+     "prefix_kf_range": [
+      227,
+      255
+     ]
+    }
+   }
+  },
+  {
+   "run": "fl_native_20261110T030931Z_2941380",
+   "status": "NO_PREFIX"
+  }
+ ]
+}
