@@ -290,6 +290,47 @@ def reregister_frame(scan_body: np.ndarray, reference_world: np.ndarray,
     init = np.asarray(init_pose, dtype=np.float64).copy()
     scan = sample_scan(scan_body, cfg)
     ref, total_ref = restrict_reference(reference_world, init, cfg)
+    return _icp_core(scan, ref, init, total_ref, cfg)
+
+
+def reregister_segment(scan_bodies: Dict[int, np.ndarray], poses: Dict[int, np.ndarray],
+                       reference_world: np.ndarray,
+                       cfg: IcpConfig = ICP_CONFIG) -> IcpResult:
+    """One rigid correction for a whole quarantine segment, fitted once.
+
+    Twenty-three per-frame registrations cost twenty-three times what the decision can afford; a
+    single rigid fit over the segment's world points fits the same description -- "align the
+    quarantined scans to the trusted map" -- at one registration's cost. The correction is applied
+    to every candidate pose, so the candidate still has one frame per quarantined keyframe and the
+    paired-evidence population is unchanged.
+
+    The points are already in the world frame (host pose applied), so the fitted transform is the
+    correction ``ΔT`` and each candidate becomes ``ΔT @ pose``. The initial transform is the
+    identity: the correction, not the pose, is what is being estimated.
+    """
+    keys = sorted(k for k in scan_bodies if k in poses)
+    if not keys:
+        return IcpResult(pose=np.eye(4), iterations=0, final_residual_m=float("nan"),
+                         converged=False, inliers=0, correspondences=0, reference_points=0,
+                         reference_total_points=0, scan_points=0, status="NO_FRAMES",
+                         displacement_from_init_m=0.0, rotation_from_init_deg=0.0)
+    clouds = []
+    for k in keys:
+        T = np.asarray(poses[k], dtype=np.float64)
+        pts = np.asarray(scan_bodies[k], dtype=np.float64)[:, :3]
+        clouds.append(pts @ T[:3, :3].T + T[:3, 3])
+    merged = np.vstack(clouds)
+    scan = sample_scan(merged, cfg)
+    centroid = np.eye(4)
+    centroid[:3, 3] = np.mean(merged, axis=0)
+    ref, total_ref = restrict_reference(reference_world, centroid, cfg)
+    # the correction is small by construction, so the identity is the right initial value; the
+    # reference restriction uses the segment centroid, not the identity's origin
+    return _icp_core(scan, ref, np.eye(4), total_ref, cfg)
+
+
+def _icp_core(scan: np.ndarray, ref: np.ndarray, init: np.ndarray, total_ref: int,
+              cfg: IcpConfig) -> IcpResult:
 
     def _fail(status: str, iterations: int = 0, gate_path: Optional[List[float]] = None) -> IcpResult:
         return IcpResult(pose=init.copy(), iterations=iterations, final_residual_m=float("nan"),

@@ -422,10 +422,10 @@ def test_icp_candidate_source_builds_poses_and_records_detail():
     assert loop.records[0]["candidate_source"] == "icp_reregistration"
     assert len(loop.icp_details) == 1
     det = loop.icp_details[0]
-    assert det["frames_with_init"] == det["frames_with_scan"] > 0
-    assert len(det["per_frame"]) == det["frames_with_init"]
+    assert det["mode"] == "single_rigid_transform_for_the_segment"
+    assert det["frames_with_scan"] == det["frames_candidate"] > 0
     for key in ("icp_iterations", "icp_residual", "icp_converged", "icp_inliers"):
-        assert key in det["per_frame"][0]
+        assert key in det
     # the frozen stream keeps exactly its 18 keys; the ICP fields live beside it
     assert tuple(loop.records[0].keys()) == CANDIDATE_KEYS
     assert build_summary(loop, {})["candidate_source_detail"]["icp_candidates"] == 1

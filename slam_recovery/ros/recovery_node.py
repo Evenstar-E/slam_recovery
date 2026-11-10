@@ -46,7 +46,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 
 from slam_recovery.core import BackendDelta, RecoveryState
-from slam_recovery.repair.pose_reregistration import ICP_CONFIG, build_icp_candidate
+from slam_recovery.repair.pose_reregistration import ICP_CONFIG, reregister_segment
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
 from slam_recovery.validation import (
     compute_6dof_point_to_plane_fim,
@@ -700,51 +700,46 @@ class NativeClosedLoop:
         return out
 
     def _icp_candidate(self, ep: "Episode"):
-        """Re-register the episode's frames against the pre-quarantine trusted map.
+        """One rigid correction for the whole segment, fitted against the frozen trusted map.
 
-        The reference is the trusted map as it stands when the quarantine opened -- frozen, so the
-        candidate cannot be scored against geometry it produced. §9's parameters are used as
-        frozen; only the neighbour-search constants come from this repository.
+        A per-frame registration costs 13 s per frame live -- 23 frames would be five minutes
+        inside a decision point. One rigid fit over the segment describes the same repair at one
+        registration's cost, and every quarantined keyframe still gets a candidate pose, so the
+        paired-evidence population is unchanged.
 
-        This runs inside the decision, so its cost is part of the loop's latency and is recorded
-        as such. It is not moved to a side thread: a candidate that arrives after the decision
-        point would be a different experiment.
+        The reference is the trusted map as it stood when the quarantine opened: frozen, so the
+        candidate cannot be scored against geometry it produced.
         """
         scans = {kf: self.node.scan_buffer_body[kf]
                  for kf, _ts, _p in ep.frames if kf in self.node.scan_buffer_body}
         inits = {kf: pose for kf, _ts, pose in ep.frames}
         reference = self.node.get_trusted_map_points(max_pts=1 << 30)
-        try:
-            import rospy
-            rospy.loginfo("[slam_recovery] icp candidate: %d frames with scans, reference %d pts, "
-                          "scan points %s", len(scans), len(reference),
-                          sorted({len(v) for v in scans.values()})[:4])
-        except Exception:
-            pass
         started = time.perf_counter()
-        poses, results = build_icp_candidate(scans, reference, inits, ICP_CONFIG,
-                                             time_budget_s=self.icp_time_budget_s)
+        res = reregister_segment(scans, inits, reference, ICP_CONFIG)
         elapsed = time.perf_counter() - started
-        try:
-            import rospy
-            rospy.loginfo("[slam_recovery] icp candidate done in %.1f s: %d/%d produced a pose",
-                          elapsed, len(poses), len(inits))
-        except Exception:
-            pass
         self.icp_seconds_total += elapsed
+        corpus = np.vstack([np.asarray(v, dtype=np.float64)[:, :3] @ inits[k][:3, :3].T
+                            + inits[k][:3, 3] for k, v in sorted(scans.items())]) \
+            if scans else np.zeros((0, 3))
+        delta = np.asarray(res.pose, dtype=np.float64)
+        poses = {k: delta @ np.asarray(inits[k], dtype=np.float64) for k in inits}
         detail = {
+            "mode": "single_rigid_transform_for_the_segment",
             "seconds": elapsed,
             "frames_with_scan": len(scans),
-            "frames_with_init": len(inits),
             "frames_candidate": len(poses),
             "reference_points_total": int(len(reference)),
-            "statuses": {},
-            "per_frame": [],
+            "segment_points_before_sampling": int(len(corpus)),
+            "status": res.status,
+            "icp_iterations": int(res.iterations),
+            "icp_residual": float(res.final_residual_m),
+            "icp_converged": bool(res.converged),
+            "icp_inliers": int(res.inliers),
+            "reference_points_used": int(res.reference_points),
+            "scan_points_used": int(res.scan_points),
+            "correction_translation_m": float(np.linalg.norm(delta[:3, 3])),
+            "correction_rotation_deg": float(res.rotation_from_init_deg),
         }
-        for kf, res in results:
-            d = res.as_dict()
-            detail["statuses"][res.status] = detail["statuses"].get(res.status, 0) + 1
-            detail["per_frame"].append({"kf_id": int(kf), **d})
         return poses, detail
 
     def _open_episode(self, ts_ns: int, pose: np.ndarray, segment=None) -> None:
@@ -1295,11 +1290,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         for row in loop.records:
             fh.write(json.dumps({k: row[k] for k in CANDIDATE_KEYS}, default=float) + "\n")
     if loop.icp_details:
+        # One row per candidate. Segment registration produces one fit for the whole segment, so
+        # there is no per-frame table; the row is the fit itself plus the frames it applied to.
         with open(os.path.join(args.run_dir, "icp_detail.jsonl"), "w", encoding="utf-8") as fh:
             for det in loop.icp_details:
-                for frame in det["per_frame"]:
-                    fh.write(json.dumps({"candidate_id": det["candidate_id"], **frame},
-                                        default=float) + "\n")
+                fh.write(json.dumps(det, default=float) + "\n")
     rospy.loginfo("[slam_recovery] wrote %d candidate rows to %s", len(loop.records),
                   args.run_dir)
     return 0

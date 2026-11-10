@@ -86,6 +86,39 @@ python3 -B docs/review_20261110_b10/run_icp_candidate_offline.py
   `icp_iterations / icp_residual / icp_converged / icp_inliers` 接到活循环里，
   并以 `candidate_source="icp_reregistration"` 单独归档——本趟只做了离线构造。
 
+
+
+## 5. 接入活循环：改成"整段一次刚体 ICP"
+
+逐帧 ICP 在决策点不可行（实测 13 s/帧，23 帧约 5 min；30 s 预算下只做出 3/23，
+`min_paired_observations=4` 都不到，拒绝理由是证据缺失）。按 S1 的裁决改成
+**对隔离段做一次刚体 ICP**，把求得的修正 `ΔT` 作用到全部候选位姿上。
+
+没有改任何 §9 参数。**扫描抽样一直是 2,000**——之前日志里打印的 `[6000]` 是节点
+`scan_buffer_body` 的缓冲尺寸（`SCAN_CAP`），不是 ICP 的抽样；`IcpResult.scan_points`
+每一帧都记录为 2000。日志已改成打印 "buffer scan sizes"，避免再被误读。
+
+实测（receipt `/tmp/fl_native_20261110T051744Z_3059939`，load 51）：
+
+| 项 | 值 |
+|---|---|
+| ICP 次数 | **1**（整段） |
+| 耗时 | **11.8 s** |
+| 扫描点 / 参考点 | 2000 / 19,039 |
+| 迭代 | 20（`ITERATION_LIMIT`，未进 1e-6） |
+| 残差 | 3.81 cm |
+| 内点 | 2000 / 2000 |
+| 修正量 | 平移 **0.459 m**，旋转 **3.73°** |
+| 候选帧 | **25 / 25 全部产出** |
+| 配对证据 | **PASSED**，Wilson **0.9023**（25/25 帧改善） |
+| 拒绝理由 | `Insufficient verified info`（`weak_dir_info_after = 4.470 < 25`） |
+
+**结论**：(d) 在决策点**可行**，但 11.8 s 是 2 s 确认边距的约 6 倍，所以决策是延迟的。
+证据腿与候选来源无关地通过了，Mode 3 由信息腿决定——与 S1 的预判一致。
+
+`ITERATION_LIMIT` 而不是 `CONVERGED` 与离线一致：1e-6 的判据在这套参考下达不到，
+残差停在参考分辨率的下限（离线 4–5 cm，线上 3.8 cm）。
+
 ## 4. 产物
 
 `icp_candidate_offline_results.json`：逐帧 `pose_se3`、`icp_iterations`、`icp_residual`、
