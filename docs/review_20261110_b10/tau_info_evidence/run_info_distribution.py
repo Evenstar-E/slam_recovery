@@ -40,12 +40,13 @@ BAGS = {
 }
 OUT = os.path.join(_HERE, "info_distribution_results.json")
 TAU_ABS_MIN = 3.0        # the value frozen by the pre-registration; measured against, not changed
+KAPPA = 2.0              # likewise frozen; measured against, not changed
 
 
 def main() -> int:
     res = {"protocol": "per-frame v^T Lambda v on each frame's own cloud, node preprocessing",
            "fim_sigma_m": FIM_SIGMA, "scan_cap": SCAN_CAP,
-           "tau_abs_min_under_test": TAU_ABS_MIN, "bags": {}}
+           "tau_abs_min_under_test": TAU_ABS_MIN, "kappa_under_test": KAPPA, "bags": {}}
     for label, path in BAGS.items():
         if not os.path.exists(path):
             res["bags"][label] = {"status": "BAG_MISSING", "path": path}
@@ -78,6 +79,18 @@ def main() -> int:
                             "max": float(max(minr))},
             "min_eig_trans": {"min": float(min(mint)), "median": float(np.median(mint)),
                               "max": float(max(mint))},
+            # A ratio leg `after >= kappa * before` is unreachable whenever `before` exceeds the
+            # best information any frame in that bag attains, divided by kappa. That is a property
+            # of the bag, not of the candidate, so it is measured here rather than argued.
+            "ratio_feasibility": {
+                "kappa": KAPPA,
+                "max_info_in_bag": q["p100"],
+                "max_before_that_can_still_pass": q["p100"] / KAPPA,
+                "frames_above_that": int(np.sum(a > q["p100"] / KAPPA)),
+                "fraction_above_that": float(np.mean(a > q["p100"] / KAPPA)),
+                "reading": ("for those frames `after >= kappa*before` cannot be satisfied by any "
+                            "candidate, because no candidate can exceed the bag's own maximum"),
+            },
             "tau_abs_min_position": {
                 "value": TAU_ABS_MIN,
                 "frames_below": below,

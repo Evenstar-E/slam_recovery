@@ -3,6 +3,7 @@
  "fim_sigma_m": 0.075,
  "scan_cap": 6000,
  "tau_abs_min_under_test": 3.0,
+ "kappa_under_test": 2.0,
  "bags": {
   "room02_2x2_O": {
    "bag": {
@@ -27,6 +28,14 @@
     "min": 0.9086834315907821,
     "median": 30.12399219832064,
     "max": 44.96939949735135
+   },
+   "ratio_feasibility": {
+    "kappa": 2.0,
+    "max_info_in_bag": 44.969399497351354,
+    "max_before_that_can_still_pass": 22.484699748675677,
+    "frames_above_that": 400,
+    "fraction_above_that": 0.667779632721202,
+    "reading": "for those frames `after >= kappa*before` cannot be satisfied by any candidate, because no candidate can exceed the bag's own maximum"
    },
    "tau_abs_min_position": {
     "value": 3.0,
@@ -59,6 +68,14 @@
     "min": 1.6801548357689204,
     "median": 40.43945915841262,
     "max": 49.782182906337745
+   },
+   "ratio_feasibility": {
+    "kappa": 2.0,
+    "max_info_in_bag": 49.782182906337766,
+    "max_before_that_can_still_pass": 24.891091453168883,
+    "frames_above_that": 416,
+    "fraction_above_that": 0.6956521739130435,
+    "reading": "for those frames `after >= kappa*before` cannot be satisfied by any candidate, because no candidate can exceed the bag's own maximum"
    },
    "tau_abs_min_position": {
     "value": 3.0,
