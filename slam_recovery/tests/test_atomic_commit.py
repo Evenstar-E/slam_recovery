@@ -633,3 +633,121 @@ class TestCheckpointAndAtomicCommit(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestAtomicPublish(unittest.TestCase):
+    """A8: a failed commit must leave every piece of trusted state untouched.
+
+    The counterexample is `repaired_factor_ids` consumed by list.extend after trusted_poses had
+    already been replaced: the map was written, the factors were half-extended, the version was
+    unchanged and no history entry existed. Four states, four different stories.
+    """
+
+    @staticmethod
+    def _manager():
+        mgr = TrustedMapTransactionManager(
+            confirmation_margin_ns=int(2.0 * 1e9),
+            gate_thresholds=GateThresholds(tau_info=25.0, tau_val_nis=2.5,
+                                           sigma_tol=0.5, sigma_bridge=4.0),
+        )
+        mgr.step_healthy(_make_delta(1.0, 1, 1.0))
+        mgr.step_healthy(_make_delta(4.0, 2, 2.0))
+        mgr.trigger_quarantine(
+            estimated_onset_ns=int(3.5 * 1e9),
+            current_ns=int(6.0 * 1e9),
+            weak_direction_6d=np.array([0, 0, 0, 1, 0, 0], dtype=np.float64),
+            info_before_6x6=np.diag([60, 60, 60, 3.0, 60, 60]),
+            propagated_cov_norm=1.8,
+        )
+        return mgr
+
+    @staticmethod
+    def _candidate(mgr, **overrides):
+        pose = np.eye(4)
+        pose[0, 3] = 42.0
+        kwargs = dict(
+            candidate_id="atomic_probe",
+            parent_map_version=mgr.trusted_version,
+            repaired_poses={42: pose},
+            info_after_6x6=np.diag([60, 60, 60, 45.0, 60, 60]),
+            cov_after_6x6=np.eye(6) * 0.05,
+            holdout_nis=1.2,
+            paired_benefit_approved=True,
+            wilson_lower_bound=0.90,
+            reentry_pos_jump_m=0.05,
+        )
+        kwargs.update(overrides)
+        return CandidateMap(**kwargs)
+
+    def _snapshot(self, mgr):
+        return {
+            "poses": {k: v.copy() for k, v in mgr.trusted_poses.items()},
+            "factors": list(mgr.trusted_factors),
+            "version": mgr.trusted_version,
+            "history": len(mgr.commit_history),
+            "state": mgr.state,
+            "segment": mgr.active_quarantine,
+            "checkpoints": len(mgr.checkpoints),
+        }
+
+    def _assert_untouched(self, mgr, before):
+        self.assertEqual(set(mgr.trusted_poses), set(before["poses"]))
+        for k, v in before["poses"].items():
+            self.assertTrue(np.array_equal(mgr.trusted_poses[k], v))
+        self.assertEqual(list(mgr.trusted_factors), before["factors"])
+        self.assertEqual(mgr.trusted_version, before["version"])
+        self.assertEqual(len(mgr.commit_history), before["history"])
+        self.assertEqual(mgr.state, before["state"])
+        self.assertIs(mgr.active_quarantine, before["segment"])
+        self.assertEqual(len(mgr.checkpoints), before["checkpoints"])
+
+    def test_factor_ids_generator_raising_leaves_state_untouched(self) -> None:
+        mgr = self._manager()
+        mgr.trusted_poses[42] = np.eye(4)          # the frame the counterexample spoke about
+        before = self._snapshot(mgr)
+
+        def exploding():
+            yield 999
+            raise RuntimeError("factor stream died after one id")
+
+        cand = self._candidate(mgr, repaired_factor_ids=exploding())
+        with self.assertRaises(RuntimeError):
+            mgr.validate_and_resolve(cand)
+
+        self._assert_untouched(mgr, before)
+        self.assertNotIn(999, mgr.trusted_factors)
+        self.assertNotIn(43, mgr.trusted_poses)    # the candidate's own frame never lands
+
+    def test_pose_mapping_raising_leaves_state_untouched(self) -> None:
+        mgr = self._manager()
+        before = self._snapshot(mgr)
+
+        class Exploding(dict):
+            def items(self):
+                done = False
+                for k, v in list(super().items()):
+                    if done:
+                        raise RuntimeError("pose mapping died mid-iteration")
+                    done = True
+                    yield k, v
+
+        poses = Exploding({42: np.eye(4), 43: np.eye(4)})
+        cand = self._candidate(mgr, repaired_poses=poses)
+        with self.assertRaises(RuntimeError):
+            mgr.validate_and_resolve(cand)
+        self._assert_untouched(mgr, before)
+
+    def test_successful_commit_publishes_every_field_together(self) -> None:
+        """Positive control: without it the two tests above pass by never committing."""
+        mgr = self._manager()
+        before = self._snapshot(mgr)
+        cand = self._candidate(mgr, repaired_factor_ids=[999])
+        report = mgr.validate_and_resolve(cand)
+
+        self.assertTrue(report.accepted)
+        self.assertEqual(report.mode, RecoveryMode.MODE2_ATOMIC_COMMIT)
+        self.assertEqual(mgr.trusted_version, before["version"] + 1)
+        self.assertIn(42, mgr.trusted_poses)
+        self.assertIn(999, mgr.trusted_factors)
+        self.assertEqual(len(mgr.commit_history), before["history"] + 1)
+        self.assertEqual(mgr.commit_history[-1][0], mgr.trusted_version)

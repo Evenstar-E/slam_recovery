@@ -213,6 +213,8 @@ class TrustedMapTransactionManager:
         if updated_propagated_cov_norm is not None:
             self.active_quarantine.propagated_cov_norm = float(updated_propagated_cov_norm)
 
+        # VALIDATING is an attempt marker, not a committed state.
+        state_before_attempt = self.state
         self.state = RecoveryState.VALIDATING
         report = evaluate_four_mode_gate(
             self.active_quarantine,
@@ -243,68 +245,108 @@ class TrustedMapTransactionManager:
                         "Mode 2 candidate contains frames with no verification evidence: "
                         f"{sorted(unverified)}"
                     )
-            new_poses = deepcopy(self.trusted_poses)
-            for kf_id, pose in candidate.repaired_poses.items():
-                new_poses[kf_id] = pose.copy()
+            try:
+                # ---- materialize ---------------------------------------------------------
+                # Every caller-supplied object is consumed here, before `self` is touched. A
+                # generator (or a mapping whose .items() raises) used to blow up half-way through
+                # the commit, leaving the map written, the factors partially extended, the version
+                # unchanged and no history entry: four states telling four different stories.
+                factor_ids = (None if candidate.repaired_factor_ids is None
+                              else [int(f) for f in candidate.repaired_factor_ids])
+                pose_items = [(int(k), np.asarray(p, dtype=np.float64).copy())
+                              for k, p in candidate.repaired_poses.items()]
+                deferred_keys = [int(k) for k in candidate.deferred_pose_keys]
+                committed_keys = {k for k, _ in pose_items}
+                new_version = self.trusted_version + 1
+
+                # ---- stage --------------------------------------------------------------
+                # Everything below computes into locals; `self` is only read, never written.
+                new_poses = deepcopy(self.trusted_poses)
+                for kf_id, pose in pose_items:
+                    new_poses[kf_id] = pose
+                new_factors = list(self.trusted_factors)
+                if factor_ids is not None:
+                    new_factors.extend(factor_ids)
+                else:
+                    for kf_id in sorted(committed_keys):
+                        fid = int(kf_id) * 10
+                        if fid not in new_factors:
+                            new_factors.append(fid)
+                new_bias_acc = (self.trusted_bias_acc if candidate.repaired_bias_acc is None
+                                else np.asarray(candidate.repaired_bias_acc,
+                                                dtype=np.float64).copy())
+                new_bias_gyr = (self.trusted_bias_gyr if candidate.repaired_bias_gyr is None
+                                else np.asarray(candidate.repaired_bias_gyr,
+                                                dtype=np.float64).copy())
+                # A partial commit does not end the quarantine. The deferred frames are still
+                # suspect, and clearing the segment would discard their pending subtransaction.
+                old_segment = self.active_quarantine
+                # pending = old - committed + newly deferred; the quarantine ends only when empty.
+                old_pending = set()
+                if old_segment is not None:
+                    for ref in old_segment.raw_frame_refs:
+                        try:
+                            old_pending.add(int(ref))
+                        except (TypeError, ValueError):
+                            continue
+                pending = (old_pending | set(deferred_keys)) - committed_keys
+                new_checkpoint = None
+                new_segment = None
+                if pending and old_segment is not None:
+                    # Built from the staged post-commit state, which is what create_checkpoint
+                    # would have captured after the assignment; only the append is deferred.
+                    new_checkpoint = Checkpoint(
+                        checkpoint_id=f"ckpt_v{new_version}_{old_segment.t_end_ns}",
+                        timestamp_ns=old_segment.t_end_ns,
+                        map_version=new_version,
+                        keyframe_poses=deepcopy(new_poses),
+                        factor_ids=list(new_factors),
+                        imu_bias_acc=new_bias_acc.copy(),
+                        imu_bias_gyr=new_bias_gyr.copy(),
+                    )
+                    new_checkpoint.state_hash = new_checkpoint.compute_hash()
+                    new_segment = QuarantineSegment(
+                        segment_id=f"{old_segment.segment_id}:deferred",
+                        checkpoint=new_checkpoint,
+                        t_start_ns=old_segment.t_start_ns,
+                        t_end_ns=old_segment.t_end_ns,
+                        weak_direction_6d=np.asarray(old_segment.weak_direction_6d,
+                                                     dtype=np.float64).copy(),
+                        info_before_6x6=np.asarray(old_segment.info_before_6x6,
+                                                   dtype=np.float64).copy(),
+                        propagated_cov_norm=float(old_segment.propagated_cov_norm),
+                        raw_frame_refs=[str(k) for k in sorted(pending)],
+                    )
+                # The receipt describes the *remaining pending set*, not only this candidate's
+                # deferrals: a retry committing 8..11 while deferring nothing still leaves 12..19
+                # pending, and deferred=[] / partial_commit=False would say the quarantine is done.
+                report.committed_pose_keys = sorted(committed_keys)
+                report.newly_deferred_pose_keys = sorted(deferred_keys)
+                report.remaining_pending_pose_keys = sorted(pending)
+                report.deferred_pose_keys = sorted(pending)
+                report.partial_commit = bool(pending)
+                new_state = (RecoveryState.WAITING_FOR_EVIDENCE
+                             if pending and old_segment is not None else RecoveryState.HEALTHY)
+                new_history = (new_version, candidate.candidate_id, report)
+            except BaseException:
+                # No half-written manager, and not stranded in VALIDATING: the caller sees the
+                # same exception, and every piece of trusted state is as it was on entry.
+                self.state = state_before_attempt
+                raise
+
+            # ---- publish ---------------------------------------------------------------------
+            # Attribute assignments only: nothing here can fail on caller input.
             self.trusted_poses = new_poses
-            if candidate.repaired_factor_ids is not None:
-                self.trusted_factors.extend(candidate.repaired_factor_ids)
-            else:
-                for kf_id in sorted(candidate.repaired_poses.keys()):
-                    fid = int(kf_id) * 10
-                    if fid not in self.trusted_factors:
-                        self.trusted_factors.append(fid)
-            if candidate.repaired_bias_acc is not None:
-                self.trusted_bias_acc = candidate.repaired_bias_acc.copy()
-            if candidate.repaired_bias_gyr is not None:
-                self.trusted_bias_gyr = candidate.repaired_bias_gyr.copy()
-            self.trusted_version += 1
-            # A partial commit does not end the quarantine. The deferred frames are still suspect,
-            # and clearing the segment would both discard their pending subtransaction and let the
-            # next call fail with "No active quarantine segment to validate". Keep a segment that
-            # resumes from the post-commit trusted map; only a full commit returns to HEALTHY.
-            old_segment = self.active_quarantine
-            # The pending set is persistent, not "whatever this candidate happened to defer". A
-            # legal retry may commit four of the twelve deferred frames and defer none; ending the
-            # quarantine there would silently drop the other eight. pending = old - committed +
-            # newly deferred, and the quarantine ends only when it is empty.
-            old_pending = set()
-            if old_segment is not None:
-                for ref in old_segment.raw_frame_refs:
-                    try:
-                        old_pending.add(int(ref))
-                    except (TypeError, ValueError):
-                        continue
-            committed_keys = {int(k) for k in candidate.repaired_poses.keys()}
-            pending = (old_pending | {int(k) for k in candidate.deferred_pose_keys}) - committed_keys
-            if pending and old_segment is not None:
-                self.provisional_queue.clear()
-                self.active_quarantine = QuarantineSegment(
-                    segment_id=f"{old_segment.segment_id}:deferred",
-                    checkpoint=self.create_checkpoint(timestamp_ns=old_segment.t_end_ns),
-                    t_start_ns=old_segment.t_start_ns,
-                    t_end_ns=old_segment.t_end_ns,
-                    weak_direction_6d=np.asarray(old_segment.weak_direction_6d, dtype=np.float64).copy(),
-                    info_before_6x6=np.asarray(old_segment.info_before_6x6, dtype=np.float64).copy(),
-                    propagated_cov_norm=float(old_segment.propagated_cov_norm),
-                    raw_frame_refs=[str(k) for k in sorted(pending)],
-                )
-                self.state = RecoveryState.WAITING_FOR_EVIDENCE
-            else:
-                self.provisional_queue.clear()
-                self.active_quarantine = None
-                self.state = RecoveryState.HEALTHY
-            # Make the commit auditable: which frames were written, and which stayed quarantined.
-            # The receipt must describe the *remaining pending set*, not only this candidate's
-            # deferrals: a retry that commits 8..11 while deferring nothing still leaves 12..19
-            # pending, and a receipt saying deferred=[] / partial_commit=False would tell the
-            # downstream consumer the quarantine is finished.
-            report.committed_pose_keys = sorted(int(k) for k in candidate.repaired_poses.keys())
-            report.newly_deferred_pose_keys = sorted(int(k) for k in candidate.deferred_pose_keys)
-            report.remaining_pending_pose_keys = sorted(int(k) for k in pending)
-            report.deferred_pose_keys = sorted(int(k) for k in pending)
-            report.partial_commit = bool(pending)
-            self.commit_history.append((self.trusted_version, candidate.candidate_id, report))
+            self.trusted_factors = new_factors
+            self.trusted_bias_acc = new_bias_acc
+            self.trusted_bias_gyr = new_bias_gyr
+            self.trusted_version = new_version
+            if new_checkpoint is not None:
+                self.checkpoints.append(new_checkpoint)
+            self.provisional_queue.clear()
+            self.active_quarantine = new_segment
+            self.state = new_state
+            self.commit_history.append(new_history)
         elif report.mode in (RecoveryMode.MODE3_SOFT_BRIDGE_WAIT, RecoveryMode.MODE1_ONLINE_REWEIGHT):
             # Trusted map stays strictly invariant; system waits for delayed loop or auxiliary evidence
             self.state = RecoveryState.WAITING_FOR_EVIDENCE
