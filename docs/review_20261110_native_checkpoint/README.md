@@ -327,6 +327,39 @@ control 重放终态 **−12.644**，而同刻 live 是 **6.49** —— 差 19 m
 
 因此本文件一律写"保真 7.3 cm"，不写"完全复现"。
 
+## 3k. 同实例两事件运行：E1 走到终态，**E2 未触发**（状态机断点）
+
+输入 `hall01_two_event_v1.bag`（`c3e905da…`，E1 在 +14.6 s、E2 在 +42…52 s），
+rate 1.0、drain 30、σ=0.884、`--candidate-source host_poses`、`--wait-limit-sec 10`，墙钟 102.7 s。
+run `/tmp/fl_native_20261110T104511Z_3336818`，host 与 recovery node 同 pgid `3337883`。
+
+| 项 | 实测 |
+|---|---|
+| host binary / runtime lib | `26a9f2e6…` / 见 receipt |
+| pose / scan | 817 / 598 |
+| 配对 | 542（扫描侧 90.6%） |
+| **E1 trigger** | 1627785263.808（bag **+2.7 s**，远早于真实注入 +14.6 s） |
+| **E1 决策** | 1627785265.874（trigger +2.07 s） |
+| Mode / 结果 | `MODE3_SOFT_BRIDGE_WAIT`，拒绝（候选为空，22 个 key 进 deferred） |
+| 原生动作 | `snapshot×3`（frame 19：7422 voxels/140114 points）→ `hold` → **`restore #1`：live 8776 → 7422 voxels** |
+| 决策后继续消费 | 498 帧 |
+| **E2** | **未触发** |
+| 最终状态 | `WAITING_FOR_EVIDENCE`，quarantine 仍开，`lifecycle.events = []` |
+
+### 断点（不在我这边，报给 S1）
+
+`maybe_close_waiting_segment()` 的**唯一调用点在 `step_frame`**（`transaction_manager_node.py:250`）。
+隔离期间帧走的是 `_ingest_without_detection()`，它在 `state != HEALTHY` 时**直接**
+`register_quarantined_frame` 并 `return`，**不经过 `step_frame`**。于是：
+
+- 等待上限这一条根本不会被求值 → `wait_limit_closed` / `rearm` 永不发生；
+- 而隔离期间 NIS 又因为参考停在冻结的地图上而大面积 `UNAVAILABLE`（本次 `fed_to_step_frame=5`，
+  其余 537 帧 UNAVAILABLE），所以 `step_frame` 也不会因为别的路径被调用；
+- 结果：段永远开着，**E2 结构上不可能触发**。
+
+这是**状态机断点**，不是本次运行的偶发。按三类归属，本次属于 **"仅接线"**：E1 的原生 hold/restore
+真的执行了（地图 8776→7422 回滚），但**第二事件没有发生**，不能算完整流程。
+
 ## 4. 边界
 
 - 没有跑两事件；没有调门、没有调 σ、没有重跑检测或候选矩阵。
