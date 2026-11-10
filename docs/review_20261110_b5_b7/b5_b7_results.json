@@ -1,0 +1,713 @@
+{
+ "_meta": {
+  "what": "B5/B7 status from archived data only; no host run, no threshold changed",
+  "written": "2026-11-10",
+  "rule": "a quantity that has no per-candidate record is reported UNAVAILABLE, never back-inferred from final results"
+ },
+ "B5": {
+  "status": "BLOCKED",
+  "reason": "the archive holds run- and arm-level outcomes only: no list of candidates each carrying a gate decision AND an independent label",
+  "records_with_decision_and_label": 0,
+  "records_with_decision_but_no_label": 1,
+  "records_with_label_but_no_decision": 0,
+  "decision_only_examples": [
+   {
+    "file": "docs/review_20261105/audit_results.json",
+    "missing": [
+     "beneficial",
+     "gt_label",
+     "harmful",
+     "independent_label",
+     "label",
+     "quality_label"
+    ],
+    "keys": [
+     "committed_pose_finite",
+     "gate_accepted",
+     "id",
+     "issue",
+     "reproduced"
+    ]
+   }
+  ],
+  "confusion_matrix": "NOT COMPUTED (would require exactly the records that are absent)",
+  "harmful_rejected": "UNAVAILABLE",
+  "beneficial_rejected": "UNAVAILABLE",
+  "next_native_run_must_record": [
+   "candidate_id",
+   "gate_accept",
+   "gate_reject_reason",
+   "independent_label"
+  ],
+  "note_on_scope": "these four fields are the whole requirement: candidate identity, the gate's decision, its reason, and an independent label. No threshold, score or extra telemetry is needed."
+ },
+ "B7": {
+  "status": "BLOCKED",
+  "reason": "every quantity B7 asks for is a count over decisions partitioned by segment; the archive has neither decisions nor segment labels. It also has no with-gate / without-gate pair, so the healthy-data cost cannot be differenced out of a host run either.",
+  "required": {
+   "false_intervention_count": "decisions on the normal segment",
+   "healthy_geometry_cost": "the same input run with and without the gate",
+   "harmful_accept_count": "independent labels on accepted candidates",
+   "harmful_reject_count": "independent labels on rejected candidates",
+   "missed_repair_count": "a repair outcome per quarantined segment",
+   "interruption_count": "a run status per decision",
+   "continued_operation_after_safe_reject": "a post-decision liveness record"
+  },
+  "descriptive_only": {
+   "source": "docs/review_20261109_bbc3dcb/room02_2x2_results.json",
+   "cells": {
+    "O#1": {
+     "status": "OK",
+     "coverage": 0.9987696231884058,
+     "healthy_region_unsupported_fraction": 0.0048643216080401785,
+     "degraded_window_unsupported_fraction": 0.011258064516128985,
+     "ate_full_diagnostic_m": 0.07162458349543022,
+     "fail": false
+    },
+    "O#2": {
+     "status": "OK",
+     "coverage": 0.6805496811594203,
+     "healthy_region_unsupported_fraction": 1.0,
+     "degraded_window_unsupported_fraction": 0.17645161290322575,
+     "ate_full_diagnostic_m": 14.43858960214947,
+     "fail": true
+    },
+    "O+F#1": {
+     "status": "OK",
+     "coverage": 0.6899958260869565,
+     "healthy_region_unsupported_fraction": 1.0,
+     "degraded_window_unsupported_fraction": 0.15890322580645166,
+     "ate_full_diagnostic_m": 593.0262141110676,
+     "fail": true
+    },
+    "O+F#2": {
+     "status": "OK",
+     "coverage": 0.6933848115942028,
+     "healthy_region_unsupported_fraction": 1.0,
+     "degraded_window_unsupported_fraction": 0.12906451612903225,
+     "ate_full_diagnostic_m": 14.872150834451231,
+     "fail": true
+    },
+    "O-B#1": {
+     "status": "OK",
+     "coverage": 0.6949365797101449,
+     "healthy_region_unsupported_fraction": 1.0,
+     "degraded_window_unsupported_fraction": 0.08619354838709681,
+     "ate_full_diagnostic_m": 48.84667762983906,
+     "fail": true
+    },
+    "O-B#2": {
+     "status": "OK",
+     "coverage": 0.6949484057971015,
+     "healthy_region_unsupported_fraction": 1.0,
+     "degraded_window_unsupported_fraction": 0.10564516129032253,
+     "ate_full_diagnostic_m": 19.67264276177945,
+     "fail": true
+    },
+    "O+F-B#1": {
+     "status": "OK",
+     "coverage": 0.6963416811594203,
+     "healthy_region_unsupported_fraction": 1.0,
+     "degraded_window_unsupported_fraction": 0.07690322580645159,
+     "ate_full_diagnostic_m": 554.5608455651169,
+     "fail": true
+    },
+    "O+F-B#2": {
+     "status": "OK",
+     "coverage": 0.998751884057971,
+     "healthy_region_unsupported_fraction": 0.006090452261306556,
+     "degraded_window_unsupported_fraction": 0.016709677419354807,
+     "ate_full_diagnostic_m": 0.3005104007819498,
+     "fail": false
+    }
+   },
+   "healthy_region_unsupported_fraction": {
+    "per_cell": {
+     "O#1": 0.0048643216080401785,
+     "O#2": 1.0,
+     "O+F#1": 1.0,
+     "O+F#2": 1.0,
+     "O-B#1": 1.0,
+     "O-B#2": 1.0,
+     "O+F-B#1": 1.0,
+     "O+F-B#2": 0.006090452261306556
+    },
+    "range": {
+     "min": 0.004864,
+     "max": 1.0,
+     "median": 1.0,
+     "n": 8
+    },
+    "caution": "six of eight cells report 1.0, i.e. a run that lost the map entirely; this is a failed host run under its input, not a cost of the gate"
+   },
+   "degraded_window_unsupported_fraction": {
+    "per_cell": {
+     "O#1": 0.011258064516128985,
+     "O#2": 0.17645161290322575,
+     "O+F#1": 0.15890322580645166,
+     "O+F#2": 0.12906451612903225,
+     "O-B#1": 0.08619354838709681,
+     "O-B#2": 0.10564516129032253,
+     "O+F-B#1": 0.07690322580645159,
+     "O+F-B#2": 0.016709677419354807
+    },
+    "range": {
+     "min": 0.011258,
+     "max": 0.176452,
+     "median": 0.105645,
+     "n": 8
+    }
+   },
+   "run_status": {
+    "cells_with_status_OK": 8,
+    "cells": 8,
+    "fail_rate_across_cells": {
+     "k": 6,
+     "n": 8,
+     "rate": 0.75,
+     "lo": 0.460128,
+     "hi": 0.913493
+    }
+   }
+  },
+  "hall01": {
+   "source": "docs/review_20261109_bbc3dcb/hall01_b4_cost_and_gap.json",
+   "arms": {
+    "R": {
+     "wall_s": 296.0,
+     "status": "OK",
+     "provenance_error": null
+    },
+    "C3": {
+     "wall_s": null,
+     "status": "NO_WALL_TIME",
+     "provenance_error": "the previously cited /tmp/fl_run_20261109T105559Z_2414230 is the room_02 filtered run: input room02_inj43_filtered.bag -> output res_room02_filtered.bag, so its 122.9 s cannot be attributed to hall_01"
+    }
+   },
+   "with_all_400": {
+    "R": {
+     "frames": 400,
+     "coverage": 0.6277749116607774,
+     "unsupported": 0.59863,
+     "ate_full": 1.9085491271221064,
+     "gt_matched": 252
+    },
+    "C3": {
+     "frames": 400,
+     "coverage": 0.9850048292108363,
+     "unsupported": 0.09572000000000003,
+     "ate_full": 0.3185291881794998,
+     "gt_matched": 252
+    }
+   },
+   "without_gap_neighbours": {
+    "R": {
+     "frames": 319,
+     "coverage": 0.7976745583038869,
+     "unsupported": 0.419987460815047,
+     "ate_full": 1.6169396188018745,
+     "gt_matched": 201
+    },
+    "C3": {
+     "frames": 319,
+     "coverage": 0.9759302709069494,
+     "unsupported": 0.09749216300940444,
+     "ate_full": 0.2735416166921444,
+     "gt_matched": 201
+    }
+   },
+   "population": {
+    "frames_400": 400,
+    "gap_adjacent_within_1s": 81,
+    "remaining": 319,
+    "missing_frames": 46
+   }
+  },
+  "note": "the numbers below are host-run outcomes under different degradation inputs. They are not the gate's cost: subtracting them would require the with/without pair that does not exist, and calling run O#2's healthy fraction 'a false intervention' would attribute a host failure to the gate."
+ },
+ "scan": {
+  "files_with_record_lists": 26,
+  "inventory": [
+   {
+    "file": "docs/mainline_progress_baseline_20261109.json",
+    "record_lists": 2,
+    "longest_list": 12,
+    "record_shapes": [
+     [
+      "acceptance_for_score_3",
+      "evidence_at_baseline",
+      "id",
+      "remaining_stage_points",
+      "score",
+      "title"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261105/artifact_check.json",
+    "record_lists": 1,
+    "longest_list": 21,
+    "record_shapes": [
+     [
+      "bytes",
+      "path",
+      "sha256_verified",
+      "text_elements"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261105/audit_results.json",
+    "record_lists": 1,
+    "longest_list": 6,
+    "record_shapes": [
+     [
+      "id",
+      "issue",
+      "mutated_keys",
+      "original_keys",
+      "reproduced"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261105/figures/manifest.json",
+    "record_lists": 8,
+    "longest_list": 7,
+    "record_shapes": [
+     [
+      "bytes",
+      "path",
+      "sha256"
+     ],
+     [
+      "caption",
+      "kind",
+      "name",
+      "outputs",
+      "source_sha256"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261106_5e2cf69/probe_results.json",
+    "record_lists": 3,
+    "longest_list": 1,
+    "record_shapes": [
+     [
+      "ate_rmse_m",
+      "reentry_position_jump_m",
+      "rejection_reason",
+      "wilson_lower_bound"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_6b61c9d/evaluate_2x2_runs.json",
+    "record_lists": 4,
+    "longest_list": 2,
+    "record_shapes": [
+     [
+      "arm",
+      "ate_max_m",
+      "ate_rmse_m",
+      "bag",
+      "exists",
+      "fail",
+      "matched",
+      "poses",
+      "repeat",
+      "span_s",
+      "window_frames",
+      "window_frames_with_pose_75ms"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_6b61c9d/init_timing.json",
+    "record_lists": 1,
+    "longest_list": 16,
+    "record_shapes": [
+     [
+      "arm",
+      "first_pose_delay_s",
+      "first_pose_stamp_s",
+      "first_pose_xyz",
+      "first_scan_stamp_s",
+      "mode",
+      "run",
+      "unsupported_fraction"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_6b61c9d/room02_original_index_audit.json",
+    "record_lists": 1,
+    "longest_list": 599,
+    "record_shapes": [
+     [
+      "background_present",
+      "dropped_background",
+      "dropped_injected",
+      "in_window",
+      "kept_background",
+      "kept_injected",
+      "n_kept",
+      "n_raw",
+      "ns",
+      "status"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/M2_record_audit.json",
+    "record_lists": 5,
+    "longest_list": 12,
+    "record_shapes": [
+     [
+      "actual",
+      "item",
+      "path",
+      "recorded",
+      "verdict"
+     ],
+     [
+      "count_matches_report",
+      "deleted_count",
+      "deleted_equals_complement",
+      "frame_index",
+      "index_strictly_increasing",
+      "kept_indices_unique",
+      "n_kept",
+      "n_original",
+      "rows_missing_from_source",
+      "scan_ns",
+      "strip_fraction"
+     ],
+     [
+      "detail",
+      "item",
+      "verdict"
+     ],
+     [
+      "item",
+      "recorded",
+      "verdict"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/completeness_healthy_region_results.json",
+    "record_lists": 1,
+    "longest_list": 46,
+    "record_shapes": [
+     [
+      "bracketing_gap_ms",
+      "cause",
+      "has_filtered_scan",
+      "has_pose",
+      "id",
+      "nearest_pose_dt_ms",
+      "ns",
+      "reason",
+      "reasons",
+      "recoverability",
+      "recoverable_if_rule_relaxed",
+      "recoverable_under_frozen_protocol",
+      "scan_points",
+      "ts"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/diag_a3_population.json",
+    "record_lists": 1,
+    "longest_list": 2,
+    "record_shapes": [
+     [
+      "candidate_span_s",
+      "frames_support_ge_0.60",
+      "frames_support_ge_0.60_frac",
+      "label",
+      "onset_rel_s",
+      "pre_frames",
+      "quar_frames",
+      "ref_pts_full",
+      "ref_pts_stride",
+      "ref_pts_used",
+      "support_fraction_median",
+      "support_fraction_p10",
+      "support_reference_points"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/fixed_input_repair_filter_audit.json",
+    "record_lists": 1,
+    "longest_list": 598,
+    "record_shapes": [
+     [
+      "binds",
+      "contam_ratio",
+      "frame_id_match",
+      "kept_rows_sha256",
+      "layout_match",
+      "n",
+      "n_kept",
+      "ns",
+      "oracle_removed",
+      "output_n",
+      "output_sha256",
+      "repairable"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/fixed_input_repair_filter_report.json",
+    "record_lists": 1,
+    "longest_list": 598,
+    "record_shapes": [
+     [
+      "contam_ratio",
+      "kept",
+      "min_bg_eigenvalue",
+      "n",
+      "repairable",
+      "strip_fraction",
+      "t"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/four_arm_independent_results.json",
+    "record_lists": 1,
+    "longest_list": 2,
+    "record_shapes": [
+     [
+      "arm",
+      "ci0.5_archived",
+      "ci0.5_mine",
+      "cov0.5_archived",
+      "cov0.5_delta",
+      "cov0.5_mine",
+      "n_points_archived",
+      "n_points_mine",
+      "tail0.5_archived",
+      "tail0.5_delta",
+      "tail0.5_mine"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/rate_controlled_results.json",
+    "record_lists": 3,
+    "longest_list": 2,
+    "record_shapes": [
+     [
+      "end",
+      "start"
+     ],
+     [
+      "max_ms_inside",
+      "median_ms_inside",
+      "median_ms_neighbours",
+      "n_inside",
+      "slow_interval_fraction_inside",
+      "slow_interval_fraction_neighbours"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/rate_diagnosis_results.json",
+    "record_lists": 5,
+    "longest_list": 2,
+    "record_shapes": [
+     [
+      "end",
+      "start"
+     ],
+     [
+      "imu_ms_inside",
+      "lidar_ms_inside",
+      "odom_ms_inside",
+      "odom_ms_neighbours",
+      "raw_threshold_fraction_inside",
+      "raw_threshold_fraction_neighbours",
+      "segment"
+     ],
+     [
+      "max_ms_inside",
+      "median_ms_inside",
+      "median_ms_neighbours",
+      "n_inside",
+      "raw_threshold_fraction_inside",
+      "raw_threshold_fraction_neighbours"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/room02_2x2_audit.json",
+    "record_lists": 1,
+    "longest_list": 599,
+    "record_shapes": [
+     [
+      "background",
+      "filter_dropped_background",
+      "filter_dropped_injected",
+      "filter_kept",
+      "filter_kept_background",
+      "filter_kept_injected",
+      "in_window",
+      "injected",
+      "n",
+      "ns"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/room02_confirmation_results.json",
+    "record_lists": 1,
+    "longest_list": 72,
+    "record_shapes": [
+     [
+      "cause",
+      "id",
+      "nearest_rerun_pose_dt_ms",
+      "ns"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/room02_filter_report.json",
+    "record_lists": 1,
+    "longest_list": 599,
+    "record_shapes": [
+     [
+      "contam_ratio",
+      "kept",
+      "min_bg_eigenvalue",
+      "n",
+      "repairable",
+      "strip_fraction",
+      "t"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/room02_filter_row_audit.json",
+    "record_lists": 1,
+    "longest_list": 599,
+    "record_shapes": [
+     [
+      "background_present",
+      "dropped_background",
+      "dropped_injected",
+      "in_window",
+      "kept_background",
+      "kept_injected",
+      "n_kept",
+      "n_raw",
+      "ns"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/room02_frozen_frames.json",
+    "record_lists": 1,
+    "longest_list": 72,
+    "record_shapes": [
+     [
+      "cause",
+      "id",
+      "nearest_rerun_pose_dt_ms",
+      "ns"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/room02_hybrid_bag_report.json",
+    "record_lists": 1,
+    "longest_list": 599,
+    "record_shapes": [
+     [
+      "in_window",
+      "kept",
+      "n",
+      "ns"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/room02_oracle_bag_report.json",
+    "record_lists": 1,
+    "longest_list": 599,
+    "record_shapes": [
+     [
+      "in_window",
+      "kept",
+      "n",
+      "ns"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/room02_x_bag_report.json",
+    "record_lists": 1,
+    "longest_list": 599,
+    "record_shapes": [
+     [
+      "in_window",
+      "kept",
+      "n",
+      "ns"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/room02_y_bag_report.json",
+    "record_lists": 1,
+    "longest_list": 599,
+    "record_shapes": [
+     [
+      "in_window",
+      "kept",
+      "n",
+      "ns"
+     ]
+    ]
+   },
+   {
+    "file": "docs/review_20261109_bbc3dcb/two_by_two_audit.json",
+    "record_lists": 8,
+    "longest_list": 8,
+    "record_shapes": [
+     [
+      "arm",
+      "host_revision",
+      "input_sha256",
+      "receipt",
+      "status"
+     ],
+     [
+      "bag",
+      "match",
+      "on_disk",
+      "sha256"
+     ],
+     [
+      "cell",
+      "changed_fields"
+     ],
+     [
+      "cell",
+      "delta_full_vs_independent",
+      "host_full",
+      "host_prefix",
+      "independent",
+      "repeat"
+     ]
+    ]
+   }
+  ]
+ }
+}
