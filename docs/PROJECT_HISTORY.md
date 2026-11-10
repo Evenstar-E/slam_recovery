@@ -389,3 +389,9 @@ main已提出原rawheader/组成员身份替换最低修，方向接受但尚未
 [核验](review_20261110_9ee52dd/README.md)接受wait2第三次run报告：两提前报警段关闭/rearm、支持局部恢复，但第三段无episode/370UNAVAILABLE/E2未处理，非实际修复成功。新after对象身份检查本机actual loop控制确开episode；旧step_frame reset后消费旧decision仍导致manager QUARANTINED/detector HEALTHY。模拟宿主全部正确ack时正常on_pair/service顺序hold→旧rearm resume，新段仍active却被释放，FAIL；最低现生命周期按当前隔离归属消费释放+fresh-decision，非新RPC/架构，旧队列/写回任务复用。
 
 runner savedPGID与receipt写成功exit0保留JSON FAIL且整体exit非零静态/局部控制接受，bash-n PASS。4项不依pytest生命周期测试0.043s PASS，新开发test在首main guard后且import pytest模块未执行，不假称131全suite。S1最低归属修、S2固定预算下一实际修复驱动原生写回→接回→E2或断点，host_poses先控如实标签，S3独立/参数停；完整A/B不升。原件仍缺、本机无ROS原bag、记录仅本地，push拒绝未解除未绕过、remote review3965299。
+
+## 44. 4b47249：五段拒绝循环新增，E2仍不可判；受控接口方向保持（仅本地）
+
+[核验](review_20261110_4b47249/README.md)接受新run154.3s/5段有episode及拒绝-close/rearm/原生动作开发报告，真实E2窗87全部UNAVAILABLE、未完成实际修复链；wiring/receipt OK不当机械全验收。仅文档增量、旧帧/decision/释放/ack/写回正常source未改不重测。检测支持实际1m/60%、3m是NIS选参考半径；表中decision→close2.14/3.15/5.67/4.68/5.60s只是算术，不推timer失效。5×恢复旧stamp不自动等累计轨迹回退10秒/同区重走，末特征与残差不定位唯一根因。
+
+声明+14.6/+42测试触发的CONTROLLED_INTERFACE_TEST符合既有接口探索范围，需实际内部恢复/同stamp接回/E2与尾段，不当自动检测/算法修复收益；不据上游BLOCKED全停已恢复原生开发。S1最低旧段释放/归属修、S2原预算下一两事件机制或断点并最终真实修复→原生写回→接回→E2，S3独立/旧参数停，新支持/保图模型需证据和用户选择。原件待交，完整A/B不升；本机仅静态/算术无ROS原bag、记录只本地、push拒绝未解除未绕过、remote review3965299。

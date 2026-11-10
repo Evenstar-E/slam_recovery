@@ -460,3 +460,11 @@ S1的wait10→2秒只记预算提案，无第三次原件/源码新增；confirm
 S2 runner两个记账修复局部接受：存活期savedPGID退出后可用、receipt写成功exit0不洗JSON FAIL且整体STATUS仍检查；bash-n PASS。本机4选定测试0.043s与小控制exit0，新开发test在首main guard后且依pytest模块未实跑，不叫131本机验收。S2固定原预算/wait2不扫描交下一实际修复→原生重估/内部写回→接回→E2或首断点，host_poses编排控制如实单列；actual patch/已有receipt/log随实质交付，guard/文字集中旁支，S3独立/旧参数停、生产门不动。
 
 自检需PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令原件，段数/131不能代真实E2/恢复。A9/A10局部推进，A8/B2仍具体隔离风险、B4/B11未闭合，不升完整A/B。实际owner4既有Cron无复制/旧repair-3e无活peer，远端当前进程未独立核；私人handoff保护，前push拒绝未解除未绕过、本条只本地、remote review3965299，不称开发收到。
+
+## 46. repair-f3核4b47249：五段拒绝循环有报告，完整恢复与真实E2仍未交（仅本地）
+
+[核验](review_20261110_4b47249/README.md)保留run154.3s/5episode/拒绝51deferred/close-rearm与原生动作报告，E2窗87不可判、未完成；wiring OK不关闭旧正常反例，driver/node/manager/hostpatch本轮未改不重测试。支持1m/60%≠NIS半径3m；表中等待间隔算术不证明timer失败、累计5次回旧stamp不证明10秒轨迹改动或唯一错图根因，snapshot2超时保留UNKNOWN不称无影响。
+
+S1沿9ee已发最低修新旧段释放/fresh-decision/帧及命令/写回归属；S2声明测试触发的受控两事件接口可在原预算先检机制，实际恢复→同stamp接回→E2/尾段结果与automatic BLOCKED分开，host_poses/人工输入不当算法修复成功。最终唯一主线仍实际修复→原生重估/内部写回→接回→E2，S3独立/旧参数停，支持恢复或保图新策略须具体证据后交选择，不自动部署。
+
+开发下次自检分PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令原件，接口/检测/修复/收益分开，归档已有实际patch/run_summary/receipt/log/stamp，不新矩阵。A/B完整分不升、本机静态/算术无ROS原bag，首次整链真完成仍单独报，当前未到。4既有Cron无复制/旧repair-3e无活peer、远端当前进程未独立核；私人handoff保护，push拒绝未解除未绕过、记录仅本地remote review3965299，不称开发收到。

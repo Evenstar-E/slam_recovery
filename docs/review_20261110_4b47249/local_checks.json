@@ -1,0 +1,22 @@
+{
+  "target": "4b472495bc38c134965ab74f6f9433d4c3674a70",
+  "comparison": "9ee52dde35af9a2ba020c54b74b09a3ba7756c95",
+  "scope": "Static source/diff and developer-report arithmetic only; no native/ROS/bag/tuning or repeated regression tests",
+  "changed_files": ["docs/DAILY_20261109.md", "docs/review_20261110_native_checkpoint/README.md"],
+  "source_unchanged": true,
+  "support_predicate": {"radius_m": 1.0, "min_supported_fraction": 0.60, "nis_reference_radius_m": 3.0},
+  "time_arithmetic": {
+    "command": "python -I -c Decimal subtraction on the five reported decision/close pairs",
+    "exit": 0,
+    "reported_decision_to_close_s": ["2.14", "3.15", "5.67", "4.68", "5.60"],
+    "limit": "Intervals do not prove a timer defect; no raw wait_started or evaluation-input records were supplied"
+  },
+  "developer_run": {
+    "run": "fl_native_20261110T110616Z_3349738",
+    "status": "DEVELOPER_REPORTED_ONLY", "episodes": 5, "all_refused": true,
+    "e2_window_frames_unavailable": 87, "native_full_two_event": "NOT_COMPLETED"
+  },
+  "existing_findings": "UNRESOLVED_SOURCE_UNCHANGED_NOT_RETESTED",
+  "controlled_two_event_proposal": "WITHIN_EXISTING_CONTROLLED_INTERFACE_SCOPE_NOT_AUTOMATIC_OR_REPAIR_SUCCESS",
+  "publication": "LOCAL_ONLY_PRIOR_PUSH_DENIAL_NOT_RETRIED"
+}
