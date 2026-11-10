@@ -186,3 +186,11 @@ S4修改文档：`AGENTS.md`、`REVIEW_AND_SIMULATION_PLAN.md`、本协作表；
 **Codex已有实际独立分支与结果：**`origin/codex/independent-reproduction-20261110@ee6a1964da0df5e42904bc7545c7c4bc0bb4cc01`，入口`docs/independent_reproduction_20261110_codex/README.md`（在该分支，未合到本审阅树）。本机核读报告/结果元信息，未重跑。目标39eac2f，报告环境Windows11/Python3.12.14/NumPy2.3.5，独立worktree；旧A5/A9/A7五个正常不变量FAIL、分批控制PASS、60核心与trace工具5例PASS。该包独立确认旧源问题，不是21fa650新fix的失败/验收；原生环境和实际运行仍未交付。
 
 Codex接续沿自己包做新anchor/cov最小适配与正常集成复验，不再造工具、不抢写算法。S1/S2/S3实际工作树变化仍需各自回报；算法/阈值/单测收敛及最高优先运行任务本次是否已接收/开工尚未确认，不从合早期审阅分支推断已接收最新任务。
+
+## 11. 6631da8：B11接线执行尝试已报告
+
+开发S1新快照将B11从NOT STARTED改为IN PROGRESS，引用r11070-c3的649d504：位姿/扫描接收、配对、一次gate决定及相关参数、进程组和NIS来源五项PASS。此前§10的未开工状态只适用于21fa650，不能套给本版本。**本机仅核读汇总，649d504 commit不可解析，驱动源码与原run_summary/candidates/receipt未取得**；执行侧当前branch/HEAD/未提交清单依旧需直接回报。
+
+首个报告断点为warm-up后0.3s即隔离、比注入早16.7s；sigma诊断绑定1500参考点/1关键帧。归档.55是等效归一化，不作新修复参数，也不据此独断cap为唯一根因。候选结果汇总已提到cand_0000拒绝，不应称零候选记录；但目标故障段完整流、原生恢复/接回/E2仍未交。
+
+[增量意见](review_20261110_6631da8/README.md)：S1集成；S2最小核参考空间支持/更新时间，回到实际恢复与E2；S3不继续sigma说明或调参，处理已给实际A7正则反例；Codex/KITTI/B10旁支不挡开工。现驱动和原小型收据随实际交付提供，不为补字段单独重跑。

@@ -139,4 +139,12 @@ A7固定anchor body、direction/info/cov联合搬运以及旧两gauge反例接�
 
 新增Codex已经在独立分支`codex/independent-reproduction-20261110@ee6a196`交验证包，绑定旧39e源码，独立复现旧五缺陷与trace事件关系；**不代表21fa650回归，也不代表新fix已被Codex复验**。旧“Codex尚无结果”更新为已有组件独立证据。后续沿现包适配新anchor/cov做集成复验，不重写工具、不重跑旧trace。
 
-主线仍是[NATIVE_RECOVERY_RUN_TASK](NATIVE_RECOVERY_RUN_TASK_20261110.md)：S1集成，r11070-c3原生恢复/接回/E2，r26534-58最小准入修正；Codex/KITTI/四策略旁支不挡开工。最新S1状态仍B11 NOT STARTED，尚无新原生恢复结果；不以本轮局部PASS自动升完整A/B总分。
+主线仍是[NATIVE_RECOVERY_RUN_TASK](NATIVE_RECOVERY_RUN_TASK_20261110.md)：S1集成，r11070-c3原生恢复/接回/E2，r26534-58最小准入修正；Codex/KITTI/四策略旁支不挡开工。截至21fa650，S1状态仍B11 NOT STARTED，尚无新原生恢复结果；不以本轮局部PASS自动升完整A/B总分。后续接线尝试见§11，不将此旧状态赋给更晚版本。
+
+## 11. 6631da8：接线已有执行汇总，提前隔离成为首个实际断点
+
+开发55904b7将B11更新IN PROGRESS：执行侧649d504报告接线五项通过，已有真实消息/一次gate决定。不能再称完全未开工，但本机未取得该commit、native驱动/原summary/candidates/receipt，只有汇总；不是原生内部恢复/接回/E2已完成。
+
+归档sigma诊断两趟窗前168帧均无HEALTHY、参考恒1500点/1关键帧，报告比注入早16.7s隔离。闭式sigma*≈.55只是当前残差归一化，本机归档算术一致、生产sigma未改；它不证明物理噪声或参考cap唯一根因。接线的首个断点是参考支持/时序与提前隔离，参数不能代替修复；S2最小核查，S3停止sigma说明循环、只处理A7实际固定基正则。cand_0000边界/Wilson失败和负信息增益仍在，改NIS不等完整候选准入通过。
+
+见[6631da8增量核验](review_20261110_6631da8/README.md)。接线有部分实施进展，主线仍缺实际原生恢复/接回/E2；现有驱动/原件随下一实际交付归档，不额外做日志框架或盲目重复实验。复用§10局部已通过组件，不全表升档。
