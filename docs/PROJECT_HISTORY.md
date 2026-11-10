@@ -347,3 +347,9 @@ P2每candidate重选最小特征向量后与λmin比较，r1/24排序恒等不�
 [本轮核验](review_20261110_e2db4b3/README.md)接受rotation_control脚本/JSON与Loewner定义、reading矛盾修正为研究封装进展；main只有日报追加，无新原生运行。C2不集成保持，不重复旋转bag矩阵。新控制0°identity、非0°加[2,-1,.5]平移，transport后重新单位化，含旋转分量时改变二次型对象；非零平移也改体素分箱，不能将fixed列百分比全称纯朝向敏感度。
 
 本机exactSPD正确transport例无任何采样：rz方向原投影1，z30°+[2,-1,.5]搬运物理投影仍1，方向范数√6；研究再单位化投影1/6。只否定一般fixed同物理声明，不推归档每个百分比全由单位化造成。最低纯旋转t0，或完整SE3不再单位化/回同anchor；沿已接受生产transport不改算法。S3独立纠正此控制，S1/S2继续既有正常接线与实际修复写回→接回→E2，参数仍停，无完整A/B分变化。
+
+## 37. d0743e1：受控测量注入报告新增，实际替换源码/原件仍未交
+
+[本轮核验](review_20261110_d0743e1/README.md)接受CONTROLLED_INTERFACE_TEST定位：人工z平移probe不是算法修复/检测成绩。开发报告20发布/10替换/10未匹配/426group并保留未知归因；actual repair subscriber/apply和hold新版patch/log/receipt未归档，host diff仍旧，不能当本机原生PASS。known24-byte布局helper仅改z/其余完整记录与header本机PASS，AST/bash语法PASS，不代跑ROS/原bag。
+
+main已提出原rawheader/组成员身份替换最低修，方向接受但尚未实施，10未匹配原因UNKNOWN。walltime窗口不自动等bag窗，脚本默认26/.5=52wall秒、reprocess前sleep也52秒，加ack成本接近包尾，报告27.7s须实际命令说明，不猜。rm-rf重复OUT会删前次失败证据，最低新空目录/拒绝既有目录、不自动清旧数据。同实例同checkpoint对照更合适，但轨迹差不自动全属修复，保留已有多线程重复散布/不确定性，不另开大重复矩阵。S1/S2下一仍实际修复输入→内部重估写回→接回→E2，S3独立研究/参数仍停；局部进展不升完整A/B。

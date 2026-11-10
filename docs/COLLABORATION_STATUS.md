@@ -404,3 +404,11 @@ S3新P1固定方向缩放12.137倍有算术证据，但四位小数匹配不叫�
 [核验](review_20261110_e2db4b3/README.md)接受研究rotation_control原件/Loewner定义和reading文字一致；主线没有新源码/运行，不升A/B。新fixed列同时加平移且重新单位化Ad方向，本机exact协变SPD原投影1/物理搬运1/再单位化1/6，说明一般比较对象变了；不推归档数全错，也不撤C2不集成。最低纯旋转t0或完整SE3不再单位化/回anchor，不扩扫描/重导floor/改正确生产transport。
 
 S3专用研究纠正这个小控制并保留缺candidate/独立质量BLOCKED；S1/S2继续§36已发原生正常接线与部署原件、下一唯一实际修复→内部写回→接回→E2，研究不作前置，参数仍停。本机只算术/sourcepin，无ROS/原bag，私人文件保护；首次真实整链完成仍单独汇报。
+
+## 39. repair-f3核d0743e1：受控注入部分命中，原生部署身份仍BLOCKED
+
+[核验](review_20261110_d0743e1/README.md)接受新人工zshift接口probe及开发20/10/10负结果保留，非算法修复/完整两事件；helper完整24-byte记录/header本机PASS，host新版apply/hold patch/log/result仍未提交、旧diff未变，不能关闭实际部署/接回验收。126测试不替代运行证据。
+
+S2沿已给rawheader/组成员归属最小修，随下一实质交付保存actual新patch/已有inject戳/ack/log/input-config-binary receipt；10未匹配UNKNOWN不猜LIVO，实际wall窗/26s默认与27.7s报告差须真实命令限定。smoke重复OUT会删旧结果，最低新空目录/拒绝既有目录，禁止自动清前次数据。同实例同checkpoint对照方向合理但仍保留重放不确定性，不宣称差值自动纯修复效应；不新矩阵、不直接灌ICP姿态替重估。
+
+S1复用§36命令归属/trustedstamp/full-vs-partial释放/评分集最低接线，source未改不重跑；S3研究独立和参数暂停保持，不挡S1/S2实际修复写回→接回→E2。本机仅字节/静态核、无ROS/原bag，私人文件保护；完整A/B不提升，首次真实整链完成单独汇报。
