@@ -38,6 +38,18 @@ from ..validation import (
 )
 
 
+def boundary_jump_within_envelope(jump_m: float, elapsed_s: float, jump_bound_m: float,
+                                  speed_m_s: float = 2.0) -> bool:
+    """Is a boundary displacement explainable as motion over `elapsed_s`?
+
+    `max_reentry_jump_m` bounds a *discontinuity*. With a positive confirmation margin the pose
+    being compared is seconds old, so the same bound applied without the elapsed time refuses
+    every candidate on a moving platform: 1.25 m over 2.33 s is 0.54 m/s of ordinary walking.
+    The envelope keeps the bound for the instantaneous case and scales it with elapsed time.
+    """
+    return float(jump_m) <= float(jump_bound_m) + float(speed_m_s) * max(0.0, float(elapsed_s))
+
+
 class OnlineRecoveryTransactionNode:
     """
     Stateful online recovery node that wraps an incremental LIO/VIO host,
@@ -498,6 +510,7 @@ class OnlineRecoveryTransactionNode:
         aux_or_loop_info_6x6: Optional[np.ndarray] = None,
         incumbent_poses: Optional[Dict[int, np.ndarray]] = None,
         reentry_anchor_pose: Optional[np.ndarray] = None,
+        reentry_anchor_ts_ns: Optional[int] = None,
     ) -> ValidationReport:
         """
         Perform true cross-scan holdout validation (Section 3.2 S1):
@@ -577,7 +590,7 @@ class OnlineRecoveryTransactionNode:
             if prev_k in self._kf_timestamps and next_k in self._kf_timestamps:
                 dt = max(0.0, (self._kf_timestamps[next_k] - self._kf_timestamps[prev_k]) * 1e-9)
             boundary_jumps.append(jump)
-            if jump > jump_bound + 2.0 * dt:
+            if not boundary_jump_within_envelope(jump, dt, jump_bound):
                 boundary_ok = False
         # The first committed run is measured against the trusted anchor as well; the re-entry
         # check above uses the candidate's boundary frame, which may not itself be committed.
@@ -587,11 +600,22 @@ class OnlineRecoveryTransactionNode:
             head = np.asarray(repaired_poses[runs[0][0]], dtype=np.float64)
             if anchor_arr.shape == (4, 4) and head.shape == (4, 4):
                 first_run_jump = float(np.linalg.norm(head[:3, 3] - anchor_arr[:3, 3]))
+                # The elapsed time that matters is between the *anchor* and the first committed
+                # frame, not between two candidate frames. The anchor is the last trusted pose,
+                # which with a confirmation margin is seconds older than the candidate: measuring
+                # the jump without that interval compares motion to a discontinuity bound and
+                # refuses every candidate on a moving platform (1.25 m over 2.33 s at 0.54 m/s).
                 dt0 = 0.0
-                if runs[0][0] in self._kf_timestamps and kf_sorted[0] in self._kf_timestamps:
-                    dt0 = max(0.0, (self._kf_timestamps[runs[0][0]]
-                                    - self._kf_timestamps[kf_sorted[0]]) * 1e-9)
-                if first_run_jump > jump_bound + 2.0 * dt0:
+                if runs[0][0] in self._kf_timestamps:
+                    if reentry_anchor_ts_ns is not None:
+                        dt0 = max(0.0, (self._kf_timestamps[runs[0][0]]
+                                        - int(reentry_anchor_ts_ns)) * 1e-9)
+                    elif kf_sorted[0] in self._kf_timestamps:
+                        # Legacy callers that cannot date their anchor keep the old, stricter
+                        # reading; the report says so through boundary_basis.
+                        dt0 = max(0.0, (self._kf_timestamps[runs[0][0]]
+                                        - self._kf_timestamps[kf_sorted[0]]) * 1e-9)
+                if not boundary_jump_within_envelope(first_run_jump, dt0, jump_bound):
                     boundary_ok = False
         # Without an independent relative-motion measurement the check is an elapsed-time speed
         # envelope, not geometric continuity; say so rather than presenting it as verified.

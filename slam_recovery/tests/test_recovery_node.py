@@ -307,12 +307,13 @@ class _FakeLoopNode:
         return None
 
     def evaluate_and_commit_candidate(self, candidate_id, repaired_poses, incumbent_poses=None,
-                                      reentry_anchor_pose=None):
+                                      reentry_anchor_pose=None, reentry_anchor_ts_ns=None):
         self.last_call = dict(candidate_id=candidate_id,
                               repaired=sorted(repaired_poses),
                               incumbent=sorted(incumbent_poses or {}),
                               anchor=None if reentry_anchor_pose is None else
-                              reentry_anchor_pose[:3, 3].tolist())
+                              reentry_anchor_pose[:3, 3].tolist(),
+                              anchor_ts_ns=reentry_anchor_ts_ns)
         self.tx_mgr.active_quarantine = None
         return _Report(accepted=False, committed_pose_keys=[], deferred_pose_keys=[0, 1])
 
@@ -486,3 +487,37 @@ def test_cloud_to_xyz_rejects_a_cloud_without_xyz():
     msg.fields = [f for f in msg.fields if f.name != "z"]
     with pytest.raises(ValueError):
         cloud_to_xyz(msg)
+
+
+def test_the_reentry_bound_is_scaled_by_time_since_the_anchor():
+    """1.2506 m over the 2.329 s confirmation margin is walking, not a discontinuity.
+
+    The live run at sigma=0.884 refused its only candidate on this number. The anchor was
+    2.329 s older than the trigger, so the distance contained 0.54 m/s of ordinary motion and the
+    bound was applied as if the two poses were instantaneous neighbours.
+    """
+    from slam_recovery.sim.transaction_manager_node import boundary_jump_within_envelope
+
+    bound = 0.5
+    assert boundary_jump_within_envelope(1.2506, 2.329, bound), \
+        "continuous motion over the margin must fit the envelope"
+    assert not boundary_jump_within_envelope(1.2506, 0.0, bound), \
+        "the same displacement with no elapsed time is a real discontinuity"
+    assert not boundary_jump_within_envelope(7.0, 2.329, bound), \
+        "a jump beyond what 2 m/s could cover in the interval is still refused"
+
+
+def test_the_loop_dates_the_anchor_it_passes():
+    """The envelope is only correct if the anchor's own timestamp reaches the evaluator."""
+    node = _FakeLoopNode(trigger_at=3)
+    loop = NativeClosedLoop(node, run_id="run", confirmation_margin_ns=2_000_000_000)
+    t0 = 1_000_000_000
+    for i in range(40):
+        loop.on_pair(t0 + i * 100_000_000, np.eye(4), _scan(200))
+    call = node.last_call
+    trusted_keys = [k for k in node._kf_timestamps if k in node.tx_mgr.trusted_poses]
+    if trusted_keys:
+        expected = node._kf_timestamps[max(trusted_keys)]
+        assert call["anchor_ts_ns"] == expected
+    else:
+        assert call["anchor_ts_ns"] is None

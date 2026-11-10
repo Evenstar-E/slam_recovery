@@ -711,6 +711,12 @@ class NativeClosedLoop:
 
         incumbent, anchor, extrap_basis = extrapolate_incumbent(
             self.node.tx_mgr.trusted_poses, self.node._kf_timestamps, ts_by_key)
+        # The anchor is the last trusted keyframe; its timestamp is what makes the re-entry bound
+        # an elapsed-time envelope instead of a bare distance.
+        anchor_ts_ns = None
+        if self.node.tx_mgr.trusted_poses:
+            anchor_key = max(self.node.tx_mgr.trusted_poses.keys())
+            anchor_ts_ns = self.node._kf_timestamps.get(anchor_key)
 
         version_before = int(self.node.tx_mgr.trusted_version)
         report = None
@@ -721,6 +727,7 @@ class NativeClosedLoop:
                 repaired,
                 incumbent_poses=incumbent,
                 reentry_anchor_pose=anchor,
+                reentry_anchor_ts_ns=anchor_ts_ns,
             )
         except BaseException as exc:       # a refused attempt must still be recorded
             error = {"candidate_id": ep.candidate_id, "error": f"{type(exc).__name__}: {exc}"}
