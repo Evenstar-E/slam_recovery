@@ -1,0 +1,351 @@
+{
+ "_meta": {
+  "what": "form 2: observable-subspace gate, and why it is not the scalar",
+  "written": "2026-11-10",
+  "definition": {
+   "variance_floor": 2.0,
+   "why_this_number": "1/sigma_tol, the covariance bound the gate already applies",
+   "gate": "admit only if m_after == 0 (no direction with lambda < 2.0)",
+   "not_a_scalar": "it is a rank/condition condition over all six directions"
+  },
+  "bag": "room02_2x2_O.bag",
+  "scans": 24,
+  "cap": 6000,
+  "not_done": [
+   "no host run",
+   "no threshold changed",
+   "no production edit",
+   "decision-level comparison BLOCKED on `after`"
+  ]
+ },
+ "rows": [
+  {
+   "stamp_ns": 1627643739514966011,
+   "points": 6000,
+   "scalar_along_weakest": 11.1465,
+   "min_eig": 11.1465,
+   "max_eig": 2023.0774,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.00551
+  },
+  {
+   "stamp_ns": 1627643742021767139,
+   "points": 6000,
+   "scalar_along_weakest": 10.9705,
+   "min_eig": 10.9705,
+   "max_eig": 1876.0618,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.005848
+  },
+  {
+   "stamp_ns": 1627643744525787830,
+   "points": 6000,
+   "scalar_along_weakest": 11.7101,
+   "min_eig": 11.7101,
+   "max_eig": 2186.3568,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.005356
+  },
+  {
+   "stamp_ns": 1627643747029613972,
+   "points": 6000,
+   "scalar_along_weakest": 27.7806,
+   "min_eig": 27.7806,
+   "max_eig": 1465.1966,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.01896
+  },
+  {
+   "stamp_ns": 1627643749534646511,
+   "points": 6000,
+   "scalar_along_weakest": 22.5684,
+   "min_eig": 22.5684,
+   "max_eig": 1572.6607,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.01435
+  },
+  {
+   "stamp_ns": 1627643752044056177,
+   "points": 6000,
+   "scalar_along_weakest": 27.5323,
+   "min_eig": 27.5323,
+   "max_eig": 1311.0362,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.021
+  },
+  {
+   "stamp_ns": 1627643754544549942,
+   "points": 6000,
+   "scalar_along_weakest": 23.1125,
+   "min_eig": 23.1125,
+   "max_eig": 1311.3061,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.017626
+  },
+  {
+   "stamp_ns": 1627643757049333334,
+   "points": 6000,
+   "scalar_along_weakest": 24.9992,
+   "min_eig": 24.9992,
+   "max_eig": 1244.8913,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.020081
+  },
+  {
+   "stamp_ns": 1627643759554082870,
+   "points": 6000,
+   "scalar_along_weakest": 2.5547,
+   "min_eig": 2.5547,
+   "max_eig": 734.8277,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.003477
+  },
+  {
+   "stamp_ns": 1627643762061752796,
+   "points": 6000,
+   "scalar_along_weakest": 2.4473,
+   "min_eig": 2.4473,
+   "max_eig": 431.1351,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.005676
+  },
+  {
+   "stamp_ns": 1627643764563946724,
+   "points": 6000,
+   "scalar_along_weakest": 2.1266,
+   "min_eig": 2.1266,
+   "max_eig": 801.5787,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.002653
+  },
+  {
+   "stamp_ns": 1627643767068705559,
+   "points": 5837,
+   "scalar_along_weakest": 4.0159,
+   "min_eig": 4.0159,
+   "max_eig": 6308.5872,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.000637
+  },
+  {
+   "stamp_ns": 1627643769573590755,
+   "points": 5464,
+   "scalar_along_weakest": 1.6992,
+   "min_eig": 1.6992,
+   "max_eig": 5532.5399,
+   "m_unconstrained": 1,
+   "lambda_min_over_max": 0.000307
+  },
+  {
+   "stamp_ns": 1627643772078472376,
+   "points": 5421,
+   "scalar_along_weakest": 2.1637,
+   "min_eig": 2.1637,
+   "max_eig": 4483.3025,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.000483
+  },
+  {
+   "stamp_ns": 1627643774583362579,
+   "points": 6000,
+   "scalar_along_weakest": 3.4299,
+   "min_eig": 3.4299,
+   "max_eig": 439.7748,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.007799
+  },
+  {
+   "stamp_ns": 1627643777088632107,
+   "points": 6000,
+   "scalar_along_weakest": 1.8941,
+   "min_eig": 1.8941,
+   "max_eig": 242.7847,
+   "m_unconstrained": 1,
+   "lambda_min_over_max": 0.007802
+  },
+  {
+   "stamp_ns": 1627643779600667477,
+   "points": 6000,
+   "scalar_along_weakest": 20.105,
+   "min_eig": 20.105,
+   "max_eig": 1457.3208,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.013796
+  },
+  {
+   "stamp_ns": 1627643782098312855,
+   "points": 6000,
+   "scalar_along_weakest": 19.3689,
+   "min_eig": 19.3689,
+   "max_eig": 1510.4329,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.012823
+  },
+  {
+   "stamp_ns": 1627643784603065252,
+   "points": 6000,
+   "scalar_along_weakest": 31.1017,
+   "min_eig": 31.1017,
+   "max_eig": 1896.8663,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.016396
+  },
+  {
+   "stamp_ns": 1627643787107827663,
+   "points": 6000,
+   "scalar_along_weakest": 32.7191,
+   "min_eig": 32.7191,
+   "max_eig": 1397.2568,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.023417
+  },
+  {
+   "stamp_ns": 1627643789612936735,
+   "points": 6000,
+   "scalar_along_weakest": 18.7268,
+   "min_eig": 18.7268,
+   "max_eig": 1589.4611,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.011782
+  },
+  {
+   "stamp_ns": 1627643792117562771,
+   "points": 6000,
+   "scalar_along_weakest": 27.6432,
+   "min_eig": 27.6432,
+   "max_eig": 1658.0604,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.016672
+  },
+  {
+   "stamp_ns": 1627643794622452736,
+   "points": 6000,
+   "scalar_along_weakest": 29.7675,
+   "min_eig": 29.7675,
+   "max_eig": 1130.0442,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.026342
+  },
+  {
+   "stamp_ns": 1627643797127331734,
+   "points": 6000,
+   "scalar_along_weakest": 29.5084,
+   "min_eig": 29.5084,
+   "max_eig": 1083.0054,
+   "m_unconstrained": 0,
+   "lambda_min_over_max": 0.027247
+  }
+ ],
+ "scalar_vs_subspace": {
+  "pearson_r": 1.0,
+  "rank_identical_positions": 24,
+  "n": 24,
+  "rank_pairs_scalar_vs_min_eig": [
+   [
+    9,
+    9
+   ],
+   [
+    8,
+    8
+   ],
+   [
+    10,
+    10
+   ],
+   [
+    19,
+    19
+   ],
+   [
+    14,
+    14
+   ],
+   [
+    17,
+    17
+   ],
+   [
+    15,
+    15
+   ],
+   [
+    16,
+    16
+   ],
+   [
+    5,
+    5
+   ],
+   [
+    4,
+    4
+   ],
+   [
+    2,
+    2
+   ],
+   [
+    7,
+    7
+   ],
+   [
+    0,
+    0
+   ],
+   [
+    3,
+    3
+   ],
+   [
+    6,
+    6
+   ],
+   [
+    1,
+    1
+   ],
+   [
+    13,
+    13
+   ],
+   [
+    12,
+    12
+   ],
+   [
+    22,
+    22
+   ],
+   [
+    23,
+    23
+   ],
+   [
+    11,
+    11
+   ],
+   [
+    18,
+    18
+   ],
+   [
+    21,
+    21
+   ],
+   [
+    20,
+    20
+   ]
+  ],
+  "reading": "the two statistics share the eigenvalue they are both built from, so they are correlated, but they do not order the scans identically: the scalar along one direction and the six-direction floor are different objects"
+ },
+ "gauge_control": {
+  "scalar_relative_diff": 0.21419551793376024,
+  "min_eig_relative_diff": 0.2141955179337524,
+  "m_unconstrained_before_after": [
+   0,
+   0
+  ]
+ }
+}
