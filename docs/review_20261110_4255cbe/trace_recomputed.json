@@ -1,0 +1,25 @@
+{
+  "source_revision": "4255cbe601263e458e772c08f9fce83bc36307e3",
+  "scope": "Local recomputation from archived original CSVs and receipt consistency, not native rerun",
+  "runs": {
+    "on1": {"csv_sha256": "00af7948aa8dd06e5439c3ef184dbd8abaa31fa631c6dd75e5469b19c8b7f7c5", "ARRIVE": 599, "GROUP": 1766, "STATE": 1766, "IMUINIT": 5, "empty_groups": 884, "receipt_status": "OK", "odom_messages": 800},
+    "on2": {"csv_sha256": "edb804c48c19e1a667684a3123fa27ade8afc3fb0de273d32f679ccc2d62aec3", "ARRIVE": 599, "GROUP": 1766, "STATE": 1766, "IMUINIT": 5, "empty_groups": 884, "receipt_status": "OK", "odom_messages": 800}
+  },
+  "receipt_bindings": {"trace_hashes_verified": true, "input_config_exec_library_equal": true, "rate": 1.0, "drain_s": 40.0, "both_planned_kill_after_drain": true},
+  "recorded_group_fields_equal": true,
+  "recorded_group_fields_include": ["lid_stamp_ns", "n_items", "first_stamp_ns", "last_stamp_ns", "stamps_sha256", "extra including img_stamp_ns and need_init"],
+  "recorded_imuinit_fields_equal": true,
+  "state_lidar_stamps_equal": true,
+  "position_max_axis_differences": {
+    "first_over_1mm": {"index": 87, "elapsed_s": 3.7293787, "difference_m": 0.001192},
+    "first_over_1cm": {"index": 119, "elapsed_s": 4.928720474, "difference_m": 0.012267},
+    "first_over_0_1m": {"index": 1036, "elapsed_s": 35.494988918, "difference_m": 0.11796},
+    "first_over_1m": {"index": 1096, "elapsed_s": 37.496442318, "difference_m": 1.004317},
+    "first_over_10m": {"index": 1222, "elapsed_s": 41.701759577, "difference_m": 10.042473},
+    "first_over_100m": {"index": 1480, "elapsed_s": 50.301020861, "difference_m": 100.898074},
+    "final_m": 293.591943, "maximum_m": 309.706199,
+    "samples_over_1mm": 1609, "samples_over_0_1m": 726
+  },
+  "limits": ["Raw consumed IMU measurements/sample lists not present: hash values compared but full-sample hash recipe not independently regenerated", "No OFF control or default-build observation", "No GT/ATE for this pair", "Position and printed diagonal rotation are not full host state", "Recorded summaries equal does not exclude unrecorded measurement or tracing effects"],
+  "verdict": "UNKNOWN"
+}
