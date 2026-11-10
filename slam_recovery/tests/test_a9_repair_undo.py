@@ -9,7 +9,7 @@ import unittest
 
 import numpy as np
 
-from slam_recovery.core import BackendDelta, CandidateMap, RecoveryState
+from slam_recovery.core import BackendDelta, CandidateMap, RecoveryState, TangentFrame
 from slam_recovery.quarantine import TrustedMapTransactionManager
 
 
@@ -28,7 +28,7 @@ def _candidate(version, poses):
         candidate_id="a9_repair", parent_map_version=version, repaired_poses=dict(poses),
         info_after_6x6=np.diag([60, 60, 60, 45.0, 60, 60]), cov_after_6x6=np.eye(6) * 0.05,
         holdout_nis=1.2, paired_benefit_approved=True, wilson_lower_bound=0.90,
-        reentry_pos_jump_m=0.05)
+        reentry_pos_jump_m=0.05, info_after_frame=TangentFrame("world", "rot_trans", "world"))
 
 
 class A9RepairUndoTest(unittest.TestCase):
@@ -39,7 +39,9 @@ class A9RepairUndoTest(unittest.TestCase):
         mgr.trigger_quarantine(
             estimated_onset_ns=2 * 100_000_000, current_ns=3 * 100_000_000,
             weak_direction_6d=np.array([0, 0, 0, 1, 0, 0], dtype=np.float64),
-            info_before_6x6=np.eye(6) * 10.0, propagated_cov_norm=1.0)
+            info_before_6x6=np.eye(6) * 10.0, propagated_cov_norm=1.0,
+            weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
+            info_before_frame=TangentFrame("world", "rot_trans", "world"))
         # the quarantine rolled 2 and 3 back, so 2 does not exist before the repair
         existed_before = 2 in mgr.trusted_poses
 
@@ -57,7 +59,9 @@ class A9RepairUndoTest(unittest.TestCase):
         mgr.trigger_quarantine(
             estimated_onset_ns=1 * 100_000_000, current_ns=5 * 100_000_000,
             weak_direction_6d=np.array([0, 0, 0, 1, 0, 0], dtype=np.float64),
-            info_before_6x6=np.eye(6) * 10.0, propagated_cov_norm=1.0)
+            info_before_6x6=np.eye(6) * 10.0, propagated_cov_norm=1.0,
+            weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
+            info_before_frame=TangentFrame("world", "rot_trans", "world"))
 
         # undo restores the pre-repair state: a key that did not exist is removed again
         self.assertFalse(existed_before)
