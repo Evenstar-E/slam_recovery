@@ -1,0 +1,811 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0652aab..f59bb83 100755
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -44,8 +44,24 @@ include(ProcessorCount)
+ ProcessorCount(N)
+ message(STATUS "Processor count: ${N}")
+ 
+-# Set the number of cores for multithreading
+-if(N GREATER 4)
++# Opt-in: -DNO_MP=ON compiles the parallel loops out, which removes the only place where the
++# same input, config and thread count can still give a different result (the OpenMP reduction in
++# vio.cpp). Default OFF so the historical build is unchanged.
++option(NO_MP "Disable OpenMP parallel loops (deterministic reductions)" OFF)
++option(DET_SYNC "Block on message arrival instead of polling at 5 kHz (T3a)" OFF)
++option(TRACE_GROUP "Write per-arrival / per-group / per-init trace lines (observation only)" OFF)
++if(TRACE_GROUP)
++  add_definitions(-DTRACE_GROUP)
++  message(STATUS "TRACE_GROUP=ON: grouping trace lines are written to $TRACE_GROUP_FILE")
++endif()
++if(DET_SYNC)
++  add_definitions(-DDET_SYNC)
++  message(STATUS "DET_SYNC=ON: main loop blocks on arrival instead of wall-clock polling")
++endif()
++if(NO_MP)
++  add_definitions(-DNO_MP -DMP_PROC_NUM=1)
++  message(STATUS "NO_MP=ON: OpenMP parallel loops disabled for determinism")
++elseif(N GREATER 4)
+   math(EXPR PROC_NUM "4")
+   add_definitions(-DMP_EN -DMP_PROC_NUM=${PROC_NUM})
+   message(STATUS "Multithreading enabled. Cores: ${PROC_NUM}")
+@@ -122,7 +138,7 @@ add_library(vio src/vio.cpp src/frame.cpp src/visual_point.cpp)
+ add_library(lio src/voxel_map.cpp)
+ add_library(pre src/preprocess.cpp)
+ add_library(imu_proc src/IMU_Processing.cpp)
+-add_library(laser_mapping src/LIVMapper.cpp)
++add_library(laser_mapping src/LIVMapper.cpp src/native_checkpoint.cpp)
+ 
+ # Add the main executable
+ add_executable(fastlivo_mapping src/main.cpp)
+diff --git a/include/IMU_Processing.h b/include/IMU_Processing.h
+index fbc815e..985eafd 100644
+--- a/include/IMU_Processing.h
++++ b/include/IMU_Processing.h
+@@ -64,6 +64,26 @@ public:
+   V3D Zero3d;
+   int lidar_type;
+ 
++  // Checkpoint hooks. UndistortPcl continues from four values left behind by the previous frame
++  // (last_imu, last_prop_end_time, acc_s_last, angvel_last); a replay that restores only the state
++  // and the map would still propagate from the wrong starting point.
++  void getCheckpointState(sensor_msgs::ImuConstPtr &last_imu_out, double &prop_end_out,
++                          V3D &acc_out, V3D &ang_out) const
++  {
++    last_imu_out = last_imu;
++    prop_end_out = last_prop_end_time;
++    acc_out = acc_s_last;
++    ang_out = angvel_last;
++  }
++  void setCheckpointState(const sensor_msgs::ImuConstPtr &last_imu_in, const double prop_end_in,
++                          const V3D &acc_in, const V3D &ang_in)
++  {
++    last_imu = last_imu_in;
++    last_prop_end_time = prop_end_in;
++    acc_s_last = acc_in;
++    angvel_last = ang_in;
++  }
++
+ private:
+   void IMU_init(const MeasureGroup &meas, StatesGroup &state, int &N);
+   void Forward_without_imu(LidarMeasureGroup &meas, StatesGroup &state_inout, PointCloudXYZI &pcl_out);
+diff --git a/include/LIVMapper.h b/include/LIVMapper.h
+index 46664d2..a4e163d 100644
+--- a/include/LIVMapper.h
++++ b/include/LIVMapper.h
+@@ -20,6 +20,10 @@ which is included as part of this source code package.
+ #include <image_transport/image_transport.h>
+ #include <nav_msgs/Path.h>
+ #include <vikit/camera_loader.h>
++#ifdef DET_SYNC
++#include <condition_variable>
++#include <mutex>
++#endif
+ 
+ class LIVMapper
+ {
+@@ -30,6 +34,21 @@ public:
+   void initializeComponents();
+   void initializeFiles();
+   void run();
++
++  // Native checkpoint (recovery mainline, minimal): the host's own state and voxel map, copied at
++  // one logical instant and restorable without re-running the input. Driven by a directory of
++  // command files (~native_checkpoint_dir) so no new ROS interface has to exist for it.
++  bool snapshotCheckpoint();
++  bool restoreCheckpoint();
++  bool reprocessCheckpoint();
++  void pollCheckpointControl();
++  std::string checkpointStatus() const;
++#ifdef DET_SYNC
++  // DET_SYNC: the main loop blocks until a lidar callback signals instead of polling at 5 kHz.
++  // Recorded, not adjusted: the processing itself is unchanged.
++  std::mutex det_mtx_;
++  std::condition_variable det_cv_;
++#endif
+   void gravityAlignment();
+   void handleFirstFrame();
+   void stateEstimationAndMapping();
+@@ -178,6 +197,32 @@ public:
+   ros::Publisher mavros_pose_publisher;
+   ros::Timer imu_prop_timer;
+ 
++  // Checkpoint contents. Deliberately only these: the states the estimator continues from and the
++  // map it continues into.
++  StatesGroup cp_state_;
++  StatesGroup cp_state_propagat_;
++  std::unordered_map<VOXEL_LOCATION, VoxelOctoTree *> cp_map_;
++  bool cp_valid_ = false;
++  double cp_stamp_ = -1.0;
++  int cp_frame_num_ = 0;
++  size_t cp_voxels_ = 0, cp_points_ = 0, cp_nodes_ = 0;
++  size_t cp_restores_ = 0;
++  // The IMU pre-integrator carries four values across frames (last_imu, last_prop_end_time and the
++  // last corrected acc/gyro). Without them a replay from the checkpoint would not reproduce the
++  // propagation the host itself did, so they are part of the checkpoint, not a convenience.
++  sensor_msgs::ImuConstPtr cp_last_imu_;
++  double cp_last_prop_end_time_ = -1.0;
++  V3D cp_acc_s_last_;
++  V3D cp_angvel_last_;
++  // Groups processed after the snapshot, replayed on demand. Capture is off unless a snapshot is
++  // live; replay mode suppresses publication so a replayed frame is never mistaken for new input.
++  std::vector<LidarMeasureGroup> replay_buffer_;
++  bool replay_capture_ = false;
++  bool replay_mode_ = false;
++  size_t cp_replays_ = 0, cp_replay_frames_ = 0;
++  std::string cp_ctrl_dir_;
++  double cp_last_poll_wall_ = -1.0;
++
+   int frame_num = 0;
+   double aver_time_consu = 0;
+   double aver_time_icp = 0;
+diff --git a/include/preprocess.h b/include/preprocess.h
+index bf74f60..3723d7a 100755
+--- a/include/preprocess.h
++++ b/include/preprocess.h
+@@ -166,6 +166,8 @@ public:
+   int lidar_type, point_filter_num, N_SCANS;
+   
+   double blind, blind_sqr;
++  // Scale from the Velodyne point time unit to milliseconds.
++  double velodyne_time_scale;
+   bool feature_enabled, given_offset_time;
+   ros::Publisher pub_full, pub_surf, pub_corn;
+ 
+diff --git a/src/IMU_Processing.cpp b/src/IMU_Processing.cpp
+index f3e4c96..def599c 100755
+--- a/src/IMU_Processing.cpp
++++ b/src/IMU_Processing.cpp
+@@ -11,6 +11,13 @@ which is included as part of this source code package.
+ */
+ 
+ #include "IMU_Processing.h"
++#include <vector>
++#ifdef TRACE_GROUP
++#include <cstdint>
++// implemented in LIVMapper.cpp; called on the main processing thread only
++void trace_emit_imuinit(const int64_t *stamps, int64_t n, int iter, int maxc);
++#endif
++
+ 
+ ImuProcess::ImuProcess() : Eye3d(M3D::Identity()),
+                            Zero3d(0, 0, 0), b_first_frame(true), imu_need_init(true)
+@@ -106,6 +113,14 @@ void ImuProcess::IMU_init(const MeasureGroup &meas, StatesGroup &state_inout, in
+   /** 1. initializing the gravity, gyro bias, acc and gyro covariance
+    ** 2. normalize the acceleration measurenments to unit gravity **/
+   ROS_INFO("IMU Initializing: %.1f %%", double(N) / MAX_INI_COUNT * 100);
++#ifdef TRACE_GROUP
++  {
++    std::vector<int64_t> _st;
++    _st.reserve(meas.imu.size());
++    for (auto &im : meas.imu) _st.push_back((int64_t)im->header.stamp.toNSec());
++    trace_emit_imuinit(_st.data(), (int64_t)_st.size(), (int)N, (int)MAX_INI_COUNT);
++  }
++#endif
+   V3D cur_acc, cur_gyr;
+ 
+   if (b_first_frame)
+@@ -570,6 +585,9 @@ void ImuProcess::Process2(LidarMeasureGroup &lidar_meas, StatesGroup &stat, Poin
+     {
+       // cov_acc *= pow(G_m_s2 / mean_acc.norm(), 2);
+       imu_need_init = false;
++#ifdef DET_SYNC
++      ROS_INFO("[DET_SYNC] imu_init_done iter=%d", init_iter_num);
++#endif
+       ROS_INFO("IMU Initials: Gravity: %.4f %.4f %.4f %.4f; acc covarience: "
+                "%.8f %.8f %.8f; gry covarience: %.8f %.8f %.8f \n",
+                stat.gravity[0], stat.gravity[1], stat.gravity[2], mean_acc.norm(), cov_acc[0], cov_acc[1], cov_acc[2], cov_gyr[0], cov_gyr[1],
+diff --git a/src/LIVMapper.cpp b/src/LIVMapper.cpp
+index 15af354..124462d 100755
+--- a/src/LIVMapper.cpp
++++ b/src/LIVMapper.cpp
+@@ -11,6 +11,118 @@ which is included as part of this source code package.
+ */
+ 
+ #include "LIVMapper.h"
++#include "native_checkpoint.h"
++#include <cstdio>
++#include <fstream>
++#include <omp.h>
++#ifdef TRACE_GROUP
++#include <atomic>
++#include <cstdint>
++#include <cstdio>
++#include <cstdlib>
++#include <cstring>
++#include <string>
++namespace tr {
++struct Ctx { uint32_t h[8]; uint64_t bytes; uint8_t buf[64]; size_t n; };
++static inline uint32_t ror(uint32_t x, int r) { return (x >> r) | (x << (32 - r)); }
++static const uint32_t K[64] = {
++ 0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
++ 0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
++ 0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
++ 0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
++ 0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
++ 0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
++ 0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
++ 0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2};
++static inline void block(Ctx &c, const uint8_t *p) {
++  uint32_t w[64];
++  for (int i = 0; i < 16; i++)
++    w[i] = (uint32_t)p[4*i]<<24 | (uint32_t)p[4*i+1]<<16 | (uint32_t)p[4*i+2]<<8 | p[4*i+3];
++  for (int i = 16; i < 64; i++) {
++    uint32_t s0 = ror(w[i-15],7) ^ ror(w[i-15],18) ^ (w[i-15] >> 3);
++    uint32_t s1 = ror(w[i-2],17) ^ ror(w[i-2],19) ^ (w[i-2] >> 10);
++    w[i] = w[i-16] + s0 + w[i-7] + s1;
++  }
++  uint32_t a=c.h[0],b=c.h[1],d=c.h[3],e=c.h[4],f=c.h[5],g=c.h[6],hh=c.h[7],cc=c.h[2];
++  for (int i = 0; i < 64; i++) {
++    uint32_t S1 = ror(e,6) ^ ror(e,11) ^ ror(e,25);
++    uint32_t ch = (e & f) ^ (~e & g);
++    uint32_t t1 = hh + S1 + ch + K[i] + w[i];
++    uint32_t S0 = ror(a,2) ^ ror(a,13) ^ ror(a,22);
++    uint32_t mj = (a & b) ^ (a & cc) ^ (b & cc);
++    uint32_t t2 = S0 + mj;
++    hh=g; g=f; f=e; e=d+t1; d=cc; cc=b; b=a; a=t1+t2;
++  }
++  c.h[0]+=a; c.h[1]+=b; c.h[2]+=cc; c.h[3]+=d; c.h[4]+=e; c.h[5]+=f; c.h[6]+=g; c.h[7]+=hh;
++}
++static inline void init(Ctx &c) {
++  c.h[0]=0x6a09e667; c.h[1]=0xbb67ae85; c.h[2]=0x3c6ef372; c.h[3]=0xa54ff53a;
++  c.h[4]=0x510e527f; c.h[5]=0x9b05688c; c.h[6]=0x1f83d9ab; c.h[7]=0x5be0cd19;
++  c.bytes = 0; c.n = 0;
++}
++static inline void update(Ctx &c, const uint8_t *p, size_t L) {
++  c.bytes += L;
++  while (L) {
++    size_t take = 64 - c.n; if (take > L) take = L;
++    memcpy(c.buf + c.n, p, take); c.n += take; p += take; L -= take;
++    if (c.n == 64) { block(c, c.buf); c.n = 0; }
++  }
++}
++static inline std::string final_hex(Ctx &c) {
++  uint64_t bits = c.bytes * 8;
++  uint8_t pad = 0x80; update(c, &pad, 1);
++  uint8_t z = 0; while (c.n != 56) update(c, &z, 1);
++  uint8_t L[8]; for (int i = 0; i < 8; i++) L[i] = (uint8_t)(bits >> (56 - 8*i));
++  update(c, L, 8);
++  char out[65];
++  for (int i = 0; i < 8; i++) snprintf(out + 8*i, 9, "%08x", c.h[i]);
++  out[64] = 0; return std::string(out);
++}
++static inline void feed_i64le(Ctx &c, int64_t v) {
++  uint8_t b[8]; for (int i = 0; i < 8; i++) b[i] = (uint8_t)((uint64_t)v >> (8*i));
++  update(c, b, 8);
++}
++struct Arrival { int64_t wall_ns; int64_t stamp_ns; size_t buflen; };
++static const size_t RING = 16384;
++static Arrival ring[RING];
++static std::atomic<size_t> head{0}, tail{0};
++static std::atomic<size_t> dropped{0};
++static FILE *fp = nullptr;
++static inline void open() {
++  if (!fp) {
++    const char *p = getenv("TRACE_GROUP_FILE");
++    if (p) {
++      fp = fopen(p, "w");
++      if (fp) {
++        fputs("kind,wall_ns,lid_stamp_ns,n_items,first_stamp_ns,last_stamp_ns,"
++              "stamps_sha256,extra\n", fp);
++        fflush(fp);
++      }
++    }
++  }
++}
++static inline int64_t wall_ns() { return (int64_t)ros::WallTime::now().toNSec(); }
++// A double at 1.6e9 s has a 238 ns ULP, but d*1e9 lands in [2^60,2^61) where the ULP is 256 ns, so
++// llround(d*1e9) collapses about 7 % of adjacent doubles onto the same ns. Splitting the seconds
++// keeps whatever the double actually carries, without adding a 256 ns lattice.
++static inline int64_t to_ns_exact(double d) {
++  const double sec = std::floor(d);
++  return (int64_t)sec * 1000000000LL + (int64_t)llround((d - sec) * 1e9);
++}
++static inline void emit(const char *line) { open(); if (!fp) return; fputs(line, fp); fputc('\n', fp); fflush(fp); }
++static inline void push_arrival(int64_t stamp_ns, size_t buflen) {
++  size_t h = head.load(std::memory_order_relaxed);
++  if (h - tail.load(std::memory_order_acquire) >= RING) {
++    dropped.fetch_add(1, std::memory_order_relaxed);
++    return;
++  }
++  ring[h % RING] = {wall_ns(), stamp_ns, buflen};
++  head.store(h + 1, std::memory_order_release);
++}
++}  // namespace tr
++#endif
++
++
+ 
+ LIVMapper::LIVMapper(ros::NodeHandle &nh)
+     : extT(0, 0, 0),
+@@ -49,6 +161,11 @@ LIVMapper::~LIVMapper() {}
+ 
+ void LIVMapper::readParameters(ros::NodeHandle &nh)
+ {
++  // Recovery mainline: the directory the checkpoint channel watches. Empty (the default) keeps
++  // the node exactly as it was.
++  // rosrun's `_name:=value` form sets a *private* parameter, so it is read from the node's
++  // private namespace; the global handle would resolve to /native_checkpoint_dir and find nothing.
++  { ros::NodeHandle pnh("~"); pnh.param<string>("native_checkpoint_dir", cp_ctrl_dir_, std::string("")); }
+   nh.param<string>("common/lid_topic", lid_topic, "/livox/lidar");
+   nh.param<string>("common/imu_topic", imu_topic, "/livox/imu");
+   nh.param<bool>("common/ros_driver_bug_fix", ros_driver_fix_en, false);
+@@ -91,6 +208,7 @@ void LIVMapper::readParameters(ros::NodeHandle &nh)
+   nh.param<int>("preprocess/lidar_type", p_pre->lidar_type, AVIA);
+   nh.param<int>("preprocess/scan_line", p_pre->N_SCANS, 6);
+   nh.param<int>("preprocess/point_filter_num", p_pre->point_filter_num, 3);
++  nh.param<double>("preprocess/velodyne_time_scale", p_pre->velodyne_time_scale, 0.001);
+   nh.param<bool>("preprocess/feature_extract_enabled", p_pre->feature_enabled, false);
+ 
+   nh.param<int>("pcd_save/interval", pcd_save_interval, -1);
+@@ -213,6 +331,13 @@ void LIVMapper::initializeSubscribersAndPublishers(ros::NodeHandle &nh, image_tr
+   pubImage = it.advertise("/rgb_img", 1);
+   pubImuPropOdom = nh.advertise<nav_msgs::Odometry>("/LIVO2/imu_propagate", 10000);
+   imu_prop_timer = nh.createTimer(ros::Duration(0.004), &LIVMapper::imu_prop_callback, this);
++#ifdef NO_MP
++  ROS_INFO("[DETERMINISM] build: NO_MP=ON (parallel loops compiled out), "
++           "omp_get_max_threads()=%d", omp_get_max_threads());
++#else
++  ROS_INFO("[DETERMINISM] build: MP_EN with MP_PROC_NUM=%d, omp_get_max_threads()=%d",
++           MP_PROC_NUM, omp_get_max_threads());
++#endif
+   voxelmap_manager->voxel_map_pub_= nh.advertise<visualization_msgs::MarkerArray>("/planes", 10000);
+ }
+ 
+@@ -531,17 +656,281 @@ void LIVMapper::savePCD()
+   }
+ }
+ 
+-void LIVMapper::run() 
++#ifdef TRACE_GROUP
++void trace_emit_imuinit(const int64_t *stamps, int64_t n, int iter, int maxc) {
++  tr::Ctx c; tr::init(c);
++  for (int64_t i = 0; i < n; ++i) tr::feed_i64le(c, stamps[i]);
++  const int64_t first_ns = n > 0 ? stamps[0] : -1;
++  const int64_t last_ns = n > 0 ? stamps[n - 1] : -1;
++  const std::string sha = tr::final_hex(c);
++  char ln[256];
++  snprintf(ln, sizeof(ln), "IMUINIT,%lld,0,%lld,%lld,%lld,%s,iter=%d|max=%d",
++           (long long)tr::wall_ns(), (long long)n, (long long)first_ns, (long long)last_ns,
++           sha.c_str(), iter, maxc);
++  tr::emit(ln);
++}
++#endif
++
++// ------------------------------------------------------------------------------------------------
++// Native checkpoint: the estimator state and the voxel map, copied at one instant and restorable
++// without re-running the input. The map is a tree of raw pointers, so the copy must be explicit;
++// that is the only reason this exists as C++ rather than as a ROS sidecar.
++// ------------------------------------------------------------------------------------------------
++bool LIVMapper::snapshotCheckpoint()
++{
++  cp_state_ = _state;
++  cp_state_propagat_ = state_propagat;
++  native_checkpoint::freeMap(cp_map_);
++  cp_map_ = native_checkpoint::cloneMap(voxelmap_manager->voxel_map_);
++  p_imu->getCheckpointState(cp_last_imu_, cp_last_prop_end_time_, cp_acc_s_last_, cp_angvel_last_);
++  // Everything processed from here on is what a replay has to re-derive.
++  replay_buffer_.clear();
++  replay_capture_ = true;
++  cp_valid_ = true;
++  cp_stamp_ = LidarMeasures.last_lio_update_time;
++  cp_frame_num_ = frame_num;
++  cp_voxels_ = cp_map_.size();
++  cp_nodes_ = native_checkpoint::countNodes(cp_map_);
++  cp_points_ = native_checkpoint::countPoints(cp_map_);
++  ROS_INFO("[NATIVE_CHECKPOINT] snapshot stamp=%.9f frame=%d voxels=%zu nodes=%zu points=%zu",
++           cp_stamp_, cp_frame_num_, cp_voxels_, cp_nodes_, cp_points_);
++  return true;
++}
++
++bool LIVMapper::restoreCheckpoint()
++{
++  if (!cp_valid_)
++  {
++    ROS_WARN("[NATIVE_CHECKPOINT] restore refused: no snapshot has been taken");
++    return false;
++  }
++  const size_t live_before = voxelmap_manager->voxel_map_.size();
++  const size_t pts_before = native_checkpoint::countPoints(voxelmap_manager->voxel_map_);
++  native_checkpoint::freeMap(voxelmap_manager->voxel_map_);
++  voxelmap_manager->voxel_map_ = native_checkpoint::cloneMap(cp_map_);
++  _state = cp_state_;
++  state_propagat = cp_state_propagat_;
++  voxelmap_manager->state_ = _state;
++  p_imu->setCheckpointState(cp_last_imu_, cp_last_prop_end_time_, cp_acc_s_last_, cp_angvel_last_);
++  // A restored map is the map that was built before the checkpoint, so the "first frame built the
++  // map" path must not run again on the next LIO update.
++  lidar_map_inited = true;
++  cp_restores_++;
++  ROS_INFO("[NATIVE_CHECKPOINT] restore #%zu: live map %zu voxels/%zu points -> %zu voxels/%zu points",
++           cp_restores_, live_before, pts_before, voxelmap_manager->voxel_map_.size(),
++           native_checkpoint::countPoints(voxelmap_manager->voxel_map_));
++  return true;
++}
++
++// Restore, then re-run the host's own propagation and LIO update for every group captured since
++// the snapshot. This is reprocessing in the host, not a Python rollback: the map is rebuilt by
++// UpdateVoxelMap and the state comes out of VoxelMapManager::StateEstimation.
++bool LIVMapper::reprocessCheckpoint()
++{
++  const size_t n = replay_buffer_.size();
++  if (!restoreCheckpoint())
++  {
++    return false;
++  }
++  if (n == 0)
++  {
++    ROS_WARN("[NATIVE_CHECKPOINT] reprocess: nothing was captured between snapshot and now");
++    replay_capture_ = false;
++    return true;
++  }
++  replay_mode_ = true;
++  for (size_t i = 0; i < n; ++i)
++  {
++    LidarMeasures = replay_buffer_[i];
++    handleFirstFrame();
++    processImu();
++    stateEstimationAndMapping();
++  }
++  replay_mode_ = false;
++  replay_buffer_.clear();
++  replay_capture_ = false;
++  cp_replays_++;
++  cp_replay_frames_ += n;
++  ROS_INFO("[NATIVE_CHECKPOINT] reprocess #%zu: %zu frames replayed, map now %zu voxels/%zu points",
++           cp_replays_, n, voxelmap_manager->voxel_map_.size(),
++           native_checkpoint::countPoints(voxelmap_manager->voxel_map_));
++  return true;
++}
++
++std::string LIVMapper::checkpointStatus() const
++{
++  char buf[512];
++  snprintf(buf, sizeof(buf),
++           "valid=%d stamp_ns=%lld frame=%d voxels=%zu nodes=%zu points=%zu restores=%zu "
++           "live_voxels=%zu live_points=%zu state_pos=%.6f,%.6f,%.6f",
++           (int)cp_valid_, (long long)(cp_stamp_ * 1e9), cp_frame_num_, cp_voxels_, cp_nodes_,
++           cp_points_, cp_restores_, voxelmap_manager->voxel_map_.size(),
++           native_checkpoint::countPoints(voxelmap_manager->voxel_map_), _state.pos_end[0],
++           _state.pos_end[1], _state.pos_end[2]);
++  return std::string(buf);
++}
++
++// One command per file: <dir>/cmd is written atomically by the driver (write - rename) and is
++// renamed to cmd.done before it runs, so a command is executed exactly once even if the poll
++// happens to come back to an unchanged directory.
++void LIVMapper::pollCheckpointControl()
++{
++  if (cp_ctrl_dir_.empty()) return;
++  const double now = ros::WallTime::now().toSec();
++  if (cp_last_poll_wall_ >= 0.0 && (now - cp_last_poll_wall_) < 0.02) return;
++  cp_last_poll_wall_ = now;
++
++  const std::string cmd_path = cp_ctrl_dir_ + "/cmd";
++  std::ifstream in(cmd_path);
++  if (!in.good()) return;
++  std::string cmd;
++  std::getline(in, cmd);
++  in.close();
++  if (cmd.empty()) return;
++
++  const std::string done_path = cp_ctrl_dir_ + "/cmd.done";
++  std::rename(cmd_path.c_str(), done_path.c_str());
++
++  bool ok = false;
++  std::string detail;
++  if (cmd == "snapshot")
++  {
++    ok = snapshotCheckpoint();
++    detail = checkpointStatus();
++  }
++  else if (cmd == "restore")
++  {
++    ok = restoreCheckpoint();
++    detail = checkpointStatus();
++  }
++  else if (cmd == "reprocess")
++  {
++    ok = reprocessCheckpoint();
++    detail = checkpointStatus();
++    {
++      char extra[128];
++      snprintf(extra, sizeof(extra), " replays=%zu replay_frames=%zu buffered=%zu", cp_replays_,
++               cp_replay_frames_, replay_buffer_.size());
++      detail += extra;
++    }
++  }
++  else if (cmd == "status")
++  {
++    ok = true;
++    detail = checkpointStatus();
++  }
++  else
++  {
++    detail = "unknown_command";
++  }
++
++  std::ofstream out(cp_ctrl_dir_ + "/ack", std::ios::trunc);
++  out << (ok ? "OK " : "FAIL ") << cmd << " " << detail << "\n";
++}
++
++void LIVMapper::run()
+ {
+   ros::Rate rate(5000);
++#ifdef DET_SYNC
++  // Callbacks on their own thread; the main loop blocks on arrival instead of polling at 5 kHz,
++  // so a package is processed when it is ready rather than at the next poll tick.
++  ros::AsyncSpinner det_spinner(1);
++  det_spinner.start();
++  ROS_INFO("[DETERMINISM] DET_SYNC: async spinner(1), main loop blocks on arrival");
++#endif
+   while (ros::ok()) 
+   {
++#ifndef DET_SYNC
+     ros::spinOnce();
++#endif
+     if (!sync_packages(LidarMeasures)) 
+     {
++#ifdef DET_SYNC
++      std::unique_lock<std::mutex> det_lk(det_mtx_);
++      det_cv_.wait_for(det_lk, std::chrono::milliseconds(20));
++#else
+       rate.sleep();
++#endif
+       continue;
+     }
++    // The trace must describe the same packages in every build shape, so the emission cannot live
++    // inside DET_SYNC: that guard is a build flag, and the default build would then write only the
++    // IMUINIT lines (which is exactly what happened on 2026-11-10).
++#if defined(DET_SYNC) || defined(TRACE_GROUP)
++    // lossy path, see the note in the STATE block: exact ns needs int64 in lid_header_time_buffer
++#ifdef TRACE_GROUP
++    // this is the very double sync_packages compares; its 238 ns quantisation belongs to the host,
++    // not to the trace, so recording the header ns here would log a time sync never saw
++    const int64_t last_lio_update_ns = tr::to_ns_exact(LidarMeasures.last_lio_update_time);
++#endif
++    // observation, not intervention: one line per processed package
++    {
++      // observation only: what this package actually contained
++      size_t det_imu_n = 0, det_img_n = 0;
++      double det_img_stamp = -1.0;
++#ifdef TRACE_GROUP
++      int64_t det_imu_first = -1, det_imu_last = -1;
++      tr::Ctx det_sha; tr::init(det_sha); size_t det_imu_n_traced = 0;
++#endif
++      for (auto &mgr : LidarMeasures.measures) {
++        det_imu_n += mgr.imu.size();
++#ifdef TRACE_GROUP
++        for (auto &im : mgr.imu) {
++          const int64_t ns = (int64_t)im->header.stamp.toNSec();
++          if (det_imu_first < 0) det_imu_first = ns;
++          det_imu_last = ns;
++          tr::feed_i64le(det_sha, ns);
++          det_imu_n_traced++;
++        }
++#endif
++        if (!mgr.img.empty()) { det_img_n++; det_img_stamp = mgr.vio_time; }
++      }
++#ifdef TRACE_GROUP
++      {
++        // drain the callback ring first: one ARRIVE line per arrival, single writer
++        size_t t = tr::tail.load(std::memory_order_relaxed);
++        const size_t h = tr::head.load(std::memory_order_acquire);
++        for (; t < h; ++t) {
++          const tr::Arrival &a = tr::ring[t % tr::RING];
++          tr::Ctx one; tr::init(one); tr::feed_i64le(one, a.stamp_ns);
++          const std::string one_sha = tr::final_hex(one);
++          char ln[256];
++          snprintf(ln, sizeof(ln), "ARRIVE,%lld,%lld,1,%lld,%lld,%s,buflen=%zu",
++                   (long long)a.wall_ns, (long long)a.stamp_ns, (long long)a.stamp_ns,
++                   (long long)a.stamp_ns, one_sha.c_str(), a.buflen);
++          tr::emit(ln);
++        }
++        tr::tail.store(t, std::memory_order_release);
++        std::string sha = tr::final_hex(det_sha);
++        char ln[512];
++        snprintf(ln, sizeof(ln),
++                 "GROUP,%lld,%lld,%zu,%lld,%lld,%s,mesures=%zu|img=%zu|img_stamp_ns=%lld|need_init=%d",
++                 (long long)tr::wall_ns(),
++                 (long long)last_lio_update_ns,
++                 det_imu_n_traced,
++                 (long long)det_imu_first, (long long)det_imu_last, sha.c_str(),
++                 LidarMeasures.measures.size(), det_img_n,
++                 (long long)(det_img_n ? tr::to_ns_exact(det_img_stamp) : -1),
++                 (int)p_imu->imu_need_init);
++        tr::emit(ln);
++      }
++#endif
++#ifdef DET_SYNC
++      ROS_INFO("[DET_SYNC] pkg lid_stamp=%.6f scans_in_pkg=%zu queued_lidar=%zu imu_in_pkg=%zu "
++               "img_in_pkg=%zu img_stamp=%.6f imu_need_init=%d state_pos=%.6f %.6f %.6f",
++               LidarMeasures.last_lio_update_time, LidarMeasures.measures.size(),
++               lid_raw_data_buffer.size(), det_imu_n, det_img_n, det_img_stamp,
++               (int)p_imu->imu_need_init, _state.pos_end[0], _state.pos_end[1], _state.pos_end[2]);
++#endif
++    }
++#endif
++    // The group is captured before it is processed: a checkpoint taken at any instant must be
++    // followed by exactly the groups the host had not yet folded into the map.
++    if (replay_capture_)
++    {
++      replay_buffer_.push_back(LidarMeasures);
++    }
++
+     handleFirstFrame();
+ 
+     processImu();
+@@ -549,6 +938,24 @@ void LIVMapper::run()
+     // if (!p_imu->imu_time_init) continue;
+ 
+     stateEstimationAndMapping();
++#ifdef TRACE_GROUP
++    // independent of DET_SYNC; declared inside its own scope so it does not collide with the
++    // package block's copy when DET_SYNC is also on
++    const int64_t state_lio_update_ns = tr::to_ns_exact(LidarMeasures.last_lio_update_time);
++    {
++      char ln[384];
++      snprintf(ln, sizeof(ln), "STATE,%lld,%lld,0,%lld,%lld,,pos=%.6f|%.6f|%.6f|diagR=%.6f|%.6f|%.6f",
++               (long long)tr::wall_ns(),
++               (long long)state_lio_update_ns,
++               (long long)state_lio_update_ns,
++               (long long)state_lio_update_ns,
++               _state.pos_end[0], _state.pos_end[1], _state.pos_end[2],
++               _state.rot_end(0, 0), _state.rot_end(1, 1), _state.rot_end(2, 2));
++      tr::emit(ln);
++    }
++#endif
++    // Self-throttled to one stat per 20 ms; a no-op until ~native_checkpoint_dir is set.
++    pollCheckpointControl();
+   }
+   savePCD();
+ }
+@@ -718,9 +1125,19 @@ void LIVMapper::standard_pcl_cbk(const sensor_msgs::PointCloud2::ConstPtr &msg)
+   lid_raw_data_buffer.push_back(ptr);
+   lid_header_time_buffer.push_back(cur_head_time);
+   last_timestamp_lidar = cur_head_time;
++#ifdef TRACE_GROUP
++  const size_t trace_buf_after = lid_raw_data_buffer.size();   // read while still holding the lock
++#endif
+ 
+   mtx_buffer.unlock();
+   sig_buffer.notify_all();
++#ifdef DET_SYNC
++  det_cv_.notify_one();
++#endif
++#ifdef TRACE_GROUP
++  // callback thread: only a lock-free ring push, no I/O
++  tr::push_arrival((int64_t)msg->header.stamp.toNSec(), trace_buf_after);
++#endif
+ }
+ 
+ void LIVMapper::livox_pcl_cbk(const livox_ros_driver::CustomMsg::ConstPtr &msg_in)
+@@ -761,9 +1178,19 @@ void LIVMapper::livox_pcl_cbk(const livox_ros_driver::CustomMsg::ConstPtr &msg_i
+   lid_raw_data_buffer.push_back(ptr);
+   lid_header_time_buffer.push_back(cur_head_time);
+   last_timestamp_lidar = cur_head_time;
++#ifdef TRACE_GROUP
++  const size_t trace_buf_after = lid_raw_data_buffer.size();   // read while still holding the lock
++#endif
+ 
+   mtx_buffer.unlock();
+   sig_buffer.notify_all();
++#ifdef DET_SYNC
++  det_cv_.notify_one();
++#endif
++#ifdef TRACE_GROUP
++  // callback thread: only a lock-free ring push, no I/O
++  tr::push_arrival((int64_t)msg->header.stamp.toNSec(), trace_buf_after);
++#endif
+ }
+ 
+ void LIVMapper::imu_cbk(const sensor_msgs::Imu::ConstPtr &msg_in)
+@@ -1307,6 +1734,7 @@ void LIVMapper::publish_visual_sub_map(const ros::Publisher &pubSubVisualMap)
+ 
+ void LIVMapper::publish_effect_world(const ros::Publisher &pubLaserCloudEffect, const std::vector<PointToPlane> &ptpl_list)
+ {
++  if (replay_mode_) return;
+   int effect_feat_num = ptpl_list.size();
+   PointCloudXYZI::Ptr laserCloudWorld(new PointCloudXYZI(effect_feat_num, 1));
+   for (int i = 0; i < effect_feat_num; i++)
+@@ -1335,9 +1763,12 @@ template <typename T> void LIVMapper::set_posestamp(T &out)
+ 
+ void LIVMapper::publish_odometry(const ros::Publisher &pubOdomAftMapped)
+ {
++  // A replayed frame is not new input: publishing it would make the recovery node pair a second
++  // time on a stamp it has already seen.
++  if (replay_mode_) return;
+   odomAftMapped.header.frame_id = "camera_init";
+   odomAftMapped.child_frame_id = "aft_mapped";
+-  odomAftMapped.header.stamp = ros::Time::now(); //.ros::Time()fromSec(last_timestamp_lidar);
++  odomAftMapped.header.stamp = ros::Time().fromSec(LidarMeasures.last_lio_update_time);
+   set_posestamp(odomAftMapped.pose.pose);
+ 
+   static tf::TransformBroadcaster br;
+@@ -1355,6 +1786,7 @@ void LIVMapper::publish_odometry(const ros::Publisher &pubOdomAftMapped)
+ 
+ void LIVMapper::publish_mavros(const ros::Publisher &mavros_pose_publisher)
+ {
++  if (replay_mode_) return;
+   msg_body_pose.header.stamp = ros::Time::now();
+   msg_body_pose.header.frame_id = "camera_init";
+   set_posestamp(msg_body_pose.pose);
+@@ -1363,9 +1795,11 @@ void LIVMapper::publish_mavros(const ros::Publisher &mavros_pose_publisher)
+ 
+ void LIVMapper::publish_path(const ros::Publisher pubPath)
+ {
++  if (replay_mode_) return;
+   set_posestamp(msg_body_pose.pose);
+-  msg_body_pose.header.stamp = ros::Time::now();
++  msg_body_pose.header.stamp = ros::Time().fromSec(LidarMeasures.last_lio_update_time);
+   msg_body_pose.header.frame_id = "camera_init";
++  path.header.stamp = msg_body_pose.header.stamp;
+   path.poses.push_back(msg_body_pose);
+   pubPath.publish(path);
+ }
+\ No newline at end of file
+diff --git a/src/preprocess.cpp b/src/preprocess.cpp
+index afe3414..3d5e65a 100755
+--- a/src/preprocess.cpp
++++ b/src/preprocess.cpp
+@@ -15,7 +15,7 @@ which is included as part of this source code package.
+ #define RETURN0 0x00
+ #define RETURN0AND1 0x10
+ 
+-Preprocess::Preprocess() : feature_enabled(0), lidar_type(AVIA), blind(0.01), point_filter_num(1)
++Preprocess::Preprocess() : feature_enabled(0), lidar_type(AVIA), blind(0.01), point_filter_num(1), velodyne_time_scale(0.001)
+ {
+   inf_bound = 10;
+   N_SCANS = 6;
+@@ -351,6 +351,7 @@ void Preprocess::velodyne_handler(const sensor_msgs::PointCloud2::ConstPtr &msg)
+ 
+   pcl::PointCloud<velodyne_ros::Point> pl_orig;
+   pcl::fromROSMsg(*msg, pl_orig);
++  ROS_INFO_ONCE("Velodyne point time scale to milliseconds: %.6f", velodyne_time_scale);
+   int plsize = pl_orig.points.size();
+   if (plsize == 0) return;
+   pl_surf.reserve(plsize);
+@@ -399,7 +400,7 @@ void Preprocess::velodyne_handler(const sensor_msgs::PointCloud2::ConstPtr &msg)
+       added_pt.y = pl_orig.points[i].y;
+       added_pt.z = pl_orig.points[i].z;
+       added_pt.intensity = pl_orig.points[i].intensity;
+-      added_pt.curvature = pl_orig.points[i].time / 1000.0; // units: ms
++      added_pt.curvature = pl_orig.points[i].time * velodyne_time_scale; // units: ms
+ 
+       if (!given_offset_time)
+       {
+@@ -462,7 +463,7 @@ void Preprocess::velodyne_handler(const sensor_msgs::PointCloud2::ConstPtr &msg)
+       added_pt.y = pl_orig.points[i].y;
+       added_pt.z = pl_orig.points[i].z;
+       added_pt.intensity = pl_orig.points[i].intensity;
+-      added_pt.curvature = pl_orig.points[i].time / 1000.0;
++      added_pt.curvature = pl_orig.points[i].time * velodyne_time_scale;
+ 
+       if (!given_offset_time)
+       {
+diff --git a/src/vio.cpp b/src/vio.cpp
+index 2ff8fd0..495dbd4 100755
+--- a/src/vio.cpp
++++ b/src/vio.cpp
+@@ -1549,7 +1549,7 @@ void VIOManager::updateState(cv::Mat img, int level)
+     // int desired_threads = std::min(max_threads, total_points);
+     // omp_set_num_threads(desired_threads);
+   
+-    #ifdef MP_EN
++    #if defined(MP_EN) && !defined(NO_MP)
+       omp_set_num_threads(MP_PROC_NUM);
+       #pragma omp parallel for reduction(+:error, n_meas)
+     #endif
+diff --git a/src/voxel_map.cpp b/src/voxel_map.cpp
+index 01923cc..2179d51 100644
+--- a/src/voxel_map.cpp
++++ b/src/voxel_map.cpp
+@@ -655,7 +655,7 @@ void VoxelMapManager::BuildResidualListOMP(std::vector<pointWithVar> &pv_list, s
+     index[i] = i;
+     useful_ptpl[i] = false;
+   }
+-  #ifdef MP_EN
++  #if defined(MP_EN) && !defined(NO_MP)
+     omp_set_num_threads(MP_PROC_NUM);
+     #pragma omp parallel for
+   #endif
