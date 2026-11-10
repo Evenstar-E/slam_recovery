@@ -1,0 +1,108 @@
+<title>修复闭环验收图谱</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* 状态协议工程手册：先给证据范围，再按工作包和反例逐层展开。 */
+:root{--bg:#f2f6fa;--panel:#ffffff;--fg:#193243;--muted:#51697b;--accent:#075e8d;--line:#bbcdd8;--display:Georgia,'Songti SC',serif;--body:'Microsoft YaHei',system-ui,sans-serif;--utility:Consolas,monospace;color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101e28;--panel:#192d3b;--fg:#e2edf4;--muted:#b2c6d4;--accent:#8dd2f4;--line:#496679;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#101e28;--panel:#192d3b;--fg:#e2edf4;--muted:#b2c6d4;--accent:#8dd2f4;--line:#496679;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.8 var(--body)}main{max-width:1080px;margin:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 60px}h1{font:700 clamp(1.8rem,5vw,2.6rem)/1.3 var(--display)}h2,h3{line-height:1.45;text-wrap:balance}h2{font-size:1.45rem}h3{font-size:1.1rem}p{max-width:78ch}a{color:var(--accent);overflow-wrap:anywhere}a:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}nav{display:flex;flex-wrap:wrap;gap:8px 20px;margin-block:20px}section{border-top:1px solid var(--line);padding-block:24px}.notice{border:1px solid var(--line);background:var(--panel);padding:18px}.muted,figcaption{color:var(--muted)}.utility,code,pre{font-family:var(--utility)}.utility{font-size:.85rem}button{background:var(--panel);color:var(--fg);border:1px solid var(--line);padding:8px 12px;cursor:pointer;font:inherit}.scroll{overflow-x:auto;max-width:100%}table{width:100%;border-collapse:collapse;font-size:.85rem;font-variant-numeric:tabular-nums}th,td{text-align:left;vertical-align:top;padding:10px;border-bottom:1px solid var(--line)}th{color:var(--muted)}td:first-child{min-width:140px}figure{margin:20px 0}svg{display:block;width:100%;height:auto;color:var(--fg)}svg text{fill:currentColor;font:14px var(--body)}svg rect{fill:var(--panel);stroke:currentColor}svg line,svg polyline{stroke:currentColor;stroke-width:1.5;fill:none}svg .pending{stroke-dasharray:5 4}svg .focus{stroke:var(--accent);stroke-width:2}svg .focus-text{fill:var(--accent)}figcaption{font-size:.85rem;margin-block:8px}.block{padding-block:20px;border-bottom:1px solid var(--line)}.block:last-child{border-bottom:0}pre{white-space:pre-wrap;overflow-wrap:anywhere;border:1px solid var(--line);background:var(--panel);padding:14px;font-size:.9rem}ul,ol{padding-left:1.4rem}li{margin-block:6px}.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}.two>*{min-width:0}@media(max-width:650px){.two{grid-template-columns:1fr}table{font-size:.8rem}svg.wide{width:850px;max-width:none}.diagram-scroll{overflow-x:auto;max-width:100%}}[hidden]{display:none!important}
+</style>
+<main>
+<p class="muted utility">2026-11-10 · 源码复验 2d36c6a · 非实时面板</p>
+<h1>修复闭环验收图谱</h1>
+<p><strong>离线实际修复链已经跑通；完整原生在线闭环尚未完成。</strong>这页区分组件完成、条件性效果与工作包闭合，保留负结果和缺测。最新修复有进展，也仍有可复现边界问题。</p>
+<div class="notice"><strong>旧全表快照：773b995，A 16/36，B 12/36，24项完全闭合0。</strong><br>这是序数证据阶段，不是完成百分比。相对7fc67cf只有B8由1升至2。最新A5/A8局部复验不自动改变总分。<br><strong>本次：目标源码46/46测试通过，另三项剩余反例均复现。</strong>没有运行真实ROS/bag。</div>
+<nav aria-label="章节"><a href="#flow">链路断点</a><a href="#done">已完成组件</a><a href="#ledger">24项清单</a><a href="#blocks">七组卡点与例子</a><a href="#next">主线与旁支</a></nav>
+<section id="flow"><h2>实际数据流：哪里已经接通？</h2>
+<figure><div class="diagram-scroll"><svg class="wide" viewBox="0 0 940 260" role="img" aria-label="离线过滤原生重估与地图重建已执行；在线检查点、提交、接回和第二事件尚未同链贯通">
+<defs><marker id="flow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="currentColor"/></marker></defs>
+<rect x="10" y="20" width="240" height="65"/><text x="25" y="47">污染原始消息 → 实际过滤</text><text x="25" y="70">保留完整点记录与索引</text>
+<line x1="250" y1="52" x2="325" y2="52" marker-end="url(#flow-arrow)"/><text x="260" y="35">输入宿主</text>
+<rect x="330" y="20" width="235" height="65"/><text x="345" y="47">FAST-LIVO2原生重估</text><text x="345" y="70">从健康前缀离线重跑</text>
+<line x1="565" y1="52" x2="640" y2="52" marker-end="url(#flow-arrow)"/><text x="578" y="35">新位姿</text>
+<rect x="645" y="20" width="280" height="65"/><text x="660" y="47">对应过滤测量 → sidecar地图</text><text x="660" y="70">hall条件正；room条件负</text>
+<rect class="pending" x="10" y="155" width="245" height="70"/><text x="25" y="183">在线检测 + 完整原生检查点</text><text x="25" y="206">当前仍缺同进程证据</text>
+<line x1="255" y1="190" x2="325" y2="190" marker-end="url(#flow-arrow)"/><text x="261" y="172">重处理</text>
+<rect class="pending" x="330" y="155" width="235" height="70"/><text x="345" y="183">独立准入 + 一致公开提交</text><text x="345" y="206">事务/切空间仍有缺口</text>
+<line x1="565" y1="190" x2="640" y2="190" marker-end="url(#flow-arrow)"/><text x="578" y="172">接回</text>
+<rect class="pending" x="645" y="155" width="280" height="70"/><text x="660" y="183">继续消费输入 + 第二故障事件</text><text x="660" y="206">未贯通原生单次完整链</text>
+</svg></div><figcaption>上排实线为已有离线链。下排虚线为目标闭环，不表示已经连通。离线重跑不能替代正在运行宿主的检查点恢复。</figcaption></figure></section>
+<section id="done"><h2>已经完成的局部交付</h2>
+<div class="two"><div><h3>实现与审计</h3><ul><li>PointCloud2完整点记录过滤，scan_ns与原始点索引。</li><li>filtered bag进入真实宿主重估，产生实际SE(3)与sidecar地图。</li><li>有界patch评价、公共集合、批次身份与clean→GT变换修正。</li><li>A5旧初始pending反例已修；开放隔离段新来帧有登记入口。</li><li>A8旧factor/pose迭代器异常半提交已修，正负控制通过。</li></ul></div><div><h3>效果证据与边界</h3><p>hall：400/446条件帧，proxy覆盖<strong>60.38%→98.49%</strong>，不支持比例<strong>62.51%→9.31%</strong>。</p><p>room：326/398条件帧，覆盖<strong>76.72%→69.52%</strong>，不支持<strong>45.85%→65.90%</strong>。负结果与重复不稳定保留。</p><p class="muted">这些是远端归档，不是本机重跑；clean-run地图是proxy，不是独立GT表面。缺46/72帧保留，不算恢复成功。</p></div></div></section>
+<section id="ledger"><h2>完整24项：做到哪一步，还缺什么？</h2><p>分数固定于773b995。右列给最新局部变化，没有做全表重新评分。<strong>所有24项工作包仍未达到完整验收3分。</strong></p>
+<nav aria-label="清单过滤"><button id="filter-all" type="button" aria-pressed="true">全部24项</button><button id="filter-a" type="button" aria-pressed="false">A 原型12项</button><button id="filter-b" type="button" aria-pressed="false">B 论文证据12项</button></nav>
+<div class="scroll"><table><thead><tr><th>工作包</th><th>旧阶段</th><th>已完成到什么程度</th><th>尚缺／最新变化</th></tr></thead><tbody id="ledger-rows"></tbody></table></div>
+<noscript>完整逐项账本见同目录README与773b995全表复验文件；下方七组卡点无需脚本即可阅读。</noscript></section>
+<section id="blocks"><h2>七组卡点：四组技术边界，三组完整度关口</h2><p>不是七个互相独立的代码bug。四组技术问题影响安全或判决；后三组需要真实运行与论文证据。</p>
+<article class="block"><h3>卡点1 · A5：报警当帧没有登记到待处理全集</h3><p><strong>已修：</strong>撤销/暂存的帧由系统登记，隔离开启后的新来帧也登记。<strong>仍未修：</strong>首次触发报警的帧走另一条分支，没有delta，也不进入新来帧登记。</p>
+<figure><svg viewBox="0 0 640 190" role="img" aria-label="报警帧先存入buffer，触发分支只登记之前的delta，报警帧自身没有进入pending">
+<defs><marker id="pending-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="currentColor"/></marker></defs>
+<rect x="10" y="20" width="165" height="60"/><text x="23" y="45">报警帧 key2</text><text x="23" y="67">已进入scan buffer</text>
+<line x1="175" y1="50" x2="230" y2="50" marker-end="url(#pending-arrow)"/><text x="179" y="32">触发</text>
+<rect x="235" y="20" width="220" height="60"/><text x="248" y="45">trigger_quarantine</text><text x="248" y="67">登记历史/暂存delta</text>
+<line x1="455" y1="50" x2="500" y2="50" marker-end="url(#pending-arrow)"/>
+<rect class="focus" x="505" y="20" width="125" height="60"/><text class="focus-text" x="518" y="45">pending=[]</text><text x="518" y="67">没有key2</text>
+<rect class="pending" x="235" y="115" width="395" height="55"/><text x="248" y="139">elif新来帧登记：只在进入本帧前已有隔离段时执行</text><text x="248" y="160">触发帧不会走这个分支</text>
+</svg><figcaption>本机实际node入口：buffer=[2]、registered=[]。检测器替身用于固定报警，不用于证明检测准确率。</figcaption></figure>
+<p><strong>影响：</strong>候选不提这帧时，pending无法记录完整人口。<strong>最小解除：</strong>同入口登记报警当帧，节点级覆盖触发/后续/Mode3等待来帧、两批提交与幂等重复。无需重跑全部旧bag。</p></article>
+<article class="block"><h3>卡点2 · A8：失败恢复与地图提交边界不完整</h3><p>旧factor生成器中途抛异常的半提交已修。但parent_version前置检查发生在新try之前；过期候选抛错后state仍留在VALIDATING。</p>
+<pre>进入前：QUARANTINED
+  → state = VALIDATING
+  → parent_version不一致，抛RuntimeError
+  → 没进入staging异常恢复
+退出后：VALIDATING（并非原状态）</pre>
+<p>这次trusted pose没有被修改，不是旧factor半提交复发。node的空间地图仍在manager提交后单独同步；本轮没有注入空间异常，也不能说它已通过。</p><p><strong>最小解除：</strong>覆盖gate/版本/证据前置异常的失败契约，完整恢复；再给位姿、地图、版本、收据一致发布的最小故障注入。多个属性依次赋值不自动构成并发读者的原子快照。</p></article>
+<article class="block"><h3>卡点3 · A9：第二次故障撤不掉已接纳的修复位姿</h3>
+<figure><svg viewBox="0 0 640 175" role="img" aria-label="普通晋升进入undo日志，修复直接写可信状态而未入日志，第二事件回溯留下修复位姿">
+<defs><marker id="undo-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="currentColor"/></marker></defs>
+<rect x="10" y="20" width="170" height="55"/><text x="25" y="44">普通promotion</text><text x="25" y="65">记录before-image</text>
+<line x1="180" y1="48" x2="240" y2="48" marker-end="url(#undo-arrow)"/><text x="190" y="31">入栈</text>
+<rect x="245" y="20" width="180" height="55"/><text x="260" y="44">undo日志</text><text x="260" y="65">第二事件只撤这里</text>
+<line x1="425" y1="48" x2="490" y2="48" marker-end="url(#undo-arrow)"/>
+<rect class="focus" x="495" y="20" width="135" height="130"/><text x="508" y="50">trusted state</text><text class="focus-text" x="508" y="83">pose42残留</text><text x="508" y="108">factor/bias</text><text x="508" y="128">已被旧日志撤回</text>
+<rect x="10" y="100" width="170" height="50"/><text x="25" y="130">Mode2 repair</text>
+<polyline points="180,125 455,125 455,98 490,98" marker-end="url(#undo-arrow)"/><text x="215" y="112">直接写入，绕过undo</text>
+</svg><figcaption>当前反例是位姿残留、因子与bias已回退的不同步；不能照抄旧版本“所有字段都残留”。</figcaption></figure>
+<p>当前只有修复方案。按被修帧时间排序插入before-image未必正确：事件时间和实际写入顺序不同，旧promotion撤销后可能被repair before-image重新恢复；因子长度截断也有依赖。</p><p><strong>最小解除：</strong>统一写入撤销依赖或明确拒绝超界回溯；覆盖两重叠事件、同key重复写、后续promotion、部分修复、factor/bias/地图所有权。</p></article>
+<article class="block"><h3>卡点4 · A7：准入前后信息量不在同一切空间</h3><pre>before：body扫描 → FIM和weak direction
+  after：world候选点云 → FIM
+比较：沿同一个weak vector直接投影二者</pre><p>地图原点平移100m，旋转Jacobian可变，而物理场景没变。这里是源码不一致，未宣称已实测原生判决翻转。</p><p><strong>最小解除：</strong>明确左/右扰动和参考坐标，transport FIM、cov与weak direction；全局平移/旋转重表达的判决不变。调sigma或阈值不能解决坐标契约。</p></article>
+<article class="block"><h3>卡点5 · 原生同进程在线恢复未贯通</h3><p>离线filtered bag从头重跑成功，不等于正在运行的宿主恢复完整filter/tree/cache/velocity/bias，再继续建图和处理第二事件。</p><p><strong>最小解除：</strong>单宿主、限定故障、同次运行贯通检测→完整检查点→重处理→独立准入→接纳或拒绝→持续输入→第二事件；记录跳变、中断、缺测和积压。实测1×持续处理，不能拿启动成功或0.5×回放代替。</p></article>
+<article class="block"><h3>卡点6 · 论文增量、公平比较和新环境不足</h3><p>hall条件正、room条件负。gate拒绝全部候选可以降低错接纳，却也可能丢掉全部有益修复。需要同一候选流的四策略比较，不只是“有门和没门各跑一次”。</p><p><strong>最小解除：</strong>固定底图/ROI/完整人口，比原生、仅隔离、无条件修复、完整门控；联合报告正确/错误新增几何、健康损失、轨迹、缺帧和成本。重复不稳机制保持UNKNOWN；方法冻结后用未参与开发环境确认。旧停损数字仅历史建议，未证明有效冻结。</p></article>
+<article class="block"><h3>卡点7 · 独立复现与合法成本证据缺失</h3><p>hall C3的122.9s来自room收据，现已撤回UNAVAILABLE。可执行文件相同也可能加载不同动态库；actual分组/IMU初始化样本与运行时so身份尚未完整。本次还误导入了本地兄弟目录旧包，证实统一入口的重要性。</p><p><strong>最小解除：</strong>固定可获取环境、数据入口、实际exe/so/config/input身份，在独立干净环境重算核心表，报告真实wall、峰内存、吞吐和积压。缺成本不抹掉条件地图收益，也不阻断已有有效输出分析。</p></article>
+</section>
+<section id="next"><h2>主线和旁支怎么分？</h2><p><strong>唯一优先主线：</strong>先闭合报警帧登记、前置失败恢复和跨事件repair撤销的最小状态协议，再推进限定native同进程链。</p><ul><li><strong>并行必要验证：</strong>A7切空间transport与坐标不变性。</li><li><strong>有界机制观察：</strong>安全snapshot、单写者、完整样本身份和trace扰动对照；不继续无假设排除法。</li><li><strong>集中旁支：</strong>成本补档、日志命名、旧声明与字段修正；不每改一项都重跑全宿主。</li></ul><p>开发侧交接须逐项给PASS/FAIL/BLOCKED/NOT_APPLICABLE、命令/证据、主线推进和调整后的分工。没有运行的新结果明确未完成，不能用测试数量加分。</p>
+<p><a href="README.md">详细说明与复验命令</a> · <a href="boundary_probes.py">三个可运行反例源码</a> · <a href="https://github.com/Evenstar-E/slam_recovery/tree/2d36c6a116535570f497f73706e24740a551a13a" target="_blank" rel="noopener">冻结源码目标</a></p><p class="muted">这页不是生产认证、恢复成功概率或论文录用预测。最新局部复验与旧完整评分分开记账；后续提交必须另验。</p></section>
+</main>
+<script>
+const rows=[
+['A1 输入与点身份',2,'完整记录、索引、hash及字节检查','所有历史输入→宿主消费链尚未统一'],
+['A2 原生运行身份',2,'真实宿主收据/重复','actual grouping、样本与运行时so身份缺完整记录'],
+['A3 在线检测',1,'检测器与局部节点路径','真实实验仍oracle窗；缺同链事件指标'],
+['A4 完整检查点',1,'Python位姿/因子/bias快照','非完整原生filter/tree/cache/velocity'],
+['A5 隔离pending',1,'最新旧集合和后续来帧登记通过','报警当帧漏登记已本机复现'],
+['A6 历史重处理',2,'实际过滤+原生离线重估+sidecar地图','未接在线原生checkpoint；总体成本缺'],
+['A7 独立准入',1,'独立参考与配对测试','body/world信息未transport到同一切空间'],
+['A8 原子提交',1,'最新迭代器异常旧半提交已修','前置异常留VALIDATING；空间/原生一致发布缺'],
+['A9 多事件撤销',1,'普通promotion撤销','repair仍不入undo；pose残留已复现'],
+['A10 原生接回',1,'Python边界/BOUND_ONLY','无同进程持续输入与第二事件完整证据'],
+['A11 共同集合与同步',2,'批次身份、common支持、gauge修正','所有声明比较尚未统一人口/时间支持'],
+['A12 复现与预算',1,'runner/config/receipt','私有依赖、独立环境和合法成本不足'],
+['B1 损害与必要性',2,'原生污染/失效与重复','缺同native链损害、检测、传播时序'],
+['B2 可信保护',1,'局部不变量和故障测试','最新三反例仍在；缺native故障注入'],
+['B3 检测定位',1,'合成/局部特征','缺全事件召回、误报、迟漏检时延'],
+['B4 修复净收益',2,'hall条件正、room条件负','全人口独立GT/合法完整成本不足'],
+['B5 门控增量',1,'配对测试和有限拒绝记录','同候选流错接纳/丢失有益修复未完整比较'],
+['B6 因果机制',1,'2×2/T1/T2/T3a探索','重复不稳，分组/初始化尚未唯一定位'],
+['B7 正常代价与风险',1,'健康段和nearwall局部统计','完整错接纳/漏修/拒绝后持续运行分母缺'],
+['B8 重复与不确定性',2,'唯一旧升档：原生重复与共同集合','n少、预注册与确认效应区间未闭合'],
+['B9 未开发泛化',1,'room初次负确认保留','hall/room已用于开发；需冻结后新环境'],
+['B10 公平完整基线',0,'部分历史/构造对照','同输入四策略及能力匹配外部基线不足'],
+['B11 原生在线链与成本',0,'离线宿主与组件timing','单次完整链、资源/积压与真实成本缺'],
+['B12 冻结独立复现',0,'脚本和局部独立复算','不是独立干净环境发布核心表']];
+const root=document.getElementById('ledger-rows');
+function render(prefix=''){root.replaceChildren();for(const [name,score,done,gap] of rows){if(prefix&&!name.startsWith(prefix))continue;const tr=document.createElement('tr');for(const value of [name,score+'/3',done,gap]){const td=document.createElement('td');td.textContent=value;tr.append(td)}root.append(tr)}for(const [id,p] of [['filter-all',''],['filter-a','A'],['filter-b','B']])document.getElementById(id).setAttribute('aria-pressed',String(p===prefix))}
+for(const [id,prefix] of [['filter-all',''],['filter-a','A'],['filter-b','B']])document.getElementById(id).addEventListener('click',()=>render(prefix));render();
+</script>
