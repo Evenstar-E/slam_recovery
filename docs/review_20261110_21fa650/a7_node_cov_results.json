@@ -1,0 +1,74 @@
+{
+  "source_revision": "21fa6506f8b1c63f95b135f7052b2fb84ea7c9c3",
+  "loaded_source_blobs": {
+    "slam_recovery/core.py": "785f5b1e4c97027563b370f6ad57143a2e04e75a",
+    "slam_recovery/sim/transaction_manager_node.py": "5ce5eabc39cfca064f4ba4cefdc5af811efd4e6b",
+    "slam_recovery/validation/fim_and_holdout.py": "b543cf0358a4a33c1bf9623cadd77aaa919d9684"
+  },
+  "scope": "synthetic normal node path, no ROS/bag/native run",
+  "detector_entry": "direct trigger_quarantine; not detector accuracy evidence",
+  "gate_thresholds": {
+    "min_duration_sec": 1.0,
+    "tau_info": 25.0,
+    "tau_val_nis": 2.5,
+    "sigma_tol": 0.5,
+    "sigma_bridge": 4.0,
+    "min_wilson_lower_bound": 0.55,
+    "max_reentry_jump_m": 0.5
+  },
+  "thresholds_modified": false,
+  "cases": [
+    {
+      "world_y_m": 0.0,
+      "weak_dir_info_before": 20.0,
+      "weak_dir_info_after": 62.98292984059509,
+      "posterior_cov_norm": 0.5136136651945151,
+      "holdout_nis": 0.3352223643752276,
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "accepted": false,
+      "paired_evidence": {
+        "num_paired_frames": 4,
+        "required_paired_frames": 4,
+        "candidate_keyframes": 4,
+        "pairable_frames": 4,
+        "frames_without_independent_reference": 0,
+        "reference_frames_from_candidate": 1,
+        "num_improved_frames": 4,
+        "improved_fraction": 1.0,
+        "wilson_lower_bound": 0.5964785398205344,
+        "approved": true,
+        "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+        "incumbent_mean_residual": 0.4979889379560912,
+        "candidate_mean_residual": 0.3352223643752276,
+        "reentry_pos_jump_m": 0.0
+      }
+    },
+    {
+      "world_y_m": 20.0,
+      "weak_dir_info_before": 20.0,
+      "weak_dir_info_after": 62.98292984059506,
+      "posterior_cov_norm": 0.4694900053022529,
+      "holdout_nis": 0.3352223643752263,
+      "mode": "MODE2_ATOMIC_COMMIT",
+      "accepted": true,
+      "paired_evidence": {
+        "num_paired_frames": 4,
+        "required_paired_frames": 4,
+        "candidate_keyframes": 4,
+        "pairable_frames": 4,
+        "frames_without_independent_reference": 0,
+        "reference_frames_from_candidate": 1,
+        "num_improved_frames": 4,
+        "improved_fraction": 1.0,
+        "wilson_lower_bound": 0.5964785398205344,
+        "approved": true,
+        "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+        "incumbent_mean_residual": 0.4979889379560898,
+        "candidate_mean_residual": 0.3352223643752263,
+        "reentry_pos_jump_m": 0.0
+      }
+    }
+  ],
+  "mode_flip_reproduced": true,
+  "accepted_flip_reproduced": true
+}

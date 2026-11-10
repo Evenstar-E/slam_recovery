@@ -1,0 +1,12 @@
+{
+  "source_revision": "21fa6506f8b1c63f95b135f7052b2fb84ea7c9c3",
+  "scope": "Local Python component checks; no ROS, bags or native recovery run",
+  "core_tests": {"status": "PASS", "tests": 68, "failures": 0, "errors": 0, "runner_seconds": 2.348, "total_seconds": 2.523},
+  "transaction_acceptance": {
+    "alarm_frame": {"status": "PASS", "buffer_keys": [2], "pending": ["2"]},
+    "revoked_repair_population": {"status": "PASS", "trusted_keys": [], "pending": ["1", "2", "3", "4"], "provisional_keys": [1, 4]},
+    "later_arrival_and_partial_retry": {"status": "PASS", "frame_4_ns": 400000000, "second_onset_ns": 350000000, "trusted_keys_after": [1], "pending_after": ["2", "3", "4", "5"], "repair_undo_ns": 400000000, "scope_note": "Original missed rollback fixed; batch shares segment end, not proof of arbitrary per-key history dependencies"}
+  },
+  "native_recovery": {"status": "NOT_APPLICABLE", "note": "Not run locally; latest S1 status still NOT STARTED"},
+  "full_rescore": {"status": "NOT_APPLICABLE", "note": "Component acceptance is not a full A/B score update"}
+}

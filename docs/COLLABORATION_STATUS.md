@@ -178,3 +178,11 @@ S4修改文档：`AGENTS.md`、`REVIEW_AND_SIMULATION_PLAN.md`、本协作表；
 用户首先要真实原生恢复，缓存旧宿主pose和Python/sidecar接线仅阶段证据，不作替代。接纳或拒绝照实报告，至少尝试实际重处理/状态重估/内部地图恢复；未具备接口明确BLOCKED并给最小实现。用已有hall链优先，不扩实验矩阵，不自动调参重跑。实际运行前执行侧沿现资源填固定输入窗口和墙钟停止预算。
 
 发布渠道是GitHub审阅分支共同任务入口；本机仍无S1/S2/S3可寻址消息通道，**本次接收/开工未确认**。已确定负责人不等于执行已经开始。配套[KITTI备用集](KITTI_HELDOUT_RESERVE_20261110.md)为旁支：05/07和封存08先待真实未见历史/Raw IMU兼容核验，不阻塞本次原生运行；本轮未下载数据。
+
+## 10. 21fa650及Codex独立包状态更新
+
+开发main固定`21fa6506f8b1c63f95b135f7052b2fb84ea7c9c3`，新A5/A9三旧正常场景本机均通过、核心68/68 PASS；详见[增量核验](review_20261110_21fa650/README.md)。已解除报警帧、回滚人口、旧end漏撤范围，不继续当当前阻塞。A7旧两个gauge门反例和固定基transport已通过；实际node world正则仍造成cov跨默认0.5门翻判，仅保留最小固定基修正，原生接线并行。S1最新仍报B11 NOT STARTED，未交原生恢复运行。
+
+**Codex已有实际独立分支与结果：**`origin/codex/independent-reproduction-20261110@ee6a1964da0df5e42904bc7545c7c4bc0bb4cc01`，入口`docs/independent_reproduction_20261110_codex/README.md`（在该分支，未合到本审阅树）。本机核读报告/结果元信息，未重跑。目标39eac2f，报告环境Windows11/Python3.12.14/NumPy2.3.5，独立worktree；旧A5/A9/A7五个正常不变量FAIL、分批控制PASS、60核心与trace工具5例PASS。该包独立确认旧源问题，不是21fa650新fix的失败/验收；原生环境和实际运行仍未交付。
+
+Codex接续沿自己包做新anchor/cov最小适配与正常集成复验，不再造工具、不抢写算法。S1/S2/S3实际工作树变化仍需各自回报；算法/阈值/单测收敛及最高优先运行任务本次是否已接收/开工尚未确认，不从合早期审阅分支推断已接收最新任务。
