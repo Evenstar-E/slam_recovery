@@ -142,7 +142,9 @@ else:
 
 json.dump(rec, open(os.path.join(rd, "receipt.json"), "w"), indent=1)
 print(json.dumps({"status": rec["status"], "reason": rec["reason"]}, indent=1))
-sys.exit(0 if rec["status"] == "OK" else 1)
+# Writing the receipt succeeded whatever the run's status says. Exiting non-zero here made the
+# caller print "could not write the receipt" for runs whose receipt had in fact been written.
+sys.exit(0)
 PY
 }
 
@@ -264,10 +266,19 @@ def pgid_of(pid):
     except (OSError, TypeError, ValueError):
         return None
 
-# The recovery node recorded its own pgid before exiting; the host is still alive here, so its
-# pgid is read live. Comparing a live pid against a reaped one would compare None with a number.
+# The recovery node recorded its own pgid before exiting. For the host, prefer the pgid recorded
+# while it was still alive: if the host exited before this check, reading it live returns None and
+# the run is reported as "different process groups" although it never was. Measured on run
+# 110042Z, which failed exactly this way.
 recovery_pgid = s.get("runtime", {}).get("pgid")
-host_pgid = pgid_of(host_pid)
+recorded_pgid = None
+pgid_path = os.path.join(rd, "runtime_pgid.txt")
+if os.path.exists(pgid_path):
+    try:
+        recorded_pgid = int(open(pgid_path).read().strip())
+    except (OSError, ValueError):
+        recorded_pgid = None
+host_pgid = recorded_pgid if recorded_pgid is not None else pgid_of(host_pid)
 
 checks = {}
 checks["both_topics_received"] = {

@@ -846,7 +846,11 @@ class NativeClosedLoop:
                           kfs_before, pts_before)
 
         after = self.node.tx_mgr.active_quarantine
-        if before is None and after is not None:
+        # A new segment can open in the same call that closes an old one: `step_frame` may expire
+        # the wait, re-arm, and then trigger on the very same frame. Comparing against None only
+        # would miss that transition -- the third segment of run 105118Z had no episode, so it was
+        # never decided, never closed, and froze the map for the remaining 370 frames.
+        if after is not None and after is not before:
             self._open_episode(ts_ns, pose, after)
         if self._open is not None and not self._open.decided:
             self._open.frames.append((kf_id, ts_ns, np.asarray(pose, dtype=np.float64).copy()))
