@@ -36,12 +36,12 @@ def _write(rows):
 
 def _group(seq, n=3, first=100, last=200, sha="a", mesures=5, img=1):
     return ("GROUP", 1000 + seq, 900 + seq, n, first, last, _sha(sha),
-            f"mesures={mesures};img={img};img_stamp=950;need_init=0")
+            f"mesures={mesures}|img={img}|img_stamp_ns=950|need_init=0")
 
 
 def _state(seq, x, stamp=None):
     return ("STATE", 2000 + seq, stamp or (500 + seq), 0, None, None, None,
-            f"pos={x}|0|0;diagR=1|1|1")
+            f"pos={x}|0|0|diagR=1|1|1")
 
 
 class TestParser(unittest.TestCase):
@@ -58,7 +58,7 @@ class TestParser(unittest.TestCase):
     def test_reads_all_four_kinds(self):
         tr = self._parse([
             ("ARRIVE", 10, 11, 1, 11, 11, _sha("1"), "buflen=7"),
-            _group(1), ("IMUINIT", 20, 300, 3, 100, 200, _sha("2"), "iter=4;max=20"),
+            _group(1), ("IMUINIT", 20, 300, 3, 100, 200, _sha("2"), "iter=4|max=20"),
             _state(1, "1.0")])
         self.assertEqual([e.kind for e in tr.events], ["ARRIVE", "GROUP", "IMUINIT", "STATE"])
         self.assertEqual(tr.of("STATE")[0].xyz(), [1.0, 0.0, 0.0])
@@ -69,7 +69,7 @@ class TestParser(unittest.TestCase):
 
     def test_float_time_is_an_error(self):
         with self.assertRaises(ValueError):
-            self._parse([("STATE", 1.5e9, 2, 0, None, None, None, "pos=0|0|0")])
+            self._parse([("STATE", 1.5e9, 2, 0, None, None, None, "pos=0|0|0|diagR=1|1|1")])
 
     def test_group_without_sha_is_an_error(self):
         with self.assertRaises(ValueError):

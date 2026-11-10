@@ -59,12 +59,25 @@ def _i(v):
 
 
 def _extra(text: str) -> Dict[str, str]:
-    out = {}
-    for part in (text or "").split(";"):
+    """Parse `k=v|k=v|...` where a bare token continues the previous value's vector.
+
+    The producer separates both pairs and vector elements with `|`, so `pos=1|2|3|diagR=a|b|c`
+    is one string to split: a token containing `=` starts a new key, a token without one is
+    another element of the previous key's vector. `;` is accepted as a pair separator too, so a
+    trace written with the older convention still parses.
+    """
+    out: Dict[str, str] = {}
+    current = None
+    for part in re.split(r"[;|]", text or ""):
+        part = part.strip()
         if not part:
             continue
-        key, _, val = part.partition("=")
-        out[key.strip()] = val.strip()
+        if "=" in part:
+            key, _, val = part.partition("=")
+            current = key.strip()
+            out[current] = val.strip()
+        elif current is not None:
+            out[current] = out[current] + "|" + part
     return out
 
 
