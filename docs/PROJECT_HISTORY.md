@@ -183,3 +183,13 @@ detection-off原summary/receipt/wiring及sigma分析已交，source原blob SHA�
 同一detection-off流新增窗口统计，生产源码未变。固定Git结果20桶合197归档记录、196有限node_map记录、70标记，35.53%/35.71%算术一致；它仅是已配对诊断人口的NIS-only离线告警占比，不是原bag全部帧/时间覆盖/在线召回或恢复率。原诊断599扫描393配对，缺失不能消失；63.5%帧比例不能直接换成12.6s。见[36e9bef核验](review_20261110_36e9bef/README.md)。
 
 保留描述性趋势/未知因果，到此不再追加sigma/coverage说明或新重放矩阵。下一唯一交付仍S1/S2原生恢复写回＋Mode3续处理/重武装的恢复/接回/E2，S3最小A7正则并行；已有组件复用、无新主线运行或完整分数。
+
+## 16. 0bdd1f4：实际检测与ICP组件部分推进，不等原生恢复
+
+新sigma=.884 detection-on运行已交原receipt/summary/wiring/candidate，source Git原blob SHA与receipt一致。本次room输入首次报警−27ms、隔离+106ms；584/599扫描配对、364检测可用、220未检测摄入。接受真实检测尝试进展，不再称只有离线统计；仍0接纳、1决定、E2为0、WAITING，决定后375消费不等接回。新ICP模块现有13个测试函数本机直接调用均通过（非pytest）；driver仍host poses，未调用ICP，所引真实离线结果文件未归档，不能说在线修复已跑。
+
+边界确实拿旧anchor与后来的候选首帧作差，连续0.3m/s跨2.329s被量成0.699m、超过0.5；0.1m/s仅0.233m，否定“移动永远拒绝”。**本次真实候选不承诺修边界后接纳**：归档tail速度仅约0.149m/s，按现匀速模型时间对齐后差的下界仍0.903m；info_after4.628亦低于冻结tau_info25。保留真实拒绝，最低统一时间基/相对运动依据，匀速外推仍BOUND_ONLY，不调门。
+
+旧replay来源为持续增长到373key的detection-off图，不是“早期冻结小参考”；真实support/FIM/反馈/人口差异和随机性不能被单一归因替代。新severity是hall而检测/replay是room，hall窗内200差异帧不证明room尾部漏检，room因果仍UNCONFIRMED。无需为这些范围更正另跑统计/σ矩阵。完整核验和最小反例见[0bdd1f4意见](review_20261110_0bdd1f4/README.md)。
+
+主要阻塞仍工程接口/生命周期：S1集成/S2接实际宿主恢复重处理与内部状态地图写回，以及真实Mode3续处理/有限终态/重武装，交一次恢复→接回→E2或第一具体宿主接口断点。S3并行最低A7正则与时间基修正，写入责任由S1确认；Codex/KITTI不挡接线。已有局部成果直接复用，不新增防御门/测试框架，不升完整A10/B11或全表评分。

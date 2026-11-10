@@ -1,0 +1,84 @@
+{
+  "target": "0bdd1f494f62f3941865700a8f321b080933f1b2",
+  "scope": "local source/archived evidence review; synthetic existing tests; no ROS or native rerun",
+  "source_identity": {
+    "status": "PASS",
+    "method": "SHA256 of fixed git show target:slam_recovery/ros/recovery_node.py bytes",
+    "receipt_sha256": "29940c086922c3724bb68a7c86b4c1d8311da4b6cc36c815170708e22db3f04c",
+    "computed_sha256": "29940c086922c3724bb68a7c86b4c1d8311da4b6cc36c815170708e22db3f04c",
+    "run_id": "fl_native_20261110T035825Z_3008585",
+    "input": "room02_2x2_O.bag",
+    "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d"
+  },
+  "icp_existing_tests": {
+    "status": "PASS",
+    "runner": "import target test_pose_reregistration; inspect.getmembers(isfunction); directly invoke all test_* no-argument functions; not pytest",
+    "implementation_path": "D:/REPAIR/slam_recovery_upstream/slam_recovery/repair/pose_reregistration.py",
+    "test_path": "D:/REPAIR/slam_recovery_upstream/slam_recovery/tests/test_pose_reregistration.py",
+    "passed": 13,
+    "failed": 0,
+    "seconds": 48.15,
+    "tests": [
+      "test_build_candidate_keeps_successes_and_reports_failures",
+      "test_build_candidate_skips_frames_without_an_init_pose",
+      "test_empty_reference_is_reported_not_guessed",
+      "test_normals_on_a_plane_are_parallel_to_its_normal",
+      "test_reference_out_of_range_is_reported",
+      "test_reregistration_leaves_an_already_correct_pose_alone",
+      "test_reregistration_recovers_a_known_small_transform",
+      "test_restrict_reference_applies_radius_and_cap",
+      "test_result_records_what_the_frozen_spec_requires",
+      "test_sample_scan_is_a_stride_subsample",
+      "test_voxel_grid_k_neighbours_are_sorted",
+      "test_voxel_grid_matches_brute_force",
+      "test_voxel_grid_reports_misses_as_minus_one"
+    ]
+  },
+  "syntax": {
+    "status": "PASS",
+    "python_ast": [
+      "slam_recovery/ros/recovery_node.py",
+      "slam_recovery/repair/pose_reregistration.py",
+      "slam_recovery/tests/test_pose_reregistration.py",
+      "docs/review_20261110_b10/run_icp_candidate_offline.py",
+      "docs/review_20261110_b10/run_injection_severity_timeline.py"
+    ],
+    "runner": "bash -n slam_recovery/ros/run_native_loop.sh"
+  },
+  "reentry_time_probe": {
+    "command": "python -B docs/review_20261110_0bdd1f4/reentry_time_probe.py",
+    "status": "PASS (defect reproduced, not fixed/full admission passed)",
+    "first_attempt": "FAIL: exact float equality for synthetic 1 m displacement; changed review-only assertion to isclose(atol=1e-12, rtol=0), then passed",
+    "elapsed_s": 2.328956843,
+    "continuous_speed_0_3_raw_jump_m": 0.6986870529000001,
+    "continuous_speed_0_1_raw_jump_m": 0.23289568430000004,
+    "aligned_continuous_difference_m": 0.0,
+    "aligned_discontinuity_m": 0.9999999999999999,
+    "real_run_tail_speed_mps": 0.14916273671315045,
+    "real_run_extrapolated_displacement_m": 0.3473935763886991,
+    "real_run_aligned_difference_lower_bound_m": 0.9032394794561844,
+    "caveat": "aligned differences are arithmetic under constant velocity, not independent motion truth or implemented fix"
+  },
+  "hall_archive_consistency": {
+    "status": "PASS (archive only; bags not available locally)",
+    "per_frame_records": 598,
+    "differing_frames": 200,
+    "frames_in_window": 200,
+    "zero_difference_inside": 0,
+    "timeline_frame_sum": 200,
+    "onset_ns": 1627785275607408524,
+    "end_ns": 1627785295546408653,
+    "scope": "hall input, not room detection/replay; changed rows not independently calibrated fault severity"
+  },
+  "icp_offline_results": {
+    "status": "UNAVAILABLE",
+    "method": "git ls-tree -r --name-only target and local glob",
+    "expected": "icp_candidate_offline_results.json",
+    "matches": 0
+  },
+  "native_recovery_reentry_E2": "BLOCKED / not delivered; actual driver still host_poses, no native restore/writeback; first Mode3 locks decided episode",
+  "full_core_rerun": "NOT_APPLICABLE: core/manager/transaction node unchanged from previously reviewed version",
+  "pytest_driver_suite": "BLOCKED: known missing pytest; not repeated or installed",
+  "native_ros_run": "NOT_APPLICABLE: remote developer responsibility; not run locally",
+  "complete_AB_rescore": "NOT_APPLICABLE: localized review only"
+}
