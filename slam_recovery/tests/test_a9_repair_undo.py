@@ -28,7 +28,8 @@ def _candidate(version, poses):
         candidate_id="a9_repair", parent_map_version=version, repaired_poses=dict(poses),
         info_after_6x6=np.diag([60, 60, 60, 45.0, 60, 60]), cov_after_6x6=np.eye(6) * 0.05,
         holdout_nis=1.2, paired_benefit_approved=True, wilson_lower_bound=0.90,
-        reentry_pos_jump_m=0.05, info_after_frame=TangentFrame("world", "rot_trans", "world"))
+        reentry_pos_jump_m=0.05, info_after_frame=TangentFrame("world", "rot_trans", "world"),
+        cov_after_frame=TangentFrame("world", "rot_trans", "world"))
 
 
 class A9RepairUndoTest(unittest.TestCase):
@@ -41,7 +42,8 @@ class A9RepairUndoTest(unittest.TestCase):
             weak_direction_6d=np.array([0, 0, 0, 1, 0, 0], dtype=np.float64),
             info_before_6x6=np.eye(6) * 10.0, propagated_cov_norm=1.0,
             weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
-            info_before_frame=TangentFrame("world", "rot_trans", "world"))
+            info_before_frame=TangentFrame("world", "rot_trans", "world"),
+            anchor_pose_world=np.eye(4))
         # the quarantine rolled 2 and 3 back, so 2 does not exist before the repair
         existed_before = 2 in mgr.trusted_poses
 
@@ -61,7 +63,8 @@ class A9RepairUndoTest(unittest.TestCase):
             weak_direction_6d=np.array([0, 0, 0, 1, 0, 0], dtype=np.float64),
             info_before_6x6=np.eye(6) * 10.0, propagated_cov_norm=1.0,
             weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
-            info_before_frame=TangentFrame("world", "rot_trans", "world"))
+            info_before_frame=TangentFrame("world", "rot_trans", "world"),
+            anchor_pose_world=np.eye(4))
 
         # undo restores the pre-repair state: a key that did not exist is removed again
         self.assertFalse(existed_before)

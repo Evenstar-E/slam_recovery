@@ -46,7 +46,7 @@ def _candidate(version: int, poses: dict) -> CandidateMap:
         info_after_6x6=np.diag([60.0, 60.0, 60.0, 45.0, 60.0, 60.0]),
         cov_after_6x6=np.eye(6) * 0.05, holdout_nis=1.2,
         paired_benefit_approved=True, wilson_lower_bound=0.90, reentry_pos_jump_m=0.05,
-        info_after_frame=WORLD)
+        info_after_frame=WORLD, cov_after_frame=WORLD)
 
 
 def _trigger(mgr, onset_ns: int, current_ns: int):
@@ -54,7 +54,8 @@ def _trigger(mgr, onset_ns: int, current_ns: int):
         estimated_onset_ns=onset_ns, current_ns=current_ns,
         weak_direction_6d=np.array([0.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
         info_before_6x6=np.eye(6) * 10.0, propagated_cov_norm=1.0,
-        weak_direction_frame=WORLD, info_before_frame=WORLD)
+        weak_direction_frame=WORLD, info_before_frame=WORLD,
+        anchor_pose_world=np.eye(4))
 
 
 class AlarmFrameRegistrationTest(unittest.TestCase):

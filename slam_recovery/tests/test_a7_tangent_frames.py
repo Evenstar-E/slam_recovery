@@ -129,6 +129,16 @@ class TestTransportAlgebra(unittest.TestCase):
         self.assertLess(float(np.linalg.norm(moved - info_world)
                               / np.linalg.norm(info_world)), 1e-6)
 
+        # The covariance has to move with it. A gate that transports one and not the other is how
+        # a body covariance ends up compared against a world threshold, so the same producer-based
+        # check is applied to it: invert the two informations and compare the transported result.
+        cov_body = np.linalg.inv(info_body + np.eye(6) * 1e-3)
+        cov_world = np.linalg.inv(info_world + np.eye(6) * 1e-3)
+        cov_moved = transport_covariance(cov_body, T)
+        self.assertLess(float(np.linalg.norm(cov_moved - cov_world)
+                              / np.linalg.norm(cov_world)), 1e-3,
+                        "covariance transport disagrees with the covariance the producer computes")
+
     def test_transport_composes(self):
         T1 = _se3(_rot_z(30.0), [0.4, -1.2, 0.7])
         T2 = _se3(_rot_z(-75.0), [2.0, 0.1, -0.5])
