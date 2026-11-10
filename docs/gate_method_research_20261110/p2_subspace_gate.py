@@ -86,6 +86,70 @@ def statistics(info):
             "ratio_min_max": float(vals[0] / max(vals[-1], 1e-12))}
 
 
+
+
+def _rotation_control(cloud_room02):
+    """Same physical scene, four orientations, both producers, relative to 0 degrees.
+
+    Two sources are recorded because the two sessions measured different scans: the room02 scan
+    sampled here, and the hall scan c1_fim_controls loads. The magnitudes differ by source; the
+    direction of the finding -- the voxel grid is orientation-dependent and the stride producer is
+    not -- is the same on both.
+    """
+    import importlib.util as _iu
+    from slam_recovery.validation import compute_6dof_point_to_plane_fim as fim_old
+
+    def one(cloud, label):
+        """Two readings per rotation.
+
+        `own_direction` compares each frame's own weak direction -- this mixes a change of matrix
+        with a change of direction, which is why its percentages are unstable when the weakest
+        direction swaps. `fixed_direction` transports the 0-degree weak direction into each
+        rotated frame and evaluates there, so only the matrix changes. The fixed-direction column
+        is the one that answers "is the producer orientation-dependent".
+        """
+        rows = []
+        base = {}
+        v0 = {}
+        for deg in (0, 10, 30, 45):
+            G = se3(deg, [2.0, -1.0, 0.5]) if deg else np.eye(4)
+            moved = cloud if deg == 0 else (cloud @ G[:3, :3].T) + G[:3, 3]
+            io_, _, _, _, wo_ = fim_old(moved, sigma_meas_m=0.075)
+            vo_ = wo_ / np.linalg.norm(wo_)
+            inn_, _, _, _, wn_ = c2.fim_spatial(moved)
+            vn_ = wn_ / np.linalg.norm(wn_)
+            if deg == 0:
+                v0 = {"old": vo_.copy(), "new": vn_.copy()}
+                base = {"old": float(vo_ @ io_ @ vo_), "new": float(vn_ @ inn_ @ vn_)}
+            vo_fixed = transport(v0["old"], G) if deg else v0["old"]
+            vo_fixed = vo_fixed / np.linalg.norm(vo_fixed)
+            vn_fixed = transport(v0["new"], G) if deg else v0["new"]
+            vn_fixed = vn_fixed / np.linalg.norm(vn_fixed)
+            rows.append({
+                "rotation_deg": deg,
+                "old_own_direction_rel": abs(float(vo_ @ io_ @ vo_) - base["old"])
+                / max(abs(base["old"]), 1e-12),
+                "new_own_direction_rel": abs(float(vn_ @ inn_ @ vn_) - base["new"])
+                / max(abs(base["new"]), 1e-12),
+                "old_fixed_direction_rel": abs(float(vo_fixed @ io_ @ vo_fixed) - base["old"])
+                / max(abs(base["old"]), 1e-12),
+                "new_fixed_direction_rel": abs(float(vn_fixed @ inn_ @ vn_fixed) - base["new"])
+                / max(abs(base["new"]), 1e-12),
+            })
+        return {"source": label, "rows": rows}
+
+    out = [one(cloud_room02, "room02_2x2_O (/velodyne_points sample, cap 6000)")]
+    c1_path = os.path.join(HERE, "c1_fim_controls.py")
+    if os.path.exists(c1_path):
+        spec = _iu.spec_from_file_location("c1", c1_path)
+        c1 = _iu.module_from_spec(spec)
+        spec.loader.exec_module(c1)
+        out.append(one(c1.load_scan(), "hall01_100_160 (/velodyne_points, 30 m crop, 8000 pts)"))
+    return {"note": ("own_direction mixes matrix and direction changes; fixed_direction transports "
+                     "the 0-degree weak direction and isolates the matrix. The fixed column is the "
+                     "decision-relevant one"),
+            "sources": out}
+
 def main():
     scans = sample_scans()
     rows = []
@@ -122,6 +186,8 @@ def main():
              "m_unconstrained_before_after": [st0["m_unconstrained"],
                                               stm["m_unconstrained"]]}
 
+    rotation = _rotation_control(scans[0]["cloud"])
+
     out = {
         "_meta": {
             "what": "form 2: observable-subspace gate, and why it is not the scalar",
@@ -133,6 +199,22 @@ def main():
                 "not_a_scalar": "it is a rank/condition condition over all six directions",
             },
             "bag": os.path.basename(BAG), "scans": len(rows), "cap": CAP,
+            "form2_loewner_frozen": {
+                "condition": "L_after - kappa * L_before is positive semi-definite AND "
+                             "min(eig(L_after)) >= LAMBDA_FLOOR",
+                "kappa": 2.0,
+                "kappa_source": "GateThresholds.tau_info_kappa, the gate's frozen relative factor, "
+                                "applied to the whole matrix (Loewner order) instead of one direction",
+                "lambda_floor": VARIANCE_FLOOR,
+                "lambda_floor_source": "1/sigma_tol, the covariance bound the gate already applies",
+                "why_not_a_scalar": "two matrices can share lambda_min and the projection along v "
+                                    "and still differ in Loewner order along other directions",
+                "status": "frozen; decision-level comparison BLOCKED on L_after",
+            },
+            "form2_scalar_floor_frozen": {
+                "condition": "count(eig(L_after) < LAMBDA_FLOOR) == 0",
+                "status": "REJECTED by its own control: it is the scalar in disguise",
+            },
             "not_done": ["no host run", "no threshold changed", "no production edit",
                          "decision-level comparison BLOCKED on `after`"],
         },
@@ -141,11 +223,13 @@ def main():
             "pearson_r": round(corr, 4) if corr is not None else None,
             "rank_identical_positions": same_order, "n": len(rows),
             "rank_pairs_scalar_vs_min_eig": rank_pairs,
-            "reading": ("the two statistics share the eigenvalue they are both built from, so they "
-                        "are correlated, but they do not order the scans identically: the scalar "
-                        "along one direction and the six-direction floor are different objects"),
+            "reading": ("pearson_r = 1.0 and 24/24 identical positions: the two orderings are the "
+                        "SAME. v is the weakest eigenvector, so v^T L v == lambda_min exactly, and "
+                        "the 'subspace' condition is a second threshold on that one number. This "
+                        "is the degeneracy the form was supposed to avoid, and it is not avoided"),
         },
         "gauge_control": gauge,
+        "rotation_control": rotation,
     }
     os.makedirs(OUT_DIR, exist_ok=True)
     path = os.path.join(OUT_DIR, "p2_subspace_gate.json")

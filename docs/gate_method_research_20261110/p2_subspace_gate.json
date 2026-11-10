@@ -11,6 +11,19 @@
   "bag": "room02_2x2_O.bag",
   "scans": 24,
   "cap": 6000,
+  "form2_loewner_frozen": {
+   "condition": "L_after - kappa * L_before is positive semi-definite AND min(eig(L_after)) >= LAMBDA_FLOOR",
+   "kappa": 2.0,
+   "kappa_source": "GateThresholds.tau_info_kappa, the gate's frozen relative factor, applied to the whole matrix (Loewner order) instead of one direction",
+   "lambda_floor": 2.0,
+   "lambda_floor_source": "1/sigma_tol, the covariance bound the gate already applies",
+   "why_not_a_scalar": "two matrices can share lambda_min and the projection along v and still differ in Loewner order along other directions",
+   "status": "frozen; decision-level comparison BLOCKED on L_after"
+  },
+  "form2_scalar_floor_frozen": {
+   "condition": "count(eig(L_after) < LAMBDA_FLOOR) == 0",
+   "status": "REJECTED by its own control: it is the scalar in disguise"
+  },
   "not_done": [
    "no host run",
    "no threshold changed",
@@ -338,7 +351,7 @@
     20
    ]
   ],
-  "reading": "the two statistics share the eigenvalue they are both built from, so they are correlated, but they do not order the scans identically: the scalar along one direction and the six-direction floor are different objects"
+  "reading": "pearson_r = 1.0 and 24/24 identical positions: the two orderings are the SAME. v is the weakest eigenvector, so v^T L v == lambda_min exactly, and the 'subspace' condition is a second threshold on that one number. This is the degeneracy the form was supposed to avoid, and it is not avoided"
  },
  "gauge_control": {
   "scalar_relative_diff": 0.21419551793376024,
@@ -346,6 +359,77 @@
   "m_unconstrained_before_after": [
    0,
    0
+  ]
+ },
+ "rotation_control": {
+  "note": "own_direction mixes matrix and direction changes; fixed_direction transports the 0-degree weak direction and isolates the matrix. The fixed column is the decision-relevant one",
+  "sources": [
+   {
+    "source": "room02_2x2_O (/velodyne_points sample, cap 6000)",
+    "rows": [
+     {
+      "rotation_deg": 0,
+      "old_own_direction_rel": 0.0,
+      "new_own_direction_rel": 0.0,
+      "old_fixed_direction_rel": 0.0,
+      "new_fixed_direction_rel": 0.0
+     },
+     {
+      "rotation_deg": 10,
+      "old_own_direction_rel": 3.6483417224534475e-16,
+      "new_own_direction_rel": 0.0121032372786252,
+      "old_fixed_direction_rel": 1.8241708612267237e-16,
+      "new_fixed_direction_rel": 0.011913838285182646
+     },
+     {
+      "rotation_deg": 30,
+      "old_own_direction_rel": 3.6483417224534475e-16,
+      "new_own_direction_rel": 0.0006169146134847722,
+      "old_fixed_direction_rel": 3.6483417224534475e-16,
+      "new_fixed_direction_rel": 0.0038693180243689882
+     },
+     {
+      "rotation_deg": 45,
+      "old_own_direction_rel": 3.6483417224534475e-16,
+      "new_own_direction_rel": 0.19335440790370617,
+      "old_fixed_direction_rel": 0.0,
+      "new_fixed_direction_rel": 0.20288516798368933
+     }
+    ]
+   },
+   {
+    "source": "hall01_100_160 (/velodyne_points, 30 m crop, 8000 pts)",
+    "rows": [
+     {
+      "rotation_deg": 0,
+      "old_own_direction_rel": 0.0,
+      "new_own_direction_rel": 0.0,
+      "old_fixed_direction_rel": 0.0,
+      "new_fixed_direction_rel": 0.0
+     },
+     {
+      "rotation_deg": 10,
+      "old_own_direction_rel": 3.473596030105658e-16,
+      "new_own_direction_rel": 6.228910846352767,
+      "old_fixed_direction_rel": 3.473596030105658e-16,
+      "new_fixed_direction_rel": 1.0304042502583384
+     },
+     {
+      "rotation_deg": 30,
+      "old_own_direction_rel": 1.736798015052829e-16,
+      "new_own_direction_rel": 1.9138900203829596,
+      "old_fixed_direction_rel": 1.736798015052829e-16,
+      "new_fixed_direction_rel": 0.08155411347339331
+     },
+     {
+      "rotation_deg": 45,
+      "old_own_direction_rel": 1.736798015052829e-16,
+      "new_own_direction_rel": 1.5638000916927972,
+      "old_fixed_direction_rel": 1.736798015052829e-16,
+      "new_fixed_direction_rel": 4.951772956614848
+     }
+    ]
+   }
   ]
  }
 }
