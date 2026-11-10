@@ -11,6 +11,50 @@
    "no nis_allowance_k touch",
    "no segment chosen to suppress the alarm"
   ],
+  "reference_construction_per_run": [
+   {
+    "scan_cap": 6000,
+    "nis_radius_m": 3.0,
+    "pair_window_ns": 40000000,
+    "map_points_over_healthy": {
+     "n": 168,
+     "min": 1500.0,
+     "p10": 1500.0,
+     "median": 1500.0,
+     "p90": 1500.0,
+     "max": 1500.0
+    },
+    "trusted_keyframes_over_healthy": {
+     "n": 168,
+     "min": 1.0,
+     "p10": 1.0,
+     "median": 1.0,
+     "p90": 1.0,
+     "max": 1.0
+    }
+   },
+   {
+    "scan_cap": 6000,
+    "nis_radius_m": 3.0,
+    "pair_window_ns": 40000000,
+    "map_points_over_healthy": {
+     "n": 168,
+     "min": 1500.0,
+     "p10": 1500.0,
+     "median": 1500.0,
+     "p90": 1500.0,
+     "max": 1500.0
+    },
+    "trusted_keyframes_over_healthy": {
+     "n": 168,
+     "min": 1.0,
+     "p10": 1.0,
+     "median": 1.0,
+     "p90": 1.0,
+     "max": 1.0
+    }
+   }
+  ],
   "coupling_caveat": "sigma* absorbs whatever the reference construction produces. The NIS reference still comes from a point-capped map sample; if that is changed, sigma* must be recomputed, and the two causes must stay reported separately."
  },
  "runs": [
@@ -28,6 +72,27 @@
     "last_ts_ns": 1627643759526658773,
     "alarm_free_subset_n": 0,
     "alarm_free_status": "NOT_SATISFIABLE"
+   },
+   "reference_construction": {
+    "scan_cap": 6000,
+    "nis_radius_m": 3.0,
+    "pair_window_ns": 40000000,
+    "map_points_over_healthy": {
+     "n": 168,
+     "min": 1500.0,
+     "p10": 1500.0,
+     "median": 1500.0,
+     "p90": 1500.0,
+     "max": 1500.0
+    },
+    "trusted_keyframes_over_healthy": {
+     "n": 168,
+     "min": 1.0,
+     "p10": 1.0,
+     "median": 1.0,
+     "p90": 1.0,
+     "max": 1.0
+    }
    },
    "before": {
     "n": 168,
@@ -83,6 +148,27 @@
     "last_ts_ns": 1627643759526658773,
     "alarm_free_subset_n": 0,
     "alarm_free_status": "NOT_SATISFIABLE"
+   },
+   "reference_construction": {
+    "scan_cap": 6000,
+    "nis_radius_m": 3.0,
+    "pair_window_ns": 40000000,
+    "map_points_over_healthy": {
+     "n": 168,
+     "min": 1500.0,
+     "p10": 1500.0,
+     "median": 1500.0,
+     "p90": 1500.0,
+     "max": 1500.0
+    },
+    "trusted_keyframes_over_healthy": {
+     "n": 168,
+     "min": 1.0,
+     "p10": 1.0,
+     "median": 1.0,
+     "p90": 1.0,
+     "max": 1.0
+    }
    },
    "before": {
     "n": 168,

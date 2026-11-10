@@ -85,6 +85,20 @@ def analyse(run_dir, onset):
             "alarm_free_subset_n": len(alarm_free),
             "alarm_free_status": ("SATISFIED" if len(alarm_free) >= 30 else "NOT_SATISFIABLE"),
         },
+        "reference_construction": {
+            # Recorded because sigma* is coupled to it: a calibration on a different reference is a
+            # different measurement, and the two must never be compared or carried across.
+            "scan_cap": summary.get("parameters", {}).get("scan_cap"),
+            # Both the per-scan input cap (6000) and the NIS reference cap are relevant, and they
+            # are different numbers. The reference cap is a source constant today
+            # (`get_trusted_map_points(max_pts=1500)`); the observed `map_points` below is the
+            # evidence that actually identifies which construction produced this calibration.
+            "nis_radius_m": summary.get("parameters", {}).get("nis_radius_m"),
+            "pair_window_ns": summary.get("parameters", {}).get("pair_window_ns"),
+            "map_points_over_healthy": distribution([f.get("map_points", 0) for f in healthy]),
+            "trusted_keyframes_over_healthy": distribution(
+                [f.get("trusted_keyframes", 0) for f in healthy]),
+        },
         "before": distribution(values),
         "sigma_star_m": round(sigma_star, 6),
         "after": distribution(after),
@@ -149,6 +163,7 @@ def main(argv):
                                 "sigma* = sigma_0 * sqrt(median NIS)"),
             "not_done": ["no sigma changed", "no threshold changed", "no nis_allowance_k touch",
                          "no segment chosen to suppress the alarm"],
+            "reference_construction_per_run": [r["reference_construction"] for r in results],
             "coupling_caveat": ("sigma* absorbs whatever the reference construction produces. The "
                                 "NIS reference still comes from a point-capped map sample; if that "
                                 "is changed, sigma* must be recomputed, and the two causes must "
