@@ -324,6 +324,7 @@ def test_loop_decides_once_at_the_confirmation_margin():
     t0 = 1_000_000_000
     for i in range(40):
         loop.on_pair(t0 + i * 100_000_000, np.eye(4), _scan(200))
+        loop.service()
     assert len(loop.episodes) == 1
     assert len(loop.records) == 1
     row = loop.records[0]
@@ -341,6 +342,7 @@ def test_loop_keeps_counting_frames_after_the_decision():
     t0 = 0
     for i in range(20):
         loop.on_pair(t0 + i * 100_000_000, np.eye(4), _scan(200))
+        loop.service()
     assert len(loop.records) == 1
     assert loop.frames_after_first_decision > 0
 
@@ -361,6 +363,7 @@ def test_summary_counts_gate_outcomes_and_nulls():
     loop = NativeClosedLoop(node, run_id="run", confirmation_margin_ns=1_000_000_000)
     for i in range(20):
         loop.on_pair(i * 100_000_000, np.eye(4), _scan(200))
+        loop.service()
     s = build_summary(loop, {})
     assert s["gate"]["rejected"] == 1 and s["gate"]["accepted"] == 0
     assert s["quarantine"]["second_and_later_events"] == 0
@@ -406,6 +409,26 @@ def test_nis_bins_report_real_quantiles_at_small_n():
     assert b["min"] == 53.49 and b["max"] == 55.045
     assert b["median"] == pytest.approx(54.2675)      # between the samples, not sel[n//2]
     assert b["p90"] >= b["median"] >= b["min"]
+
+
+def test_icp_candidate_source_builds_poses_and_records_detail():
+    node = _FakeLoopNode(trigger_at=2)
+    loop = NativeClosedLoop(node, run_id="run", confirmation_margin_ns=1_000_000_000,
+                            candidate_source="icp_reregistration")
+    for i in range(20):
+        loop.on_pair(i * 100_000_000, np.eye(4), _scan(200))
+        loop.service()
+    assert len(loop.records) == 1
+    assert loop.records[0]["candidate_source"] == "icp_reregistration"
+    assert len(loop.icp_details) == 1
+    det = loop.icp_details[0]
+    assert det["frames_with_init"] == det["frames_with_scan"] > 0
+    assert len(det["per_frame"]) == det["frames_with_init"]
+    for key in ("icp_iterations", "icp_residual", "icp_converged", "icp_inliers"):
+        assert key in det["per_frame"][0]
+    # the frozen stream keeps exactly its 18 keys; the ICP fields live beside it
+    assert tuple(loop.records[0].keys()) == CANDIDATE_KEYS
+    assert build_summary(loop, {})["candidate_source_detail"]["icp_candidates"] == 1
 
 
 def test_no_quarantine_means_no_records_and_a_readable_summary():
@@ -514,6 +537,7 @@ def test_the_loop_dates_the_anchor_it_passes():
     t0 = 1_000_000_000
     for i in range(40):
         loop.on_pair(t0 + i * 100_000_000, np.eye(4), _scan(200))
+        loop.service()          # decisions run on the main thread, not in the callback
     call = node.last_call
     trusted_keys = [k for k in node._kf_timestamps if k in node.tx_mgr.trusted_poses]
     if trusted_keys:

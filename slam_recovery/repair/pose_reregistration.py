@@ -24,6 +24,7 @@ the gate's decision, and this module never calls the gate.
 
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass, field
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
@@ -361,6 +362,7 @@ def build_icp_candidate(
     reference_world: np.ndarray,
     init_poses: Dict[int, np.ndarray],
     cfg: IcpConfig = ICP_CONFIG,
+    time_budget_s: float = 0.0,
 ) -> Tuple[Dict[int, np.ndarray], List[Tuple[int, IcpResult]]]:
     """Re-register every frame that has both a scan and an init pose.
 
@@ -370,11 +372,27 @@ def build_icp_candidate(
     """
     poses: Dict[int, np.ndarray] = {}
     results: List[Tuple[int, IcpResult]] = []
+    started = time.perf_counter()
     for kf_id in sorted(scan_bodies):
         if kf_id not in init_poses:
+            continue
+        if time_budget_s and (time.perf_counter() - started) > time_budget_s:
+            # Stop rather than overrun the decision point. The frames that did not get a pose are
+            # absent from the candidate, and the caller records the truncation.
+            results.append((kf_id, _budget_exhausted(init_poses[kf_id], reference_world, cfg)))
             continue
         res = reregister_frame(scan_bodies[kf_id], reference_world, init_poses[kf_id], cfg)
         results.append((kf_id, res))
         if res.status in ("CONVERGED", "ITERATION_LIMIT"):
             poses[kf_id] = res.pose
     return poses, results
+
+
+def _budget_exhausted(init_pose: np.ndarray, reference_world: np.ndarray,
+                      cfg: IcpConfig) -> IcpResult:
+    ref, total = restrict_reference(reference_world, np.asarray(init_pose, dtype=np.float64), cfg)
+    return IcpResult(pose=np.asarray(init_pose, dtype=np.float64).copy(), iterations=0,
+                     final_residual_m=float("nan"), converged=False, inliers=0,
+                     correspondences=0, reference_points=len(ref), reference_total_points=total,
+                     scan_points=0, status="BUDGET_EXHAUSTED",
+                     displacement_from_init_m=0.0, rotation_from_init_deg=0.0)

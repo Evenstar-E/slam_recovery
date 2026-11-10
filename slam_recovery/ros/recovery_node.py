@@ -46,6 +46,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 
 from slam_recovery.core import BackendDelta, RecoveryState
+from slam_recovery.repair.pose_reregistration import ICP_CONFIG, build_icp_candidate
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
 from slam_recovery.validation import (
     compute_6dof_point_to_plane_fim,
@@ -496,6 +497,7 @@ class NativeClosedLoop:
         pair_dt_ns: int = PAIR_DT_NS,
         scan_cap: int = SCAN_CAP,
         detection_enabled: bool = True,
+        icp_time_budget_s: float = 0.0,
     ) -> None:
         self.node = node
         self.run_id = run_id
@@ -512,6 +514,19 @@ class NativeClosedLoop:
         self._open: Optional[Episode] = None
         self.records: List[Dict[str, Any]] = []
         self.decision_errors: List[Dict[str, Any]] = []
+        # Per-candidate ICP detail, kept beside the frozen 18-key stream rather than inside
+        # it: the schema is frozen, and an extra key on some rows would break every consumer
+        # that parses by key.
+        self.icp_details: List[Dict[str, Any]] = []
+        self.icp_seconds_total = 0.0
+        # 0 = no budget. A budget that is hit is recorded, because truncating the candidate
+        # changes what the gate sees and must never happen silently.
+        self.icp_time_budget_s = float(icp_time_budget_s)
+        # A decision is requested by the callback and performed by the main loop. Performing it
+        # in the callback put a multi-second candidate construction inside a subscriber thread:
+        # it raced with shutdown, and on 2026-11-10 a run was killed mid-decision with the
+        # summary already written and the record missing.
+        self.pending_decision: Optional[str] = None
         self.frames_fed = 0
         self.frames_after_first_decision = 0
         self._first_decision_ts_ns: Optional[int] = None
@@ -599,7 +614,7 @@ class NativeClosedLoop:
         if self._open is not None and not self._open.decided:
             self._open.frames.append((kf_id, ts_ns, np.asarray(pose, dtype=np.float64).copy()))
             if ts_ns >= self._open.deadline_ns:
-                self.decide(ts_ns, "confirmation_margin")
+                self.pending_decision = "confirmation_margin"
 
     def _record_diag(self, kf_id: int, ts_ns: int, value: Optional[float], source: str,
                      reference: str, status: str, kfs_before: int, pts_before: int) -> None:
@@ -684,6 +699,54 @@ class NativeClosedLoop:
                                                <= out["nis_reversed_T_bw"]) else "REVERSED_SELECTED"
         return out
 
+    def _icp_candidate(self, ep: "Episode"):
+        """Re-register the episode's frames against the pre-quarantine trusted map.
+
+        The reference is the trusted map as it stands when the quarantine opened -- frozen, so the
+        candidate cannot be scored against geometry it produced. §9's parameters are used as
+        frozen; only the neighbour-search constants come from this repository.
+
+        This runs inside the decision, so its cost is part of the loop's latency and is recorded
+        as such. It is not moved to a side thread: a candidate that arrives after the decision
+        point would be a different experiment.
+        """
+        scans = {kf: self.node.scan_buffer_body[kf]
+                 for kf, _ts, _p in ep.frames if kf in self.node.scan_buffer_body}
+        inits = {kf: pose for kf, _ts, pose in ep.frames}
+        reference = self.node.get_trusted_map_points(max_pts=1 << 30)
+        try:
+            import rospy
+            rospy.loginfo("[slam_recovery] icp candidate: %d frames with scans, reference %d pts, "
+                          "scan points %s", len(scans), len(reference),
+                          sorted({len(v) for v in scans.values()})[:4])
+        except Exception:
+            pass
+        started = time.perf_counter()
+        poses, results = build_icp_candidate(scans, reference, inits, ICP_CONFIG,
+                                             time_budget_s=self.icp_time_budget_s)
+        elapsed = time.perf_counter() - started
+        try:
+            import rospy
+            rospy.loginfo("[slam_recovery] icp candidate done in %.1f s: %d/%d produced a pose",
+                          elapsed, len(poses), len(inits))
+        except Exception:
+            pass
+        self.icp_seconds_total += elapsed
+        detail = {
+            "seconds": elapsed,
+            "frames_with_scan": len(scans),
+            "frames_with_init": len(inits),
+            "frames_candidate": len(poses),
+            "reference_points_total": int(len(reference)),
+            "statuses": {},
+            "per_frame": [],
+        }
+        for kf, res in results:
+            d = res.as_dict()
+            detail["statuses"][res.status] = detail["statuses"].get(res.status, 0) + 1
+            detail["per_frame"].append({"kf_id": int(kf), **d})
+        return poses, detail
+
     def _open_episode(self, ts_ns: int, pose: np.ndarray, segment=None) -> None:
         estimated = None
         q_start = None
@@ -708,6 +771,20 @@ class NativeClosedLoop:
         keys = [kf for kf, _ts, _p in ep.frames]
         repaired = {kf: pose for kf, _ts, pose in ep.frames}
         ts_by_key = {kf: ts for kf, ts, _p in ep.frames}
+
+        icp_detail = None
+        if self.candidate_source == "icp_reregistration":
+            # A failure while building the candidate must leave a record, not a silent gap: the
+            # episode is already marked decided by the time we get here, so an uncaught exception
+            # would drop the decision entirely and the stream would show nothing happened.
+            try:
+                repaired, icp_detail = self._icp_candidate(ep)
+                self.icp_details.append({"candidate_id": ep.candidate_id, **icp_detail})
+            except BaseException as exc:
+                self.decision_errors.append({
+                    "candidate_id": ep.candidate_id, "stage": "icp_candidate",
+                    "error": f"{type(exc).__name__}: {exc}"})
+                repaired = {}          # no candidate; do not silently substitute the host poses
 
         incumbent, anchor, extrap_basis = extrapolate_incumbent(
             self.node.tx_mgr.trusted_poses, self.node._kf_timestamps, ts_by_key)
@@ -760,8 +837,21 @@ class NativeClosedLoop:
         }
         return row
 
+    def service(self, backlog_limit: int = 0) -> Optional[Dict[str, Any]]:
+        """Perform a decision the callbacks have asked for. Runs on the main thread only."""
+        if self.pending_decision is None or self._open is None or self._open.decided:
+            return None
+        if backlog_limit and (len(self.pairer._poses) + len(self.pairer._scans)) > backlog_limit:
+            # Let the backlog drain first: a decision made with a queue this deep would be
+            # scored against frames the node has not seen yet.
+            return None
+        basis = self.pending_decision
+        self.pending_decision = None
+        return self.decide(self._last_ts_ns or self._open.trigger_ts_ns, basis)
+
     def finish(self) -> None:
         """Bag end: decide anything still open, and account for unpaired messages."""
+        self.service()
         if self._open is not None and not self._open.decided:
             if self.bag_end_ts_ns is not None:
                 self.decide(self.bag_end_ts_ns, "bag_end")
@@ -780,16 +870,17 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
         "run_id": loop.run_id,
         "candidate_source": loop.candidate_source,
         "detection_enabled": loop.detection_enabled,
-        # A7 (review): the gate's mode depends on the world origin, because the transported weak
-        # direction is re-normalised by a length that is not Ad-invariant and because the
-        # covariance norm is compared against a fixed tolerance although the spectral norm is not
-        # translation invariant. Until that is fixed, a decision from this run says what the gate
-        # did, not what the gate is worth -- so every record carries the caveat.
-        "gate_decision_validity": "GAUGE_DEPENDENT_UNTIL_A7_FIX",
-        "gate_decision_caveat": "A7 is unaccepted: the same physical scene changes Mode when the "
-                                "world origin changes. Do not use these accept/refuse outcomes to "
-                                "compare against the offline A3 arm, and do not feed them into the "
-                                "B10 four-strategy table or the B5 confusion matrix.",
+        # A7 v2 cleared the gauge dependence: the transported weak direction is no longer
+        # re-normalised by a non-Ad-invariant length, and the covariance is carried back to the
+        # trigger frame's body basis before it meets a fixed tolerance. Verified locally by
+        # slam_recovery/tests/test_a7_tangent_frames.py (18 tests, including a plain translation
+        # and a rotated anchor with translation); reproduced by S1. The earlier
+        # GAUGE_DEPENDENT_UNTIL_A7_FIX label is obsolete and must not be quoted any more.
+        "gate_decision_validity": "A7_V2_GAUGE_CLEARED",
+        "gate_decision_caveat": "Gauge dependence was cleared by A7 v2. This statement is about "
+                                "the gate's invariance, not about whether a given candidate is "
+                                "good: the accept/refuse outcome still needs independent labels "
+                                "before it means anything in B10.",
         "protocol": {
             "ingest": "step_frame(kf_id, timestamp_ns, pose_se3=T_wb, scan_body_xyz, nis_value)",
             "pose_convention": "T_wb (body -> world), matching world_points = pts @ R.T + t",
@@ -871,6 +962,15 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
         "holdout_nis_nonfinite": sum(1 for r in rows if r["holdout_nis"] is None)
         if rows else 0,
         "decision_errors": loop.decision_errors,
+        "candidate_source_detail": {
+            "candidate_source": loop.candidate_source,
+            "icp_seconds_total": loop.icp_seconds_total,
+            "icp_candidates": len(loop.icp_details),
+            "note": "the frozen 18-key stream stays at 18 keys; the ICP fields are written to "
+                    "icp_detail.jsonl and repeated here, because adding keys to some rows would "
+                    "break every consumer that parses by key",
+            "details": loop.icp_details,
+        },
         "nis_vs_map_size": nis_vs_map_size(loop.diag),
         "frame_diagnostics": loop.diag,
         "final_state": getattr(loop.node.tx_mgr.state, "value", loop.node.tx_mgr.state),
@@ -1134,6 +1234,8 @@ def main(argv: Optional[List[str]] = None) -> int:
                     help="stop after this many seconds of wall time (0 = run until shutdown)")
     ap.add_argument("--max-pairs", type=int, default=0,
                     help="stop after this many paired frames (0 = no limit); wiring checks use it")
+    ap.add_argument("--icp-time-budget-sec", type=float, default=0.0,
+                    help="0 = no limit; a hit budget is recorded, never silent")
     ap.add_argument("--detection", default="on", choices=("on", "off"),
                     help="off = diagnosis only: the map grows and the NIS is recorded, "
                          "but nothing is judged")
@@ -1155,6 +1257,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         pair_dt_ns=int(args.pair_dt_ms * 1e6),
         scan_cap=args.scan_cap,
         detection_enabled=(args.detection == "on"),
+        icp_time_budget_s=args.icp_time_budget_sec,
     )
     driver = RosDriver(loop, args.pose_topic, args.scan_topic, args.status_topic)
 
@@ -1163,6 +1266,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     try:
         while not rospy.is_shutdown():
             rate.sleep()
+            loop.service()
             if args.duration_sec and (time.time() - started) >= args.duration_sec:
                 break
             if args.max_pairs and loop.pairer.paired >= args.max_pairs:
@@ -1190,6 +1294,12 @@ def main(argv: Optional[List[str]] = None) -> int:
     with open(os.path.join(args.run_dir, "candidates.jsonl"), "w", encoding="utf-8") as fh:
         for row in loop.records:
             fh.write(json.dumps({k: row[k] for k in CANDIDATE_KEYS}, default=float) + "\n")
+    if loop.icp_details:
+        with open(os.path.join(args.run_dir, "icp_detail.jsonl"), "w", encoding="utf-8") as fh:
+            for det in loop.icp_details:
+                for frame in det["per_frame"]:
+                    fh.write(json.dumps({"candidate_id": det["candidate_id"], **frame},
+                                        default=float) + "\n")
     rospy.loginfo("[slam_recovery] wrote %d candidate rows to %s", len(loop.records),
                   args.run_dir)
     return 0
