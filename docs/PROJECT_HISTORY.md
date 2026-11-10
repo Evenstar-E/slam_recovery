@@ -359,3 +359,9 @@ main已提出原rawheader/组成员身份替换最低修，方向接受但尚未
 [核验](review_20261110_930563d/README.md)接受set_state客户端/两个四元数测试PASS，开发人工x10→未来x11.229报告为受控接口观察；actual新版host patch/log/receipt依旧未交，地图数量不证明旧图清空/完整状态等价。实际driver用ep.frames旧host尾而非repaired/committed：本机正常编排旧x10/20、修复x1/2，trusted修复却native写x20；partial只提交key1、尾key2 deferred仍写x20；reprocess失败也继续set_state。最低实际已准入且同宿主重放时刻的修复状态来源、partial归属、native失败不继续依赖动作，不以灌ICP位姿代原生重估。
 
 原rawheader尝试回退不等正确成员映射不可行，未匹配计数语义/原因UNKNOWN；按已有stamp分类，不扩大窗口/矩阵。完整修复写回→接回→E2未交，参数仍停/S3并行。此前push因继承开发脚本rm-rf既有OUT被权限阻止，本轮未重试/绕过；本条及报告仅本地，远端review仍3965299，不冒称开发收到。
+
+## 39. d5f7d8f：进程内对照报告保留，撤PASS不等重放失真已证（仅本地）
+
+[核验](review_20261110_d5f7d8f/README.md)保留开发同实例control/treatment负观察：426group、12替换/8未匹配；报告算术x差14.231m、vox差6565、points差46369本机核过，非本机宿主测量。撤回修复效应PASS合理，但旧运行live与本次control不同时间/实例，z注入与x非线性响应也不能单凭量级定位根因；本次保真度/效应归因UNKNOWN/BLOCKED。新版host patch/log/receipt及同末stamp live/control/treatment尚未交，旧patch未变，完整写回→接回→E2仍未闭合。
+
+分类脚本读全部20发布戳而非实际8未匹配，inside下界用cp不使用replay lo。本机提取原表达式单个合成时间控制cp10、replay[12,14]、stamp11仍inside；cp缺失亦将早戳算inside。仅证明分类标签边界，不猜实际8帧根因。最低归档已有同次三终态/实际host source及matched戳、统一撤PASS范围，不扩大匹配窗/矩阵。S1/S2原生主线、S3独立研究/旧参数停保持；局部审阅不升完整A/B。run_checks.py及bash-n退出0，无ROS/原bag；此前push拒绝未重试/绕过，记录只本地，远端review仍3965299。

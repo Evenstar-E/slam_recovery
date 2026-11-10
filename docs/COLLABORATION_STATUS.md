@@ -420,3 +420,11 @@ S1复用§36命令归属/trustedstamp/full-vs-partial释放/评分集最低接�
 S2人工set_state烟测试是受控位姿接口观察，不是算法修复/地图等价/完整接回E2；新版host source/log/results/config receipt仍未归档。计数增不证明地图从零或全是新点，精确匹配回退/merged计数语义保持UNKNOWN。下一主线仍实际修复测量支配原生重估/内部map-state写回→接回→第二事件，S3并行/参数停，不等新研究。
 
 发布阻断：上一轮push因携带开发smoke脚本rm-rf既有OUT被权限检查拒绝，本轮新增smoke_writeback亦有同删除。本机未执行、未删数据、未重试/换工具/要求peer代推；本条与前轮d074核验仅本地，远端review仍3965299。需实际开发改新空目录/拒绝覆盖旧产物，或用户明确相关发布权限后再处理，不冒称已送达。
+
+## 41. repair-f3核d5f7d8f：进程内负对照新增，保真度与效应归因未闭合（仅本地）
+
+[核验](review_20261110_d5f7d8f/README.md)接受开发保留426group、12替换/8未匹配和撤修复效应PASS；三差值本机算术核过，非独立宿主实测。不能拿旧run live量级或z→x非线性响应确认本次control失真；本次同末stamp live终态/实际control源码/原件仍缺，保真度UNKNOWN，不从缺交付猜二次积分或restore根因。README效果已测与日报撤PASS最低统一，不为措辞另跑宿主。
+
+S2随下一主线实质交付归档同次live/control/treatment末stamp、已运行host patch/log/receipt及已有matched戳。新分类读发布全集且用cp而非lo作inside下界：本机单个合成正常空隙反例复现，不能代actual8缺测归属；复用已有20戳分类，不新宽窗/大重复矩阵。S1仍负责正常命令/准入写回来源与失败顺序最低修，旧source未变不重跑；S3研究并行、旧参数继续停，生产门不改。下一唯一主线仍实际修复测量→原生重估/地图写回→接回→E2，完整A/B不重评分。
+
+本机sourcepin分类控制与bash-n退出0，无ROS/原bag。实际自动所有权已核：本会话4既有Cron未复制，peer列表无repair-3e；未向其他会话要求代推。私人handoff保护，前push拒绝未解除，本条及报告只本地、远端review仍3965299，不称开发已收到。
