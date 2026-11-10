@@ -65,5 +65,14 @@
   ],
   "change": "none",
   "why": "the grouping observation now holds for the default configuration, but it is still one sequence and one pair; no work package closes"
+ },
+ "empty_group_mechanism": {
+  "claim_source": "code reading of FAST-LIVO2 src/LIVMapper.cpp sync_packages(), LIVO branch (lines ~1193-1335); not a new experiment",
+  "mechanism": "LIVO mode alternates two cuts per processed frame. In the WAIT/VIO state it builds one MeasureGroup with the IMU samples in (last_lio_update_time, img_capture_time] and returns. The next call is in the LIO state, which clears meas.measures, builds a new MeasureGroup carrying only the image, and its IMU collection loop is commented out -- so that group is empty by construction. One GROUP row is written per package, hence exactly two per frame, one of which never contains IMU.",
+  "arithmetic_check": "1766 GROUP rows / 2 = 883 frames, and 884 empty rows -- the off-by-one is the initial frame before the image cut starts",
+  "correction_to_peer_reading": "the earlier explanation ('adjacent lidar frames are close, so the previous frame already drained the IMU queue') is not what the code does: the empty group is not a timing race, it is the image-cut MeasureGroup whose IMU loop is commented out",
+  "consequence": "the ~50% empty fraction is structural in LIVO mode and carries no anomaly signal; it should not be counted as missing IMU or as evidence about grouping",
+  "row_pairing": "the rows come in pairs sharing one img_stamp: first the LIO-state cut (mesures=1, img=1, n_items=0, its IMU loop commented out), then the WAIT/VIO cut (mesures=2, n_items>0) that carries the IMU samples. Counts: 883 empty rows and 882 non-empty rows, plus the initial frame before the image cut starts",
+  "counting_rule": "GROUP rows are not frames. Each processed frame yields two rows, and every count taken from GROUP must be folded by 2 before it is read as a frame count; the pair shares img_stamp_ns, so the pairing is recoverable from the trace itself"
  }
 }
