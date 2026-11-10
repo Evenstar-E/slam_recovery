@@ -39,6 +39,7 @@ import json
 import math
 import os
 import sys
+import threading
 import time
 from collections import deque
 from typing import Any, Dict, List, Optional, Tuple
@@ -238,6 +239,34 @@ def candidate_record(
     row["wilson_lower_bound"] = _f(ev.get("wilson_lower_bound"))
     row["reentry_pos_jump_m"] = _f(ev.get("reentry_pos_jump_m"))
     return row
+
+
+def candidate_detail_record(
+    candidate_id: str,
+    t_trigger_ns: Optional[int],
+    t_decision_ns: Optional[int],
+    keys: List[int],
+    ts_by_key: Dict[int, int],
+    repaired_poses: Dict[int, np.ndarray],
+) -> Dict[str, Any]:
+    """Record the frame set and poses the gate scored, so `after` can be recomputed offline.
+
+    The archived stream says *whether* a candidate passed; it does not say which frames formed
+    `after` or with which poses. A later producer change therefore could not be re-derived from
+    it -- the frame set would have to be invented, which is a different quantity wearing the same
+    name. This sidecar keeps the actual input to `info_after` for the next run.
+    """
+    return {
+        "candidate_id": candidate_id,
+        "t_trigger_ns": None if t_trigger_ns is None else int(t_trigger_ns),
+        "t_decision_ns": None if t_decision_ns is None else int(t_decision_ns),
+        "candidate_frame_ids": [int(k) for k in keys],
+        "candidate_frame_ts_ns": [int(ts_by_key.get(int(k), 0)) for k in keys],
+        "repaired_poses": {
+            str(int(k)): [float(v) for v in np.asarray(p, dtype=np.float64).reshape(16)]
+            for k, p in repaired_poses.items()
+        },
+    }
 
 
 def _int_list(v) -> Optional[List[int]]:
@@ -504,13 +533,20 @@ class CheckpointClient:
         self.snapshots = 0
         self.restores = 0
         self.reprocesses = 0
+        self.holds = 0
+        self.resumes = 0
         self.failures = 0
+        # The hold is written from the subscriber callback (a quarantine opens there) while the
+        # ack is collected on the main thread; the queue keeps the two from dropping each other.
+        self._pending: List[Dict[str, Any]] = []
+        self._lock = threading.Lock()
         self._last_snapshot_wall = 0.0
         self._stopped = False
         if self.enabled:
             os.makedirs(self.dir, exist_ok=True)
 
-    def _send(self, cmd: str) -> Dict[str, Any]:
+    def _write(self, cmd: str) -> Dict[str, Any]:
+        """Write one command file. Fast enough for a callback thread; the ack is collected later."""
         path = os.path.join(self.dir, "cmd")
         ack = os.path.join(self.dir, "ack")
         event: Dict[str, Any] = {"command": cmd, "wall": round(time.time(), 3)}
@@ -522,11 +558,25 @@ class CheckpointClient:
                 fh.write(cmd + "\n")
             os.replace(tmp, path)
         except OSError as exc:
-            self.failures += 1
             event.update(ok=False, error=f"write: {exc}")
+            self.failures += 1
             self.events.append(event)
             return event
-        deadline = time.time() + self.ack_timeout_s
+        with self._lock:
+            self._pending.append(event)
+        return event
+
+    def collect(self, timeout_s: Optional[float] = None) -> Optional[Dict[str, Any]]:
+        """Wait for the ack of the oldest outstanding command and account for it exactly once."""
+        with self._lock:
+            if not self._pending:
+                return None
+            event = self._pending.pop(0)
+        if event.get("ok") is False:            # the write itself failed
+            return event
+        cmd = event["command"]
+        ack = os.path.join(self.dir, "ack")
+        deadline = time.time() + (self.ack_timeout_s if timeout_s is None else timeout_s)
         while time.time() < deadline:
             try:
                 with open(ack, "r", encoding="utf-8") as fh:
@@ -540,18 +590,34 @@ class CheckpointClient:
             time.sleep(0.02)
         else:
             event.update(ok=False, error="ack_timeout")
-        # Exactly one accounting site: the timeout path above only marks the event.
         if event.get("ok"):
-            if cmd == "snapshot":
-                self.snapshots += 1
-            elif cmd == "restore":
-                self.restores += 1
-            elif cmd == "reprocess":
-                self.reprocesses += 1
+            self._count(cmd)
         else:
             self.failures += 1
         self.events.append(event)
         return event
+
+    def _count(self, cmd: str) -> None:
+        if cmd == "snapshot":
+            self.snapshots += 1
+        elif cmd == "restore":
+            self.restores += 1
+        elif cmd == "reprocess":
+            self.reprocesses += 1
+        elif cmd == "hold":
+            self.holds += 1
+        elif cmd == "resume":
+            self.resumes += 1
+
+    def _send(self, cmd: str) -> Dict[str, Any]:
+        event = self._write(cmd)
+        if event.get("ok") is False:
+            return event
+        return self.collect() or event
+
+    def hold(self) -> Optional[Dict[str, Any]]:
+        """Stop the host writing its map, without waiting: this is called from a callback."""
+        return self._write("hold")
 
     def tick(self, now_wall: float, quiescent: bool) -> Optional[Dict[str, Any]]:
         """Rolling snapshot while nothing is being judged; nothing at all once stopped."""
@@ -568,6 +634,10 @@ class CheckpointClient:
     def reprocess(self) -> Dict[str, Any]:
         return self._send("reprocess")
 
+    def resume(self) -> Dict[str, Any]:
+        """Let the host write its map again; the host side of the recovery loop's re-arm."""
+        return self._send("resume")
+
     def stop(self) -> None:
         self._stopped = True
 
@@ -579,6 +649,8 @@ class CheckpointClient:
             "snapshots": self.snapshots,
             "restores": self.restores,
             "reprocesses": self.reprocesses,
+            "holds": self.holds,
+            "resumes": self.resumes,
             "failures": self.failures,
             "events": self.events,
             "note": ("the checkpoint is the host's own _state and voxel map plus the IMU "
@@ -609,6 +681,9 @@ class NativeClosedLoop:
         self.cp = checkpoint_client if (checkpoint_client is not None
                                         and checkpoint_client.enabled) else None
         self.cp_actions: List[Dict[str, Any]] = []
+        # How many of the manager's lifecycle events this loop has already acted on. A re-arm is
+        # the moment the host is allowed to write its map again.
+        self._lifecycle_seen = 0
         self.candidate_source = candidate_source
         self.detection_enabled = bool(detection_enabled)
         self.confirmation_margin_ns = int(
@@ -626,6 +701,12 @@ class NativeClosedLoop:
         # it: the schema is frozen, and an extra key on some rows would break every consumer
         # that parses by key.
         self.icp_details: List[Dict[str, Any]] = []
+        # What the gate actually evaluated, per candidate: which frames formed `after` and the
+        # poses it was built from. Without these, `after` cannot be recomputed offline under a
+        # different producer -- the archived streams carry only a trigger pose, so any later
+        # re-derivation would have to invent a frame set. Kept in its own file for the same
+        # reason as `icp_details`: the 18-key stream is frozen.
+        self.candidate_details: List[Dict[str, Any]] = []
         self.icp_seconds_total = 0.0
         # 0 = no budget. A budget that is hit is recorded, because truncating the candidate
         # changes what the gate sees and must never happen silently.
@@ -864,6 +945,10 @@ class NativeClosedLoop:
                      quarantine_start_ns=q_start)
         self.episodes.append(ep)
         self._open = ep
+        # The host keeps writing its map until told otherwise. The command is only written here --
+        # waiting for the ack inside a subscriber callback would stall the pairing.
+        if self.cp is not None:
+            self.cp.hold()
 
     # -- decision -----------------------------------------------------------------------------
     def decide(self, now_ts_ns: int, basis: str) -> Optional[Dict[str, Any]]:
@@ -926,6 +1011,9 @@ class NativeClosedLoop:
             pose_first_trigger=ep.pose,
         )
         self.records.append(row)
+        self.candidate_details.append(
+            candidate_detail_record(ep.candidate_id, ep.trigger_ts_ns, int(now_ts_ns),
+                                    keys, ts_by_key, repaired))
         if self._first_decision_ts_ns is None:
             self._first_decision_ts_ns = int(now_ts_ns)
         ep.meta = {                                  # summary-only, never in the stream
@@ -952,6 +1040,14 @@ class NativeClosedLoop:
 
     def service(self, backlog_limit: int = 0) -> Optional[Dict[str, Any]]:
         """Perform a decision the callbacks have asked for. Runs on the main thread only."""
+        if self.cp is not None:
+            # Account for commands written from the callback (the hold) before issuing anything
+            # blocking, so one ack is never attributed to the wrong command.
+            ack = self.cp.collect(timeout_s=0.05)
+            while ack is not None:
+                self.cp_actions.append(ack)
+                ack = self.cp.collect(timeout_s=0.05)
+            self._apply_lifecycle()
         # The rolling checkpoint is taken here, on the main thread, while no episode is open: a
         # deep copy of the map inside a subscriber callback would delay exactly the frames the
         # pairing depends on.
@@ -966,6 +1062,18 @@ class NativeClosedLoop:
         basis = self.pending_decision
         self.pending_decision = None
         return self.decide(self._last_ts_ns or self._open.trigger_ts_ns, basis)
+
+    def _apply_lifecycle(self) -> None:
+        """Follow the manager's bounded wait: a re-arm is when the host may write again."""
+        events = getattr(self.node.tx_mgr, "lifecycle_events", None)
+        if not events:
+            return
+        for ev in events[self._lifecycle_seen:]:
+            if ev.get("event") == "rearm":
+                action = self.cp.resume()
+                action["trigger"] = "rearm"
+                self.cp_actions.append(action)
+        self._lifecycle_seen = len(events)
 
     def finish(self) -> None:
         """Bag end: decide anything still open, and account for unpaired messages."""
@@ -1087,6 +1195,9 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
             "state": getattr(loop.node.tx_mgr.state, "value", loop.node.tx_mgr.state),
             "events": list(loop.node.tx_mgr.lifecycle_events),
             "unresolved_segments": len(loop.node.tx_mgr.unresolved_segments),
+            # The host side of the same lifecycle: when its map was held and when it was released.
+            # A re-arm the host never heard would otherwise look like a re-arm that happened.
+            "native_checkpoint_actions": loop.cp_actions,
         },
         "native_checkpoint": (loop.cp.status() if loop.cp is not None
                               else {"enabled": False, "note": "no checkpoint directory was given"}),
@@ -1104,6 +1215,9 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
                     "break every consumer that parses by key",
             "details": loop.icp_details,
         },
+        # The frame set and poses behind `info_after`, one row per decision, in
+        # candidates_detail.jsonl. Without them a producer change cannot be re-derived offline.
+        "candidate_detail_rows": len(loop.candidate_details),
         "nis_vs_map_size": nis_vs_map_size(loop.diag),
         "frame_diagnostics": loop.diag,
         "final_state": getattr(loop.node.tx_mgr.state, "value", loop.node.tx_mgr.state),
@@ -1446,6 +1560,13 @@ def main(argv: Optional[List[str]] = None) -> int:
         # there is no per-frame table; the row is the fit itself plus the frames it applied to.
         with open(os.path.join(args.run_dir, "icp_detail.jsonl"), "w", encoding="utf-8") as fh:
             for det in loop.icp_details:
+                fh.write(json.dumps(det, default=float) + "\n")
+    if loop.candidate_details:
+        # The frame set and poses that produced `after`, so a later producer change can be
+        # re-derived from this run instead of from an invented frame set.
+        with open(os.path.join(args.run_dir, "candidates_detail.jsonl"), "w",
+                  encoding="utf-8") as fh:
+            for det in loop.candidate_details:
                 fh.write(json.dumps(det, default=float) + "\n")
     rospy.loginfo("[slam_recovery] wrote %d candidate rows to %s", len(loop.records),
                   args.run_dir)
