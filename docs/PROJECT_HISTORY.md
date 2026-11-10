@@ -335,3 +335,9 @@ A/B旧基线/输入标签错误未修。仓库A不删/B搁置/C集成侧定/S3�
 [本轮核验](review_20261110_f2bbbb5/README.md)接受Python开段hold/rearm→resume接线、候选输入sidecar和unittest发现修正为局部组件增量，不能当完整链。宿主hold新增测量表和smoke_hold诊断入口，但actual hold patch/log/result未交，发布host diff与adff相同；最低保存已有部署源码/原件，不重跑矩阵、不把报告表当本机PASS。
 
 本机5选定测试通过；确定性正常命令控制：hold→restore覆盖一格cmd，一个OK restore ack被两次collect计成hold/restore成功；短50ms poll丢pending后迟到OK hold又可计restore成功。最低现通道单in-flight、短poll保持pending、匹配ack消费一次，不造RPC框架。完整accepted→HEALTHY无rearm事件，Python仅hold→reprocess不resume；实际host是否内部释放因新patch未交BLOCKED，明确全接纳与partial隔离语义。实际node7帧输入6verified/仅1与7进info_after，sidecar仍1…7：接受输入归档、不称实际评分集，最低现node归档真实verified/holdout/anchor而不从拒绝committed空集猜。producer/manager/core未变，旧正常任务复用不重跑。S1/S2仍交实际修复→内部写回→接回→E2，S3独立研究与参数暂停保持，不升完整A/B分。
+
+## 35. 06f543a/2449c0b：撤回C2集成可保留，P2自弱向不等固定门方向
+
+[本轮核验](review_20261110_06f543a/README.md)固定main06f543a，仅日报追加、无新原生源码/两事件；撤回C2集成及不据该版重导floor方向接受，旧正常接线/部署原件缺口不变，不重跑。研究2449c0b新增P1五帧before重算及P2定义，固定方向新旧缩放跨度约12.137倍算术可保留，但四位小数/容差与5–23ms最近scan不叫逐位同header，cos.8792约28.45°不叫仅几度。
+
+P2每candidate重选最小特征向量后与λmin比较，r1/24排序恒等不能推生产固定trigger信息腿等价。本机复用b5554ef正常SPD例：actual gate after100、candidateλmin38.8889且accepted，否定一般恒等；同固定投影100另一轴1/4可使F2-A m1/0。F2-A m0等价全谱最小值阈值，在P=Λ逆精确同基限定才对应cov腿，不对应一般固定方向腿。候选效果/Loewner/序贯判决仍BLOCKED，不由概念“冻结”授权新门；S3最小纠正控制对象和基/精度，S1/S2主线不等研究，参数仍停，完整A/B分不提升。

@@ -1,0 +1,29 @@
+{
+  "main": "06f543a4679caecbc6043636f79b29dafa4584df",
+  "research": "2449c0b4fe8039b8cccfdcc643af96fc08bf821f",
+  "command": "python -B -W ignore docs/review_20261110_06f543a/research_controls.py",
+  "exit": 0,
+  "scope": "Local archive arithmetic and reused normal SPD fixture; no ROS/bag/new gate/tuning",
+  "mainline": "NO_NEW_RUN_OR_SOURCE: main only appends progress records",
+  "reused_gate_control": {
+    "fixed_trigger_projection": 100.0, "candidate_own_min": 38.8888888889,
+    "actual_gate_after": 100.0, "accepted": true,
+    "interpretation": "Candidate minimum and fixed-trigger projection are not identical"
+  },
+  "same_fixed_projection_different_subspace_condition": {"projection": 100.0, "m_a": 1, "m_b": 0},
+  "p1_arithmetic": {
+    "reported_matches": 5, "precision": "four decimals and tolerance, not bitwise",
+    "scan_dt_ms": [5.39, 23.19, 5.5, 21.0, 20.9],
+    "max_direction_angle_deg": 28.453990018418175,
+    "fixed_direction_factor_spread": 12.137409189993384,
+    "status": "PASS_ARITHMETIC_NOT_RAW_RECOMPUTE"
+  },
+  "p2_archive": {
+    "rows": 24, "pearson_r": 1.0, "rank_matches": 24,
+    "object": "Each matrix own minimum eigenvector versus same matrix minimum eigenvalue",
+    "production_fixed_direction_equivalence_claim": "FAIL"
+  },
+  "candidate_effectiveness": "BLOCKED",
+  "native_full_chain": "BLOCKED: no new run artifacts",
+  "not_applicable": ["Native host runs", "Raw scan/bag recomputation", "Unchanged lifecycle regression", "Full A/B rescoring", "New model implementation or tuning"]
+}
