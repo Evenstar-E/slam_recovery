@@ -1,0 +1,109 @@
+{
+ "_meta": {
+  "what": "Part 1: the information leg on the corrected producer",
+  "written": "2026-11-10",
+  "producers": {
+   "old": "stride 1200 + 15-NN",
+   "new": "C-2 research patch: voxel 0.25 m + radius 0.6 m"
+  },
+  "not_done": [
+   "no host run",
+   "no threshold changed",
+   "no production code edited"
+  ],
+  "after_status": "BLOCKED: the archived candidate record carries no candidate frame list and no repaired poses, so `after` cannot be rebuilt; a proxy frame set would be a different quantity under the archive's name"
+ },
+ "rows": [
+  {
+   "case": "room02_early1",
+   "bag": "room02_2x2_O.bag",
+   "trigger_stamp_ns": 1627643740912290335,
+   "scan_stamp_ns": 1627643740917676926,
+   "scan_dt_ms": 5.39,
+   "raw_points": 51057,
+   "capped_points": 6000,
+   "archived_before": 39.0496,
+   "before_old_recomputed": 39.0496,
+   "reproduced": true,
+   "before_new": 26.5929,
+   "factor_new_over_old": 0.681,
+   "weak_direction_alignment_cos": 0.9855,
+   "old_direction_in_new_matrix": 28.0986
+  },
+  {
+   "case": "room02_early2",
+   "bag": "room02_2x2_O.bag",
+   "trigger_stamp_ns": 1627643742844584942,
+   "scan_stamp_ns": 1627643742821393490,
+   "scan_dt_ms": 23.19,
+   "raw_points": 32951,
+   "capped_points": 6000,
+   "archived_before": 40.2316,
+   "before_old_recomputed": 40.2316,
+   "reproduced": true,
+   "before_new": 26.3532,
+   "factor_new_over_old": 0.655,
+   "weak_direction_alignment_cos": 0.9842,
+   "old_direction_in_new_matrix": 27.8138
+  },
+  {
+   "case": "room02_onset",
+   "bag": "room02_2x2_O.bag",
+   "trigger_stamp_ns": 1627643759659727812,
+   "scan_stamp_ns": 1627643759654230833,
+   "scan_dt_ms": 5.5,
+   "raw_points": 6246,
+   "capped_points": 6000,
+   "archived_before": 1.1019,
+   "before_old_recomputed": 1.1019,
+   "reproduced": true,
+   "before_new": 7.8157,
+   "factor_new_over_old": 7.0928,
+   "weak_direction_alignment_cos": 0.8792,
+   "old_direction_in_new_matrix": 2.8195
+  },
+  {
+   "case": "hall_A",
+   "bag": "hall01_inj43_filtered.bag",
+   "trigger_stamp_ns": 1627785265208036184,
+   "scan_stamp_ns": 1627785265187039375,
+   "scan_dt_ms": 21.0,
+   "raw_points": 50170,
+   "capped_points": 6000,
+   "archived_before": 45.4565,
+   "before_old_recomputed": 45.4565,
+   "reproduced": true,
+   "before_new": 1.4448,
+   "factor_new_over_old": 0.0318,
+   "weak_direction_alignment_cos": 0.98,
+   "old_direction_in_new_matrix": 10.9618
+  },
+  {
+   "case": "hall_B",
+   "bag": "hall01_inj43_filtered.bag",
+   "trigger_stamp_ns": 1627785263807538033,
+   "scan_stamp_ns": 1627785263786634922,
+   "scan_dt_ms": 20.9,
+   "raw_points": 50335,
+   "capped_points": 6000,
+   "archived_before": 37.0057,
+   "before_old_recomputed": 37.0057,
+   "reproduced": true,
+   "before_new": 1.2882,
+   "factor_new_over_old": 0.0348,
+   "weak_direction_alignment_cos": 0.9913,
+   "old_direction_in_new_matrix": 7.8014
+  }
+ ],
+ "validation": {
+  "reproduced": 5,
+  "of": 5
+ },
+ "scale_summary": {
+  "factor_min": 0.0318,
+  "factor_max": 7.0928,
+  "factor_spread": 223.0,
+  "alignment_min_cos": 0.8792,
+  "reading": "the producer change is not a global rescale: the factor spans two orders of magnitude across five real trigger frames, while the weak direction stays within a few degrees. The direction survives; the magnitude does not"
+ }
+}
