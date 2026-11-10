@@ -1,0 +1,92 @@
+{
+ "status": "OK",
+ "status_reason": "completed",
+ "termination": "PLANNED_KILL_AFTER_DRAIN",
+ "pre_run": {
+  "paths": {
+   "script": "/tmp/wt-sim/docs/review_20261109_bbc3dcb/fl_run_isolated.sh",
+   "input_bag": "/tmp/fastlivo/room02_2x2_O.bag",
+   "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+   "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+   "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping"
+  },
+  "sha256": {
+   "script": "59500116b8fee2b871184609135df8d838cfc516fd1c76b1aa3bf5def5e2b9d3",
+   "input_bag": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+   "config_m2dgr": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+   "config_camera": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+   "host_binary": "76359f5387f75da3dcad7aa72372048c3feefd91b340ae0c40f92f6fb534a53b"
+  },
+  "host_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+  "captured": "BEFORE_LAUNCH",
+  "sizes": {
+   "script": 14372,
+   "input_bag": 1318694375,
+   "config_m2dgr": 2052,
+   "config_camera": 238,
+   "host_binary": 100720
+  }
+ },
+ "sources_changed_during_run": [],
+ "config": {
+  "primary": {
+   "path": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+   "sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+   "override_env": ""
+  },
+  "camera": {
+   "path": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+   "sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7"
+  },
+  "ros_params_dump": {
+   "path": "/tmp/fl_run_20261110T020104Z_2887395/ros_params.yaml",
+   "sha256": "64f37f514261c9c084c78a1e37f271d9f424cdb2d2db724bf5d8060c604d6d1b"
+  }
+ },
+ "host": {
+  "binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+  "sha256": "76359f5387f75da3dcad7aa72372048c3feefd91b340ae0c40f92f6fb534a53b",
+  "source_revision": "0d2c0346107b75b59934975adec9a6eeeb913c64",
+  "runtime_library": {
+   "path": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+   "sha256": "20df3d3f42400aec0c56387e55d027289f5117402837a712f2002da6e06c450f",
+   "pid": "2888625",
+   "cmdline": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+   "pgid": "2888625"
+  },
+  "trace_file": {
+   "path": "/tmp/fastlivo/on2.csv",
+   "sha256": "edb804c48c19e1a667684a3123fa27ade8afc3fb0de273d32f679ccc2d62aec3"
+  }
+ },
+ "run": {
+  "rate": 1.0,
+  "drain_sec": 40.0,
+  "master_uri": "http://127.0.0.1:49325",
+  "run_dir": "/tmp/fl_run_20261110T020104Z_2887395",
+  "taskset_prefix": "taskset -c 0-7"
+ },
+ "managed_pids": {
+  "roscore": null,
+  "record": 2888483,
+  "node": 2888625
+ },
+ "process_exit": {
+  "rosbag_play": 0,
+  "rosbag_record": 0,
+  "fastlivo_node": 137
+ },
+ "output": {
+  "bag": "/tmp/fastlivo/res_on2.bag",
+  "exists": true,
+  "bytes": 634533,
+  "sha256": "6e92986c80b41f5c8a4aaf087c57da47c842a4ccfb2ca3df6102ad078fad5cba",
+  "odometry_messages": 800,
+  "first_stamp_sec": 1627643740.5124795,
+  "last_stamp_sec": 1627643799.3622923,
+  "duration_sec": 58.849812746047974,
+  "bag_start_sec": 1794276085.6629794,
+  "bag_end_sec": 1794276143.8607013,
+  "verdict": "OK"
+ }
+}
