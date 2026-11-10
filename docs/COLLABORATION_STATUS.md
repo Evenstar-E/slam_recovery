@@ -412,3 +412,11 @@ S3专用研究纠正这个小控制并保留缺candidate/独立质量BLOCKED；S
 S2沿已给rawheader/组成员归属最小修，随下一实质交付保存actual新patch/已有inject戳/ack/log/input-config-binary receipt；10未匹配UNKNOWN不猜LIVO，实际wall窗/26s默认与27.7s报告差须真实命令限定。smoke重复OUT会删旧结果，最低新空目录/拒绝既有目录，禁止自动清前次数据。同实例同checkpoint对照方向合理但仍保留重放不确定性，不宣称差值自动纯修复效应；不新矩阵、不直接灌ICP姿态替重估。
 
 S1复用§36命令归属/trustedstamp/full-vs-partial释放/评分集最低接线，source未改不重跑；S3研究独立和参数暂停保持，不挡S1/S2实际修复写回→接回→E2。本机仅字节/静态核、无ROS/原bag，私人文件保护；完整A/B不提升，首次真实整链完成单独汇报。
+
+## 40. repair-f3核930563d：写回来源/顺序FAIL，记录仅本地未发布
+
+[本机核验](review_20261110_930563d/README.md)两个四元数测试PASS；actual normal driver写ep旧host尾x20，而候选修复末帧x2；partial尾deferred仍写x20；reprocess失败也set_state。本机用模拟正常report/ack隔离编排，不叫真实门/宿主成功。S1最低已准入/同stamp修复来源、partial隔离与失败动作顺序，复用single in-flight/ack和trustedstamp任务，不重构估计器。
+
+S2人工set_state烟测试是受控位姿接口观察，不是算法修复/地图等价/完整接回E2；新版host source/log/results/config receipt仍未归档。计数增不证明地图从零或全是新点，精确匹配回退/merged计数语义保持UNKNOWN。下一主线仍实际修复测量支配原生重估/内部map-state写回→接回→第二事件，S3并行/参数停，不等新研究。
+
+发布阻断：上一轮push因携带开发smoke脚本rm-rf既有OUT被权限检查拒绝，本轮新增smoke_writeback亦有同删除。本机未执行、未删数据、未重试/换工具/要求peer代推；本条与前轮d074核验仅本地，远端review仍3965299。需实际开发改新空目录/拒绝覆盖旧产物，或用户明确相关发布权限后再处理，不冒称已送达。

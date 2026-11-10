@@ -1,0 +1,18 @@
+{
+  "target": "930563d31b826420fd6960e5b240f7c5b1b3f5f5",
+  "scope": "Local source-pinned driver controls with simulated accepted reports/acks; no ROS/native host/bag/tuning",
+  "command": "python -B -W ignore docs/review_20261110_930563d/run_checks.py",
+  "exit": 0,
+  "selected_tests": {"status": "PASS_LOCAL", "count": 2, "elapsed_s": 0.001, "checks": ["identity quaternion", "z ninety-degree quaternion"]},
+  "shell_syntax": "PASS_BASH_N_ONLY",
+  "controls": [
+    {"case": "full_corrected_candidate", "status": "FAIL", "old_host_x": [10, 20], "repaired_x": [1, 2], "committed_keys": [1, 2], "trusted_x": [1, 2], "native_set_state_x": 20},
+    {"case": "partial_tail_deferred", "status": "FAIL", "old_host_x": [10, 20], "repaired_x": [1, 2], "committed_keys": [1], "deferred_keys": [2], "trusted_x": [1], "native_set_state_x": 20, "manager_state": "WAITING_FOR_EVIDENCE"},
+    {"case": "reprocess_failed", "status": "FAIL", "reprocess_ok": false, "set_state_still_sent": true, "native_set_state_x": 20}
+  ],
+  "host_source": {"status": "BLOCKED_NOT_PUBLISHED", "patch_unchanged": true, "sha256": "f5efce7160e45933f84b23c365f08b9a51798aeb9c201c4e48a5ba026e2c2f21"},
+  "writeback_smoke": {"status": "DEVELOPER_REPORTED_NOT_RAW_VERIFIED", "manual_set_state_x": 10, "reported_future_x": [10.276, 11.229], "limit": "Not algorithmic repair, state-map equivalence or two-event certification"},
+  "native_full_two_event": "BLOCKED",
+  "publication": "LOCAL_ONLY: prior push denied for destructive OUT cleanup in inherited developer script; not retried",
+  "not_applicable": ["Native execution", "Raw bags", "Developer full 129 tests", "Windows fake-host transport test", "Full A/B rescoring", "Production tuning"]
+}

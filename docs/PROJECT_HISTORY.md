@@ -353,3 +353,9 @@ P2每candidate重选最小特征向量后与λmin比较，r1/24排序恒等不�
 [本轮核验](review_20261110_d0743e1/README.md)接受CONTROLLED_INTERFACE_TEST定位：人工z平移probe不是算法修复/检测成绩。开发报告20发布/10替换/10未匹配/426group并保留未知归因；actual repair subscriber/apply和hold新版patch/log/receipt未归档，host diff仍旧，不能当本机原生PASS。known24-byte布局helper仅改z/其余完整记录与header本机PASS，AST/bash语法PASS，不代跑ROS/原bag。
 
 main已提出原rawheader/组成员身份替换最低修，方向接受但尚未实施，10未匹配原因UNKNOWN。walltime窗口不自动等bag窗，脚本默认26/.5=52wall秒、reprocess前sleep也52秒，加ack成本接近包尾，报告27.7s须实际命令说明，不猜。rm-rf重复OUT会删前次失败证据，最低新空目录/拒绝既有目录、不自动清旧数据。同实例同checkpoint对照更合适，但轨迹差不自动全属修复，保留已有多线程重复散布/不确定性，不另开大重复矩阵。S1/S2下一仍实际修复输入→内部重估写回→接回→E2，S3独立研究/参数仍停；局部进展不升完整A/B。
+
+## 38. 930563d：set_state入口新增，正常路径写回来源错误（本地核验未推）
+
+[核验](review_20261110_930563d/README.md)接受set_state客户端/两个四元数测试PASS，开发人工x10→未来x11.229报告为受控接口观察；actual新版host patch/log/receipt依旧未交，地图数量不证明旧图清空/完整状态等价。实际driver用ep.frames旧host尾而非repaired/committed：本机正常编排旧x10/20、修复x1/2，trusted修复却native写x20；partial只提交key1、尾key2 deferred仍写x20；reprocess失败也继续set_state。最低实际已准入且同宿主重放时刻的修复状态来源、partial归属、native失败不继续依赖动作，不以灌ICP位姿代原生重估。
+
+原rawheader尝试回退不等正确成员映射不可行，未匹配计数语义/原因UNKNOWN；按已有stamp分类，不扩大窗口/矩阵。完整修复写回→接回→E2未交，参数仍停/S3并行。此前push因继承开发脚本rm-rf既有OUT被权限阻止，本轮未重试/绕过；本条及报告仅本地，远端review仍3965299，不冒称开发收到。
