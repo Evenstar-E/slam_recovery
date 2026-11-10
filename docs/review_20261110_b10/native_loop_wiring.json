@@ -1,0 +1,48 @@
+{
+ "checks": {
+  "both_topics_received": {
+   "pose_messages": 672,
+   "scan_messages": 599,
+   "ok": true
+  },
+  "pairing": {
+   "paired": 499,
+   "fraction_of_poses": 0.7425595238095238,
+   "fraction_of_scans": 0.8330550918196995,
+   "max_abs_dt_ns": 39824962,
+   "ok": true
+  },
+  "nis_provenance": {
+   "computed": 498,
+   "carried_forward": 0,
+   "unavailable": 1,
+   "reference_node_map": 363,
+   "reference_prev_scan": 135,
+   "fed_to_step_frame": 498,
+   "not_fed_no_reference": 1,
+   "ok": true
+  },
+  "gate_reachable": {
+   "episodes": 1,
+   "decisions": 1,
+   "accepted": 0,
+   "rejected": 1,
+   "errored": 0,
+   "incumbent_basis": [
+    "ZERO_VELOCITY_SINGLE_KEYFRAME"
+   ],
+   "evidence_reasons": [
+    "wilson_sequential_benefit_lower_bound_failed"
+   ],
+   "ok": true
+  },
+  "same_process_group": {
+   "recovery_pid": 2942560,
+   "host_pid": 2942559,
+   "recovery_pgid": 2942557,
+   "host_pgid": 2942557,
+   "ok": true
+  }
+ },
+ "all_ok": true
+}
