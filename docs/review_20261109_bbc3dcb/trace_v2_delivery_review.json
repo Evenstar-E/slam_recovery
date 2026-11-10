@@ -199,7 +199,7 @@
   }
  ],
  "runtime_library_probe": {
-  "status": "RESOLVED_IN_CODE, ONE_HARDENING_PENDING",
+  "status": "RESOLVED_IN_CODE_PENDING_RECEIPT_FIELD",
   "symptom": "ON run FAILed at startup: 'no /proc/<pid>/maps entry for liblaser_mapping.so'",
   "peer_hypothesis": "the check ran too early (3 s after start); move it to after the drain",
   "root_cause": "pid resolution, not timing: liblaser_mapping.so is a DT_NEEDED entry of fastlivo_mapping (readelf -d), so ld.so maps it before main; there is no window in which the node runs without it",
@@ -220,7 +220,10 @@
    "cmdline": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping"
   },
   "fail_closed_control": "/tmp/fl_run_20261110T014109Z_2869028/receipt.json keeps path/sha null with status FAIL",
-  "hardening_pending": "pgrep -f matches the whole machine; a leftover node from an earlier SIGKILLed run has the library mapped and would be accepted with a different build's hash -- restrict to the launched process group (pgrep -g \"$(ps -o pgid= -p $NODE)\") or check the pid's start time"
+  "hardening_pending": "pgrep -f matches the whole machine; a leftover node from an earlier SIGKILLed run has the library mapped and would be accepted with a different build's hash -- restrict to the launched process group (pgrep -g \"$(ps -o pgid= -p $NODE)\") or check the pid's start time",
+  "pgid_commit": "4028385",
+  "pgid_probe": "/tmp/fl_run_20261110T014510Z_2873489 (runtime_pgid.txt = 2874707, same as pid, setsid group leader)",
+  "remaining": "receipt.host.runtime_library lists path/sha256/pid/cmdline but not pgid, although the claim is five fields; run_dir files live under /tmp and are not durable, so pgid must be copied into the receipt"
  },
  "current_build": {
   "library_sha256": "20df3d3f42400aec0c56387e55d027289f5117402837a712f2002da6e06c450f",
