@@ -413,3 +413,9 @@ runner savedPGID与receipt写成功exit0保留JSON FAIL且整体exit非零静态
 [核验](review_20261110_8ca5b41/README.md)接受tick异步写/poll无等待保pending、status启动与ack命令名检查源码/2本机测试0.056s，小控制通过；旧同步snapshot与service短poll丢pending的该入口已解除。新正常callback hold仍覆盖status，正确OK hold卡在pending[status,hold]队首；超时第一snapshot后重发同名，旧ack可归新snapshot，合成迟到控制FAIL非14次实跑错配证明。最低所有命令真实single in-flight/超时不等宿主结束/匹配消费，复用现通道不造RPC。
 
 新报告入口延迟0.4s/评估内部18s与一次MODE2 23commit169deferred仅开发机制/成本观察，非修复质量/E2；旧accepted旧尾/partial/失败set_state未修。marker累计elapsed且gate marker不含node同步/native动作，wait_start_offset在evaluate前取t_end不等真实WAIT赋值，最低已有原件分入口/赋值/返回成本，不改wait藏延迟。S1/S2最低归属修及有限成本定位后下一actual修复→原生写回→接回→E2/尾段或预算断点，S3独立/旧参数停。完整A/B不升、无ROS原bag/全suite，记录仅本地push拒绝未解除未绕过、remote review3965299。
+
+## 48. 9862ad5：精确支持索引局部通过，成本下降报告不等完整恢复（仅本地）
+
+[核验](review_20261110_9862ad5/README.md)接受27邻格+原距离阈值索引复用，查询人口/支持阈值/生产门不改；3测试含20随机/精确边界及actual support正负控制本机PASS0.143s，新建/共享索引与暴力法一致，无新正常缺陷，不扩极端矩阵。开发4356.5→842.9ms成本观察保留，前后16/13candidate不当纯5.168倍测量、不新矩阵确认精确倍数；4.36s非旧18s解释、轮询ack不当host真实时延方向接受。
+
+wait_start/decision消息时间差减evaluate墙钟耗时不证明独立前置阶段2.2s，保留未对齐差额，沿下一实质运行最小入口/调用/记录时刻分时钟，不需消除才跑两事件。S1/S2复用旧正常归属最低修，下一唯一actual修复→原生写回→接回→E2/尾段或原预算断点，S3独立/旧参数停。A12支持效率局部推进、完整A/B不升，无ROS原bag/全suite/大性能矩阵；记录仅本地、push拒绝未解除未绕过、remote review3965299。

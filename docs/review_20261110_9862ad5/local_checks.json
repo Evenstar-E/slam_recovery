@@ -1,0 +1,21 @@
+{
+  "target": "9862ad5bb7cd5056421fb9ea865787f16d421a5f",
+  "scope": "Three local radius-index tests and actual support-predicate equivalence; no ROS/native/bag/tuning/performance benchmark",
+  "command": "python -B -W ignore docs/review_20261110_9862ad5/run_checks.py", "exit": 0,
+  "selected_tests": {"count": 3, "elapsed_s": 0.143, "status": "PASS_LOCAL"},
+  "support_predicate_equivalence": {
+    "status": "PASS_LOCAL",
+    "observations": [
+      {"pose_x": 0.0, "brute": true, "new_index": true, "shared_index": true},
+      {"pose_x": 4.0, "brute": false, "new_index": false, "shared_index": false}
+    ]
+  },
+  "report_arithmetic": {
+    "reported_cumulative_ms_before": "4356.5", "reported_cumulative_ms_after": "842.9",
+    "reported_ratio": "5.168466010202871040455570056", "candidate_frames_before_after": [16, 13],
+    "limit": "Different candidate populations; ratio not an isolated native speedup measurement"
+  },
+  "remaining_time_gap": "MESSAGE_TIME_MINUS_WALL_ELAPSED_IS_NOT_INDEPENDENTLY_MEASURED_WALL_STAGE",
+  "native_full_two_event": "NOT_COMPLETED",
+  "publication": "LOCAL_ONLY_PRIOR_PUSH_DENIAL_NOT_RETRIED"
+}

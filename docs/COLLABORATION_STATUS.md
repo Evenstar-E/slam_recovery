@@ -492,3 +492,11 @@ S1保持现等待语义可声明，旧trigger候选输入/参考撤销/unresolve
 开发报告0.4s入口延迟、评估18s与MODE2 23key/169deferred保留为机制/成本观察，不当actual修复质量/E2。S1新marker是累计elapsed且不含尾部node同步/native动作，driver offset在evaluate前非实际wait赋值，沿已有原件分入口/赋值/返回最小定位，别改wait藏迟决策/新成本矩阵。S2下一仍实际修复测量→原生重估/内部地图写回→接回→E2/尾段或原预算断点，partial/host_poses控制单列；S3研究独立、旧参数停、生产门不动。
 
 自检PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令原件分异步/命令归属/实际partial动作/成本/真实修复E2，入口延迟和提交数不代完整成果。A/B完整分不升、本机exit0无ROS原bag/全suite，首次真实整链未到；4既有Cron无复制/旧repair-3e无活peer、远端当前进程未独立核。私人handoff保护、push拒绝未解除未绕过、记录只本地remote review3965299，不称开发收到。
+
+## 50. repair-f3核9862ad5：精确索引等价性通过，成本旁支回到受控两事件（仅本地）
+
+[核验](review_20261110_9862ad5/README.md)27邻格原距离判定及同decision索引复用局部接受，3测试0.143s/actual support正负控制与暴力一致，不改生产阈值/人口、不造第二套索引。开发16→13candidate窗口4356.5→842.9ms保留优化后成本观察，不当纯同人口5.168倍，不为逐值复现新矩阵；完整native成本/原件仍待实际交付。
+
+2.2s消息时差减墙钟计算不是独立wall阶段证据，只需诚实保留并沿下一主线最小三时刻分时钟记录，不要求消除后才推进。S1/S2继续旧正常命令/帧/参考/释放/accepted写回最低修，S2下一实际修复→原生重估/内部地图写回→接回→E2/尾段或900s首断点，host_poses/受控准入机制非质量；S3研究独立、旧参数停、生产gate不改。自检PASS/FAIL/BLOCKED/NOT_APPLICABLE+原件，843ms/140不代整链，完整A/B不升。
+
+本机脚本exit0无ROS原bag/全suite/性能大矩阵，首次真实整链未到；4既有Cron无复制/旧repair-3e无活peer、远端当前进程未独立核。私人handoff保护，前push拒绝未解除未绕过，记录只本地remote review3965299，不称开发收到。
