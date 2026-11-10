@@ -1,0 +1,36 @@
+{
+ "published_manifest": "docs/review_20261109_bbc3dcb/four_arm_independent_results.json (script_version 1.1.0)",
+ "observed_on": "2026-11-10, current main",
+ "onset": {
+  "published_s": 14.52839303,
+  "current_s": 14.528392315,
+  "cause": "integer-nanosecond boundary fix moved the onset 715 ns earlier"
+ },
+ "drift": {
+  "A1_n_keyframes": {
+   "published": 133,
+   "current_rerun": 132
+  },
+  "A1_tail_over_0.5": {
+   "published": 0.0078796992481203,
+   "current_rerun": 0.0046
+  }
+ },
+ "unexplained": {
+  "A3_gate_nis": {
+   "published": 265.81,
+   "current_rerun": 41.67
+  },
+  "status": "UNEXPLAINED; a 6x change cannot come from one boundary frame alone",
+  "required": "locate the field and the commit that changed it before any manifest is regenerated"
+ },
+ "decision": [
+  "the auxiliary voxel-surface fields are merged without regenerating the manifest",
+  "the published manifest is not overwritten",
+  "no number in this file is used as a current result until the gap is closed"
+ ],
+ "auxiliary_surface": {
+  "code": "slam_recovery/experiments/run_four_arm_same_input.py (PROXY_VOXEL=0.05, distance_stats_voxel_surface)",
+  "manifest": "NOT UPDATED; rerun values kept out of the published file"
+ }
+}
