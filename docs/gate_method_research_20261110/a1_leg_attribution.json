@@ -1,0 +1,408 @@
+{
+ "_meta": {
+  "what": "A-1 leg attribution and A ablation on the archived candidate stream",
+  "written": "2026-11-10",
+  "rules": {
+   "tau_abs_min": 3.0,
+   "tau_info_kappa": 2.0,
+   "tau_val_nis": 2.5,
+   "sigma_tol": 0.5
+  },
+  "A_definition": "remove after>=tau_abs_min, after>=kappa*before and gain>0; keep paired evidence, holdout, covariance and boundary",
+  "no_quality_label": "a flip is 'admitted with UNKNOWN quality'. The archive has no independent label, so it cannot be called a gain or a harm",
+  "not_done": "no host run, no threshold change, no production gate edit"
+ },
+ "self_check": {
+  "rows": 18,
+  "reproduced": 18,
+  "failed": [],
+  "detail": [
+   {
+    "run": "fl_native_20261110T025831Z_2928165",
+    "archived_reason": "Rejected candidate due to non-finite (NaN/Inf) state/bias or",
+    "replayed_leg": "non_finite",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": null
+   },
+   {
+    "run": "fl_native_20261110T030300Z_2932931",
+    "archived_reason": "Rejected candidate due to non-finite (NaN/Inf) state/bias or",
+    "replayed_leg": "non_finite",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": null
+   },
+   {
+    "run": "fl_native_20261110T030656Z_2938083",
+    "archived_reason": "Refused Mode 2 atomic commit: a committed segment begins bey",
+    "replayed_leg": "boundary",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": null
+   },
+   {
+    "run": "fl_native_20261110T030931Z_2941380",
+    "archived_reason": "Refused Mode 2 atomic commit: a committed segment begins bey",
+    "replayed_leg": "boundary",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": null
+   },
+   {
+    "run": "fl_native_20261110T031851Z_2949682",
+    "archived_reason": "Refused Mode 2 atomic commit: a committed segment begins bey",
+    "replayed_leg": "boundary",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": null
+   },
+   {
+    "run": "fl_native_20261110T032515Z_2954170",
+    "archived_reason": "Refused Mode 2 atomic commit: a committed segment begins bey",
+    "replayed_leg": "boundary",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": null
+   },
+   {
+    "run": "fl_native_20261110T035239Z_3002102",
+    "archived_reason": "Refused Mode 2 atomic commit: a committed segment begins bey",
+    "replayed_leg": "boundary",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": null
+   },
+   {
+    "run": "fl_native_20261110T035544Z_3005906",
+    "archived_reason": "Refused Mode 2 atomic commit: a committed segment begins bey",
+    "replayed_leg": "boundary",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": null
+   },
+   {
+    "run": "fl_native_20261110T035825Z_3008585",
+    "archived_reason": "Refused Mode 2 atomic commit: a committed segment begins bey",
+    "replayed_leg": "boundary",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": null
+   },
+   {
+    "run": "fl_native_20261110T042426Z_3020861",
+    "archived_reason": "Refused Mode 2 atomic commit: paired-benefit evidence FAILED",
+    "replayed_leg": "evidence_failed",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": null
+   },
+   {
+    "run": "fl_native_20261110T043148Z_3025639",
+    "archived_reason": "Refused Mode 2 atomic commit: paired-benefit evidence FAILED",
+    "replayed_leg": "evidence_failed",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": null
+   },
+   {
+    "run": "fl_native_20261110T044250Z_3031393",
+    "archived_reason": "Refused Mode 2 atomic commit: paired-benefit evidence FAILED",
+    "replayed_leg": "evidence_failed",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": null
+   },
+   {
+    "run": "fl_native_20261110T044830Z_3036955",
+    "archived_reason": "Insufficient verified info; maintaining soft bridge while wa",
+    "replayed_leg": "info",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": 0.37862473612385805
+   },
+   {
+    "run": "fl_native_20261110T050737Z_3052527",
+    "archived_reason": "Refused Mode 2 atomic commit: paired-benefit evidence MISSIN",
+    "replayed_leg": "evidence_missing",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": 0.2578996416190722
+   },
+   {
+    "run": "fl_native_20261110T051542Z_3057611",
+    "archived_reason": "Insufficient verified info; maintaining soft bridge while wa",
+    "replayed_leg": "info",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": 0.37572771127709026
+   },
+   {
+    "run": "fl_native_20261110T051744Z_3059939",
+    "archived_reason": "Insufficient verified info; maintaining soft bridge while wa",
+    "replayed_leg": "info",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": 0.4331221699941341
+   },
+   {
+    "run": "fl_native_20261110T054559Z_3073038",
+    "archived_reason": "Insufficient verified info; maintaining soft bridge while wa",
+    "replayed_leg": "cov_certified_by_archive",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": 0.4398241260949126
+   },
+   {
+    "run": "fl_native_20261110T054753Z_3075620",
+    "archived_reason": "Rejected candidate due to non-finite (NaN/Inf) state/bias or",
+    "replayed_leg": "non_finite",
+    "accepted": false,
+    "reproduced": true,
+    "assumed_elapsed_s": null
+   }
+  ]
+ },
+ "comparison": [
+  {
+   "run": "fl_native_20261110T025831Z_2928165",
+   "candidate_id": "cand_0000",
+   "info_before": 39.049573249542064,
+   "info_after": 0.0,
+   "current_leg": "non_finite",
+   "current_decision": false,
+   "A_leg": "non_finite",
+   "A_decision": false,
+   "changes": false,
+   "blocked_on": null
+  },
+  {
+   "run": "fl_native_20261110T030300Z_2932931",
+   "candidate_id": "cand_0000",
+   "info_before": 39.049573249542064,
+   "info_after": 0.0,
+   "current_leg": "non_finite",
+   "current_decision": false,
+   "A_leg": "non_finite",
+   "A_decision": false,
+   "changes": false,
+   "blocked_on": null
+  },
+  {
+   "run": "fl_native_20261110T030656Z_2938083",
+   "candidate_id": "cand_0000",
+   "info_before": 40.23159328113725,
+   "info_after": 34.47426048609952,
+   "current_leg": "boundary",
+   "current_decision": false,
+   "A_leg": "boundary",
+   "A_decision": false,
+   "changes": false,
+   "blocked_on": null
+  },
+  {
+   "run": "fl_native_20261110T030931Z_2941380",
+   "candidate_id": "cand_0000",
+   "info_before": 40.23159328113725,
+   "info_after": 34.4744035929326,
+   "current_leg": "boundary",
+   "current_decision": false,
+   "A_leg": "boundary",
+   "A_decision": false,
+   "changes": false,
+   "blocked_on": null
+  },
+  {
+   "run": "fl_native_20261110T031851Z_2949682",
+   "candidate_id": "cand_0000",
+   "info_before": 40.23159328113725,
+   "info_after": 34.472984003273865,
+   "current_leg": "boundary",
+   "current_decision": false,
+   "A_leg": "boundary",
+   "A_decision": false,
+   "changes": false,
+   "blocked_on": null
+  },
+  {
+   "run": "fl_native_20261110T032515Z_2954170",
+   "candidate_id": "cand_0000",
+   "info_before": 40.23159328113725,
+   "info_after": 34.47304590572707,
+   "current_leg": "boundary",
+   "current_decision": false,
+   "A_leg": "boundary",
+   "A_decision": false,
+   "changes": false,
+   "blocked_on": null
+  },
+  {
+   "run": "fl_native_20261110T035239Z_3002102",
+   "candidate_id": "cand_0000",
+   "info_before": 1.101917196050157,
+   "info_after": 4.645795867243582,
+   "current_leg": "boundary",
+   "current_decision": false,
+   "A_leg": "boundary",
+   "A_decision": false,
+   "changes": false,
+   "blocked_on": null
+  },
+  {
+   "run": "fl_native_20261110T035544Z_3005906",
+   "candidate_id": "cand_0000",
+   "info_before": 1.101917196050157,
+   "info_after": 4.619946007208283,
+   "current_leg": "boundary",
+   "current_decision": false,
+   "A_leg": "boundary",
+   "A_decision": false,
+   "changes": false,
+   "blocked_on": null
+  },
+  {
+   "run": "fl_native_20261110T035825Z_3008585",
+   "candidate_id": "cand_0000",
+   "info_before": 1.101917196050157,
+   "info_after": 4.628084392166303,
+   "current_leg": "boundary",
+   "current_decision": false,
+   "A_leg": "boundary",
+   "A_decision": false,
+   "changes": false,
+   "blocked_on": null
+  },
+  {
+   "run": "fl_native_20261110T042426Z_3020861",
+   "candidate_id": "cand_0000",
+   "info_before": 1.101917196050157,
+   "info_after": 4.634214422708495,
+   "current_leg": "evidence_failed",
+   "current_decision": false,
+   "A_leg": "evidence_failed",
+   "A_decision": false,
+   "changes": false,
+   "blocked_on": null
+  },
+  {
+   "run": "fl_native_20261110T043148Z_3025639",
+   "candidate_id": "cand_0000",
+   "info_before": 1.101917196050157,
+   "info_after": 4.647159100051212,
+   "current_leg": "evidence_failed",
+   "current_decision": false,
+   "A_leg": "evidence_failed",
+   "A_decision": false,
+   "changes": false,
+   "blocked_on": null
+  },
+  {
+   "run": "fl_native_20261110T044250Z_3031393",
+   "candidate_id": "cand_0000",
+   "info_before": 1.101917196050157,
+   "info_after": 4.6990386780914815,
+   "current_leg": "evidence_failed",
+   "current_decision": false,
+   "A_leg": "evidence_failed",
+   "A_decision": false,
+   "changes": false,
+   "blocked_on": null
+  },
+  {
+   "run": "fl_native_20261110T044830Z_3036955",
+   "candidate_id": "cand_0000",
+   "info_before": 1.101917196050157,
+   "info_after": 4.661177853863551,
+   "current_leg": "mode2_if_cov_passes",
+   "current_decision": null,
+   "A_leg": "mode2_if_cov_passes",
+   "A_decision": null,
+   "changes": false,
+   "blocked_on": "posterior_cov_norm"
+  },
+  {
+   "run": "fl_native_20261110T050737Z_3052527",
+   "candidate_id": "cand_0000",
+   "info_before": 1.101917196050157,
+   "info_after": 0.9745973915662198,
+   "current_leg": "evidence_missing",
+   "current_decision": false,
+   "A_leg": "evidence_missing",
+   "A_decision": false,
+   "changes": false,
+   "blocked_on": null
+  },
+  {
+   "run": "fl_native_20261110T051542Z_3057611",
+   "candidate_id": "cand_0000",
+   "info_before": 1.101917196050157,
+   "info_after": 4.029288568978529,
+   "current_leg": "mode2_if_cov_passes",
+   "current_decision": null,
+   "A_leg": "mode2_if_cov_passes",
+   "A_decision": null,
+   "changes": false,
+   "blocked_on": "posterior_cov_norm"
+  },
+  {
+   "run": "fl_native_20261110T051744Z_3059939",
+   "candidate_id": "cand_0000",
+   "info_before": 1.101917196050157,
+   "info_after": 4.470129267922591,
+   "current_leg": "mode2_if_cov_passes",
+   "current_decision": null,
+   "A_leg": "mode2_if_cov_passes",
+   "A_decision": null,
+   "changes": false,
+   "blocked_on": "posterior_cov_norm"
+  },
+  {
+   "run": "fl_native_20261110T054559Z_3073038",
+   "candidate_id": "cand_0000",
+   "info_before": 45.456475452557456,
+   "info_after": 45.98877320108639,
+   "current_leg": "info",
+   "current_decision": false,
+   "A_leg": "cov_certified_by_archive",
+   "A_decision": false,
+   "changes": false,
+   "blocked_on": null
+  },
+  {
+   "run": "fl_native_20261110T054753Z_3075620",
+   "candidate_id": "cand_0000",
+   "info_before": 37.00566213677504,
+   "info_after": 0.0,
+   "current_leg": "non_finite",
+   "current_decision": false,
+   "A_leg": "non_finite",
+   "A_decision": false,
+   "changes": false,
+   "blocked_on": null
+  }
+ ],
+ "summary": {
+  "current_gate": {
+   "boundary": 7,
+   "evidence_failed": 3,
+   "evidence_missing": 1,
+   "info": 1,
+   "mode2_if_cov_passes": 3,
+   "non_finite": 3
+  },
+  "A_gate": {
+   "boundary": 7,
+   "cov_certified_by_archive": 1,
+   "evidence_failed": 3,
+   "evidence_missing": 1,
+   "mode2_if_cov_passes": 3,
+   "non_finite": 3
+  },
+  "changed_decisions": [],
+  "blocked_on_cov": [
+   "fl_native_20261110T044830Z_3036955",
+   "fl_native_20261110T051542Z_3057611",
+   "fl_native_20261110T051744Z_3059939"
+  ]
+ }
+}
