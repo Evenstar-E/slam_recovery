@@ -569,6 +569,66 @@ ack 记到当前命令上。
 169 个 deferred），`committed_key_total=23`。受控运行里出现接纳本身是机制证据，但**不是修复质量证据**：
 注入是受控触发、不读标签，且该时间点的几何未做独立评价。
 
+## 3r. 决策内部的四段计时：构建占满，门本身可忽略
+
+`SLAM_RECOVERY_DECISION_TIMING=1`（S1 `dcd2181`），受控小窗口一次（`SCRIPTED=14.6`、
+`--detection off`、16 个候选帧、Mode 3 拒绝）。原样贴回：
+
+```
+[DECIDE_TIMING] cand_0000 support_and_boundary 2018.2 ms elapsed
+[DECIDE_TIMING] cand_0000 holdout_nis_and_fim 2377.2 ms elapsed
+[DECIDE_TIMING] cand_0000 paired_evidence     4355.7 ms elapsed
+[DECIDE_TIMING] cand_0000 candidate_built     4355.8 ms elapsed
+[DECIDE_TIMING] cand_0000 gate_and_commit     4356.5 ms elapsed
+```
+
+读法（累计值，不是分段）：
+
+| 段 | 累计 | 该段耗时 |
+|---|---:|---:|
+| support_and_boundary | 2018.2 ms | **2018 ms** |
+| holdout_nis_and_fim | 2377.2 ms | **359 ms** |
+| paired_evidence | 4355.7 ms | **1979 ms** |
+| candidate_built | 4355.8 ms | ≈0 ms |
+| gate_and_commit | 4356.5 ms | **0.7 ms** |
+
+**结论：候选构建的三个计算段（support/boundary 2.0 s、holdout 0.36 s、paired 2.0 s）占满 4.36 s，
+门本身 0.7 ms 可以忽略。** 这与"gate 主导"的猜测相反。
+
+两点必须同时写明：
+
+1. **本窗口的决策总耗时是 4.36 s，不是 18 s。** 前面那次 18 s 的窗口候选帧数更多、且当时循环里还挂着
+   快照阻塞；我没有在同一条件下复现 18 s，所以不能把 4.36 s 当成那次 18 s 的解释；
+2. `snapshot_ack_s` 记到的 **0.5 s 是我的探针量化**：ack 只在 2 Hz 的主循环 tick 上被收取，
+   所以读数恒等于轮询周期，**不是宿主侧的真实时延**（真实值 ≤0.5 s）。这一条我先标出来，免得被当成测量。
+
+## 3s. 精确半径索引之后：决策 4.36 s → 0.84 s
+
+S1 `92316b4`（`_RadiusIndex`：参考点按半径边长分桶、查询 27 邻格，精确非近似；一次决策只建一个索引）。
+同一受控小窗口再跑一次（13 候选帧、Mode 3 拒绝），五个数字原样：
+
+```
+[DECIDE_TIMING] cand_0000 support_and_boundary  273.2 ms elapsed
+[DECIDE_TIMING] cand_0000 holdout_nis_and_fim   548.1 ms elapsed
+[DECIDE_TIMING] cand_0000 paired_evidence       842.2 ms elapsed
+[DECIDE_TIMING] cand_0000 candidate_built       842.3 ms elapsed
+[DECIDE_TIMING] cand_0000 gate_and_commit       842.9 ms elapsed
+```
+
+| 段 | 修前 | 修后 |
+|---|---:|---:|
+| support_and_boundary | 2018.2 ms | **273.2 ms** |
+| holdout_nis_and_fim | +359 ms | +275 ms |
+| paired_evidence | +1979 ms | **+294 ms** |
+| gate_and_commit | 0.7 ms | 0.6 ms |
+| **总计** | 4356.5 ms | **842.9 ms** |
+
+决策 − deadline 也从 0.400 s 降到 **0.201 s**。
+
+**同时照实标一处没解释清的**：本趟 `wait_started_ns` = bag 20.28，而决策时刻是 17.28、五个分段计时
+合计只有 0.84 s——也就是说**决策开始到 `validate_and_resolve` 之间还有约 2.2 s 不在五段计时的覆盖里**
+（`wait_limit_closed` 落在 22.35，其中等待本身 2.07 s）。这 2.2 s 未测，也没有猜。
+
 ## 4. 边界
 
 - 没有跑两事件；没有调门、没有调 σ、没有重跑检测或候选矩阵。
