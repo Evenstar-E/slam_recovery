@@ -377,3 +377,9 @@ main已提出原rawheader/组成员身份替换最低修，方向接受但尚未
 [核验](review_20261110_e3a60e7/README.md)保留双事件bag同实例负尝试：提前+2.7s报警（真注入+14.6s）、拒绝/22deferred、hold/restore、之后498配对、E2未触发/最终WAIT。不能再说未尝试，亦不叫完整修复链完成；host_poses仍是编排控制，原件/newhost patch未归档。旧8帧PASS显式SUPERSEDED并保留旧数字，新LIO4非空/地图+203vox/+4728点只是开发复核报告，接受范围不冒本机宿主验收。
 
 新增driver在UNAVAILABLE摄入服务期限，4个lifecycle测试0.062s PASS，本机复用on_pair旧例确关闭/rearm→HEALTHY，局部遗漏接受解除。沿改变路径复用旧key7：provisional@.1s、E1@.5s、2s UNAVAILABLE关闭后，归档unresolved含7却trusted pose/factor/空间地图又有7；FAIL仍存，最低既有关闭/队列处移出该段旧provisional，不造新框架。S1同步旧fresh-decision/命令正常任务，S2原预算继续接回/E2并最终实际修复驱动原生重估，S3独立/参数停；原件和文字集中旁支，不重复大矩阵。完整A/B不升，本机脚本退出0/无ROS原bag，完整整链仍未完成；push拒绝未解除且未绕过、记录仅本地、remote review3965299。
+
+## 42. 1b8a449：第二次负运行已重武装，参考失效与等待预算归因未闭合（仅本地）
+
+[核验](review_20261110_1b8a449/README.md)保留第二次run104.9s/721MB、wait关闭/rearm/native resume开发报告，E2仍未触发、169帧UNAVAILABLE，完整链未完成；源码与原件未新增。同kf在不同配对人口下不保证同scan，回滚条件timestamp≥t_q_start与“边界在所有帧之后却全撤”解释方向不符，最低已有戳/边界/撤回范围。初次空图不足以解释rearm后全部尾段，本机actual on_pair小控制prev_scan且AVAILABLE/fed1，否定参考来源等价检测不可用，不猜真实169帧根因。
+
+10→2秒仅开发预算提案，无新运行；confirmation margin不自动确定等待证据预算。当前wait_started用segment.t_end、无独立decision时刻，本机单控制4s最后帧/8s模拟决策/9s来帧已关闭，非2秒部署实测。最低明确时钟身份及已有rearm后stamp/支持比例/地图/host特征再定位，不盲第三趟或改架构/参数。S1旧正常队列/decision/命令修复继续，S2下一唯一真实修复驱动原生写回→接回→E2或原预算具体断点，S3并行/旧参数停。Codex bdc4c1f仅493c5b3参考包、不重开旧接口/不替代用户主线；本机两小控制exit0、无ROS原bag，A/B完整分不升，记录仅本地、push拒绝未解除未绕过、remote review3965299。

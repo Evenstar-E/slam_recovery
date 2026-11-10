@@ -444,3 +444,11 @@ S1冻结host_poses为已声明编排控制，可交受控两事件/拒绝/尾段
 S1新UNAVAILABLE期限服务本机4项测试和actual on_pair复用例PASS，关闭/rearm确可达；同入口马上使旧unresolved provisional key7再次trusted pose/factor/空间地图，正常反例FAIL。最低既有关闭/队列移出该段旧provisional，保留归档/新帧，与已发fresh-decision/命令归属并行修，不造新状态机/防御矩阵。S2原900s预算继续真实接回/E2或首断点，host_poses若先验编排如实标签；最终主线仍实际修复测量→原生重估/内部地图写回→接回→E2。已有原件随实质交付归档，措辞集中清理，S3独立/旧参数停，不为Mode2调门。
 
 开发下次自检用PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令/证据逐项给期限/归属/真实释放/事件/修复来源/E2/尾段，不能用测试总数或继续消费替成功。A9/A10局部探索推进，不升完整A/B；本机脚本退出0、无ROS原bag。实际owner核4既有Cron且无旧repair-3e，不复制/代推，远端进程当前未独立核。私人handoff保护，前push拒绝未解除，本条仅本地、remote review3965299，不称开发收到。
+
+## 44. repair-f3核1b8a449：等待/重武装已运行报告，参考恢复与预算解释待定位（仅本地）
+
+[核验](review_20261110_1b8a449/README.md)接受第二次负run等待关闭/rearm/resume报告局部推进，不叫完整接回/E2；169帧UNAVAILABLE/fed5/E2未开仍是断点。S2先沿已有stamp把旧新run及rearm后头20帧support fraction/参考缓存与实际点数/pose/host特征对齐，同kf不同配对人口不是身份。初次清空地图及末特征降不足以单独定位尾段根因；本机小例prev_scan且AVAILABLE/fed1，二者谓词不同；回滚timestamp≥t_q_start与报告“边界在所有项之后”方向需纠正，不改正确隔离。
+
+S1的wait10→2秒只记预算提案，无第三次原件/源码新增；confirmation margin不是唯一等待预算证据，当前wait从segment.t_end而非独立decision参数起算，最低明确message/wall身份、若声明独立decision起点沿现入口传入，不新时钟框架/参数扫描。本机两个小控制exit0，非真实169帧根因或2秒部署复现。S1旧unresolved provisional/decision/命令/写回正常任务source未改不重复测；S2下一仍实际修复→原生写回→接回→E2或预算首断点，先host_poses控制如实非算法修复。S3独立/旧参数停、生产gate不改，文档集中清理不升级新实验前置。
+
+新增Codex bdc4c1f README/REVIEW已读、固定493c5b3仅参考，未合/未执行；不把旧无接口论点当当前缺陷、不据其建议替代用户主线。开发自检仍需PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令/原件，actual当前远端进程未独立核；4既有Cron无复制/旧repair-3e无活peer。A/B完整分不升、首次整链完成仍单独报，目前未完成。私人handoff保护，前push拒绝未解除/未绕过，记录仅本地、remote review3965299，不称开发收到。
