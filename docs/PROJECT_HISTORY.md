@@ -371,3 +371,9 @@ main已提出原rawheader/组成员身份替换最低修，方向接受但尚未
 [核验](review_20261110_969c424/README.md)接受开发撤14.23m效果、补同末stamp live/control/treatment和深拷贝修后报告，较跨run比较实质推进。旧capture/replay值拷贝+固定上游三个云Ptr与原地swap支持别名风险；actual深拷贝/匹配代码和log/receipt仍未交，不把诊断报告当独立宿主PASS。读数欧氏差本机核为7.239cm/2.883cm，非算法质量/完整状态保真指标；旧8帧PASS待复核，不改历史数字，复用下一实质运行点数/地图原件而非大矩阵。
 
 新≤0.2s取最大前戳只保证近邻；本机按文字单个合成正常缺当前repair例，会把前一scan repair匹配当前group，非本次20条实际错配证明。最低已有20条原header/group归属，20/20不当身份PASS，不再宽窗。冻结host_poses源码只复用旧host候选，可验编排/拒绝/E2但不是实际修复，旧sigma配置不重开调参。S1/S2下一仍真实修复驱动内部重估/地图写回→接回→E2或预算断点，S3并行/参数停；旧写回/命令source未改不重测。完整A/B不升，脚本本机退出0/无ROS原bag，记录仅本地，push拒绝未解除/未绕过，remote review仍3965299。
+
+## 41. e3a60e7：首次两事件负尝试报告，UNAVAILABLE期限入口局部解除（仅本地）
+
+[核验](review_20261110_e3a60e7/README.md)保留双事件bag同实例负尝试：提前+2.7s报警（真注入+14.6s）、拒绝/22deferred、hold/restore、之后498配对、E2未触发/最终WAIT。不能再说未尝试，亦不叫完整修复链完成；host_poses仍是编排控制，原件/newhost patch未归档。旧8帧PASS显式SUPERSEDED并保留旧数字，新LIO4非空/地图+203vox/+4728点只是开发复核报告，接受范围不冒本机宿主验收。
+
+新增driver在UNAVAILABLE摄入服务期限，4个lifecycle测试0.062s PASS，本机复用on_pair旧例确关闭/rearm→HEALTHY，局部遗漏接受解除。沿改变路径复用旧key7：provisional@.1s、E1@.5s、2s UNAVAILABLE关闭后，归档unresolved含7却trusted pose/factor/空间地图又有7；FAIL仍存，最低既有关闭/队列处移出该段旧provisional，不造新框架。S1同步旧fresh-decision/命令正常任务，S2原预算继续接回/E2并最终实际修复驱动原生重估，S3独立/参数停；原件和文字集中旁支，不重复大矩阵。完整A/B不升，本机脚本退出0/无ROS原bag，完整整链仍未完成；push拒绝未解除且未绕过、记录仅本地、remote review3965299。

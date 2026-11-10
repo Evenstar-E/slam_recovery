@@ -1,0 +1,28 @@
+{
+  "target": "e3a60e7d5c52dd3dd96da462d338117afab221bb",
+  "scope": "Source-pinned local lifecycle tests and two synthetic actual on_pair controls; no native/ROS/bag/tuning",
+  "command": "python -B -W ignore docs/review_20261110_e3a60e7/run_checks.py",
+  "exit": 0,
+  "selected_suite": {"status": "PASS_LOCAL", "count": 4, "elapsed_s": 0.062},
+  "unavailable_wait_closure": {
+    "status": "PASS_LOCAL", "state": "HEALTHY",
+    "events": ["wait_limit_closed", "rearm"], "unavailable_frames": 1
+  },
+  "unresolved_provisional_promotion": {
+    "status": "FAIL_REPRODUCED_LOCAL", "archived_unresolved_frames": ["7"],
+    "trusted_keys_after_rearm_ingest": [7], "trusted_factors": [7],
+    "spatial_map_keys": [7], "unavailable_frames": 1, "state": "HEALTHY"
+  },
+  "developer_run": {
+    "status": "DEVELOPER_REPORTED_NEGATIVE_ONLY", "e1": "FALSE_EARLY_TRIGGER_REFUSED",
+    "e2": "NOT_TRIGGERED", "candidate_source": "host_poses", "post_e1_paired_frames": 498,
+    "scan_pair_fraction": 0.9063545150501672, "native_full_two_event": "NOT_COMPLETED"
+  },
+  "old_eight_frame_recheck": {
+    "status": "DEVELOPER_REPORTED_NOT_RAW_VERIFIED", "old_pass": "SUPERSEDED",
+    "lio_groups": 4, "vio_groups": 4, "reported_nonempty_lio": 4,
+    "reported_voxel_growth": 203, "reported_point_growth": 4728,
+    "elapsed_s": "NOT_REMEASURED"
+  },
+  "publication": "LOCAL_ONLY_PRIOR_PUSH_DENIAL_NOT_RETRIED"
+}

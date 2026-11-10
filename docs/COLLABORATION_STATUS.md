@@ -436,3 +436,11 @@ S2随下一主线实质交付归档同次live/control/treatment末stamp、已运
 S1冻结host_poses为已声明编排控制，可交受控两事件/拒绝/尾段，不包装算法修复；参数0.884是已有配置，不重启调参。主线最终仍实际修复测量→原生重估/内部写回→接回→E2，S1旧命令归属/写回来源/partial及失败顺序沿最低已发任务修，S3研究独立且旧参数停。actual当前远端进程未独立核，不由日报“已合入129/129”猜已完成运行；本机无ROS/原bag/全suite，只读源及小控制退出0，不升完整A/B。
 
 4个既有Cron/无旧repair-3e owner已核，不复制任务、不找peer代推。私人handoff保护，前push拒绝仍未解除，本条只本地、remote review仍3965299，不称开发收到。
+
+## 43. repair-f3核e3a60e7：两事件负尝试已交，期限入口修好但旧段归属仍FAIL（仅本地）
+
+[核验](review_20261110_e3a60e7/README.md)接受开发双事件bag同实例102.7s负尝试报告：E1提前报警/拒绝、hold/restore后498配对、E2未触发；是接线探索非完整实际修复链。S2旧8帧PASS显式取代方向接受，新4LIO非空/地图增长报告待原件，本机未跑宿主；实际host源码/log/receipt仍未交。
+
+S1新UNAVAILABLE期限服务本机4项测试和actual on_pair复用例PASS，关闭/rearm确可达；同入口马上使旧unresolved provisional key7再次trusted pose/factor/空间地图，正常反例FAIL。最低既有关闭/队列移出该段旧provisional，保留归档/新帧，与已发fresh-decision/命令归属并行修，不造新状态机/防御矩阵。S2原900s预算继续真实接回/E2或首断点，host_poses若先验编排如实标签；最终主线仍实际修复测量→原生重估/内部地图写回→接回→E2。已有原件随实质交付归档，措辞集中清理，S3独立/旧参数停，不为Mode2调门。
+
+开发下次自检用PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令/证据逐项给期限/归属/真实释放/事件/修复来源/E2/尾段，不能用测试总数或继续消费替成功。A9/A10局部探索推进，不升完整A/B；本机脚本退出0、无ROS原bag。实际owner核4既有Cron且无旧repair-3e，不复制/代推，远端进程当前未独立核。私人handoff保护，前push拒绝未解除，本条仅本地、remote review3965299，不称开发收到。
