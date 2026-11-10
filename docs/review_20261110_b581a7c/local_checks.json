@@ -1,0 +1,20 @@
+{
+  "target": "b581a7c155d8d4ca18b3590eb4332d86e68afb66",
+  "scope": "Source-bound local diagnostics on/off controls and reported time arithmetic; no native/ROS/bag/tuning",
+  "command": "python -B -W ignore docs/review_20261110_b581a7c/run_checks.py", "exit": 0,
+  "diagnostic_gate": {
+    "status": "PASS_LOCAL",
+    "observations": [
+      {"enabled": false, "state": "ABORTED", "wait_started_after_close": null, "closed_ns": 2005000000, "diagnostic_lines": 0},
+      {"enabled": true, "state": "ABORTED", "wait_started_after_close": null, "closed_ns": 2005000000, "diagnostic_lines": 4}
+    ]
+  },
+  "report_arithmetic": {
+    "ack_to_validate_wall_s": "35.642131", "reported_tail_minus_deadline_bag_s": "18.55",
+    "limit": "A gap does not establish an overlapping decision block; raw command/ack/deadline-reached/service records missing"
+  },
+  "driver_change": "NONE_IN_THIS_REVISION",
+  "snapshot_causality": "DEVELOPER_REPORTED_NOT_INDEPENDENTLY_ESTABLISHED",
+  "native_full_two_event": "NOT_COMPLETED",
+  "publication": "LOCAL_ONLY_PRIOR_PUSH_DENIAL_NOT_RETRIED"
+}

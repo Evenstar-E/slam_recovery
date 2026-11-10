@@ -401,3 +401,9 @@ runner savedPGID与receipt写成功exit0保留JSON FAIL且整体exit非零静态
 [核验](review_20261110_fafbd0c/README.md)保留同实例受控14.678/42.022s两次开段/拒绝restore及间隔216帧消费报告，终态第二WAIT未释放，无actual修复重处理/成功写回/完整E2尾段，非用户整链完成。scripted开episode本机PASS，但trigger当帧pending已登记却candidate frames空；新分支没同步node空间参考，manager撤key7后reference仍含7/100点、下一隔离来帧仍残留。最低复用_track_episode和_sync_spatial_map，不造新系统。
 
 连续来帧不重置wait_started本机PASS，接受日报否定旧解释；晚设起点实际原因UNKNOWN，沿下一窗口最小三处诊断，不新锁框架/调wait。summary未fired标签正确，receipt只按声明仍误记CONTROLLED_INTERFACE_TEST，单表达式控制证实，最低requested/actual取summary分开，非本次两fired失败。脚本/语法exit0、无ROS原bag/开发suite，A/B不升；S1最低归属/同步修，S2最终实际修复→原生写回→接回→E2/尾段或预算断点，S3独立/旧参数停。只本地归档、push拒绝未解除未绕过、remote review3965299。
+
+## 46. b581a7c：默认关闭诊断接受，迟决策快照归因仍待时间重叠原件（仅本地）
+
+[核验](review_20261110_b581a7c/README.md)接受manager三处SLAM_RECOVERY_WAITDIAG默认关闭/段尾起点语义不变，开发小窗报告validate读晚t_end支持进入WAIT取该值；driver未改、迟决策未修。开关本机两种状态均2.005s关闭/默认0行开启4行PASS。快照ack1794310079.327到validate1794310114.969131差35.642131s，bag尾-deadline18.55s；启动前16.42s等待不自动证明覆盖到期决策。最低已有bag start/deadline到达/service/cmd-ack同次区间，UNKNOWN不猜唯一因果、不新跑归因矩阵。
+
+确有阻塞沿现通道最低非阻塞滚动快照并复用单in-flight/短poll保pending/匹配ack；0.5 timeout仍阻塞、第一ack前不发需实际已有ready启动入口，不造RPC/锁框架。S1旧正常归属/参考/释放/写回任务source未改不重测，S2下一实际修复→原生写回→接回→E2/尾段或原预算断点，S3独立/旧参数停。完整A/B不升，diagnostic exit0非136本机全suite/无ROS原bag；仅本地记录，push拒绝未解除未绕过、remote review3965299。

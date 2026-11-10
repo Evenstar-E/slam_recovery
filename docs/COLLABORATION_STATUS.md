@@ -476,3 +476,11 @@ S1沿9ee已发最低修新旧段释放/fresh-decision/帧及命令/写回归属�
 S1连续来帧不重置wait的解释纠正接受、本机control PASS；晚设wait起点仍UNKNOWN，沿下一实质小窗既有三处诊断核decision/t_end/wait_start，不新锁/时钟/参数矩阵。S2 summary未fired标签已分，receipt仍只按声明，最低requested/actual取已有summary，属于记账旁支不把本次两fired报错。S2下一仍实际修复测量→原生重估/内部地图写回→接回→E2/尾段或预算断点，受控拒绝范围单列，S3独立/旧参数停、生产门不改。
 
 本机小控制与bash-n exit0，无ROS原bag/开发suite，A/B完整分不升，首次真实整链仍单独及时报、当前未到。开发自检PASS/FAIL/BLOCKED/NOT_APPLICABLE+原件/命令区分受控触发/输入归属/参考撤销/native结果/等待/E2尾段/算法修复。4既有Cron无复制/旧repair-3e无活peer，远端当前进程未独立核；私人handoff保护、push拒绝未解除未绕过、本条只本地remote review3965299，不称开发收到。
+
+## 48. repair-f3核b581a7c：诊断默认关闭/语义未变，驱动阻塞修复尚未交（仅本地）
+
+[核验](review_20261110_b581a7c/README.md)接受SLAM_RECOVERY_WAITDIAG默认安静与段尾起点声明，本机开关2.005s同关闭/0vs4行PASS；只工程诊断、不是原生恢复。小窗validate晚t_end与进入WAIT取值报告保留，但首次snapshot ack早validate35.642s、deadline到段尾18.55s，缺实际bag start/deadline到达/service/cmd-ack重叠，不能断言启动期16.42s等待阻塞已到期决策。S2先复用已有原件定位哪条等待覆盖，不为归因再跑大矩阵；driver本轮未改，0.5s等待不等非阻塞、第一ack前不发须明确已有ready启动，不新RPC/锁框架。
+
+S1保持现等待语义可声明，旧trigger候选输入/参考撤销/unresolved/旧decision-rearm/ack/accepted写回正常任务source未改不重测；S2沿现通道最小正常阻塞解除后交实际修复→原生重估/内部写回→接回→E2/尾段或原预算首断点，S3独立/旧参数停/生产门不改。自检PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令原件分诊断/实际阻塞/驱动修后/真实修复E2，不拿136测试或日志数量代成果，完整A/B不升。
+
+本机小控制exit0无ROS原bag/全suite，完整链未到首次完成；4既有Cron无复制/旧repair-3e无活peer、actual远端当前进程未独立核。私人handoff保护，push拒绝未解除未绕过，记录只本地remote review3965299，不称开发收到。
