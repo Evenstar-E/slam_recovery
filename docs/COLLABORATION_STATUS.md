@@ -484,3 +484,11 @@ S1连续来帧不重置wait的解释纠正接受、本机control PASS；晚设wa
 S1保持现等待语义可声明，旧trigger候选输入/参考撤销/unresolved/旧decision-rearm/ack/accepted写回正常任务source未改不重测；S2沿现通道最小正常阻塞解除后交实际修复→原生重估/内部写回→接回→E2/尾段或原预算首断点，S3独立/旧参数停/生产门不改。自检PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令原件分诊断/实际阻塞/驱动修后/真实修复E2，不拿136测试或日志数量代成果，完整A/B不升。
 
 本机小控制exit0无ROS原bag/全suite，完整链未到首次完成；4既有Cron无复制/旧repair-3e无活peer、actual远端当前进程未独立核。私人handoff保护，push拒绝未解除未绕过，记录只本地remote review3965299，不称开发收到。
+
+## 49. repair-f3核8ca5b41：异步snapshot局部解除，普通hold/迟到同名ack仍需归属修（仅本地）
+
+[核验](review_20261110_8ca5b41/README.md)接受tick异步/status启动/poll保pending/异名检查，2测试0.056s与正常文件控制PASS，旧同步快照与50ms即丢pending该入口关闭。S1/S2最低所有正常命令真single in-flight：未消费status可被hold覆盖并卡队首、snapshot软件timeout后旧同名ack可计新成功，两个明确本机控制非native错配实测，不造RPC/新框架。旧帧/trigger参考/decision-rearm/accepted写回正常source未修不重跑。
+
+开发报告0.4s入口延迟、评估18s与MODE2 23key/169deferred保留为机制/成本观察，不当actual修复质量/E2。S1新marker是累计elapsed且不含尾部node同步/native动作，driver offset在evaluate前非实际wait赋值，沿已有原件分入口/赋值/返回最小定位，别改wait藏迟决策/新成本矩阵。S2下一仍实际修复测量→原生重估/内部地图写回→接回→E2/尾段或原预算断点，partial/host_poses控制单列；S3研究独立、旧参数停、生产门不动。
+
+自检PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令原件分异步/命令归属/实际partial动作/成本/真实修复E2，入口延迟和提交数不代完整成果。A/B完整分不升、本机exit0无ROS原bag/全suite，首次真实整链未到；4既有Cron无复制/旧repair-3e无活peer、远端当前进程未独立核。私人handoff保护、push拒绝未解除未绕过、记录只本地remote review3965299，不称开发收到。

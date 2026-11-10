@@ -407,3 +407,9 @@ runner savedPGID与receipt写成功exit0保留JSON FAIL且整体exit非零静态
 [核验](review_20261110_b581a7c/README.md)接受manager三处SLAM_RECOVERY_WAITDIAG默认关闭/段尾起点语义不变，开发小窗报告validate读晚t_end支持进入WAIT取该值；driver未改、迟决策未修。开关本机两种状态均2.005s关闭/默认0行开启4行PASS。快照ack1794310079.327到validate1794310114.969131差35.642131s，bag尾-deadline18.55s；启动前16.42s等待不自动证明覆盖到期决策。最低已有bag start/deadline到达/service/cmd-ack同次区间，UNKNOWN不猜唯一因果、不新跑归因矩阵。
 
 确有阻塞沿现通道最低非阻塞滚动快照并复用单in-flight/短poll保pending/匹配ack；0.5 timeout仍阻塞、第一ack前不发需实际已有ready启动入口，不造RPC/锁框架。S1旧正常归属/参考/释放/写回任务source未改不重测，S2下一实际修复→原生写回→接回→E2/尾段或原预算断点，S3独立/旧参数停。完整A/B不升，diagnostic exit0非136本机全suite/无ROS原bag；仅本地记录，push拒绝未解除未绕过、remote review3965299。
+
+## 47. 8ca5b41：异步快照/异名ack检查局部解除，真实单在途与partial原生写回待验（仅本地）
+
+[核验](review_20261110_8ca5b41/README.md)接受tick异步写/poll无等待保pending、status启动与ack命令名检查源码/2本机测试0.056s，小控制通过；旧同步snapshot与service短poll丢pending的该入口已解除。新正常callback hold仍覆盖status，正确OK hold卡在pending[status,hold]队首；超时第一snapshot后重发同名，旧ack可归新snapshot，合成迟到控制FAIL非14次实跑错配证明。最低所有命令真实single in-flight/超时不等宿主结束/匹配消费，复用现通道不造RPC。
+
+新报告入口延迟0.4s/评估内部18s与一次MODE2 23commit169deferred仅开发机制/成本观察，非修复质量/E2；旧accepted旧尾/partial/失败set_state未修。marker累计elapsed且gate marker不含node同步/native动作，wait_start_offset在evaluate前取t_end不等真实WAIT赋值，最低已有原件分入口/赋值/返回成本，不改wait藏延迟。S1/S2最低归属修及有限成本定位后下一actual修复→原生写回→接回→E2/尾段或预算断点，S3独立/旧参数停。完整A/B不升、无ROS原bag/全suite，记录仅本地push拒绝未解除未绕过、remote review3965299。
