@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import time
 from typing import Dict, List, Optional, Tuple
 import numpy as np
 
@@ -43,6 +44,7 @@ class TrustedMapTransactionManager:
         # never returns to HEALTHY and the detector can never fire again.
         self.wait_limit_ns: Optional[int] = None if wait_limit_ns is None else int(wait_limit_ns)
         self.wait_started_ns: Optional[int] = None
+        self._wait_diag_calls = 0
         self.unresolved_segments: List[QuarantineSegment] = []
         self.lifecycle_events: List[dict] = []
 
@@ -285,6 +287,14 @@ class TrustedMapTransactionManager:
         if self.active_quarantine is None:
             raise RuntimeError("No active quarantine segment to validate")
 
+        # DIAGNOSTIC (no behaviour change): which end time the waiting timer will start from, and
+        # when this validation actually ran. Added to separate "the timer is wrong" from "the timer
+        # was started late", which the archived runs could not distinguish.
+        print(f"[WAITDIAG] validate_enter wall={time.time():.6f} "
+              f"state={self.state} t_end_ns={self.active_quarantine.t_end_ns} "
+              f"wait_started_ns={self.wait_started_ns} wait_limit_ns={self.wait_limit_ns}",
+              flush=True)
+
         if updated_propagated_cov_norm is not None:
             self.active_quarantine.propagated_cov_norm = float(updated_propagated_cov_norm)
 
@@ -464,11 +474,16 @@ class TrustedMapTransactionManager:
             self.state = new_state
             if new_state == RecoveryState.WAITING_FOR_EVIDENCE and new_segment is not None:
                 self.wait_started_ns = int(new_segment.t_end_ns)
+                print(f"[WAITDIAG] wait_started_set(from new_segment) wall={time.time():.6f} "
+                      f"started={self.wait_started_ns}", flush=True)
             self.commit_history.append(new_history)
         elif report.mode in (RecoveryMode.MODE3_SOFT_BRIDGE_WAIT, RecoveryMode.MODE1_ONLINE_REWEIGHT):
             # Trusted map stays strictly invariant; system waits for delayed loop or auxiliary evidence
             self.state = RecoveryState.WAITING_FOR_EVIDENCE
             self.wait_started_ns = int(self.active_quarantine.t_end_ns)
+            print(f"[WAITDIAG] wait_started_set(mode3) wall={time.time():.6f} "
+                  f"started={self.wait_started_ns} t_end_ns={self.active_quarantine.t_end_ns}",
+                  flush=True)
         elif report.mode == RecoveryMode.MODE4_HARD_SLEEP_SPLIT:
             # Archive current trusted map into sleeping submaps and reset active trusted map cleanly
             if self.trusted_poses:
@@ -492,6 +507,14 @@ class TrustedMapTransactionManager:
         the wait ends here and the frames it held are recorded as *unresolved* -- not committed,
         not silently deleted. The trusted map is untouched: it stays at the last commit.
         """
+        # DIAGNOSTIC: the first ten evaluations, so the caller's clock can be compared with the
+        # timer's start without changing either.
+        if self._wait_diag_calls < 10:
+            self._wait_diag_calls += 1
+            print(f"[WAITDIAG] close_check#{self._wait_diag_calls} wall={time.time():.6f} "
+                  f"now_ns={now_ns} started={self.wait_started_ns} "
+                  f"delta_s={(None if self.wait_started_ns is None else (int(now_ns) - int(self.wait_started_ns)) / 1e9)}",
+                  flush=True)
         if (self.state != RecoveryState.WAITING_FOR_EVIDENCE
                 or self.active_quarantine is None
                 or self.wait_limit_ns is None
