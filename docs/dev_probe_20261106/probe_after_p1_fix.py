@@ -26,7 +26,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from slam_recovery.core import CandidateMap, RecoveryState
+from slam_recovery.core import CandidateMap, RecoveryState, TangentFrame
 from slam_recovery.quarantine import TrustedMapTransactionManager
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
 from slam_recovery.tests.test_atomic_commit import _make_delta
@@ -35,10 +35,15 @@ from slam_recovery.tests.test_atomic_commit import _make_delta
 def try_candidate(**evidence):
     m = TrustedMapTransactionManager()
     m.trigger_quarantine(10_000_000_000, 14_000_000_000,
-                         np.array([0., 0., 0., 1., 0., 0.]), np.eye(6), 1.)
+                         np.array([0., 0., 0., 1., 0., 0.]), np.eye(6), 1.,
+        weak_direction_frame=TangentFrame("body", "rot_trans", "probe"),
+        info_before_frame=TangentFrame("body", "rot_trans", "probe"),
+                         )
     candidate = CandidateMap(candidate_id="review", parent_map_version=m.trusted_version,
                              repaired_poses={42: np.eye(4)}, info_after_6x6=np.eye(6) * 100,
-                             cov_after_6x6=np.eye(6) * .01, holdout_nis=.1, **evidence)
+                             cov_after_6x6=np.eye(6) * .01, holdout_nis=.1, **evidence,
+        info_after_frame=TangentFrame("body", "rot_trans", "probe"),
+                             )
     report = m.validate_and_resolve(candidate)
     return {"accepted": bool(report.accepted),
             "mode": report.mode.value,
@@ -75,12 +80,17 @@ def non_finite_evidence_is_not_treated_as_sufficient():
     """A repair that cannot be constructed reports inf NIS; it must wait, not commit."""
     m = TrustedMapTransactionManager()
     m.trigger_quarantine(10_000_000_000, 14_000_000_000,
-                         np.array([0., 0., 0., 1., 0., 0.]), np.eye(6), 1.)
+                         np.array([0., 0., 0., 1., 0., 0.]), np.eye(6), 1.,
+        weak_direction_frame=TangentFrame("body", "rot_trans", "probe"),
+        info_before_frame=TangentFrame("body", "rot_trans", "probe"),
+                         )
     candidate = CandidateMap(candidate_id="not_evaluable", parent_map_version=m.trusted_version,
                              repaired_poses={42: np.eye(4)}, info_after_6x6=np.eye(6) * 100,
                              cov_after_6x6=np.eye(6) * .01, holdout_nis=float("inf"),
                              paired_benefit_approved=True, wilson_lower_bound=0.9,
-                             reentry_pos_jump_m=0.01)
+                             reentry_pos_jump_m=0.01,
+        info_after_frame=TangentFrame("body", "rot_trans", "probe"),
+                             )
     report = m.validate_and_resolve(candidate)
     return {"accepted": bool(report.accepted), "mode": report.mode.value,
             "pose_42_committed": 42 in m.trusted_poses}

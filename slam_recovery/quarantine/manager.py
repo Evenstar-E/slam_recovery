@@ -14,6 +14,7 @@ from ..core import (
     QuarantineSegment,
     RecoveryMode,
     RecoveryState,
+    TangentFrame,
     ValidationReport,
     evaluate_four_mode_gate,
 )
@@ -150,6 +151,9 @@ class TrustedMapTransactionManager:
         weak_direction_6d: np.ndarray,
         info_before_6x6: np.ndarray,
         propagated_cov_norm: float,
+        *,
+        weak_direction_frame: "TangentFrame",
+        info_before_frame: "TangentFrame",
     ) -> QuarantineSegment:
         """
         Roll back provisional updates starting at t_{q,start} = \hat{t}_{onset} - \Delta t_{margin},
@@ -225,6 +229,8 @@ class TrustedMapTransactionManager:
             raw_frame_refs=[str(int(d.keyframe_id)) for d in quarantined_deltas
                             if getattr(d, "keyframe_id", None) is not None],
             provisional_factor_ids=prov_factors,
+            weak_direction_frame=weak_direction_frame,
+            info_before_frame=info_before_frame,
         )
         self.active_quarantine.raw_frame_refs = sorted(
             set(self.active_quarantine.raw_frame_refs), key=lambda r: int(r))
@@ -259,11 +265,18 @@ class TrustedMapTransactionManager:
         # VALIDATING is an attempt marker, not a committed state.
         state_before_attempt = self.state
         self.state = RecoveryState.VALIDATING
-        report = evaluate_four_mode_gate(
-            self.active_quarantine,
-            candidate,
-            self.gate_thresholds,
-        )
+        try:
+            report = evaluate_four_mode_gate(
+                self.active_quarantine,
+                candidate,
+                self.gate_thresholds,
+            )
+        except BaseException:
+            # The gate can refuse a candidate outright (e.g. an undeclared tangent frame). A
+            # refusal is a rejected attempt, not a state transition: the manager must not be left
+            # in VALIDATING, where no further step is possible.
+            self.state = state_before_attempt
+            raise
 
         if candidate is not None:
             # Report the split on every path, so a Mode 3 wait says which frames it is waiting on
@@ -359,6 +372,10 @@ class TrustedMapTransactionManager:
                                                    dtype=np.float64).copy(),
                         propagated_cov_norm=float(old_segment.propagated_cov_norm),
                         raw_frame_refs=[str(k) for k in sorted(pending)],
+                        # The deferred segment is the same physical segment: it inherits the
+                        # declared basis, it does not re-derive one.
+                        weak_direction_frame=old_segment.weak_direction_frame,
+                        info_before_frame=old_segment.info_before_frame,
                     )
                 # The receipt describes the *remaining pending set*, not only this candidate's
                 # deferrals: a retry committing 8..11 while deferring nothing still leaves 12..19

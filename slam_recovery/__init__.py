@@ -14,6 +14,13 @@ from .core import (
     CandidateMap,
     ValidationReport,
     GateThresholds,
+    TangentFrame,
+    TangentFrameError,
+    MissingTangentFrame,
+    TangentFrameMismatch,
+    adjoint,
+    transport,
+    transport_information,
     evaluate_four_mode_gate,
 )
 
@@ -31,5 +38,12 @@ __all__ = [
     "CandidateMap",
     "ValidationReport",
     "GateThresholds",
+    "TangentFrame",
+    "TangentFrameError",
+    "MissingTangentFrame",
+    "TangentFrameMismatch",
+    "adjoint",
+    "transport",
+    "transport_information",
     "evaluate_four_mode_gate",
 ]

@@ -23,7 +23,7 @@ import numpy as np
 OUT = Path(__file__).resolve().parent
 REPO = OUT.parents[1]
 sys.path.insert(0, str(REPO))
-from slam_recovery.core import CandidateMap, DegeneracyType, HealthWindow, RecoveryState
+from slam_recovery.core import CandidateMap, DegeneracyType, HealthWindow, RecoveryState, TangentFrame
 from slam_recovery.quarantine import TrustedMapTransactionManager
 from slam_recovery.tests.test_atomic_commit import _make_delta
 from slam_recovery.diagnosis import PhysicsGuidedCausalTransformer
@@ -34,7 +34,10 @@ from slam_recovery.experiments.evaluation.trajectory_eval import evaluate_rotati
 
 def quarantine(m, onset=10., now=14.):
     return m.trigger_quarantine(int(onset*1e9), int(now*1e9),
-                               np.array([0.,0,0,1,0,0]), np.eye(6), 1.)
+                               np.array([0.,0,0,1,0,0]), np.eye(6), 1.,
+        weak_direction_frame=TangentFrame("body", "rot_trans", "probe"),
+        info_before_frame=TangentFrame("body", "rot_trans", "probe"),
+                               )
 
 
 def candidate(m, **kw):
@@ -42,7 +45,9 @@ def candidate(m, **kw):
                 repaired_poses={42: np.eye(4)}, info_after_6x6=np.eye(6)*100,
                 cov_after_6x6=np.eye(6)*.01, holdout_nis=.1)
     args.update(kw)
-    return CandidateMap(**args)
+    return CandidateMap(**args,
+        info_after_frame=TangentFrame("body", "rot_trans", "probe"),
+    )
 
 
 def nominal_window(i=0):

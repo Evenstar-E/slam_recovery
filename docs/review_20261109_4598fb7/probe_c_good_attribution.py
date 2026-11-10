@@ -30,6 +30,7 @@ from slam_recovery.experiments.run_four_arm_same_input import (
 from slam_recovery.quarantine import TrustedMapTransactionManager
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
 from slam_recovery.experiments.evaluation import umeyama_se3_align, associate_trajectories
+from slam_recovery.core import TangentFrame
 
 OCCLUSION_FRACTION = 0.88
 
@@ -94,6 +95,8 @@ def main() -> None:
     node.tx_mgr.trigger_quarantine(
         int(ev["start_rel_sec"] * 1e9), int((ev["start_rel_sec"] + 2.0) * 1e9),
         np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2,
+        weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
+        info_before_frame=TangentFrame("world", "rot_trans", "world"),
     )
     report = node.evaluate_and_commit_candidate(
         "attribution", good, incumbent_poses=incumbent,

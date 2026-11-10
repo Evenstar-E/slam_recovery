@@ -1,0 +1,108 @@
+{
+ "protocol": "pre-registered in trace_schema.md; judge(ON#1, ON#2) with tol_m=1e-3",
+ "inputs": {
+  "bag": {
+   "path": "/tmp/fastlivo/room02_2x2_O.bag",
+   "sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d"
+  },
+  "library": {
+   "sha256": "20df3d3f42400aec0c56387e55d027289f5117402837a712f2002da6e06c450f",
+   "same_in_both": true
+  },
+  "executable": {
+   "sha256": "76359f5387f75da3dcad7aa72372048c3feefd91b340ae0c40f92f6fb534a53b",
+   "same_in_both": true
+  },
+  "build": "TRACE_GROUP + NO_MP + DET_SYNC (default build still not run)"
+ },
+ "runs": {
+  "ON#1": {
+   "csv": "on1.csv",
+   "csv_sha256": "00af7948aa8dd06e5439c3ef184dbd8abaa31fa631c6dd75e5469b19c8b7f7c5",
+   "receipt": "trace_20261110T015818Z_2883571_receipt.json",
+   "odometry_messages": 800,
+   "output_bag_sha256": "c5b098e0a9536cc73b56310da3821e4601659b57e08210c2279edbbd86eae697"
+  },
+  "ON#2": {
+   "csv": "on2.csv",
+   "csv_sha256": "edb804c48c19e1a667684a3123fa27ade8afc3fb0de273d32f679ccc2d62aec3",
+   "receipt": "trace_20261110T020104Z_2887395_receipt.json",
+   "odometry_messages": 800,
+   "output_bag_sha256": "6e92986c80b41f5c8a4aaf087c57da47c842a4ccfb2ca3df6102ad078fad5cba"
+  }
+ },
+ "trace_integrity": {
+  "header_present": true,
+  "rows": {
+   "ARRIVE": 599,
+   "GROUP": 1766,
+   "IMUINIT": 5,
+   "STATE": 1766
+  },
+  "arrive_sha_ok": "599/599 both",
+  "empty_groups": {
+   "count": 884,
+   "sha_is_sha256_empty": true,
+   "fraction": 0.5006
+  },
+  "imuinit_full_sample_sha": "5/5 calls identical between the two runs"
+ },
+ "judgement": {
+  "verdict": "UNKNOWN",
+  "why": "group composition is identical (1766 groups, identical count, span and sample sha; 5 identical IMUINIT calls) yet the states diverge, so grouping cannot be the mechanism in this pair",
+  "groups_identical": true,
+  "first_divergence": {
+   "index": 87,
+   "t_after_start_s": 3.7,
+   "max_axis_delta_m": 0.001192
+  },
+  "divergence_growth": {
+   "first_gt_1mm": {
+    "index": 87,
+    "t_s": 3.7
+   },
+   "first_gt_1cm": {
+    "index": 119,
+    "t_s": 4.9
+   },
+   "first_gt_0.1m": {
+    "index": 1036,
+    "t_s": 35.5
+   },
+   "first_gt_1m": {
+    "index": 1096,
+    "t_s": 37.5
+   },
+   "first_gt_10m": {
+    "index": 1222,
+    "t_s": 41.7
+   },
+   "first_gt_100m": {
+    "index": 1480,
+    "t_s": 50.3
+   },
+   "final_delta_m": 293.59,
+   "max_delta_m": 309.71,
+   "frames_gt_1mm": 1609,
+   "frames_gt_0.1m": 726,
+   "frames": 1766
+  },
+  "alignment": "state rows pair one-to-one, 0/1766 differ in lid_stamp_ns, so the comparison is frame-by-frame, not by index luck"
+ },
+ "limits": {
+  "single_pair": "no causal claim; the pre-registered rule says so",
+  "no_off_trace": "the OFF build failed, so tracing-off control is absent and tracing itself remains a live perturbation candidate",
+  "default_build_missing": "both runs carry NO_MP + DET_SYNC; the default build is unobserved",
+  "both_runs_diverge": "the two runs separate from each other by up to 309.7 m; this is not a GOOD-vs-BAD pair, and which (if either) stays near the reference is not established here -- no GT/ATE was computed for these runs"
+ },
+ "score_mapping": {
+  "rows": [
+   "A2",
+   "A11",
+   "B6",
+   "B8"
+  ],
+  "change": "none",
+  "why": "the judgement is a negative result about grouping on one pair; it does not close any work package, and B6/B8 need the OFF control and repeated pairs"
+ }
+}

@@ -12,7 +12,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 import numpy as np
-from slam_recovery.core import CandidateMap
+from slam_recovery.core import CandidateMap, TangentFrame
 from slam_recovery.quarantine import TrustedMapTransactionManager
 from slam_recovery.health.detector import analyze_decoupled_information
 from slam_recovery.tests.test_atomic_commit import _make_delta
@@ -21,7 +21,10 @@ from slam_recovery.validation import compute_disjoint_holdout_point_to_plane_nis
 
 def quarantine(m):
     return m.trigger_quarantine(int(10e9), int(14e9), np.array([0,0,0,1,0,0]),
-                                np.eye(6), 1.0)
+                                np.eye(6), 1.0,
+        weak_direction_frame=TangentFrame("body", "rot_trans", "probe"),
+        info_before_frame=TangentFrame("body", "rot_trans", "probe"),
+                                )
 
 
 def main():
@@ -55,7 +58,9 @@ def main():
     quarantine(m)
     pose = np.eye(4); pose[0,3] = np.nan
     c = CandidateMap('nonfinite_pose', m.trusted_version, {42:pose}, np.eye(6)*100,
-                     np.eye(6)*0.01, 0.1)
+                     np.eye(6)*0.01, 0.1,
+        info_after_frame=TangentFrame("body", "rot_trans", "probe"),
+                     )
     rep = m.validate_and_resolve(c)
     observations.append(dict(id='R3', issue='nonfinite_pose_can_be_committed',
         reproduced=rep.accepted and not np.isfinite(m.trusted_poses.get(42, np.eye(4))).all(),
@@ -81,7 +86,9 @@ def main():
     m.trusted_poses[1] = np.eye(4); m.trusted_factors=[10]
     quarantine(m)
     c = CandidateMap('pose_only', m.trusted_version, {2:np.eye(4)}, np.eye(6)*100,
-                     np.eye(6)*.01, .1)
+                     np.eye(6)*.01, .1,
+        info_after_frame=TangentFrame("body", "rot_trans", "probe"),
+                     )
     rep = m.validate_and_resolve(c)
     observations.append(dict(id='R6', issue='commit_updates_poses_without_candidate_factor_or_bias_transaction',
         reproduced=rep.accepted and m.trusted_factors == [10],

@@ -25,7 +25,10 @@ from ..core import (
     HealthWindow,
     RecoveryMode,
     RecoveryState,
+    TangentFrame,
     ValidationReport,
+    transport,
+    transport_information,
 )
 from ..diagnosis import SignatureMatrixRouter
 from ..health import DetectorConfig, JointHealthDetector
@@ -229,12 +232,22 @@ class OnlineRecoveryTransactionNode:
 
         if self.tx_mgr.state == RecoveryState.HEALTHY:
             if decision.state == RecoveryState.QUARANTINED:
+                # `weak_dir` and `fim_6x6` are produced from this scan's own points, i.e. in the
+                # body frame of `kf_id`. The repaired candidate's information is assembled from
+                # world-frame points (see `_build_candidate`). The gate multiplies the weak
+                # direction by both, so they must share one declared basis: move the two segment
+                # quantities into the world frame here, once, using this keyframe's pose. The
+                # quadratic form v^T Lambda v is invariant under that transport, so the
+                # *before* information is unchanged; the repair's information is now profiled
+                # along the same physical direction as the one that is weak.
                 self.tx_mgr.trigger_quarantine(
                     estimated_onset_ns=decision.estimated_onset_ns,
                     current_ns=timestamp_ns,
-                    weak_direction_6d=weak_dir,
-                    info_before_6x6=fim_6x6,
+                    weak_direction_6d=transport(weak_dir, pose_se3),
+                    info_before_6x6=transport_information(fim_6x6, pose_se3),
                     propagated_cov_norm=float(np.linalg.norm(cov_6x6, ord=2)),
+                    weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
+                    info_before_frame=TangentFrame("world", "rot_trans", "world"),
                 )
                 self._sync_spatial_map_with_trusted_poses()
             else:
@@ -666,6 +679,8 @@ class OnlineRecoveryTransactionNode:
             boundary_basis=boundary_basis,
             info_after_6x6=info_after,
             cov_after_6x6=cov_after,
+            # `fims_after` are computed from world-frame points and averaged in that one basis.
+            info_after_frame=TangentFrame("world", "rot_trans", "world"),
             holdout_nis=mean_holdout_nis,
             repairer_name=candidate_id,
             paired_benefit_approved=paired_ok,

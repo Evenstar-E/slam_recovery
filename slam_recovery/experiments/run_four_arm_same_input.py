@@ -41,6 +41,7 @@ if _REPO_ROOT not in sys.path:
 
 from slam_recovery.quarantine import TrustedMapTransactionManager
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
+from slam_recovery.core import TangentFrame
 from slam_recovery.experiments.evaluation import (
     associate_trajectories,
     load_tum_trajectory_se3,
@@ -634,6 +635,8 @@ def main():
     node.tx_mgr.trigger_quarantine(
         int(ONSET_REL * 1e9), int((ONSET_REL + 2.0) * 1e9),
         np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2,
+        weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
+        info_before_frame=TangentFrame("world", "rot_trans", "world"),
     )
 
     t0 = time.perf_counter()
@@ -663,6 +666,8 @@ def main():
     node_good.tx_mgr.trigger_quarantine(
         int(ONSET_REL * 1e9), int((ONSET_REL + 2.0) * 1e9),
         np.array([0, 0, 0, 1, 0, 0], dtype=np.float64), np.eye(6) * 2.0, 1.2,
+        weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
+        info_before_frame=TangentFrame("world", "rot_trans", "world"),
     )
     report_good = node_good.evaluate_and_commit_candidate(
         "four_arm_A3_good", good, incumbent_poses=incumbent, reentry_anchor_pose=pre[-1]["pose"].copy())

@@ -22,7 +22,7 @@ import rosbag
 
 sys.path.insert(0, "/home/R26534/MM-LINS")
 
-from slam_recovery.core import CandidateMap
+from slam_recovery.core import CandidateMap, TangentFrame
 from slam_recovery.quarantine.manager import TrustedMapTransactionManager
 from slam_recovery.repair.pose_graph_repairer import repair_quarantined_trajectory_segment
 from slam_recovery.validation import (
@@ -401,6 +401,8 @@ def main() -> None:
             weak_direction_6d=weak_6d,
             info_before_6x6=info_before,
             propagated_cov_norm=0.85,
+            weak_direction_frame=TangentFrame("body", "rot_trans", "ref_scan"),
+            info_before_frame=TangentFrame("body", "rot_trans", "ref_scan"),
         )
 
         # Pre-commit sequential Wilson lower bound & re-entry continuity check BEFORE calling validate_and_resolve
@@ -435,6 +437,7 @@ def main() -> None:
             paired_benefit_approved=wilson_b6.approved,
             wilson_lower_bound=wilson_b6.wilson_lower_bound,
             reentry_pos_jump_m=reentry_jump_b6,
+            info_after_frame=TangentFrame("body", "rot_trans", "ref_scan"),
         )
         val_report = tx_mgr.validate_and_resolve(candidate=cand)
 
