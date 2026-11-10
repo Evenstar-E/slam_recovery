@@ -887,6 +887,13 @@ class NativeClosedLoop:
         """
         self.node.scan_buffer_body[kf_id] = np.asarray(scan_body, dtype=np.float64)[:, :3].copy()
         self.node._kf_timestamps[kf_id] = int(ts_ns)
+        # A wait must be allowed to end on this path too. `step_frame` checks it, but while the
+        # reference is frozen almost every frame is UNAVAILABLE and never reaches `step_frame`;
+        # the first two-event run ended with the segment open and `lifecycle.events = []` for
+        # exactly this reason, which made a second event structurally impossible.
+        if self.node.tx_mgr.maybe_close_waiting_segment(int(ts_ns)) is not None:
+            self.node.detector.reset()
+            self.node.tx_mgr.rearm()
         if self.node.tx_mgr.state != RecoveryState.HEALTHY:
             # The segment owns this frame. step_healthy raises here by design, and swallowing that
             # into a callback error would hide 200+ frames of the quarantine.

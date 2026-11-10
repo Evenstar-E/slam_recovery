@@ -23,6 +23,7 @@ import numpy as np
 from slam_recovery.core import RecoveryMode, RecoveryState, TangentFrame
 from slam_recovery.health import DetectorConfig, JointHealthDetector
 from slam_recovery.quarantine import TrustedMapTransactionManager
+from slam_recovery.ros.recovery_node import NativeClosedLoop
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
 
 WORLD = TangentFrame("world", "rot_trans", "world")
@@ -110,6 +111,49 @@ class TestNodeRearm(unittest.TestCase):
         # the re-armed run is back on the normal trusted path, not just reporting HEALTHY.
         node.step_frame(3, 11_000_000_000, np.eye(4), cloud, 0.5)
         self.assertIn(2, node.tx_mgr.trusted_poses)
+
+
+class TestWaitClosesOnTheUndetectedPath(unittest.TestCase):
+    """The first two-event run ended with the segment open because this path never checked.
+
+    While the reference is frozen almost every frame is UNAVAILABLE and is ingested through
+    `_ingest_without_detection`, which used to register the frame and return without ever
+    evaluating the wait limit. The segment therefore stayed open for the rest of the run and a
+    second event could not fire. Measured: 537 of 542 frames took this path, `lifecycle.events`
+    stayed empty, terminal state WAITING_FOR_EVIDENCE.
+    """
+
+    def test_a_frame_ingested_without_detection_can_close_the_wait(self):
+        node = OnlineRecoveryTransactionNode(wait_limit_sec=5.0)
+        node.detector = JointHealthDetector(DetectorConfig(
+            lambda_rot_min_th=0.0, lambda_trans_min_th=0.0,
+            nis_spike_th=1e9, nis_cusum_h=1e9,
+            loso_conflict_th=1e9, loop_spike_th=1e9,
+            confirmation_margin_ns=node.tx_mgr.confirmation_margin_ns))
+        loop = NativeClosedLoop(node, run_id="t", detection_enabled=False)
+
+        cloud = np.random.default_rng(0).normal(size=(400, 3)) * 0.16
+        body = TangentFrame("body", "rot_trans", "scan:0")
+        node.scan_buffer_body[0] = cloud.copy()
+        node._kf_timestamps[0] = 0
+        node.tx_mgr.trigger_quarantine(
+            0, 0, V, INFO_BEFORE, 1.0,
+            weak_direction_frame=body, info_before_frame=body,
+            anchor_pose_world=np.eye(4))
+        node.tx_mgr.validate_and_resolve(None)
+        self.assertIs(node.tx_mgr.state, RecoveryState.WAITING_FOR_EVIDENCE)
+
+        loop._ingest_without_detection(1, 1_000_000_000, np.eye(4), cloud, None)
+        self.assertIs(node.tx_mgr.state, RecoveryState.WAITING_FOR_EVIDENCE,
+                      "a frame inside the wait must stay on the segment")
+
+        loop._ingest_without_detection(2, 9_000_000_000, np.eye(4), cloud, None)
+        self.assertIs(node.tx_mgr.state, RecoveryState.HEALTHY,
+                      "the wait limit was never evaluated on the undetected path")
+        self.assertEqual([e["event"] for e in node.tx_mgr.lifecycle_events],
+                         ["wait_limit_closed", "rearm"])
+        self.assertNotIn(1, node.tx_mgr.trusted_poses,
+                         "a frame from the closed segment reached the trusted map")
 
 
 if __name__ == "__main__":

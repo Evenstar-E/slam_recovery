@@ -265,6 +265,11 @@ class _FakeTxMgr:
     def register_quarantined_frame(self, keyframe_id, timestamp_ns=0):
         self.registered.append(int(keyframe_id))
 
+    def maybe_close_waiting_segment(self, now_ns):
+        # The real manager closes an expired wait here; this fake has no segment-clock, so the
+        # undetected ingest path's call is a no-op and the state assertions still hold.
+        return None
+
     def step_healthy(self, delta):
         self.promoted.append(delta.keyframe_id)
         self.trusted_poses[delta.keyframe_id] = np.asarray(delta.pose_se3).copy()
