@@ -43,16 +43,10 @@
   "verdict": "IDENTICAL_FRACTION"
  },
  "default_vs_on": {
-  "groups_identical": true,
-  "group_differences": 0,
-  "imuinit_identical": true,
-  "first_state_divergence": {
-   "index": 75,
-   "max_axis_delta_m": 0.001104
-  },
-  "max_state_delta_m": 424.6,
-  "frames_gt_0.1m": 732,
-  "reading": "the default build neither changes the grouping nor tracks the DET_SYNC run; the state separation is of the same order as the same-build run pairs, which is the run-variance regime already established"
+  "status": "INVALID_AS_INDEX_COMPARISON",
+  "why": "the review found 878 of 1766 same-index rows carry different lid_stamp_ns between the default and ON traces, so index alignment is not frame alignment across builds; the earlier 'first divergence at index 75, 1.104 mm' cannot be stated as a same-frame divergence",
+  "required": "re-pair by actual package-event identity (image event / LIO-VIO sub-event and its update timestamps) before any cross-build state comparison; until then this quantity is UNAVAILABLE",
+  "groups_identical_still_holds": true
  },
  "instrumentation_defect_fixed": "ARRIVE/GROUP used to be emitted inside #ifdef DET_SYNC, so the first default run (library c65f134c) wrote only 5 IMUINIT rows; the emission now sits under #if defined(DET_SYNC) || defined(TRACE_GROUP) and this run is the evidence it works",
  "provenance_note": "the executable sha is 6e0a3e57 here, not 76359f53 as in the ON/OFF runs: relinking needed LIBRARY_PATH=/home/R26534/mm/ros/lib:/home/R26534/fast_livo2_deps/build/Sophus (the earlier executable had been deleted by a failed link with the older libstdc++). The node source is unchanged; the executable is main.cpp only, and the behaviour under test lives in liblaser_mapping.so, whose sha is recorded per run",
@@ -73,6 +67,6 @@
   "correction_to_peer_reading": "the earlier explanation ('adjacent lidar frames are close, so the previous frame already drained the IMU queue') is not what the code does: the empty group is not a timing race, it is the image-cut MeasureGroup whose IMU loop is commented out",
   "consequence": "the ~50% empty fraction is structural in LIVO mode and carries no anomaly signal; it should not be counted as missing IMU or as evidence about grouping",
   "row_pairing": "the rows come in pairs sharing one img_stamp: first the LIO-state cut (mesures=1, img=1, n_items=0, its IMU loop commented out), then the WAIT/VIO cut (mesures=2, n_items>0) that carries the IMU samples. Counts: 883 empty rows and 882 non-empty rows, plus the initial frame before the image cut starts",
-  "counting_rule": "GROUP rows are not frames. Each processed frame yields two rows, and every count taken from GROUP must be folded by 2 before it is read as a frame count; the pair shares img_stamp_ns, so the pairing is recoverable from the trace itself"
+  "counting_rule": "GROUP rows are not frames and there is no blanket division by two: the 1766 rows are 882 complete image events (an empty LIO-state row followed by a non-empty WAIT/VIO row sharing one img_stamp), plus one head row with img_stamp=-1 and one incomplete tail event. Count image events, GROUP rows and odometry separately; any count quoted must say which of the three it is"
  }
 }
