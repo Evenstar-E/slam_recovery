@@ -1,25 +1,29 @@
 {
  "checks": {
   "both_topics_received": {
-   "pose_messages": 672,
+   "pose_messages": 800,
    "scan_messages": 599,
    "ok": true
   },
   "pairing": {
-   "paired": 499,
-   "fraction_of_poses": 0.7425595238095238,
-   "fraction_of_scans": 0.8330550918196995,
+   "paired": 584,
+   "fraction_of_poses": 0.73,
+   "fraction_of_scans": 0.9749582637729549,
    "max_abs_dt_ns": 39824962,
    "ok": true
   },
   "nis_provenance": {
-   "computed": 498,
+   "computed": 583,
    "carried_forward": 0,
    "unavailable": 1,
-   "reference_node_map": 363,
-   "reference_prev_scan": 135,
-   "fed_to_step_frame": 498,
-   "not_fed_no_reference": 1,
+   "reference_node_map": 365,
+   "reference_prev_scan": 218,
+   "fed_to_step_frame": 361,
+   "ingested_without_detection": 223,
+   "detection_status": {
+    "AVAILABLE": 361,
+    "UNAVAILABLE": 223
+   },
    "ok": true
   },
   "gate_reachable": {
@@ -29,18 +33,18 @@
    "rejected": 1,
    "errored": 0,
    "incumbent_basis": [
-    "ZERO_VELOCITY_SINGLE_KEYFRAME"
+    "CONSTANT_VELOCITY"
    ],
    "evidence_reasons": [
-    "wilson_sequential_benefit_lower_bound_failed"
+    "passed_wilson_sequential_benefit_and_boundary_continuity"
    ],
    "ok": true
   },
   "same_process_group": {
-   "recovery_pid": 2942560,
-   "host_pid": 2942559,
-   "recovery_pgid": 2942557,
-   "host_pgid": 2942557,
+   "recovery_pid": 2955403,
+   "host_pid": 2955402,
+   "recovery_pgid": 2955400,
+   "host_pgid": 2955400,
    "ok": true
   }
  },

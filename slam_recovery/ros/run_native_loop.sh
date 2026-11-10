@@ -268,7 +268,8 @@ checks["nis_provenance"] = {
     "reference_node_map": n.get("reference_node_map"),
     "reference_prev_scan": n.get("reference_prev_scan"),
     "fed_to_step_frame": f.get("fed_to_step_frame"),
-    "not_fed_no_reference": f.get("not_fed_no_nis_reference"),
+    "ingested_without_detection": f.get("ingested_without_detection"),
+    "detection_status": s.get("warmup", {}).get("detection_status_counts"),
     "ok": bool(f.get("fed_to_step_frame")),
 }
 checks["gate_reachable"] = {

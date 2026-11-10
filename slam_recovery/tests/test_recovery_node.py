@@ -14,6 +14,7 @@ import types
 import numpy as np
 import pytest
 
+from slam_recovery.core import RecoveryState
 from slam_recovery.ros.recovery_node import (
     CANDIDATE_KEYS,
     FramePairer,
@@ -197,8 +198,12 @@ class _FakeNode:
 
     def __init__(self, trusted=None):
         self._trusted = np.zeros((0, 3)) if trusted is None else np.asarray(trusted, float)
+        self.tx_mgr = types.SimpleNamespace(trusted_version=0, trusted_poses={})
 
     def get_trusted_map_points(self, max_pts=2000):
+        return self._trusted
+
+    def support_reference(self):
         return self._trusted
 
 
@@ -246,8 +251,12 @@ class _FakeTxMgr:
         self.trusted_poses = {}
         self.trusted_version = 7
         self.confirmation_margin_ns = 2_000_000_000
-        self.state = types.SimpleNamespace(value="HEALTHY")
+        self.state = RecoveryState.HEALTHY
         self.promoted = []
+        self.registered = []
+
+    def register_quarantined_frame(self, keyframe_id, timestamp_ns=0):
+        self.registered.append(int(keyframe_id))
 
     def step_healthy(self, delta):
         self.promoted.append(delta.keyframe_id)
@@ -278,6 +287,15 @@ class _FakeLoopNode:
 
     def get_trusted_map_points(self, max_pts=2000):
         return self._trusted
+
+    def support_reference(self):
+        return self._trusted
+
+    def _frame_has_reference_support(self, kf_id, ref_pts, repaired_poses,
+                                     radius_m=1.0, min_supported_fraction=0.60):
+        # the real predicate compares the placed scan against the reference; for the fake, "is
+        # there a reference at all" is the same distinction
+        return len(ref_pts) >= 30
 
     def step_frame(self, kf_id, ts_ns, pose, scan, nis):
         self.calls.append((kf_id, ts_ns))
@@ -381,18 +399,20 @@ class _WarmupNode(_FakeLoopNode):
         return super().step_frame(kf_id, ts_ns, pose, scan, nis)
 
 
-def test_warmup_promotes_without_asking_the_detector_then_hands_over():
+def test_unsupported_frames_are_ingested_as_unavailable_not_as_healthy():
     node = _WarmupNode()
     loop = NativeClosedLoop(node, run_id="run")
     for i in range(6):
         loop.on_pair(i * 100_000_000, np.eye(4), _scan(200))
-    assert loop.warmup_frames >= 1
-    assert len(node.tx_mgr.promoted) == loop.warmup_frames
-    assert loop.warmup_done, "a promoted frame supplies the node-map reference"
-    assert node.step_frame_calls > 0, "gating resumes once the map is usable"
-    warm = [d for d in loop.diag if d["warmup"]]
-    assert warm and all(d["detector_state"] == "HEALTHY" for d in warm)
-    assert build_summary(loop, {})["warmup"]["frames_promoted"] == loop.warmup_frames
+    assert loop.ingested_undetected >= 1, "frames with no reference still enter the map"
+    assert loop.detection_counts["UNAVAILABLE"] >= 1
+    assert loop.detection_counts["AVAILABLE"] >= 1, "gating resumes once the map is usable"
+    assert loop.first_detected_kf is not None
+    undetected = [d for d in loop.diag if d["detection_status"] == "UNAVAILABLE"]
+    assert undetected and all(d["detector_state"] == "HEALTHY" for d in undetected)
+    w = build_summary(loop, {})["warmup"]
+    assert w["frames_ingested_without_detection"] == loop.ingested_undetected
+    assert w["detection_status_counts"]["UNAVAILABLE"] == loop.detection_counts["UNAVAILABLE"]
 
 
 # ---------------------------------------------------------------------------------------------

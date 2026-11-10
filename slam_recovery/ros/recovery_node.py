@@ -45,7 +45,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
-from slam_recovery.core import BackendDelta
+from slam_recovery.core import BackendDelta, RecoveryState
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
 from slam_recovery.validation import (
     compute_6dof_point_to_plane_fim,
@@ -341,13 +341,16 @@ class LiveNis:
 
     Roles, fixed before the run (the estimator is never given a made-up reference):
 
-      * ``node_map``     -- trusted map points within ``radius_m`` of the current pose. This is the
-                            primary reference and the one the ruling names.
-      * ``prev_scan``    -- world points of the previous *fed* frame. Used only while the node's map
-                            is still empty, which is unavoidable: the map is populated by the very
-                            frames this NIS gates, so frame 0 has no node-map reference at all and
-                            frames 1..k have fewer than ``min_train`` points in radius. The previous
-                            scan is a real, disjoint observation of the same scene, not a constant.
+      * ``node_map``     -- the trusted map, sampled **spatially** (one point per occupied voxel,
+                            via the node's own ``support_reference``), then restricted to points
+                            within ``radius_m`` of the current pose. The point-count cap that
+                            ``get_trusted_map_points`` applies is not used here: as that method's
+                            own docstring says for the coverage test, a point budget makes the
+                            point *spacing* a function of map size, which is a property of the
+                            budget rather than of the geometry being scored.
+      * ``prev_scan``    -- world points of the previous frame. Used only while the trusted map
+                            holds no points at all. The previous scan is a real, disjoint
+                            observation of the same scene, not a constant.
       * no reference     -- the frame is **not fed** to the gate. Carrying a constant forward would
                             fabricate a measurement; a frame with no evidence is counted, not gated.
       * ``carried_forward`` -- once a value has been computed, a later frame without a reference
@@ -364,6 +367,8 @@ class LiveNis:
         self.min_holdout = int(min_holdout)
         self._prev_world: Optional[np.ndarray] = None
         self._last_value: Optional[float] = None
+        self._support_cache: Optional[np.ndarray] = None
+        self._support_key: Optional[tuple] = None
         self.counts = {
             "computed": 0,
             "carried_forward": 0,
@@ -374,8 +379,23 @@ class LiveNis:
         }
         self.nonfinite = 0
 
+    def support_reference(self) -> np.ndarray:
+        """The node's spatially sampled trusted map, cached until the trusted map changes.
+
+        `support_reference` rebuilds from every trusted point and de-duplicates by voxel, which is
+        O(map points) per call; calling it per frame would make the loop quadratic in run length.
+        The cache key is the transaction manager's own version plus its pose count, so any
+        promotion, commit or revocation invalidates it.
+        """
+        key = (int(self.node.tx_mgr.trusted_version), len(self.node.tx_mgr.trusted_poses))
+        if self._support_key != key:
+            self._support_cache = self.node.support_reference()
+            self._support_key = key
+        return (self._support_cache if self._support_cache is not None
+                else np.zeros((0, 3), dtype=np.float64))
+
     def _reference(self, pose: np.ndarray) -> Tuple[Optional[np.ndarray], str]:
-        trusted = self.node.get_trusted_map_points(max_pts=2000)
+        trusted = self.support_reference()
         if len(trusted) >= self.min_train:
             d = np.linalg.norm(trusted - pose[:3, 3], axis=1)
             near = trusted[d <= self.radius_m]
@@ -464,7 +484,6 @@ class NativeClosedLoop:
         self.records: List[Dict[str, Any]] = []
         self.decision_errors: List[Dict[str, Any]] = []
         self.frames_fed = 0
-        self.frames_not_fed = 0
         self.frames_after_first_decision = 0
         self._first_decision_ts_ns: Optional[int] = None
         self.bag_end_ts_ns: Optional[int] = None
@@ -474,14 +493,12 @@ class NativeClosedLoop:
         # geometry path or the dwell counter after the fact.
         self.diag: List[Dict[str, Any]] = []
         self.diag_cap = 2000
-        # Warm-up: the gate cannot judge a frame before the trusted map holds a reference, and the
-        # map is grown by the very path the gate gates. Frames are therefore promoted through the
-        # manager's own healthy path until a node-map reference exists; only then does the
-        # detector start deciding. The assumption is declared, not hidden.
-        self.warmup_frames = 0
-        self.warmup_done = False
-        self.warmup_ended_kf: Optional[int] = None
-        self.pose_convention_check: Dict[str, Any] = {"status": "NOT_REACHED"}
+        # Detection availability. The gate is not asked to judge a frame that has no independent
+        # reference to be judged against; such frames still grow the map, and are counted as
+        # UNAVAILABLE rather than assumed healthy.
+        self.detection_counts = {"AVAILABLE": 0, "UNAVAILABLE": 0}
+        self.ingested_undetected = 0
+        self.first_detected_kf: Optional[int] = None
 
     # -- ingest -------------------------------------------------------------------------------
     def _fed(self, ts_ns: int) -> bool:
@@ -494,39 +511,34 @@ class NativeClosedLoop:
         if self._first_decision_ts_ns is not None and ts_ns > self._first_decision_ts_ns:
             self.frames_after_first_decision += 1
 
-        value, _source, _reference = self.nis.measure(pose, scan_body)
-        if value is None and not self.warmup_done:
-            # Nothing to score and nothing to promote yet (the very first frame).
-            self.frames_not_fed += 1
-            return
-
-        if not self.warmup_done and _reference != "node_map":
-            # Promote through the manager's healthy path, but do not ask the detector to judge:
-            # the reference being used here is not the one the detector was calibrated on.
-            kf_id = self.next_kf_id
-            self.next_kf_id += 1
-            self._warmup_step(kf_id, ts_ns, pose, scan_body, value)
-            self.frames_fed += 1
-            self.warmup_frames += 1
-            self._record_diag(kf_id, ts_ns, value, _source, _reference, warmup=True)
-            return
-
-        if not self.warmup_done:
-            self.warmup_done = True
-            self.warmup_ended_kf = self.next_kf_id
-            self.pose_convention_check = self._pose_convention_check(pose, scan_body)
-
-        if value is None:
-            # No reference exists yet. Feeding a constant here would be a fabricated measurement.
-            self.frames_not_fed += 1
-            return
-
         kf_id = self.next_kf_id
         self.next_kf_id += 1
+        # Both paths below register the frame; step_frame would do the same, so storing it here
+        # only makes the support predicate usable before the decision to gate or not.
+        self.node.scan_buffer_body[kf_id] = np.asarray(scan_body, dtype=np.float64)[:, :3].copy()
+        self.node._kf_timestamps[kf_id] = ts_ns
+
+        value, source, reference = self.nis.measure(pose, scan_body)
+        support_ref = self.nis.support_reference()
+        supported = self.node._frame_has_reference_support(
+            kf_id, support_ref, {kf_id: np.asarray(pose, dtype=np.float64)})
+        # Detection is available only when the frame can actually be scored against an independent
+        # reference. "Unsupported" and "healthy" are different statements and are recorded as such:
+        # an unsupported frame is ingested so the map can grow, but the detector does not judge it.
+        available = bool(supported) and value is not None
+        self.detection_counts["AVAILABLE" if available else "UNAVAILABLE"] += 1
+
         before = self.node.tx_mgr.active_quarantine
-        self.node.step_frame(kf_id, ts_ns, pose, scan_body, value)
-        self.frames_fed += 1
-        self._record_diag(kf_id, ts_ns, value, _source, _reference, warmup=False)
+        if available:
+            if self.first_detected_kf is None:
+                self.first_detected_kf = kf_id
+                self.pose_convention_check = self._pose_convention_check(pose, scan_body)
+            self.node.step_frame(kf_id, ts_ns, pose, scan_body, value)
+            self.frames_fed += 1
+        else:
+            self.ingested_undetected += 1
+            self._ingest_without_detection(kf_id, ts_ns, pose, scan_body, value)
+        self._record_diag(kf_id, ts_ns, value, source, reference, available)
 
         after = self.node.tx_mgr.active_quarantine
         if before is None and after is not None:
@@ -537,36 +549,46 @@ class NativeClosedLoop:
                 self.decide(ts_ns, "confirmation_margin")
 
     def _record_diag(self, kf_id: int, ts_ns: int, value: Optional[float], source: str,
-                     reference: str, warmup: bool) -> None:
+                     reference: str, detected: bool) -> None:
         if len(self.diag) >= self.diag_cap:
             return
         det = self.node.detector
         self.diag.append({
             "kf_id": int(kf_id), "ts_ns": int(ts_ns),
             "nis": None if value is None else float(value),
-            "nis_source": source, "nis_reference": reference, "warmup": bool(warmup),
+            "nis_source": source, "nis_reference": reference,
+            "detection_status": "AVAILABLE" if detected else "UNAVAILABLE",
             "detector_state": getattr(det.state, "value", det.state),
             "cusum": float(getattr(det, "cusum_g", float("nan"))),
             "suspect_dwell": int(getattr(det, "suspect_dwell", -1)),
-            "map_points": int(len(self.node.get_trusted_map_points(max_pts=2000))),
+            "map_points": int(len(self.nis.support_reference())),
             "trusted_keyframes": int(len(self.node.tx_mgr.trusted_poses)),
         })
 
-    def _warmup_step(self, kf_id: int, ts_ns: int, pose: np.ndarray,
-                     scan_body: np.ndarray, nis_value: Optional[float]) -> None:
+    def _ingest_without_detection(self, kf_id: int, ts_ns: int, pose: np.ndarray,
+                                  scan_body: np.ndarray, nis_value: Optional[float]) -> None:
         """Promote a frame into the trusted map without asking the detector to judge it.
 
         This mirrors `OnlineRecoveryTransactionNode.step_frame`'s HEALTHY branch line for line --
         store the scan, build the 6-DoF FIM, append the delta to the confirmation-margin queue,
         resync the spatial map -- and differs in exactly one thing: it does not call
-        `detector.step`. That is deliberate. Before the map holds a reference, the only NIS this
-        node can compute is a scan-to-scan statistic, which is not the statistic the detector's
-        thresholds were calibrated on; letting it decide would open a quarantine by construction.
+        `detector.step`. The reason is not that the frame is believed healthy; it is that the
+        frame cannot be scored against an independent reference, so the detector would have no
+        evidence to judge. It is recorded as UNAVAILABLE, which is what it is.
+
+        While a quarantine is open the manager forbids `step_healthy` -- and rightly so, the frame
+        belongs to the segment. The frame is then registered on the segment instead, which is the
+        same thing `step_frame` does for a quarantined frame.
         """
-        fim_6x6, cov_6x6, _min_r, _min_t, _weak = compute_6dof_point_to_plane_fim(
-            scan_body, sigma_meas_m=0.075)
         self.node.scan_buffer_body[kf_id] = np.asarray(scan_body, dtype=np.float64)[:, :3].copy()
         self.node._kf_timestamps[kf_id] = int(ts_ns)
+        if self.node.tx_mgr.state != RecoveryState.HEALTHY:
+            # The segment owns this frame. step_healthy raises here by design, and swallowing that
+            # into a callback error would hide 200+ frames of the quarantine.
+            self.node.tx_mgr.register_quarantined_frame(kf_id, int(ts_ns))
+            return
+        fim_6x6, cov_6x6, _min_r, _min_t, _weak = compute_6dof_point_to_plane_fim(
+            scan_body, sigma_meas_m=0.075)
         delta = BackendDelta(
             timestamp_ns=int(ts_ns),
             frame_id="map",
@@ -721,14 +743,17 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
             "extrap_frames": EXTRAP_FRAMES,
             "sigma_meas_m": float(loop.node.sigma_meas_m),
         },
-        "pairing": loop.pairer.stats(),
+        "pairing": {**loop.pairer.stats(),
+                    "pairing_rule": f"nearest pose within {loop.pairer.dt_ns // 1_000_000} ms, "
+                                    f"no pose reused" },
         "pairing_diagnosis": pairing_diagnosis(loop.pairer),
         "nis": {**loop.nis.counts, "nonfinite_estimator_output": loop.nis.nonfinite,
                 "sigma_meas_m": float(loop.node.sigma_meas_m)},
         "frames": {
             "paired": loop.pairer.paired,
+            "ingested": int(loop.next_kf_id),
             "fed_to_step_frame": loop.frames_fed,
-            "not_fed_no_nis_reference": loop.frames_not_fed,
+            "ingested_without_detection": loop.ingested_undetected,
             "consumed_after_first_decision": loop.frames_after_first_decision,
             "first_decision_ts_ns": loop._first_decision_ts_ns,
         },
@@ -745,14 +770,15 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
             ],
         },
         "warmup": {
-            "policy": "frames are promoted through the manager's healthy path until the node's "
-                      "own trusted map can supply the NIS reference; the detector is not asked "
-                      "to judge a frame scored against the scan-to-scan fallback",
-            "frames_promoted": loop.warmup_frames,
-            "ended": loop.warmup_done,
-            "ended_at_kf": loop.warmup_ended_kf,
-            "assumption": "the warm-up frames are healthy by assumption, and that assumption is "
-                          "not evidenced by this run",
+            "policy": "a frame the node cannot support against its own spatially sampled trusted "
+                      "map is ingested through the manager's healthy path but is NOT judged by "
+                      "the detector; it is recorded as detection_status=UNAVAILABLE",
+            "detection_status_counts": loop.detection_counts,
+            "frames_ingested_without_detection": loop.ingested_undetected,
+            "first_detected_kf": loop.first_detected_kf,
+            "not_an_assumption": "no frame is labelled healthy; UNAVAILABLE says the detector had "
+                                 "no reference, which is a statement about the evidence, not "
+                                 "about the frame",
         },
         "pose_convention": {
             "declared": "T_wb (body -> world), matching world_points = pts @ R.T + t",
@@ -776,6 +802,32 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
         "trusted_keyframes_at_exit": len(loop.node.tx_mgr.trusted_poses),
         **extra,
     }
+
+
+def simulate_pairing(pose_stamps: List[int], scan_stamps: List[int], dt_ns: int) -> Dict[str, Any]:
+    """Re-run the same front-of-queue matcher at a different window, from the logged stamps.
+
+    Lets a report say what the window change bought without another run. The stamps are logged in
+    arrival order, which is the order the live matcher saw.
+    """
+    poses, scans = list(pose_stamps), list(scan_stamps)
+    i = j = paired = 0
+    max_dt = 0
+    while i < len(poses) and j < len(scans):
+        dt = poses[i] - scans[j]
+        if abs(dt) <= dt_ns:
+            paired += 1
+            max_dt = max(max_dt, abs(dt))
+            i += 1
+            j += 1
+        elif dt < 0:
+            i += 1
+        else:
+            j += 1
+    return {"window_ns": int(dt_ns), "paired": paired,
+            "fraction_of_scans": (paired / len(scans)) if scans else None,
+            "fraction_of_poses": (paired / len(poses)) if poses else None,
+            "max_abs_dt_ns": int(max_dt)}
 
 
 def pairing_diagnosis(pairer: FramePairer) -> Dict[str, Any]:
@@ -808,6 +860,13 @@ def pairing_diagnosis(pairer: FramePairer) -> Dict[str, Any]:
             "p10": float(np.percentile(dt, 10)), "p90": float(np.percentile(dt, 90)),
         },
         "fraction_within_window": float(np.mean(np.abs(dt) * 1e6 <= pairer.dt_ns)),
+        "nearest_pose_dt_ms_p10_median_p90": [float(np.percentile(dt, 10)), float(np.median(dt)),
+                                              float(np.percentile(dt, 90))],
+        "same_matcher_at_20_and_40_ms": {
+            f"{w // 1_000_000}ms": simulate_pairing(pairer.pose_stamps_ns, pairer.scan_stamps_ns, w)
+            for w in (20_000_000, 40_000_000)},
+        "comparability": "the offline arms pair at 20 ms; a run at 40 ms is a different pairing "
+                         "and must not be pooled with them in one table",
         "pose_interarrival_ms": {
             "median": float(np.median(np.diff(pose_sorted)) / 1e6),
             "min": float(np.diff(pose_sorted).min() / 1e6),

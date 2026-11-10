@@ -2,7 +2,7 @@
  "status": "OK",
  "reason": "all wiring checks passed",
  "termination": "PLANNED_KILL_AFTER_DRAIN",
- "run_id": "fl_native_20261110T030931Z_2941380",
+ "run_id": "fl_native_20261110T032515Z_2954170",
  "inputs": {
   "bag": "/tmp/fastlivo/room02_2x2_O.bag",
   "bag_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
@@ -12,7 +12,7 @@
   "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
   "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
   "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
-  "recovery_node_source": "c0490471bef90c6dae0cfbb75cbf7a79da00b9e66a959ce9c9f5859ff329eb94",
+  "recovery_node_source": "e3f9c414da134d3dcff0cd927a40e8b377d37d3ab73bb00e82284b59de0b2571",
   "runtime_library": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
   "runtime_library_sha256": "6aeef0321066e4345228adb4a9a5320fa04a3748123600de520829bf0fe224a7"
  },
@@ -32,8 +32,8 @@
  },
  "recovery_summary_present": true,
  "recovery_summary_headline": {
-  "paired": 499,
-  "fed_to_step_frame": 498,
+  "paired": 584,
+  "fed_to_step_frame": 361,
   "episodes": 1,
   "decisions": 1,
   "accepted": 0,
