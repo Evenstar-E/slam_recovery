@@ -154,6 +154,42 @@ restore 会把估计一起回滚，输入恢复时这就是**声明过的轨迹�
 （原 83 + 本项 7），其中 `test_opening_a_segment_holds_the_host_map`、
 `test_a_re_arm_writes_resume`、`test_lifecycle_events_are_only_acted_on_once` 直接覆盖本钩子。
 
+## 3d. 修复测量注入（第三断点，受控接口测试）
+
+**声明**：CONTROLLED_INTERFACE_TEST，不是检测成绩、也不是修复质量结论。触发方式是测试脚本直接调用恢复接口。
+
+接口：宿主订阅 `/native_recovery/repaired_scan`（`sensor_msgs/PointCloud2`），走同一个
+`PreProcess`，按**扫描起始时间戳**入队；`reprocessCheckpoint()` 在重放每一帧前
+`applyRepairedScan()`，命中就替换 `meas.lidar` / `meas.pcl_proc_cur`，其余字段不动。
+
+两处实测事实（都是先跑出来才知道的）：
+
+1. **live 路径不可能命中**：修复是在帧处理**之后**才决定的，实测表现为 `received` 有、
+   `applied` 恒 0。所以注入点必须在重放里，不在主循环里；主循环那次调用已删除并留注释。
+2. **组的起始时间要从结束时间反推**：这个模式下 `lidar_frame_beg_time` 只在开扫描组时赋值
+   （其余为 0），PCL header 也不随 `pcl_proc_cur` 传递。实测可用的换算是
+   `begin = measures.back().lio_time - 末点 curvature/1000`，误差约 9 ms，因此匹配窗口取 20 ms
+   （扫描周期 100 ms，不会串帧）。
+
+实测（hall01 filtered，rate 0.5，dz=+1.0 m，bag 20–22 s）：
+
+| 项 | 实测 | 判定 |
+|---|---|---|
+| 发布修复扫描 | 20 | — |
+| 重放并替换测量 | **10** | PASS（`repair_applied`） |
+| 未匹配到帧 | **10** | 如实记录（`repair_dropped`） |
+| 重放帧数 / 时间跨度 | 426 帧 / bag 13.6–27.7 s | — |
+| 重放后宿主地图 | 12733 → **16651** voxels，245751 → 282179 points | PASS（宿主自己重算） |
+| 重放后宿主状态 | `7.205,9.046,0.140` → `3.448,2.157,0.044` | — |
+
+**未解决、如实标注**：20 条里有 10 条没找到可替换的帧。原因**未确定**，候选解释是 LIVO 模式下
+`pcl_proc_next` 会把连续扫描并进同一个观测组，于是被并掉的那一帧没有独立组可替换。这是测出来的
+数字，不是解释掉的数字。
+
+**未证明**：重放后地图/状态的变化里，有多少来自修复、有多少来自"重放本身"。
+要分清需要一次**不带修复的重放对照**；但同一输入两次运行的基线差已测得 **>1.6 m**，
+大于 1.0 m 修复在此处的效果量级，所以本轮预算内无法据此归因。
+
 ## 4. 边界
 
 - 没有跑两事件；没有调门、没有调 σ、没有重跑检测或候选矩阵。
