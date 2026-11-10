@@ -394,6 +394,49 @@ pgid `3342097`，wall 104.9 s，peak RSS 721 MB，binary `26a9f2e6…`。
 按三类归属：**仍是"仅接线"**——E1 的原生 hold/restore/resume 全执行了、等待上限与重武装也真的发生了，
 但第二事件没有开出来。
 
+## 3m. 定位：回归从哪一帧开始（同 kf 对照）
+
+早期 `054559Z` vs 本次 `105118Z`，同 kf 21–40：
+
+| kf | 早期：status / ref / nis / kfs / pts | 本次：status / ref / nis / kfs / pts |
+|---|---|---|
+| 21 | AVAILABLE / prev_scan / 0.22 / 1 / 923 | AVAILABLE / node_map / 13.41 / 1 / 926 |
+| 25 | AVAILABLE / prev_scan / 0.14 / 5 / 923 | AVAILABLE / node_map / 14.40 / 5 / 926 |
+| **26** | AVAILABLE / node_map / 0.85 / **5** / **3237** | UNAVAILABLE / prev_scan / 0.19 / **0** / **0** |
+| 27–40 | AVAILABLE / node_map / ~1.0 / 7 / 3237→4071 | UNAVAILABLE / prev_scan / ~0.2 / **0** / **0** |
+
+**分叉点就是 kf 26**：本次运行在这一帧 `trusted_poses` 从 5 个变成 **0 个**、`support_reference()`
+长度从 926 变成 **0**，此后整趟再没恢复（直到 rearm 后地图重建）。参考长度一旦为 0，
+`_frame_has_reference_support` 恒 False，匹配只能退回 `prev_scan`，`fed_to_step_frame` 就此停在 5。
+
+清空发生在**隔离开启那一刻**：`trigger_quarantine`（`manager.py:156`）按
+`t_q_start = 估计 onset − 裕度` 回滚 `promoted_history`，而本次 `t_q_start` 落在几乎全部已提升帧
+之后，于是把它们全部撤销；早期运行的脏触发落在帧序更晚的位置，回滚没扫到已建的地图。
+**"恢复哪一个 checkpoint / 回滚窗口是否该覆盖全部已提升帧"是下一步要定的**，我没有改。
+
+### 宿主输出的变化（回答第 1 问）
+
+| 项 | 早期 054559Z | 本次 105118Z |
+|---|---:|---:|
+| host.log 中 `Update Voxel Map` | 780 | **408** |
+| LIO 有效特征数（末帧） | 15027 | **426** |
+| 平均残差 | 0.051 | **0.113** |
+| 发布位姿数 | 777 | **471** |
+| 配对 | 515 | **312** |
+
+408 vs 780 里有 185 帧是 hold 期间被挡下的写入，剩下是真实下降；**有效特征 15027 → 426、残差
+0.051 → 0.113** 说明 restore 之后宿主是在一张与当前位姿不再对齐的地图上匹配——这正是"声明过的
+轨迹不连续"的代价，不是发布链路本身坏了。
+
+**逐帧扫描点数**：两趟都没有归档这个字段（`frame_diagnostics` 只记
+`map_points`/`trusted_keyframes`），所以现在给不出，要么加字段、要么不报——我没有为了补数去跑新实验。
+
+### 配对 312 vs 515（第 2 问）
+
+位姿数 471 vs 777 已经解释了大半（配对上限就是位姿数），剩下的差来自本次 `max_backlog=282`：
+主循环每 2 s 要等一次快照 ack，期间配对队列在堆。**快照没有丢弃消息**（`scan_messages` 两趟都是 598），
+但它确实降低了主循环的推进速度。
+
 ## 4. 边界
 
 - 没有跑两事件；没有调门、没有调 σ、没有重跑检测或候选矩阵。
