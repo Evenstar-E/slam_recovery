@@ -249,6 +249,11 @@ class OnlineRecoveryTransactionNode:
                     weak_direction_frame=TangentFrame("world", "rot_trans", "world"),
                     info_before_frame=TangentFrame("world", "rot_trans", "world"),
                 )
+                # A5 normal path: this frame set off the alarm, so it was never handed to
+                # step_healthy and therefore is not among the deltas the trigger rolled back.
+                # Without this line it belongs to no population at all -- not trusted, not
+                # pending -- and can never be resolved.
+                self.tx_mgr.register_quarantined_frame(kf_id, timestamp_ns)
                 self._sync_spatial_map_with_trusted_poses()
             else:
                 delta = BackendDelta(
