@@ -103,6 +103,14 @@ def analyse(run_dir, onset):
             "trusted_keyframes_over_healthy": distribution(
                 [f.get("trusted_keyframes", 0) for f in healthy]),
         },
+        # Bin by trusted-keyframe count: a detection-off run measures NIS while the map is still
+        # growing, so its whole-segment median is not the same population as a frozen-reference
+        # run. Comparing the two medians directly would mix "the map got bigger" with "the
+        # detector started too early". Only within-bin comparisons are meaningful.
+        "nis_by_trusted_keyframes": {
+            str(k): distribution([f["nis"] for f in healthy if f.get("trusted_keyframes") == k])
+            for k in sorted({f.get("trusted_keyframes") for f in healthy})
+        },
         "before": distribution(values),
         "sigma_star_m": round(sigma_star, 6),
         "after": distribution(after),

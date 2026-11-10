@@ -96,7 +96,22 @@ r11070-c3 实测：把 NIS 参考从点数上限换成 **0.30 m 分辨率空间�
 常数 = `point_cap`，随地图变化 = 其它抽样。两次标定分属两版，**不比 σ\* 数值**；
 判"参考口径已换"用 `map_points` 分布本身。
 
-## 6. 复现
+## 6. 分箱口径（等 detection=off 那趟）
+
+detection=off 的 NIS 是在**地图持续增长**过程中量的，与本文"冻结在 1500/931 点"的分布
+**不是同一人口**。所以收敛判断按 `trusted_keyframes` 分箱，**不用全段中位数直接和 21.30 比**
+——那会把"地图变大"和"启动太早"混进一个数。
+
+结果 JSON 每条 run 都带 `nis_by_trusted_keyframes`，形如：
+
+```json
+"nis_by_trusted_keyframes": {"1": {"n": 168, "median": 21.301, "p90": 29.426, ...}}
+```
+
+本趟健康段 168 帧**全部落在 `trusted_keyframes = 1`**（这正是问题本身：地图在首判时只有 1 帧）。
+新一趟应当出现 `1/2/3/...` 多个箱；判据是**箱内中位是否随箱增大而收敛**，不是箱间中位的高低。
+
+## 7. 复现
 
 ```bash
 python -I docs/review_20261110_sigma/nis_sigma_calibration.py
