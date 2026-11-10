@@ -54,6 +54,57 @@ def boundary_jump_within_envelope(jump_m: float, elapsed_s: float, jump_bound_m:
     return float(jump_m) <= float(jump_bound_m) + float(speed_m_s) * max(0.0, float(elapsed_s))
 
 
+class _RadiusIndex:
+    """Exact "is there a reference point within r" queries without a distance matrix.
+
+    The support test asks one question per query point: is any reference point within `radius`.
+    Answering it with the full distance matrix is O(queries * points) per call, and the decision
+    calls it for every candidate frame twice -- 4 s of a 4.4 s decision on a 100k-point map.
+    Bucketing the reference into cells of exactly `radius` answers the same question exactly:
+    a point within `radius` of a query must lie in one of the 27 cells around it, so no true
+    neighbour is ever missed and no approximate structure is introduced.
+    """
+
+    def __init__(self, points: np.ndarray, cell: float) -> None:
+        self.cell = float(cell)
+        pts = np.asarray(points, dtype=np.float64)[:, :3]
+        self.points = pts
+        q = np.floor(pts / self.cell).astype(np.int64)
+        self.origin = q.min(axis=0) - 1
+        q = q - self.origin
+        self.dims = q.max(axis=0) + 2
+        lin = (q[:, 0] * self.dims[1] + q[:, 1]) * self.dims[2] + q[:, 2]
+        order = np.argsort(lin, kind="stable")
+        self.sorted_lin = lin[order]
+        self.sorted_idx = order
+
+    def within_radius_mask(self, queries: np.ndarray, radius: float) -> np.ndarray:
+        queries = np.asarray(queries, dtype=np.float64)[:, :3]
+        cell = np.floor(queries / self.cell).astype(np.int64) - self.origin
+        inside = np.zeros(len(queries), dtype=bool)
+        r2 = float(radius) * float(radius)
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                for dz in (-1, 0, 1):
+                    c = cell + np.array([dx, dy, dz], dtype=np.int64)
+                    valid = np.all((c >= 0) & (c < self.dims), axis=1)
+                    if not valid.any():
+                        continue
+                    valid &= ~inside
+                    lin = (c[:, 0] * self.dims[1] + c[:, 1]) * self.dims[2] + c[:, 2]
+                    lo = np.searchsorted(self.sorted_lin, lin, side="left")
+                    hi = np.searchsorted(self.sorted_lin, lin, side="right")
+                    hit = valid & (hi > lo)
+                    for i in np.flatnonzero(hit):
+                        if inside[i]:
+                            continue
+                        cand = self.sorted_idx[lo[i]:hi[i]]
+                        d2 = np.sum((self.points[cand] - queries[i]) ** 2, axis=1)
+                        if d2.size and d2.min() <= r2:
+                            inside[i] = True
+        return inside
+
+
 class OnlineRecoveryTransactionNode:
     """
     Stateful online recovery node that wraps an incremental LIO/VIO host,
@@ -316,6 +367,7 @@ class OnlineRecoveryTransactionNode:
         repaired_poses: Dict[int, np.ndarray],
         radius_m: float = 1.0,
         min_supported_fraction: float = 0.60,
+        index: Optional["_RadiusIndex"] = None,
     ) -> bool:
         """True when most of this frame's points land near the independent reference cloud.
 
@@ -338,16 +390,9 @@ class OnlineRecoveryTransactionNode:
             return False
         pts_w = (pts_b @ T[:3, :3].T) + T[:3, 3]
         q = pts_w[:: max(1, len(pts_w) // 200)][:200]
-        # Chunk the query points so the distance matrix stays bounded when the reference is the
-        # spatially sampled map rather than a 1500-point cap.
-        ref = np.asarray(ref_pts, dtype=np.float64)[:, :3]
-        r2 = radius_m * radius_m
-        nearest = np.empty(len(q), dtype=np.float64)
-        chunk = 25
-        for s in range(0, len(q), chunk):
-            d2 = np.sum((q[s:s + chunk, None, :] - ref[None, :, :]) ** 2, axis=-1)
-            nearest[s:s + chunk] = d2.min(axis=1)
-        return bool(np.mean(nearest <= r2) >= min_supported_fraction)
+        index = index if index is not None else _RadiusIndex(ref_pts, radius_m)
+        inside = index.within_radius_mask(q, radius_m)
+        return bool(np.mean(inside) >= min_supported_fraction)
 
     @staticmethod
     def _contiguous_runs(keys) -> List[List[int]]:
@@ -383,6 +428,7 @@ class OnlineRecoveryTransactionNode:
         empty_reason: str = "no_repaired_poses",
         support_reference: Optional[np.ndarray] = None,
         reentry_candidate_pose: Optional[np.ndarray] = None,
+        support_index: Optional["_RadiusIndex"] = None,
     ) -> Tuple[Optional[bool], Optional[float], Optional[float]]:
         """
         Measure the paired-benefit / re-entry evidence of a candidate against its incumbent.
@@ -455,7 +501,9 @@ class OnlineRecoveryTransactionNode:
         # definition. Using it here made every paired frame look unsupported in the four-arm replay
         # even though the same frames had already passed the (correct) prefix check.
         support = ref_pts if support_reference is None else support_reference
-        paired_keys = [k for k in pairable_keys if self._frame_has_reference_support(k, support, repaired_poses)]
+        paired_keys = [k for k in pairable_keys
+                       if self._frame_has_reference_support(k, support, repaired_poses,
+                                                            index=support_index)]
         unsupported = len(pairable_keys) - len(paired_keys)
         # Evidence requirement scales with how much of the map the candidate would commit. This is
         # a floor under both settings, so a caller that raises min_paired_observations above the
@@ -590,12 +638,17 @@ class OnlineRecoveryTransactionNode:
         # scoring: that cap is a point budget, and letting it decide coverage makes the answer a
         # function of map size rather than of geometry (see support_reference()).
         support_ref = self.support_reference()
+        # One index for the whole decision: the same reference answers the commit-prefix test and
+        # the paired-evidence coverage test, and rebuilding it (or the distance matrix) per frame
+        # was most of the decision's 4.4 s.
+        support_index = (_RadiusIndex(support_ref, 1.0) if len(support_ref) else None)
         committable = {
             k
             for k in kf_sorted
             if k not in reference_keys
             and (incumbent_keys is None or k in incumbent_keys)
-            and self._frame_has_reference_support(k, support_ref, repaired_poses)
+            and self._frame_has_reference_support(k, support_ref, repaired_poses,
+                                                 index=support_index)
         }
         commit_keys: List[int] = [k for k in kf_sorted if k in committable]
         deferred_keys = [k for k in kf_sorted if k not in set(commit_keys)]
@@ -739,6 +792,7 @@ class OnlineRecoveryTransactionNode:
                 "no_committable_frames" if (not commit_keys and kf_sorted) else "no_repaired_poses"
             ),
             support_reference=support_ref,
+            support_index=support_index,
             # The boundary frame of the *candidate*, independent of which frames are committable.
             reentry_candidate_pose=(repaired_poses[kf_sorted[0]] if kf_sorted else None),
         )
