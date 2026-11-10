@@ -1,0 +1,41 @@
+{
+ "source": {
+  "path": "/tmp/fastlivo/hall01_inj43_filtered.bag",
+  "sha256": "c90300cb2911be53361645b037ba864f7aa9f9d1483905a9c5b757a4bd269178"
+ },
+ "output": {
+  "path": "/tmp/fastlivo/hall01_two_event_v1.bag",
+  "sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec"
+ },
+ "e1": {
+  "window_abs_ns": [
+   1627785275607408524,
+   1627785295546408653
+  ],
+  "note": "already present in the source; copied unchanged"
+ },
+ "e2": {
+  "window_rel_s": [
+   42.0,
+   52.0
+  ],
+  "window_abs_ns": [
+   1627785303161298275,
+   1627785312980509996
+  ],
+  "frames": 99,
+  "injector": "inject_plastic_bag_near_field_occlusion",
+  "params": {
+   "occluded_azimuth_fraction": 0.7,
+   "bag_distance_m": 3.5,
+   "bag_Thickness_jitter_m": 0.01,
+   "seed": 4242
+  }
+ },
+ "between_events_rel_s": [
+  34.467392444,
+  42.0
+ ],
+ "scans_total": 598,
+ "note": "source untouched; output is a new file; E1 messages and the re-entry interval are copied verbatim from the source"
+}

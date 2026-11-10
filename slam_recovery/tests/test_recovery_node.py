@@ -252,6 +252,11 @@ class _FakeTxMgr:
         self.trusted_poses = {}
         self.trusted_version = 7
         self.confirmation_margin_ns = 2_000_000_000
+        # The real manager gained a bounded wait in a1a371d and the summary reads it
+        # unconditionally, so the fake carries it too (None = wait indefinitely).
+        self.wait_limit_ns = None
+        self.lifecycle_events = []
+        self.unresolved_segments = []
         self.state = RecoveryState.HEALTHY
         self.promoted = []
         self.registered = []

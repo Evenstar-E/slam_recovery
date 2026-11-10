@@ -485,6 +485,108 @@ class Episode:
         self.candidate_id = f"cand_{index:04d}"
 
 
+class CheckpointClient:
+    """Drive the host's native checkpoint over a directory of command files.
+
+    The host has no restore entry point, so this is the whole wiring: one command file, which the
+    host renames to ``cmd.done`` before executing so it runs exactly once, and one ack file it
+    writes back. Nothing here changes a decision -- it only tells the host to copy, restore, or
+    replay its own state and map, and records what the host said it did.
+    """
+
+    def __init__(self, directory: str, snapshot_period_s: float = 2.0,
+                 ack_timeout_s: float = 30.0) -> None:
+        self.dir = directory or ""
+        self.enabled = bool(self.dir)
+        self.period_s = float(snapshot_period_s)
+        self.ack_timeout_s = float(ack_timeout_s)
+        self.events: List[Dict[str, Any]] = []
+        self.snapshots = 0
+        self.restores = 0
+        self.reprocesses = 0
+        self.failures = 0
+        self._last_snapshot_wall = 0.0
+        self._stopped = False
+        if self.enabled:
+            os.makedirs(self.dir, exist_ok=True)
+
+    def _send(self, cmd: str) -> Dict[str, Any]:
+        path = os.path.join(self.dir, "cmd")
+        ack = os.path.join(self.dir, "ack")
+        event: Dict[str, Any] = {"command": cmd, "wall": round(time.time(), 3)}
+        try:
+            if os.path.exists(ack):
+                os.unlink(ack)
+            tmp = path + ".tmp"
+            with open(tmp, "w", encoding="utf-8") as fh:
+                fh.write(cmd + "\n")
+            os.replace(tmp, path)
+        except OSError as exc:
+            self.failures += 1
+            event.update(ok=False, error=f"write: {exc}")
+            self.events.append(event)
+            return event
+        deadline = time.time() + self.ack_timeout_s
+        while time.time() < deadline:
+            try:
+                with open(ack, "r", encoding="utf-8") as fh:
+                    line = fh.read().strip()
+            except OSError:
+                line = ""
+            if line:
+                event.update(ok=line.startswith("OK"), ack=line,
+                             ack_wall=round(time.time(), 3))
+                break
+            time.sleep(0.02)
+        else:
+            event.update(ok=False, error="ack_timeout")
+        # Exactly one accounting site: the timeout path above only marks the event.
+        if event.get("ok"):
+            if cmd == "snapshot":
+                self.snapshots += 1
+            elif cmd == "restore":
+                self.restores += 1
+            elif cmd == "reprocess":
+                self.reprocesses += 1
+        else:
+            self.failures += 1
+        self.events.append(event)
+        return event
+
+    def tick(self, now_wall: float, quiescent: bool) -> Optional[Dict[str, Any]]:
+        """Rolling snapshot while nothing is being judged; nothing at all once stopped."""
+        if not self.enabled or self._stopped or not quiescent:
+            return None
+        if now_wall - self._last_snapshot_wall < self.period_s:
+            return None
+        self._last_snapshot_wall = now_wall
+        return self._send("snapshot")
+
+    def restore(self) -> Dict[str, Any]:
+        return self._send("restore")
+
+    def reprocess(self) -> Dict[str, Any]:
+        return self._send("reprocess")
+
+    def stop(self) -> None:
+        self._stopped = True
+
+    def status(self) -> Dict[str, Any]:
+        return {
+            "enabled": self.enabled,
+            "dir": self.dir,
+            "snapshot_period_s": self.period_s,
+            "snapshots": self.snapshots,
+            "restores": self.restores,
+            "reprocesses": self.reprocesses,
+            "failures": self.failures,
+            "events": self.events,
+            "note": ("the checkpoint is the host's own _state and voxel map plus the IMU "
+                     "pre-integrator's cross-frame values; a snapshot taken while healthy is the "
+                     "trusted checkpoint, and its age at the trigger is the snapshot period"),
+        }
+
+
 class NativeClosedLoop:
     """Pairs host output, feeds ``step_frame``, and decides once per quarantine episode."""
 
@@ -498,9 +600,15 @@ class NativeClosedLoop:
         scan_cap: int = SCAN_CAP,
         detection_enabled: bool = True,
         icp_time_budget_s: float = 0.0,
+        checkpoint_client: Optional["CheckpointClient"] = None,
     ) -> None:
         self.node = node
         self.run_id = run_id
+        # The host's own state/map checkpoint, if this run was given a control directory. Without
+        # one the run is exactly the observational loop it was before.
+        self.cp = checkpoint_client if (checkpoint_client is not None
+                                        and checkpoint_client.enabled) else None
+        self.cp_actions: List[Dict[str, Any]] = []
         self.candidate_source = candidate_source
         self.detection_enabled = bool(detection_enabled)
         self.confirmation_margin_ns = int(
@@ -830,10 +938,25 @@ class NativeClosedLoop:
                                    self.node.tx_mgr.state),
             "quarantine_still_open": self.node.tx_mgr.active_quarantine is not None,
         }
+        # Native writeback. A refused candidate leaves the host's map holding the frames it was
+        # asked to judge, so the host is rolled back to its own checkpoint; an accepted one is
+        # re-derived from that checkpoint through the host's own estimator. Both are recorded with
+        # the host's ack, because "the command was sent" and "the host did it" are different facts.
+        if self.cp is not None:
+            action = self.cp.reprocess() if row.get("accepted") is True else self.cp.restore()
+            self.cp_actions.append(action)
+            ep.meta["native_checkpoint"] = action
+            # The decision is made; the next event needs its own trusted checkpoint.
+            self.cp._last_snapshot_wall = time.time()
         return row
 
     def service(self, backlog_limit: int = 0) -> Optional[Dict[str, Any]]:
         """Perform a decision the callbacks have asked for. Runs on the main thread only."""
+        # The rolling checkpoint is taken here, on the main thread, while no episode is open: a
+        # deep copy of the map inside a subscriber callback would delay exactly the frames the
+        # pairing depends on.
+        if self.cp is not None and self.node.tx_mgr.active_quarantine is None:
+            self.cp.tick(time.time(), quiescent=True)
         if self.pending_decision is None or self._open is None or self._open.decided:
             return None
         if backlog_limit and (len(self.pairer._poses) + len(self.pairer._scans)) > backlog_limit:
@@ -847,6 +970,8 @@ class NativeClosedLoop:
     def finish(self) -> None:
         """Bag end: decide anything still open, and account for unpaired messages."""
         self.service()
+        if self.cp is not None:
+            self.cp.stop()
         if self._open is not None and not self._open.decided:
             if self.bag_end_ts_ns is not None:
                 self.decide(self.bag_end_ts_ns, "bag_end")
@@ -963,6 +1088,9 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
             "events": list(loop.node.tx_mgr.lifecycle_events),
             "unresolved_segments": len(loop.node.tx_mgr.unresolved_segments),
         },
+        "native_checkpoint": (loop.cp.status() if loop.cp is not None
+                              else {"enabled": False, "note": "no checkpoint directory was given"}),
+        "native_checkpoint_actions": loop.cp_actions,
         "null_field_counts": null_counts,
         "holdout_nis_nonfinite": sum(1 for r in rows if r["holdout_nis"] is None)
         if rows else 0,
@@ -1244,6 +1372,12 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--detection", default="on", choices=("on", "off"),
                     help="off = diagnosis only: the map grows and the NIS is recorded, "
                          "but nothing is judged")
+    ap.add_argument("--checkpoint-dir", default="",
+                    help="directory shared with the host's native checkpoint poll; empty = the "
+                         "host is not asked to snapshot or restore anything")
+    ap.add_argument("--checkpoint-period-sec", type=float, default=2.0,
+                    help="how often a rolling snapshot is taken while no segment is open; this "
+                         "is also the worst-case age of the trusted checkpoint at a trigger")
     ap.add_argument("--wait-limit-sec", type=float, default=0.0,
                     help="close a Mode 3 wait as unresolved after this many seconds without "
                          "evidence and re-arm (0 = wait indefinitely, which means a refused "
@@ -1268,6 +1402,9 @@ def main(argv: Optional[List[str]] = None) -> int:
         scan_cap=args.scan_cap,
         detection_enabled=(args.detection == "on"),
         icp_time_budget_s=args.icp_time_budget_sec,
+        checkpoint_client=(
+            CheckpointClient(args.checkpoint_dir, snapshot_period_s=args.checkpoint_period_sec)
+            if args.checkpoint_dir else None),
     )
     driver = RosDriver(loop, args.pose_topic, args.scan_topic, args.status_topic)
 
