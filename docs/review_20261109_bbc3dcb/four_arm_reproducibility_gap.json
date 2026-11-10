@@ -33,5 +33,37 @@
   "code": "slam_recovery/experiments/run_four_arm_same_input.py (PROXY_VOXEL=0.05, distance_stats_voxel_surface)",
   "manifest": "NOT UPDATED; rerun values kept out of the published file"
  },
- "citation_rule": "until the A3 gate-NIS change is explained, neither 265.81 nor 41.67 may be cited as the current value; both are reported only as NOT REPRODUCIBLE"
+ "citation_rule": "until the A3 gate-NIS change is explained, neither 265.81 nor 41.67 may be cited as the current value; both are reported only as NOT REPRODUCIBLE",
+ "diagnosis": {
+  "status": "BLOCKED",
+  "onset_ruled_out": {
+   "method": "rebuild the A3 candidate under both onset values on the same data",
+   "pre_frames": [
+    146,
+    146
+   ],
+   "quarantine_frames": [
+    432,
+    432
+   ],
+   "ref_pts_full": 2190000,
+   "ref_stride": 547,
+   "ref_used": 4000,
+   "support_reference_points": 2935,
+   "frames_support_ge_0.60": [
+    214,
+    214
+   ],
+   "conclusion": "the 715 ns boundary shift changes no frame membership"
+  },
+  "method_caveat": "the diagnostic counts 146 pre-onset frames while the manifests record 133/132: the diagnostic uses bag-relative stamps, the manifests absolute ones. Its 214 is not comparable to 194/66; it only shows the two onsets agree under one convention.",
+  "unexplained": "no change between 027bd28 and 4b228e9 accounts for 194 -> 66 candidate frames",
+  "next_step": "replay the archived manifest command with its four input shas (a host run); deferred until the trace mainline is idle",
+  "artifacts": [
+   "docs/review_20261109_bbc3dcb/diag_a3_population.py",
+   "docs/review_20261109_bbc3dcb/diag_a3_population.md",
+   "docs/review_20261109_bbc3dcb/diag_a3_population.json"
+  ],
+  "commit": "7c4f85e"
+ }
 }
