@@ -187,5 +187,15 @@
     "detail": "README says base 0d2c034, but the CMakeLists hunk does not apply to plain 0d2c034 (no option(NO_MP/DET_SYNC)); the true base is 0d2c034 + the T3a determinism patch, i.e. the *.pre_trace backups"
    }
   ]
- }
+ },
+ "rulings": [
+  {
+   "id": "lidar_stamp_semantics",
+   "date": "2026-11-10",
+   "decision": "keep the patch observation-only (do not carry int64 through lid_header_time_buffer); fix the conversion instead",
+   "why": "GROUP/STATE timestamps must record the double the sync path actually compared, because that is the quantity that decides the group boundary; substituting the raw header ns would record a value sync never saw",
+   "defect_found": "llround(d*1e9) multiplies into a 256 ns grid (ULP of d*1e9 at 1.6e18) while the double spacing at 1.6e9 s is 238 ns, so 274 of 4000 adjacent double pairs collapse to the same integer ns; the floor/frac split collapses 0 of 4000",
+   "action": "to_ns_exact(): sec*1e9 + llround((d-sec)*1e9); ARRIVE keeps msg->header.stamp.toNSec(); optional extra key lid_dbl=<hex bits>"
+  }
+ ]
 }
