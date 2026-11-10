@@ -1,0 +1,18 @@
+{
+  "target": "d35671f97a54f611fef70318b7f0534d2011d470",
+  "scope": "Three selected local tests, received/applied file fixture and simulated accepted report with actual driver/client; no ROS/native/bag/tuning",
+  "command": "python -B -W ignore docs/review_20261110_d35671f/run_checks.py", "exit": 0,
+  "selected_tests": {"status": "PASS_LOCAL", "count": 3, "elapsed_s": 0.233},
+  "received_is_not_applied": "PASS_LOCAL_PENDING_UNTIL_APPLIED_ACK",
+  "accepted_async_order": {
+    "status": "FAIL_REPRODUCED_LOCAL", "pending_at_decision_return": ["reprocess", "set_state"],
+    "physical_command": "set_state", "native_pose_x": 20.0, "trusted_repaired_pose_x": 1.0,
+    "deferred_key": 2, "reprocess_applied_before_set_state": false,
+    "later_reprocess_ack": "FAIL reprocess replay_failed", "set_state_already_sent": true,
+    "limit": "Normal source ordering under a simulated gate report, not a deployed accepted native run"
+  },
+  "host_thread_source": "BLOCKED_NOT_PUBLISHED_OLD_PATCH_UNCHANGED",
+  "reported_controlled_completion": "TWO_REFUSAL_RESTORE_RESUME_EPISODES_REPORTED_NOT_RAW_VERIFIED",
+  "actual_repair_and_full_two_event": "NOT_COMPLETED",
+  "publication": "LOCAL_ONLY_PRIOR_PUSH_DENIAL_NOT_RETRIED"
+}

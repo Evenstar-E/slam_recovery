@@ -425,3 +425,9 @@ wait_start/decision消息时间差减evaluate墙钟耗时不证明独立前置�
 [核验](review_20261110_95b0d97/README.md)保留受控两触发/拒绝run128.8s、restore/hold ack_timeout、355帧消费，完整链未完成、超时不证明动作未应用。新_pending_decision_wall每个到期帧重写，本机actual跟踪控制首次100/后帧124/125进入公式1s却首次资格25s；最低同episode只记首次/新段重置，不改旧数字、不扩计时矩阵。post_eval不含native动作，不能叫整体后段成本。
 
 旧公开poll中restore→status→写ack在下一LIO前，报告“恢复后慢LIO导致该restore ack超时”仍需actual新source/cmd应用ack原件，不猜唯一因果。独立接收线程只早received、主循环applied仍可慢，仓库S1提案非本会话用户新架构选择；先最低命令归属/具体断点，超出设计按用户规则报告，不无限控制框架。S1/S2下一真实修复→原生写回→接回→E2/尾段或900s首断点，S3独立/旧参数停。完整A/B不升，本机小control exit0无ROS原bag，记录仅本地push拒绝未解除未绕过、remote review3965299。
+
+## 50. d35671f：受控两次拒绝释放链完成有报告，异步接纳会覆盖重处理（仅本地）
+
+[核验](review_20261110_d35671f/README.md)保留run103.1s两Mode3/hold-restore-resume各2/两close-rearm/368中间帧/HEALTHY，首次受控拒绝范围完整报告已及时告用户，非actual修复成功或自动链。actual新host线程patch/原件仍未归档旧blob未变，snapshot30全OK与7超时需分人口。3本机测试0.233s及received≠applied控制PASS，所有_send异步解除旧阻塞调用范围，service pending仅保护新决定入口。
+
+actual driver/client复用模拟正常partial候选：reprocess未applied就set_state写旧尾x20，pending两项、物理cmd覆盖，trusted修复x1/deferred尾key2；后供FAIL reprocess时set_state已发，FAIL。最低真实单in-flight按applied成功推进依赖动作、失败未知不继续、准入与同stamp来源/partial归属，不新RPC。旧正常缺陷source未改不重测，S1/S2下一actual修复→原生重估/内部写回→接回→E2/尾段或900s首断点，S3独立/旧参数停。完整A/B不升，本机exit0无ROS原bag/全suite、记录仅本地push拒绝未解除未绕过、remote review3965299。

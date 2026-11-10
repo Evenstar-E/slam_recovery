@@ -508,3 +508,11 @@ S1保持现等待语义可声明，旧trigger候选输入/参考撤销/unresolve
 S2先已有actual hostsource/cmd读取应用ack日志核具体断点；旧公开restore返回后立即写ack再LIO，不能直接用恢复后慢LIO解释该restore未ack，旧single-inflight/ack缺口仍未修。S1独立线程received/applied提案非本会话用户新架构选择，received不等主循环应用变快，现通道最小归属改动保持研究尺度，大设计按规则报用户选择、不代授/代实现。下一仍真实修复测量→原生重估/内部写回→接回→E2/尾段或原900s首断点，S3独立/旧参数停/生产门不改。
 
 自检PASS/FAIL/BLOCKED/NOT_APPLICABLE+原件/命令分首次排队/动作received-applied/真实修复E2，wiring OK不代动作成功。完整A/B不升，本机小control exit0无ROS原bag/全suite；4既有Cron无复制/旧repair-3e无活peer，远端当前进程未独立核。私人handoff保护、push拒绝未解除未绕过、记录仅本地remote review3965299，不称开发收到。
+
+## 52. repair-f3核d35671f：受控拒绝两段完成有报告，accepted依赖顺序仍FAIL（仅本地）
+
+[核验](review_20261110_d35671f/README.md)首次报告受控两Mode3拒绝hold/restore/resume均完成、两rearm/终态HEALTHY，已即时说明局部成果；actual修复写回/自动检测/独立收益与完整尾段原件仍缺，旧host patch不含新线程。S2保留已运行newpatch/receipt/log/applied时间人口，30快照全OK与7超时分开，撤本run慢LIO强因果合理不当旧run根因已证。
+
+3项本机测试0.233s、received不能代applied控制PASS，所有_send异步解除旧30s调用等待，但S1/S2 actual driver/client模拟partial正常准入reprocess尚未applied就set_state覆盖物理cmd、写deferred旧尾x20；即使后reprocess FAIL依赖动作已发。最低现通道真实single-inflight/apply成功后推进、失败未知停依赖、实际准入同stamp来源/partial归属，不造RPC/新事务框架。service pending检查只在新决定前不保护该依赖序列；旧normal帧/参考/释放/ack/首次资格任务source未改不重测。
+
+下一唯一仍实际修复测量→原生重估/内部地图写回→接回→E2/尾段或900s首断点，S3研究独立/旧参数停/生产gate不改。自检PASS/FAIL/BLOCKED/NOT_APPLICABLE+原件分拒绝机制/actual修复/动作结果/partial/E2尾段，完整A/B不升，本机exit0无ROS原bag/全suite。4既有Cron无复制/旧repair-3e无活peer、actual远端当前进程未独立核；私人handoff保护、push拒绝未解除未绕过、记录仅本地remote review3965299，不称开发收到。
