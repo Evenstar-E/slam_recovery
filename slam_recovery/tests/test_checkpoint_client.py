@@ -37,6 +37,8 @@ class _FakeHost(threading.Thread):
                     cmd = fh.readline().strip()
                 os.rename(path, os.path.join(self.dir, "cmd.done"))
                 self.seen.append(cmd)
+                with open(os.path.join(self.dir, "ack_received"), "w", encoding="utf-8") as fh:
+                    fh.write(f"RECEIVED {cmd} wall={time.time():.6f}\n")
                 time.sleep(self.delay)
                 with open(os.path.join(self.dir, "ack"), "w", encoding="utf-8") as fh:
                     fh.write(self.ack.format(cmd=cmd) + "\n")
@@ -68,20 +70,42 @@ class CheckpointClientTest(unittest.TestCase):
         host = self._host()
         client = CheckpointClient(self.dir, ack_timeout_s=5.0)
         event = client._send("snapshot")
+        # Issuing does not wait: the ack is collected by poll().
+        self.assertNotIn("ok", event)
+        deadline = time.time() + 3.0
+        while time.time() < deadline and not event.get("ok"):
+            client.poll()
+            time.sleep(0.005)
         self.assertTrue(event["ok"])
         self.assertEqual(host.seen, ["snapshot"])
         # A second send must produce a second execution, not a replay of the first ack.
         client._send("restore")
+        deadline = time.time() + 3.0
+        while time.time() < deadline and not client.restores:
+            client.poll()
+            time.sleep(0.005)
         self.assertEqual(host.seen, ["snapshot", "restore"])
 
-    def test_a_silent_host_is_a_failure_not_a_success(self):
+    def test_received_is_recorded_before_applied(self):
+        host = self._host(delay=0.15)
+        client = CheckpointClient(self.dir, ack_timeout_s=5.0)
+        event = client._send("restore")
+        deadline = time.time() + 3.0
+        while time.time() < deadline and not event.get("ack"):
+            client.poll()
+            time.sleep(0.005)
+        self.assertIsNotNone(event.get("received_wall"))
+        self.assertTrue(event["ok"])
+        self.assertGreaterEqual(event["received_s"], 0.0)
+        self.assertGreater(event["ack_wall"] - event["received_wall"], 0.05)
+
+    def test_a_silent_host_leaves_the_command_pending(self):
         client = CheckpointClient(self.dir, ack_timeout_s=0.2)
-        event = client._send("snapshot")
-        self.assertFalse(event["ok"])
-        self.assertEqual(event["error"], "ack_timeout")
-        # Exactly one accounting: the timeout must not also be counted by the success branch.
-        self.assertEqual(client.failures, 1)
-        self.assertEqual(client.snapshots, 0)
+        event = client._send("restore")
+        self.assertIsNone(client.poll())
+        self.assertTrue(client.pending())
+        self.assertNotIn("ok", event)
+        self.assertEqual(client.restores, 0)
 
     def test_rolling_snapshot_respects_the_period_and_the_quiescent_flag(self):
         host = self._host()
@@ -167,6 +191,11 @@ class CheckpointWiringTest(unittest.TestCase):
         node.tx_mgr.lifecycle_events.append({"event": "rearm"})
         loop._apply_lifecycle()
         self.assertEqual(self._wait_seen(2), ["hold", "resume"])
+        # resume is now async too: the count follows when poll() sees the applied ack.
+        deadline = time.time() + 3.0
+        while time.time() < deadline and client.resumes == 0:
+            client.poll()
+            time.sleep(0.005)
         self.assertEqual(client.resumes, 1)
 
     def test_lifecycle_events_are_only_acted_on_once(self):
@@ -223,6 +252,10 @@ class WritebackTest(unittest.TestCase):
                 T = np.eye(4)
                 T[:3, 3] = [1.0, -2.0, 3.0]
                 event = client.set_state(T)
+                deadline = time.time() + 3.0
+                while time.time() < deadline and not event.get("ok"):
+                    client.poll()
+                    time.sleep(0.005)
                 self.assertTrue(event["ok"])
                 self.assertEqual(host.seen, ["set_state"])
                 with open(os.path.join(d, "cmd.done"), encoding="utf-8") as fh:
