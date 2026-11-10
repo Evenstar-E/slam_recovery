@@ -51,6 +51,7 @@ CONTROL_FRAMES = 10
 
 
 def main() -> int:
+    max_frames = int(os.environ.get("ICP_MAX_FRAMES", "0"))
     sha_scans = V._sha_file(SCANS)
     scans, _layout = V.load_scans(SCANS, sha_scans)
     kfs, pairing = V.pair_keyframes(scans, V.load_poses(POSES))
@@ -72,6 +73,10 @@ def main() -> int:
     print(f"[] onset {onset_s:.3f} s, cfg {ICP_CONFIG}")
 
     # ---- quarantine population ---------------------------------------------------------------
+    total_quar = len(quar)
+    if max_frames and total_quar > max_frames:
+        quar = quar[:max_frames]
+        print(f"[] declared subset: first {max_frames} of {total_quar} quarantine frames")
     t0 = time.perf_counter()
     init_poses = {i: k["T"] for i, k in enumerate(quar)}
     poses, results = build_icp_candidate(
@@ -95,26 +100,38 @@ def main() -> int:
     print(f"[] control: reference {len(ctrl_ref)} pts from {len(ctrl_ref_src)} frames, "
           f"{len(ctrl_results)} frames")
 
+    def _q(values):
+        v = np.asarray(values, dtype=float)
+        return {"n": len(v), "median_m": float(np.median(v)),
+                "p90_m": float(np.percentile(v, 90)), "max_m": float(v.max())}
+
     def _agg(rows):
+        # `ITERATION_LIMIT` still produces a candidate, so it counts as one; the two classes are
+        # counted and summarised separately, because if their residuals are the same then
+        # "converged" carries no information about quality under this reference.
         ok = [r for r in rows if r["status"] in ("CONVERGED", "ITERATION_LIMIT")]
         if not ok:
             return {"n": 0}
         conv = [r for r in ok if r["status"] == "CONVERGED"]
+        lim = [r for r in ok if r["status"] == "ITERATION_LIMIT"]
         disp = np.asarray([r["displacement_from_init_m"] for r in ok])
-        res = np.asarray([r["icp_residual"] for r in ok])
         it = np.asarray([r["icp_iterations"] for r in ok])
         inl = np.asarray([r["icp_inliers"] for r in ok])
-        return {"n": len(ok), "converged": len(conv),
-                "converged_fraction": len(conv) / len(ok),
-                "iterations_median": float(np.median(it)), "iterations_max": int(it.max()),
-                "residual_median_m": float(np.median(res)),
-                "residual_p90_m": float(np.percentile(res, 90)),
-                "inliers_median": float(np.median(inl)),
-                "displacement_median_m": float(np.median(disp)),
-                "displacement_p90_m": float(np.percentile(disp, 90)),
-                "displacement_max_m": float(disp.max()),
-                "statuses": {s: sum(1 for r in rows if r["status"] == s)
-                             for s in sorted({r["status"] for r in rows})}}
+        out = {"n": len(ok), "converged": len(conv), "iteration_limit": len(lim),
+               "converged_fraction": len(conv) / len(ok),
+               "iterations_median": float(np.median(it)), "iterations_max": int(it.max()),
+               "inliers_median": float(np.median(inl)),
+               "displacement_median_m": float(np.median(disp)),
+               "displacement_p90_m": float(np.percentile(disp, 90)),
+               "displacement_max_m": float(disp.max()),
+               "residual_all": _q([r["icp_residual"] for r in ok]),
+               "statuses": {s: sum(1 for r in rows if r["status"] == s)
+                            for s in sorted({r["status"] for r in rows})}}
+        if conv:
+            out["residual_converged"] = _q([r["icp_residual"] for r in conv])
+        if lim:
+            out["residual_iteration_limit"] = _q([r["icp_residual"] for r in lim])
+        return out
 
     quarantine_rows = []
     for i, k in enumerate(quar):
@@ -131,7 +148,9 @@ def main() -> int:
         "config": {k: getattr(ICP_CONFIG, k) for k in ICP_CONFIG.__dataclass_fields__},
         "pairing": pairing,
         "populations": {
-            "quarantine": {"frames": len(quar), "reference_points": int(len(reference)),
+            "quarantine": {"frames": len(quar), "frames_available": total_quar,
+                           "subset_declared": bool(max_frames and total_quar > max_frames),
+                           "reference_points": int(len(reference)),
                            "reference_frames": len(pre),
                            "reference_definition": "world cloud of every frame before the "
                                                    "injection onset, built from the host poses"},
@@ -165,12 +184,16 @@ def main() -> int:
         if not s.get("n"):
             print(f"[] {name}: NO RESULT")
             continue
-        print(f"[] {name}: n={s['n']} conv={s['converged']} ({s['converged_fraction']:.0%}) "
-              f"iters med {s['iterations_median']:.0f}/max {s['iterations_max']} "
-              f"residual med {s['residual_median_m']*100:.2f} cm p90 {s['residual_p90_m']*100:.2f} "
-              f"cm | moved med {s['displacement_median_m']*100:.2f} cm "
-              f"p90 {s['displacement_p90_m']*100:.2f} cm max {s['displacement_max_m']*100:.2f} cm "
-              f"| statuses {s['statuses']}")
+        print(f"[] {name}: n={s['n']} converged={s['converged']} "
+              f"iteration_limit={s['iteration_limit']} iters med {s['iterations_median']:.0f} "
+              f"| moved med {s['displacement_median_m']*100:.2f} cm "
+              f"p90 {s['displacement_p90_m']*100:.2f} cm max {s['displacement_max_m']*100:.2f} cm")
+        for key in ("residual_all", "residual_converged", "residual_iteration_limit"):
+            if key in s:
+                q = s[key]
+                print(f"     {key:26s} n={q['n']:3d} median {q['median_m']*100:.2f} cm "
+                      f"p90 {q['p90_m']*100:.2f} cm max {q['max_m']*100:.2f} cm")
+        print(f"     statuses {s['statuses']}")
     print(f"saved {OUT}")
     return 0
 

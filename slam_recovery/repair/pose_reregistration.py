@@ -41,7 +41,15 @@ CONVERGENCE_TOL = 1e-6
 
 # Not part of §9: implementation constants of the neighbour search and normal estimate. They are
 # recorded with every result so a run is interpretable, and they do not change what is optimised.
-CELL_M = 1.0
+# 0.5 m, not 1.0 m: with a 1 m cell a dense surface puts hundreds of points in every
+# neighbourhood and the query dominates the run (2000 queries x 27 cells x N per cell). At
+# 0.5 m the same 3x3x3 block still reaches 1.5 m, which is three times the correspondence gate,
+# and the candidate set shrinks by close to an order of magnitude.
+CELL_M = 0.5
+# Hard ceiling on points taken from one cell per query. Only reached in very dense cells; when
+# it is, the nearest neighbour is taken from this cap rather than from the whole cell, which is
+# recorded with the run so an approximation is never silent.
+MAX_POINTS_PER_CELL = 64
 NORMAL_K = 8
 MIN_REFERENCE_POINTS = 100
 MIN_CORRESPONDENCES = 30
@@ -58,6 +66,7 @@ class IcpConfig:
     max_iters: int = MAX_ITERS
     convergence_tol: float = CONVERGENCE_TOL
     cell_m: float = CELL_M
+    max_points_per_cell: int = MAX_POINTS_PER_CELL
     normal_k: int = NORMAL_K
     min_reference_points: int = MIN_REFERENCE_POINTS
     min_correspondences: int = MIN_CORRESPONDENCES
@@ -110,7 +119,10 @@ class VoxelGrid:
     not a victim of the grid.
     """
 
-    def __init__(self, points: np.ndarray, cell_m: float = CELL_M) -> None:
+    def __init__(self, points: np.ndarray, cell_m: float = CELL_M,
+                 max_per_cell: int = MAX_POINTS_PER_CELL) -> None:
+        self.max_per_cell = int(max_per_cell)
+        self.capped_cells = 0
         self.points = np.ascontiguousarray(np.asarray(points, dtype=np.float64)[:, :3])
         self.cell_m = float(cell_m)
         if len(self.points) == 0:
@@ -152,6 +164,9 @@ class VoxelGrid:
             target = base + off
             lo = np.searchsorted(self.keys, target, side="left")
             hi = np.searchsorted(self.keys, target, side="right")
+            over = hi - lo
+            self.capped_cells += int(np.count_nonzero(over > self.max_per_cell))
+            hi = np.minimum(hi, lo + self.max_per_cell)
             lo_all.append(lo)
             hi_all.append(hi)
         counts = np.stack([h - l for l, h in zip(lo_all, hi_all)], axis=0)   # (27, n), offset-major

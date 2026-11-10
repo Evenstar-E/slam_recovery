@@ -61,9 +61,63 @@ weak_dir_info_before/after = 1.102 / 4.628
 candidate_frames = 22（隔离期缓存的宿主位姿）
 ```
 
-配对证据这一趟**通过了**（Wilson 0.601 > 0.55，17/22 帧改善，残差 0.253 → 0.091），
-唯一拒绝理由是 re-entropy 边界跳变 1.25 m。这个 1.25 m 现在是在一张**已长起来的地图**上量的，
-不再是 2 帧锚点，所以它是关于候选本身的实质信息。
+配对证据这一趟**通过了**（Wilson 0.601 > 0.55，17/22 帧改善，残差 0.253 → 0.091）。
+
+**更正：1.25 m 边界跳变不是唯一的拒绝原因。** refusal 文案只会报先失败的那一腿，而
+`weak_dir_info_after = 4.628` 对 `tau_info = 25`——**弱方向信息这一腿本来就不够**。
+所以即使边界判据修好，Mode 仍然是 3，拒绝理由会变成"弱方向信息不足"。
+
+另外，这个 1.25 m 本身也不是候选的问题：锚点比触发帧早 2.329 s，1.2506/2.329 ≈ 0.54 m/s，
+是行走速度。已由 S1 在 `bcadd9f` 修成"锚点时间戳起算的时距包络"，阈值 0.5 m 未动。
+
+## 4b. 边界判据修完重跑（`bcadd9f` 之后）
+
+同一 bag、同一 σ，重跑一次（receipt `/tmp/fl_native_20261110T042426Z_3020861`）：
+
+| 项 | 修前 | 修后 |
+|---|---|---|
+| 首次报警 / 隔离 / 起点估计 / 决策 | −0.027 / +0.106 / −0.127 / +2.237 s | **完全相同** |
+| Mode | 3 | 3 |
+| refusal 文案 | 段边界跳变超限 | **paired-benefit evidence FAILED** |
+| `reentry_pos_jump_m` | 1.2506 | **1.2636**（未变，仍超 0.5 界） |
+| `boundary_continuity_ok` | False | **True**（边界这一腿通过） |
+
+**修复只覆盖了一半。** `bcadd9f` 把时距包络用在段边界与 first-run 两处判定上，
+但 `_measure_paired_evidence`（`transaction_manager_node.py:404`）仍把**原始锚点距离**
+写进 `CandidateMap.reentry_pos_jump_m`，而 `evaluate_four_mode_gate`（`core.py:522`）用
+`reentry_pos_jump_m > max_reentry_jump_m` 决定 `evidence_status`。
+于是同一个陈旧锚点距离换了条腿再失败一次：边界腿过了，证据腿没过，文案随之变成
+"paired-benefit evidence FAILED"。
+
+修好之后才会轮到真正的下一个原因：**`weak_dir_info_after = 4.634` 对 `tau_info = 25`**，
+Mode 仍是 3。这与 S1 的判断一致（他事先指出边界不是唯一原因）。
+
+## 4c. 门侧包络修完之后（`f9ad688`）
+
+再跑一趟（receipt `/tmp/fl_native_20261110T044250Z_3031393`）。检测三项仍完全不变。
+
+| 项 | 值 |
+|---|---|
+| Mode | 3 |
+| refusal | **paired-benefit evidence FAILED**（不再是边界） |
+| `reentry_pos_jump_m` | 1.2518（仍作为物理距离上报） |
+| 门是否仍因它拒绝 | **否**——`reentry_elapsed_s` 存在时走同一包络 |
+| Wilson 下界 | **0.418 < 0.55** → 证据腿这次是**真的**没过 |
+| `weak_dir_info_after` | 4.699 < `tau_info` 25 |
+
+所以 re-entry 这条**修好了**（不再拒绝），拒绝理由落到配对收益本身；而
+`weak_dir_info_after` 仍然不足，Mode 3 与 S1 的预判一致。
+
+**但这趟的 Wilson 数值受机器负载影响，不能当结论。** 同一份代码、同一 bag：
+
+| 运行 | 机器 load | 配对 | 改善帧 | Wilson |
+|---|---|---|---|---|
+| `035825Z`（空载） | ~200 | 584/599 | 17/22 | 0.601 |
+| `044250Z` | **338 / 128 核** | 369/599 | 13/22 | 0.418 |
+
+候选人口是"2 s 决策窗内处理到的帧"，节点跟不上时窗内帧数变少、改善比例随之变化。
+`runner` 现在把 `/proc/loadavg` 与 `nproc` 写进 receipt（`machine_load_at_launch`），
+因为这是同一份代码给出不同 Wilson 的直接原因。
 
 ## 5. 三条代价（按裁决必须写进 receipt）
 
@@ -78,7 +132,12 @@ candidate_frames = 22（隔离期缓存的宿主位姿）
 
 ## 7. 仍未验收
 
-- 边界跳变 1.25 m 导致 Mode 3：这是候选不连续，还是门对非连续提交的判据过严，需要单独判断；
+- 边界判据的度量缺陷已由 S1 在 `bcadd9f` 修掉（锚点时间戳起算的时距包络，阈值不变）；
+  但它不是这趟被拒的原因，见 §4 的更正；
+- **弱方向信息 4.628 对 `tau_info = 25`**：这两个数是否同一尺度、25 来自哪套 FIM 量级，
+  需要证据才能说。本趟只有决策时刻的一个样本 `(before, after) = (1.102, 4.628)`
+  （这两个量只在判定时计算，node 不逐帧记录），所以给不出分布；要分布需在
+  `_record_diag` 里逐帧记 `min_eig_rot/min_eig_trans`，代价是每帧多一次 FIM。**未动阈值。**
 - 阶段二 (d) 的 ICP 候选构造已完成（`slam_recovery/repair/pose_reregistration.py` + 13 项单测），
-  离线跑分见 `icp_candidate_offline_results.json`；
+  离线跑分仍在进行；
 - A7 的 gauge 问题不变：本趟决策仍标 `GAUGE_DEPENDENT_UNTIL_A7_FIX`，不进 B10 四策略表。
