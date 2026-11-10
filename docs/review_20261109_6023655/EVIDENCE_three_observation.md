@@ -1,3 +1,9 @@
+> **HISTORICAL / SUPERSEDED for the current protocol.** This document records the 4.0-4.6 m
+> spherical-shell deletion and the 445-key / 50-gate population, not the current integer-nanosecond
+> onset and 52-gate protocol. It is kept as history; its "filtering is not the solution" statement is
+> not an independent mechanism result under the current protocol. The median match is a same-statistic
+> recomputation and does not exclude a shared protocol bias.
+
 # 补充证据：三观测对照与代理面分辨率
 
 回应本目录 README「需收窄：good poses 不等于 good scans」「同一固定 key/query 集对照」两节。
