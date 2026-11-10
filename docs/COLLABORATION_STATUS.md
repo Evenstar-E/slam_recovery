@@ -264,3 +264,9 @@ S1集成/S2下一优先真实宿主恢复重处理/状态地图写回和Mode3续
 新归档run044830Z有load原收据，516配对、20/22改善、Wilson.7591、paired PASSED，仍info4.661<25/0接纳/E2零/WAITING。生产未变，完整恢复没有增加；[核验](review_20261110_a2e721e/README.md)。接受开发撤回窗内帧变少、参考图假说仍未证；当前成员/负载因果UNKNOWN，不继续矩阵或重跑追同值。
 
 S1集成/S2下一直接实际宿主恢复重处理/地图写回＋Mode3续处理/终态/重武装，S3旧正则最小修并行。Codex/KITTI/四策略后继不挡接口，actual branch/工作树/正在运行及最新任务接收仍待直接回报；不因再一趟旁路观察推已经实施恢复接口。
+
+## 22. 5f59f47真实ICP调用接线接受，窗口/A7限制保持
+
+driver已调用ICP，本机actual node4帧接线核过；执行方最新尝试与七run对照只有日报、未交原件。当前6000缓冲再采样2000，违反冻结采样未证明；段刚体是新模型/人口假说，不立即换法或跑矩阵。service延后改变候选窗有最小正常例，新A7 cleared标签仍被旧actual producer反例否定；详见[5f59f47核验](review_20261110_5f59f47/README.md)。
+
+S1集成/明确共享入口责任，S2复用新接线优先实际宿主restore/reprocess/internal map writeback及真实Mode3续处理/终态/重武装/E2，S3旧正则最小修并行；窗口最低snapshot/能力声明不扩线程防御框架。Codex/KITTI后继不挡接口，实际checkout/编辑/运行/收到最新任务仍待直接回报，不以代码call或日报数字代完整恢复。

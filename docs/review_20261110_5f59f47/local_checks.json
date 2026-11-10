@@ -1,0 +1,52 @@
+{
+  "target": "5f59f47d22242140f5e65ecc4a5966e182f1a853",
+  "baseline": "a2e721e69b8b03c2dcda755f8a48ff00338f5d0a",
+  "scope": "actual Python loop/node on synthetic inputs; fixed Git source inspection; no ROS or native rerun",
+  "integration_probe": {
+    "command": "python -B -W ignore docs/review_20261110_5f59f47/live_integration_probe.py",
+    "status": "PASS: new ICP branch calls actual solver and gate",
+    "source_identity": "fixed target driver/repair/node/core SHA256 match normalized checkout",
+    "candidate_frames": 4,
+    "icp_statuses": {"ITERATION_LIMIT": 4},
+    "mode": "MODE3_SOFT_BRIDGE_WAIT",
+    "accepted": false,
+    "summary_validity_label": "A7_V2_GAUGE_CLEARED",
+    "service_schedule_counterexample": [
+      {"service_immediate": true, "deadline_ns": 3000000000, "candidate_frames": 1, "decision_input_ts_ns": 3000000000, "pending_after_input": [1, 2, 3]},
+      {"service_immediate": false, "deadline_ns": 3000000000, "candidate_frames": 3, "decision_input_ts_ns": 3200000000, "pending_after_input": [1, 2, 3]}
+    ]
+  },
+  "sampling": {
+    "status": "PASS: 6000 buffer points become 2000 actual ICP points",
+    "actual_path": "reregister_frame calls sample_scan with ICP_CONFIG.scan_samples=2000",
+    "input_points": 6000,
+    "solver_scan_points": 2000,
+    "synthetic_plane_status": "CONVERGED"
+  },
+  "candidate_assembly": {
+    "status": "PASS",
+    "existing_functions": ["test_build_candidate_keeps_successes_and_reports_failures", "test_build_candidate_skips_frames_without_an_init_pose"],
+    "seconds": 5.568,
+    "budget_control": "tiny positive budget reports both frames BUDGET_EXHAUSTED with no candidate; not a hard wall-time bound test"
+  },
+  "a7_actual_producer": {
+    "method": "reuse docs/review_20261110_21fa650/a7_node_cov_probe.py in memory, replace only source target with 5f59f47; archive unchanged",
+    "source_blobs": {
+      "slam_recovery/core.py": "b50903b47ef65871db6568e292bcc8a1502ad13c",
+      "slam_recovery/sim/transaction_manager_node.py": "364bd5fd763accf36229ab7ed6631acc3154dd99",
+      "slam_recovery/validation/fim_and_holdout.py": "b543cf0358a4a33c1bf9623cadd77aaa919d9684"
+    },
+    "status": "FAIL: new cleared label contradicted by reused actual-node invariant",
+    "world_y_0": {"cov_norm": 0.5136136651945151, "mode": "MODE3_SOFT_BRIDGE_WAIT", "accepted": false},
+    "world_y_20": {"cov_norm": 0.4694900053022529, "mode": "MODE2_ATOMIC_COMMIT", "accepted": true},
+    "info_after_both": 62.982929840595,
+    "holdout_nis_both": 0.335222364375,
+    "thresholds_modified": false,
+    "not_new_bug": "same known world-ridge producer issue; rerun solely because current summary newly declares it cleared"
+  },
+  "syntax": "PASS: fixed Git AST driver/repair/tests; bash -n runner",
+  "reported_live_attempt": "UNAVAILABLE: target adds no new attempt receipt/summary/candidate/ICP detail; 23 frames, 13s/frame, 3/23 within 30s and seven-run membership claims remain developer narrative",
+  "pytest_adapter_suite": "BLOCKED: known missing pytest, not repeated/installed/shimmed",
+  "native_restore_writeback_reentry_E2": "not delivered; no new host interface",
+  "full_regression_rescore": "NOT_APPLICABLE"
+}
