@@ -27,6 +27,7 @@ from ..core import (
     RecoveryState,
     TangentFrame,
     ValidationReport,
+    transport_information,
 )
 from ..diagnosis import SignatureMatrixRouter
 from ..health import DetectorConfig, JointHealthDetector
@@ -667,8 +668,24 @@ class OnlineRecoveryTransactionNode:
             fims_after.append(fim_k)
 
         mean_holdout_nis = float(np.mean(holdout_nis_list)) if holdout_nis_list else float("inf")
-        if fims_after:
+        # The gate reads ||P_after|| against a fixed bound, and a covariance depends on where the
+        # tangent-space origin is. The regulariser that builds it therefore has to be added in the
+        # basis the gate evaluates in: epsilon*I in world, inverted and then transported, is
+        # not epsilon*I in the anchor body frame (Ad is not orthogonal once the translation is
+        # non-zero). On the fixed 400-point fixture a pure 20 m world-origin change moved the norm
+        # from .4876 to .4336 with the same physical cloud -- re-expressing the problem, not
+        # changing it. Build the covariance in the anchor body frame instead.
+        segment = self.tx_mgr.active_quarantine
+        frame_after = TangentFrame("world", "rot_trans", "world")
+        if fims_after and segment is not None and segment.anchor_pose_world is not None:
+            T_body_world = np.linalg.inv(np.asarray(segment.anchor_pose_world,
+                                                    dtype=np.float64))
+            info_after = transport_information(np.mean(fims_after, axis=0), T_body_world)
+            frame_after = TangentFrame("body", "rot_trans",
+                                       segment.weak_direction_frame.anchor)
+        elif fims_after:
             info_after = np.mean(fims_after, axis=0)
+        if fims_after:
             cov_after = np.linalg.inv(info_after + np.eye(6) * 1e-3)
         else:
             info_after = np.eye(6) * 1e-3
@@ -706,10 +723,11 @@ class OnlineRecoveryTransactionNode:
             boundary_basis=boundary_basis,
             info_after_6x6=info_after,
             cov_after_6x6=cov_after,
-            # `fims_after` are computed from world-frame points and averaged in that one basis;
-            # the covariance is the inverse of that same average, so it shares the basis.
-            info_after_frame=TangentFrame("world", "rot_trans", "world"),
-            cov_after_frame=TangentFrame("world", "rot_trans", "world"),
+            # Both quantities are expressed in `frame_after`: the candidate's information and
+            # covariance are moved out of world once, together, and are inverted/regularised in
+            # that one basis, so the bound the gate applies does not depend on the world origin.
+            info_after_frame=frame_after,
+            cov_after_frame=frame_after,
             holdout_nis=mean_holdout_nis,
             reentry_elapsed_s=(
                 None if (reentry_anchor_ts_ns is None or not kf_sorted
