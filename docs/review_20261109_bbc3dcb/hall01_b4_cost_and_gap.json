@@ -13,14 +13,16 @@
   },
   "C3": {
    "host_output": "/tmp/fastlivo/res_h1_inj43_filtered.bag",
-   "run_identity": "/tmp/fl_run_20261109T105559Z_2414230/receipt.json (hardened runner)",
+   "run_identity": "NO RECEIPT for res_h1_inj43_filtered.bag",
    "rate": 1.0,
    "drain_s": 40,
-   "wall_s": 122.9,
-   "wall_basis": "MEASURED from the run directory start (UTC in the name) to receipt.json mtime",
+   "wall_s": null,
+   "wall_basis": "UNAVAILABLE",
    "peak_rss": "UNAVAILABLE",
-   "rss_basis": "the runner did not sample /proc/<pid>/status VmHWM"
-  }
+   "rss_basis": "the runner did not sample /proc/<pid>/status VmHWM",
+   "provenance_error": "the previously cited /tmp/fl_run_20261109T105559Z_2414230 is the room_02 filtered run: input room02_inj43_filtered.bag -> output res_room02_filtered.bag, so its 122.9 s cannot be attributed to hall_01"
+  },
+  "determination": "R is derived from its command (no receipt); C3 is UNAVAILABLE (no hall_01 receipt). No cost comparison is made."
  },
  "population": {
   "frames_400": 400,

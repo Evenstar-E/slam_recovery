@@ -172,8 +172,10 @@ this sequence; the result remains single-sequence, GT-partial (252/400) and offl
 
 Two B4 cells are filled from archived receipts without a new host run. Cost: R's output has no
 receipt (old `fl_record.sh`), so its 296 s is derived (58 s / 0.5 playback + 150 s drain + ~30 s
-startup), while C3's 122.9 s is measured (rate 1.0, drain 40); different rates and drains make the
-wall times not directly comparable, and peak RSS is unavailable for both. Missing sensitivity:
+startup). C3 has no hall_01 receipt either: the previously cited run directory is the room_02
+filtered run (input room02_inj43_filtered.bag, output res_room02_filtered.bag), so 122.9 s was a
+provenance error and the C3 cost is UNAVAILABLE. No cost comparison is made, and peak RSS is
+unavailable for both. Missing sensitivity:
 excluding the 81 frames within 1 s of the 46 missing ones leaves 319 frames, where R moves to
 coverage 0.7977 / unsupported 0.4200 / ATE 1.617 m and C3 to 0.9759 / 0.0975 / 0.274 m. The
 ordering is unchanged, so the 46 missing frames do not carry the conclusion, although they

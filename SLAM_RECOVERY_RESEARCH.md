@@ -2287,7 +2287,7 @@ C_good 的 NIS 仍高于 2.5。**按冻结的整数纳秒边界重做了归因�
 
 C3 相对 R 新增 42,227 点：**35,999 supported（85.25%）**；仅 novel 子集 10,581 点：**7,318 supported（69.16%）**。R 有而 C3 没有的 50,234 点中 **47,790（95.14%）本来就是 unsupported**；novel 损失 48,814 点中 46,819（95.91%）unsupported。
 
-**预先声明的判据**（写在结果里）：novel 新增 supported > unsupported，且总新增 unsupported 比例 ≤ R 自身。实测 **7,318 > 3,263**，**0.1475 ≤ 0.6251**，判定 **`REPAIR_BENEFIT_SUPPORTED`**。同一 400 帧人口上补轨迹（GT 覆盖 252 帧）：R 的 full-alignment ATE **1.909 m**（max 3.959）、冻结 clean→GT 协议 **10.929 m**；C3 为 **0.319 m**（max 0.695）、**0.492 m**（冻结变换由 onset 前 77 个 clean keyframes 拟合，残差 0.085 m）。几何与轨迹在本序列上一致；仍为单序列、GT 部分覆盖、离线重估。成本：R 无 receipt，296 s 为派生值（rate 0.5 / drain 150），C3 实测 122.9 s（rate 1.0 / drain 40），两者 rate/drain 不同不可直接比较，峰值内存缺失。缺测敏感性：剔除 46 缺测帧的 81 个相邻帧后 R 变为 cover 0.7977 / unsup 0.4200 / ATE 1.617 m，C3 为 0.9759 / 0.0975 / 0.274 m，排序不变。
+**预先声明的判据**（写在结果里）：novel 新增 supported > unsupported，且总新增 unsupported 比例 ≤ R 自身。实测 **7,318 > 3,263**，**0.1475 ≤ 0.6251**，判定 **`REPAIR_BENEFIT_SUPPORTED`**。同一 400 帧人口上补轨迹（GT 覆盖 252 帧）：R 的 full-alignment ATE **1.909 m**（max 3.959）、冻结 clean→GT 协议 **10.929 m**；C3 为 **0.319 m**（max 0.695）、**0.492 m**（冻结变换由 onset 前 77 个 clean keyframes 拟合，残差 0.085 m）。几何与轨迹在本序列上一致；仍为单序列、GT 部分覆盖、离线重估。成本：R 无 receipt，296 s 为派生值（rate 0.5 / drain 150），C3 引用的 run 目录实际是 room_02 filtered（input `room02_inj43_filtered.bag` → `res_room02_filtered.bag`），hall_01 的 `res_h1_inj43_filtered.bag` 无 receipt，故 122.9 s 属误归属、C3 成本为 `UNAVAILABLE`；本轮不做成本比较，峰值内存缺失。缺测敏感性：剔除 46 缺测帧的 81 个相邻帧后 R 变为 cover 0.7977 / unsup 0.4200 / ATE 1.617 m，C3 为 0.9759 / 0.0975 / 0.274 m，排序不变。
 
 读法：在同一批帧上，修复**删掉的是坏点、补上的是好点**（新增 85.3% 落在参考面、被替换点 95.1% 本来就在面外），不是把地图整体挪位。
 
