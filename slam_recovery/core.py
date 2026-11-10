@@ -356,8 +356,12 @@ class ValidationReport:
     accepted: bool
     mode: RecoveryMode
     weak_dir_info_before: float
-    weak_dir_info_after: float
-    weak_dir_info_gain: float
+    # None means "there was no candidate to measure", which is not the same as a candidate whose
+    # information measured zero. A producer that fails before it builds any pose (empty reference,
+    # no valid normals, budget exhausted) used to arrive here as 0.0 and was reported as a
+    # malformed candidate; the two have completely different remedies.
+    weak_dir_info_after: Optional[float]
+    weak_dir_info_gain: Optional[float]
     holdout_nis: float
     posterior_cov_norm: float
     propagated_cov_norm: float
@@ -548,6 +552,28 @@ def evaluate_four_mode_gate(
         )
         evidence_status = "FAILED" if evidence_failed else ("MISSING" if evidence_missing else "PASSED")
 
+        # A repairer that fails before it builds any pose has not produced a malformed candidate;
+        # it has produced none. Reporting that as "invalid SE(3) pose shape" sends the operator to
+        # the pose chain when the real cause is upstream (empty reference, no valid normals,
+        # exhausted budget), and it is only visible in a side file. Say which one it is, and keep
+        # "no measurement" distinguishable from "measured zero" in the numbers.
+        if not candidate.repaired_poses:
+            return ValidationReport(
+                accepted=False,
+                mode=(RecoveryMode.MODE3_SOFT_BRIDGE_WAIT if p_prop < thresholds.sigma_bridge
+                      else RecoveryMode.MODE4_HARD_SLEEP_SPLIT),
+                weak_dir_info_before=info_before,
+                weak_dir_info_after=None,
+                weak_dir_info_gain=None,
+                holdout_nis=float("inf"),
+                posterior_cov_norm=float("inf"),
+                propagated_cov_norm=p_prop,
+                reason=("No candidate was produced: the repairer returned no poses. The "
+                        "construction status (empty reference, too few normals, exhausted "
+                        "budget) belongs to the producer and is not a pose defect"),
+                evidence_status=evidence_status,
+            )
+
         # Reject any candidate containing non-finite (NaN / Inf) poses, biases, covariances, or invalid pose shapes (R3 & F4 fix)
         def _is_valid_pose_array(p: np.ndarray) -> bool:
             arr = np.asarray(p, dtype=np.float64)
@@ -598,8 +624,8 @@ def evaluate_four_mode_gate(
                 accepted=False,
                 mode=RecoveryMode.MODE3_SOFT_BRIDGE_WAIT if p_prop < thresholds.sigma_bridge else RecoveryMode.MODE4_HARD_SLEEP_SPLIT,
                 weak_dir_info_before=info_before,
-                weak_dir_info_after=0.0,
-                weak_dir_info_gain=-info_before,
+                weak_dir_info_after=None,
+                weak_dir_info_gain=None,
                 holdout_nis=float("inf"),
                 posterior_cov_norm=float("inf"),
                 propagated_cov_norm=p_prop,

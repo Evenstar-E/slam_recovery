@@ -32,10 +32,19 @@ class TrustedMapTransactionManager:
         self,
         confirmation_margin_ns: int = int(2.0 * 1e9),
         gate_thresholds: GateThresholds = GateThresholds(),
+        wait_limit_ns: Optional[int] = None,
     ) -> None:
         self.confirmation_margin_ns = int(confirmation_margin_ns)
         self.gate_thresholds = gate_thresholds
         self.state: RecoveryState = RecoveryState.HEALTHY
+        # How long a Mode 3 wait may stay open without new evidence before the segment is closed
+        # unresolved. None keeps the old behaviour (wait indefinitely); a run that must reach a
+        # second event declares a value before it starts, because a segment that waits forever
+        # never returns to HEALTHY and the detector can never fire again.
+        self.wait_limit_ns: Optional[int] = None if wait_limit_ns is None else int(wait_limit_ns)
+        self.wait_started_ns: Optional[int] = None
+        self.unresolved_segments: List[QuarantineSegment] = []
+        self.lifecycle_events: List[dict] = []
 
         self.trusted_version: int = 0
         self.trusted_poses: Dict[int, np.ndarray] = {}
@@ -453,10 +462,13 @@ class TrustedMapTransactionManager:
             self.provisional_queue.clear()
             self.active_quarantine = new_segment
             self.state = new_state
+            if new_state == RecoveryState.WAITING_FOR_EVIDENCE and new_segment is not None:
+                self.wait_started_ns = int(new_segment.t_end_ns)
             self.commit_history.append(new_history)
         elif report.mode in (RecoveryMode.MODE3_SOFT_BRIDGE_WAIT, RecoveryMode.MODE1_ONLINE_REWEIGHT):
             # Trusted map stays strictly invariant; system waits for delayed loop or auxiliary evidence
             self.state = RecoveryState.WAITING_FOR_EVIDENCE
+            self.wait_started_ns = int(self.active_quarantine.t_end_ns)
         elif report.mode == RecoveryMode.MODE4_HARD_SLEEP_SPLIT:
             # Archive current trusted map into sleeping submaps and reset active trusted map cleanly
             if self.trusted_poses:
@@ -466,3 +478,61 @@ class TrustedMapTransactionManager:
             self.state = RecoveryState.ABORTED
 
         return report
+
+    # ----------------------------------------------------------------------------------------
+    # Lifecycle after a refusal: a waiting segment that never gets evidence must not stall the run.
+    # ----------------------------------------------------------------------------------------
+    def maybe_close_waiting_segment(self, now_ns: int) -> Optional[QuarantineSegment]:
+        """Close a Mode 3 wait once its declared limit has passed with no new evidence.
+
+        A segment in WAITING_FOR_EVIDENCE keeps `active_quarantine` set so that arriving frames
+        still have a home. That is correct while evidence might arrive, but it also means the
+        manager never returns to HEALTHY: the next fault can never open a new segment, so a
+        two-event run silently becomes a one-event run. When a limit was declared for the run,
+        the wait ends here and the frames it held are recorded as *unresolved* -- not committed,
+        not silently deleted. The trusted map is untouched: it stays at the last commit.
+        """
+        if (self.state != RecoveryState.WAITING_FOR_EVIDENCE
+                or self.active_quarantine is None
+                or self.wait_limit_ns is None
+                or self.wait_started_ns is None):
+            return None
+        if int(now_ns) - int(self.wait_started_ns) < int(self.wait_limit_ns):
+            return None
+        seg = self.active_quarantine
+        self.unresolved_segments.append(seg)
+        self.lifecycle_events.append({
+            "event": "wait_limit_closed",
+            "segment_id": seg.segment_id,
+            "wait_started_ns": int(self.wait_started_ns),
+            "closed_ns": int(now_ns),
+            "wait_limit_ns": int(self.wait_limit_ns),
+            "t_start_ns": int(seg.t_start_ns),
+            "t_end_ns": int(seg.t_end_ns),
+            "frames_unresolved": list(seg.raw_frame_refs),
+            "trusted_version": int(self.trusted_version),
+        })
+        self.active_quarantine = None
+        self.wait_started_ns = None
+        self.state = RecoveryState.ABORTED
+        return seg
+
+    def rearm(self) -> bool:
+        """Return to HEALTHY after a segment closed without evidence.
+
+        The frames of the closed segment are lost, not committed; the trusted map is exactly
+        what the last commit left. The next promoted frame re-establishes the map at the host's
+        current estimate, which is a declared discontinuity of the map, and the lifecycle event
+        keeps that visible rather than letting the run look continuous.
+        """
+        if self.active_quarantine is not None or self.state != RecoveryState.ABORTED:
+            return False
+        self.lifecycle_events.append({
+            "event": "rearm",
+            "from_state": RecoveryState.ABORTED.value,
+            "trusted_version": int(self.trusted_version),
+            "n_sleeping_submaps": len(self.sleeping_submaps),
+        })
+        self.wait_started_ns = None
+        self.state = RecoveryState.HEALTHY
+        return True

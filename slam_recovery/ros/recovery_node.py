@@ -953,6 +953,16 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
             "committed_key_total": sum(len(r["committed_pose_keys"] or []) for r in rows),
             "deferred_key_total": sum(len(r["deferred_pose_keys"] or []) for r in rows),
         },
+        # What happened to a segment that never got evidence. Without a declared wait limit a
+        # refused Mode 3 keeps its segment open forever and no second event can ever fire; with
+        # one, the segment closes as unresolved and the run re-arms. Both the close and the lost
+        # frames are recorded here, so "the run continued" cannot hide dropped input.
+        "lifecycle": {
+            "wait_limit_ns": loop.node.tx_mgr.wait_limit_ns,
+            "state": getattr(loop.node.tx_mgr.state, "value", loop.node.tx_mgr.state),
+            "events": list(loop.node.tx_mgr.lifecycle_events),
+            "unresolved_segments": len(loop.node.tx_mgr.unresolved_segments),
+        },
         "null_field_counts": null_counts,
         "holdout_nis_nonfinite": sum(1 for r in rows if r["holdout_nis"] is None)
         if rows else 0,
@@ -1234,6 +1244,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--detection", default="on", choices=("on", "off"),
                     help="off = diagnosis only: the map grows and the NIS is recorded, "
                          "but nothing is judged")
+    ap.add_argument("--wait-limit-sec", type=float, default=0.0,
+                    help="close a Mode 3 wait as unresolved after this many seconds without "
+                         "evidence and re-arm (0 = wait indefinitely, which means a refused "
+                         "first event can never be followed by a second one)")
     args, _unknown = ap.parse_known_args(argv)
 
     import rospy
@@ -1242,6 +1256,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     node = OnlineRecoveryTransactionNode(
         confirmation_margin_sec=args.confirmation_margin_sec,
         sigma_meas_m=args.sigma_meas_m,
+        wait_limit_sec=(args.wait_limit_sec if args.wait_limit_sec > 0 else None),
     )
     run_id = os.path.basename(os.path.normpath(args.run_dir))
     loop = NativeClosedLoop(
