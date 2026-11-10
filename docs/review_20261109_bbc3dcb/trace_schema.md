@@ -46,7 +46,18 @@ kind,wall_ns,lid_stamp_ns,n_items,first_stamp_ns,last_stamp_ns,stamps_sha256,ext
 - 或者对整个 `extra` 字段做标准 CSV 引用（`"pos=1,2,3;..."`），但 C++ 侧要自己实现引用规则，
   多一处可能出错的地方。
 
-解析仍按分号切键值、按第一个等号切键与值。
+**最终格式（r11070-c3 2026-11-10 确认）**：键值对与向量元素**都用竖线**分隔，不带分号、不带逗号：
+
+```
+kind,wall_ns,lid_stamp_ns,n_items,first_stamp_ns,last_stamp_ns,stamps_sha256,extra
+ARRIVE,<wall_ns>,<stamp_ns>,1,<stamp_ns>,<stamp_ns>,<sha>,buflen=<N>
+GROUP,<wall_ns>,<lid_ns>,<imu_n>,<first_ns>,<last_ns>,<sha>,mesures=<n>|img=<n>|img_stamp_ns=<n>|need_init=<0/1>
+IMUINIT,<wall_ns>,0,<n>,<first_ns>,<last_ns>,<sha>,iter=<N>|max=<M>
+STATE,<wall_ns>,<lid_ns>,0,<lid_ns>,<lid_ns>,,pos=<x>|<y>|<z>|diagR=<a>|<b>|<c>
+```
+
+解析规则：含 `=` 的 token 开启一个新键，不含 `=` 的 token 续到上一个键的向量。
+`;` 仍被接受为键值分隔符，仅为兼容早期文件；**写入端一律用竖线**。
 
 ## 解析器必须拒绝的情况
 
