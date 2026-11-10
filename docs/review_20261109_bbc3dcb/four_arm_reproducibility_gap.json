@@ -32,5 +32,6 @@
  "auxiliary_surface": {
   "code": "slam_recovery/experiments/run_four_arm_same_input.py (PROXY_VOXEL=0.05, distance_stats_voxel_surface)",
   "manifest": "NOT UPDATED; rerun values kept out of the published file"
- }
+ },
+ "citation_rule": "until the A3 gate-NIS change is explained, neither 265.81 nor 41.67 may be cited as the current value; both are reported only as NOT REPRODUCIBLE"
 }
