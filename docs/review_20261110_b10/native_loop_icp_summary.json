@@ -1,0 +1,161 @@
+{
+ "run_id": "fl_native_20261110T051744Z_3059939",
+ "detection_enabled": true,
+ "parameters": {
+  "confirmation_margin_ns": 2000000000,
+  "pair_window_ns": 40000000,
+  "scan_cap": 6000,
+  "nis_radius_m": 3.0,
+  "extrap_frames": 5,
+  "sigma_meas_m": 0.884
+ },
+ "pairing": {
+  "pair_window_ns": 40000000,
+  "poses_received": 800,
+  "scans_received": 599,
+  "paired": 584,
+  "poses_unpaired": 216,
+  "scans_unpaired": 15,
+  "paired_fraction_of_poses": 0.73,
+  "paired_fraction_of_scans": 0.9749582637729549,
+  "max_abs_dt_ns": 39824962,
+  "max_backlog_messages": 116,
+  "messages_considered": 1399,
+  "pairing_rule": "nearest pose within 40 ms, no pose reused"
+ },
+ "frames": {
+  "paired": 584,
+  "ingested": 584,
+  "fed_to_step_frame": 365,
+  "ingested_without_detection": 219,
+  "consumed_after_first_decision": 254,
+  "first_decision_ts_ns": 1627643762194744587
+ },
+ "warmup": {
+  "policy": "a frame the node cannot support against its own spatially sampled trusted map is ingested through the manager's healthy path but is NOT judged by the detector; it is recorded as detection_status=UNAVAILABLE. In diagnosis mode (detection=off) every frame is recorded as DISABLED_FOR_DIAGNOSIS and nothing is judged at all.",
+  "detection_status_counts": {
+   "AVAILABLE": 365,
+   "UNAVAILABLE": 219,
+   "DISABLED_FOR_DIAGNOSIS": 0
+  },
+  "frames_ingested_without_detection": 219,
+  "first_detected_kf": 19,
+  "not_an_assumption": "no frame is labelled healthy; UNAVAILABLE says the detector had no reference, which is a statement about the evidence, not about the frame"
+ },
+ "nis": {
+  "computed": 583,
+  "carried_forward": 0,
+  "unavailable": 1,
+  "reference_node_map": 367,
+  "reference_prev_scan": 216,
+  "reference_none": 1,
+  "nonfinite_estimator_output": 0,
+  "sigma_meas_m": 0.884
+ },
+ "quarantine": {
+  "episodes": 1,
+  "trigger_ts_ns": [
+   1627643759659727812
+  ],
+  "decisions": 1,
+  "second_and_later_events": 0,
+  "episode_detail": [
+   {
+    "index": 0,
+    "trigger_ts_ns": 1627643759659727812,
+    "deadline_ns": 1627643761659727812,
+    "decided": true,
+    "estimated_onset_ns": 1627643759426658773,
+    "quarantine_start_ns": 1627643757426658773,
+    "first_alarm_ts_ns": 1627643759526658773,
+    "frames_registered": 25,
+    "decision_basis": "confirmation_margin",
+    "candidate_frames": 25,
+    "incumbent_basis": {
+     "tail_frames_requested": 5,
+     "trusted_keyframes": 165,
+     "anchor_key": 164,
+     "velocity_mps": [
+      0.14952650388389288,
+      0.02335618644859955,
+      0.04256305966256293
+     ],
+     "rotation_held": true,
+     "status": "CONSTANT_VELOCITY",
+     "tail_keys": [
+      160,
+      161,
+      162,
+      163,
+      164
+     ],
+     "anchor_timestamp_ns": 1627643757330770969
+    },
+    "paired_evidence": {
+     "num_paired_frames": 25,
+     "required_paired_frames": 8,
+     "candidate_keyframes": 25,
+     "pairable_frames": 25,
+     "frames_without_independent_reference": 0,
+     "reference_frames_from_candidate": 165,
+     "num_improved_frames": 25,
+     "improved_fraction": 1.0,
+     "wilson_lower_bound": 0.9023308107171635,
+     "approved": true,
+     "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+     "incumbent_mean_residual": 0.2628693672922457,
+     "candidate_mean_residual": 0.025050938103248196,
+     "reentry_pos_jump_m": 1.3662443399882682
+    },
+    "error": null,
+    "state_after": "WAITING_FOR_EVIDENCE",
+    "quarantine_still_open": true
+   }
+  ]
+ },
+ "gate": {
+  "accepted": 0,
+  "rejected": 1,
+  "errored": 0,
+  "modes": [
+   "MODE3_SOFT_BRIDGE_WAIT"
+  ],
+  "committed_key_total": 0,
+  "deferred_key_total": 0
+ },
+ "final_state": "WAITING_FOR_EVIDENCE",
+ "candidate_source": "icp_reregistration",
+ "candidate_source_detail": {
+  "candidate_source": "icp_reregistration",
+  "icp_seconds_total": 11.827733919024467,
+  "icp_candidates": 1,
+  "note": "the frozen 18-key stream stays at 18 keys; the ICP fields are written to icp_detail.jsonl and repeated here, because adding keys to some rows would break every consumer that parses by key",
+  "details": [
+   {
+    "candidate_id": "cand_0000",
+    "mode": "single_rigid_transform_for_the_segment",
+    "seconds": 11.827733919024467,
+    "frames_with_scan": 25,
+    "frames_candidate": 25,
+    "reference_points_total": 247500,
+    "segment_points_before_sampling": 150000,
+    "status": "ITERATION_LIMIT",
+    "icp_iterations": 20,
+    "icp_residual": 0.03809359440692323,
+    "icp_converged": false,
+    "icp_inliers": 2000,
+    "reference_points_used": 19039,
+    "scan_points_used": 2000,
+    "correction_translation_m": 0.45918547105573193,
+    "correction_rotation_deg": 3.728982266332218
+   }
+  ]
+ },
+ "runtime": {
+  "wall_sec": 77.587,
+  "peak_rss_kb": 460796,
+  "pose_messages": 800,
+  "scan_messages": 599,
+  "callback_error_count": 0
+ }
+}

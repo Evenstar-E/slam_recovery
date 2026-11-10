@@ -15,6 +15,7 @@ from slam_recovery.repair.pose_reregistration import (
     build_icp_candidate,
     estimate_normals,
     reregister_frame,
+    reregister_segment,
     restrict_reference,
     sample_scan,
 )
@@ -195,3 +196,47 @@ def test_build_candidate_skips_frames_without_an_init_pose():
     poses, results = build_icp_candidate({0: world, 1: world}, world, {0: np.eye(4)})
     assert set(poses) == {0}
     assert len(results) == 1
+
+
+def test_segment_registration_recovers_one_rigid_correction():
+    """Three frames placed wrong by the same rigid correction; one fit should undo all of it."""
+    # a box alone leaves the yaw weakly constrained; add one plane whose normal is not axis
+    # aligned, which is what makes the correction observable at the tolerance asserted below
+    rng = np.random.default_rng(9)
+    a, b = rng.uniform(-2, 2, 1200), rng.uniform(0, 2, 1200)
+    e1 = np.array([1.0, 0.0, 0.0])
+    n = np.array([1.0, 0.4, 0.2])
+    n = n / np.linalg.norm(n)
+    e1 = e1 - n * float(e1 @ n)
+    e1 = e1 / np.linalg.norm(e1)
+    e2 = np.cross(n, e1)
+    slab = a[:, None] * e1 + b[:, None] * e2 + np.array([1.5, 1.5, 1.0]) - 4.0 * n
+    world = np.vstack([_room(), slab])
+    Rc = _rot("z", 1.0)
+    tc = np.array([0.10, -0.05, 0.02])
+    # world = Rc @ body + tc, so ICP on (body -> world) from identity recovers se3(Rc, tc)
+    body = (world - tc) @ Rc          # row-vector convention: p @ R = R^T p
+    scans = {i: body for i in range(3)}
+    poses = {i: np.eye(4) for i in range(3)}      # every frame claims it is already in world
+    cfg = IcpConfig(scan_samples=3000, max_iters=30, convergence_tol=1e-9)
+    res = reregister_segment(scans, poses, world, cfg)
+    assert res.status in ("CONVERGED", "ITERATION_LIMIT")
+    assert np.linalg.norm(res.pose[:3, 3] - tc) < 0.01
+    ang = np.degrees(np.arccos(np.clip(
+        (np.trace(res.pose[:3, :3].T @ Rc) - 1) / 2, -1, 1)))
+    assert ang < 0.3
+
+
+def test_segment_registration_is_one_registration_not_one_per_frame():
+    world = _room(1500)
+    scans = {i: world for i in range(5)}
+    poses = {i: np.eye(4) for i in range(5)}
+    res = reregister_segment(scans, poses, world, IcpConfig(scan_samples=800, max_iters=5))
+    # the reported scan size is the sampled merged cloud, not five frames' worth
+    assert res.scan_points <= 800
+    assert res.status in ("CONVERGED", "ITERATION_LIMIT")
+
+
+def test_segment_registration_without_frames_reports_it():
+    res = reregister_segment({}, {}, _room(500))
+    assert res.status == "NO_FRAMES"
