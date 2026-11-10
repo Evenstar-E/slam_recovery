@@ -87,10 +87,33 @@ class CheckpointClientTest(unittest.TestCase):
         host = self._host()
         client = CheckpointClient(self.dir, snapshot_period_s=10.0, ack_timeout_s=5.0)
         self.assertIsNone(client.tick(100.0, quiescent=False))   # a segment is open
-        self.assertIsNotNone(client.tick(100.0, quiescent=True))  # first snapshot
+        # Nothing is asked of the host until it has answered once: the first tick is a probe.
+        client.tick(100.0, quiescent=True)
+        deadline = time.time() + 2.0
+        while time.time() < deadline and not client.host_ready:
+            client.poll()
+            time.sleep(0.005)
+        self.assertTrue(client.host_ready)
         self.assertIsNone(client.tick(101.0, quiescent=True))     # inside the period
-        self.assertIsNotNone(client.tick(110.5, quiescent=True))  # period elapsed
-        self.assertEqual(host.seen, ["snapshot", "snapshot"])
+        client.tick(110.5, quiescent=True)                        # period elapsed
+        deadline = time.time() + 2.0
+        while time.time() < deadline and client.snapshots == 0:
+            client.poll()
+            time.sleep(0.005)
+        self.assertEqual(host.seen, ["status", "snapshot"])
+
+    def test_a_snapshot_never_blocks_the_caller(self):
+        # No host at all: tick must return immediately, and the timeout is recorded by the
+        # expiring path rather than by making the main loop wait for it.
+        client = CheckpointClient(self.dir, snapshot_period_s=0.0, ack_timeout_s=5.0)
+        client.host_ready = True
+        t0 = time.time()
+        event = client.tick(time.time(), quiescent=True)
+        self.assertLess(time.time() - t0, 0.2)
+        self.assertEqual(event["command"], "snapshot")
+        time.sleep(0.05)
+        client.expire_pending(0.01)
+        self.assertEqual(client.snapshot_ack_timeouts, 1)
 
     def test_a_disabled_client_sends_nothing(self):
         client = CheckpointClient("")

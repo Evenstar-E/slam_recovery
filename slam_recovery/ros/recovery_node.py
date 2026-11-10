@@ -572,6 +572,12 @@ class CheckpointClient:
         # ack is collected on the main thread; the queue keeps the two from dropping each other.
         self._pending: List[Dict[str, Any]] = []
         self._lock = threading.Lock()
+        # Nothing is asked of the host until it has answered once. Its control poll only runs in
+        # the host's main loop, which starts ~16 s after launch; a snapshot written before that
+        # blocked the driver's main loop for 16.4 s and pushed a decision 18 s past its deadline.
+        self.host_ready = False
+        self.snapshot_ack_timeouts = 0
+        self.snapshot_ack_s: List[float] = []
         self._last_snapshot_wall = 0.0
         self._stopped = False
         if self.enabled:
@@ -609,21 +615,55 @@ class CheckpointClient:
         cmd = event["command"]
         ack = os.path.join(self.dir, "ack")
         deadline = time.time() + (self.ack_timeout_s if timeout_s is None else timeout_s)
-        while time.time() < deadline:
-            try:
-                with open(ack, "r", encoding="utf-8") as fh:
-                    line = fh.read().strip()
-            except OSError:
-                line = ""
-            if line:
-                event.update(ok=line.startswith("OK"), ack=line,
-                             ack_wall=round(time.time(), 3))
-                break
+        line = self._read_ack_for(cmd)
+        while not line and time.time() < deadline:
             time.sleep(0.02)
+            line = self._read_ack_for(cmd)
+        if line:
+            event.update(ok=line.startswith("OK"), ack=line, ack_wall=round(time.time(), 3))
+            self.host_ready = True
         else:
             event.update(ok=False, error="ack_timeout")
         if event.get("ok"):
             self._count(cmd)
+        else:
+            self.failures += 1
+        self.events.append(event)
+        return event
+
+    def _read_ack_for(self, cmd: str) -> str:
+        """Read the ack once and return it only if it answers *this* command.
+
+        The ack file is shared, so a late ack for an earlier command must not be mistaken for a
+        reply to the current one; the host writes "OK <cmd> ..." for exactly this check.
+        """
+        try:
+            with open(os.path.join(self.dir, "ack"), "r", encoding="utf-8") as fh:
+                line = fh.read().strip()
+        except OSError:
+            return ""
+        if not line:
+            return ""
+        parts = line.split()
+        return line if len(parts) >= 2 and parts[1] == cmd else ""
+
+    def poll(self) -> Optional[Dict[str, Any]]:
+        """Account for a pending command without waiting. Never blocks the main loop."""
+        with self._lock:
+            if not self._pending:
+                return None
+            event = self._pending[0]
+        line = self._read_ack_for(event["command"])
+        if not line:
+            return None
+        with self._lock:
+            self._pending.pop(0)
+        event.update(ok=line.startswith("OK"), ack=line, ack_wall=round(time.time(), 3))
+        if event.get("ok"):
+            self.host_ready = True
+            if event["command"] == "snapshot":
+                self.snapshot_ack_s.append(round(time.time() - float(event.get("wall", 0)), 3))
+            self._count(event["command"])
         else:
             self.failures += 1
         self.events.append(event)
@@ -641,7 +681,27 @@ class CheckpointClient:
         elif cmd == "resume":
             self.resumes += 1
 
+    def expire_pending(self, age_s: float) -> None:
+        """Drop a snapshot that has not answered within its budget; record it, never wait."""
+        with self._lock:
+            if not self._pending:
+                return
+            event = self._pending[0]
+        if event["command"] != "snapshot":
+            return
+        if time.time() - float(event.get("wall", 0)) <= age_s:
+            return
+        with self._lock:
+            if self._pending and self._pending[0] is event:
+                self._pending.pop(0)
+        self.snapshot_ack_timeouts += 1
+        self.failures += 1
+        event.update(ok=False, error="snapshot_ack_timeout")
+        self.events.append(event)
+
     def _send(self, cmd: str) -> Dict[str, Any]:
+        # A blocking command must not inherit an unanswered snapshot's ack.
+        self.expire_pending(0.0)
         event = self._write(cmd)
         if event.get("ok") is False:
             return event
@@ -652,13 +712,24 @@ class CheckpointClient:
         return self._write("hold")
 
     def tick(self, now_wall: float, quiescent: bool) -> Optional[Dict[str, Any]]:
-        """Rolling snapshot while nothing is being judged; nothing at all once stopped."""
+        """Rolling snapshot while nothing is being judged; nothing at all once stopped.
+
+        Never waits: the command is written and the ack is collected by poll() on a later tick.
+        Until the host has answered something, a cheap ``status`` probe is used instead, so the
+        driver learns the host is up without asking it for a 100 ms map copy.
+        """
         if not self.enabled or self._stopped or not quiescent:
             return None
+        if self._pending:
+            return None                       # one outstanding command at a time
         if now_wall - self._last_snapshot_wall < self.period_s:
             return None
         self._last_snapshot_wall = now_wall
-        return self._send("snapshot")
+        if not self.host_ready:
+            return self._write("status")
+        event = self._write("snapshot")
+        event["sent_wall"] = round(time.time(), 3)
+        return event
 
     def restore(self) -> Dict[str, Any]:
         return self._send("restore")
@@ -692,6 +763,9 @@ class CheckpointClient:
     def status(self) -> Dict[str, Any]:
         return {
             "enabled": self.enabled,
+            "host_ready": self.host_ready,
+            "snapshot_ack_timeouts": self.snapshot_ack_timeouts,
+            "snapshot_ack_s": list(self.snapshot_ack_s[-50:]),
             "dir": self.dir,
             "snapshot_period_s": self.period_s,
             "snapshots": self.snapshots,
@@ -1110,6 +1184,13 @@ class NativeClosedLoop:
             anchor_key = max(self.node.tx_mgr.trusted_poses.keys())
             anchor_ts_ns = self.node._kf_timestamps.get(anchor_key)
 
+        # How far the segment's end had moved past this episode's deadline when the decision ran.
+        # This is the quantity that inflates wait_started_ns, so it is recorded per decision.
+        seg = self.node.tx_mgr.active_quarantine
+        seg_end = getattr(seg, "t_end_ns", None)
+        wait_offset_s = (None if seg_end is None
+                         else round((int(seg_end) - int(ep.deadline_ns)) / 1e9, 3))
+
         version_before = int(self.node.tx_mgr.trusted_version)
         report = None
         error = None
@@ -1152,6 +1233,7 @@ class NativeClosedLoop:
             "state_after": getattr(self.node.tx_mgr.state, "value",
                                    self.node.tx_mgr.state),
             "quarantine_still_open": self.node.tx_mgr.active_quarantine is not None,
+            "wait_start_offset_s": wait_offset_s,
         }
         # Native writeback. A refused candidate leaves the host's map holding the frames it was
         # asked to judge, so the host is rolled back to its own checkpoint; an accepted one is
@@ -1177,10 +1259,14 @@ class NativeClosedLoop:
         if self.cp is not None:
             # Account for commands written from the callback (the hold) before issuing anything
             # blocking, so one ack is never attributed to the wrong command.
-            ack = self.cp.collect(timeout_s=0.05)
+            ack = self.cp.poll()
             while ack is not None:
-                self.cp_actions.append(ack)
-                ack = self.cp.collect(timeout_s=0.05)
+                if ack.get("command") != "status":
+                    self.cp_actions.append(ack)
+                ack = self.cp.poll()
+            # A snapshot that has not answered in half a second is dropped, not waited on: the
+            # decision path runs on this thread and must never queue behind a map copy.
+            self.cp.expire_pending(0.5)
             self._apply_lifecycle()
         # The rolling checkpoint is taken here, on the main thread, while no episode is open: a
         # deep copy of the map inside a subscriber callback would delay exactly the frames the
