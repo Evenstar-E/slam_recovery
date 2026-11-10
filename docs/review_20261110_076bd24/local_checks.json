@@ -1,0 +1,47 @@
+{
+  "target": "076bd2467572d809286d08c5307240ef30c7f1b0",
+  "baseline": "f9ad688b42cca607a35b766634b0e7a5a3a5f9f9",
+  "scope": "fixed Git archive arithmetic, modified ICP synthetic tests; no local native run or parameter tuning",
+  "reruns": {
+    "status": "PASS: receipt/summary/candidate run IDs and pairing arithmetic agree",
+    "driver_sha256": "5e2d6cad93f21e717419a63e612e54ec22cab8e9f3c0d65e55d1b892481f7b5c",
+    "driver_sha_caveat": "bcadd9f and f9ad688 have identical driver bytes but different core blobs; driver hash alone cannot pin gate dependencies",
+    "rows": [
+      {"run_id": "fl_native_20261110T035825Z_3008585", "paired": 584, "scan_total": 599, "scan_unpaired": 15, "candidate_n": 22, "paired_evidence_n": 22, "improved": 17, "wilson": 0.6009833871549518, "trusted_reference_n": 165, "incumbent_residual": 0.25274549939009483, "accepted": 0, "E2": 0},
+      {"run_id": "fl_native_20261110T042426Z_3020861", "paired": 310, "scan_total": 599, "scan_unpaired": 289, "candidate_n": 22, "paired_evidence_n": 22, "improved": 22, "wilson": 0.8904710490659667, "trusted_reference_n": 165, "incumbent_residual": 0.3929969044849089, "accepted": 0, "E2": 0},
+      {"run_id": "fl_native_20261110T044250Z_3031393", "paired": 369, "scan_total": 599, "scan_unpaired": 230, "candidate_n": 22, "paired_evidence_n": 22, "improved": 13, "wilson": 0.41792987463389836, "trusted_reference_n": 162, "incumbent_residual": 0.13836557103825786, "accepted": 0, "E2": 0}
+    ],
+    "machine_load_in_archived_receipts": "UNAVAILABLE in all three receipts; new runner records it for future runs",
+    "wilson_check": "PASS using existing z=1.645 one-sided convention; initial scratch z=1.96 was not the repository convention and was corrected before conclusion",
+    "causality": "load association suggested, not isolated; candidate membership not archived here, sample sizes all 22, reference/poses/incumbents differ"
+  },
+  "offline_icp": {
+    "status": "PASS archive counts/aggregates; raw bags not locally available",
+    "scans": 598, "paired": 533, "interpolated": 215, "dropped": 65,
+    "reference_frames": 134, "control_reference_frames": 124, "control_frames": 10,
+    "candidate_frames": 399, "converged": 53, "iteration_limit": 346,
+    "finite_candidate_poses": 399,
+    "seconds_archived": 1066.2882467396557,
+    "seconds_per_frame_archived": 2.672401620901393,
+    "candidate_displacement_median_m": 0.47765753709183395,
+    "candidate_residual_median_m": 0.049810727178964884,
+    "control_displacement_median_m": 0.01749553426275132,
+    "inside_injection_n": 153, "inside_displacement_median_m": 0.47174526574004133,
+    "after_injection_n": 246, "after_displacement_median_m": 0.4792532807051971,
+    "control_converged_residual_median_m": 0.04115437226332913,
+    "control_iteration_limit_residual_median_m": 0.04122846485121111,
+    "provenance_limit": "input/config recorded; execution source/script SHA/environment/receipt not in this archive; split summaries explicitly computed after execution",
+    "not_claimed": "independent quality, contamination-specific cause, proven residual floor, online ICP or native state/map recovery"
+  },
+  "icp_existing_test_functions": {
+    "status": "PASS", "passed": 13, "failed": 0, "seconds": 11.096,
+    "command": "python -B -W ignore; target root inserted into sys.path; import test_pose_reregistration, inspect.getmembers(isfunction), directly invoke all test_* functions",
+    "runner": "direct existing test function invocation, not pytest",
+    "loaded_module": "D:/REPAIR/slam_recovery_upstream/slam_recovery/tests/test_pose_reregistration.py"
+  },
+  "syntax": "PASS: bash -n runner; fixed Git AST parse ICP implementation and offline script",
+  "old_core_boundary_and_A5_A9_retests": "NOT_APPLICABLE: not repeated",
+  "pytest_driver_suite": "BLOCKED: known absent pytest; not repeated or installed",
+  "native_recovery_E2": "not delivered; remote native rerun observations only",
+  "complete_AB_rescore": "NOT_APPLICABLE"
+}
