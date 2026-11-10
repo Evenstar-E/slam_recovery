@@ -24,6 +24,7 @@ from slam_recovery.ros.recovery_node import (
     candidate_record,
     cloud_to_xyz,
     extrapolate_incumbent,
+    nis_vs_map_size,
     pose_to_matrix,
     quat_to_rot,
     subsample,
@@ -365,6 +366,30 @@ def test_summary_counts_gate_outcomes_and_nulls():
     assert set(s["null_field_counts"]) == set(CANDIDATE_KEYS)
     assert s["frames"]["consumed_after_first_decision"] > 0
     json.dumps(s)
+
+
+def test_detection_off_grows_the_map_and_judges_nothing():
+    node = _WarmupNode()
+    loop = NativeClosedLoop(node, run_id="run", detection_enabled=False)
+    for i in range(25):
+        loop.on_pair(i * 100_000_000, np.eye(4), _scan(200))
+    assert loop.detection_counts["DISABLED_FOR_DIAGNOSIS"] == 25
+    assert loop.detection_counts["AVAILABLE"] == 0
+    assert node.step_frame_calls == 0, "nothing may be judged in diagnosis mode"
+    assert len(node.tx_mgr.trusted_poses) > 0, "the map still grows"
+    assert loop.records == []
+    assert all(d["detection_status"] == "DISABLED_FOR_DIAGNOSIS" for d in loop.diag)
+
+
+def test_nis_vs_map_size_bins_every_node_map_frame_once():
+    node = _WarmupNode()
+    loop = NativeClosedLoop(node, run_id="run", detection_enabled=False)
+    for i in range(30):
+        loop.on_pair(i * 100_000_000, np.eye(4), _scan(200))
+    t = nis_vs_map_size(loop.diag)
+    n_rows = sum(b["n"] for b in t["by_trusted_keyframes"])
+    assert n_rows == sum(1 for d in loop.diag
+                         if d["nis"] is not None and d["nis_reference"] == "node_map")
 
 
 def test_no_quarantine_means_no_records_and_a_readable_summary():
