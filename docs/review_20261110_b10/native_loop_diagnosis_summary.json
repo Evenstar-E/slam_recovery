@@ -1,0 +1,168 @@
+{
+ "run_id": "fl_native_20261110T033802Z_2974473",
+ "detection_enabled": false,
+ "parameters": {
+  "confirmation_margin_ns": 2000000000,
+  "pair_window_ns": 40000000,
+  "scan_cap": 6000,
+  "nis_radius_m": 3.0,
+  "extrap_frames": 5,
+  "sigma_meas_m": 0.12
+ },
+ "pairing": {
+  "pair_window_ns": 40000000,
+  "poses_received": 513,
+  "scans_received": 599,
+  "paired": 393,
+  "poses_unpaired": 120,
+  "scans_unpaired": 206,
+  "paired_fraction_of_poses": 0.7660818713450293,
+  "paired_fraction_of_scans": 0.656093489148581,
+  "max_abs_dt_ns": 39824962,
+  "max_backlog_messages": 207,
+  "messages_considered": 1112,
+  "pairing_rule": "nearest pose within 40 ms, no pose reused"
+ },
+ "frames": {
+  "paired": 393,
+  "ingested": 393,
+  "fed_to_step_frame": 0,
+  "ingested_without_detection": 0,
+  "consumed_after_first_decision": 0,
+  "first_decision_ts_ns": null
+ },
+ "warmup": {
+  "policy": "a frame the node cannot support against its own spatially sampled trusted map is ingested through the manager's healthy path but is NOT judged by the detector; it is recorded as detection_status=UNAVAILABLE. In diagnosis mode (detection=off) every frame is recorded as DISABLED_FOR_DIAGNOSIS and nothing is judged at all.",
+  "detection_status_counts": {
+   "AVAILABLE": 0,
+   "UNAVAILABLE": 0,
+   "DISABLED_FOR_DIAGNOSIS": 393
+  },
+  "frames_ingested_without_detection": 0,
+  "first_detected_kf": null,
+  "not_an_assumption": "no frame is labelled healthy; UNAVAILABLE says the detector had no reference, which is a statement about the evidence, not about the frame"
+ },
+ "nis": {
+  "computed": 392,
+  "carried_forward": 0,
+  "unavailable": 1,
+  "reference_node_map": 364,
+  "reference_prev_scan": 28,
+  "reference_none": 1,
+  "nonfinite_estimator_output": 0,
+  "sigma_meas_m": 0.12
+ },
+ "nis_vs_map_size": {
+  "frames_with_node_map_nis": 364,
+  "bins_are_half_open": "lo <= k <= hi inclusive at both ends",
+  "by_trusted_keyframes": [
+   {
+    "lo": 1,
+    "hi": 2,
+    "n": 2,
+    "median": 55.04453375430199,
+    "p90": 53.49032575343704,
+    "max": 55.04453375430199
+   },
+   {
+    "lo": 3,
+    "hi": 5,
+    "n": 2,
+    "median": 50.869515603497746,
+    "p90": 43.47773979830638,
+    "max": 50.869515603497746
+   },
+   {
+    "lo": 6,
+    "hi": 10,
+    "n": 6,
+    "median": 41.37336140705429,
+    "p90": 41.60166324062276,
+    "max": 44.449430443335274
+   },
+   {
+    "lo": 11,
+    "hi": 20,
+    "n": 12,
+    "median": 32.69579966880069,
+    "p90": 34.263825213443134,
+    "max": 36.621370719317284
+   },
+   {
+    "lo": 21,
+    "hi": 50,
+    "n": 30,
+    "median": 13.503947019917465,
+    "p90": 19.562847643485426,
+    "max": 24.503064591461303
+   },
+   {
+    "lo": 51,
+    "hi": 100,
+    "n": 51,
+    "median": 18.043930279759927,
+    "p90": 24.386318036070737,
+    "max": 28.188888291944142
+   },
+   {
+    "lo": 101,
+    "hi": null,
+    "n": 261,
+    "median": 19.718524606130277,
+    "p90": 1035.4360852700836,
+    "max": 3340.6734995107904
+   }
+  ],
+  "by_map_points": [
+   {
+    "lo": 501,
+    "hi": 1000,
+    "n": 5,
+    "median": 50.869515603497746,
+    "p90": 53.49032575343704,
+    "max": 55.04453375430199
+   },
+   {
+    "lo": 1001,
+    "hi": 2000,
+    "n": 11,
+    "median": 36.621370719317284,
+    "p90": 41.60166324062276,
+    "max": 44.449430443335274
+   },
+   {
+    "lo": 2001,
+    "hi": 5000,
+    "n": 71,
+    "median": 15.239136277032717,
+    "p90": 23.72573306003261,
+    "max": 32.69579966880069
+   },
+   {
+    "lo": 5001,
+    "hi": null,
+    "n": 277,
+    "median": 20.475770273278457,
+    "p90": 990.3752430895865,
+    "max": 3340.6734995107904
+   }
+  ]
+ },
+ "trusted_keyframes_at_exit": 373,
+ "final_state": "HEALTHY",
+ "gate": {
+  "accepted": 0,
+  "rejected": 0,
+  "errored": 0,
+  "modes": [],
+  "committed_key_total": 0,
+  "deferred_key_total": 0
+ },
+ "runtime": {
+  "wall_sec": 79.813,
+  "peak_rss_kb": 551764,
+  "pose_messages": 513,
+  "scan_messages": 599,
+  "callback_error_count": 0
+ }
+}

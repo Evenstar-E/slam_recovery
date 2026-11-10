@@ -64,6 +64,9 @@ NIS_MIN_TRAIN = 30               # below this the estimator itself has no refere
 NIS_MIN_HOLDOUT = 10             # below this the estimator itself has no holdout
 EXTRAP_FRAMES = 5                # tail length for the incumbent's constant-velocity extrapolation
 RSS_POLL_SEC = 1.0
+# How often the spatially sampled reference is rebuilt. Not a point budget: the voxel size still
+# fixes the point spacing; this only bounds how far the reference can lag the map.
+REFERENCE_REFRESH_NS = 500_000_000
 
 # The frozen per-candidate record, in schema order. Exactly these keys, missing values as null;
 # no extra keys are added here -- anything else belongs in the run summary, not in the stream.
@@ -360,15 +363,19 @@ class LiveNis:
     """
 
     def __init__(self, node: OnlineRecoveryTransactionNode, radius_m: float = NIS_RADIUS_M,
-                 min_train: int = NIS_MIN_TRAIN, min_holdout: int = NIS_MIN_HOLDOUT) -> None:
+                 min_train: int = NIS_MIN_TRAIN, min_holdout: int = NIS_MIN_HOLDOUT,
+                 refresh_ns: int = REFERENCE_REFRESH_NS) -> None:
         self.node = node
         self.radius_m = float(radius_m)
         self.min_train = int(min_train)
         self.min_holdout = int(min_holdout)
+        self.refresh_ns = int(refresh_ns)
         self._prev_world: Optional[np.ndarray] = None
         self._last_value: Optional[float] = None
         self._support_cache: Optional[np.ndarray] = None
         self._support_key: Optional[tuple] = None
+        self._last_refresh_ns: Optional[int] = None
+        self.refresh_count = 0
         self.counts = {
             "computed": 0,
             "carried_forward": 0,
@@ -379,23 +386,32 @@ class LiveNis:
         }
         self.nonfinite = 0
 
-    def support_reference(self) -> np.ndarray:
-        """The node's spatially sampled trusted map, cached until the trusted map changes.
+    def support_reference(self, now_ts_ns: Optional[int] = None) -> np.ndarray:
+        """The node's spatially sampled trusted map, cached between refreshes.
 
-        `support_reference` rebuilds from every trusted point and de-duplicates by voxel, which is
-        O(map points) per call; calling it per frame would make the loop quadratic in run length.
-        The cache key is the transaction manager's own version plus its pose count, so any
-        promotion, commit or revocation invalidates it.
+        `support_reference` de-duplicates every trusted point by voxel, which is O(map points); at
+        ten frames a second on a growing map that alone would make the loop quadratic. The cloud is
+        therefore rebuilt when the trusted map version changes **and** at least ``refresh_ns`` of
+        message time has passed, so the reference lags the map by at most one refresh period. The
+        lag is recorded; it is not a point budget, so the point *spacing* still comes from the
+        voxel size rather than from the map size.
         """
         key = (int(self.node.tx_mgr.trusted_version), len(self.node.tx_mgr.trusted_poses))
-        if self._support_key != key:
+        now = None if now_ts_ns is None else int(now_ts_ns)
+        due = (self._support_cache is None or self._support_key != key) and (
+            self._last_refresh_ns is None or now is None
+            or (now - self._last_refresh_ns) >= self.refresh_ns)
+        if due:
             self._support_cache = self.node.support_reference()
             self._support_key = key
+            self._last_refresh_ns = now if now is not None else self._last_refresh_ns
+            self.refresh_count += 1
         return (self._support_cache if self._support_cache is not None
                 else np.zeros((0, 3), dtype=np.float64))
 
-    def _reference(self, pose: np.ndarray) -> Tuple[Optional[np.ndarray], str]:
-        trusted = self.support_reference()
+    def _reference(self, pose: np.ndarray, now_ts_ns: Optional[int] = None
+                   ) -> Tuple[Optional[np.ndarray], str]:
+        trusted = self.support_reference(now_ts_ns)
         if len(trusted) >= self.min_train:
             d = np.linalg.norm(trusted - pose[:3, 3], axis=1)
             near = trusted[d <= self.radius_m]
@@ -405,13 +421,13 @@ class LiveNis:
             return self._prev_world, "prev_scan"
         return None, "none"
 
-    def measure(self, pose: np.ndarray, scan_body: np.ndarray
-                ) -> Tuple[Optional[float], str, str]:
+    def measure(self, pose: np.ndarray, scan_body: np.ndarray,
+                now_ts_ns: Optional[int] = None) -> Tuple[Optional[float], str, str]:
         """Return ``(value, source, reference)``. ``value`` is None only when nothing is available."""
         # Transform first, then resolve the reference: the fallback reference is the *previous*
         # frame's cloud, so it must be read before this frame replaces it.
         world = (np.asarray(scan_body, dtype=np.float64)[:, :3] @ pose[:3, :3].T) + pose[:3, 3]
-        ref, ref_name = self._reference(pose)
+        ref, ref_name = self._reference(pose, now_ts_ns)
         value: Optional[float] = None
         if ref is not None and len(world) >= self.min_holdout:
             v = float(compute_disjoint_holdout_point_to_plane_nis(
@@ -468,10 +484,12 @@ class NativeClosedLoop:
         confirmation_margin_ns: Optional[int] = None,
         pair_dt_ns: int = PAIR_DT_NS,
         scan_cap: int = SCAN_CAP,
+        detection_enabled: bool = True,
     ) -> None:
         self.node = node
         self.run_id = run_id
         self.candidate_source = candidate_source
+        self.detection_enabled = bool(detection_enabled)
         self.confirmation_margin_ns = int(
             confirmation_margin_ns if confirmation_margin_ns is not None
             else node.tx_mgr.confirmation_margin_ns)
@@ -496,9 +514,10 @@ class NativeClosedLoop:
         # Detection availability. The gate is not asked to judge a frame that has no independent
         # reference to be judged against; such frames still grow the map, and are counted as
         # UNAVAILABLE rather than assumed healthy.
-        self.detection_counts = {"AVAILABLE": 0, "UNAVAILABLE": 0}
+        self.detection_counts = {"AVAILABLE": 0, "UNAVAILABLE": 0, "DISABLED_FOR_DIAGNOSIS": 0}
         self.ingested_undetected = 0
         self.first_detected_kf: Optional[int] = None
+        self.pose_convention_check: Dict[str, Any] = {"status": "NOT_REACHED"}
 
     # -- ingest -------------------------------------------------------------------------------
     def _fed(self, ts_ns: int) -> bool:
@@ -518,27 +537,44 @@ class NativeClosedLoop:
         self.node.scan_buffer_body[kf_id] = np.asarray(scan_body, dtype=np.float64)[:, :3].copy()
         self.node._kf_timestamps[kf_id] = ts_ns
 
-        value, source, reference = self.nis.measure(pose, scan_body)
-        support_ref = self.nis.support_reference()
+        value, source, reference = self.nis.measure(pose, scan_body, now_ts_ns=ts_ns)
+        support_ref = self.nis.support_reference(ts_ns)
+        # Map size as it stood when this frame's NIS was computed -- not after this frame has been
+        # ingested. The diagnostic bins NIS by reference size, so the two must be the same instant.
+        kfs_before = int(len(self.node.tx_mgr.trusted_poses))
+        pts_before = int(len(support_ref))
+
+        if not self.detection_enabled:
+            # Diagnosis mode: the map grows, the NIS is computed and recorded, and nothing is
+            # judged. This is how the NIS-versus-map-size curve is obtained without a threshold.
+            status = "DISABLED_FOR_DIAGNOSIS"
+            self.detection_counts[status] += 1
+            self._ingest_without_detection(kf_id, ts_ns, pose, scan_body, value)
+            self._record_diag(kf_id, ts_ns, value, source, reference, status,
+                              kfs_before, pts_before)
+            return
+
         supported = self.node._frame_has_reference_support(
             kf_id, support_ref, {kf_id: np.asarray(pose, dtype=np.float64)})
         # Detection is available only when the frame can actually be scored against an independent
         # reference. "Unsupported" and "healthy" are different statements and are recorded as such:
         # an unsupported frame is ingested so the map can grow, but the detector does not judge it.
         available = bool(supported) and value is not None
-        self.detection_counts["AVAILABLE" if available else "UNAVAILABLE"] += 1
+        status = "AVAILABLE" if available else "UNAVAILABLE"
+        self.detection_counts[status] += 1
 
         before = self.node.tx_mgr.active_quarantine
         if available:
             if self.first_detected_kf is None:
                 self.first_detected_kf = kf_id
-                self.pose_convention_check = self._pose_convention_check(pose, scan_body)
+                self.pose_convention_check = self._pose_convention_check(pose, scan_body, ts_ns)
             self.node.step_frame(kf_id, ts_ns, pose, scan_body, value)
             self.frames_fed += 1
         else:
             self.ingested_undetected += 1
             self._ingest_without_detection(kf_id, ts_ns, pose, scan_body, value)
-        self._record_diag(kf_id, ts_ns, value, source, reference, available)
+        self._record_diag(kf_id, ts_ns, value, source, reference, status,
+                          kfs_before, pts_before)
 
         after = self.node.tx_mgr.active_quarantine
         if before is None and after is not None:
@@ -549,7 +585,7 @@ class NativeClosedLoop:
                 self.decide(ts_ns, "confirmation_margin")
 
     def _record_diag(self, kf_id: int, ts_ns: int, value: Optional[float], source: str,
-                     reference: str, detected: bool) -> None:
+                     reference: str, status: str, kfs_before: int, pts_before: int) -> None:
         if len(self.diag) >= self.diag_cap:
             return
         det = self.node.detector
@@ -557,12 +593,12 @@ class NativeClosedLoop:
             "kf_id": int(kf_id), "ts_ns": int(ts_ns),
             "nis": None if value is None else float(value),
             "nis_source": source, "nis_reference": reference,
-            "detection_status": "AVAILABLE" if detected else "UNAVAILABLE",
+            "detection_status": str(status),
             "detector_state": getattr(det.state, "value", det.state),
             "cusum": float(getattr(det, "cusum_g", float("nan"))),
             "suspect_dwell": int(getattr(det, "suspect_dwell", -1)),
-            "map_points": int(len(self.nis.support_reference())),
-            "trusted_keyframes": int(len(self.node.tx_mgr.trusted_poses)),
+            "map_points": int(pts_before),
+            "trusted_keyframes": int(kfs_before),
         })
 
     def _ingest_without_detection(self, kf_id: int, ts_ns: int, pose: np.ndarray,
@@ -606,8 +642,8 @@ class NativeClosedLoop:
         self.node.tx_mgr.step_healthy(delta)
         self.node._sync_spatial_map_with_trusted_poses()
 
-    def _pose_convention_check(self, pose: np.ndarray, scan_body: np.ndarray
-                               ) -> Dict[str, Any]:
+    def _pose_convention_check(self, pose: np.ndarray, scan_body: np.ndarray,
+                               now_ts_ns: Optional[int] = None) -> Dict[str, Any]:
         """Score one frame under T_wb and under the reversed reading, once.
 
         The peer's caution: a reversed pose is invisible in ``weak_dir_info_before`` (the quadratic
@@ -615,7 +651,7 @@ class NativeClosedLoop:
         the convention is checked on the quantity that actually depends on it -- the residual of
         the scan placed by the pose -- and the two numbers are recorded side by side.
         """
-        ref, ref_name = self.nis._reference(pose)
+        ref, ref_name = self.nis._reference(pose, now_ts_ns)
         out: Dict[str, Any] = {"reference": ref_name, "frames": 1}
         if ref is None:
             out["status"] = "NO_REFERENCE"
@@ -710,6 +746,7 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
     return {
         "run_id": loop.run_id,
         "candidate_source": loop.candidate_source,
+        "detection_enabled": loop.detection_enabled,
         # A7 (review): the gate's mode depends on the world origin, because the transported weak
         # direction is re-normalised by a length that is not Ad-invariant and because the
         # covariance norm is compared against a fixed tolerance although the spectral norm is not
@@ -772,7 +809,9 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
         "warmup": {
             "policy": "a frame the node cannot support against its own spatially sampled trusted "
                       "map is ingested through the manager's healthy path but is NOT judged by "
-                      "the detector; it is recorded as detection_status=UNAVAILABLE",
+                      "the detector; it is recorded as detection_status=UNAVAILABLE. In diagnosis "
+                      "mode (detection=off) every frame is recorded as DISABLED_FOR_DIAGNOSIS "
+                      "and nothing is judged at all.",
             "detection_status_counts": loop.detection_counts,
             "frames_ingested_without_detection": loop.ingested_undetected,
             "first_detected_kf": loop.first_detected_kf,
@@ -796,6 +835,7 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
         "holdout_nis_nonfinite": sum(1 for r in rows if r["holdout_nis"] is None)
         if rows else 0,
         "decision_errors": loop.decision_errors,
+        "nis_vs_map_size": nis_vs_map_size(loop.diag),
         "frame_diagnostics": loop.diag,
         "final_state": getattr(loop.node.tx_mgr.state, "value", loop.node.tx_mgr.state),
         "quarantine_open_at_exit": loop.node.tx_mgr.active_quarantine is not None,
@@ -828,6 +868,43 @@ def simulate_pairing(pose_stamps: List[int], scan_stamps: List[int], dt_ns: int)
             "fraction_of_scans": (paired / len(scans)) if scans else None,
             "fraction_of_poses": (paired / len(poses)) if poses else None,
             "max_abs_dt_ns": int(max_dt)}
+
+
+def nis_vs_map_size(diag: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """NIS distribution as a function of how much map the reference held.
+
+    This is the curve the start condition has to be read off. It is computed from the recorded
+    frames only -- no extra run, and no selection of "the segment that looked best": every frame
+    with a computed node-map NIS enters exactly one bin.
+    """
+    bins = [(1, 2), (3, 5), (6, 10), (11, 20), (21, 50), (51, 100), (101, 10 ** 9)]
+    rows = [d for d in diag if d.get("nis") is not None and d.get("nis_reference") == "node_map"]
+    out: Dict[str, Any] = {
+        "frames_with_node_map_nis": len(rows),
+        "bins_are_half_open": "lo <= k <= hi inclusive at both ends",
+        "by_trusted_keyframes": [], "by_map_points": [],
+    }
+
+    def _bin(field, lo_attr, hi_attr, bucket):
+        sel = [d["nis"] for d in rows if lo_attr <= d[field] <= hi_attr]
+        if not sel:
+            return None
+        sel.sort()
+        n = len(sel)
+        return {"lo": lo_attr, "hi": (None if hi_attr >= 10 ** 9 else hi_attr), "n": n,
+                "median": float(sel[n // 2]), "p90": float(sel[int(0.9 * (n - 1))]),
+                "max": float(sel[-1])}
+
+    for lo, hi in bins:
+        r = _bin("trusted_keyframes", lo, hi, "kf")
+        if r:
+            out["by_trusted_keyframes"].append(r)
+    for lo, hi in ((1, 50), (51, 100), (101, 200), (201, 500), (501, 1000),
+                   (1001, 2000), (2001, 5000), (5001, 10 ** 9)):
+        r = _bin("map_points", lo, hi, "pts")
+        if r:
+            out["by_map_points"].append(r)
+    return out
 
 
 def pairing_diagnosis(pairer: FramePairer) -> Dict[str, Any]:
@@ -1016,7 +1093,9 @@ def main(argv: Optional[List[str]] = None) -> int:
                     help="stop after this many seconds of wall time (0 = run until shutdown)")
     ap.add_argument("--max-pairs", type=int, default=0,
                     help="stop after this many paired frames (0 = no limit); wiring checks use it")
-    ap.add_argument("--stop-when-bag-ends", action="store_true")
+    ap.add_argument("--detection", default="on", choices=("on", "off"),
+                    help="off = diagnosis only: the map grows and the NIS is recorded, "
+                         "but nothing is judged")
     args, _unknown = ap.parse_known_args(argv)
 
     import rospy
@@ -1034,6 +1113,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         confirmation_margin_ns=int(args.confirmation_margin_sec * 1e9),
         pair_dt_ns=int(args.pair_dt_ms * 1e6),
         scan_cap=args.scan_cap,
+        detection_enabled=(args.detection == "on"),
     )
     driver = RosDriver(loop, args.pose_topic, args.scan_topic, args.status_topic)
 

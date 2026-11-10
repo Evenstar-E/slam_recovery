@@ -21,7 +21,7 @@
 set -uo pipefail
 
 BAG="${1:-}"; shift || true
-RATE=1.0; DRAIN=20; DURATION=0; MAX_PAIRS=0; CAND_SRC=host_poses
+RATE=1.0; DRAIN=20; DURATION=0; MAX_PAIRS=0; CAND_SRC=host_poses; DETECTION=on
 while [ $# -gt 0 ]; do
   case "$1" in
     --rate) RATE="$2"; shift 2 ;;
@@ -29,6 +29,7 @@ while [ $# -gt 0 ]; do
     --duration) DURATION="$2"; shift 2 ;;
     --max-pairs) MAX_PAIRS="$2"; shift 2 ;;
     --candidate-source) CAND_SRC="$2"; shift 2 ;;
+    --detection) DETECTION="$2"; shift 2 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
@@ -69,11 +70,11 @@ cleanup() {
 
 write_receipt() {
   env -u PYTHONPATH /usr/bin/python3 - "$RUN_DIR" "$STATUS" "$REASON" "$TERMINATION" \
-      "$BAG" "$RATE" "$DRAIN" "$DURATION" "$MAX_PAIRS" "$CAND_SRC" \
+      "$BAG" "$RATE" "$DRAIN" "$DURATION" "$MAX_PAIRS" "$CAND_SRC" "$DETECTION" \
       "$BIN" "$CFG" "$CAM" "$PLAY_EXIT" "$PAIR_EXIT" "$REC_EXIT" "$RC_EXIT" <<'PY'
 import hashlib, json, os, sys
 
-(rd, status, reason, term, bag, rate, drain, duration, max_pairs, cand_src,
+(rd, status, reason, term, bag, rate, drain, duration, max_pairs, cand_src, detection,
  binp, cfg, cam, play_x, pair_x, rec_x, rc_x) = sys.argv[1:]
 
 def sha(p):
@@ -95,6 +96,7 @@ rec = {
                "recovery_node_source": os.path.join(rd, "recovery_node_source.sha256")},
     "launch": {"rate": rate, "drain_s": drain, "duration_s": duration,
                "max_pairs": max_pairs, "candidate_source": cand_src,
+               "detection": detection,
                "group_model": "host and recovery node are children of one setsid supervisor"},
     "exit_codes": {"play": play_x, "supervisor": pair_x, "recovery_node": rec_x,
                    "roscore": rc_x},
@@ -171,7 +173,7 @@ rosparam load "$CFG" / || { STATUS=FAIL; REASON="could not load $CFG"; exit 1; }
 rosparam load "$CAM" /laserMapping || { STATUS=FAIL; REASON="could not load $CAM"; exit 1; }
 
 # ---- one supervisor, one process group ------------------------------------------------------
-REC_ARGS=(--run-dir "$RUN_DIR" --candidate-source "$CAND_SRC" --scan-cap 6000)
+REC_ARGS=(--run-dir "$RUN_DIR" --candidate-source "$CAND_SRC" --scan-cap 6000 --detection "$DETECTION")
 [ "$DURATION" != "0" ] && REC_ARGS+=(--duration-sec "$DURATION")
 [ "$MAX_PAIRS" != "0" ] && REC_ARGS+=(--max-pairs "$MAX_PAIRS")
 
@@ -262,6 +264,8 @@ checks["pairing"] = {
     "max_abs_dt_ns": p.get("max_abs_dt_ns"),
     "ok": bool(p.get("paired")),
 }
+_diag_only = not bool(s.get("detection_enabled", True))
+_det = s.get("warmup", {}).get("detection_status_counts", {})
 checks["nis_provenance"] = {
     "computed": n.get("computed"), "carried_forward": n.get("carried_forward"),
     "unavailable": n.get("unavailable"),
@@ -269,9 +273,13 @@ checks["nis_provenance"] = {
     "reference_prev_scan": n.get("reference_prev_scan"),
     "fed_to_step_frame": f.get("fed_to_step_frame"),
     "ingested_without_detection": f.get("ingested_without_detection"),
-    "detection_status": s.get("warmup", {}).get("detection_status_counts"),
-    "ok": bool(f.get("fed_to_step_frame")),
+    "detection_status": _det,
+    # With detection off, zero frames reach step_frame by design; the evidence that the pipeline
+    # ran is that frames were recorded as DISABLED_FOR_DIAGNOSIS and the NIS still got a source.
+    "ok": (bool(_det.get("DISABLED_FOR_DIAGNOSIS")) if _diag_only
+           else bool(f.get("fed_to_step_frame"))),
 }
+detection_on = bool(s.get("detection_enabled", True))
 checks["gate_reachable"] = {
     "episodes": q.get("episodes"), "decisions": q.get("decisions"),
     "accepted": g.get("accepted"), "rejected": g.get("rejected"),
@@ -280,7 +288,10 @@ checks["gate_reachable"] = {
                         for e in q.get("episode_detail", [])],
     "evidence_reasons": [e.get("paired_evidence", {}).get("reason")
                          for e in q.get("episode_detail", [])],
-    "ok": bool(q.get("decisions")),
+    # In diagnosis mode the gate is deliberately never reached: zero decisions is the correct
+    # outcome, not a wiring failure.
+    "status": "APPLICABLE" if detection_on else "NOT_APPLICABLE_DETECTION_OFF",
+    "ok": bool(q.get("decisions")) if detection_on else True,
 }
 checks["same_process_group"] = {
     "recovery_pid": int(rec_pid) if rec_pid.isdigit() else None,
