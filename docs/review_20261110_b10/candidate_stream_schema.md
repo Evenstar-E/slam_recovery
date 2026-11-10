@@ -22,7 +22,7 @@ B10 的四策略和 B5 的混淆矩阵都要求**逐候选**记录，而不是�
   "wilson_lower_bound": 0.9,
   "reentry_pos_jump_m": 0.05,
   "parent_map_version": 3,
-  "candidate_source": "recovery_node",
+  "candidate_source": "host_poses | icp_reregistration",
   "pose_se3_first_trigger": [16 floats, row-major]
 }
 ```
@@ -37,6 +37,8 @@ B10 的四策略和 B5 的混淆矩阵都要求**逐候选**记录，而不是�
 | `weak_dir_info_*` / `holdout_nis` / `paired_benefit_status` | 诊断，不参与判定 | **不得**当独立标签 |
 | `t_trigger_ns` / `t_decision_ns` | 检测→决策延迟 | 迟检分析 |
 | `pose_se3_first_trigger` | 事后核对 `T_wb` 约定 | 复算排查 |
+| `candidate_source` | 区分阶段一 `(b)` 与阶段二 `(d)` 的候选流 | 同左 |
+| `icp_iterations` / `icp_residual` / `icp_converged` / `icp_inliers` | 仅 `(d)` 阶段有值，其余为 `null` | — |
 
 ## 三条纪律
 
