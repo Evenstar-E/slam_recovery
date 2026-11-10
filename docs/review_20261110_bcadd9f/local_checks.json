@@ -1,0 +1,40 @@
+{
+  "target": "bcadd9f6a03846589ef5a3ae73309c977f6d97c4",
+  "command": "python -B -W ignore docs/review_20261110_bcadd9f/boundary_integration_probe.py",
+  "source_identity": "PASS: core, transaction_manager_node, fim_and_holdout normalized checkout SHA256 matched fixed Git blobs",
+  "helper_three_controls": "PASS: 1.2506m/2.329s within envelope; 1.2506m/0s and 7m/2.329s outside envelope",
+  "scope": "synthetic actual-node integration, no ROS; default thresholds; direct quarantine entry; body clouds transformed to the same world scene",
+  "cases": [
+    {
+      "speed_mps": 0.3,
+      "elapsed_s": 2.328956843,
+      "first_run_jump_m": 0.6986870529000001,
+      "boundary_ok": true,
+      "paired_approved": true,
+      "reentry_jump_m": 0.6986870529000001,
+      "evidence_status": "FAILED",
+      "reason": "Refused Mode 2 atomic commit: paired-benefit evidence FAILED (explicit failure, non-finite value, or threshold violation)",
+      "info_after": 62.982929840595105,
+      "cov_norm": 0.513613665194515,
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "accepted": false
+    },
+    {
+      "speed_mps": 0.1,
+      "first_run_jump_m": 0.23289568430000004,
+      "boundary_ok": true,
+      "paired_approved": true,
+      "evidence_status": "PASSED",
+      "reason": "Insufficient verified info; maintaining soft bridge while waiting for new evidence",
+      "info_after": 62.98292984059512,
+      "cov_norm": 0.513613665194515,
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "accepted": false
+    }
+  ],
+  "probe_exit": 0,
+  "verdict": "remaining duplicate raw-distance refusal reproduced; no complete gate PASS claim, covariance in fixture also exceeds default 0.5",
+  "pytest_suite": "BLOCKED: known missing pytest; not installed, shimmed or repeated",
+  "native_run_and_E2": "NOT_APPLICABLE: no new native evidence, not run locally",
+  "full_regression_and_AB_rescore": "NOT_APPLICABLE: limited modified-boundary review"
+}

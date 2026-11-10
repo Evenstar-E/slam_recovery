@@ -193,3 +193,9 @@ detection-off原summary/receipt/wiring及sigma分析已交，source原blob SHA�
 旧replay来源为持续增长到373key的detection-off图，不是“早期冻结小参考”；真实support/FIM/反馈/人口差异和随机性不能被单一归因替代。新severity是hall而检测/replay是room，hall窗内200差异帧不证明room尾部漏检，room因果仍UNCONFIRMED。无需为这些范围更正另跑统计/σ矩阵。完整核验和最小反例见[0bdd1f4意见](review_20261110_0bdd1f4/README.md)。
 
 主要阻塞仍工程接口/生命周期：S1集成/S2接实际宿主恢复重处理与内部状态地图写回，以及真实Mode3续处理/有限终态/重武装，交一次恢复→接回→E2或第一具体宿主接口断点。S3并行最低A7正则与时间基修正，写入责任由S1确认；Codex/KITTI不挡接线。已有局部成果直接复用，不新增防御门/测试框架，不升完整A10/B11或全表评分。
+
+## 17. bcadd9f：首段包络时间已修，重复raw-distance准入仍未贯通
+
+仅driver/node/tests增量，无新运行。接受首个committed run使用anchor自身时间，既有2m/s包络三个控制本机通过；仍BOUND_ONLY，不是独立正常运动证明。真实node集成反例：连续0.3m/s跨2.329s，boundary_ok和paired均通过，但raw reentry=.699m仍被core固定.5检查判evidence FAILED；0.1m/s控制evidence PASSED。两例cov仍高于默认门，不称完整接纳正例。见[bcadd9f核验](review_20261110_bcadd9f/README.md)。只统一这两处既有边界时间定义，非新增防御任务；不提高门/删检查/造零jump，不重开已修首段时间。
+
+主线S1/S2原生恢复写回及真实Mode3续处理/重武装/E2仍优先，S3/由S1指定接口写入责任并行最小评价修正；不以局部helper通过宣称运行候选将接纳。pytest环境缺失未重试，原核心/ICP测试不重复，无新完整A/B评分。
