@@ -55,7 +55,23 @@
     }
    }
   ],
-  "coupling_caveat": "sigma* absorbs whatever the reference construction produces. The NIS reference still comes from a point-capped map sample; if that is changed, sigma* must be recomputed, and the two causes must stay reported separately."
+  "reference_variant_per_run": [
+   "point_cap",
+   "point_cap"
+  ],
+  "variant_rule": "a constant map_points over the healthy segment identifies the point-capped reference; a varying distribution identifies a sampling that tracks the map, so the two calibrations are different measurements and sigma* must not be carried between them",
+  "coupling_caveat": "sigma* absorbs whatever the reference construction produces. This calibration was taken on the point-capped reference (map_points constant 1500, one trusted keyframe); a later run with resolution-based spatial sampling measured a higher median, so sigma* must be recomputed on any other construction and must not be carried across.",
+  "attribution_correction": {
+   "date": "2026-11-10",
+   "source": "r11070-c3 measurement, relayed by the integration session",
+   "what": "the point cap was replaced by 0.30 m resolution-based spatial sampling: 1500 -> 931 points and the NIS median moved 21.57 -> 24.05, i.e. it did not fall",
+   "withdrawn": "the 'point cap thins the map and inflates NIS' half of the earlier attribution is withdrawn; this file's own numbers are unaffected but the explanation attached to them is",
+   "remaining_candidates": [
+    "the reference holds only two keyframes at first decision (confirmation margin 2 s), so the map is young irrespective of how it is sampled",
+    "the residual between a scan and this 931-point reference is genuinely ~0.55 m"
+   ],
+   "open": "r11070-c3 runs a detection-off pass to see whether NIS converges to O(1) as the map grows; convergence would move the fix to start conditions, non-convergence would bring it back to sigma / residual definition. Neither outcome may reuse 0.5538."
+  }
  },
  "runs": [
   {
@@ -73,6 +89,7 @@
     "alarm_free_subset_n": 0,
     "alarm_free_status": "NOT_SATISFIABLE"
    },
+   "reference_variant": "point_cap",
    "reference_construction": {
     "scan_cap": 6000,
     "nis_radius_m": 3.0,
@@ -92,6 +109,16 @@
      "median": 1.0,
      "p90": 1.0,
      "max": 1.0
+    }
+   },
+   "nis_by_trusted_keyframes": {
+    "1": {
+     "n": 168,
+     "min": 5.49117,
+     "p10": 14.495329,
+     "median": 21.301072,
+     "p90": 29.426072,
+     "max": 49.73168
     }
    },
    "before": {
@@ -149,6 +176,7 @@
     "alarm_free_subset_n": 0,
     "alarm_free_status": "NOT_SATISFIABLE"
    },
+   "reference_variant": "point_cap",
    "reference_construction": {
     "scan_cap": 6000,
     "nis_radius_m": 3.0,
@@ -168,6 +196,16 @@
      "median": 1.0,
      "p90": 1.0,
      "max": 1.0
+    }
+   },
+   "nis_by_trusted_keyframes": {
+    "1": {
+     "n": 168,
+     "min": 5.484772,
+     "p10": 13.912079,
+     "median": 21.172807,
+     "p90": 29.476343,
+     "max": 49.73168
     }
    },
    "before": {
