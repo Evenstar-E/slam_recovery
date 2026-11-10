@@ -1,0 +1,19 @@
+{
+  "assessment_date": "2026-11-10",
+  "revision": "773b995b9babc9951fbb9672bffe7914b785ecbc",
+  "baseline_revision": "7fc67cf6ca7eb57ae48919de742f7773bd940045",
+  "rubric": "docs/MAINLINE_PROGRESS_STANDARD_20261109.md",
+  "scope": "Full A1-A12/B1-B12 evidence-stage reassessment; local tests and in-memory probes; native outcomes archived, not rerun locally",
+  "prototype_scores": {"A1":2,"A2":2,"A3":1,"A4":1,"A5":1,"A6":2,"A7":1,"A8":1,"A9":1,"A10":1,"A11":2,"A12":1},
+  "evidence_scores": {"B1":2,"B2":1,"B3":1,"B4":2,"B5":1,"B6":1,"B7":1,"B8":2,"B9":1,"B10":0,"B11":0,"B12":0},
+  "prototype_total":16,
+  "evidence_total":12,
+  "score_changes": {"B8":{"old":1,"new":2,"basis":"Corrected batch-qualified common-support records and archived repeated native outcomes; confirmation statistics and independent protocol remain incomplete"}},
+  "fully_closed_packages":0,
+  "newly_closed_packages":0,
+  "blocker_groups": ["authoritative_initial_pending", "atomic_publication", "accepted_repair_undo", "admission_tangent_transport"],
+  "remaining_milestone_groups": ["same_process_native_online_recovery", "paper_incremental_benefit_baselines_generalization", "portable_reproduction_valid_runtime_budget"],
+  "local_test_counts":{"core":41,"identity_audit":25,"result_schema":9},
+  "native_runs_executed_locally":0,
+  "interpretation":"Ordinal planning scores, not completion percentages, success probabilities or venue predictions; detailed evidence and limits in README.md"
+}
