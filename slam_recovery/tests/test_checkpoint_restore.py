@@ -29,9 +29,9 @@ class TestCheckpointRestoreAndRollbackTheory(unittest.TestCase):
         Mode 2 atomic commit even if residuals look small.
         """
         mgr = TrustedMapTransactionManager(
-            gate_thresholds=GateThresholds(tau_info=25.0, tau_val_nis=2.5, sigma_tol=0.5, sigma_bridge=4.0)
+            gate_thresholds=GateThresholds(tau_abs_min=25.0, tau_val_nis=2.5, sigma_tol=0.5, sigma_bridge=4.0)
         )
-        # Weak direction along x-translation (index 3) has eigenvalue 1.5 (< tau_info=25.0)
+        # Weak direction along x-translation (index 3) has eigenvalue 1.5 (< tau_abs_min=25.0)
         info_degraded = np.diag([80.0, 80.0, 80.0, 1.5, 80.0, 80.0])
         mgr.trigger_quarantine(
             estimated_onset_ns=int(5.0 * 1e9),

@@ -239,7 +239,9 @@ class TestGaugeInvariance(unittest.TestCase):
 
     V_BODY = np.array([0.0, 0.0, 0.0, 1.0, 0.0, 0.0])
     INFO_BEFORE_BODY = np.diag([60.0, 60.0, 60.0, 20.0, 40.0, 40.0])
-    INFO_AFTER_BODY = np.diag([60.0, 60.0, 60.0, 30.0, 5.0, 5.0])
+    # 50 against 20 is a 2.5x gain: the gate now asks for a factor (kappa) as well as an
+    # absolute floor, so a fixture built on a 1.5x gain would no longer reach Mode 2.
+    INFO_AFTER_BODY = np.diag([60.0, 60.0, 60.0, 50.0, 5.0, 5.0])
     COV_BODY = np.linalg.inv(INFO_AFTER_BODY)
 
     def _report(self, T_world_anchor):
@@ -258,7 +260,7 @@ class TestGaugeInvariance(unittest.TestCase):
         self.assertAlmostEqual(rows[0].weak_dir_info_before, rows[1].weak_dir_info_before, places=9)
         self.assertAlmostEqual(rows[0].weak_dir_info_after, rows[1].weak_dir_info_after, places=9)
         self.assertAlmostEqual(rows[0].weak_dir_info_before, 20.0, places=9)
-        self.assertAlmostEqual(rows[0].weak_dir_info_after, 30.0, places=9)
+        self.assertAlmostEqual(rows[0].weak_dir_info_after, 50.0, places=9)
 
     def test_a_plain_translation_does_not_move_the_covariance_norm(self):
         rows = [self._report(_se3(np.eye(3), [0.0, t, 0.0])) for t in (0.0, 5.0)]

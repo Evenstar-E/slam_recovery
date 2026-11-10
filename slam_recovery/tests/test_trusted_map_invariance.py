@@ -13,7 +13,7 @@ class TestTrustedMapInvariance(unittest.TestCase):
     def test_trusted_map_invariant_during_mode3_and_archived_on_mode4(self) -> None:
         mgr = TrustedMapTransactionManager(
             confirmation_margin_ns=int(1.0 * 1e9),
-            gate_thresholds=GateThresholds(tau_info=25.0, tau_val_nis=2.5, sigma_tol=0.5, sigma_bridge=3.0),
+            gate_thresholds=GateThresholds(tau_abs_min=25.0, tau_val_nis=2.5, sigma_tol=0.5, sigma_bridge=3.0),
         )
         mgr.step_healthy(_make_delta(1.0, 1, 1.0))
         mgr.step_healthy(_make_delta(2.5, 2, 2.0))  # promotes kf 1
