@@ -241,6 +241,34 @@ def candidate_record(
     return row
 
 
+def candidate_detail_record(
+    candidate_id: str,
+    t_trigger_ns: Optional[int],
+    t_decision_ns: Optional[int],
+    keys: List[int],
+    ts_by_key: Dict[int, int],
+    repaired_poses: Dict[int, np.ndarray],
+) -> Dict[str, Any]:
+    """Record the frame set and poses the gate scored, so `after` can be recomputed offline.
+
+    The archived stream says *whether* a candidate passed; it does not say which frames formed
+    `after` or with which poses. A later producer change therefore could not be re-derived from
+    it -- the frame set would have to be invented, which is a different quantity wearing the same
+    name. This sidecar keeps the actual input to `info_after` for the next run.
+    """
+    return {
+        "candidate_id": candidate_id,
+        "t_trigger_ns": None if t_trigger_ns is None else int(t_trigger_ns),
+        "t_decision_ns": None if t_decision_ns is None else int(t_decision_ns),
+        "candidate_frame_ids": [int(k) for k in keys],
+        "candidate_frame_ts_ns": [int(ts_by_key.get(int(k), 0)) for k in keys],
+        "repaired_poses": {
+            str(int(k)): [float(v) for v in np.asarray(p, dtype=np.float64).reshape(16)]
+            for k, p in repaired_poses.items()
+        },
+    }
+
+
 def _int_list(v) -> Optional[List[int]]:
     if v is None:
         return None
@@ -673,6 +701,12 @@ class NativeClosedLoop:
         # it: the schema is frozen, and an extra key on some rows would break every consumer
         # that parses by key.
         self.icp_details: List[Dict[str, Any]] = []
+        # What the gate actually evaluated, per candidate: which frames formed `after` and the
+        # poses it was built from. Without these, `after` cannot be recomputed offline under a
+        # different producer -- the archived streams carry only a trigger pose, so any later
+        # re-derivation would have to invent a frame set. Kept in its own file for the same
+        # reason as `icp_details`: the 18-key stream is frozen.
+        self.candidate_details: List[Dict[str, Any]] = []
         self.icp_seconds_total = 0.0
         # 0 = no budget. A budget that is hit is recorded, because truncating the candidate
         # changes what the gate sees and must never happen silently.
@@ -977,6 +1011,9 @@ class NativeClosedLoop:
             pose_first_trigger=ep.pose,
         )
         self.records.append(row)
+        self.candidate_details.append(
+            candidate_detail_record(ep.candidate_id, ep.trigger_ts_ns, int(now_ts_ns),
+                                    keys, ts_by_key, repaired))
         if self._first_decision_ts_ns is None:
             self._first_decision_ts_ns = int(now_ts_ns)
         ep.meta = {                                  # summary-only, never in the stream
@@ -1178,6 +1215,9 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
                     "break every consumer that parses by key",
             "details": loop.icp_details,
         },
+        # The frame set and poses behind `info_after`, one row per decision, in
+        # candidates_detail.jsonl. Without them a producer change cannot be re-derived offline.
+        "candidate_detail_rows": len(loop.candidate_details),
         "nis_vs_map_size": nis_vs_map_size(loop.diag),
         "frame_diagnostics": loop.diag,
         "final_state": getattr(loop.node.tx_mgr.state, "value", loop.node.tx_mgr.state),
@@ -1520,6 +1560,13 @@ def main(argv: Optional[List[str]] = None) -> int:
         # there is no per-frame table; the row is the fit itself plus the frames it applied to.
         with open(os.path.join(args.run_dir, "icp_detail.jsonl"), "w", encoding="utf-8") as fh:
             for det in loop.icp_details:
+                fh.write(json.dumps(det, default=float) + "\n")
+    if loop.candidate_details:
+        # The frame set and poses that produced `after`, so a later producer change can be
+        # re-derived from this run instead of from an invented frame set.
+        with open(os.path.join(args.run_dir, "candidates_detail.jsonl"), "w",
+                  encoding="utf-8") as fh:
+            for det in loop.candidate_details:
                 fh.write(json.dumps(det, default=float) + "\n")
     rospy.loginfo("[slam_recovery] wrote %d candidate rows to %s", len(loop.records),
                   args.run_dir)
