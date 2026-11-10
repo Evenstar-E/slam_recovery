@@ -218,8 +218,11 @@ def main():
 
     res = {
         "protocol": "same-frame raw/native vs repaired, fixed frame set",
-        "time_sync": {"rule": "nearest pose within 75 ms; bracketing interpolation",
-                      "frame_stamps_from": "injected scan header (ns)"},
+        "time_sync": {"rule": "nearest pose within 20 ms; else interpolate across a bracket gap "
+                              "<= 75 ms; else MISSING, never filled",
+                      "frame_stamps_from": "injected scan header (ns)",
+                      "source": "run_fixed_input_repair_c0c3.pose_lookup "
+                                "(POSE_NEAR_DT=0.020, POSE_MAX_GAP=0.075)"},
         "inputs": {"injected_scans": {"path": R.INJ_SCANS, "sha256": sha["injected_scans"]},
                    "injected_poses": {"path": R.INJ_POSES, "sha256": sha["injected_poses"]},
                    "clean_scans": {"path": R.CLN_SCANS, "sha256": sha["clean_scans_proxy_only"]},

@@ -334,8 +334,13 @@ exactly by a separate implementation). Serial reductions plus `taskset 0-7`, `ni
 The remaining candidates are the 5 kHz wall-clock frame grouping (S3) and the IMU initialisation
 window it determines (S4); they are to be tested as two separate single-factor controls.
 
-**T3a (deterministic grouping)**: switching to an `AsyncSpinner(1)` with a blocking condition
-variable (20 ms fallback, no busy-wait), everything else as in T2, still splits: build A gave two
+**T3a (wake-up change, not a deterministic grouping control)**: the patch uses `AsyncSpinner(1)`
+with `wait_for(20 ms)`, but `det_mtx_` is not the lock the callbacks use for the buffers, the wait
+has no ready predicate, and `sync_packages` still depends on arrival timing; the concurrency path
+was not audited for races. The two runs also show different `init_iter` (37 vs 73) and different
+first-package times, so measurement consumption was not the same. The honest reading is that this
+change did not stabilize the cell, not that the wall-clock phase was removed. Everything else as
+in T2; the cell still splits: build A gave two
 GOOD runs, while the same build B run four times gave BAD/BAD/GOOD/GOOD. The executable sha was
 identical across builds because the behaviour lives in `liblaser_mapping.so`; the enriched
 result records both, but the six receipts carry only the executable sha (a retrospective gap that

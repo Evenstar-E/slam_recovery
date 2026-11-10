@@ -97,13 +97,14 @@
    }
   }
  },
- "same_mode": true,
  "criterion": {
   "mode_rule": "GOOD unsupported<0.10 / BAD>0.50",
-  "verdict": "S3_ACCEPTED_AS_SEED",
+  "verdict": "S3_ACCEPTED_AS_SEED_LOCAL_BUILD_A_ONLY",
   "verdict_within_build_A": "S3_ACCEPTED_AS_SEED",
   "verdict_within_build_B": "GO_TO_T3B",
-  "cross_build_consistent": false
+  "cross_build_consistent": false,
+  "authoritative_verdict": "NOT_STABLE_WITHIN_BUILD_B",
+  "scope": "build A, r1-r2 only; superseded by four runs of build B"
  },
  "binary": {
   "executable_sha256": "76359f5387f75da3dcad7aa72372048c3feefd91b340ae0c40f92f6fb534a53b",
@@ -138,6 +139,10 @@
     "GOOD"
    ]
   },
-  "note": "same criterion satisfied within each build, but the two builds disagree -- the literal 'same mode in two runs' rule is too weak to attribute the variance to S3"
+  "note": "the two-run rule passed within each build, but build B run four times produced BAD/BAD/GOOD/GOOD, so the wake-up change did not stabilize the cell"
+ },
+ "same_mode_by_build": {
+  "A_two_runs": true,
+  "B_four_runs": false
  }
 }
