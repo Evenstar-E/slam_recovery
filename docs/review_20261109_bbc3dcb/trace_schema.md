@@ -61,6 +61,32 @@ STATE,<wall_ns>,<lid_ns>,0,<lid_ns>,<lid_ns>,,pos=<x>|<y>|<z>|diagR=<a>|<b>|<c>
 解析规则：含 `=` 的 token 开启一个新键，不含 `=` 的 token 续到上一个键的向量。
 `;` 仍被接受为键值分隔符，仅为兼容早期文件；**写入端一律用竖线**。
 
+**表头是文件的一部分**：首行必须原样写出上面那行 `kind,wall_ns,...`。解析器用 `DictReader` 读，
+没有表头的文件第一行会被当成数据，`kind` 为空，直接报错退出（2026-11-10 的 v2 交付即因此被拒）。
+
+**空组**（2026-11-10 定）：`GROUP` 的 `n_items=0` 是合法且必须记录的情形——主循环拿到 package，
+但组内 IMU 窗口为空。此时 `first_stamp_ns=last_stamp_ns=-1`（哨兵，不是时间戳），
+`stamps_sha256 = sha256("") = e3b0c442…`。不得用跳过该行来代替，否则"没有样本"与"没有记录"不可区分，
+而 room02 O 上约一半的 package 就是这种情况（ON 863/1722，OFF 836/1670）。
+
+## 4. lidar 时间列记的是谁（2026-11-10 裁定）
+
+- `ARRIVE` 的 lidar 时间取 `msg->header.stamp.toNSec()`，原始 int64。
+- `GROUP` / `STATE` 的 lidar 时间取 **sync 实际比较的那个 double**（`LidarMeasureGroup.last_lio_update_time`），
+  它是划组边界的量，换成 header 真值反而记录了一个 sync 从没见过的数。
+- 但转换**不得**写 `llround(d * 1e9)`：1.6e9 s 处 `d` 的 ULP 是 238 ns，而 `d*1e9 ≈ 1.6e18`
+  落进 [2^60, 2^61)，乘积的 ULP 是 256 ns，于是相邻的两个 double 有概率塌缩成同一个整数 ns
+  （实测 4000 对相邻 double 中 274 对，6.9%）。必须拆成两段：
+
+  ```cpp
+  const double s = std::floor(d);
+  return (int64_t)s * 1000000000LL + (int64_t)llround((d - s) * 1e9);   // 0/4000 塌缩
+  ```
+
+- 因此 `GROUP`/`STATE` 的 lidar ns 是"宿主 double 的值"，不是 header 真值；两者不可混用，
+  比较时也不能拿 `ARRIVE` 的原始值去校 `GROUP` 的值。可选：在 `extra` 里加 `lid_dbl=<16 位十六进制>`
+  记录该 double 的 IEEE-754 位型，完全不丢信息。
+
 ## 解析器必须拒绝的情况
 
 - 未知 `kind` → 报错退出，不跳过；

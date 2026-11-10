@@ -81,11 +81,24 @@ def _extra(text: str) -> Dict[str, str]:
     return out
 
 
+HEADER = ["kind", "wall_ns", "lid_stamp_ns", "n_items", "first_stamp_ns",
+          "last_stamp_ns", "stamps_sha256", "extra"]
+
+
 def parse(path: str) -> Trace:
-    """Read the CSV. Unknown kind or a float time is an error, not a row to skip."""
+    """Read the CSV. Unknown kind or a float time is an error, not a row to skip.
+
+    The header is checked, not assumed: without it a `DictReader` either promotes the first
+    event to a header (one-row file: silently zero events) or mangles every row's keys, and
+    both failure modes used to arrive as a confusing KindError on row 2.
+    """
     out = Trace(path=path)
     with open(path, newline="", encoding="utf-8") as fh:
-        for lineno, row in enumerate(csv.DictReader(fh), start=2):
+        reader = csv.reader(fh)
+        header = next(reader, None)
+        if header != HEADER:
+            raise ValueError(f"{path}:1: expected header {','.join(HEADER)}, found {header}")
+        for lineno, row in enumerate(csv.DictReader(fh, fieldnames=HEADER), start=2):
             kind = (row.get("kind") or "").strip()
             if kind not in KINDS:
                 raise ValueError(f"{path}:{lineno}: unknown kind {kind!r}")
