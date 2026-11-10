@@ -707,6 +707,63 @@ def check_gap_sensitivity(b4):
     return {"verdict": "PASS" if not bad else "FAIL", "problems": bad,
             "remaining": pop.get("remaining")}
 
+def _walk_dicts(o, path=""):
+    if isinstance(o, dict):
+        yield path, o
+        for k, v in o.items():
+            yield from _walk_dicts(v, f"{path}/{k}" if path else k)
+
+
+def check_verdict_scoping(doc, label=""):
+    """Every verdict must say which runs it covers, and same_mode must name its batch.
+
+    A bare `same_mode: true` means "these two runs agreed" without saying which two, and a
+    verdict beside it inherits the same ambiguity. The rule is the same one applied to
+    room02_T3a when S3_ACCEPTED_AS_SEED travelled without its run set.
+    """
+    bad = []
+    root_scope = (doc.get("scope") or doc.get("runs_analysed") or doc.get("run_set")
+                  or doc.get("authoritative_verdict"))
+    for path, d in _walk_dicts(doc):
+        for key in d:
+            if key == "verdict" or key.endswith("_verdict"):
+                local = (d.get("scope") or d.get("runs_analysed") or d.get("build")
+                         or d.get("authoritative_verdict"))
+                if not local and not root_scope:
+                    bad.append(f"{label}{path or '/'}: `{key}` has no scope or authoritative "
+                               "pointer")
+            if key == "same_mode" and isinstance(d[key], bool):
+                local = d.get("runs_analysed") or d.get("scope") or d.get("build")
+                if not local:
+                    bad.append(f"{label}{path or '/'}: bare `same_mode` boolean with no batch "
+                               "scope; use same_mode_by_build")
+    return {"verdict": "PASS" if not bad else "FAIL", "problems": bad}
+
+
+def check_authoritative_pointer(t3a, enriched, label="room02_T3a"):
+    """The superseded local verdict and the authoritative one must point at each other."""
+    bad = []
+    sup = t3a.get("superseded_by") or {}
+    target = sup.get("file")
+    if sup and not target:
+        bad.append(f"{label}: superseded_by names no file")
+    crit = enriched.get("criterion") or {}
+    auth = crit.get("authoritative_verdict") or enriched.get("authoritative_verdict")
+    if sup and not auth:
+        bad.append(f"{label}: {target or 'superseding file'} carries no authoritative_verdict")
+    if auth and crit.get("scope") is None and enriched.get("scope") is None:
+        bad.append(f"{label}: authoritative_verdict without a scope")
+    if sup and target and not os.path.exists(os.path.join(_HERE, target)):
+        bad.append(f"{label}: superseded_by points at {target}, which is not in the tree")
+    # the supersession marker belongs to the superseded file; the authoritative one states the
+    # conclusion and its scope
+    local = (t3a.get("criterion") or {}).get("verdict") or ""
+    if auth and local and "SUPERSEDED" not in local:
+        bad.append(f"{label}: local verdict {local!r} does not mark itself superseded")
+    return {"verdict": "PASS" if not bad else "FAIL", "problems": bad,
+            "superseded_by": target, "authoritative_verdict": auth}
+
+
 def main():
     results = json.load(open(RESULTS, encoding="utf-8"))
     prereg = json.load(open(PREREG, encoding="utf-8"))
@@ -739,6 +796,11 @@ def main():
                "sensitivity": check_gap_sensitivity(
                    json.load(open(os.path.join(_HERE, "hall01_b4_cost_and_gap.json"),
                                   encoding="utf-8"))),
+           },
+           "15_verdict_scope": {
+               "t3a_results": check_verdict_scoping(T3A_RESULTS, "room02_T3a_results "),
+               "t3a_enriched": check_verdict_scoping(T3A_ENRICHED, "room02_T3a_enriched "),
+               "pointer": check_authoritative_pointer(T3A_RESULTS, T3A_ENRICHED),
            },
            "13_hall01_trajectory": check_trajectory_population(
                json.load(open(os.path.join(_HERE, "raw_vs_repaired_results.json"),
@@ -779,7 +841,13 @@ def main():
         json.dump(out, fh, indent=1, default=float)
     for k in ("1_protocol", "2_receipts", "3_independent", "4_ate_convention",
               "5_frozen_transform", "6_hash_chain", "7_diagnostic_unchanged",
-              "8_bistability", "9_bist_runs", "10_run_identity", "11_t3a", "12_hall01", "13_hall01_trajectory", "14_b4"):
+              "8_bistability", "9_bist_runs", "10_run_identity", "11_t3a", "12_hall01", "13_hall01_trajectory", "14_b4", "15_verdict_scope"):
+        if k == "15_verdict_scope":
+            print(k, {n: v["verdict"] for n, v in out[k].items()})
+            for n, v in out[k].items():
+                if v["verdict"] != "PASS":
+                    print("   ", n, v.get("problems", [])[:2])
+            continue
         if k == "14_b4":
             print(k, {n: v["verdict"] for n, v in out[k].items()})
             for n, v in out[k].items():

@@ -509,6 +509,22 @@
    "remaining": 319
   }
  },
+ "15_verdict_scope": {
+  "t3a_results": {
+   "verdict": "PASS",
+   "problems": []
+  },
+  "t3a_enriched": {
+   "verdict": "PASS",
+   "problems": []
+  },
+  "pointer": {
+   "verdict": "PASS",
+   "problems": [],
+   "superseded_by": "room02_T3a_enriched_results.json",
+   "authoritative_verdict": "NOT_STABLE_WITHIN_BUILD_B"
+  }
+ },
  "13_hall01_trajectory": {
   "verdict": "PASS",
   "problems": [],

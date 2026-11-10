@@ -317,6 +317,21 @@ T3a 走的是结果文件内的 `provenance_gap`；hall_01 没有这个字段，
 
 `13_hall01_trajectory` 与 `14_b4` 现已全部 PASS。
 
+## 15. verdict 作用域与权威指针（main 224c520）
+
+| 检查 | 结果 |
+|---|---|
+| `room02_T3a_results.json` 的 verdict 作用域 | **PASS**：根上有 `scope` 与 `runs_analysed`，`same_mode` 布尔有批次作用域 |
+| `room02_T3a_enriched_results.json` | **PASS**：`criterion` 自带 `verdict` + `authoritative_verdict` + `scope`，`same_mode_by_build` 按 build 分列 |
+| 指针一致性 | **PASS**：`superseded_by.file` 指向 enriched，enriched 有 `authoritative_verdict = NOT_STABLE_WITHIN_BUILD_B`，且 `t3a_results` 的局部 verdict 带 `__SUPERSEDED_BY_BUILD_B_FOUR_RUNS` |
+
+规则：任何名为 `verdict` 或以 `_verdict` 结尾的字段，其所在字典必须带 `scope`/`runs_analysed`/`build`/`authoritative_verdict`，
+或文档根上有其中之一；`same_mode` 若是裸布尔且无批次作用域则判 FAIL，要求改用 `same_mode_by_build`。
+
+实现时我第一版把「superseded 标记」也要求到 enriched 文件的局部 verdict 上，误报了一次——
+enriched 的 `criterion.verdict` 本来就是 build A 的局部结论，取代标记属于被取代的那份文件。
+规则已按此修正，误报不是数据问题。
+
 ## 5b. R2 / R3 处置（同意你的提议）
 
 - **R2**：旧 `room02_hybrid_bag_report.json` 属已废弃的 X/Y 设计，2×2 已取代它。

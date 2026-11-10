@@ -233,5 +233,48 @@ class TestReceiptLibrary(unittest.TestCase):
         self.assertEqual(r["verdict"], "RETROSPECTIVE_PARTIAL")
 
 
+class TestVerdictScoping(unittest.TestCase):
+    def test_scoped_verdict_passes(self):
+        doc = {"criterion": {"verdict": "X"}, "scope": {"runs_analysed": ["r1", "r2"]}}
+        self.assertEqual(A.check_verdict_scoping(doc)["verdict"], "PASS")
+
+    def test_unscoped_verdict_fails(self):
+        doc = {"criterion": {"verdict": "S3_ACCEPTED_AS_SEED"}}
+        self.assertEqual(A.check_verdict_scoping(doc)["verdict"], "FAIL")
+
+    def test_authoritative_verdict_lifts_the_scope(self):
+        doc = {"criterion": {"verdict": "X", "authoritative_verdict": "Y"}}
+        self.assertEqual(A.check_verdict_scoping(doc)["verdict"], "PASS")
+
+    def test_bare_same_mode_fails(self):
+        doc = {"same_mode": True}
+        self.assertEqual(A.check_verdict_scoping(doc)["verdict"], "FAIL")
+
+    def test_same_mode_with_batch_scope_passes(self):
+        doc = {"same_mode": True, "runs_analysed": ["r1", "r2"]}
+        self.assertEqual(A.check_verdict_scoping(doc)["verdict"], "PASS")
+
+    def test_same_mode_by_build_passes(self):
+        doc = {"same_mode_by_build": {"A": True, "B": False}}
+        self.assertEqual(A.check_verdict_scoping(doc)["verdict"], "PASS")
+
+
+class TestAuthoritativePointer(unittest.TestCase):
+    def test_consistent_pointer_passes(self):
+        t3a = {"criterion": {"verdict": "SEED__SUPERSEDED_BY_B"},
+               "superseded_by": {"file": "test_two_by_two_audit.py"}}
+        enr = {"criterion": {"authoritative_verdict": "NOT_STABLE", "scope": "build A"}}
+        self.assertEqual(A.check_authoritative_pointer(t3a, enr)["verdict"], "PASS")
+
+    def test_local_verdict_must_mark_itself(self):
+        t3a = {"criterion": {"verdict": "SEED"}, "superseded_by": {"file": "x"}}
+        enr = {"criterion": {"authoritative_verdict": "NOT_STABLE", "scope": "a"}}
+        self.assertEqual(A.check_authoritative_pointer(t3a, enr)["verdict"], "FAIL")
+
+    def test_missing_authoritative_verdict_fails(self):
+        t3a = {"criterion": {"verdict": "SEED__SUPERSEDED"}, "superseded_by": {"file": "x"}}
+        self.assertEqual(A.check_authoritative_pointer(t3a, {"criterion": {}})["verdict"], "FAIL")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
