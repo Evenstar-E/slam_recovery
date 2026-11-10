@@ -1,0 +1,19 @@
+{
+  "target": "9ee52dde35af9a2ba020c54b74b09a3ba7756c95",
+  "scope": "Four selected lifecycle tests, actual loop control with supplied NIS/support and simulated host, runner expression controls; no ROS/native/bag/tuning",
+  "command": "python -B -W ignore docs/review_20261110_9ee52dd/run_checks.py",
+  "exit": 0,
+  "selected_tests": {"count": 4, "elapsed_s": 0.043, "status": "PASS_LOCAL"},
+  "replacement_episode": {"status": "PASS_LOCAL", "episodes": 1},
+  "same_frame_reopen": {"status": "FAIL_REPRODUCED_LOCAL", "manager_state": "QUARANTINED", "detector_state": "HEALTHY", "detector_dwell": 0},
+  "new_quarantine_release": {
+    "status": "FAIL_REPRODUCED_LOCAL", "commands": ["hold", "resume"],
+    "simulated_host_held": false, "new_segment_active": true,
+    "limit": "Source ordering with simulated host, not measured native map pollution"
+  },
+  "runner_controls": {"receipt_write_exit": "PASS_LOCAL_ZERO_EXIT_PRESERVES_JSON_STATUS", "saved_pgid_dead_host": "PASS_LOCAL", "runner_overall_fail_check": "STATIC_PRESENT"},
+  "shell_syntax": {"command": "bash -n slam_recovery/ros/run_native_loop.sh", "status": "PASS_BASH_N_ONLY", "exit": 0},
+  "developer_new_episode_test": "NOT_RUN_DEPENDS_ON_PYTEST_MODULE_IMPORT_AND_AFTER_FIRST_MAIN_GUARD",
+  "third_run": "DEVELOPER_REPORTED_TWO_PREINJECTION_SEGMENTS_THIRD_WITHOUT_EPISODE_E2_NOT_TRIGGERED",
+  "publication": "LOCAL_ONLY_PRIOR_PUSH_DENIAL_NOT_RETRIED"
+}

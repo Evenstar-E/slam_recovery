@@ -383,3 +383,9 @@ main已提出原rawheader/组成员身份替换最低修，方向接受但尚未
 [核验](review_20261110_1b8a449/README.md)保留第二次run104.9s/721MB、wait关闭/rearm/native resume开发报告，E2仍未触发、169帧UNAVAILABLE，完整链未完成；源码与原件未新增。同kf在不同配对人口下不保证同scan，回滚条件timestamp≥t_q_start与“边界在所有帧之后却全撤”解释方向不符，最低已有戳/边界/撤回范围。初次空图不足以解释rearm后全部尾段，本机actual on_pair小控制prev_scan且AVAILABLE/fed1，否定参考来源等价检测不可用，不猜真实169帧根因。
 
 10→2秒仅开发预算提案，无新运行；confirmation margin不自动确定等待证据预算。当前wait_started用segment.t_end、无独立decision时刻，本机单控制4s最后帧/8s模拟决策/9s来帧已关闭，非2秒部署实测。最低明确时钟身份及已有rearm后stamp/支持比例/地图/host特征再定位，不盲第三趟或改架构/参数。S1旧正常队列/decision/命令修复继续，S2下一唯一真实修复驱动原生写回→接回→E2或原预算具体断点，S3并行/旧参数停。Codex bdc4c1f仅493c5b3参考包、不重开旧接口/不替代用户主线；本机两小控制exit0、无ROS原bag，A/B完整分不升，记录仅本地、push拒绝未解除未绕过、remote review3965299。
+
+## 43. 9ee52dd：第三次负运行与替换episode修复，旧rearm会释放新隔离（仅本地）
+
+[核验](review_20261110_9ee52dd/README.md)接受wait2第三次run报告：两提前报警段关闭/rearm、支持局部恢复，但第三段无episode/370UNAVAILABLE/E2未处理，非实际修复成功。新after对象身份检查本机actual loop控制确开episode；旧step_frame reset后消费旧decision仍导致manager QUARANTINED/detector HEALTHY。模拟宿主全部正确ack时正常on_pair/service顺序hold→旧rearm resume，新段仍active却被释放，FAIL；最低现生命周期按当前隔离归属消费释放+fresh-decision，非新RPC/架构，旧队列/写回任务复用。
+
+runner savedPGID与receipt写成功exit0保留JSON FAIL且整体exit非零静态/局部控制接受，bash-n PASS。4项不依pytest生命周期测试0.043s PASS，新开发test在首main guard后且import pytest模块未执行，不假称131全suite。S1最低归属修、S2固定预算下一实际修复驱动原生写回→接回→E2或断点，host_poses先控如实标签，S3独立/参数停；完整A/B不升。原件仍缺、本机无ROS原bag、记录仅本地，push拒绝未解除未绕过、remote review3965299。
