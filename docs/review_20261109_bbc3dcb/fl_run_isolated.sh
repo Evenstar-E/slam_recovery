@@ -88,6 +88,8 @@ def i(x):
     except Exception:
         return None
 
+_libfile = os.path.join(rd, "runtime_lib.txt")
+_libpath = open(_libfile).read().strip() if os.path.exists(_libfile) else None
 pre_path = os.path.join(rd, "pre_run.json")
 pre = json.load(open(pre_path)) if os.path.exists(pre_path) else {}
 
@@ -110,7 +112,19 @@ rec = {
                "camera": {"path": cam, "sha256": sha(cam)},
                "ros_params_dump": {"path": params, "sha256": sha(params)}},
     "host": {"binary": binp, "sha256": sha(binp),
-             "source_revision": pre.get("host_revision")},
+             "source_revision": pre.get("host_revision"),
+             "runtime_library": {
+                 "path": _libpath,
+                 "sha256": sha(_libpath) if _libpath else None,
+                 "pid": (open(os.path.join(rd, "runtime_pid.txt")).read().strip()
+                         if os.path.exists(os.path.join(rd, "runtime_pid.txt")) else None),
+                 "cmdline": (open(os.path.join(rd, "runtime_cmdline.txt")).read().strip()
+                             if os.path.exists(os.path.join(rd, "runtime_cmdline.txt")) else None),
+                 "pgid": (open(os.path.join(rd, "runtime_pgid.txt")).read().strip()
+                          if os.path.exists(os.path.join(rd, "runtime_pgid.txt")) else None)},
+             "trace_file": {
+                 "path": os.environ.get("TRACE_GROUP_FILE"),
+                 "sha256": sha(os.environ.get("TRACE_GROUP_FILE", ""))}},
     "run": {"rate": float(rate), "drain_sec": float(drain),
             "master_uri": os.environ.get("ROS_MASTER_URI"), "run_dir": rd,
             "taskset_prefix": os.environ.get("FL_TASKSET", "")},
@@ -204,6 +218,38 @@ setsid ${FL_TASKSET:-} rosrun fast_livo fastlivo_mapping > "$RUN_DIR/node.log" 2
 NODE=$!
 sleep 3
 
+# runtime identity of the library that actually carries the behaviour
+# Resolve the process that actually hosts the node. The library is DT_NEEDED, so it is mapped
+# before main() runs: there is no "process up but library not mapped yet" window. What fails is
+# reading the wrong pid -- the rosrun wrapper's cmdline contains the node name but its maps do not
+# contain the library -- so every candidate is tried, and a short poll covers a slow exec.
+resolve_runtime_lib() {
+  PGID=$(ps -o pgid= -p "$NODE" 2>/dev/null | tr -d ' ')
+  if [ -z "$PGID" ]; then
+    echo "FAIL: could not read the launch process group" >&2
+    return 1
+  fi
+  for _ in $(seq 1 60); do
+    # restrict to this launch's process group: a stale node left by an earlier SIGKILL would also
+    # have liblaser_mapping.so mapped, and it may be a different build
+    for pid in $(pgrep -g "$PGID" -f fastlivo_mapping 2>/dev/null); do
+      line=$(grep -m1 'liblaser_mapping\.so' "/proc/$pid/maps" 2>/dev/null) || continue
+      printf '%s\n' "${line##* }" > "$RUN_DIR/runtime_lib.txt"
+      printf '%s\n' "$pid" > "$RUN_DIR/runtime_pid.txt"
+      tr '\0' ' ' < "/proc/$pid/cmdline" > "$RUN_DIR/runtime_cmdline.txt" 2>/dev/null || true
+      printf '%s\n' "$PGID" > "$RUN_DIR/runtime_pgid.txt"
+      return 0
+    done
+    sleep 0.5
+  done
+  return 1
+}
+if ! resolve_runtime_lib; then
+  STATUS=FAIL
+  REASON="runtime library identity unavailable: no process under liblaser_mapping.so was found"
+  echo "FAIL: $REASON" >&2
+  exit 1
+fi
 if [ ! -x "$BIN" ]; then STATUS=FAIL; REASON="host binary missing: $BIN"; exit 1; fi
 if ! kill -0 "$NODE" 2>/dev/null; then STATUS=FAIL; REASON="node did not start"; exit 1; fi
 

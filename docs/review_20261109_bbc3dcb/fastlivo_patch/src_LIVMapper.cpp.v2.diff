@@ -1,0 +1,279 @@
+--- a/src/LIVMapper.cpp
++++ b/src/LIVMapper.cpp
+@@ -12,6 +12,114 @@
+ 
+ #include "LIVMapper.h"
+ #include <omp.h>
++#ifdef TRACE_GROUP
++#include <atomic>
++#include <cstdint>
++#include <cstdio>
++#include <cstdlib>
++#include <cstring>
++#include <string>
++namespace tr {
++struct Ctx { uint32_t h[8]; uint64_t bytes; uint8_t buf[64]; size_t n; };
++static inline uint32_t ror(uint32_t x, int r) { return (x >> r) | (x << (32 - r)); }
++static const uint32_t K[64] = {
++ 0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
++ 0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
++ 0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
++ 0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
++ 0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
++ 0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
++ 0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
++ 0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2};
++static inline void block(Ctx &c, const uint8_t *p) {
++  uint32_t w[64];
++  for (int i = 0; i < 16; i++)
++    w[i] = (uint32_t)p[4*i]<<24 | (uint32_t)p[4*i+1]<<16 | (uint32_t)p[4*i+2]<<8 | p[4*i+3];
++  for (int i = 16; i < 64; i++) {
++    uint32_t s0 = ror(w[i-15],7) ^ ror(w[i-15],18) ^ (w[i-15] >> 3);
++    uint32_t s1 = ror(w[i-2],17) ^ ror(w[i-2],19) ^ (w[i-2] >> 10);
++    w[i] = w[i-16] + s0 + w[i-7] + s1;
++  }
++  uint32_t a=c.h[0],b=c.h[1],d=c.h[3],e=c.h[4],f=c.h[5],g=c.h[6],hh=c.h[7],cc=c.h[2];
++  for (int i = 0; i < 64; i++) {
++    uint32_t S1 = ror(e,6) ^ ror(e,11) ^ ror(e,25);
++    uint32_t ch = (e & f) ^ (~e & g);
++    uint32_t t1 = hh + S1 + ch + K[i] + w[i];
++    uint32_t S0 = ror(a,2) ^ ror(a,13) ^ ror(a,22);
++    uint32_t mj = (a & b) ^ (a & cc) ^ (b & cc);
++    uint32_t t2 = S0 + mj;
++    hh=g; g=f; f=e; e=d+t1; d=cc; cc=b; b=a; a=t1+t2;
++  }
++  c.h[0]+=a; c.h[1]+=b; c.h[2]+=cc; c.h[3]+=d; c.h[4]+=e; c.h[5]+=f; c.h[6]+=g; c.h[7]+=hh;
++}
++static inline void init(Ctx &c) {
++  c.h[0]=0x6a09e667; c.h[1]=0xbb67ae85; c.h[2]=0x3c6ef372; c.h[3]=0xa54ff53a;
++  c.h[4]=0x510e527f; c.h[5]=0x9b05688c; c.h[6]=0x1f83d9ab; c.h[7]=0x5be0cd19;
++  c.bytes = 0; c.n = 0;
++}
++static inline void update(Ctx &c, const uint8_t *p, size_t L) {
++  c.bytes += L;
++  while (L) {
++    size_t take = 64 - c.n; if (take > L) take = L;
++    memcpy(c.buf + c.n, p, take); c.n += take; p += take; L -= take;
++    if (c.n == 64) { block(c, c.buf); c.n = 0; }
++  }
++}
++static inline std::string final_hex(Ctx &c) {
++  uint64_t bits = c.bytes * 8;
++  uint8_t pad = 0x80; update(c, &pad, 1);
++  uint8_t z = 0; while (c.n != 56) update(c, &z, 1);
++  uint8_t L[8]; for (int i = 0; i < 8; i++) L[i] = (uint8_t)(bits >> (56 - 8*i));
++  update(c, L, 8);
++  char out[65];
++  for (int i = 0; i < 8; i++) snprintf(out + 8*i, 9, "%08x", c.h[i]);
++  out[64] = 0; return std::string(out);
++}
++static inline void feed_i64le(Ctx &c, int64_t v) {
++  uint8_t b[8]; for (int i = 0; i < 8; i++) b[i] = (uint8_t)((uint64_t)v >> (8*i));
++  update(c, b, 8);
++}
++struct Arrival { int64_t wall_ns; int64_t stamp_ns; size_t buflen; };
++static const size_t RING = 16384;
++static Arrival ring[RING];
++static std::atomic<size_t> head{0}, tail{0};
++static std::atomic<size_t> dropped{0};
++static FILE *fp = nullptr;
++static inline void open() {
++  if (!fp) {
++    const char *p = getenv("TRACE_GROUP_FILE");
++    if (p) {
++      fp = fopen(p, "w");
++      if (fp) {
++        fputs("kind,wall_ns,lid_stamp_ns,n_items,first_stamp_ns,last_stamp_ns,"
++              "stamps_sha256,extra\n", fp);
++        fflush(fp);
++      }
++    }
++  }
++}
++static inline int64_t wall_ns() { return (int64_t)ros::WallTime::now().toNSec(); }
++// A double at 1.6e9 s has a 238 ns ULP, but d*1e9 lands in [2^60,2^61) where the ULP is 256 ns, so
++// llround(d*1e9) collapses about 7 % of adjacent doubles onto the same ns. Splitting the seconds
++// keeps whatever the double actually carries, without adding a 256 ns lattice.
++static inline int64_t to_ns_exact(double d) {
++  const double sec = std::floor(d);
++  return (int64_t)sec * 1000000000LL + (int64_t)llround((d - sec) * 1e9);
++}
++static inline void emit(const char *line) { open(); if (!fp) return; fputs(line, fp); fputc('\n', fp); fflush(fp); }
++static inline void push_arrival(int64_t stamp_ns, size_t buflen) {
++  size_t h = head.load(std::memory_order_relaxed);
++  if (h - tail.load(std::memory_order_acquire) >= RING) {
++    dropped.fetch_add(1, std::memory_order_relaxed);
++    return;
++  }
++  ring[h % RING] = {wall_ns(), stamp_ns, buflen};
++  head.store(h + 1, std::memory_order_release);
++}
++}  // namespace tr
++#endif
++
++
+ 
+ LIVMapper::LIVMapper(ros::NodeHandle &nh)
+     : extT(0, 0, 0),
+@@ -540,6 +648,21 @@
+   }
+ }
+ 
++#ifdef TRACE_GROUP
++void trace_emit_imuinit(const int64_t *stamps, int64_t n, int iter, int maxc) {
++  tr::Ctx c; tr::init(c);
++  for (int64_t i = 0; i < n; ++i) tr::feed_i64le(c, stamps[i]);
++  const int64_t first_ns = n > 0 ? stamps[0] : -1;
++  const int64_t last_ns = n > 0 ? stamps[n - 1] : -1;
++  const std::string sha = tr::final_hex(c);
++  char ln[256];
++  snprintf(ln, sizeof(ln), "IMUINIT,%lld,0,%lld,%lld,%lld,%s,iter=%d|max=%d",
++           (long long)tr::wall_ns(), (long long)n, (long long)first_ns, (long long)last_ns,
++           sha.c_str(), iter, maxc);
++  tr::emit(ln);
++}
++#endif
++
+ void LIVMapper::run() 
+ {
+   ros::Rate rate(5000);
+@@ -565,21 +688,75 @@
+ #endif
+       continue;
+     }
+-#ifdef DET_SYNC
++    // The trace must describe the same packages in every build shape, so the emission cannot live
++    // inside DET_SYNC: that guard is a build flag, and the default build would then write only the
++    // IMUINIT lines (which is exactly what happened on 2026-11-10).
++#if defined(DET_SYNC) || defined(TRACE_GROUP)
++    // lossy path, see the note in the STATE block: exact ns needs int64 in lid_header_time_buffer
++#ifdef TRACE_GROUP
++    // this is the very double sync_packages compares; its 238 ns quantisation belongs to the host,
++    // not to the trace, so recording the header ns here would log a time sync never saw
++    const int64_t last_lio_update_ns = tr::to_ns_exact(LidarMeasures.last_lio_update_time);
++#endif
+     // observation, not intervention: one line per processed package
+     {
+       // observation only: what this package actually contained
+       size_t det_imu_n = 0, det_img_n = 0;
+       double det_img_stamp = -1.0;
++#ifdef TRACE_GROUP
++      int64_t det_imu_first = -1, det_imu_last = -1;
++      tr::Ctx det_sha; tr::init(det_sha); size_t det_imu_n_traced = 0;
++#endif
+       for (auto &mgr : LidarMeasures.measures) {
+         det_imu_n += mgr.imu.size();
++#ifdef TRACE_GROUP
++        for (auto &im : mgr.imu) {
++          const int64_t ns = (int64_t)im->header.stamp.toNSec();
++          if (det_imu_first < 0) det_imu_first = ns;
++          det_imu_last = ns;
++          tr::feed_i64le(det_sha, ns);
++          det_imu_n_traced++;
++        }
++#endif
+         if (!mgr.img.empty()) { det_img_n++; det_img_stamp = mgr.vio_time; }
+       }
++#ifdef TRACE_GROUP
++      {
++        // drain the callback ring first: one ARRIVE line per arrival, single writer
++        size_t t = tr::tail.load(std::memory_order_relaxed);
++        const size_t h = tr::head.load(std::memory_order_acquire);
++        for (; t < h; ++t) {
++          const tr::Arrival &a = tr::ring[t % tr::RING];
++          tr::Ctx one; tr::init(one); tr::feed_i64le(one, a.stamp_ns);
++          const std::string one_sha = tr::final_hex(one);
++          char ln[256];
++          snprintf(ln, sizeof(ln), "ARRIVE,%lld,%lld,1,%lld,%lld,%s,buflen=%zu",
++                   (long long)a.wall_ns, (long long)a.stamp_ns, (long long)a.stamp_ns,
++                   (long long)a.stamp_ns, one_sha.c_str(), a.buflen);
++          tr::emit(ln);
++        }
++        tr::tail.store(t, std::memory_order_release);
++        std::string sha = tr::final_hex(det_sha);
++        char ln[512];
++        snprintf(ln, sizeof(ln),
++                 "GROUP,%lld,%lld,%zu,%lld,%lld,%s,mesures=%zu|img=%zu|img_stamp_ns=%lld|need_init=%d",
++                 (long long)tr::wall_ns(),
++                 (long long)last_lio_update_ns,
++                 det_imu_n_traced,
++                 (long long)det_imu_first, (long long)det_imu_last, sha.c_str(),
++                 LidarMeasures.measures.size(), det_img_n,
++                 (long long)(det_img_n ? tr::to_ns_exact(det_img_stamp) : -1),
++                 (int)p_imu->imu_need_init);
++        tr::emit(ln);
++      }
++#endif
++#ifdef DET_SYNC
+       ROS_INFO("[DET_SYNC] pkg lid_stamp=%.6f scans_in_pkg=%zu queued_lidar=%zu imu_in_pkg=%zu "
+                "img_in_pkg=%zu img_stamp=%.6f imu_need_init=%d state_pos=%.6f %.6f %.6f",
+                LidarMeasures.last_lio_update_time, LidarMeasures.measures.size(),
+                lid_raw_data_buffer.size(), det_imu_n, det_img_n, det_img_stamp,
+                (int)p_imu->imu_need_init, _state.pos_end[0], _state.pos_end[1], _state.pos_end[2]);
++#endif
+     }
+ #endif
+     handleFirstFrame();
+@@ -589,6 +766,22 @@
+     // if (!p_imu->imu_time_init) continue;
+ 
+     stateEstimationAndMapping();
++#ifdef TRACE_GROUP
++    // independent of DET_SYNC; declared inside its own scope so it does not collide with the
++    // package block's copy when DET_SYNC is also on
++    const int64_t state_lio_update_ns = tr::to_ns_exact(LidarMeasures.last_lio_update_time);
++    {
++      char ln[384];
++      snprintf(ln, sizeof(ln), "STATE,%lld,%lld,0,%lld,%lld,,pos=%.6f|%.6f|%.6f|diagR=%.6f|%.6f|%.6f",
++               (long long)tr::wall_ns(),
++               (long long)state_lio_update_ns,
++               (long long)state_lio_update_ns,
++               (long long)state_lio_update_ns,
++               _state.pos_end[0], _state.pos_end[1], _state.pos_end[2],
++               _state.rot_end(0, 0), _state.rot_end(1, 1), _state.rot_end(2, 2));
++      tr::emit(ln);
++    }
++#endif
+   }
+   savePCD();
+ }
+@@ -758,12 +951,19 @@
+   lid_raw_data_buffer.push_back(ptr);
+   lid_header_time_buffer.push_back(cur_head_time);
+   last_timestamp_lidar = cur_head_time;
++#ifdef TRACE_GROUP
++  const size_t trace_buf_after = lid_raw_data_buffer.size();   // read while still holding the lock
++#endif
+ 
+   mtx_buffer.unlock();
+   sig_buffer.notify_all();
+ #ifdef DET_SYNC
+   det_cv_.notify_one();
+ #endif
++#ifdef TRACE_GROUP
++  // callback thread: only a lock-free ring push, no I/O
++  tr::push_arrival((int64_t)msg->header.stamp.toNSec(), trace_buf_after);
++#endif
+ }
+ 
+ void LIVMapper::livox_pcl_cbk(const livox_ros_driver::CustomMsg::ConstPtr &msg_in)
+@@ -804,12 +1004,19 @@
+   lid_raw_data_buffer.push_back(ptr);
+   lid_header_time_buffer.push_back(cur_head_time);
+   last_timestamp_lidar = cur_head_time;
++#ifdef TRACE_GROUP
++  const size_t trace_buf_after = lid_raw_data_buffer.size();   // read while still holding the lock
++#endif
+ 
+   mtx_buffer.unlock();
+   sig_buffer.notify_all();
+ #ifdef DET_SYNC
+   det_cv_.notify_one();
+ #endif
++#ifdef TRACE_GROUP
++  // callback thread: only a lock-free ring push, no I/O
++  tr::push_arrival((int64_t)msg->header.stamp.toNSec(), trace_buf_after);
++#endif
+ }
+ 
+ void LIVMapper::imu_cbk(const sensor_msgs::Imu::ConstPtr &msg_in)
