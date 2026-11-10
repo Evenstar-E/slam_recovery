@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import os
 import time
 from typing import Dict, List, Optional, Tuple
 import numpy as np
@@ -290,7 +291,8 @@ class TrustedMapTransactionManager:
         # DIAGNOSTIC (no behaviour change): which end time the waiting timer will start from, and
         # when this validation actually ran. Added to separate "the timer is wrong" from "the timer
         # was started late", which the archived runs could not distinguish.
-        print(f"[WAITDIAG] validate_enter wall={time.time():.6f} "
+        if os.environ.get("SLAM_RECOVERY_WAITDIAG"):
+            print(f"[WAITDIAG] validate_enter wall={time.time():.6f} "
               f"state={self.state} t_end_ns={self.active_quarantine.t_end_ns} "
               f"wait_started_ns={self.wait_started_ns} wait_limit_ns={self.wait_limit_ns}",
               flush=True)
@@ -474,14 +476,22 @@ class TrustedMapTransactionManager:
             self.state = new_state
             if new_state == RecoveryState.WAITING_FOR_EVIDENCE and new_segment is not None:
                 self.wait_started_ns = int(new_segment.t_end_ns)
-                print(f"[WAITDIAG] wait_started_set(from new_segment) wall={time.time():.6f} "
+                if os.environ.get("SLAM_RECOVERY_WAITDIAG"):
+                    print(f"[WAITDIAG] wait_started_set(from new_segment) wall={time.time():.6f} "
                       f"started={self.wait_started_ns}", flush=True)
             self.commit_history.append(new_history)
         elif report.mode in (RecoveryMode.MODE3_SOFT_BRIDGE_WAIT, RecoveryMode.MODE1_ONLINE_REWEIGHT):
             # Trusted map stays strictly invariant; system waits for delayed loop or auxiliary evidence
             self.state = RecoveryState.WAITING_FOR_EVIDENCE
+            # The wait starts at the last frame seen when this decision is recorded, not at the
+            # configured deadline. Normally the two coincide within a frame. They diverge when the
+            # caller cannot run the decision on time: run 112059Z's first rolling snapshot blocked
+            # the driver for 16 s, the segment kept registering frames, and the wait started 11 s
+            # late. That inflation belongs to the caller -- record it there rather than silently
+            # shortening the interval here.
             self.wait_started_ns = int(self.active_quarantine.t_end_ns)
-            print(f"[WAITDIAG] wait_started_set(mode3) wall={time.time():.6f} "
+            if os.environ.get("SLAM_RECOVERY_WAITDIAG"):
+                print(f"[WAITDIAG] wait_started_set(mode3) wall={time.time():.6f} "
                   f"started={self.wait_started_ns} t_end_ns={self.active_quarantine.t_end_ns}",
                   flush=True)
         elif report.mode == RecoveryMode.MODE4_HARD_SLEEP_SPLIT:
@@ -511,7 +521,8 @@ class TrustedMapTransactionManager:
         # timer's start without changing either.
         if self._wait_diag_calls < 10:
             self._wait_diag_calls += 1
-            print(f"[WAITDIAG] close_check#{self._wait_diag_calls} wall={time.time():.6f} "
+            if os.environ.get("SLAM_RECOVERY_WAITDIAG"):
+                print(f"[WAITDIAG] close_check#{self._wait_diag_calls} wall={time.time():.6f} "
                   f"now_ns={now_ns} started={self.wait_started_ns} "
                   f"delta_s={(None if self.wait_started_ns is None else (int(now_ns) - int(self.wait_started_ns)) / 1e9)}",
                   flush=True)
