@@ -845,6 +845,7 @@ class NativeClosedLoop:
         # it raced with shutdown, and on 2026-11-10 a run was killed mid-decision with the
         # summary already written and the record missing.
         self.pending_decision: Optional[str] = None
+        self._pending_decision_wall: Optional[float] = None
         self.frames_fed = 0
         self.frames_after_first_decision = 0
         self._first_decision_ts_ns: Optional[int] = None
@@ -956,6 +957,7 @@ class NativeClosedLoop:
             self._open.frames.append((kf_id, ts_ns, np.asarray(pose, dtype=np.float64).copy()))
             if ts_ns >= self._open.deadline_ns:
                 self.pending_decision = "confirmation_margin"
+                self._pending_decision_wall = time.time()
 
     def _maybe_scripted_trigger(self, kf_id: int, ts_ns: int, pose: np.ndarray,
                                 scan_body: np.ndarray) -> bool:
@@ -1156,6 +1158,12 @@ class NativeClosedLoop:
         ep = self._open
         if ep is None or ep.decided:
             return None
+        # Three timestamps, so the interval that the five stage timers do not cover can be split
+        # into "the main loop took this long to get to the decision" and "decide() spent this long
+        # before handing over to evaluate_and_commit_candidate". Recorded, not optimised.
+        t_enter = time.time()
+        sched_delay_s = (None if self._pending_decision_wall is None
+                         else round(t_enter - self._pending_decision_wall, 3))
         ep.decided = True
         keys = [kf for kf, _ts, _p in ep.frames]
         repaired = {kf: pose for kf, _ts, pose in ep.frames}
@@ -1192,6 +1200,7 @@ class NativeClosedLoop:
                          else round((int(seg_end) - int(ep.deadline_ns)) / 1e9, 3))
 
         version_before = int(self.node.tx_mgr.trusted_version)
+        t_before_eval = time.time()
         report = None
         error = None
         try:
@@ -1206,6 +1215,7 @@ class NativeClosedLoop:
             error = {"candidate_id": ep.candidate_id, "error": f"{type(exc).__name__}: {exc}"}
             self.decision_errors.append(error)
 
+        t_after_eval = time.time()
         evidence = dict(getattr(self.node, "last_paired_evidence", {}) or {})
         row = candidate_record(
             run_id=self.run_id,
@@ -1234,6 +1244,12 @@ class NativeClosedLoop:
                                    self.node.tx_mgr.state),
             "quarantine_still_open": self.node.tx_mgr.active_quarantine is not None,
             "wait_start_offset_s": wait_offset_s,
+            "decide_timing_s": {
+                "scheduler_delay_s": sched_delay_s,
+                "pre_eval_s": round(t_before_eval - t_enter, 3),
+                "eval_s": round(t_after_eval - t_before_eval, 3),
+                "post_eval_s": round(time.time() - t_after_eval, 3),
+            },
         }
         # Native writeback. A refused candidate leaves the host's map holding the frames it was
         # asked to judge, so the host is rolled back to its own checkpoint; an accepted one is
