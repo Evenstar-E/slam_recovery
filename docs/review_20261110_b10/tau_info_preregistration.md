@@ -1,5 +1,8 @@
 # `tau_info` 预注册提案（2026-11-10）
 
+> **`OLD_CRITERION`（2026-11-10）**：本文的判定使用 `weak_dir_info_after >= tau_info = 25`。该判据已被 `1917e16` 取代为 `after >= tau_abs_min=3.0 且 after >= tau_info_kappa=2.0 * before 且 gain > 0`。本文的**数值**是归档测量，仍然有效；基于旧判据的**结论**必须单独标注，新旧不得进同一张表。
+
+
 **状态（2026-11-10）：用户裁决「先补证据再改」（C → B）；证据已补齐，判据已按方案 B 冻结并实现。**
 
 - **冻结值**：`tau_info_kappa = 2.0`、`tau_abs_min = 3.0`；判据 = `after >= 3.0 且 after >= 2.0 * before 且 gain > 0`；
