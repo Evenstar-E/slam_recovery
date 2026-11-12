@@ -1,0 +1,836 @@
+{
+  "main": "b2f3983801e6113f3c3626df0d95783666e1c24f",
+  "archive": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261113_b2f3983/run_checks.py",
+  "scope": "fixed archived logs and saved summaries only, no actual bag parsing/host/code execution",
+  "independent_workspace_evidence": {
+    "build_target_finished": true,
+    "source_commit_declaration": "c6d9e3264bccc8e8762bb072ec0b3b741358d9bd",
+    "source_commit_subject_in_this_repo": "Record the FAST-LIVO2 stop and the FAST-LIO2 independent-build task",
+    "source_declaration": [
+      "source_commit c6d9e3264bccc8e8762bb072ec0b3b741358d9bd",
+      "source_path /home/R26534/MM-LINS/FAST-LIO",
+      "no-git-in-copy",
+      "livox 3d240d5666129e1a3052e78ee8487a04b08fdda3",
+      "da889ce04ffcc2c8f0c226d14b37d1102cab62c5c28d95121555a75023e7929d  -"
+    ],
+    "run2_binary_identity": [
+      "# rosrun resolves through ROS_PACKAGE_PATH, not PATH:  is empty by design.",
+      "bash_source_ws=/home/R26534/fastlio2_ws/devel/setup.bash",
+      "expected_binary=/home/R26534/fastlio2_ws/devel/lib/fast_lio/fastlio_mapping",
+      "4c31fada7b39207037c624c0b5944d37d2608dd25125e60d647fff8cb90bc525  /home/R26534/fastlio2_ws/devel/lib/fast_lio/fastlio_mapping",
+      "bag=/home/R26534/datasets/mmlins/campus_12_fl.bag",
+      "a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de  /home/R26534/datasets/mmlins/campus_12_fl.bag",
+      "node_pid=705077 exe=/home/R26534/fastlio2_ws/devel/lib/fast_lio/fastlio_mapping"
+    ],
+    "original_upstream_implementation_identity": "NOT_VERIFIED",
+    "run1_actual_process_in_new_workspace": true
+  },
+  "run1": {
+    "progress_values": 78798,
+    "last_duration_s": 375.960884,
+    "has_done_marker": false,
+    "imu_initial_markers": 323,
+    "rebuild_markers": 4,
+    "zero_messages_reindex": "DEVELOPER_REPORTED: no bag/reindex-info artifact here",
+    "root_cause": "UNKNOWN: load attribution and changed-recording claims not established"
+  },
+  "run2": {
+    "record_topics_actual": {
+      "/Odometry": 4186,
+      "/cloud_registered": 4186,
+      "/cloud_registered_body": 4186,
+      "/path": 418,
+      "/Issleeping": 2,
+      "/Isbuilding": 2
+    },
+    "messages_sum": 12980,
+    "bag_info_consistent_with_analysis": true,
+    "node_markers": {
+      "sleep": {
+        "count": 2,
+        "matches": [
+          [
+            6,
+            "Over-degeneracy has happened, publish hibernating map operation!!!!!!!!!!!!!"
+          ],
+          [
+            312,
+            "Over-degeneracy has happened, publish hibernating map operation!!!!!!!!!!!!!"
+          ]
+        ]
+      },
+      "rebuild": {
+        "count": 2,
+        "matches": [
+          [
+            309,
+            "Over-degeneracy has disappear, construct a new map....................."
+          ],
+          [
+            664,
+            "Over-degeneracy has disappear, construct a new map....................."
+          ]
+        ]
+      },
+      "imu_initial": {
+        "count": 165,
+        "matches": [
+          [
+            3,
+            "[ INFO] [1794504912.615345006]: IMU Initial Done"
+          ],
+          [
+            8,
+            "[ INFO] [1794505028.908471529]: IMU Initial Done"
+          ],
+          [
+            12,
+            "[ INFO] [1794505029.208653454]: IMU Initial Done"
+          ],
+          [
+            16,
+            "[ INFO] [1794505029.508188403]: IMU Initial Done"
+          ],
+          [
+            20,
+            "[ INFO] [1794505029.808506147]: IMU Initial Done"
+          ],
+          [
+            24,
+            "[ INFO] [1794505030.107789042]: IMU Initial Done"
+          ],
+          [
+            28,
+            "[ INFO] [1794505030.408713515]: IMU Initial Done"
+          ],
+          [
+            32,
+            "[ INFO] [1794505030.709059167]: IMU Initial Done"
+          ],
+          [
+            36,
+            "[ INFO] [1794505031.009076390]: IMU Initial Done"
+          ],
+          [
+            40,
+            "[ INFO] [1794505031.308686873]: IMU Initial Done"
+          ],
+          [
+            44,
+            "[ INFO] [1794505031.608340967]: IMU Initial Done"
+          ],
+          [
+            48,
+            "[ INFO] [1794505032.108701730]: IMU Initial Done"
+          ],
+          [
+            52,
+            "[ INFO] [1794505032.408781364]: IMU Initial Done"
+          ],
+          [
+            56,
+            "[ INFO] [1794505032.708515925]: IMU Initial Done"
+          ],
+          [
+            60,
+            "[ INFO] [1794505033.008331774]: IMU Initial Done"
+          ],
+          [
+            64,
+            "[ INFO] [1794505033.908365442]: IMU Initial Done"
+          ],
+          [
+            68,
+            "[ INFO] [1794505034.208851542]: IMU Initial Done"
+          ],
+          [
+            72,
+            "[ INFO] [1794505034.608584696]: IMU Initial Done"
+          ],
+          [
+            76,
+            "[ INFO] [1794505034.908263624]: IMU Initial Done"
+          ],
+          [
+            80,
+            "[ INFO] [1794505035.208298906]: IMU Initial Done"
+          ],
+          [
+            84,
+            "[ INFO] [1794505035.508153049]: IMU Initial Done"
+          ],
+          [
+            88,
+            "[ INFO] [1794505035.808222914]: IMU Initial Done"
+          ],
+          [
+            92,
+            "[ INFO] [1794505036.108140429]: IMU Initial Done"
+          ],
+          [
+            96,
+            "[ INFO] [1794505036.407985561]: IMU Initial Done"
+          ],
+          [
+            100,
+            "[ INFO] [1794505036.708784875]: IMU Initial Done"
+          ],
+          [
+            104,
+            "[ INFO] [1794505037.009904567]: IMU Initial Done"
+          ],
+          [
+            108,
+            "[ INFO] [1794505037.308940782]: IMU Initial Done"
+          ],
+          [
+            112,
+            "[ INFO] [1794505037.608247001]: IMU Initial Done"
+          ],
+          [
+            116,
+            "[ INFO] [1794505037.908719005]: IMU Initial Done"
+          ],
+          [
+            120,
+            "[ INFO] [1794505038.208321223]: IMU Initial Done"
+          ],
+          [
+            124,
+            "[ INFO] [1794505038.510293701]: IMU Initial Done"
+          ],
+          [
+            128,
+            "[ INFO] [1794505038.808106910]: IMU Initial Done"
+          ],
+          [
+            132,
+            "[ INFO] [1794505039.108160028]: IMU Initial Done"
+          ],
+          [
+            136,
+            "[ INFO] [1794505039.410431397]: IMU Initial Done"
+          ],
+          [
+            140,
+            "[ INFO] [1794505039.710553772]: IMU Initial Done"
+          ],
+          [
+            144,
+            "[ INFO] [1794505040.008593219]: IMU Initial Done"
+          ],
+          [
+            148,
+            "[ INFO] [1794505040.310156488]: IMU Initial Done"
+          ],
+          [
+            152,
+            "[ INFO] [1794505040.608357045]: IMU Initial Done"
+          ],
+          [
+            156,
+            "[ INFO] [1794505040.908417937]: IMU Initial Done"
+          ],
+          [
+            160,
+            "[ INFO] [1794505041.208251437]: IMU Initial Done"
+          ],
+          [
+            164,
+            "[ INFO] [1794505041.508412732]: IMU Initial Done"
+          ],
+          [
+            168,
+            "[ INFO] [1794505041.808556435]: IMU Initial Done"
+          ],
+          [
+            172,
+            "[ INFO] [1794505042.108344153]: IMU Initial Done"
+          ],
+          [
+            176,
+            "[ INFO] [1794505042.409607692]: IMU Initial Done"
+          ],
+          [
+            180,
+            "[ INFO] [1794505042.708670980]: IMU Initial Done"
+          ],
+          [
+            184,
+            "[ INFO] [1794505043.008566843]: IMU Initial Done"
+          ],
+          [
+            188,
+            "[ INFO] [1794505043.308421077]: IMU Initial Done"
+          ],
+          [
+            192,
+            "[ INFO] [1794505043.608337925]: IMU Initial Done"
+          ],
+          [
+            196,
+            "[ INFO] [1794505043.908619652]: IMU Initial Done"
+          ],
+          [
+            200,
+            "[ INFO] [1794505044.208613855]: IMU Initial Done"
+          ],
+          [
+            204,
+            "[ INFO] [1794505044.509146013]: IMU Initial Done"
+          ],
+          [
+            208,
+            "[ INFO] [1794505044.808541622]: IMU Initial Done"
+          ],
+          [
+            212,
+            "[ INFO] [1794505045.108480891]: IMU Initial Done"
+          ],
+          [
+            216,
+            "[ INFO] [1794505045.408578608]: IMU Initial Done"
+          ],
+          [
+            220,
+            "[ INFO] [1794505045.708585138]: IMU Initial Done"
+          ],
+          [
+            224,
+            "[ INFO] [1794505046.009219171]: IMU Initial Done"
+          ],
+          [
+            228,
+            "[ INFO] [1794505046.308630195]: IMU Initial Done"
+          ],
+          [
+            232,
+            "[ INFO] [1794505046.609048779]: IMU Initial Done"
+          ],
+          [
+            236,
+            "[ INFO] [1794505046.910376806]: IMU Initial Done"
+          ],
+          [
+            240,
+            "[ INFO] [1794505047.208569146]: IMU Initial Done"
+          ],
+          [
+            244,
+            "[ INFO] [1794505047.508622094]: IMU Initial Done"
+          ],
+          [
+            248,
+            "[ INFO] [1794505047.809020779]: IMU Initial Done"
+          ],
+          [
+            252,
+            "[ INFO] [1794505048.110062782]: IMU Initial Done"
+          ],
+          [
+            256,
+            "[ INFO] [1794505048.408698800]: IMU Initial Done"
+          ],
+          [
+            260,
+            "[ INFO] [1794505048.708619810]: IMU Initial Done"
+          ],
+          [
+            264,
+            "[ INFO] [1794505049.008821812]: IMU Initial Done"
+          ],
+          [
+            268,
+            "[ INFO] [1794505049.309565600]: IMU Initial Done"
+          ],
+          [
+            272,
+            "[ INFO] [1794505049.611600023]: IMU Initial Done"
+          ],
+          [
+            276,
+            "[ INFO] [1794505049.911622246]: IMU Initial Done"
+          ],
+          [
+            280,
+            "[ INFO] [1794505050.209166573]: IMU Initial Done"
+          ],
+          [
+            284,
+            "[ INFO] [1794505050.510725405]: IMU Initial Done"
+          ],
+          [
+            288,
+            "[ INFO] [1794505050.809726487]: IMU Initial Done"
+          ],
+          [
+            292,
+            "[ INFO] [1794505051.108685335]: IMU Initial Done"
+          ],
+          [
+            296,
+            "[ INFO] [1794505051.408798292]: IMU Initial Done"
+          ],
+          [
+            300,
+            "[ INFO] [1794505051.708875321]: IMU Initial Done"
+          ],
+          [
+            304,
+            "[ INFO] [1794505052.008825066]: IMU Initial Done"
+          ],
+          [
+            308,
+            "[ INFO] [1794505052.309488745]: IMU Initial Done"
+          ],
+          [
+            314,
+            "[ INFO] [1794505142.808084265]: IMU Initial Done"
+          ],
+          [
+            318,
+            "[ INFO] [1794505143.108121405]: IMU Initial Done"
+          ],
+          [
+            322,
+            "[ INFO] [1794505143.408115394]: IMU Initial Done"
+          ],
+          [
+            326,
+            "[ INFO] [1794505143.708198247]: IMU Initial Done"
+          ],
+          [
+            330,
+            "[ INFO] [1794505144.008180900]: IMU Initial Done"
+          ],
+          [
+            334,
+            "[ INFO] [1794505144.308065896]: IMU Initial Done"
+          ],
+          [
+            338,
+            "[ INFO] [1794505144.608042693]: IMU Initial Done"
+          ],
+          [
+            342,
+            "[ INFO] [1794505144.908021499]: IMU Initial Done"
+          ],
+          [
+            346,
+            "[ INFO] [1794505145.208203391]: IMU Initial Done"
+          ],
+          [
+            350,
+            "[ INFO] [1794505145.508061118]: IMU Initial Done"
+          ],
+          [
+            354,
+            "[ INFO] [1794505145.808194489]: IMU Initial Done"
+          ],
+          [
+            358,
+            "[ INFO] [1794505146.108265662]: IMU Initial Done"
+          ],
+          [
+            362,
+            "[ INFO] [1794505146.408232234]: IMU Initial Done"
+          ],
+          [
+            366,
+            "[ INFO] [1794505146.708112689]: IMU Initial Done"
+          ],
+          [
+            370,
+            "[ INFO] [1794505147.008578121]: IMU Initial Done"
+          ],
+          [
+            374,
+            "[ INFO] [1794505147.308116814]: IMU Initial Done"
+          ],
+          [
+            378,
+            "[ INFO] [1794505147.606479678]: IMU Initial Done"
+          ],
+          [
+            382,
+            "[ INFO] [1794505147.906163886]: IMU Initial Done"
+          ],
+          [
+            386,
+            "[ INFO] [1794505148.205601105]: IMU Initial Done"
+          ],
+          [
+            390,
+            "[ INFO] [1794505148.506195191]: IMU Initial Done"
+          ],
+          [
+            394,
+            "[ INFO] [1794505148.806020618]: IMU Initial Done"
+          ],
+          [
+            398,
+            "[ INFO] [1794505149.105461006]: IMU Initial Done"
+          ],
+          [
+            402,
+            "[ INFO] [1794505149.405913053]: IMU Initial Done"
+          ],
+          [
+            406,
+            "[ INFO] [1794505149.706107128]: IMU Initial Done"
+          ],
+          [
+            410,
+            "[ INFO] [1794505150.006069153]: IMU Initial Done"
+          ],
+          [
+            414,
+            "[ INFO] [1794505150.306631008]: IMU Initial Done"
+          ],
+          [
+            418,
+            "[ INFO] [1794505150.606162918]: IMU Initial Done"
+          ],
+          [
+            422,
+            "[ INFO] [1794505150.905238197]: IMU Initial Done"
+          ],
+          [
+            426,
+            "[ INFO] [1794505151.205718230]: IMU Initial Done"
+          ],
+          [
+            430,
+            "[ INFO] [1794505151.505330538]: IMU Initial Done"
+          ],
+          [
+            434,
+            "[ INFO] [1794505151.808328966]: IMU Initial Done"
+          ],
+          [
+            438,
+            "[ INFO] [1794505152.108341666]: IMU Initial Done"
+          ],
+          [
+            442,
+            "[ INFO] [1794505152.408380434]: IMU Initial Done"
+          ],
+          [
+            447,
+            "[ INFO] [1794505152.805368580]: IMU Initial Done"
+          ],
+          [
+            451,
+            "[ INFO] [1794505153.008458919]: IMU Initial Done"
+          ],
+          [
+            455,
+            "[ INFO] [1794505153.308529596]: IMU Initial Done"
+          ],
+          [
+            459,
+            "[ INFO] [1794505153.608487306]: IMU Initial Done"
+          ],
+          [
+            463,
+            "[ INFO] [1794505153.908440870]: IMU Initial Done"
+          ],
+          [
+            467,
+            "[ INFO] [1794505154.208699542]: IMU Initial Done"
+          ],
+          [
+            471,
+            "[ INFO] [1794505154.508543098]: IMU Initial Done"
+          ],
+          [
+            475,
+            "[ INFO] [1794505154.808682979]: IMU Initial Done"
+          ],
+          [
+            479,
+            "[ INFO] [1794505155.108468189]: IMU Initial Done"
+          ],
+          [
+            483,
+            "[ INFO] [1794505155.408538287]: IMU Initial Done"
+          ],
+          [
+            487,
+            "[ INFO] [1794505155.708625654]: IMU Initial Done"
+          ],
+          [
+            491,
+            "[ INFO] [1794505156.008766322]: IMU Initial Done"
+          ],
+          [
+            495,
+            "[ INFO] [1794505156.308568324]: IMU Initial Done"
+          ],
+          [
+            499,
+            "[ INFO] [1794505156.608629513]: IMU Initial Done"
+          ],
+          [
+            503,
+            "[ INFO] [1794505156.908780255]: IMU Initial Done"
+          ],
+          [
+            507,
+            "[ INFO] [1794505157.208784344]: IMU Initial Done"
+          ],
+          [
+            511,
+            "[ INFO] [1794505157.508690438]: IMU Initial Done"
+          ],
+          [
+            515,
+            "[ INFO] [1794505157.808764886]: IMU Initial Done"
+          ],
+          [
+            519,
+            "[ INFO] [1794505158.108776909]: IMU Initial Done"
+          ],
+          [
+            523,
+            "[ INFO] [1794505158.406496297]: IMU Initial Done"
+          ],
+          [
+            527,
+            "[ INFO] [1794505158.706538148]: IMU Initial Done"
+          ],
+          [
+            531,
+            "[ INFO] [1794505159.005942288]: IMU Initial Done"
+          ],
+          [
+            535,
+            "[ INFO] [1794505159.307567823]: IMU Initial Done"
+          ],
+          [
+            539,
+            "[ INFO] [1794505159.606814581]: IMU Initial Done"
+          ],
+          [
+            543,
+            "[ INFO] [1794505159.906078508]: IMU Initial Done"
+          ],
+          [
+            547,
+            "[ INFO] [1794505160.206943233]: IMU Initial Done"
+          ],
+          [
+            551,
+            "[ INFO] [1794505160.505835286]: IMU Initial Done"
+          ],
+          [
+            555,
+            "[ INFO] [1794505160.805970671]: IMU Initial Done"
+          ],
+          [
+            559,
+            "[ INFO] [1794505161.106651032]: IMU Initial Done"
+          ],
+          [
+            563,
+            "[ INFO] [1794505161.406222084]: IMU Initial Done"
+          ],
+          [
+            567,
+            "[ INFO] [1794505161.705909663]: IMU Initial Done"
+          ],
+          [
+            571,
+            "[ INFO] [1794505162.005998732]: IMU Initial Done"
+          ],
+          [
+            575,
+            "[ INFO] [1794505162.307385854]: IMU Initial Done"
+          ],
+          [
+            579,
+            "[ INFO] [1794505162.606296101]: IMU Initial Done"
+          ],
+          [
+            583,
+            "[ INFO] [1794505162.906237651]: IMU Initial Done"
+          ],
+          [
+            587,
+            "[ INFO] [1794505163.205786416]: IMU Initial Done"
+          ],
+          [
+            591,
+            "[ INFO] [1794505163.505606038]: IMU Initial Done"
+          ],
+          [
+            595,
+            "[ INFO] [1794505163.806071095]: IMU Initial Done"
+          ],
+          [
+            599,
+            "[ INFO] [1794505164.105717582]: IMU Initial Done"
+          ],
+          [
+            603,
+            "[ INFO] [1794505164.406541852]: IMU Initial Done"
+          ],
+          [
+            607,
+            "[ INFO] [1794505164.706177022]: IMU Initial Done"
+          ],
+          [
+            611,
+            "[ INFO] [1794505165.006112007]: IMU Initial Done"
+          ],
+          [
+            615,
+            "[ INFO] [1794505165.306387019]: IMU Initial Done"
+          ],
+          [
+            619,
+            "[ INFO] [1794505165.705722223]: IMU Initial Done"
+          ],
+          [
+            623,
+            "[ INFO] [1794505166.005481134]: IMU Initial Done"
+          ],
+          [
+            627,
+            "[ INFO] [1794505166.305443223]: IMU Initial Done"
+          ],
+          [
+            631,
+            "[ INFO] [1794505166.605659377]: IMU Initial Done"
+          ],
+          [
+            635,
+            "[ INFO] [1794505166.906163357]: IMU Initial Done"
+          ],
+          [
+            639,
+            "[ INFO] [1794505167.205921219]: IMU Initial Done"
+          ],
+          [
+            643,
+            "[ INFO] [1794505167.505720833]: IMU Initial Done"
+          ],
+          [
+            647,
+            "[ INFO] [1794505168.006911454]: IMU Initial Done"
+          ],
+          [
+            651,
+            "[ INFO] [1794505168.306085771]: IMU Initial Done"
+          ],
+          [
+            655,
+            "[ INFO] [1794505168.605667526]: IMU Initial Done"
+          ],
+          [
+            659,
+            "[ INFO] [1794505168.905360750]: IMU Initial Done"
+          ],
+          [
+            663,
+            "[ INFO] [1794505169.205577564]: IMU Initial Done"
+          ]
+        ]
+      }
+    },
+    "saved_metrics_shared_compatible": true,
+    "position_differences_m": {
+      "E1": 0.18087591213925913,
+      "E2": 0.22977261760180342
+    },
+    "event_to_first_output_s_not_outage": {
+      "E1": 0.023395748,
+      "E2": 0.020962829
+    },
+    "actual_saved_outages": [
+      {
+        "from_ns": 1711547999575659752,
+        "to_ns": 1711548023375040054,
+        "dt_s": 23.799380302,
+        "step_m": 60.47881367460649,
+        "pos_before": [
+          34.136074895411355,
+          -49.91491338260359,
+          1.183219525965063
+        ],
+        "pos_after": [
+          0.004839276990429686,
+          -0.0016933291840986863,
+          -0.006789947327871607
+        ]
+      },
+      {
+        "from_ns": 1711548113473230600,
+        "to_ns": 1711548140372420073,
+        "dt_s": 26.899189473,
+        "step_m": 71.12241634281042,
+        "pos_before": [
+          67.10506977317539,
+          -23.288387196389813,
+          4.00048823802456
+        ],
+        "pos_after": [
+          0.017357671216154728,
+          0.0023273375964267848,
+          0.10438661447031983
+        ]
+      }
+    ],
+    "tail_after_E2_declared_s": 239.317980404,
+    "messages_after_E2_declared": 2126,
+    "continuous_tail": "NOT_ESTABLISHED: includes the 26.899s gap after E2",
+    "path_lengths_m": {
+      "excluding_gaps": 353.432906761176,
+      "gap_steps": 131.60123001741692,
+      "including_gaps": 485.03413677859294,
+      "shared_including_gaps": 485.07913907088596
+    },
+    "runner_log_has_rate_120s": false,
+    "runner_log_has_cgroup_delta": false,
+    "runner_records_clouds": true,
+    "record_command": "setsid rosbag record --lz4 -O \"$OUT/frontend.bag\" \\\n  /Odometry /path /cloud_registered /cloud_registered_body /Issleeping /Isbuilding \\\n  > \"$OUT/record.log\" 2>&1 & REC=$!",
+    "runner_log": [
+      "WARN_HOST_LOAD: load1=221 is host-global; continuing, gating on rate",
+      "# rosrun resolves through ROS_PACKAGE_PATH, not PATH:  is empty by design.",
+      "bash_source_ws=/home/R26534/fastlio2_ws/devel/setup.bash",
+      "expected_binary=/home/R26534/fastlio2_ws/devel/lib/fast_lio/fastlio_mapping",
+      "4c31fada7b39207037c624c0b5944d37d2608dd25125e60d647fff8cb90bc525  /home/R26534/fastlio2_ws/devel/lib/fast_lio/fastlio_mapping",
+      "bag=/home/R26534/datasets/mmlins/campus_12_fl.bag",
+      "a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de  /home/R26534/datasets/mmlins/campus_12_fl.bag",
+      "[fastlio2-independent] done",
+      "355004"
+    ],
+    "missing_originals": [
+      "run2/play.log",
+      "run2/frontend.bag",
+      "run2/frontend_sha256.txt",
+      "run2/cgroup_start.txt",
+      "run2/cgroup_120s.txt"
+    ],
+    "play_rate_092x": "DEVELOPER_REPORTED_NOT_RECOMPUTED",
+    "recovery_wiring": "NOT_IMPLEMENTED"
+  },
+  "hashes": {
+    "docs/review_20261112_four_host/fastlio2_independent_20261113/run2/analysis.json": "8180709550220d6ce6298b410170ab2f4cfefb31a3d0553a2459ab8aa780612d",
+    "docs/review_20261112_four_host/fastlio2_shared_campus12_20261112/analysis.json": "c7759ff2188867be763ae9ea828a89e070e6d2dd24d05e4af54908829d239a95",
+    "docs/review_20261112_four_host/fastlio2_independent_20261113/run2/bag_info.txt": "83ee4f0eb2699654e6e9165ea32c25c8153f1eddfe4d92f1acbf468f99830152",
+    "docs/review_20261112_four_host/fastlio2_independent_20261113/run2/fastlio_node.log": "9176c5667a2df82c2c31446dd08544b01550c228cfb08e83d90c94a8f64cda4f",
+    "docs/review_20261112_four_host/fastlio2_independent_20261113/run1/fastlio_node.log": "bbd44288df1d757ac880ba26144d6692ae1f7024cb6ae6919902390e40d94ce2",
+    "docs/review_20261112_four_host/fastlio2_independent_20261113/run_fastlio2_independent.sh": "18460eacddab2f5d518968c09860b188e22f8ad7eced1a877dd6732434fa13fe",
+    "docs/review_20261112_four_host/fastlio2_independent_20261113/run2/runner.log": "23807e1247bc5b5b319c8dffdf7928f851ce8a7b035fe952bd40853ac1952bde",
+    "docs/review_20261112_four_host/fastlio2_independent_20261113/run2/record.log": "50589de2435986a79975ed86604e677d8dae664e443666bb5a0a1387fd23934d",
+    "docs/review_20261112_four_host/fastlio2_independent_20261113/run2/binary_identity.txt": "02a2e35073ca12cdc8129b7077628f981fb1b356326d81a67f912e99c023803b",
+    "docs/review_20261112_four_host/fastlio2_independent_20261113/source_identity.txt": "f3e67773de74fee9ba762d628ac511d76839d3e434e1447992b1a2f8ca8a17aa",
+    "docs/review_20261112_four_host/fastlio2_independent_20261113/run1/process_identity.txt": "6f8dddb607a9433e5d84261ddd828678af0b9caae68fd18cfd5e5211ef958e21",
+    "docs/review_20261112_four_host/fastlio2_independent_20261113/build2.log": "b122303959b4b48f5f924b039897cfd71f6af232537e59ef02742080c660970f",
+    "docs/review_20261112_four_host/fastlio2_independent_20261113/run1/play.log": "bf4bce516ef793a600eb030e768e34e65ddd578b51825ea47559ef1442642bfa",
+    "docs/review_20261112_four_host/fastlio2_independent_20261113/run2/loadavg.log": "d5c80774da05fcb0f8d633e6760e2ba8ac93fd2c913ceca28a89d66da520f789"
+  },
+  "no_installation_production_edit_native_archive_CLI_execution": true
+}
