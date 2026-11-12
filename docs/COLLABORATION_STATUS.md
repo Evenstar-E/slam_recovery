@@ -1628,3 +1628,15 @@ S3上传研究/配对评价、S2一次现预算真实导出、S1共享集成与�
 Run A（402）中 285 个 UNAVAILABLE 帧的 `support.reason` 仍是 `ok`（fraction 低于阈值却未更新原因字段）；
 Run B（544）为 `fraction_below_threshold` 351。S3 的 `insufficient_support` 是派生值，与审阅结论一致；
 后续引用须注明该字段在旧 Run A 中不可直接当判据。
+
+## 120. S3 的 T2 输入契约已核并合入；真实 T2 仍等 trace
+
+S3 HEAD `63b9029`（`exp/ali-h-v1`，只动 `docs/ali_h_v1_research/`），本机核对：
+- `REPORT.md` §2.1 已写明 Run A 的 285 帧旧 `support.reason` 仍为 `ok`、`insufficient_support` 为派生值
+  （`pass==false && reference_points>0`），Run B 的 351 帧旧字段为 `fraction_below_threshold`；与 §119.4 一致。
+- 新增 `T2_INPUT_CONTRACT.md` + `t2_input_check.py`：只接收 `P⁻`/`P⁺` 6×6 位姿块、`vec` 6、`effct_feat_num`、
+  更新前/后位姿与绝对戳；**显式拒绝** `S` 与 `H_T_H` 当 6D 协方差；必须声明 state order/旋转参数化/扰动
+  左右/frame/外参/bias 来源，缺项 `INCOMPLETE`；无协方差则单位权 + `NOT_AVAILABLE`。
+- `t2_prep_selftest.json`：11 项、`failed: 0`（含 S 拒绝、旧 run id 拒绝、e_I 手算、秩亏协方差、单位权）。
+
+已 `--no-ff` 合入 main，测试 `python -m unittest discover` 通过。真实 T2 **仍 NOT_EXECUTED**，等 S2 trace。
