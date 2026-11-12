@@ -2420,3 +2420,21 @@ S2 停止确认：**在途无**（无 build/rosbag play/宿主进程）；最后
 **S1 已批准下一任务**：FAST-LIO2 **独立构建** + 同一 bag（`campus_12_fl.bag`，sha `a924b5f9…`）/同 E1-E2 声明戳/同 `/Odometry`
 口径复跑；验收含新二进制 sha、构建日志、源码身份、双事件证据、与 SHARED_EXECUTION 的逐项差异；标签升级为
 `NATIVE_INDEPENDENT` 或如实 FAIL。预算 1 次构建 + ≤2 次 run，不扩参数矩阵；恢复接线仍 NOT_IMPLEMENTED，不混为已实现。
+
+## 162. T2 时间索引缺陷已修；v11 同行 pre/post 升为 PASS_SAME_ROW（单位权）；meta 已对齐
+
+S3 `6e35d30`（已合入 main）：
+- **时间索引缺陷**：排序后误用原数组索引 `m2[j]` 改为 `pose_rows[j][1]`；v7 的 504 条 I 诊断中 **92 条**受影响，
+  `s` 中位 **70.31→72.29**、p90 414.2→420.9、phase0/1 中位 67.06→69.25 / 870.68→911.87，`|e|` 基本不变；
+  `T2_RESULTS` 保留旧值并标"修正前"。
+- **v11 run `165438Z_669633`（既有原件、只读）**：trace 792×107、0 malformed/0 truncated、`has_out=725`、phase 全 0、
+  `same_row_pre_post_rows=725`；availability 482（129 AVAILABLE/353 UNAVAILABLE，support 非空）；join 真实跨度+512 ns
+  **481/482 映射、1 NO_TRACE_ROW、246 行多对一**；M **175** / T **306** / neither 1；I **462**（Ppre 秩 6）；单位权
+  `|e_I|²` p50 **1.1726e-3**、p90 1.2931e-2、max 0.34893；`s` 诊断中位 57.68（不作曲差）；106 块/53.0 s 全 UNKNOWN、
+  无尾段（run 未到 E2 后）。
+- **资格升级**：v11 pre/post `PASS_SAME_ROW`、总体 I **`PASS_SAME_ROW_UNIT_WEIGHTED`**（3 行抽检：post 与 M2DGR
+  同时间 ≤1 mm、quat 范数 1.0±1.2e-11、pre≠post）；`vec6` 仍 `NOT_VERIFIED`、协方差 `NOT_AVAILABLE_FOR_E_I`。
+- **meta 对齐**：`t2_v11_summary.json` 的 `i_qualification`/`same_row_post_pose_rows`/`join_status`/`pose_source_status`
+  已与正文一致；v7 的 `t2_summary.json` 保持 `INCOMPLETE/UNKNOWN / 0 / HEURISTIC_UNPROVEN / LEGACY_M2DGR_TIME_JOIN`，两 run 分开记账。
+
+两段均 `LATE_AFTER_BOUNDARY`、0 accepted：不用于修复/接纳结论；分类/误报/漏检/延迟仍 `NOT_EVALUABLE`（`ALI-B2`）。
