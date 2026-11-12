@@ -1,0 +1,54 @@
+{
+ "status": "OK",
+ "reason": "all wiring checks passed",
+ "termination": "PLANNED_KILL_AFTER_DRAIN",
+ "run_id": "fl_native_20261112T055931Z_151459",
+ "inputs": {
+  "bag": "/tmp/fastlivo/hall01_two_event_v1.bag",
+  "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+  "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+  "host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+  "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+  "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+  "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+  "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+  "recovery_node_source": "5877388c9d651a8963e3a989146c411764b9fb276058ec1cea7f9a9b83c686d5",
+  "runtime_library": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+  "runtime_library_sha256": "9c0330beffa2d93564ba10d36751e938baa54768fa218b21b75fe17bb8f700db"
+ },
+ "machine_load_at_launch": "45.76 56.42 101.02 10/62211 151494\nnproc=128",
+ "launch": {
+  "rate": "1.0",
+  "drain_s": "30",
+  "duration_s": "0",
+  "max_pairs": "0",
+  "candidate_source": "icp_reregistration",
+  "detection": "off",
+  "sigma_meas_m": "0.884",
+  "scripted_triggers_s": "",
+  "scripted_triggers_ns": "1627785276215170145",
+  "confirmation_margin_sec": "4.0",
+  "relay_shift_z": "0.5",
+  "relay_start_ns": "1627785276215170145",
+  "relay_end_ns": "1627785282215170145",
+  "injection": "INJECTION_DECLARED_Z_BIAS",
+  "repair_publish": "sham",
+  "run_mode": "CONTROLLED_INTERFACE_TEST",
+  "group_model": "host and recovery node are children of one setsid supervisor"
+ },
+ "exit_codes": {
+  "play": "0",
+  "supervisor": "null",
+  "recovery_node": "0",
+  "roscore": "null"
+ },
+ "recovery_summary_present": true,
+ "recovery_summary_headline": {
+  "paired": 518,
+  "fed_to_step_frame": 1,
+  "episodes": 1,
+  "decisions": 1,
+  "accepted": 1,
+  "final_state": "HEALTHY"
+ }
+}

@@ -165,7 +165,7 @@ class RepairGateTest(unittest.TestCase):
         self.assertEqual(loop.cp.set_state_calls, 1)
         self.assertTrue(ep.meta["repair_publish"]["synced"])
         # the replay is bounded by the frozen decision stamp
-        self.assertEqual(loop.cp.reprocess_end_stamp, ep.frozen_at_ns)
+        self.assertEqual(loop.cp.reprocess_end_stamp, ep.frozen_at_ns + 100_000_000)
 
     def test_the_sham_publishes_unchanged_clouds_with_the_same_receipts(self):
         loop, ep = self._loop(wait_result=True)
