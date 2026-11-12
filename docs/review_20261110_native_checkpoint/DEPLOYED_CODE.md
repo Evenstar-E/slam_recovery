@@ -119,7 +119,8 @@ bag 与 `inputs.bag_sha256` 一致。源码文件 mtime 均早于二进制（`LI
 | v1（2026-11-10） | `deployed_host.diff` | 1501 行 / 见文件 | `0eacffe1017b…65659` | `0d7e23de…af6c1` |
 | v2（终止戳） | `../review_20261112_four_host/host_change_terminal_stamp/deployed_host_v2.diff` | 1528 行 / `2ffc5f6e…59a0` | `f27d1730927e…79d0c` | `0d7e23de…af6c1` |
 | v3（声明戳 hold/snapshot） | `../review_20261112_four_host/host_change_deferred_stamp/deployed_host_v3.diff` | 1627 行 / `46648b4c…ab28` | `9c0330be…00db` | `0d7e23de…af6c1` |
-| **v4（当前，后缀重推）** | `../review_20261112_four_host/host_change_suffix_replay/deployed_host_v4.diff` | **1625 行 / `f025329c…bc22`** | **`c0833d9f…dfe0`** | `0d7e23de…af6c1` |
+| v4（后缀重推） | `../review_20261112_four_host/host_change_suffix_replay/deployed_host_v4.diff` | 1625 行 / `f025329c…bc22` | `c0833d9f…dfe0` | `0d7e23de…af6c1` |
+| **v5（当前，ack 暴露 replay_suffix）** | `../review_20261112_four_host/host_change_replay_suffix_ack/deployed_host_v5.diff` | **1632 行 / `e444adac…eab9`** | **`9e7d8cdf…3b0a`** | `0d7e23de…af6c1` |
 
 增量 patch（都在上一版树上 `git apply --check` 通过）：
 
@@ -128,6 +129,7 @@ bag 与 `inputs.bag_sha256` 一致。源码文件 mtime 均早于二进制（`LI
 | `host_change_terminal_stamp/terminal_stamp_increment.diff` | v1 | 87 行 / `4419d401…2530` |
 | `host_change_deferred_stamp/deferred_increment.diff` | v2 | 203 行 / `adc61753…4be8` |
 | `host_change_suffix_replay/suffix_increment.diff` | v3 | 67 行 / `e234a12c…88d2` |
+| `host_change_replay_suffix_ack/ack_increment.diff` | v4 | 49 行 / `4c8aedf2…d824` |
 
 **可执行文件未变、库变了**：`fastlivo_mapping` 一直动态链接 `liblaser_mapping.so`，宿主的行为在库
 里。每次运行的 receipt 以 `/proc/<pid>/maps` 解析实际加载的库并哈希，所以 run 身份应看
@@ -149,6 +151,12 @@ bag 与 `inputs.bag_sha256` 一致。源码文件 mtime 均早于二进制（`LI
 `reprocessCheckpoint` 不再用终止戳截断重放本身；终止戳只限制修复云匹配，决策后捕获的后缀组
 用原始测量按顺序重推。日志分列 `replayed_within_end / replayed_suffix`。见
 `../review_20261112_four_host/host_change_suffix_replay/BUILD.md`（新库 `c0833d9f…`）。
+
+### 8.2c v5（ack 暴露 replay_suffix）
+
+`checkpointStatus()` 新增 `replay_within_end/replay_suffix`（取自上一次重放，不新算）；驱动在
+`suffix>0` 时跳过 `set_state`，避免把状态回拨到候选末端。见
+`../review_20261112_four_host/host_change_replay_suffix_ack/BUILD.md`（新库 `9e7d8cdf…`）。
 
 ### 8.3 构建记录
 

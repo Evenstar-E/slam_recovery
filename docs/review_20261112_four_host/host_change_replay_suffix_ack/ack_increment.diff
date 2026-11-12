@@ -1,0 +1,49 @@
+--- a/include/LIVMapper.h
++++ b/include/LIVMapper.h
+@@ -261,6 +261,9 @@
+   bool replay_capture_ = false;
+   bool replay_mode_ = false;
+   size_t cp_replays_ = 0, cp_replay_frames_ = 0;
++  // Last replay's split, exposed in the status ack so the driver can decide whether the host's own
++  // state already reached the captured boundary.
++  size_t cp_replay_within_ = 0, cp_replay_suffix_ = 0;
+   std::string cp_ctrl_dir_;
+   std::thread cp_ctrl_thread_;
+   std::atomic<bool> cp_ctrl_stop_{false};
+--- a/src/LIVMapper.cpp
++++ b/src/LIVMapper.cpp
+@@ -1039,6 +1039,8 @@
+   }
+   cp_replays_++;
+   cp_replay_frames_ += replayed_within + replayed_suffix;
++  cp_replay_within_ = replayed_within;
++  cp_replay_suffix_ = replayed_suffix;
+   ROS_INFO("[NATIVE_CHECKPOINT] replay points: with_points=%zu empty=%zu total_undistorted=%zu "
+            "| LIO frames=%zu with_points=%zu empty=%zu | VIO frames=%zu",
+            replay_frames_with_points_, replay_frames_empty_, replay_points_total_,
+@@ -1056,13 +1058,14 @@
+ 
+ std::string LIVMapper::checkpointStatus() const
+ {
+-  char buf[512];
++  char buf[768];
+   snprintf(buf, sizeof(buf),
+            "valid=%d stamp_ns=%lld frame=%d voxels=%zu nodes=%zu points=%zu restores=%zu "
+            "live_voxels=%zu live_points=%zu state_pos=%.6f,%.6f,%.6f "
+            "hold=%d held_frames=%zu held_points=%zu hold_commands=%zu "
+            "repair_received=%zu repair_applied=%zu repair_dropped=%zu repair_queued=%zu "
+            "multi_scan_groups=%zu merged_scans=%zu set_state=%zu repair_merged_away=%zu "
++           "replay_within_end=%zu replay_suffix=%zu "
+            "control_valid=%d control_pos=%.6f,%.6f,%.6f control_points=%zu",
+            (int)cp_valid_, (long long)(cp_stamp_ * 1e9), cp_frame_num_, cp_voxels_, cp_nodes_,
+            cp_points_, cp_restores_, voxelmap_manager->voxel_map_.size(),
+@@ -1070,7 +1073,8 @@
+            _state.pos_end[1], _state.pos_end[2], (int)map_hold_, held_frames_, held_points_,
+            hold_commands_, repaired_received_, repaired_applied_, repaired_dropped_,
+            repaired_clouds_.size(), native_multi_scan_groups_, native_merged_scans_, cp_commands_,
+-           repaired_merged_away_, (int)cp_control_valid_, cp_control_pos_[0], cp_control_pos_[1],
++           repaired_merged_away_, cp_replay_within_, cp_replay_suffix_,
++           (int)cp_control_valid_, cp_control_pos_[0], cp_control_pos_[1],
+            cp_control_pos_[2], cp_control_points_);
+   return std::string(buf);
+ }
