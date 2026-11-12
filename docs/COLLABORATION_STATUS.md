@@ -1780,3 +1780,23 @@ C（不新增数据，只交资格/UNKNOWN）。**S1 不代替用户选择**；t
 
 **宿主**：本机无 `fastlivo_mapping`/`recovery_node`/`rosbag play` 进程，无新 run 目录（最新仍是两次 FAIL 的
 `100744Z`/`101116Z`）；S2 的 B1 二分/ASan 结果未到，记 NOT_EXECUTED。
+
+## 128. B1 定位到 `LIVMapper` 新增 `ofstream` 成员的布局变化；修复后探针 5/5；批准 R
+
+S2 的 B1 结果（本机核归档）：`probe_b1b_1` 在启动期 `No plugins found`；`probe_v7s_1..5` 的 `result.txt` 均为
+`PASS alive 25s`，但 `host.log` 末尾**仍是 `stack smashing detected`**；当前 `devel/lib` 库 sha `007c3bdc…` 与回报一致；
+`LIVMapper.h` 相对 v6 只多 `bool trace_cov_en` + `long trace_cov_rows`，`ofstream` 移到 `LIVMapper.cpp` 文件级 static。
+
+| 步骤 | 组合 | 通过/5 |
+|---|---|---|
+| v6 基线 | — | 5/6 |
+| B1a | v6 + `voxel_map.{h,cpp}` | 5/5 |
+| B1b | v6 + `LIVMapper.h` 成员（含 ofstream） | **0/5** |
+| B1b1 | 只加标量成员 | 5/5 |
+| B1b2 | 只加 `ofstream` 成员 | **1/5** |
+| 修复 | v7 全量 + 文件级 static 流 | **5/5** |
+
+结论：触发点是**类布局变化**放大了既有的启动期内存故障，不是 v7 逻辑本身；修复只恢复布局，**底层损坏未修复**
+（所有通过探针在 teardown 仍 smash）。已批准 S2 按 R 开始 off/on 两次：同一 build `007c3bdc…`、同 bag/config/触发、
+同 k、每次 run 前 5 次探针 ≥4/5、结束后立即复制 `mat_pre/mat_out/trace_cov` 并算 sha256、报告两次帧数/决定/lifecycle
+一致性；run 中途 smash 则该次数据无效；任何一次启动失败即停下先做 ASan（≤10 min）。
