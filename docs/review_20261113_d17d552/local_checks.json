@@ -1,0 +1,42 @@
+{
+  "main": "d17d5526157b97b374f79cf70b5bcb8465f8a096",
+  "comparison": "f795643b774bfe0ecb6b39d7aaa17f2d4ba700a2",
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261113_d17d552/run_checks.py <new-output>",
+  "scope": "fixed summary/receipt/schema plus previously accepted review and saved meta; no new host or repeated numeric audit",
+  "new_files": [
+    "docs/OVERNIGHT_RESULTS_20261113_S1.md"
+  ],
+  "online_run_label": {
+    "status": "FAIL_VERSION_LABEL",
+    "claimed_version": "v11",
+    "actual_run": "fl_native_20261112T121127Z_497953",
+    "actual_trace_width_counts": {
+      "92": 1568
+    },
+    "actual_header": "# idx rel_s abs_ns grp_idx scan_first_ns scan_last_ns has_out phase eff r_mean r_med r_abs_mean r_chi2 r_chi2w vec6 Ppre6x6 Ppost6x6",
+    "library": "49f2f941cc0a90357e088d2271f21e60fdeb18c88b5b89a1c6acce5f55e48eda",
+    "binary": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+    "driver": "62c165d13a2fe39c3b029ef8b6f21556b31fa440aac25484b5ed03920acc670a",
+    "scope": "old 92-column trace lacks v11 same-row pose pair; actual 42 applications not invalidated"
+  },
+  "covariance_claim": {
+    "summary_says_fixed": true,
+    "actual_COVARIANCE_6D": "NOT_AVAILABLE",
+    "meaning": "limitation declared, not residual covariance implemented/qualified"
+  },
+  "host_scope_reused": {
+    "source_upstream_verified": false,
+    "records_clouds": true,
+    "restored_wiring": "NOT_IMPLEMENTED",
+    "output_metrics_compatible_in_saved_scope": true,
+    "e2_outage_s": 26.899189473
+  },
+  "no_new_execution_evidence": true,
+  "hashes": {
+    "d17d5526157b97b374f79cf70b5bcb8465f8a096:docs/OVERNIGHT_RESULTS_20261113_S1.md": "5ced5ee2d7d3518ff85e0a424aa029ea6cc5d4e5c95595ff68a47cdf6ed8f80c",
+    "e991eaf:docs/review_20261112_four_host/trace_online_fl_native_20261112T121127Z_497953/receipt.json": "57154627dbb046170e1676459e8b32812fab128e36f92914fcc555b09d1f4456",
+    "e991eaf:docs/review_20261112_four_host/trace_online_fl_native_20261112T121127Z_497953/host_logs/trace_cov.txt": "435fff50dab6e996311209ee346d71f632aa364b940d889d09038a9faf657d55",
+    "0df6ea83020af92424c463ebb236ad35581de2f1:docs/review_20261113_b2f3983/extended_checks.json": "ab92d760c67d714bbb836a46870f624a23b38cee8afee8871a22667bcb4de5e6",
+    "d17d5526157b97b374f79cf70b5bcb8465f8a096:docs/ali_h_v1_research/t2_v11_summary.json": "bfe335bb981012fde3af89423f9fe85761e2c97adf7ea48c1ae537985c2b6b8b"
+  }
+}
