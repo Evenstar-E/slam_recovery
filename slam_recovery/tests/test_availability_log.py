@@ -47,6 +47,36 @@ class TestRecorder(unittest.TestCase):
             self.assertNotIn("points_total", rows[1]["support"])
 
 
+class TestPredictedPoseSupport(unittest.TestCase):
+    def test_the_row_carries_the_support_fraction_under_the_predicted_pose(self):
+        from slam_recovery.ros.recovery_node import NativeClosedLoop
+        from slam_recovery.tests.test_recovery_node import _FakeLoopNode, _scan
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "availability.jsonl")
+            node = _FakeLoopNode(trigger_at=10 ** 9)
+            loop = NativeClosedLoop(node, run_id="run", availability_log=path)
+            loop.on_pair(1_000_000_000, np.eye(4), _scan(200))
+            loop.availability.close()
+            with open(path, encoding="utf-8") as fh:
+                row = json.loads(fh.readline())
+        self.assertIn("support_under_predicted_pose", row)
+        self.assertIsNotNone(row["support_under_predicted_pose"])
+
+    def test_prediction_extrapolates_the_last_two_trusted_poses(self):
+        from slam_recovery.ros.recovery_node import NativeClosedLoop
+        from slam_recovery.tests.test_recovery_node import _FakeLoopNode
+
+        node = _FakeLoopNode(trigger_at=10 ** 9)
+        node._kf_timestamps = {1: 0, 2: 1_000_000_000}
+        T0, T1 = np.eye(4), np.eye(4)
+        T1[0, 3] = 2.0                      # 2 m/s along x
+        node.tx_mgr.trusted_poses = {1: T0, 2: T1}
+        loop = NativeClosedLoop(node, run_id="run")
+        predicted = loop._predicted_pose(2_000_000_000)
+        self.assertAlmostEqual(float(predicted[0, 3]), 4.0, places=6)
+
+
 class TestDecisionsUnchanged(unittest.TestCase):
     def test_the_log_does_not_change_decisions(self):
         from slam_recovery.ros.recovery_node import NativeClosedLoop

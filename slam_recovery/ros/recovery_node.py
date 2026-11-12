@@ -1174,6 +1174,13 @@ class NativeClosedLoop:
         supported = self.node._frame_has_reference_support(
             kf_id, support_ref, {kf_id: np.asarray(pose, dtype=np.float64)},
             detail=(support_detail if self.availability.enabled else None))
+        predicted_support: Optional[Dict[str, Any]] = None
+        if self.availability.enabled:
+            predicted = self._predicted_pose(ts_ns)
+            if predicted is not None:
+                predicted_support = {}
+                self.node._frame_has_reference_support(
+                    kf_id, support_ref, {kf_id: predicted}, detail=predicted_support)
         # Detection is available only when the frame can actually be scored against an independent
         # reference. "Unsupported" and "healthy" are different statements and are recorded as such:
         # an unsupported frame is ingested so the map can grow, but the detector does not judge it.
@@ -1181,7 +1188,8 @@ class NativeClosedLoop:
         status = "AVAILABLE" if available else "UNAVAILABLE"
         self.detection_counts[status] += 1
         self._record_availability(kf_id, ts_ns, scan_ns, pose, scan_body, support_detail,
-                                  nis_detail, bool(supported), value is not None, status)
+                                  nis_detail, bool(supported), value is not None, status,
+                                  predicted_support=predicted_support)
 
         before = self.node.tx_mgr.active_quarantine
         if available:
@@ -1297,11 +1305,36 @@ class NativeClosedLoop:
         self.node.tx_mgr.register_quarantined_frame(kf_id, int(ts_ns))
         self._first_alarm_ts_ns = int(ts_ns)
 
+    def _predicted_pose(self, ts_ns: int) -> Optional[np.ndarray]:
+        """Short-horizon constant-velocity prediction from the last two trusted poses.
+
+        Used only by the availability diagnostic: it answers whether the support fraction is low
+        because the host pose has moved away from the (frozen) trusted map, or because the map
+        itself does not cover the scan. It never enters a decision.
+        """
+        poses = self.node.tx_mgr.trusted_poses
+        if not poses:
+            return None
+        keys = sorted(poses)
+        if len(keys) < 2:
+            return np.asarray(poses[keys[-1]], dtype=np.float64).copy()
+        k2, k1 = keys[-1], keys[-2]
+        t2 = self.node._kf_timestamps.get(k2)
+        t1 = self.node._kf_timestamps.get(k1)
+        T = np.asarray(poses[k2], dtype=np.float64).copy()
+        if t1 is None or t2 is None or int(t2) == int(t1):
+            return T
+        v = (np.asarray(poses[k2], dtype=np.float64)[:3, 3]
+             - np.asarray(poses[k1], dtype=np.float64)[:3, 3]) / ((int(t2) - int(t1)) * 1e-9)
+        T[:3, 3] = np.asarray(poses[k2], dtype=np.float64)[:3, 3] + v * ((int(ts_ns) - int(t2)) * 1e-9)
+        return T
+
     def _record_availability(self, kf_id: int, ts_ns: int, scan_ns: Optional[int],
                              pose: np.ndarray, scan_body: np.ndarray,
                              support: Dict[str, Any], nis: Dict[str, Any],
                              support_pass: Optional[bool], nis_present: bool,
-                             status: str) -> None:
+                             status: str,
+                             predicted_support: Optional[Dict[str, Any]] = None) -> None:
         """Write this frame's availability evidence. Derived status is never asserted here."""
         if not self.availability.enabled:
             return
@@ -1326,6 +1359,7 @@ class NativeClosedLoop:
                         "trusted_keyframes": int(len(mgr.trusted_poses)),
                         "active_segment": (None if seg is None else seg.segment_id)},
             "support": support or None,
+            "support_under_predicted_pose": predicted_support,
             "nis": nis or None,
             "support_pass": support_pass,
             "nis_present": bool(nis_present),
