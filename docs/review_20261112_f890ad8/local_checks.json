@@ -1,0 +1,38 @@
+{
+  "main": "f890ad8064cb42bfbc708732e98735206e2b09ee",
+  "archive": "1fde5219e0aad403a5b3895d1067c12b6edb6f65",
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261112_f890ad8/run_checks.py",
+  "executed_driver_sha256": "7cfcccf7ce144d71cacfe47b1b7ea41cf845fe5187dde600a1bbcef2636b8c82",
+  "base_driver_sha256": "a6c0380c94ad4e865c9eeb735c9e70539190d986ebd37c6afe2cd9068f39eddd",
+  "main_driver_sha256": "c5efdd733cdcf65fadc4fc28fd1f509ad9ccd2e87a644b9d38165a80554cc830",
+  "executed_matches_receipt": true,
+  "only_AST_change_is_reviewed_checkpoint_checks_expression": true,
+  "base_matches_de4360b": true,
+  "declared_driver_patch_matches_actual_source_diff": true,
+  "provenance_manifest_verified": {
+    "docs/review_20261112_four_host/run_provenance_131213/driver_patch.diff": "c10369119cb110e1ea66f38f88b16b7760ca995ca30aa143e2044b535344e022",
+    "docs/review_20261112_four_host/run_provenance_131213/recovery_node.executed.py": "7cfcccf7ce144d71cacfe47b1b7ea41cf845fe5187dde600a1bbcef2636b8c82",
+    "docs/review_20261112_four_host/run_provenance_131213/run_native_loop.diff": "75fadac2c0f7be0d488352d8e8f0407e066ff0b09122d3c51a7d324a3c6d39b2"
+  },
+  "actual_driver_source_diff": "--- base_driver\n+++ executed_driver\n@@ -2165,8 +2165,12 @@\n             \"native_checkpoint_actions\": loop.cp_actions,\n             # The host has one checkpoint slot; these say whether each segment's restore or\n             # replay used the checkpoint that segment was armed with, or a later one.\n-            \"checkpoint_checks\": [ep.meta.get(\"checkpoint_check\")\n-                                  for ep in loop.episodes if ep.meta.get(\"checkpoint_check\")],\n+            # LOCAL WORKAROUND (not upstream): Episode.meta is only created by decide(); an\n+            # episode that never decided made this line raise AttributeError and the run wrote no\n+            # summary. Reported to the driver owner; keep getattr until their fix lands.\n+            \"checkpoint_checks\": [getattr(ep, \"meta\", {}).get(\"checkpoint_check\")\n+                                  for ep in loop.episodes\n+                                  if getattr(ep, \"meta\", {}).get(\"checkpoint_check\")],\n         },\n         # The label has to describe what actually happened, not what was asked for. A run that\n         # declared scripted triggers and fired none is an online run, and saying otherwise would\n",
+  "candidate_saved_row_verified": [
+    "0",
+    "1627785261507921600",
+    "1627785264873980928",
+    "LATE_AFTER_BOUNDARY",
+    "1",
+    "1627785261470954240",
+    "0.037",
+    "2036096",
+    "51",
+    "1627785261470954240:f2,1627785263142319872:f27,1627785264873980928:f53"
+  ],
+  "candidate_minus_boundary_ns": -36967360,
+  "actual_minus_boundary_ns": 3366059328,
+  "candidate_bytes_scope": "same points*32+voxels*96 estimate; not RSS/full checkpoint cost",
+  "frame_gap_scope": "active checkpoint frame minus candidate frame, not actual replay count or required suffix total",
+  "archive_receipt_old_host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+  "relinked_binary_6dd71953": "DEVELOPER_REPORTED: no new run receipt or full hash/ldd/link log in this eight-file delta",
+  "new_native_or_ALI_results": "NONE_IN_REVIEWED_DELTA",
+  "archived_CLI_native_or_tests_executed": false
+}
