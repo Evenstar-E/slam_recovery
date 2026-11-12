@@ -1,0 +1,1383 @@
+{
+ "_meta": {
+  "run": "fl_native_20261112T115734Z_483777",
+  "run_id": "fl_native_20261112T115734Z_483777",
+  "branch_head_at_run": "see git log",
+  "trace_sha256": "8c0d6a24cb71416c50916b404867356628eebe28c41db2447f7ad3e4f75ff62d",
+  "availability_sha256": "3489abbb510f49e0c584db12cad74b1e837814d2bda49d4e77f7ed3774e8e083",
+  "receipt_sha256": "9d51a46976bb2c98b1570acb2699deed3c36eb5c68d132e8fcc693bc48644af3",
+  "summary_sha256": "2c3db8eab7bb3f6324a3e3fd952fdbc14f6225f69ee2838e0783f18cb8620962",
+  "protocol": "T2_PROTOCOL.md (pre-registered)",
+  "block_ns": 500000000,
+  "e2_rel_s": 54.0,
+  "i_sign_note": "s_i and |e| are sign-invariant; e_I = -vec6 under the trace header (vec6 = state_propagat - state_ after StateEstimation).",
+  "not_done": [
+   "no normal reference",
+   "no independent labels",
+   "no host run"
+  ]
+ },
+ "run": {
+  "run_mode": "CONTROLLED_TRIGGERS_NOT_FIRED",
+  "detection_enabled": true,
+  "final_state": "WAITING_FOR_EVIDENCE",
+  "paired": 532,
+  "injection": "INJECTION_DECLARED_Z_BIAS",
+  "candidate_source": "icp_reregistration",
+  "recovery_node_source": "a4aaa58b05503749b420f164ac93a942b4d137b69c65362128904a6d27428a69",
+  "runtime_library": "49f2f941cc0a90357e088d2271f21e60fdeb18c88b5b89a1c6acce5f55e48eda",
+  "status_counts": {
+   "UNAVAILABLE": 180,
+   "AVAILABLE": 351
+  },
+  "support_non_null": 531,
+  "repair_ack": {
+   "repair_received": 42,
+   "repair_applied": 0,
+   "repair_dropped": 42,
+   "repair_queued": 0
+  },
+  "support_reasons": {
+   "empty_reference": 41,
+   "ok": 351,
+   "fraction_below_threshold": 139
+  },
+  "support_classes": {
+   "EMPTY": 41,
+   "SUPPORTED": 351,
+   "LOW": 139
+  }
+ },
+ "trace": {
+  "rows_total_lines": 1042,
+  "rows_valid": 1041,
+  "malformed": [
+   {
+    "line": 1048,
+    "ncols": 53
+   }
+  ],
+  "phase1_rows": 156,
+  "has_out_rows": 974,
+  "groups": 885,
+  "duplicate_groups": 156,
+  "scan_first_sentinel_all": true
+ },
+ "join": {
+  "availability_rows": 531,
+  "mapped": 530,
+  "unmapped": 1,
+  "exact_equality": 1,
+  "trace_rows_per_group": {
+   "2": 276,
+   "1": 217,
+   "4": 37,
+   "0": 1
+  },
+  "availability_per_group": {
+   "1": 296,
+   "2": 117
+  },
+  "multi_grp_idx_rows": 257,
+  "multi_grp_idx_row_examples": [
+   0,
+   1,
+   2,
+   4,
+   5
+  ],
+  "groups_used_by_availability": 413,
+  "phase_coverage_availability": {
+   "live_only": 437,
+   "both": 93
+  },
+  "phase_sets": {
+   "(0,)": 437,
+   "(0, 1)": 93
+  },
+  "has_out_sets": {
+   "(1,)": 490,
+   "(0, 1)": 24,
+   "(0,)": 16
+  },
+  "rule": "effective span containment: previous distinct scan_last < scan_stamp_ns <= scan_last"
+ },
+ "channels": {
+  "M_present_all": 444,
+  "T_present_all": 86,
+  "I_present": 504,
+  "I_missing": {
+   "missing_HAS_OUT_0": 26,
+   "missing_NO_TRACE_ROW": 1
+  },
+  "I_phase": {
+   "phase_0": 504
+  },
+  "I_rank6": 504,
+  "I_e_norm": {
+   "min": 0.0,
+   "median": 0.018267771874565623,
+   "max": 1.544963135028306
+  },
+  "I_s": {
+   "min": 0.0,
+   "median": 66.86904947448734,
+   "max": 5937.929410428376
+  },
+  "I_by_phase": {
+   "0": {
+    "n": 818,
+    "e_norm_median": 0.018507255635730017,
+    "e_norm_max": 1.544963135028306,
+    "s_median": 63.6456670175677,
+    "s_max": 5937.929410428376
+   },
+   "1": {
+    "n": 156,
+    "e_norm_median": 0.04250227035716067,
+    "e_norm_max": 0.1451059687292555,
+    "s_median": 831.723651545967,
+    "s_max": 9358.432616286755
+   }
+  },
+  "old_status_by_M_T": {
+   "('UNAVAILABLE', False, False)": 1,
+   "('UNAVAILABLE', False, True)": 86,
+   "('AVAILABLE', True, False)": 351,
+   "('UNAVAILABLE', True, False)": 93
+  }
+ },
+ "states": {
+  "by_status_and_tail": {
+   "('UNKNOWN', False)": 480,
+   "('UNKNOWN', True)": 51
+  },
+  "blocks": 120,
+  "unknown_blocks": 120,
+  "tail_rows": 51,
+  "tail_blocks": 12,
+  "span_s": 60.0,
+  "not_evaluable": [
+   "NORMAL_CONSISTENT",
+   "SUSPECT",
+   "false positive",
+   "missed detection",
+   "detection delay",
+   "wrong NORMAL"
+  ]
+ },
+ "blocks": [
+  {
+   "block_id": 3255570522,
+   "n_frames": 2,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570523,
+   "n_frames": 4,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570524,
+   "n_frames": 6,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570525,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570526,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570527,
+   "n_frames": 4,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570528,
+   "n_frames": 6,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570529,
+   "n_frames": 4,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570530,
+   "n_frames": 6,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570531,
+   "n_frames": 4,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570532,
+   "n_frames": 6,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570533,
+   "n_frames": 4,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570534,
+   "n_frames": 6,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570535,
+   "n_frames": 4,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570536,
+   "n_frames": 6,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570537,
+   "n_frames": 4,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570538,
+   "n_frames": 6,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570539,
+   "n_frames": 4,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570540,
+   "n_frames": 6,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570541,
+   "n_frames": 4,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570542,
+   "n_frames": 6,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570543,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570544,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570545,
+   "n_frames": 4,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570546,
+   "n_frames": 6,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570547,
+   "n_frames": 4,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570548,
+   "n_frames": 6,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570549,
+   "n_frames": 4,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570550,
+   "n_frames": 6,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570551,
+   "n_frames": 3,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570552,
+   "n_frames": 4,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570553,
+   "n_frames": 3,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570554,
+   "n_frames": 3,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570555,
+   "n_frames": 2,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570556,
+   "n_frames": 3,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570557,
+   "n_frames": 2,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570558,
+   "n_frames": 3,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570559,
+   "n_frames": 3,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570560,
+   "n_frames": 3,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570561,
+   "n_frames": 2,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570562,
+   "n_frames": 3,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570563,
+   "n_frames": 2,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570564,
+   "n_frames": 3,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570565,
+   "n_frames": 3,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570566,
+   "n_frames": 2,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570567,
+   "n_frames": 3,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570568,
+   "n_frames": 2,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570569,
+   "n_frames": 3,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570570,
+   "n_frames": 3,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570571,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570572,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570573,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570574,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570575,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570576,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570577,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570578,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570579,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570580,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570581,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570582,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570583,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570584,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570585,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570586,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570587,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570588,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570589,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570590,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570591,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570592,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570593,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570594,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570595,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570596,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570597,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570598,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570599,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570600,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570601,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570602,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570603,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570604,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570605,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570606,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570607,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570608,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570609,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570610,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570611,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570612,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570613,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570614,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570615,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570616,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570617,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570618,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570619,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570620,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570621,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570622,
+   "n_frames": 3,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570623,
+   "n_frames": 0,
+   "phase": "NO_DATA",
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570624,
+   "n_frames": 0,
+   "phase": "NO_DATA",
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570625,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570626,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570627,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570628,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570629,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": true,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
+   ]
+  },
+  {
+   "block_id": 3255570630,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": true,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
+   ]
+  },
+  {
+   "block_id": 3255570631,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": true,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
+   ]
+  },
+  {
+   "block_id": 3255570632,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": true,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
+   ]
+  },
+  {
+   "block_id": 3255570633,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": true,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
+   ]
+  },
+  {
+   "block_id": 3255570634,
+   "n_frames": 4,
+   "phase": 0,
+   "tail": true,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
+   ]
+  },
+  {
+   "block_id": 3255570635,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": true,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
+   ]
+  },
+  {
+   "block_id": 3255570636,
+   "n_frames": 4,
+   "phase": 0,
+   "tail": true,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
+   ]
+  },
+  {
+   "block_id": 3255570637,
+   "n_frames": 0,
+   "phase": "NO_DATA",
+   "tail": false,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference"
+   ]
+  },
+  {
+   "block_id": 3255570638,
+   "n_frames": 3,
+   "phase": 0,
+   "tail": true,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
+   ]
+  },
+  {
+   "block_id": 3255570639,
+   "n_frames": 6,
+   "phase": 0,
+   "tail": true,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
+   ]
+  },
+  {
+   "block_id": 3255570640,
+   "n_frames": 4,
+   "phase": 0,
+   "tail": true,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
+   ]
+  },
+  {
+   "block_id": 3255570641,
+   "n_frames": 5,
+   "phase": 0,
+   "tail": true,
+   "state": "UNKNOWN",
+   "reason_codes": [
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
+   ]
+  }
+ ]
+}

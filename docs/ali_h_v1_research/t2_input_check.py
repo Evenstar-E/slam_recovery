@@ -90,6 +90,11 @@ def check_manifest(m: dict) -> dict:
                       "establish one physical scan")
     if join.get("time_correspondence") is not True:
         errors.append("join_time_unresolved: the two ends are not the same physical interval")
+    if join.get("mode") != "span_containment":
+        errors.append("join.mode must be span_containment (availability header stamp inside the "
+                      "merged group's scan_first..scan_last span)")
+    if join.get("multi_to_one") is not True:
+        errors.append("join.multi_to_one must be true and every availability row mapped explicitly")
     forbidden = set(m.get("not_included") or [])
     cov = m.get("covariance") or {}
     for name in ("S", "H_T_H"):
@@ -220,9 +225,9 @@ def _manifest(**over):
                        "frame": "pre_body", "perturbation": "right"},
         "not_included": ["S", "H_T_H"],
         "join": {"identity_correspondence": True, "time_correspondence": True,
-                 "identity_method": "scan_source_index + native_group_id",
-                 "time_method": "same physical interval, original ns",
-                 "offset_constant": True},
+                 "mode": "span_containment", "multi_to_one": True,
+                 "identity_method": "grp_idx", "time_method": "abs_ns",
+                 "scan_first_sentinel": -1},
     }
     m.update(over)
     return m
