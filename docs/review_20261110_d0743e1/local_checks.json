@@ -1,0 +1,34 @@
+{
+  "target": "d0743e13b05c2535673de79739f0e3db1a0a9bd5",
+  "scope": "Local known-layout scan helper and static source checks; no ROS/native host/bag/tuning",
+  "command": "python -B -W ignore docs/review_20261110_d0743e1/run_checks.py",
+  "exit": 0,
+  "known_layout_bytes": {
+    "status": "PASS_LOCAL", "records": 4, "point_step": 24,
+    "z_changed_offsets": [8, 9, 10, 11], "all_other_offsets_preserved": true,
+    "header_preserved": true, "message_type": "local test double"
+  },
+  "syntax": {"injector_ast": "PASS", "smoke_repair_bash_n": "PASS"},
+  "host_patch": {
+    "unchanged": true,
+    "sha256": "f5efce7160e45933f84b23c365f08b9a51798aeb9c201c4e48a5ba026e2c2f21",
+    "repair_subscriber_apply_source": "NOT_PUBLISHED",
+    "actual_deployment_identity": "BLOCKED"
+  },
+  "native_replacement": {
+    "status": "DEVELOPER_REPORTED_NOT_RAW_VERIFIED",
+    "published": 20, "applied": 10, "unmatched": 10, "replay_groups": 426,
+    "reported_span_bag_s": [13.6, 27.7],
+    "unmatched_cause": "UNKNOWN", "repair_effect": "UNKNOWN",
+    "test_label": "CONTROLLED_INTERFACE_TEST, synthetic z shift not algorithmic repair"
+  },
+  "script_defaults": {
+    "duration_bag_s": 26, "rate": 0.5, "nominal_play_wall_s": 52,
+    "fixed_sleeps_before_reprocess_wall_s": 52,
+    "actual_command_receipt": "NOT_PUBLISHED",
+    "repeat_out_dir": "FAIL_DATA_PRESERVATION: rm -rf OUT deletes prior run artifacts"
+  },
+  "unchanged_prior_controls_not_rerun": ["checkpoint client", "manager lifecycle", "candidate scoring population", "gate"],
+  "native_full_two_event": "BLOCKED",
+  "not_applicable": ["Native execution", "Raw bag recomputation", "Developer full 126 tests", "Production tuning", "Full A/B rescoring"]
+}

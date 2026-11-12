@@ -1,0 +1,22 @@
+{
+  "target": "1b8a4492c1db21682f12f37d07a389eee92e20d5",
+  "scope": "Synthetic actual on_pair and manager controls; no native/ROS/bag/tuning",
+  "command": "python -B -W ignore docs/review_20261110_1b8a449/run_checks.py",
+  "exit": 0,
+  "reference_predicate_control": {
+    "status": "COUNTEREXAMPLE_REPRODUCED_LOCAL", "reference_points": 20,
+    "nis_reference": "prev_scan", "detection_status": "AVAILABLE", "fed_to_step_frame": 1,
+    "limit": "prev_scan does not imply UNAVAILABLE; not a reproduction of the reported 169 frames"
+  },
+  "wait_origin_control": {
+    "status": "SOURCE_SEMANTICS_CONFIRMED_LOCAL", "simulated_decision_ns": 8000000000,
+    "last_segment_frame_ns": 4000000000, "actual_wait_start_ns": 4000000000,
+    "arrival_ns": 9000000000, "closed": true, "would_close_under_decision_origin": false,
+    "limit": "Documents current clock origin, not a deployed 2s trial or an actual timing failure"
+  },
+  "second_run": "DEVELOPER_REPORTED_WAIT_CLOSE_REARM_RESUME_E2_NOT_TRIGGERED",
+  "reported_scan_pair_fraction": 0.5217391304347826,
+  "native_full_two_event": "NOT_COMPLETED",
+  "codex_reference": {"revision": "bdc4c1f681ee28befd69331d557d8f62d653bfc8", "target": "493c5b3d056e5050af1a0fe915a1f749b3a81dd8", "scope": "README/REVIEW read only; not executed or merged; not current-main acceptance"},
+  "publication": "LOCAL_ONLY_PRIOR_PUSH_DENIAL_NOT_RETRIED"
+}

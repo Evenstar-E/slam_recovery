@@ -500,3 +500,149 @@ S3专用研究纠正这个小控制并保留缺candidate/独立质量BLOCKED；S
 - **限制**：第二事件是事件、不是第二次接纳；`commit_closed` 仍不可达（用户已定保持现协议）；
   `repairs applied=0` 表示重放用宿主原始扫描，修复仅经 `set_state` 进入；该 run 的 hold 窗口不能用
   `Update Voxel Map` 计数判断停写（reprocess/restore 都会写图），普通帧看 `held_frames` 126 / 248。
+
+## 45. repair-f3核d0743e1：受控注入部分命中，原生部署身份仍BLOCKED
+
+[核验](review_20261110_d0743e1/README.md)接受新人工zshift接口probe及开发20/10/10负结果保留，非算法修复/完整两事件；helper完整24-byte记录/header本机PASS，host新版apply/hold patch/log/result仍未提交、旧diff未变，不能关闭实际部署/接回验收。126测试不替代运行证据。
+
+S2沿已给rawheader/组成员归属最小修，随下一实质交付保存actual新patch/已有inject戳/ack/log/input-config-binary receipt；10未匹配UNKNOWN不猜LIVO，实际wall窗/26s默认与27.7s报告差须真实命令限定。smoke重复OUT会删旧结果，最低新空目录/拒绝既有目录，禁止自动清前次数据。同实例同checkpoint对照方向合理但仍保留重放不确定性，不宣称差值自动纯修复效应；不新矩阵、不直接灌ICP姿态替重估。
+
+S1复用§36命令归属/trustedstamp/full-vs-partial释放/评分集最低接线，source未改不重跑；S3研究独立和参数暂停保持，不挡S1/S2实际修复写回→接回→E2。本机仅字节/静态核、无ROS/原bag，私人文件保护；完整A/B不提升，首次真实整链完成单独汇报。
+
+## 46. repair-f3核930563d：写回来源/顺序FAIL，记录仅本地未发布
+
+[本机核验](review_20261110_930563d/README.md)两个四元数测试PASS；actual normal driver写ep旧host尾x20，而候选修复末帧x2；partial尾deferred仍写x20；reprocess失败也set_state。本机用模拟正常report/ack隔离编排，不叫真实门/宿主成功。S1最低已准入/同stamp修复来源、partial隔离与失败动作顺序，复用single in-flight/ack和trustedstamp任务，不重构估计器。
+
+S2人工set_state烟测试是受控位姿接口观察，不是算法修复/地图等价/完整接回E2；新版host source/log/results/config receipt仍未归档。计数增不证明地图从零或全是新点，精确匹配回退/merged计数语义保持UNKNOWN。下一主线仍实际修复测量支配原生重估/内部map-state写回→接回→第二事件，S3并行/参数停，不等新研究。
+
+发布阻断：上一轮push因携带开发smoke脚本rm-rf既有OUT被权限检查拒绝，本轮新增smoke_writeback亦有同删除。本机未执行、未删数据、未重试/换工具/要求peer代推；本条与前轮d074核验仅本地，远端review仍3965299。需实际开发改新空目录/拒绝覆盖旧产物，或用户明确相关发布权限后再处理，不冒称已送达。
+
+## 47. repair-f3核d5f7d8f：进程内负对照新增，保真度与效应归因未闭合（仅本地）
+
+[核验](review_20261110_d5f7d8f/README.md)接受开发保留426group、12替换/8未匹配和撤修复效应PASS；三差值本机算术核过，非独立宿主实测。不能拿旧run live量级或z→x非线性响应确认本次control失真；本次同末stamp live终态/实际control源码/原件仍缺，保真度UNKNOWN，不从缺交付猜二次积分或restore根因。README效果已测与日报撤PASS最低统一，不为措辞另跑宿主。
+
+S2随下一主线实质交付归档同次live/control/treatment末stamp、已运行host patch/log/receipt及已有matched戳。新分类读发布全集且用cp而非lo作inside下界：本机单个合成正常空隙反例复现，不能代actual8缺测归属；复用已有20戳分类，不新宽窗/大重复矩阵。S1仍负责正常命令/准入写回来源与失败顺序最低修，旧source未变不重跑；S3研究并行、旧参数继续停，生产门不改。下一唯一主线仍实际修复测量→原生重估/地图写回→接回→E2，完整A/B不重评分。
+
+本机sourcepin分类控制与bash-n退出0，无ROS/原bag。实际自动所有权已核：本会话4既有Cron未复制，peer列表无repair-3e；未向其他会话要求代推。私人handoff保护，前push拒绝未解除，本条及报告只本地、远端review仍3965299，不称开发已收到。
+
+## 48. repair-f3核969c424：浅拷贝诊断/修后同stamp表推进，host_poses不等实际修复（仅本地）
+
+[核验](review_20261110_969c424/README.md)接受撤14m与补同stamp表，报告差值7.239cm/2.883cm本机算术成立；旧归档指针别名风险固定上游源码支持，actual深拷贝/新匹配代码和日志尚未归档，旧8帧重放PASS待实效复核。S2随下一实质交付保存已运行patch/log/receipt、每帧点数/地图变化与20条rawscan→group归属，复用已有helper保持两次消费源缓存，不造新缓存框架。≤0.2s最大前戳的单个合成正常例可选前一scan，非本次实际错配证明；不把20/20当身份验收，不再扩窗口。
+
+S1冻结host_poses为已声明编排控制，可交受控两事件/拒绝/尾段，不包装算法修复；参数0.884是已有配置，不重启调参。主线最终仍实际修复测量→原生重估/内部写回→接回→E2，S1旧命令归属/写回来源/partial及失败顺序沿最低已发任务修，S3研究独立且旧参数停。actual当前远端进程未独立核，不由日报“已合入129/129”猜已完成运行；本机无ROS/原bag/全suite，只读源及小控制退出0，不升完整A/B。
+
+4个既有Cron/无旧repair-3e owner已核，不复制任务、不找peer代推。私人handoff保护，前push拒绝仍未解除，本条只本地、remote review仍3965299，不称开发收到。
+
+## 49. repair-f3核e3a60e7：两事件负尝试已交，期限入口修好但旧段归属仍FAIL（仅本地）
+
+[核验](review_20261110_e3a60e7/README.md)接受开发双事件bag同实例102.7s负尝试报告：E1提前报警/拒绝、hold/restore后498配对、E2未触发；是接线探索非完整实际修复链。S2旧8帧PASS显式取代方向接受，新4LIO非空/地图增长报告待原件，本机未跑宿主；实际host源码/log/receipt仍未交。
+
+S1新UNAVAILABLE期限服务本机4项测试和actual on_pair复用例PASS，关闭/rearm确可达；同入口马上使旧unresolved provisional key7再次trusted pose/factor/空间地图，正常反例FAIL。最低既有关闭/队列移出该段旧provisional，保留归档/新帧，与已发fresh-decision/命令归属并行修，不造新状态机/防御矩阵。S2原900s预算继续真实接回/E2或首断点，host_poses若先验编排如实标签；最终主线仍实际修复测量→原生重估/内部地图写回→接回→E2。已有原件随实质交付归档，措辞集中清理，S3独立/旧参数停，不为Mode2调门。
+
+开发下次自检用PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令/证据逐项给期限/归属/真实释放/事件/修复来源/E2/尾段，不能用测试总数或继续消费替成功。A9/A10局部探索推进，不升完整A/B；本机脚本退出0、无ROS原bag。实际owner核4既有Cron且无旧repair-3e，不复制/代推，远端进程当前未独立核。私人handoff保护，前push拒绝未解除，本条仅本地、remote review3965299，不称开发收到。
+
+## 50. repair-f3核1b8a449：等待/重武装已运行报告，参考恢复与预算解释待定位（仅本地）
+
+[核验](review_20261110_1b8a449/README.md)接受第二次负run等待关闭/rearm/resume报告局部推进，不叫完整接回/E2；169帧UNAVAILABLE/fed5/E2未开仍是断点。S2先沿已有stamp把旧新run及rearm后头20帧support fraction/参考缓存与实际点数/pose/host特征对齐，同kf不同配对人口不是身份。初次清空地图及末特征降不足以单独定位尾段根因；本机小例prev_scan且AVAILABLE/fed1，二者谓词不同；回滚timestamp≥t_q_start与报告“边界在所有项之后”方向需纠正，不改正确隔离。
+
+S1的wait10→2秒只记预算提案，无第三次原件/源码新增；confirmation margin不是唯一等待预算证据，当前wait从segment.t_end而非独立decision参数起算，最低明确message/wall身份、若声明独立decision起点沿现入口传入，不新时钟框架/参数扫描。本机两个小控制exit0，非真实169帧根因或2秒部署复现。S1旧unresolved provisional/decision/命令/写回正常任务source未改不重复测；S2下一仍实际修复→原生写回→接回→E2或预算首断点，先host_poses控制如实非算法修复。S3独立/旧参数停、生产gate不改，文档集中清理不升级新实验前置。
+
+新增Codex bdc4c1f README/REVIEW已读、固定493c5b3仅参考，未合/未执行；不把旧无接口论点当当前缺陷、不据其建议替代用户主线。开发自检仍需PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令/原件，actual当前远端进程未独立核；4既有Cron无复制/旧repair-3e无活peer。A/B完整分不升、首次整链完成仍单独报，目前未完成。私人handoff保护，前push拒绝未解除/未绕过，记录仅本地、remote review3965299，不称开发收到。
+
+## 51. repair-f3核9ee52dd：replacement episode补齐，旧rearm释放新段须最小修（仅本地）
+
+[核验](review_20261110_9ee52dd/README.md)保留第三次wait2负run支持局部恢复、两提前报警段/第三段无episode/E2未处理，不能宣布2秒最佳或真实修复完成。S1新after身份比较本机actual loop开episodePASS，但复用旧decision路径+模拟宿主正确ack，on_pair新段hold后service旧rearm resume、新段active却释放FAIL。最低现生命周期使旧段释放不作用当前隔离，fresh-decision避免reset后用旧报警，保留正常无新段resume；不用新RPC/矩阵，旧provisional/ack/写回来源任务沿已有反例修。
+
+S2 runner两个记账修复局部接受：存活期savedPGID退出后可用、receipt写成功exit0不洗JSON FAIL且整体STATUS仍检查；bash-n PASS。本机4选定测试0.043s与小控制exit0，新开发test在首main guard后且依pytest模块未实跑，不叫131本机验收。S2固定原预算/wait2不扫描交下一实际修复→原生重估/内部写回→接回→E2或首断点，host_poses编排控制如实单列；actual patch/已有receipt/log随实质交付，guard/文字集中旁支，S3独立/旧参数停、生产门不动。
+
+自检需PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令原件，段数/131不能代真实E2/恢复。A9/A10局部推进，A8/B2仍具体隔离风险、B4/B11未闭合，不升完整A/B。实际owner4既有Cron无复制/旧repair-3e无活peer，远端当前进程未独立核；私人handoff保护，前push拒绝未解除未绕过、本条只本地、remote review3965299，不称开发收到。
+
+## 52. repair-f3核4b47249：五段拒绝循环有报告，完整恢复与真实E2仍未交（仅本地）
+
+[核验](review_20261110_4b47249/README.md)保留run154.3s/5episode/拒绝51deferred/close-rearm与原生动作报告，E2窗87不可判、未完成；wiring OK不关闭旧正常反例，driver/node/manager/hostpatch本轮未改不重测试。支持1m/60%≠NIS半径3m；表中等待间隔算术不证明timer失败、累计5次回旧stamp不证明10秒轨迹改动或唯一错图根因，snapshot2超时保留UNKNOWN不称无影响。
+
+S1沿9ee已发最低修新旧段释放/fresh-decision/帧及命令/写回归属；S2声明测试触发的受控两事件接口可在原预算先检机制，实际恢复→同stamp接回→E2/尾段结果与automatic BLOCKED分开，host_poses/人工输入不当算法修复成功。最终唯一主线仍实际修复→原生重估/内部写回→接回→E2，S3独立/旧参数停，支持恢复或保图新策略须具体证据后交选择，不自动部署。
+
+开发下次自检分PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令原件，接口/检测/修复/收益分开，归档已有实际patch/run_summary/receipt/log/stamp，不新矩阵。A/B完整分不升、本机静态/算术无ROS原bag，首次整链真完成仍单独报，当前未到。4既有Cron无复制/旧repair-3e无活peer、远端当前进程未独立核；私人handoff保护，push拒绝未解除未绕过、记录仅本地remote review3965299，不称开发收到。
+
+## 53. repair-f3核fafbd0c：受控第二次拒绝接口已报告，实际修复整链仍未完成（仅本地）
+
+[核验](review_20261110_fafbd0c/README.md)接受同实例受控两次触发/拒绝native restore、中间216帧消费报告；原件/actual hostpatch未归档、第二段终态WAIT无尾段释放，不能叫actual修复/整链完成。S1新scripted分支需最低保存trigger当帧candidate input并同步已撤node空间参考：本机actual node/loop撤trusted key7后ref仍7/100点、下一隔离帧不清，trigger pending有0但episode frames空；复用现_track_episode/_sync_spatial_map即可，不新参考框架。旧归属/释放/ack/写回任务source未变不重测。
+
+S1连续来帧不重置wait的解释纠正接受、本机control PASS；晚设wait起点仍UNKNOWN，沿下一实质小窗既有三处诊断核decision/t_end/wait_start，不新锁/时钟/参数矩阵。S2 summary未fired标签已分，receipt仍只按声明，最低requested/actual取已有summary，属于记账旁支不把本次两fired报错。S2下一仍实际修复测量→原生重估/内部地图写回→接回→E2/尾段或预算断点，受控拒绝范围单列，S3独立/旧参数停、生产门不改。
+
+本机小控制与bash-n exit0，无ROS原bag/开发suite，A/B完整分不升，首次真实整链仍单独及时报、当前未到。开发自检PASS/FAIL/BLOCKED/NOT_APPLICABLE+原件/命令区分受控触发/输入归属/参考撤销/native结果/等待/E2尾段/算法修复。4既有Cron无复制/旧repair-3e无活peer，远端当前进程未独立核；私人handoff保护、push拒绝未解除未绕过、本条只本地remote review3965299，不称开发收到。
+
+## 54. repair-f3核b581a7c：诊断默认关闭/语义未变，驱动阻塞修复尚未交（仅本地）
+
+[核验](review_20261110_b581a7c/README.md)接受SLAM_RECOVERY_WAITDIAG默认安静与段尾起点声明，本机开关2.005s同关闭/0vs4行PASS；只工程诊断、不是原生恢复。小窗validate晚t_end与进入WAIT取值报告保留，但首次snapshot ack早validate35.642s、deadline到段尾18.55s，缺实际bag start/deadline到达/service/cmd-ack重叠，不能断言启动期16.42s等待阻塞已到期决策。S2先复用已有原件定位哪条等待覆盖，不为归因再跑大矩阵；driver本轮未改，0.5s等待不等非阻塞、第一ack前不发须明确已有ready启动，不新RPC/锁框架。
+
+S1保持现等待语义可声明，旧trigger候选输入/参考撤销/unresolved/旧decision-rearm/ack/accepted写回正常任务source未改不重测；S2沿现通道最小正常阻塞解除后交实际修复→原生重估/内部写回→接回→E2/尾段或原预算首断点，S3独立/旧参数停/生产门不改。自检PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令原件分诊断/实际阻塞/驱动修后/真实修复E2，不拿136测试或日志数量代成果，完整A/B不升。
+
+本机小控制exit0无ROS原bag/全suite，完整链未到首次完成；4既有Cron无复制/旧repair-3e无活peer、actual远端当前进程未独立核。私人handoff保护，push拒绝未解除未绕过，记录只本地remote review3965299，不称开发收到。
+
+## 55. repair-f3核8ca5b41：异步snapshot局部解除，普通hold/迟到同名ack仍需归属修（仅本地）
+
+[核验](review_20261110_8ca5b41/README.md)接受tick异步/status启动/poll保pending/异名检查，2测试0.056s与正常文件控制PASS，旧同步快照与50ms即丢pending该入口关闭。S1/S2最低所有正常命令真single in-flight：未消费status可被hold覆盖并卡队首、snapshot软件timeout后旧同名ack可计新成功，两个明确本机控制非native错配实测，不造RPC/新框架。旧帧/trigger参考/decision-rearm/accepted写回正常source未修不重跑。
+
+开发报告0.4s入口延迟、评估18s与MODE2 23key/169deferred保留为机制/成本观察，不当actual修复质量/E2。S1新marker是累计elapsed且不含尾部node同步/native动作，driver offset在evaluate前非实际wait赋值，沿已有原件分入口/赋值/返回最小定位，别改wait藏迟决策/新成本矩阵。S2下一仍实际修复测量→原生重估/内部地图写回→接回→E2/尾段或原预算断点，partial/host_poses控制单列；S3研究独立、旧参数停、生产门不动。
+
+自检PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令原件分异步/命令归属/实际partial动作/成本/真实修复E2，入口延迟和提交数不代完整成果。A/B完整分不升、本机exit0无ROS原bag/全suite，首次真实整链未到；4既有Cron无复制/旧repair-3e无活peer、远端当前进程未独立核。私人handoff保护、push拒绝未解除未绕过、记录只本地remote review3965299，不称开发收到。
+
+## 56. repair-f3核9862ad5：精确索引等价性通过，成本旁支回到受控两事件（仅本地）
+
+[核验](review_20261110_9862ad5/README.md)27邻格原距离判定及同decision索引复用局部接受，3测试0.143s/actual support正负控制与暴力一致，不改生产阈值/人口、不造第二套索引。开发16→13candidate窗口4356.5→842.9ms保留优化后成本观察，不当纯同人口5.168倍，不为逐值复现新矩阵；完整native成本/原件仍待实际交付。
+
+2.2s消息时差减墙钟计算不是独立wall阶段证据，只需诚实保留并沿下一主线最小三时刻分时钟记录，不要求消除后才推进。S1/S2继续旧正常命令/帧/参考/释放/accepted写回最低修，S2下一实际修复→原生重估/内部地图写回→接回→E2/尾段或900s首断点，host_poses/受控准入机制非质量；S3研究独立、旧参数停、生产gate不改。自检PASS/FAIL/BLOCKED/NOT_APPLICABLE+原件，843ms/140不代整链，完整A/B不升。
+
+本机脚本exit0无ROS原bag/全suite/性能大矩阵，首次真实整链未到；4既有Cron无复制/旧repair-3e无活peer、远端当前进程未独立核。私人handoff保护，前push拒绝未解除未绕过，记录只本地remote review3965299，不称开发收到。
+
+## 57. repair-f3核95b0d97：原生动作超时待归属，调度时间戳最低修（仅本地）
+
+[核验](review_20261110_95b0d97/README.md)保留受控run128.8s/restore与hold ack超时/355帧继续消费，actual修复E2链未完成，ack超时不确认动作未应用。S1/S2新sched字段每到期帧重设，本机首次wall100后帧124入125记1而首次资格25正常例复现，最低同episode首次记录/新段重置、分wall/message，不重改历史时序/扩测试矩阵；post_eval仍不含native等待。
+
+S2先已有actual hostsource/cmd读取应用ack日志核具体断点；旧公开restore返回后立即写ack再LIO，不能直接用恢复后慢LIO解释该restore未ack，旧single-inflight/ack缺口仍未修。S1独立线程received/applied提案非本会话用户新架构选择，received不等主循环应用变快，现通道最小归属改动保持研究尺度，大设计按规则报用户选择、不代授/代实现。下一仍真实修复测量→原生重估/内部写回→接回→E2/尾段或原900s首断点，S3独立/旧参数停/生产门不改。
+
+自检PASS/FAIL/BLOCKED/NOT_APPLICABLE+原件/命令分首次排队/动作received-applied/真实修复E2，wiring OK不代动作成功。完整A/B不升，本机小control exit0无ROS原bag/全suite；4既有Cron无复制/旧repair-3e无活peer，远端当前进程未独立核。私人handoff保护、push拒绝未解除未绕过、记录仅本地remote review3965299，不称开发收到。
+
+## 58. repair-f3核d35671f：受控拒绝两段完成有报告，accepted依赖顺序仍FAIL（仅本地）
+
+[核验](review_20261110_d35671f/README.md)首次报告受控两Mode3拒绝hold/restore/resume均完成、两rearm/终态HEALTHY，已即时说明局部成果；actual修复写回/自动检测/独立收益与完整尾段原件仍缺，旧host patch不含新线程。S2保留已运行newpatch/receipt/log/applied时间人口，30快照全OK与7超时分开，撤本run慢LIO强因果合理不当旧run根因已证。
+
+3项本机测试0.233s、received不能代applied控制PASS，所有_send异步解除旧30s调用等待，但S1/S2 actual driver/client模拟partial正常准入reprocess尚未applied就set_state覆盖物理cmd、写deferred旧尾x20；即使后reprocess FAIL依赖动作已发。最低现通道真实single-inflight/apply成功后推进、失败未知停依赖、实际准入同stamp来源/partial归属，不造RPC/新事务框架。service pending检查只在新决定前不保护该依赖序列；旧normal帧/参考/释放/ack/首次资格任务source未改不重测。
+
+下一唯一仍实际修复测量→原生重估/内部地图写回→接回→E2/尾段或900s首断点，S3研究独立/旧参数停/生产gate不改。自检PASS/FAIL/BLOCKED/NOT_APPLICABLE+原件分拒绝机制/actual修复/动作结果/partial/E2尾段，完整A/B不升，本机exit0无ROS原bag/全suite。4既有Cron无复制/旧repair-3e无活peer、actual远端当前进程未独立核；私人handoff保护、push拒绝未解除未绕过、记录仅本地remote review3965299，不称开发收到。
+
+## 59. repair-f3核70f68fb：公开部署与旧受控原件推进，下一仍actual修复整链（仅本地）
+
+[核验](review_20261112_70f68fb/README.md)局部接受actual部署patch/26归档哈希及旧d356双拒绝、持续输入/E2后尾段；纠正§52“原件全缺”和368区间解释（实际E1decision→E2trigger诊断217帧），不改旧报告。受控run无repair/reprocess/set_state，不等actual恢复；E2原生snapshot/restore比隔离起点晚约3s，trusted时间归属有原件断点，source→binary构建仍UNKNOWN。
+
+S1/S2最低解除真实single-in-flight/applied依赖、旧close不得release新active、checkpoint不晚于可信隔离边界。70新fullcommit event两testPASS0.007s但本机目标blob控制复现：reprocess/set_state旧尾→未applied再resume覆盖；实际manager串行旧close→新trigger/hold→旧resume释放新段。两反例FAIL非部署接纳实测，不扩RPC/锁/异常矩阵。下一900s预算actual测量修复→原生状态重估/内部地图→接回/E2尾段或具体宿主首断点，逐项PASS/FAIL/BLOCKED/NOT_APPLICABLE+实际命令原件；成功首次及时单报，不等研究。
+
+S3旁支接受62f294对fixed/own与坐标/精度控制的有限纠正，A/B旧逻辑/人口缺口未动；集中修既有缺口/小数值叙述，不开大矩阵、不自动生产部署，旧参数继续停。A/B仅行ID局部变化不新全表评分，远端当前执行/本地意见接收UNCONFIRMED。20min8e05b042、2ha249a2ce、daily7f3f33f6属本会话，旧5min已取消；无双写。记录仅本地、push拒绝未解除不重试/绕过，private保护、不改算法、不合main。
+
+## 60. repair-f3核bbe916f：串行成功局部解除，失败依赖仍需最低修（仅本地）
+
+[核验](review_20261112_bbe916f/README.md)本机目标blob支持outbox成功reprocess→set_state→resume与received不推进，1test0.010s/actual节点absolute stamp控制PASS；pytest缺失导致首跑exit1已记录，未安装/shim、未跑全suite/native。正常准入FAIL reprocess仍自动发旧尾set_state x20（修复x2）及后续resume，FAIL_REPRODUCED_LOCAL；S1/S2最低按applied成功推进依赖、失败未知不放写、实际准入同stamp状态来源。旧段release/晚trusted checkpoint未变不重测，不扩RPC/防御矩阵。
+
+新文档报告accepted run fl_native_20261112T020634Z_4148249有门准入/partial与放写，但reprocess未执行、记账卡头、收尾double free；目标缺所引原件目录，只DEVELOPER_REPORTED，串行化后run未独立确认。S2并行归档现原件保留负结果，S1/S2下一唯一900s actual修复→原生重估/内部地图→接回/E2尾段或具体首断点；逐项PASS/FAIL/BLOCKED/NOT_APPLICABLE+实际命令原件。S3研究无新增/旧范围纠正/参数仍停，不等其收口、不全表升分。三既有Cron单owner无复制，当前remote执行/意见接收UNCONFIRMED；仅本地提交、push拒绝未解除不重试/绕过、private保护。
+
+## 61. repair-f3核3dec39a：原生成功通道有原件；全宿主第二事件矩阵须交付（仅本地）
+
+[核验](review_20261112_3dec39a/README.md)两新归档各25SHA一致，022158Z真实重放416group、state命令各OK/内部地图更新/接回局部支持；两run仅单trigger、detection off、host_poses、repair应用0，无E2，不能作actual修复整链完成。旧正常FAIL依赖/旧尾/段release/晚checkpoint未修，直接复用反例不重测；上run double free保留未定位。
+
+最新用户直接强调所有宿主第二事件矩阵，覆盖旧“不扩多宿主矩阵”的单宿主交接；S1下一认领五命名宿主矩阵及分工，S2先复用MM-LINS历史双事件、ORB多次原生恢复、LIVO双拒绝原件，并给独立FAST-LIO2/LIO-SAM未执行项真实原因/具体接口BLOCKED或NOT_STARTED，不能把无记录猜成不能跑。每行E1→接回→E2/尾段、状态/命令/source/input/run/证据，原生自身与actual修复分开；现授权预算/超范围具体报告、不造通用checkpoint/无限矩阵。S3门旁支、参数继续停、不等门收口；A/B只局部、不新总分。
+
+本机只Git原件核验，无host/bag/测试/调参，远端当前执行/意见接收UNCONFIRMED。三任务单owner、private保护，本地白名单提交、push拒绝未解除不重试/绕过，不称开发收到。
+
+## 62. 最新顺序：先非FAST-LIVO2四宿主各跑一次第二事件（仅本地）
+
+用户2026-11-12再次纠正偏回仅FAST-LIVO2，直接要求先跑其余宿主。[执行任务](NON_FASTLIVO2_SECOND_EVENT_TASK_20261112.md)明确S1/S2下一优先MM-LINS、FAST-LIO2、LIO-SAM、ORB-SLAM3四项，各实际E1→输入继续→E2/尾段；不等LIVO全部问题修完、不用历史摘要代新执行、不以完整事务适配挡原生机制测试。现有已启动任务原预算安全收尾后转向，不擅自停未知进程，不再新开LIVO轮次替代。S1实际分工/owner/执行回执待确认，S3研究旁支及参数停不变。
+
+逐项PASS/FAIL/BLOCKED及命令/source/input/run/事件stamp/原件/尾段；未启动给NOT_STARTED真实原因，不猜环境或算法不能跑。FAST-LIO2与MM前端共享身份明示、不冒两次独立执行。审阅侧顺序交接错误已纠正，本机不代跑；本地提交不等收到/开工，push拒绝未解除不重试/绕过，private保护。
+
+## 63. repair-f3核751a226：保存既有LIVO双事件局部成果，不替代四宿主先跑（仅本地）
+
+[原件核验](review_20261112_751a226/README.md)024337Z受控run有E1partial accepted/reprocess316group/set_state/resume，E2refused/restore/resume及E2关闭后28帧；25SHA一致、状态动作OK，接受局部原生接回/E2，不充actual修复（repair应用0/detection off/host_poses）。cp晚于边界/旧normal缺陷未修、人口计数端点明确，不新防御矩阵或全表评分。
+
+本增量发布早于用户明确四宿主优先，不称其为MM-LINS/FAST-LIO2/LIO-SAM/ORB本批交付；下一仍先各实际一次E1→继续输入→E2尾段，S1/S2逐项自检状态/实际命令原件/具体BLOCKED或NOT_STARTED原因，不等LIVO修完、不起新LIVO轮次、不等S3门研究。当前远端接收/执行UNCONFIRMED，本机仅Git原件核验无host/bag/tests，独立review本地提交、push拒绝未解除不重试/绕过，private保护。

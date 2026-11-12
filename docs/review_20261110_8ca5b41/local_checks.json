@@ -1,0 +1,20 @@
+{
+  "target": "8ca5b41f9e1aabfd75d21a9e9adfdbfd78883356",
+  "scope": "Selected local tests and deterministic file-channel fixtures; no ROS/native/bag/tuning",
+  "command": "python -B -W ignore docs/review_20261110_8ca5b41/run_checks.py", "exit": 0,
+  "selected_tests": {"status": "PASS_LOCAL", "count": 2, "elapsed_s": 0.056},
+  "async_probe_snapshot_poll": "PASS_LOCAL_NONBLOCKING_POLL_RETAINS_PENDING_AND_CHECKS_COMMAND_NAME",
+  "probe_overwritten_by_hold": {
+    "status": "FAIL_REPRODUCED_LOCAL", "physical_command": "hold", "ack": "OK hold done",
+    "poll_returned": null, "pending_commands": ["status", "hold"]
+  },
+  "late_same_command_ack": {
+    "status": "FAIL_REPRODUCED_LOCAL", "first_ok": false, "second_ok": true,
+    "second_ack": "OK snapshot first-command-done", "timeout_count": 1,
+    "limit": "Synthetic delayed receipt, not evidence that the reported 14 snapshots were misattributed"
+  },
+  "reported_partial_accept": "DEVELOPER_REPORTED_MODE2_23_COMMITTED_169_DEFERRED_NOT_REPAIR_QUALITY",
+  "timing_scope": "CUMULATIVE_EVALUATE_MARKERS_AND_PRE_EVALUATE_SEGMENT_END_OFFSET_NOT_ACTUAL_WAIT_START_OR_FULL_DECISION_COST",
+  "native_full_two_event": "NOT_COMPLETED",
+  "publication": "LOCAL_ONLY_PRIOR_PUSH_DENIAL_NOT_RETRIED"
+}

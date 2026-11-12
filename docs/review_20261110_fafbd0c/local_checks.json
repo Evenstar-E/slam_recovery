@@ -1,0 +1,28 @@
+{
+  "target": "fafbd0cbfb21e4456b8c187494638b778a0d3466",
+  "scope": "Synthetic actual node/loop controls and receipt expression; no native/ROS/bag/tuning",
+  "command": "python -B -W ignore docs/review_20261110_fafbd0c/run_checks.py", "exit": 0,
+  "scripted_trigger_and_episode": "PASS_LOCAL",
+  "trigger_frame_tracking": {
+    "status": "FAIL_REPRODUCED_LOCAL", "trigger_key": 0, "pending_keys": ["0", "7", "8"],
+    "candidate_frame_keys": [], "trusted_keys": [], "spatial_map_keys": [7],
+    "trusted_map_points": 100, "next_candidate_keys": [1],
+    "limit": "Trigger belongs to pending but is omitted from candidate input, not lost from manager accounting"
+  },
+  "revoked_reference_sync": {
+    "status": "FAIL_REPRODUCED_LOCAL", "revoked_key": 7, "stale_after_next_quarantined_frame": true,
+    "limit": "Python spatial reference, not measured host map pollution"
+  },
+  "wait_stream_control": {
+    "status": "PASS_LOCAL_NO_CONTINUOUS_RESET", "wait_started_ns": 0, "closed_ns": 2005000000,
+    "limit": "Does not identify the deployed delayed-start cause"
+  },
+  "unfired_mode_control": {
+    "summary_mode": "CONTROLLED_TRIGGERS_NOT_FIRED", "receipt_mode": "CONTROLLED_INTERFACE_TEST",
+    "status": "FAIL_LOCAL_MODE_MISMATCH"
+  },
+  "shell_syntax": {"command": "bash -n slam_recovery/ros/run_native_loop.sh", "status": "PASS_BASH_N_ONLY", "exit": 0},
+  "developer_run": "REPORTED_CONTROLLED_REFUSAL_RESTORE_REENTRY_SECOND_REFUSAL_TERMINAL_WAIT",
+  "actual_repair_and_full_two_event": "NOT_COMPLETED",
+  "publication": "LOCAL_ONLY_PRIOR_PUSH_DENIAL_NOT_RETRIED"
+}

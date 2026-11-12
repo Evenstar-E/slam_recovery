@@ -1,0 +1,25 @@
+{
+  "target": "d5f7d8f81a0aa8522d943649301aecd4fb636e82",
+  "scope": "Local arithmetic and extracted classification expressions; synthetic timestamps, no ROS/native/bag/tuning",
+  "command": "python -B docs/review_20261110_d5f7d8f/run_checks.py",
+  "exit": 0,
+  "source_binding": "PASS_LOCAL",
+  "shell_syntax": {"command": "bash -n slam_recovery/ros/smoke_repair.sh", "status": "PASS_BASH_N_ONLY", "exit": 0},
+  "developer_report_arithmetic": {
+    "x_difference_m": "14.231",
+    "voxel_difference": 6565,
+    "point_difference": 46369,
+    "origin": "Developer-reported values, not independently measured host results"
+  },
+  "classification_control": {
+    "status": "COUNTEREXAMPLE_REPRODUCED_LOCAL",
+    "fixture": {"published_s": [9, 11, 13, 15], "checkpoint_s": 10, "replay_span_s": [12, 14]},
+    "with_checkpoint": {"before": [9.0], "after": [15.0], "inside": [11.0, 13.0]},
+    "without_checkpoint": {"before": [], "after": [15.0], "inside": [9.0, 11.0, 13.0]},
+    "limit": "Shows diagnostic boundary semantics only; does not locate the actual eight unmatched repairs"
+  },
+  "host_patch": {"sha256": "f5efce7160e45933f84b23c365f08b9a51798aeb9c201c4e48a5ba026e2c2f21", "status": "UNCHANGED_OLD_PATCH"},
+  "native_replay_fidelity": "BLOCKED_NO_SAME_RUN_LIVE_AND_DEPLOYED_SOURCE",
+  "native_full_two_event": "BLOCKED",
+  "publication": "LOCAL_ONLY: prior push denial not retried or bypassed"
+}
