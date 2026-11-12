@@ -141,6 +141,38 @@ applied 没有驱动侧时间戳；只有宿主 ack 的 `hold=0` 作为已应用
 | `lifecycle_events.json` / `native_checkpoint_events.json` / `.tsv` | 生命周期事件、逐命令账本（11 条） |
 | `host.log` | 宿主全文（含停写/恢复写图的直接打印） |
 | `host_control/{ack,ack_received,cmd.done}` | 宿主最终 ack（resume 生效）与 receipt |
-| `map_write_evidence.py` / `map_write_evidence.json` | 第 3 节的计数方法与结果（可复算） |
+| `map_write_evidence.json` | 第 3 节的计数结果（脚本在上一层 `../map_write_evidence.py`，可复算） |
 | `ros_home_log/`、`launch_pair.sh`、环境文件 | 运行配方与 ROS 侧日志 |
 | `SHA256SUMS` | 本目录完整性 |
+
+---
+
+## 10. 第二次运行（命令串行化之后）：`fl_native_20261112T022158Z_4156288`
+
+S1 修好了断点 2/3（`bbe916f`：`CheckpointClient._outbox` 一次只放一条命令，只读快照可被状态
+命令抢占）。同一份声明（kf 132 绝对戳）、同一 margin 4.0、`--detection off`、宿主二进制未变
+（`0d7e23de…`），只换驱动（sha `18d92a03…`）。原始件在
+`run_fl_native_20261112T022158Z_4156288/`，索引在该目录的 `INDEX.md`。
+
+**结果**：候选仍然真过 Mode 2（before 3.1388 / after 6.6761 / Wilson 0.9197 / holdout 0.4412），
+仍是 **partial commit（31 submitted / 81 deferred）**，`commit_closed` 依旧不出现——这是第 4 节
+的协议断点，本轮按要求没有动。放写仍由 `wait_limit_closed → rearm` 触发。
+
+**串行化要核对的三件事，全部成立**：
+
+- `host.log` 出现 `[NATIVE_CHECKPOINT] reprocess #1: 416 frames replayed over [1627785274.681 ..
+  1627785288.545], repairs applied=0 queued=0, map now 19194 voxels/362286 points`。
+- ack 顺序 `hold → reprocess → set_state → resume`，`native_checkpoint.events` 里
+  reprocess / set_state / resume **各有且仅各一条**；驱动 `reprocesses=1`、`resumes=1`、`restores=0`。
+  宿主 ack 里的 `restores=1` 是 reprocess 内部先 restore 再重放，不是驱动发的 `restore` 命令。
+- resume 有驱动侧记录：received `1794450183.672810`（+0.003 s），applied `1794450184.170`（+0.497 s）。
+  reprocess 的 applied−received = **5.500 s**，就是重放本身的耗时。
+
+**地图与 LIO**：重放把地图从 checkpoint 的 15161 voxels/298650 points 写成 19194/362286；
+resume 后滚动快照继续增长到 60425 voxels。重放前后 `average residual` 中位 0.0512 → 0.0529，
+无新 ERROR/WARN，**本轮没有 `double free`**（上一 run 的那一行保留原记录，不推测）。
+
+**一个口径修正**：第 3 节用 "hold 窗口内 `Update Voxel Map` = 0" 证明停写，那只对**没有 reprocess**
+的运行成立。`reprocessCheckpoint` 在重放期间会临时清掉 `map_hold_` 才能写图（宿主源码如此设计），
+所以本轮同一窗口有 164 次写图，全部来自重放；停写对普通帧的约束仍由 resume ack 的
+`held_frames=171` 体现。以后引用这个指标必须写明运行里有没有 reprocess。

@@ -2,7 +2,8 @@
  "method": "count of '[ LIO ] Update Voxel Map' lines between timestamped INFO anchors",
  "boundaries": {
   "hold_applied_wall": 1794449251.168,
-  "resume_received_wall": 1794449256.11704
+  "resume_received_wall": 1794449256.11704,
+  "resume_time_source": "host_control/ack_received"
  },
  "line_index": {
   "hold": 9404,
