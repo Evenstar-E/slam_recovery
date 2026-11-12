@@ -746,3 +746,15 @@ main AGENTS/HOST_VALIDATION_ORDER及S1交接收紧四非LIVO全需求先验收�
 growth只新38行文字无map序列/原脚本，report0.43/12.7是回溯边界非trigger/确认窗；真实trigger4.595/17.003、deadline8.595/21.003本机复算。5秒eff统计全行可核但早退须分层，精确峰/最终地图/唯一机制仍开发报告UNKNOWN，不从时序排越界写。FAST-LIO2 run1空输出/timeout、停止/进程归属/权限拒绝及load全局解释仅COLLAB转述，实际原件/同步采样/用户授权/门控版本和S2回执未交；S1批准不用户批准、不得绕拒绝杀进程或把处置作所有主线前置。最低既有原件与根因收窄，不新授权重试/安装/算力/FAST-LIVO2。
 
 下一单一现MM-LINS具体调用点/输入状态map恢复首断点和最小接入，或实际测量修复→native状态map→真实后继/E2；S1唯一集成/S2实际host/S3已有数值资格并行，不让环境调查/文案替主线。A1/A11/A3/B3局部，不全表分/净收益；四Cron单owner/私人保护/08:53如实/noCodex前置/手调停门不降。reader先两严格float等值、一次np.int64序列化失败为本机问题，有限容差及显式int后两次exit0，非全CLI/ROS/宿主/算法；中文review SSH白名单，不main历史/私人/开发日报。
+
+## 93. b2f3983：独立工作区原生取证局部接受，四宿主实际拓扑与功能归属须纠正
+
+[增量核验](review_20261113_b2f3983/README.md)固定01:45:56 fetch mainb2f3983/growth4f205ef。run1原play最后375.960884/无Done、PID692359新工作区与构建第二次链接完成可核，旧只有转述局部解除；run2日志两sleep/two rebuild、bag_info及analysis12980/4186Odom/2126E2后保存结果与共享版相容。是独立workspace复制MM-LINS/FAST-LIO编译/执行，不原版独立实现：声明source_commit c6d9e32本仓为交接文档、copy无git、实际config/hash链与输出bagSHA未交。真实gap23.799/26.899秒/60.479与71.122m重置保留，.023/.021是事件到下一输出不是停发；239.318秒尾含断流非连续恢复。路径同口径加gap485.034 vs共享485.079相容，E1/E2位置差.181/.230m，不全轨迹逐位。run2仍录六话题含两云、无120s/cgroup实际采样档/执行脚本绑定；不能从成功判去云/负载因果或代码无关，共享与run2同字符串初始化各165不是共享2。恢复层NOT_IMPLEMENTED/成本未知。
+
+四分析仅growth文档：MM-LINS默认ALOAM四节点却既有run为FAST-LIO+PGO两节点；点云订阅/TrackMonocular调用已是测量输入面，缺历史回滚不不可替换测量。FAST-LIO实际ESKF/ikdtree重置不是FAST-LIVO2体素/replay/reprocess，比较表错属须最小纠正；LIO-SAM单进程与低成本无实际PID证据、既有receipt4nodes。LIO轨迹发散及ORB80建图385motion43badimu/0KF/139负结果可核，新输入点数/低视差唯一原因/成本排序未证，根因UNKNOWN，不豁免A6或自动换数据。S1锁现两节点MM-LINS输入修复→前端重估→PGO后继接口实交或具体首断点，S2host/S3既有资格修后并行，不通用防御矩阵/新FAST-LIVO2/新权限。A2/A12来源局部非A4/A6/B4/B11整链，不全表分；两标准库-I只读reader exit0，四Cron/private/08:53/手调停门不降，中文SSH review不算法ROS/main历史/日报。
+
+## 94. cdd3bf7：I资格三层及本run尾段局部接受，旧v7无条件header PASS须最小修正
+
+[增量核验](review_20261113_cdd3bf7/README.md)固定02:05:55 fetch maincdd3bf7/ca384cf。v11三层与18 eff0/Log0保人口实交，462派生mode改同行而数字/四输入hash未变；从本run第二episode读17.003触发/21.003deadline，303精确尾行与64尾块/304块成员复核，106全UNKNOWN非正常真值/catchup，81.957ms边界差说明。不重跑已验消费者/数学/宿主；旧531/504数值未改、24 eff0保留，47尾行/12尾块/51块成员仍legacy54s，不把51误写块。
+
+新t2_run RAW_HEADER_CONTAINMENT无条件常量PASS，保存旧v7 meta也PASS，与实际1041完整行first全−1和join HEURISTIC_UNPROVEN冲突。标准库-I只读AST/原件控制exit0复现，最低S3/S1从现join模式派生该字段并保旧heuristic/数字/人口，不新成员架构或宿主run；只阻误用旧来源资格、不阻v11数值或原生主线。下一仍S1/S2现MM-LINS两节点测量修复→native状态map→PGO后继或具体首断点/S2认领；S3最小一层并行，不让旁支代主线。A1/A11/A3/B3局部非整链/性能/新总分，四Cron/私人/08:53/手调停门不降，中文SSH review不算法ROS/main历史/日报。
