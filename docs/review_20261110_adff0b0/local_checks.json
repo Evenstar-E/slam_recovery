@@ -1,0 +1,40 @@
+{
+  "main": "adff0b084b55cc29059bf3e91cb71230d6e30a72",
+  "research": "545340f6ddb3cb64d0ce8fe5dc886eb45868a01e",
+  "scope": "Local source checks and simulated normal controls; no ROS/native-host/bag runs or threshold changes",
+  "driver_control": {
+    "command": "python -B -W ignore docs/review_20261110_adff0b0/driver_controls.py",
+    "exit": 0,
+    "test_functions_passed": 2,
+    "test_functions": ["test_a_silent_host_is_a_failure_not_a_success", "test_a_disabled_client_sends_nothing"],
+    "suspect_snapshot": {"command": "snapshot", "detector_state": "SUSPECT", "simulated_ack": true, "status": "FAIL"},
+    "gate_native_separation": {"gate_accepted": true, "native_reprocess_ok": false, "native_error": "ack_timeout", "simulated_ack": true, "note": "Gate acceptance is not native commit completion"}
+  },
+  "c_coordinate_control": {
+    "command": "python -B -W ignore docs/review_20261110_adff0b0/c_coordinate_control.py",
+    "exit": 0,
+    "points": 1875, "rotation_z_deg": 90, "direction": "fixed physical tx, rotated with coordinates",
+    "production_original": 92.59259359259259, "production_rotated": 92.59259359259259,
+    "research_original": 92.59259359259259, "research_rotated": 88.88888988888888,
+    "research_relative_difference": 0.039999999568000065, "status": "FAIL",
+    "patch_apply_check_exit": 128, "patch_apply_check_error": "No valid patches in input",
+    "note": "Control process exit zero means defects reproduced; no patch applied"
+  },
+  "native_source": {
+    "status": "PASS_IMPLEMENTATION_SCOPE",
+    "patch_git_blob_sha256": "f5efce7160e45933f84b23c365f08b9a51798aeb9c201c4e48a5ba026e2c2f21",
+    "implemented": ["host internal state/map snapshot", "host internal state/map restore", "native processImu/handleLIO replay"],
+    "normal_source_failures": ["No control polling when sync_packages fails/end-of-input", "Replay cloud public output is not silenced"],
+    "declared_missing": ["Repaired measurement injection", "Map-write isolation", "Same-timeline reentry and second-event run"]
+  },
+  "native_smoke": {
+    "status": "DEVELOPER_REPORTED_NOT_RAW_VERIFIED",
+    "reported_snapshot_points": 210985, "reported_snapshot_ack_s": 0.086,
+    "reported_replay_frames": 8, "reported_replay_s": 0.358,
+    "missing_from_commit": ["host_smoke.log", "smoke_results.json", "actual configuration receipt"],
+    "not_certified": "Value-for-value full state/map equivalence"
+  },
+  "host_selection": {"status": "DIRECTIVE_RECEIVED_AND_COMPARISON_DELIVERED", "selected": "FAST-LIVO2 LIO path", "limit": "Measured path is developer-reported; complete native chain unverified; bounded failure reopens comparison"},
+  "full_native_two_event": {"status": "BLOCKED", "note": "Input bag prepared, run not started in reviewed snapshot"},
+  "not_applicable": ["Full pytest suite", "Native ROS tests", "Raw bag replay", "Old unchanged lifecycle suite rerun", "Full A/B rescoring", "Production research integration or parameter tuning"]
+}

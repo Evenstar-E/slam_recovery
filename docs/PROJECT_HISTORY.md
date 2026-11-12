@@ -305,3 +305,45 @@ S1先协调真实暂停范围与原生主线优先，S1/S2下一直接写回→�
 S1/S2先收尾当前具体改动/已启动运行并保存代码、原件及失败；未开工直接比较，已BLOCKED交断点，不无限修FAST-LIVO2全部问题。对已有FAST-LIO2/MM-LINS/FAST-LIVO2做一次有限源码/接口事实比较，按checkpoint/测量重处理/内部地图写回/持续输入与重武装能力及最低新增工作选一个宿主，再固定host/source/config/input验证两事件。历史良好指标可参考但不是原生能力证明，不按易出好结果选，不多宿主扩矩阵。原生任务§11明确覆盖旧FAST-LIVO2硬限制，历史数据不改/不删。
 
 两个主线会话继续原生实现和运行，S3独立门实验、参数手调暂停；已完成恢复/事务组件直接复用。可先做受控原生接口两事件局部验证，不能冒充自动检测链，最终完整写回→接回→第二事件目标及首次完成单独汇报不变。远端当前在手任务/接收/转向与选定宿主待实际回报，本机不代跑/不修算法。
+
+## 30. 0edc3d7：恢复开发有源码，生命周期仍有三个正常阻断
+
+[本轮主线核验](review_20261110_0edc3d7/README.md)固定main@0edc3d7。开发实际采用19e53b2的1研究＋2主线分工并交候选body基正则、有限等待/rearm及空候选null记录；S2首次回报FAST-LIVO2缺原生快照/重放入口的具体断点。不能再说开发一直未恢复，但仍没有原生内部恢复/接回/E2新运行原件。较新05f7fc5宿主选择指令尚不在该main，收尾后立即转向要求保留、实际接收待回报。
+
+本机60相关unittest通过；复用旧实际producer例，新source两坐标均Mode3，旧跨.5翻判局部解除并接受，不重开正确transport或扩平移矩阵。inner world ridge小残差仍声明，局部结果不证明严格全部gauge/准入质量，不升完整A/B分。正常loop/node/manager控制复现：UNAVAILABLE来帧不处理等待期限、reset/rearm后仍消费旧报警决定并重开同段、归档unresolved的旧provisional帧下一健康输入又晋升trusted。S1沿现helper分别统一输入生命周期入口、先重武装再fresh决定/episode、保持旧未解帧归属，必要runner接入已声明wait预算；只修持续链的正常问题，不造全异常框架。
+
+## 31. 门研究b289283：首批有限交付不等于完整选型结论
+
+[独立研究分支核验](review_20261110_0edc3d7/GATE_RESEARCH_REVIEW.md)固定exp/gate-method-research@b289283，未合生产门。A18条归档/17理由匹配/4缺P一致，3073038由拒绝移UNKNOWN而非接纳，条件性历史归因不等完整独立门回放；旧绝对腿漏正gain、自检文字待纠正，独立收益/删除风险BLOCKED。
+
+B前缀冻结/滚动规则不读未来，尺度最大987.3306及49.894倍轨迹可保留；但基线把已归一化NIS再次除sigma²，研究检测器漏现无报警帧CUSUM乘.5。本机25帧NIS1.6控制：实际全HEALTHY，研究第17帧SUSPECT/18帧QUARANTINED。2974473输入receipt绑定O背景包而非原注入包，名义窗19.839s、+19.659s仍窗内，没有独立故障/恢复标签支持“故障吸收/恢复假警/形式必然失败”；B正文人口111/168及污染控制盲区25.761s需与JSON一致。最低沿同人口纠正既有两版，不扫描sigma/不自动开B-v3；准入仍BLOCKED。C任务定义的量纲/方向研究截至本分支未交，实际成本未记录。S3专用研究继续，参数手调暂停，S1/S2主线不等研究，尚不请用户盲选。
+
+## 32. adff0b0：原生入口首次实质交付，宿主路线已按接口选择
+
+[本轮核验](review_20261110_adff0b0/README.md)接受590aa50真正新增C++内部_state/voxel树/IMU四值snapshot/restore以及processImu→handleLIO原生重放实现，A4/A6组件推进；不是Python sidecar。报告210985点/8帧/成本属于开发实测声明，所引host_smoke.log/smoke_results/config receipt未随提交归档，ack数量和position不证明完整逐值等价，不升完整项/总分。05f已进main，055b200有限接口表选FAST-LIVO2 LIO，不能再说转向未收到；按原预算失败需重比较，不无限绑定。
+
+正常最低缺口：SUSPECT且无active段时driver仍覆盖检查点（本机实际node控制复现），host snapshot stamp未对齐backdated可信边界；无group/包尾不poll控制；重放未静默公开旧cloud；隔离期仍写图、重放原云无修复测量注入，restore后未来输入时间归属未闭合。S1/S2沿现入口最小解除并交选定单宿主实际修复→内部写回→接回→E2，不新框架/矩阵。runnerwait参数已接，旧三生命周期相关source未修不重跑旧suite。双事件包只是输入准备，完整链仍未开始，不发完成通知。
+
+## 33. 545340f：C研究实际新增，坐标控制失败且无采用裁决依据
+
+[C核验](review_20261110_adff0b0/C_RESEARCH_REVIEW.md)保留同扫描重复控制四位小数一致、新体素/半径producer实际实现，不再称C未交。新截取字典序最前1200体素新增坐标人口差，本机三正交平面1875点/90°旋转/固定物理方向控制：旧92.592594→92.592594，C2→88.888890约4%差。删planarity/邻域自身/筛后支持及原契约不全，不能说只改两处精确修掉；示意patch不能git apply --check。旧方向40.911→25.582与各自弱向→1.121不同，不自动证明κ比值校准继承或授权重导floor。
+
+A/B旧基线/输入标签错误未修。仓库A不删/B搁置/C集成侧定/S3收口只记录开发状态，非本会话用户选择，尚不能盲选或自动部署。S3有限纠正既有研究/解释，真实候选效益继续BLOCKED并复用主线自然产物；参数手调继续暂停、生产不集成，S1/S2不等研究。
+
+## 34. f2bbbb5：hold生命周期接线新增，命令与评分归属仍需最小修
+
+[本轮核验](review_20261110_f2bbbb5/README.md)接受Python开段hold/rearm→resume接线、候选输入sidecar和unittest发现修正为局部组件增量，不能当完整链。宿主hold新增测量表和smoke_hold诊断入口，但actual hold patch/log/result未交，发布host diff与adff相同；最低保存已有部署源码/原件，不重跑矩阵、不把报告表当本机PASS。
+
+本机5选定测试通过；确定性正常命令控制：hold→restore覆盖一格cmd，一个OK restore ack被两次collect计成hold/restore成功；短50ms poll丢pending后迟到OK hold又可计restore成功。最低现通道单in-flight、短poll保持pending、匹配ack消费一次，不造RPC框架。完整accepted→HEALTHY无rearm事件，Python仅hold→reprocess不resume；实际host是否内部释放因新patch未交BLOCKED，明确全接纳与partial隔离语义。实际node7帧输入6verified/仅1与7进info_after，sidecar仍1…7：接受输入归档、不称实际评分集，最低现node归档真实verified/holdout/anchor而不从拒绝committed空集猜。producer/manager/core未变，旧正常任务复用不重跑。S1/S2仍交实际修复→内部写回→接回→E2，S3独立研究与参数暂停保持，不升完整A/B分。
+
+## 35. 06f543a/2449c0b：撤回C2集成可保留，P2自弱向不等固定门方向
+
+[本轮核验](review_20261110_06f543a/README.md)固定main06f543a，仅日报追加、无新原生源码/两事件；撤回C2集成及不据该版重导floor方向接受，旧正常接线/部署原件缺口不变，不重跑。研究2449c0b新增P1五帧before重算及P2定义，固定方向新旧缩放跨度约12.137倍算术可保留，但四位小数/容差与5–23ms最近scan不叫逐位同header，cos.8792约28.45°不叫仅几度。
+
+P2每candidate重选最小特征向量后与λmin比较，r1/24排序恒等不能推生产固定trigger信息腿等价。本机复用b5554ef正常SPD例：actual gate after100、candidateλmin38.8889且accepted，否定一般恒等；同固定投影100另一轴1/4可使F2-A m1/0。F2-A m0等价全谱最小值阈值，在P=Λ逆精确同基限定才对应cov腿，不对应一般固定方向腿。候选效果/Loewner/序贯判决仍BLOCKED，不由概念“冻结”授权新门；S3最小纠正控制对象和基/精度，S1/S2主线不等研究，参数仍停，完整A/B分不提升。
+
+## 36. e2db4b3/3e9f947：旋转控制归档补齐，不等同物理方向已正确
+
+[本轮核验](review_20261110_e2db4b3/README.md)接受rotation_control脚本/JSON与Loewner定义、reading矛盾修正为研究封装进展；main只有日报追加，无新原生运行。C2不集成保持，不重复旋转bag矩阵。新控制0°identity、非0°加[2,-1,.5]平移，transport后重新单位化，含旋转分量时改变二次型对象；非零平移也改体素分箱，不能将fixed列百分比全称纯朝向敏感度。
+
+本机exactSPD正确transport例无任何采样：rz方向原投影1，z30°+[2,-1,.5]搬运物理投影仍1，方向范数√6；研究再单位化投影1/6。只否定一般fixed同物理声明，不推归档每个百分比全由单位化造成。最低纯旋转t0，或完整SE3不再单位化/回同anchor；沿已接受生产transport不改算法。S3独立纠正此控制，S1/S2继续既有正常接线与实际修复写回→接回→E2，参数仍停，无完整A/B分变化。
