@@ -448,8 +448,18 @@ def main(argv=None):
             "join_status": "HEURISTIC_UNPROVEN",
             "results_conditional_on": "unproven group-membership mapping; not a source-membership proof",
             "e_i_convention": ("host mixed convention: rot = R*Exp(d_rot) (body right), "
-                               "pos = p + d_pos (world additive); e_I = [-w, -R_pre^T v] "
-                               "explicitly rotates the translation into pre-body"),
+                               "pos = p + d_pos (world additive); rot=-w, t_body=-R_pre^T v, "
+                               "then SE(3) Log t_log = so3_left_jacobian_inv(rot) @ t_body"),
+            "pose_source_scope": "CONFIRMED_POST_POSE_TIME_JOIN applies to v8 124217Z only; "
+                                 "v7 115734Z remains HEURISTIC_UNPROVEN",
+            "i_qualification": "INCOMPLETE/UNKNOWN",
+            "i_qualification_reasons": [
+                "vec6 is captured before the final solution (state_ += solution); the final "
+                "solution is not exported, so vec6 is not the final pre-post increment",
+                "pre pose is not independently exported for the LIO handler; mat_pre has "
+                "VIO/LIO double writes without a handler tag",
+                "Ppre/Ppost are mixed-convention state blocks; no verified 6D tangent covariance",
+                "504 numeric I rows are not 504 qualified independent I observations"],
             "covariance_status": ("NOT_AVAILABLE_FOR_E_I: Ppre/Ppost are mixed-convention state "
                                   "blocks; no verified 6x6 tangent conversion"),
             "vec6_status": ("NOT_VERIFIED: saved before the final solution; same pre/post and "
@@ -554,6 +564,11 @@ def main(argv=None):
             "by_status_and_tail": {str(k): v for k, v in state_counts.items()},
             "blocks": len(block_rows), "unknown_blocks": unknown_blocks,
             "tail_rows": tail_rows, "tail_blocks": len(tail_blocks),
+            "tail_rows_by_pose_rel_54": sum(
+                1 for r in joined_rows if (int(r["pose_stamp_ns"]) - first_pose_ns) / 1e9 >= E2_REL_S),
+            "tail_rows_by_block": sum(
+                1 for r in joined_rows
+                if (int(r["pose_stamp_ns"]) // BLOCK_NS) in {b["block_id"] for b in block_rows if b["tail"]}),
             "span_s": (block_ids[-1] - block_ids[0] + 1) * (BLOCK_NS / 1e9),
             "unknown_normal": {
                 "blocks": len(normal_blocks),
