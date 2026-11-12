@@ -18,7 +18,7 @@
 | 同帧 pre/post | **725**（`same_row_pre_post_rows = same_row_post_pose_rows = 725`） |
 | join | **TRUE_SPAN_CONTAINMENT_WITH_512NS_QUANTIZATION**；481/482 映射、1 `NO_TRACE_ROW`、246 行多对一 |
 | 块 | **106 块 / 53.0 s，全部 UNKNOWN**；普通 42 块/21.0 s，E2 后 **64 块/32.0 s**（21.0–53.0 s） |
-| 事件 | 第 2 段 trigger **rel 17.0029 s**、deadline **21.0029 s**（从本 run `episode_detail` 读取，非旧 54 s） |
+| 事件 | 第 2 段 trigger **rel 17.0029 s**、deadline **21.0029 s**（从本 run `episode_detail` 读取，非旧 54 s）；deadline 前 **179 行**、后 **303 行** |
 | 段/接纳 | 2 段均 `LATE_AFTER_BOUNDARY`，**0 accepted**；E2 后输出不是合法 catch-up |
 
 **通道与 I 分位**
@@ -107,7 +107,9 @@
 
 | 项 | 状态 | 依据 |
 |---|---|---|
-| source scan 身份 | **PASS（真实跨度 + 512 ns 量化）** | `scan_first/last` 真实、`n_scans`、481/482 映射 |
+| `RAW_HEADER_CONTAINMENT` | **PASS**（真实跨度 + 512 ns 量化） | `scan_first/last` 真实、481/482 映射 |
+| `SAME_UPDATE_PRE_POST` | **PASS**（725 行同行） | pre/post 同帧 |
+| `COMPLETE_POINT_MEMBERSHIP` | **`ASSERTED_NOT_VERIFIED`** | carryover、`n_scans` 只计新 pop raw、同 header 可出现在两个更新组 |
 | pre 位姿 | **`PASS_SAME_ROW`** | 同行 `pre_pose7`；3 行抽检 + 725 行 |
 | post 位姿 | **`PASS_SAME_ROW`** | 同行 `pose7`；与 M2DGR 同时间一致 |
 | `vec6` | `NOT_VERIFIED` | 仅作对照，不再作为 e_I 来源 |
