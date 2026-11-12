@@ -26,6 +26,7 @@ FAST-LIO2，S1 负责 LIO-SAM 与 ORB-SLAM3。本目录只收 S2 的两项。
 | `074154Z_215075` | `0a38e952` | `9e7d8cdf` | 同上（窗口从触发戳起） | 后缀重放 + 跳过 set_state：454 帧 [276.282..291.359]、within=124/suffix=330、repairs 23、地图 20625/380221；reprocess 与 resume 的 state_pos 差 3.6 cm，无回拨 | 能：后缀重放且状态/地图停在边界；不能：真实修复收益 |
 | `074744Z_219478` | `0a38e952` | `9e7d8cdf` | 第一窗口 +0.5 z（[触发1, 触发1+6 s)），第二事件无损坏 | 两事件：第一段 accepted + repairs 23 + `replayed_suffix=373` + 无 set_state；第二段 Mode 3 拒绝 + restore；276/186/122 帧；2 行候选；终态 HEALTHY | 能：修复接回后同实例第二事件完整走完；不能：第二段用滚动 checkpoint、真实修复收益 |
 | `080204Z_228057` | `a7cf030c` | `9e7d8cdf` | 第一窗口 +0.5 z，第二事件无损坏 | 每戳武装 checkpoint + 开段作废 snapshot + scripted 关滚动快照：第二段 restore 戳 308.048271360 **早于**触发 308.048271418；第一段 accepted + repairs 23 + suffix 313 + 无 set_state；第二段决策完成但 wait 关闭落在 bag 外 0.47 s，终态 open=true | 能：restore 戳修复成立；不能：该 run 第二段完整关闭（尾部不足，最晚戳 ≤307.574，kf416 307.442 留 127 帧） |
+| `080914Z_233068` | `a7cf030c` | `9e7d8cdf` | 第一窗口 +0.5 z，第二事件无损坏 | 第二戳 kf 405（306.372，留 139 帧）：restore stamp 306.3038 **早于触发 67.8 ms**；两段都完整（第一段 accepted + repairs 23 + suffix 379 + 无 set_state；第二段 Mode 3 拒绝 + restore + close/rearm/resume）；关闭 316.258，尾段 39 帧/4.65 s；终态 HEALTHY/open=false；2 行候选 | 能：修复接回+第二事件+尾段在同一 run 完整成立；不能：真实修复收益 |
 
 ## 状态
 
