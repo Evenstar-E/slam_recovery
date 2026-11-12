@@ -2053,3 +2053,21 @@ sha `3728c94c…`；availability 444（**88 AVAILABLE / 356 UNAVAILABLE**）。
 **审阅 `646d4f2` 同时指出**（已接受）：ep0/ep1 实际 restore 晚隔离起点约 3.9 s（`ACK cp − qstart`），属**非可信回退**，
 不能因改纯在线就认为回退合法；ep3 修复 42 条扫描全部落在声明注入窗**之后**，不能称"注入测量已修回"，
 需 S1/S3 说明修复对象（点测量错误 vs 状态误差被转成点偏置）与正常后继误干预。
+
+## 142. v8 join 升级完成（真实跨度包含）；本机复算与 S3 一致
+
+S3 `5115387`（已合入 main）基于 v8 run `124217Z_521833` 升级 join。本机独立复算（读 run 原件）：
+
+| 项 | 本机结果 |
+|---|---|
+| trace | 736 行、93 列、`n_scans` 全为 1、`scan_first==scan_last` **736/736**、`has_out=1` 669 |
+| availability | 444 行（88 AVAILABLE / 356 UNAVAILABLE） |
+| 跨度包含（`first−512 ≤ S ≤ last+512`） | **217 行 1 组、227 行 2 组、0 行未匹配** |
+| 旧机械规则 vs 真实组 | 一致 **222/444**、不一致 222、无未匹配 |
+
+`join.status` 在 v8 run 上为 `TRUE_SPAN_CONTAINMENT_WITH_512NS_QUANTIZATION`；v7 `115734Z` 因 `scan_first` 仍为 -1
+保持 `HEURISTIC_UNPROVEN`，两 run 不混用。227 行的多对一来自**同一 scan 戳对应两条 LIO trace 行**（`n_scans=1`），
+按实际关系保留、不拆组。
+
+人口限制照实：本 run 只到 rel **49.11 s**、paired 444、2 段全拒 0 accepted，**不是 60 s 完整覆盖**，拒绝分布与
+上次（5 段/1 accepted）不同；修复收益结论仍需区分"点测量错误 vs 状态误差"。
