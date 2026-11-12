@@ -651,3 +651,9 @@ e0只增加header/end exports及常offset精确join协议，没有真实trace或
 S1§128/129报告布局/static流修正与探针5/5但teardown仍smash、库007c3bdc、off run111325Z_435333/536paired/E1suffix651/E2拒绝/pre-out复制；目标无run/probe/patch原件，仅DEVELOPER_REPORTED，不能独立核诊断因果/成本/真实I或on-off不变性。最低上传已存原件，不为审阅重跑off；同现预算有限on/off继续，随机配对数量差保留不硬逐值一致。新恢复/自动检测效果没有可核增加，A1/A11/A3/B3准备推进非性能，其他原生项未闭合不全表评分。
 
 ALI-B2记录未变/用户确认空，78de840最低解除意见尚未入target不指控忽略；正常校准+事件标签两依赖，既有注入离线授权不重复等待，新来源/超预算或资格-only待用户选、不代选C。S1共享集成/原生归宿、S2真实导出、S3同新trace完整资格UNKNOWN/校准标签后风险评价仍单一交付，四Cron/noCodex/参数停；状态命令原件/合并组/未配对/无行块/UNKNOWN时长/失败成本自检，不test数当成果。实质修正接受与新运行证据界限中文review SSH发布，不生产算法ROS/main历史冻结门/private/日报。
+
+## 81. 1fd75b3：trace开关负结果与缓冲后尾段限制，组行号不冒扫描身份
+
+[增量核验](review_20261112_1fd75b3/README.md)固定19:45 fetch的1fd75b3，比较aaf7e28，跳过旧审阅合入。新增仅COLLAB§130–131回报，无新源码/研究实现/四宿主档；old off112254Z与on112753Z同库3b26365f/544paired，但修23 vs修0丢23/spans0、replay244+439 vs0+151，门决定/wiring同不等native不变。buffered on113855Z换49f2f941修23/244+400、实际早E1cp，但phase异常、尾记录范数519.9m及无availability；全部DEVELOPER_REPORTED原件未Git，不当真实I/自动检测或连续正常通过，不位置范数冒ATE/GT。负结果保留，旧三组件修正/关联声明资格未变不重测。
+
+322重复grp_idx/同abs_ns与出现序号只能定位日志行，不能独自证原scan或live/replay阶段；最低现source成员关系+checkpoint/reprocess事件绑定，允许真实多对一/未知phase分母，不nearest/静默删。buffer改后改善但库/cp/span也变，std::endl为候选机制非唯一根因，最低现三run原件对照不新矩阵；首段/replay/后继全人口保留，不以HEALTHY推尾段正常。S2现库带availability有限导出/上传已存原件、S3实际关联/完整资格UNKNOWN与校准标签状态、S1原生归宿仍唯一实交；无用户确认不代选C、不停未阻工作、真需新决定立即中文阻塞。A/B仅回报不验收/不总分，四Cron/noCodex/参数停，中文review SSH/private保护不算法ROS/main历史冻结门。
