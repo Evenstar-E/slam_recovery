@@ -4,6 +4,21 @@
 `接纳 → commit_closed → resume → 宿主恢复写图`。仍标 `CONTROLLED_INTERFACE_TEST`、`--detection off`、
 不改门/阈值/σ。
 
+## 0. 三次 run 的输入身份对照
+
+字段均取各 run 的 `receipt.json` → `inputs`。
+
+| run | `host_binary_sha256` | `runtime_library_sha256` | `recovery_node_source` |
+|---|---|---|---|
+| `fl_native_20261112T020634Z_4148249`（事件 1，reprocess 丢失） | `0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1` | `0eacffe1017b9ccf4331ad4752cb0d336aaac4457d9f66ff056d66965cd35659` | `fb746dddc1a0f4e4041e27dddd75ab4f85559c88b18694510f25a582e8b36e18` |
+| `fl_native_20261112T022158Z_4156288`（串行化后，事件 1） | `0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1` | `0eacffe1017b9ccf4331ad4752cb0d336aaac4457d9f66ff056d66965cd35659` | `18d92a032835dbfaff8593987bca9c6d5928882d33da876cb1549970646ea225` |
+| `fl_native_20261112T024337Z_4166038`（两事件） | `0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1` | `0eacffe1017b9ccf4331ad4752cb0d336aaac4457d9f66ff056d66965cd35659` | `18d92a032835dbfaff8593987bca9c6d5928882d33da876cb1549970646ea225` |
+
+- `host_binary_sha256`：三次**逐位相同**。
+- `runtime_library_sha256`：三次**逐位相同**。
+- `recovery_node_source`：run 1 与 run 2/3 不同；run 2 与 run 3 相同。变化点是合入命令串行化
+  （`bbe916f`）之后。该字段记录的是驱动源码文件的 sha256，不是宿主产物。
+
 **结论先说**：候选**真的过了 Mode 2**（不是凑出来的），宿主也**真的被 resume 并恢复了写图**；
 但 `commit_closed` **没有出现**，因为这次提交是 **partial commit**，隔离段由等待超时关闭 + `rearm`
 结束。并且，接纳后的 `reprocess` 命令在宿主侧**从未执行**——被同一毫秒内下一条命令覆盖了。
