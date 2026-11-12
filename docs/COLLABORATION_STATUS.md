@@ -2580,3 +2580,18 @@ S2 `5c3bf54`（`exp/growth-run`，已推）新增两份只读文档：
    所以"0 条 tail"只说明未进旧 54 s 窗口，**不说明没有 E2 后输出**；须从本 run 的 `episode_detail` 读取事件时刻重算。
 
 **宿主**：FAST-LIO2 独立重跑（run2）进行中——`fastlio2_ws` 二进制、`rosbag play --clock` 正在跑；本轮未干预。
+
+## 171. FAST-LIO2 独立重跑 PASS，与共享版逐项一致（NATIVE_INDEPENDENT）
+
+S2 `4f205ef`（`exp/growth-run`，已推）。run2 证据（本机核对 `analysis.json`）：
+- 二进制 `/home/R26534/fastlio2_ws/devel/lib/fast_lio/fastlio_mapping` sha **`4c31fada…`**（独立构建）；
+- 门控：`load1=221` 仅警告（宿主全局）→ 继续；**120 s 时 bag 已走 110.4 s（≈0.92×）**，未触发早停；
+- 录制 `/Odometry /path /Issleeping /Isbuilding`，`rosbag info` **12,980 条、469 s、索引完整**；退出 SIGINT→wait→info；
+- `/Odometry` **4,186 条**，首/末戳 `…773886889086` / `…352770248175` 与共享版**逐位相同**；E1 停发 0.023 s、E2 停发 0.021 s
+  （与共享版 0.023/0.021 一致）；**E2 后尾段 239.318 s / 2,126 条**（与共享版完全相同）；`Issleeping`/`Isbuilding` 各 2 次完整 cycle。
+
+**标签升级**：FAST-LIO2 从 `SHARED_EXECUTION` 升级为 **`NATIVE_INDEPENDENT` + PASS**（原生双事件与尾段）；轨迹长度 485.08 vs 353.43 m
+的差异是**度量口径**（独立版按 `dt<1 s` 求和、排除重建跳变；相加 353.43+131.6≈485.0 吻合），不是行为差异。
+slam_recovery 恢复接线仍 **NOT_IMPLEMENTED**。首次 FAIL 的原因（900 s 超时 + 全量云录制 + 宿主负载）与代码无关，新门控下一次通过。
+
+四宿主对比表中的 FAST-LIO2 行应据此更新（原生证据由"共享版 PASS"改为"独立版 PASS"）。
