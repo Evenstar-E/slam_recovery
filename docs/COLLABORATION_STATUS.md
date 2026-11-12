@@ -2071,3 +2071,27 @@ S3 `5115387`（已合入 main）基于 v8 run `124217Z_521833` 升级 join。本
 
 人口限制照实：本 run 只到 rel **49.11 s**、paired 444、2 段全拒 0 accepted，**不是 60 s 完整覆盖**，拒绝分布与
 上次（5 段/1 accepted）不同；修复收益结论仍需区分"点测量错误 vs 状态误差"。
+
+## 143. 在线路径的 checkpoint 回退被证为不支持：实测晚 qstart 3.77–4.23 s；已加机器可读标注
+
+S2 用新 driver（`8d9cd0d`）跑纯在线 `125406Z_533623`（detection on、无 trace/availability、库 `1239f35f…`、paired 544、
+accepted 0/rejected 4/errored 0、终态 HEALTHY）。本机核对 `checkpoint_checks` 与回报一致：
+
+| ep | boundary（qstart） | actual cp | 晚 | 状态 |
+|---|---|---|---|---|
+| 0 | `1627785261507921600` | `1627785265275036928` | **+3.77 s** | LATE_AFTER_BOUNDARY |
+| 1 | `1627785270114168549` | 同上（复用） | −4.84 s | AT_OR_BEFORE_BOUNDARY |
+| 2 | `1627785288459063196` | `1627785292292419072` | **+3.83 s** | LATE_AFTER_BOUNDARY |
+| 3 | `1627785302541834497` | `1627785306775187456` | **+4.23 s** | LATE_AFTER_BOUNDARY |
+
+**结论（负结果，已写进代码与文档）**：在线路径下 rolling snapshot 每 2 s 发出，但宿主在**下一个已处理帧边界**才应用快照，
+播放 backlog 下"发出"与"应用"相差数秒，槽里的状态时间戳因此晚于隔离起点。ep1 的 AT_OR_BEFORE 只是复用了 ep0 那份，
+不是机制上正确。**当前配置不支持"回滚到不晚于 qstart 的检查点"**；要支持必须给在线 snapshot 带 `apply_stamp=qstart`
+（与 scripted 同机制）或做带身份的 keyed checkpoint。
+
+**S1 实现**：`_finalize_checkpoint_checks` 现在同时写 `rollback_support`：LATE → `UNSUPPORTED_AT_OR_BEFORE_QSTART`、
+AT_OR_BEFORE → `WITHIN_DECLARED_BOUNDARY`、其余 `UNKNOWN`。207 tests OK。
+
+**S3 同步**：trace 读取改按列名（v7 92 列 / v8 93 列共用）；`T2_JOIN_UPGRADE.md` 写明本 run `phase` 全 0、无 replay，
+227 行多对一是**同 scan 戳的两条 live 行**而非 live+replay，可进逐帧资格人口但仍不拆组；v7/v8 并列表已建。
+归档已推：`exp/online-v2` → `45d0fee`（远端新建）。
