@@ -1074,7 +1074,7 @@ reason/fraction/pass 与点级证据。只写诊断，不进入任何决定；�
 判读规则（运行前声明）：
 - 预测位姿下 fraction 明显恢复（越过 0.60 或显著高于宿主位姿），说明**位姿漂移**；
 - 两种位姿下都低，说明**参考地图覆盖不足/过期**，与位姿无关；
-- 若预测位姿本身不可用（trusted 位姿 <2 帧），记 `null`，不猜。
+- **预测语义（审阅 4740d94 纠正）**：`_predicted_pose` 用最后两帧位置差/时间差外推、旋转取最新值；**没有外推时间上限**，且只有一帧 trusted 时返回最后位姿（不是 null，预测位姿不可用为 null 的说法不适用于 1 帧情形）。因此判读只能说"同帧同参考下支持对位姿敏感"，不能称漂移量；记录需带基准 key/时间/速度/horizon。
 
 下一步（S2）：用同一输入再跑**一次**检测 on 的有限诊断，交按上述二分的原因计数与连续段；不改检测/阈值/门。
 
@@ -1094,7 +1094,7 @@ S1 复核 S2 `ab51d60`（合入，205 测试）。run `fl_native_20261112T070801
 **判读（按预先声明的规则，并收窄）**：50 帧仅宿主席不达标、预测位姿达标 ⇒ **短时位姿漂移**可解释；
 301 帧两套位姿都不达标 ⇒ **不能用短时预测位姿解释**，指向参考覆盖（或预测本身失效），**根因仍 UNKNOWN**，
 不能据此宣布"参考覆盖不足即为唯一原因"。47 帧预测反而更低，不判为漂移（可能外推失效）。
-`both_pass` 82 与 AVAILABLE 132 的差是 NIS 门（可用还要求 NIS 非 None）。
+AVAILABLE 132 的构成（审阅 4740d94 纠正，本机复算一致）：82 both_pass + 47 only_pred_low（预测失败但宿主席通过）+ 3 无预测但宿主席通过 = 132；host 支持通过总数恰好 132。**此前写成"82 与 132 的差是 NIS 门"是错的**——480 个有预测帧的 `nis_present` 全为真，差异来自 only_pred_low 与无预测帧。
 
 检测/阈值/门/模型未改；分解只写诊断。S3 早前列的选项（双参考支持 / 位姿-地图分解 / 诊断分解）中，
 分解已完成；若要继续查 both_low 的 301 帧，下一步应做**双参考支持**（restore 前快照 vs 当前可信地图）。
@@ -1159,3 +1159,41 @@ S1可并行最小补当时reference/cache身份与必要坐标、原row和少数
 source预测无horizon界/一trusted返回last非null，kf21原件及actual-method控制确认；最低记录已有key/戳/预测T/horizon、同次reference/cache与原row，旧缺项未修不重测，不先加预测器/阈值。12帧9不可用/3可用base/target/log输出同，全部package Git bytes加载、-I archive reader无host/bag，pytest辅助新test未跑不安装。跨run人口不同不唯一归因负载；S3旧/tmp统计不新同版本证据。仓库“用户选中”仅开发转述无本机直接选择证据，不自动批准双参考或部署替代策略。
 
 S1/S2唯一主线继续物理一致实际修复→native完整state/map→保后缀catch-up→接回/E2或首断点，已验替换复用，v3后缀/成功依赖未改；诊断补元数据/真实分母与因果限定可并行只挡强诊断主张，不继续日志矩阵代native。S3回既定门A/B/C研究专用、旧参数停；自检逐项状态/命令/原件/失败/成本/质量UNKNOWN，A3/B3局部观察不总分。独立review SSH提交推送、不合main不改算法历史/冻结门/private保护；target早于fe56883发布不指控忽略，新意见接收待实际回执。
+
+## 97. set_state 回拨修复（v5）：后缀重放后不再写回旧位姿，state/map 同边界
+
+S1 复核 S2 `cbbdeda`（合入，206 测试）。宿主 v5：`checkpointStatus()` 暴露 `replay_within_end/replay_suffix`
+（取上次重放计数，不新算；缓冲 512→768）；增量 49 行、完整 `deployed_host_v5.diff` 1632 行，均 apply 通过；
+新库 sha **`9e7d8cdf…`**（本机核对），可执行文件仍 `0d7e23de…`。
+
+驱动：reprocess 后等待 ack（≤90 s），解析 `replay_suffix`；**>0 跳过 `set_state`** 并记
+`native_writeback_skipped={reason:"replay_suffix",replay_suffix:N}`；ack 缺失/无字段同样不盲写，记 null；=0 保持原行为。
+
+run `fl_native_20261112T074154Z_215075`（同声明）：
+
+| 项 | 实际 |
+|---|---|
+| reprocess | 454 帧 [276.281966925 .. 291.358868361]，`replayed_within_end=124 replayed_suffix=330`，`repairs applied=23 leftover 0` |
+| 地图 | 20625 voxels / 380221 points |
+| 命令 | `native_checkpoint_events` 只有 reprocess 与 resume（**无 set_state**） |
+| 状态 | reprocess ack `5.796264,7.677180,0.181549`；resume ack `5.761748,7.652826,0.182390`，差约 **3.6 cm**（上一版 3.9 m / 15 s 回拨消失） |
+| 终态 | HEALTHY、`quarantine_open_at_exit=false` |
+
+边界：后缀数随负载变化（本 run 330 vs 上一 run 448），但 `within_end` 124、修复 23/23 不变；
+门/阈值/σ 未动；可用性诊断暂停；损坏自注入，不声称修复收益。
+诊断侧同轮更新（§98）：预测基准/参考身份/边界帧全样本。
+
+## 98. 诊断按审阅收窄并补齐：预测基准、参考身份、边界帧样本
+
+审阅 `4740d94` 指出两处真实错误与三处缺项，S1 已修：
+
+1. **§91 的 AVAILABLE 构成写错**：实为 82 both_pass + 47 only_pred_low + 3 无预测但宿主席通过 = **132**；
+   此前"82 与 132 的差是 NIS 门"不成立（480 个有预测帧 `nis_present` 全真）。
+2. **`predicted_pose/REPORT.md` 终态写错**：原件为 **WAITING_FOR_EVIDENCE、open=true、resume 7/8**，
+   报告原写 HEALTHY，已按 receipt/run_summary/lifecycle 更正。
+3. **预测语义收窄**：`_predicted_pose` 是最后两帧位置差/时间差外推、旋转取最新、**无时间上限**；
+   仅 1 帧 trusted 时返回最后位姿（不是 null）。判读只能说"同帧同参考下支持对位姿敏感"。
+4. **补齐记录**（`90c95b5`）：`prediction` 块（mode last_pose/velocity、基准 key/stamp、速度、horizon、
+   16 维 predicted_T）；`reference` 块（cache_key[version,nposes]、refresh_ns、点数、sha256——每次刷新算一次，
+   不是每帧）；`boundary` 帧（与前一帧状态不同）保留全部点级样本；参考 hash 与点数随行保存。
+5. 未改预测器本身、未加新阈值/防御；下一轮诊断如需再跑，由用户决定（当前暂停）。
