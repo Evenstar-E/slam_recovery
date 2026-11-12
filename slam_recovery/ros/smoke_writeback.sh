@@ -9,11 +9,17 @@ OUT="${2:-/tmp/writeback_smoke}"
 RATE="${3:-1.0}"
 DUR="${4:-30}"
 
+# Keep earlier run artifacts; this smoke test requires a new output directory.
+if ! mkdir -- "$OUT"; then
+  echo "Cannot create output directory: $OUT. Use a new path; existing outputs are preserved." >&2
+  exit 1
+fi
+mkdir -p -- "$OUT/ctrl" "$OUT/ros_home" || exit 1
+
 set +u
 source /home/R26534/mm/ros/setup.bash
 source /home/R26534/fast_livo2_ws/devel/setup.bash
 set -u
-rm -rf "$OUT"; mkdir -p "$OUT/ctrl" "$OUT/ros_home"
 export ROS_HOME="$OUT/ros_home"
 PORT=$(/usr/bin/python3 -c 'import socket;s=socket.socket();s.bind(("127.0.0.1",0));print(s.getsockname()[1]);s.close()')
 export ROS_MASTER_URI="http://127.0.0.1:$PORT"; export ROS_HOSTNAME=127.0.0.1
