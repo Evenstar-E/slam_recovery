@@ -1,0 +1,69 @@
+{
+ "_meta": {
+  "what": "C-1 normal controls on a real archived scan",
+  "bag": "/tmp/fastlivo/hall01_100_160.bag",
+  "crop_m": 30.0,
+  "points": 8000,
+  "sigma_fim": 0.075,
+  "not_done": [
+   "no host run",
+   "no threshold changed",
+   "no new statistic claimed as an improvement"
+  ]
+ },
+ "duplication": {
+  "n_points": 8000,
+  "projection": 40.91107484012684,
+  "projection_evaluating_all_points": 32.2253,
+  "ratio_stride_vs_all": 0.7877,
+  "projection_duplicated_evaluating_all": 30.4889,
+  "ratio_duplicated_vs_all": 0.9461,
+  "projection_duplicated": 45.66847382342641,
+  "ratio": 1.116286335714489,
+  "expected": 1.0,
+  "verdict": "NOT_COUNT_NEUTRAL",
+  "why": "the mean removes the 1/N factor, but the producer's stride subsample is a function of N (8000 -> step 6, 16000 -> step 13) and the k-nearest-neighbour neighbourhood is a function of the point set, so the same physical scan scores differently at different input sizes. The defect is in the evaluation sample, not in the missing 1/N"
+ },
+ "density": {
+  "half_projection_ratios": [
+   1.0987,
+   1.1018,
+   1.0836,
+   1.0544,
+   1.098
+  ],
+  "spread": 0.0475,
+  "note": "a mean does not drift with density by construction; the spread is the normal-estimation noise from keeping half the points, not a scale defect"
+ },
+ "coordinate_reexpression": {
+  "projection_original": 40.91107484012684,
+  "projection_moved": 40.91107484012683,
+  "relative_difference": 1.736798015052829e-16,
+  "verdict": "PASS"
+ },
+ "physical_scale": {
+  "rows": [
+   {
+    "scale": 0.5,
+    "translation_block_mean_eig": 59.2593,
+    "projection_fixed_v": 40.9111
+   },
+   {
+    "scale": 1.0,
+    "translation_block_mean_eig": 59.2593,
+    "projection_fixed_v": 40.9111
+   },
+   {
+    "scale": 2.0,
+    "translation_block_mean_eig": 59.2593,
+    "projection_fixed_v": 40.9111
+   }
+  ],
+  "interpretation": "the translation block is scale-invariant (normals do not see a uniform zoom) while the rotational block grows as s^2; this weak direction is translation-dominated, so its projection does not move with the scene's metric scale. A constant floor on such a direction is therefore an angular-diversity statement, not a distance one"
+ },
+ "direction_selection": {
+  "own_min_6d": 35.7891,
+  "projection_fixed_weak": 40.9111,
+  "note": "the fixed-direction projection and the own-minimum are different quantities; no per-frame own-weak maximum bounds the other (review correction, restated as a control)"
+ }
+}

@@ -1,0 +1,144 @@
+{
+ "run": "fl_native_20261110T033802Z_2974473",
+ "sigma_in_run": 0.12,
+ "rule": {
+  "K_MIN": 20,
+  "M_MIN": 3000,
+  "W": 50,
+  "MIN_SAMPLES": 30,
+  "update": "rolling median, current frame included",
+  "filter": "none"
+ },
+ "first_suspect": {
+  "rel_onset_s": 4.317,
+  "kf": 208,
+  "scale": 11.51587277618863,
+  "nis": 34.16366376764488
+ },
+ "first_quarantine": {
+  "rel_onset_s": 4.383,
+  "kf": 210,
+  "scale": 11.51587277618863,
+  "nis": 24.464689277823805
+ },
+ "unjudged_frames": 57,
+ "window_frames": 196,
+ "window_flagged": 57,
+ "window_coverage": 0.2908,
+ "fault_absorption": {
+  "scale_at_onset": 19.44438196795838,
+  "scale_pre_onset_median": 19.7886,
+  "scale_max_in_window": 987.3306,
+  "scale_median_in_window": 17.4357,
+  "drift_ratio_max_over_pre": 49.894
+ },
+ "scale_trajectory": [
+  {
+   "target_rel_onset_s": -10,
+   "rel_onset_s": -10.021,
+   "scale": 13.4749,
+   "state": "HEALTHY"
+  },
+  {
+   "target_rel_onset_s": -5,
+   "rel_onset_s": -5.019,
+   "scale": 22.0053,
+   "state": "HEALTHY"
+  },
+  {
+   "target_rel_onset_s": -1,
+   "rel_onset_s": -1.026,
+   "scale": 20.5601,
+   "state": "HEALTHY"
+  },
+  {
+   "target_rel_onset_s": 0,
+   "rel_onset_s": -0.027,
+   "scale": 19.5844,
+   "state": "HEALTHY"
+  },
+  {
+   "target_rel_onset_s": 2,
+   "rel_onset_s": 2.035,
+   "scale": 15.2351,
+   "state": "HEALTHY"
+  },
+  {
+   "target_rel_onset_s": 4,
+   "rel_onset_s": 3.982,
+   "scale": 11.5159,
+   "state": "HEALTHY"
+  },
+  {
+   "target_rel_onset_s": 6,
+   "rel_onset_s": 5.984,
+   "scale": 16.3836,
+   "state": "QUARANTINED"
+  },
+  {
+   "target_rel_onset_s": 8,
+   "rel_onset_s": 7.986,
+   "scale": 35.0909,
+   "state": "QUARANTINED"
+  },
+  {
+   "target_rel_onset_s": 10,
+   "rel_onset_s": 10.05,
+   "scale": 831.0656,
+   "state": "HEALTHY"
+  },
+  {
+   "target_rel_onset_s": 12,
+   "rel_onset_s": 12.048,
+   "scale": 958.7945,
+   "state": "HEALTHY"
+  },
+  {
+   "target_rel_onset_s": 14,
+   "rel_onset_s": 13.993,
+   "scale": 869.3408,
+   "state": "HEALTHY"
+  },
+  {
+   "target_rel_onset_s": 16,
+   "rel_onset_s": 16.054,
+   "scale": 8.2983,
+   "state": "HEALTHY"
+  },
+  {
+   "target_rel_onset_s": 18,
+   "rel_onset_s": 18.056,
+   "scale": 3.4937,
+   "state": "HEALTHY"
+  },
+  {
+   "target_rel_onset_s": 20,
+   "rel_onset_s": 19.659,
+   "scale": 2.8341,
+   "state": "QUARANTINED"
+  }
+ ],
+ "coverage_by_third": [
+  {
+   "third": 1,
+   "frames": 66,
+   "flagged": 18,
+   "coverage": 0.2727,
+   "scale_median": 14.8637
+  },
+  {
+   "third": 2,
+   "frames": 66,
+   "flagged": 31,
+   "coverage": 0.4697,
+   "scale_median": 804.5397
+  },
+  {
+   "third": 3,
+   "frames": 64,
+   "flagged": 8,
+   "coverage": 0.125,
+   "scale_median": 5.9963
+  }
+ ]
+}
