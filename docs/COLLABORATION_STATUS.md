@@ -902,9 +902,12 @@ S1 复核 S2 `bec959a`（合入，192 测试；测试已按新语义更新）。
 控制线程只入队并回 `OK <cmd> deferred stamp=…`。增量 diff 203 行、完整 `deployed_host_v3.diff` 1627 行，
 均 `git apply --check` 通过；新库 sha **`9c0330be…`**（本机核对），`fastlivo_mapping` 仍 `0d7e23de…`。
 
-**归因**：在冻结人口、门、重放区间、修复计数全部一致的前提下，地图差（+495 voxels/+6538 points）
-与 resume 后状态差可归因于**测量是否被修正**；`set_state` 几乎相同（同一 ICP 候选）。**仍不声称真实
-修复收益**——损坏是自注入的；也不外推为恢复成功率。门/阈值/σ 未动。
+**归因（按审阅 5e97501 缩小）**：冻结人口、门、重放区间、修复计数与修复云平移一致，但这只是**一对**
+受控对照，不是"其余状态完全相同"：开段 snapshot 本身就有前缀差异（voxels/nodes/points
+15905/33641/308821 vs 15902/33624/308223，`state_pos` 差约毫米），且 resume ack 落在不同后继消费边界。
+因此可声称：**匹配时间支持的全量测量替换在宿主重估中执行，并观测到地图差异**（17811/335054 vs
+17316/328516）；不能把全部 495 voxels/6538 points 与 resume 后状态差断言为唯一由修正造成，也不声称
+正确几何或真实修复收益。损坏为自注入，不外推自然故障或成功率。门/阈值/σ 未动。
 
 **声明常量溯源（如实）**：`REPLAY_END_GRACE_NS = 100 ms` 是在观察到"无 grace 时最后一组修复云匹配
 不上（22/23）"之后加的；它只加在重放终点、两臂一致，不接触门/阈值。
@@ -977,3 +980,21 @@ S1最低native成功依赖与失败公开一致；S2按已派分批流控复用�
 [核验](review_20261112_e82d900/README.md)两run41SHA一致/target driver/新库绑定，按戳snapshot时刻frame同、replay两端124group同、23stamp人口及23全应用接受，旧晚cp/部分应用该范围解除。修复前snapshot地图及state不同，不要求随机逐值一致，但单对不能宣称唯一因素/全部map和resume差归因；质量UNKNOWN。v3仍skip+clear后缀399/372、无catch-up，单事件/detection off、尾帧不是E2，deferred ACK非应用且预置仅首脚本戳。S1成功依赖/真实人口、S2物理一致产物及后缀追赶→接回E2或能力断点优先，S3研究/参数停，非无限单事件A/B。
 
 用户诊断任务ddd0fb7晚于target发布，现main无实现不说开发已无视；S1实际认领共享逐帧取证、S2检测on有限分支/样本复算，native并行不调门。逐项自检状态/实际命令/原件/失败/质量/未知，A/B局部推进不总分。本机1receipt test/control无host/bag，独立review SSH推送、不合main不改算法/private保护，实际接收待回执。
+
+## 86. 接收用户新的 UNAVAILABLE 逐帧取证任务（S1 认领共享诊断）
+
+审阅 `5e97501`/`ddd0fb7` 已合入（`8419cbf`）。新任务 `docs/UNAVAILABLE_DIAGNOSTIC_TASK_20261112.md`：
+用户直接要求弄清 UNAVAILABLE 的**实际分支原因**，逐帧打印两个指标及其计算相关量；不改检测策略/阈值/模型。
+
+S1 认领的部分（共享诊断，默认不改变计算与决定）：
+- 复用现有 `_frame_has_reference_support`（半径 1.0 m / 60% / 200 确定性抽样）与 LiveNis 的计算结果，
+  在**同一次**计算里旁路记录：support 的 sampled/within/fraction/pass、实际抽样索引、点级 body/world 坐标
+  与原始 row 映射；NIS 的 trusted_total、3 m 内参考数、prev_scan 来源与点数、current/train/query 数、
+  sigma、attempted/computed、raw 数值类别（finite/inf/nan/not_computed+reason）、effective NIS 及其
+  source（computed/carried_forward/unavailable）与沿用值的来源/年龄；holdout 的 k=8 邻居、面中心/法向、
+  残差、(r/σ)²、r<2 m、coverage、all/clipped 分支与均值/rms/分位数。
+- 流式写 `availability_frames.jsonl`（每 paired frame 一行），**不受 2000 条 summary 截断**；检测 off 记
+  `DISABLED`，不沿用旧 detector 状态冒充本帧判断；status 必须能由 `support_pass` 与 `nis_present` 重算。
+- 计算与决定不变（开关前后逐值一致的小控制），不新增阈值/置信层，不把相关点当独立样本做显著性。
+
+S2 的部分：在现有宿主/输入与预算内跑**一次检测 on** 的有限诊断，交每帧原件与原因计数；本次实现完成后再派。
