@@ -1,2 +1,2 @@
-ep         boundary_ns           actual_ns status                 cand<=b           latest<=b  delta_s  candidates
- 0 1627785261507921600 1627785264873980928 LATE_AFTER_BOUNDARY          1 1627785261470954240    0.037  1627785261470954240:f2,1627785263142319872:f27,1627785264873980928:f53
+ep         boundary_ns           actual_ns status                 cand<=b           latest<=b  delta_s  cand_bytes frame_gap  candidates
+ 0 1627785261507921600 1627785264873980928 LATE_AFTER_BOUNDARY          1 1627785261470954240    0.037     2036096        51  1627785261470954240:f2,1627785263142319872:f27,1627785264873980928:f53

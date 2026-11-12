@@ -46,7 +46,8 @@ def main(run_dir):
             for a in (s.get("lifecycle") or {}).get("native_checkpoint_actions") or []
             if a.get("ack") and "stamp_ns=" in a.get("ack", "")]
     print(f"{'ep':>2} {'boundary_ns':>19} {'actual_ns':>19} {'status':<22} "
-          f"{'cand<=b':>7} {'latest<=b':>19} {'delta_s':>8}  candidates")
+          f"{'cand<=b':>7} {'latest<=b':>19} {'delta_s':>8} {'cand_bytes':>11} "
+          f"{'frame_gap':>9}  candidates")
     for i, c in enumerate(checks):
         b = c.get("boundary_stamp_ns")
         actual = c.get("actual_stamp_ns")
@@ -57,10 +58,14 @@ def main(run_dir):
         legal = [x for x in cands if b is not None and x["stamp_ns"] <= b]
         latest = max(legal, key=lambda x: x["stamp_ns"]) if legal else None
         delta = (None if latest is None else round((b - latest["stamp_ns"]) / 1e9, 3))
+        cand_bytes = (None if latest is None
+                      else latest.get("points", 0) * 32 + latest.get("voxels", 0) * 96)
+        gap = (None if latest is None or ack is None
+               else ack.get("frame", -1) - latest.get("frame", -1))
         cand_s = ",".join(f"{x['stamp_ns']}:f{x.get('frame', -1)}" for x in cands)
         print(f"{i:>2} {str(b):>19} {str(actual):>19} {c.get('status', ''):<22} "
               f"{len(legal):>7} {str(latest['stamp_ns'] if latest else None):>19} "
-              f"{str(delta):>8}  {cand_s}")
+              f"{str(delta):>8} {str(cand_bytes):>11} {str(gap):>9}  {cand_s}")
 
 
 if __name__ == "__main__":
