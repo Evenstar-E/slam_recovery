@@ -2257,11 +2257,17 @@ def cloud_to_xyz(msg) -> np.ndarray:
     return out[np.isfinite(out).all(axis=1)]
 
 
-def arm_scripted_checkpoints(cp, stamps) -> None:
-    """Queue hold+snapshot at each declared stamp, in stamp order."""
+def arm_scripted_checkpoints(cp, stamps, margin_ns: int = 0) -> None:
+    """Queue hold+snapshot at each declared stamp minus the confirmation margin.
+
+    The manager's quarantine starts at ``estimated_onset - confirmation_margin``, so the checkpoint
+    and the map hold belong at that boundary, not at the trigger itself: frames in the confirmation
+    window are already part of the segment and must not be folded into the trusted map.
+    """
     for stamp in sorted(int(s) for s in stamps):
-        cp.hold(stamp)
-        cp.snapshot_now(stamp)
+        at = int(stamp) - int(margin_ns)
+        cp.hold(at)
+        cp.snapshot_now(at)
 
 
 class RosDriver:
@@ -2467,7 +2473,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         # Every scripted stamp gets its own armed hold/snapshot. The first one was enough while
         # the run had a single event; a second event otherwise falls back to a rolling checkpoint
         # that can be applied after its trigger and roll back only part of the segment.
-        arm_scripted_checkpoints(loop.cp, loop.scripted_trigger_stamps_ns)
+        arm_scripted_checkpoints(loop.cp, loop.scripted_trigger_stamps_ns,
+                                 loop.confirmation_margin_ns)
     driver = RosDriver(loop, args.pose_topic, args.scan_topic, args.status_topic)
 
     started = time.time()

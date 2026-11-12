@@ -321,9 +321,9 @@ class CheckpointWiringTest(unittest.TestCase):
                 self.calls.append(("snapshot", int(stamp)))
 
         rec = _Recorder()
-        arm_scripted_checkpoints(rec, [200, 100])
-        self.assertEqual(rec.calls, [("hold", 100), ("snapshot", 100),
-                                     ("hold", 200), ("snapshot", 200)])
+        arm_scripted_checkpoints(rec, [200, 100], margin_ns=20)
+        self.assertEqual(rec.calls, [("hold", 80), ("snapshot", 80),
+                                     ("hold", 180), ("snapshot", 180)])
 
     def test_a_re_arm_writes_resume(self):
         client = CheckpointClient(self.dir, ack_timeout_s=5.0)
