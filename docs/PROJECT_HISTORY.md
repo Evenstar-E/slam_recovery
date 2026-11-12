@@ -629,3 +629,9 @@ S3上传/同新trace风险UNKNOWN成本，S2一次已有预算真实导出、S1�
 S1报100744Z/101116Z两次host image_transport启动错误/pose0 paired0，同新库691d7334，但失败receipt/host log/部署patch未上传，本机记DEVELOPER_REPORTED/root UNKNOWN。查询进程rospack成功不证明实际host进程环境/依赖，先S2保存fork环境/原件最小解除，不盲第三次重跑但其余15h工作继续。独立正常校准/label另一依赖现在确认，确需超授权/现证据不可得即中文重大阻塞用户选，尚不从二次失败造全面重大阻塞。S3复用T0实现/准备真实同人口评价、S1集成/原生归宿、S2有效导出不新矩阵/模型或手调，1研究+2集成/无Codex，四Cron含截止保持，状态命令原件/人口缺项风险成本自检，review SSH/private保护不合main算法历史冻结门。
 
 本机目标函数最小控制另复现3正常问题：eI只SO3+原translation非SE3 Log，.2rad/.1m应rho(.0996664,-.01,0)而(.1,0,0)同cov评分.05/100.0499；块10/12无11仍跨空窗SUSPECT或NORMAL，显式missing11则UNKNOWN；left/world READY无Pframe绑定但右残差直接用P，旋转pi/2例评分1/正确搬运.01。最低完整Log+已有控制、空块NO_DATA断dwell保历史、cov同扰动frame来源/实际转换或拒不支持。仅阻对应分类结论/真实计分，不否定T0全UNKNOWN或停环境导出，不增阈值/矩阵。源码只读代理误再调用skill fork已披露，主会话亲自复核/实际小控制，不冒归档自测实跑或远端Codex配置。
+
+## 78. 16:37–18:37：部分推进，新增T2时间规则仍须实际扫描身份对应
+
+[两小时总结](MAINLINE_CHECK_20261112_1837.md)绑定18:38 fetch的e0d403b。复用d86受控cp边界实证解除与24研究原件资格核验；自动检测/真实I/完整收益尚未验证，失败trace原件未上传、启动根因UNKNOWN。主要当前工程依赖是实际host启动与有效导出，科学依赖是正常校准/标签和三个已复现数学/缺块问题；没有同版本同人口调参规律能补这些缺项，旧手调继续暂停，不全表重评分。
+
+e0只增加header/end exports及常offset精确join协议，没有真实trace或join caller；header是原消息身份，native更新/分组末时间是不同物理量，偏移非恒定不独自证明身份无法对应、恒定也不证同帧。最低本次导出保实际source scan→group/update/phase关系，同run按原身份关联并核pre/post同一物理时间；缺关系保INCOMPLETE和全部未配对人口，不nearest、不同run贴接或静默删变offset行，不改冻结规则迁就结果。三问题函数未变，不重跑旧控制；本机未见实际错配。S1/S2/S3已认领范围复用，下一单一有效真实I+同新trace完整风险/UNKNOWN人口结果，证据支持后继续有限自动接线；普通修正不停止15h，确需用户选择才中文重大阻塞。四Cron单owner保持、无Codex前置，现review中文SSH提交，只新时间评价限制与整合状态，不算法/ROS/大实验、不合main、不触private/开发日报。
