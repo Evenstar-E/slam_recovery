@@ -10,7 +10,8 @@
   "protocol": "T2_PROTOCOL.md (pre-registered)",
   "block_ns": 500000000,
   "e2_rel_s": 54.0,
-  "i_sign_note": "s_i and |e| are sign-invariant; e_I = -vec6 under the trace header (vec6 = state_propagat - state_ after StateEstimation).",
+  "pose_source_status": "CONFIRMED_POST_POSE_TIME_JOIN",
+  "i_sign_note": "exact e_I uses vec6 and the M2DGR post pose under the host StatesGroup::operator- convention; if M2DGR is not the post pose of the same frame, the exact values are invalid. -vec6 is kept as the small-angle comparison column.",
   "not_done": [
    "no normal reference",
    "no independent labels",
@@ -64,7 +65,9 @@
   "duplicate_groups": 156,
   "scan_first_sentinel_all": true,
   "m2dgr_rows": 975,
-  "m2dgr_time_err_ns_max": 512
+  "m2dgr_time_err_ns_max": 512,
+  "pose_join_mode": "time_with_duplicate_order",
+  "duplicate_time_groups": 156
  },
  "join": {
   "availability_rows": 531,
@@ -133,7 +136,7 @@
   },
   "I_s": {
    "min": 0.0,
-   "median": 73.02134738121339,
+   "median": 70.39192969003082,
    "max": 5953.314894251505
   },
   "I_by_phase": {
@@ -141,15 +144,15 @@
     "n": 818,
     "e_norm_median": 0.018507255635730017,
     "e_norm_max": 1.5449631350283055,
-    "s_median": 69.2880225827814,
+    "s_median": 67.04345368361173,
     "s_max": 5953.314894251505
    },
    "1": {
     "n": 156,
-    "e_norm_median": 0.042502270357160685,
-    "e_norm_max": 0.14510596872925555,
-    "s_median": 911.8667588733604,
-    "s_max": 9808.186515758405
+    "e_norm_median": 0.04250227035716067,
+    "e_norm_max": 0.14510596872925552,
+    "s_median": 869.055870633722,
+    "s_max": 9713.966459863705
    }
   },
   "I_compare": {
@@ -158,11 +161,70 @@
    "e_norm_median_approx": 0.018267771874565623,
    "e_norm_max_exact": 1.5449631350283055,
    "e_norm_max_approx": 1.544963135028306,
-   "s_median_exact": 73.02134738121339,
+   "s_median_exact": 70.39192969003082,
    "s_median_approx": 66.86904947448734,
-   "trans_vector_diff_median": 0.00959039993599696,
+   "trans_vector_diff_median": 0.009368423616879843,
    "trans_vector_diff_max": 2.637508029702121,
    "rows_trans_diff_gt_1pct": 475
+  },
+  "I_quantiles": {
+   "e_norm_exact": {
+    "n": 504,
+    "min": 0.0,
+    "p10": 0.006016523009848154,
+    "p50": 0.01826777187456562,
+    "p90": 0.06074568402584174,
+    "max": 1.5449631350283055
+   },
+   "e_norm_approx": {
+    "n": 504,
+    "min": 0.0,
+    "p10": 0.006016523009848154,
+    "p50": 0.018267771874565623,
+    "p90": 0.06074568402584174,
+    "max": 1.544963135028306
+   },
+   "s_exact": {
+    "n": 504,
+    "min": 0.0,
+    "p10": 4.046647630177653,
+    "p50": 70.39192969003082,
+    "p90": 413.76361054255705,
+    "max": 5953.314894251505
+   },
+   "s_approx": {
+    "n": 504,
+    "min": 0.0,
+    "p10": 3.9144694065301904,
+    "p50": 66.86904947448734,
+    "p90": 411.613525034514,
+    "max": 5937.929410428376
+   },
+   "e_trans_exact": {
+    "n": 504,
+    "min": 0.0,
+    "p10": 0.005082814376124265,
+    "p50": 0.01661578612677014,
+    "p90": 0.053653366209573096,
+    "max": 1.5442400505090186
+   },
+   "e_trans_approx": {
+    "n": 504,
+    "min": 0.0,
+    "p10": 0.005082814376124265,
+    "p50": 0.01661578612677014,
+    "p90": 0.053653366209573096,
+    "max": 1.544240050509019
+   }
+  },
+  "M_T_denominators": {
+   "all": 531,
+   "M_present": 444,
+   "T_present": 86,
+   "both": 0,
+   "neither": 1,
+   "M_pct": 83.61581920903954,
+   "T_pct": 16.195856873822976
   },
   "old_status_by_M_T": {
    "('UNAVAILABLE', False, False)": 1,
@@ -173,14 +235,48 @@
  },
  "states": {
   "by_status_and_tail": {
-   "('UNKNOWN', False)": 480,
-   "('UNKNOWN', True)": 51
+   "('UNKNOWN', False)": 484,
+   "('UNKNOWN', True)": 47
   },
   "blocks": 120,
   "unknown_blocks": 120,
-  "tail_rows": 51,
+  "tail_rows": 47,
   "tail_blocks": 12,
   "span_s": 60.0,
+  "unknown_normal": {
+   "blocks": 108,
+   "duration_s": 54.0,
+   "longest_run": 54.0,
+   "runs": [
+    {
+     "block_first": 3255570522,
+     "block_last": 3255570629,
+     "blocks": 108,
+     "duration_s": 54.0,
+     "rel_start_s": 0.0,
+     "rel_end_s": 54.0,
+     "start_ns": 1627785261000000000,
+     "end_ns": 1627785315000000000
+    }
+   ]
+  },
+  "unknown_post_e2": {
+   "blocks": 12,
+   "duration_s": 6.0,
+   "longest_run": 6.0,
+   "runs": [
+    {
+     "block_first": 3255570630,
+     "block_last": 3255570641,
+     "blocks": 12,
+     "duration_s": 6.0,
+     "rel_start_s": 54.0,
+     "rel_end_s": 60.0,
+     "start_ns": 1627785315000000000,
+     "end_ns": 1627785321000000000
+    }
+   ]
+  },
   "not_evaluable": [
    "NORMAL_CONSISTENT",
    "SUSPECT",
@@ -1265,11 +1361,10 @@
    "block_id": 3255570629,
    "n_frames": 5,
    "phase": 0,
-   "tail": true,
+   "tail": false,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference",
-    "POST_E2_NO_CATCHUP"
+    "CALIBRATION_BLOCKED:no_normal_reference"
    ]
   },
   {
@@ -1353,7 +1448,7 @@
    "block_id": 3255570637,
    "n_frames": 0,
    "phase": "NO_DATA",
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
     "CALIBRATION_BLOCKED:no_normal_reference"
