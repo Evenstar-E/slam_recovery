@@ -2442,3 +2442,23 @@ oracle 是精确的：注入窗内逐行与同戳 clean 帧比对，不同的行
 判定字段（生产者原样）：编排器写 `FILTER_IS_THE_CAUSE (in-window removal)`；**对外不这样表述**——只说「窗内测量选择差异是重要因素，单因素尚未分离」，健康区误删不是原因。四格 2×2（O / O+F / O−B / O+F−B，原始索引、同 prefix/config、窗外同为 actual）已预注册，见里程碑；`FULL_ALIGNMENT_DIAGNOSTIC` 也不得与冻结 healthy-prefix 并表（本序列该协议 ATE 记 `UNAVAILABLE`）。
 
 **2×2 输入侧已建并核验（`b67a804`，`REAL_HOST` 输入，未跑 host）**：original-index 审计 599/599 帧 0 未匹配；四臂窗内行数 O 1,186,220 / O+F 1,187,485 / O−B 1,162,613 / O+F−B 1,163,878；窗外四臂逐字节等于 filtered 包，窗内各臂逐行等于注入包索引行，**O+F−B 逐字节等于 actual filtered 扫描**（`single_factor_bags_verified.json`，599 帧 0 失败）。四格 host 原生重算（每格 2 次）已完成，**重复运行不稳定、未分离因子（n=2 不足以估计分布）**：O 0.072/14.439 m、O+F 593.0/14.9 m、O−B 48.8/19.7 m、O+F−B 554.6/0.301 m（`FULL_ALIGNMENT_DIAGNOSTIC`）；地图 coverage 同向分端（好端 0.9988 / unsupported 0.007，坏端 ≈0.69/0.65；后续对照显示还有中间态，不称"双稳"），且好模式在 O 与 actual 各出现一次，与臂无关。预声明规则判定 `NOT_A_CLEAN_INTERACTION`（交互形态未获支持、重复不稳定；n=2 不足以声称交互不存在或方差统计上压过所有因素）；此前单次运行得出的 `FILTER_IS_THE_CAUSE` 不再复现，降级为未获支持。**口径更正**：预声明误用了诊断 ATE，协议量是冻结前缀 ATE；且旧协议计算漏了 clean→GT 变换。已用 onset 前 clean keyframes 拟合一个冻结 clean→GT（177 匹配，残差 0.091 m）并复合 run→clean→GT：协议读数 O 0.093/26.373、O+F 743.3/26.1、O−B 76.1/33.7、O+F−B 687.5/0.314，与诊断口径一致——同样是 O#1、O+F−B#2 两次好、其余六次坏；两口径都未支持交互形态、重复都不稳定。诊断量/覆盖/unsupported 与旧结果逐位相同。两套独立编写的 builder/audit 给出相同窗内计数。**在宿主方差受控前，不宣布任何单因素或交互结论。** 预注册方差对照（O 与 O+F−B 各再 4 次、只改运行次序）两格均跨模式（O BAD/GOOD/BAD/BAD；O+F−B UNCLEAR/UNCLEAR/BAD/BAD），判定 **`SEQUENCE_UNUSABLE_FOR_SINGLE_RUN`**；合并 n=6 好模式约 O 2/6、O+F−B 1/6（量级）；两次 UNCLEAR 表明是连续分布两端而非二值双稳；本二稳分析 12 个 run 的共同集 323 帧上 mode 序列与 per-run 一致，O+F−B 无 GOOD（不是 GOOD-vs-BAD 跨模式）。**重复首分歧（gauge 对齐后，`POST_HOC_DESCRIPTIVE`）**：用共同健康前缀的单一 SE(3) 对齐后，gauge 残差 0.013–0.015 m，首帧两轨迹差 1.6–2.9 cm。低于 fit 残差的阈值（1 cm）构造上必在首样本触发，不采用；以 5 cm 起报，首个 >5 cm 在 onset 附近（仅 O+F 一次在 −5.95 s，其余 +0.24–0.37 s），>10 cm 在 +0.5–0.8 s，>1 m 在 +15.5–17.9 s。原始"首帧差 1.6 m"主要是坐标系；窗前差异多在 fit 噪声量级，**"初始化已种下分歧"的旧说法撤回**——可辨分歧从 onset 附近开始并在窗内放大，但 n=2 与 post-hoc 不足以断言因果。**确定性控制 T1/T2**：关 OpenMP（`NO_MP=ON`，旧 binary 已备份）后 O 仍分叉（0.309 / 336.75 m，归档 onset 帧对齐差 11.3 mm；独立复算同帧 8.7 mm、首共同帧 15.1 mm）；串行 + `taskset` + `nice` + 低负载（load 52/128）把对齐首帧压到 1.9 mm，仍分叉（0.072 / 17.910 m，归档 1.95 mm；独立复算 3.9 mm / 首共同帧 7.7 mm）。关 S1 或固定调度/负载都不足以稳定结果（不据此排除其贡献）；剩余候选为 5 kHz 墙钟帧分组（S3）与其决定的 IMU 初始化窗口（S4），将拆成两个单因素控制。**T3a（并发唤醒改动，非确定的 measurement grouping）**：`AsyncSpinner(1)` + `wait_for(20 ms)`，但 `det_mtx_` 不是回调 buffer 锁、无 ready predicate，`sync_packages` 仍随到达时序变化，并发路径未核数据竞争；两次 `init_iter` 37/73 也说明消费未相同。只能说该改动未稳定结果，不能称"移除墙钟相位、排除 S3"。其余同 T2；build A 两次 GOOD，同 build B 四次 **BAD/BAD/GOOD/GOOD**，仍跨模式，S3 未确立为种子。exec sha 两轮相同、行为在 `liblaser_mapping.so`，enriched 结果记录了 build 级 library sha；六份 receipt 仍只有 exec sha，今后须从运行时映射取 library hash。T1/T2/T3a 三个单变量控制后方差仍在，room_02 重复运行本身跨模式（好模式约一半，量级），单次因子对比无效，四格 UNKNOWN。下一步做序列适用性检查（同 build 在 hall_01 干净序列 4 次），不是继续排除机制。**序列适用性（hall_01，同 build B）**：四次不注入运行在共同 562 帧上 patch unsupported 0.228/0.279/0.243/0.271（跨度 0.0508）、NN supported 全 1.0；room_02 为 0.007 vs 0.66–0.69（跨度 0.68）。0.10/0.50 阈值在 hall_01 全判 UNCLEAR，稳定性基于原始值而非同一标签。判定 `STABLE_ON_HALL01_ROOM02_IS_SEQUENCE_SPECIFIC`：宿主在 hall_01 稳定，room_02 是序列特异退化，排除单次因子对比；四格 UNKNOWN。只界定现象，不解释根因。**首帧延迟代理为负结果**：16 次中 GOOD 延迟 1.864/4.196/5.462 s、BAD 1.397–3.130 s，无阈值可分（1.864 s 同为一个 GOOD 与两个 BAD 的值）；按时间序先跑的 2×2 批次 2.06–5.46 s、后跑的 bist 批次 1.40–2.33 s，方向与负载直觉相反，不能确认初始化时序假说，需受控环境再验。输入侧门禁已补：窗口按审计的独立声明与 `source` 校验（不是 sidecar 自证），所有流必须同时 EOF，sidecar 的 dtype/负索引/越界/乱序/缺帧与 sha 全部门控；非扫描流（IMU 8,313、图像 884）注入包与 filtered 包逐条一致；窗内 199 帧无重复行，故有序子序列映射是唯一原索引而非多解之一。
+
+## 13.21 原生写回→接回→第二事件的受控整链（2026-11-12，INJECTION + CONTROLLED_INTERFACE_TEST）
+
+本节记录本轮在真实宿主（FAST-LIVO2 LIO 路径）上完成的第一条**同一实例**整链，与 §13.20 的
+`FULL_ALIGNMENT_DIAGNOSTIC` 是不同实验，不可并表。
+
+**链路与断点解除（宿主 v1→v5，逐版见 `docs/review_20261110_native_checkpoint/DEPLOYED_CODE.md` §9）**：
+宿主停写→恢复写图→控制通道串行化→`reprocess <end_stamp>` 终止边界→后缀重推→`replay_suffix>0` 跳过
+`set_state`（避免 3.9 m/15 s 回拨）→每个声明戳武装 hold/snapshot→同一实例两事件。
+
+**终点 run** `two_event_final_20261112`（宿主库 `9e7d8cdf…`、驱动 `b1bce5e` 及其收尾）：事件 1
+Mode 2 accepted（3.1388→7.3001，Wilson .8947），23 条修复云逐帧进入重放（within 124 / suffix 379，
+`repairs applied=23`），无 `set_state`，close→rearm→resume；事件 2 Mode 3 refused（22.064→19.616），
+restore checkpoint 比触发早 67.8 ms，close 316.258→rearm→resume；尾段 39 帧/4.65 s；终态 HEALTHY。
+器件/输入/库/receipt 均归档于 `docs/review_20261112_four_host/two_event_final_20261112/`。
+
+**能声称**：在声明注入（+0.5 m body-z，窗口自触发起 6 s）与受控触发下，修复测量确实替换了宿主重放中的
+原始扫描、修复计数 23/23、地图由重放重建，且同一实例在接回后处理了第二个声明事件并保留了尾段。
+**不能声称**：自然故障下的修复收益、恢复成功率、自动检测链能力（UNAVAILABLE 支持谓词问题仍在，见
+`docs/AVAILABILITY_OPTIONS_20261112.md`）、地图/轨迹质量（无 GT）；门/阈值/σ 全程未改。
