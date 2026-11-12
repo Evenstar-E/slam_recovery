@@ -431,3 +431,14 @@ S3专用研究纠正这个小控制并保留缺candidate/独立质量BLOCKED；S
 | S2 归档 | `792d838`（合入 `10900c9`）：`deployed_host.diff` 对干净 `0d2c034` apply 成功，与本机宿主 `diff -r` **0 个已跟踪文件不同**；`SHA256SUMS` 26/26 OK；二进制/库/配置/launch/bag 与 receipt 逐位一致；157 测试通过 |
 | 新修缺口 | `resume` 原本只跟 `rearm`；Mode 2 完整接纳静默置 `HEALTHY`，宿主 `map_hold_` 不释放。已加 `commit_closed` 事件 + 驱动放写；test-first，全量 **160 通过**。**未在宿主上跑过接纳路径** |
 | 未闭合 | §57 LIO 逐帧耗时原始记录未归档（NOT_ARCHIVED）；在线链仍 BLOCKED 在上游检测；接纳路径需一次真实整链验证 |
+
+## 41. S2 触发锚改为绝对 pose 戳；仍未跑新的宿主运行
+
+以下为 S1 复核实测。
+
+| 项 | 实际状态 |
+|---|---|
+| S2 提交 | `55750fc`（S2 侧合 main 后 `b86b889`；S1 合入 main）：新增 `--scripted-trigger-stamps`（ns，首个 ≥ 戳的帧触发）与 `--confirmation-margin-sec` 透传；触发体抽成 `_trigger_segment_now`，两个锚走同一 manager 入口；receipt 记两种声明与 margin；全量 **161 测试通过** |
+| 动机 | 相对首配帧的秒数随启动/负载漂移约 0.2 s，而相邻扫描的门读数一个 3.14（可接受）、下一个 21.14（拒绝），声明 14.6 s 的两次运行并不测同一件事 |
+| 未做 | **没有新的宿主运行**（巡检时无 fastlivo/rosbag/recovery 进程，无新 receipt）；接纳路径的 `commit_closed→resume` 仍只有单测 |
+| S3 | `exp/gate-method-research@62f294b` 无新提交、工作树干净，待命 |
