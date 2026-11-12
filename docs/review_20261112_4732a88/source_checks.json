@@ -1,0 +1,181 @@
+{
+  "main_target": "4732a881cfcb83dc5c59c9780bff955908364c00",
+  "archive_target": "ffd4b13ce86d03556e389e42236e913d4701cf8d",
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261112_4732a88/source_checks.py",
+  "manifest_source_sha256": "7b60d2d6de0c6bde7400bb2ccd9e1d226a10266c0dc0e62f9d5844e383e05d65",
+  "manifest_controls": [
+    {
+      "name": "valid",
+      "result": {
+        "status": "READY_UNIT_ONLY",
+        "missing": [],
+        "errors": [],
+        "warnings": [
+          "unit_weighted_only:host_mixed_tangent_not_residual_covariance"
+        ]
+      }
+    },
+    {
+      "name": "detection_off",
+      "result": {
+        "status": "INCOMPLETE",
+        "missing": [],
+        "errors": [
+          "detection must be on: detection-off availability has only DISABLED rows"
+        ],
+        "warnings": [
+          "unit_weighted_only:host_mixed_tangent_not_residual_covariance"
+        ]
+      }
+    },
+    {
+      "name": "availability_disabled",
+      "result": {
+        "status": "INCOMPLETE",
+        "missing": [],
+        "errors": [
+          "availability.status_not_disabled must be true"
+        ],
+        "warnings": [
+          "unit_weighted_only:host_mixed_tangent_not_residual_covariance"
+        ]
+      }
+    },
+    {
+      "name": "support_null",
+      "result": {
+        "status": "INCOMPLETE",
+        "missing": [],
+        "errors": [
+          "availability.support_non_null must be true"
+        ],
+        "warnings": [
+          "unit_weighted_only:host_mixed_tangent_not_residual_covariance"
+        ]
+      }
+    }
+  ],
+  "buffered_run": {
+    "run_id": "fl_native_20261112T113855Z_464306",
+    "header_lines": 6,
+    "data_rows": 1208,
+    "columns": [
+      "idx",
+      "rel_s",
+      "abs_ns",
+      "grp_idx",
+      "scan_first_ns",
+      "scan_last_ns",
+      "has_out",
+      "phase",
+      "eff",
+      "r_mean",
+      "r_med",
+      "r_abs_mean",
+      "r_chi2",
+      "r_chi2w"
+    ],
+    "phase_counts": {
+      "0": 886,
+      "1": 322
+    },
+    "has_out_counts": {
+      "0": 121,
+      "1": 1087
+    },
+    "replay_idx_range": [
+      489,
+      810
+    ],
+    "trace_sha256": "55a75615870ac38031287bd132725e0ab1acdb997fa73938195825810920307b",
+    "listed_SHA256SUMS": [
+      {
+        "name": "receipt.json",
+        "recorded": "27b696585f4e38c7b708a4a20c8bcc0860224e4d6d6e6c2b80f3ae81fb834644",
+        "actual": "27b696585f4e38c7b708a4a20c8bcc0860224e4d6d6e6c2b80f3ae81fb834644",
+        "matches": true
+      },
+      {
+        "name": "run_summary.json",
+        "recorded": "8331c5a775f61112565a300eff7852922073b2b408d31f94e5329ef2f827ddb4",
+        "actual": "8331c5a775f61112565a300eff7852922073b2b408d31f94e5329ef2f827ddb4",
+        "matches": true
+      },
+      {
+        "name": "wiring.json",
+        "recorded": "9c131b7327d1eabef8a28edf2f9df4559f5dcbeb9dce09f6825b8eed7e4d8599",
+        "actual": "9c131b7327d1eabef8a28edf2f9df4559f5dcbeb9dce09f6825b8eed7e4d8599",
+        "matches": true
+      },
+      {
+        "name": "launch_pair.sh",
+        "recorded": "f55818410abab2ddb1603cd57e5f7112dec84ad697abbb37c4a3825332d3fc7d",
+        "actual": "f55818410abab2ddb1603cd57e5f7112dec84ad697abbb37c4a3825332d3fc7d",
+        "matches": true
+      },
+      {
+        "name": "SHA256SUMS",
+        "recorded": "4b6627206612b8bba546d5906ff4b152c1aa744a1a634b0a68120497e8f76926",
+        "actual": "ea9d0a328ddddf9416cfdc3f07403a9a3a76efd40222006cab4dda9a305a1cfb",
+        "matches": false
+      }
+    ],
+    "column_counts": {
+      "92": 1207,
+      "44": 1
+    },
+    "incomplete_rows": [
+      {
+        "idx": 1207,
+        "columns": 44,
+        "phase": 0
+      }
+    ]
+  },
+  "host_mixed_state_convention": {
+    "source": "docs/review_20261112_four_host/host_change_trace_cov/include_common_lib.h.v7u",
+    "rotation": "right body increment",
+    "translation": "additive world increment",
+    "raw_covariance_equals_pre_body_SE3_covariance": false,
+    "residual_covariance_source": "NOT_AVAILABLE_without_matched_conversion_and_source"
+  },
+  "startup_probes": [
+    {
+      "name": "probe_v7s_1",
+      "saved_result": "PASS alive 25s",
+      "teardown_stack_smash": true
+    },
+    {
+      "name": "probe_v7s_2",
+      "saved_result": "PASS alive 25s",
+      "teardown_stack_smash": true
+    },
+    {
+      "name": "probe_v7s_3",
+      "saved_result": "PASS alive 25s",
+      "teardown_stack_smash": true
+    },
+    {
+      "name": "probe_v7s_4",
+      "saved_result": "PASS alive 25s",
+      "teardown_stack_smash": true
+    },
+    {
+      "name": "probe_v7s_5",
+      "saved_result": "PASS alive 25s",
+      "teardown_stack_smash": true
+    }
+  ],
+  "final_v7u_source_or_diff_names": [
+    "host_build_v7u.log",
+    "include_common_lib.h.v7u",
+    "probe_v7u_1",
+    "probe_v7u_2",
+    "probe_v7u_3",
+    "probe_v7u_4",
+    "probe_v7u_5",
+    "v7u_sha.txt"
+  ],
+  "full_final_LIVMapper_voxel_source_binding": "NOT_AVAILABLE_in_this_archive; v7 sources only, no full v7u patch",
+  "no_archive_code_ROS_host_bag_parameters": true
+}

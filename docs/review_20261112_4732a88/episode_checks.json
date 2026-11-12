@@ -1,0 +1,299 @@
+{
+  "archive_target": "ffd4b13ce86d03556e389e42236e913d4701cf8d",
+  "runs": [
+    {
+      "run_id": "fl_native_20261112T115203Z_476840",
+      "summary_sha256": "3ff71dd74f6dbad581c872dd317b69b29b0e65116f05c23febc720cc0902e9cb",
+      "detection_enabled": true,
+      "paired": 544,
+      "episode_count": 5,
+      "episodes": [
+        {
+          "index": 0,
+          "trigger_ts_ns": 1627785265674491405,
+          "quarantine_start_ns": 1627785261507921600,
+          "native_checkpoint": {
+            "command": "restore",
+            "wall": 1794484353.486,
+            "received_wall": 1794484353.487339,
+            "received_s": 0.001,
+            "ok": false,
+            "ack": "FAIL restore valid=0 stamp_ns=-1000000000 frame=0 voxels=0 nodes=0 points=0 restores=0 live_voxels=10869 live_points=200811 state_pos=4.778382,2.179893,0.049787 hold=1 held_frames=93 held_points=1535930 hold_commands=1 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=109 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+            "ack_wall": 1794484353.987
+          },
+          "ack_fields": {
+            "stamp_ns": -1000000000,
+            "frame": 0,
+            "repair_applied": 0,
+            "repair_dropped": 0,
+            "replay_within_end": 0,
+            "replay_suffix": 0
+          },
+          "cp_minus_quarantine_start_ns": null,
+          "repair_published": null,
+          "scope": "Actual ACK fields in archived driver summary; no inference all state/cache restored"
+        },
+        {
+          "index": 1,
+          "trigger_ts_ns": 1627785275680882215,
+          "quarantine_start_ns": 1627785271514107132,
+          "native_checkpoint": {
+            "command": "restore",
+            "wall": 1794484364.761,
+            "received_wall": 1794484364.763968,
+            "received_s": 0.003,
+            "ok": true,
+            "ack": "OK restore valid=1 stamp_ns=1627785272199251712 frame=163 voxels=10869 nodes=20640 points=200811 restores=1 live_voxels=10869 live_points=200811 state_pos=4.844274,2.236979,0.051981 hold=1 held_frames=250 held_points=2510580 hold_commands=4 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=262 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+            "ack_wall": 1794484365.262
+          },
+          "ack_fields": {
+            "stamp_ns": 1627785272199251712,
+            "frame": 163,
+            "repair_applied": 0,
+            "repair_dropped": 0,
+            "replay_within_end": 0,
+            "replay_suffix": 0
+          },
+          "cp_minus_quarantine_start_ns": 685144580,
+          "repair_published": null,
+          "scope": "Actual ACK fields in archived driver summary; no inference all state/cache restored"
+        },
+        {
+          "index": 2,
+          "trigger_ts_ns": 1627785286811158657,
+          "quarantine_start_ns": 1627785273781757259,
+          "native_checkpoint": {
+            "command": "restore",
+            "wall": 1794484374.498,
+            "received_wall": 1794484374.498667,
+            "received_s": 0.001,
+            "ok": true,
+            "ack": "OK restore valid=1 stamp_ns=1627785272199251712 frame=163 voxels=10869 nodes=20640 points=200811 restores=2 live_voxels=10869 live_points=200811 state_pos=4.844274,2.236979,0.051981 hold=0 held_frames=287 held_points=2586453 hold_commands=6 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=354 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+            "ack_wall": 1794484374.998
+          },
+          "ack_fields": {
+            "stamp_ns": 1627785272199251712,
+            "frame": 163,
+            "repair_applied": 0,
+            "repair_dropped": 0,
+            "replay_within_end": 0,
+            "replay_suffix": 0
+          },
+          "cp_minus_quarantine_start_ns": -1582505547,
+          "repair_published": null,
+          "scope": "Actual ACK fields in archived driver summary; no inference all state/cache restored"
+        },
+        {
+          "index": 3,
+          "trigger_ts_ns": 1627785298625563860,
+          "quarantine_start_ns": 1627785294625563860,
+          "native_checkpoint": {
+            "command": "restore",
+            "wall": 1794484381.135,
+            "received_wall": 1794484381.138817,
+            "received_s": 0.004,
+            "ok": true,
+            "ack": "OK restore valid=1 stamp_ns=1627785302359221248 frame=552 voxels=117743 nodes=171096 points=906373 restores=3 live_voxels=117743 live_points=906373 state_pos=767.401425,-416.790333,-313.981217 hold=1 held_frames=352 held_points=3648014 hold_commands=9 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=425 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+            "ack_wall": 1794484381.999
+          },
+          "ack_fields": {
+            "stamp_ns": 1627785302359221248,
+            "frame": 552,
+            "repair_applied": 0,
+            "repair_dropped": 0,
+            "replay_within_end": 0,
+            "replay_suffix": 0
+          },
+          "cp_minus_quarantine_start_ns": 7733657388,
+          "repair_published": null,
+          "scope": "Actual ACK fields in archived driver summary; no inference all state/cache restored"
+        },
+        {
+          "index": 4,
+          "trigger_ts_ns": 1627785306371636152,
+          "quarantine_start_ns": 1627785302371636152,
+          "native_checkpoint": {
+            "command": "restore",
+            "wall": 1794484388.144,
+            "received_wall": 1794484388.148897,
+            "received_s": 0.005,
+            "ok": true,
+            "ack": "OK restore valid=1 stamp_ns=1627785302359221248 frame=552 voxels=117743 nodes=171096 points=906373 restores=4 live_voxels=117743 live_points=906373 state_pos=767.401425,-416.790333,-313.981217 hold=1 held_frames=447 held_points=4886154 hold_commands=11 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=495 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+            "ack_wall": 1794484388.998
+          },
+          "ack_fields": {
+            "stamp_ns": 1627785302359221248,
+            "frame": 552,
+            "repair_applied": 0,
+            "repair_dropped": 0,
+            "replay_within_end": 0,
+            "replay_suffix": 0
+          },
+          "cp_minus_quarantine_start_ns": -12414904,
+          "repair_published": null,
+          "scope": "Actual ACK fields in archived driver summary; no inference all state/cache restored"
+        }
+      ]
+    },
+    {
+      "run_id": "fl_native_20261112T115734Z_483777",
+      "summary_sha256": "2c3db8eab7bb3f6324a3e3fd952fdbc14f6225f69ee2838e0783f18cb8620962",
+      "detection_enabled": true,
+      "paired": 532,
+      "episode_count": 7,
+      "episodes": [
+        {
+          "index": 0,
+          "trigger_ts_ns": 1627785265674491405,
+          "quarantine_start_ns": 1627785261507921600,
+          "native_checkpoint": {
+            "command": "restore",
+            "wall": 1794484692.196,
+            "received_wall": 1794484692.199353,
+            "received_s": 0.003,
+            "ok": false,
+            "ack": "FAIL restore valid=0 stamp_ns=-1000000000 frame=0 voxels=0 nodes=0 points=0 restores=0 live_voxels=10869 live_points=200811 state_pos=4.817617,2.223225,0.027650 hold=1 held_frames=95 held_points=1568369 hold_commands=1 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=111 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+            "ack_wall": 1794484692.698
+          },
+          "ack_fields": {
+            "stamp_ns": -1000000000,
+            "frame": 0,
+            "repair_applied": 0,
+            "repair_dropped": 0,
+            "replay_within_end": 0,
+            "replay_suffix": 0
+          },
+          "cp_minus_quarantine_start_ns": null,
+          "repair_published": null,
+          "scope": "Actual ACK fields in archived driver summary; no inference all state/cache restored"
+        },
+        {
+          "index": 1,
+          "trigger_ts_ns": 1627785275680882215,
+          "quarantine_start_ns": 1627785271514107132,
+          "native_checkpoint": {
+            "command": "restore",
+            "wall": 1794484702.471,
+            "received_wall": 1794484702.472695,
+            "received_s": 0.002,
+            "ok": true,
+            "ack": "OK restore valid=1 stamp_ns=1627785272199251712 frame=163 voxels=10869 nodes=20640 points=200811 restores=1 live_voxels=10869 live_points=200811 state_pos=4.845381,2.238124,0.052456 hold=1 held_frames=253 held_points=2467383 hold_commands=4 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=267 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+            "ack_wall": 1794484702.972
+          },
+          "ack_fields": {
+            "stamp_ns": 1627785272199251712,
+            "frame": 163,
+            "repair_applied": 0,
+            "repair_dropped": 0,
+            "replay_within_end": 0,
+            "replay_suffix": 0
+          },
+          "cp_minus_quarantine_start_ns": 685144580,
+          "repair_published": null,
+          "scope": "Actual ACK fields in archived driver summary; no inference all state/cache restored"
+        },
+        {
+          "index": 2,
+          "trigger_ts_ns": 1627785286411345959,
+          "quarantine_start_ns": 1627785273781757259,
+          "native_checkpoint": {
+            "command": "restore",
+            "wall": 1794484707.1,
+            "received_wall": 1794484707.10156,
+            "received_s": 0.002,
+            "ok": true,
+            "ack": "OK restore valid=1 stamp_ns=1627785272199251712 frame=163 voxels=10869 nodes=20640 points=200811 restores=2 live_voxels=10869 live_points=200811 state_pos=4.845381,2.238124,0.052456 hold=0 held_frames=284 held_points=2534149 hold_commands=6 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=314 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+            "ack_wall": 1794484707.471
+          },
+          "ack_fields": {
+            "stamp_ns": 1627785272199251712,
+            "frame": 163,
+            "repair_applied": 0,
+            "repair_dropped": 0,
+            "replay_within_end": 0,
+            "replay_suffix": 0
+          },
+          "cp_minus_quarantine_start_ns": -1582505547,
+          "repair_published": null,
+          "scope": "Actual ACK fields in archived driver summary; no inference all state/cache restored"
+        },
+        {
+          "index": 3,
+          "trigger_ts_ns": 1627785294558965921,
+          "quarantine_start_ns": 1627785282444622421,
+          "native_checkpoint": {
+            "command": "reprocess",
+            "wall": 1794484730.51,
+            "ok": true,
+            "ack": "OK reprocess valid=1 stamp_ns=1627785302359221248 frame=552 voxels=22196 nodes=47653 points=478212 restores=3 live_voxels=40300 live_points=970447 state_pos=9.360870,7.065541,0.090150 hold=1 held_frames=449 held_points=4617891 hold_commands=10 repair_received=42 repair_applied=0 repair_dropped=42 repair_queued=0 multi_scan_groups=0 merged_scans=517 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=311 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+            "ack_wall": 1794484741.755
+          },
+          "ack_fields": {
+            "stamp_ns": 1627785302359221248,
+            "frame": 552,
+            "repair_applied": 0,
+            "repair_dropped": 42,
+            "replay_within_end": 0,
+            "replay_suffix": 311
+          },
+          "cp_minus_quarantine_start_ns": 19914598827,
+          "repair_published": 42,
+          "scope": "Actual ACK fields in archived driver summary; no inference all state/cache restored"
+        },
+        {
+          "index": 4,
+          "trigger_ts_ns": 1627785301625902176,
+          "quarantine_start_ns": 1627785282444622421,
+          "native_checkpoint": {},
+          "ack_fields": {},
+          "cp_minus_quarantine_start_ns": null,
+          "repair_published": null,
+          "scope": "Actual ACK fields in archived driver summary; no inference all state/cache restored"
+        },
+        {
+          "index": 5,
+          "trigger_ts_ns": 1627785303625830173,
+          "quarantine_start_ns": 1627785299259181166,
+          "native_checkpoint": {
+            "command": "restore",
+            "wall": 1794484745.608,
+            "received_wall": 1794484745.611524,
+            "received_s": 0.004,
+            "ok": true,
+            "ack": "OK restore valid=1 stamp_ns=1627785302359221248 frame=552 voxels=22196 nodes=47653 points=478212 restores=4 live_voxels=22196 live_points=478212 state_pos=9.055689,6.565362,0.213817 hold=0 held_frames=455 held_points=4697974 hold_commands=12 repair_received=42 repair_applied=0 repair_dropped=42 repair_queued=0 multi_scan_groups=0 merged_scans=543 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=311 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+            "ack_wall": 1794484746.108
+          },
+          "ack_fields": {
+            "stamp_ns": 1627785302359221248,
+            "frame": 552,
+            "repair_applied": 0,
+            "repair_dropped": 42,
+            "replay_within_end": 0,
+            "replay_suffix": 311
+          },
+          "cp_minus_quarantine_start_ns": 3100040082,
+          "repair_published": null,
+          "scope": "Actual ACK fields in archived driver summary; no inference all state/cache restored"
+        },
+        {
+          "index": 6,
+          "trigger_ts_ns": 1627785317389723063,
+          "quarantine_start_ns": 1627785313389723063,
+          "native_checkpoint": {
+            "command": "restore",
+            "wall": 1794484779.07
+          },
+          "ack_fields": {},
+          "cp_minus_quarantine_start_ns": null,
+          "repair_published": null,
+          "scope": "Actual ACK fields in archived driver summary; no inference all state/cache restored"
+        }
+      ]
+    }
+  ],
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261112_4732a88/episode_reader.py",
+  "first_automatic_refusal_has_no_native_cp_in_both_runs": true,
+  "accepted_run_has_cp_19_914598827_seconds_after_quarantine_start": true,
+  "scripted_and_automatic_mixed_not_pure_autonomous_chain": true,
+  "no_ROS_host_parameter_or_archived_code_execution": true
+}

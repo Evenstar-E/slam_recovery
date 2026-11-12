@@ -657,3 +657,11 @@ ALI-B2记录未变/用户确认空，78de840最低解除意见尚未入target不
 [增量核验](review_20261112_1fd75b3/README.md)固定19:45 fetch的1fd75b3，比较aaf7e28，跳过旧审阅合入。新增仅COLLAB§130–131回报，无新源码/研究实现/四宿主档；old off112254Z与on112753Z同库3b26365f/544paired，但修23 vs修0丢23/spans0、replay244+439 vs0+151，门决定/wiring同不等native不变。buffered on113855Z换49f2f941修23/244+400、实际早E1cp，但phase异常、尾记录范数519.9m及无availability；全部DEVELOPER_REPORTED原件未Git，不当真实I/自动检测或连续正常通过，不位置范数冒ATE/GT。负结果保留，旧三组件修正/关联声明资格未变不重测。
 
 322重复grp_idx/同abs_ns与出现序号只能定位日志行，不能独自证原scan或live/replay阶段；最低现source成员关系+checkpoint/reprocess事件绑定，允许真实多对一/未知phase分母，不nearest/静默删。buffer改后改善但库/cp/span也变，std::endl为候选机制非唯一根因，最低现三run原件对照不新矩阵；首段/replay/后继全人口保留，不以HEALTHY推尾段正常。S2现库带availability有限导出/上传已存原件、S3实际关联/完整资格UNKNOWN与校准标签状态、S1原生归宿仍唯一实交；无用户确认不代选C、不停未阻工作、真需新决定立即中文阻塞。A/B仅回报不验收/不总分，四Cron/noCodex/参数停，中文review SSH/private保护不算法ROS/main历史冻结门。
+
+## 82. 4732a88＋ffd4b13：真实trace归档已到，−1跨度假关联与自动检查点失败可核
+
+[核验](review_20261112_4732a88/README.md)固定主线4732a88、归档分支ffd4b13；关闭原件未上传和旧phase误读：buffered1208行phase1真实322/idx489–810、has_out1087，尾一44列缺项。新on115734实际availability531/kf缺503/computed530，与summary532/531不同；trace1042=1041完整+末53列，live/replay886/156、完整out974，原量真实交付不等I对应资格。全部scan_first=−1，机械531/531涵盖会产生296310候选边/530行多义，有效跨度0，不能组号/范围/出现序号冒source scan/同次update。abs/last256ns量化不原ns；pre/out2082/1948无身份且重戳，不能按行zip。最低现成员/执行关系与同物理pre/post绑定，缺项UNKNOWN，不nearest/补零或换人口规则。
+
+可读最终common_lib混合旋转右body+平移world加性，反证BUILD统一body cov；原vec/P非直接右SE3残差/Sigma，最低真实来源与映射或unit-only，不能改frame字符串冒转换。最终完整v7u LIVMapper/voxel patch未上，清单自hash/host logs未列集中补现来源不为此重跑。v7s5探针原件PASS alive25s但teardown smash保留，不单凭首帧前崩定根因。
+
+新detection-on两run首自动事件restore实际FAIL valid0；on接纳42段cp晚qstart19.914598827s/applied0 dropped42/within0 suffix311，原生具体断点已实证。旧on112753也用E2cp修0/丢23，buffered回E1cp修23但换库，flush/单槽覆盖唯一cause UNKNOWN。S1/S2优先在手事件合法cp/capture绑定→实际修复/明确拒绝→全部后继归宿，不继续trace/参数矩阵追成功；S3真实I资格/完整UNKNOWN与校准标签并行。新协议已知尾结果后删除E2尾段错误率人口，不接受作为预注册完整结果；最低保全部人口/缺测NOT_EVALUABLE、明确偏离与条件子集，尾机制相容非唯一原因/GT标签。ALI-B2用户确认仍空不代选C，未阻工作继续，三组件旧修正复用不重测。A2归档推进但A1/A11关联FAIL、A4/A5/A8/B2自动native范围FAIL，不全表评分/闭环承诺；四Cron/noCodex/参数停、中文review SSH/private保护，不算法ROS/main历史门。
