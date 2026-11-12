@@ -2595,3 +2595,15 @@ S2 `4f205ef`（`exp/growth-run`，已推）。run2 证据（本机核对 `analys
 slam_recovery 恢复接线仍 **NOT_IMPLEMENTED**。首次 FAIL 的原因（900 s 超时 + 全量云录制 + 宿主负载）与代码无关，新门控下一次通过。
 
 四宿主对比表中的 FAST-LIO2 行应据此更新（原生证据由"共享版 PASS"改为"独立版 PASS"）。
+
+## 172. I 资格已分层、eff=0 单列、E2 尾段按本 run 绑定（S3 已核）
+
+S3 `ca384cf`（已合入 main）：
+- **资格分层**（`_meta.i_qualification_layers`）：`RAW_HEADER_CONTAINMENT=PASS`、`SAME_UPDATE_PRE_POST=PASS`、
+  `COMPLETE_POINT_MEMBERSHIP=ASSERTED_NOT_VERIFIED`、`COVARIANCE_6D=NOT_AVAILABLE`；不再把 462 行说成 462 个合格独立观测；
+- **eff=0 单列**（`channels`）：`I_zero_eff_rows=18`、`I_zero_eff_zero_log_rows=18`、`has_out_eff0_rows=37`；保留分母、不剔除，
+  零修正不作 NORMAL 支持；
+- **E2 绑定本 run**：不再硬编码 54 s，从 `quarantine.episode_detail` 读第 2 段（trigger rel **17.0029 s**、deadline 21.0029 s）；
+  输出到约 53 s → **E2 后 64 块 / 30 行尾段（303 行）**，明确只是宿主在回滚地图上继续输出，**不是合法 catch-up**；
+  v7 保留 `e2_basis="legacy_54s_not_run_bound"`（tail 47 行/51 块不变）。
+- v11 其余数值不变：I 462、`|e|` p50 0.03424、单位权 p50 1.1726e-3、106 块/53 s 全 UNKNOWN；分类/误报/漏检 `NOT_EVALUABLE`。
