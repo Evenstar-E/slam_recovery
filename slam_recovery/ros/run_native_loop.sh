@@ -23,6 +23,7 @@ set -uo pipefail
 BAG="${1:-}"; shift || true
 RATE=1.0; DRAIN=20; DURATION=0; MAX_PAIRS=0; CAND_SRC=host_poses; DETECTION=on; SIGMA=0.12
 WAIT_LIMIT="${WAIT_LIMIT:-0}"; SNAP_PERIOD="${SNAP_PERIOD:-2.0}"; SCRIPTED="${SCRIPTED:-}"
+SCRIPTED_STAMPS="${SCRIPTED_STAMPS:-}"; MARGIN="${MARGIN:-2.0}"
 while [ $# -gt 0 ]; do
   case "$1" in
     --rate) RATE="$2"; shift 2 ;;
@@ -34,6 +35,8 @@ while [ $# -gt 0 ]; do
     --sigma-meas-m) SIGMA="$2"; shift 2 ;;
     --wait-limit-sec) WAIT_LIMIT="$2"; shift 2 ;;
     --snapshot-period-sec) SNAP_PERIOD="$2"; shift 2 ;;
+    --confirmation-margin-sec) MARGIN="$2"; shift 2 ;;
+    --scripted-trigger-stamps) SCRIPTED_STAMPS="$2"; shift 2 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
@@ -75,11 +78,13 @@ cleanup() {
 write_receipt() {
   env -u PYTHONPATH /usr/bin/python3 - "$RUN_DIR" "$STATUS" "$REASON" "$TERMINATION" \
       "$BAG" "$RATE" "$DRAIN" "$DURATION" "$MAX_PAIRS" "$CAND_SRC" "$DETECTION" "$SIGMA" \
-      "$BIN" "$CFG" "$CAM" "$PLAY_EXIT" "$PAIR_EXIT" "$REC_EXIT" "$RC_EXIT" "$SCRIPTED" <<'PY'
+      "$BIN" "$CFG" "$CAM" "$PLAY_EXIT" "$PAIR_EXIT" "$REC_EXIT" "$RC_EXIT" "$SCRIPTED" \
+      "$SCRIPTED_STAMPS" "$MARGIN" <<'PY'
 import hashlib, json, os, sys
 
 (rd, status, reason, term, bag, rate, drain, duration, max_pairs, cand_src, detection, sigma,
- binp, cfg, cam, play_x, pair_x, rec_x, rc_x, scripted) = sys.argv[1:]
+ binp, cfg, cam, play_x, pair_x, rec_x, rc_x, scripted, scripted_ns,
+ margin) = sys.argv[1:]
 
 def sha(p):
     if not p or not os.path.exists(p):
@@ -106,7 +111,10 @@ rec = {
                "max_pairs": max_pairs, "candidate_source": cand_src,
                "detection": detection, "sigma_meas_m": sigma,
                "scripted_triggers_s": scripted,
-               "run_mode": ("CONTROLLED_INTERFACE_TEST" if scripted else "ONLINE_DETECTION"),
+               "scripted_triggers_ns": scripted_ns,
+               "confirmation_margin_sec": margin,
+               "run_mode": ("CONTROLLED_INTERFACE_TEST" if (scripted or scripted_ns)
+                            else "ONLINE_DETECTION"),
                "group_model": "host and recovery node are children of one setsid supervisor"},
     "exit_codes": {"play": play_x, "supervisor": pair_x, "recovery_node": rec_x,
                    "roscore": rc_x},
@@ -195,8 +203,10 @@ CPDIR="$RUN_DIR/host_control"
 mkdir -p "$CPDIR"
 REC_ARGS=(--run-dir "$RUN_DIR" --candidate-source "$CAND_SRC" --scan-cap 6000 --detection "$DETECTION" --sigma-meas-m "$SIGMA" --icp-time-budget-sec "${ICP_BUDGET:-0}" --checkpoint-dir "$CPDIR" --checkpoint-period-sec "$SNAP_PERIOD")
 [ "$WAIT_LIMIT" != "0" ] && REC_ARGS+=(--wait-limit-sec "$WAIT_LIMIT")
+REC_ARGS+=(--confirmation-margin-sec "$MARGIN")
 # CONTROLLED_INTERFACE_TEST: the declared trigger times replace the detector for this run.
 [ -n "$SCRIPTED" ] && REC_ARGS+=(--scripted-triggers "$SCRIPTED")
+[ -n "$SCRIPTED_STAMPS" ] && REC_ARGS+=(--scripted-trigger-stamps "$SCRIPTED_STAMPS")
 [ "$DURATION" != "0" ] && REC_ARGS+=(--duration-sec "$DURATION")
 [ "$MAX_PAIRS" != "0" ] && REC_ARGS+=(--max-pairs "$MAX_PAIRS")
 

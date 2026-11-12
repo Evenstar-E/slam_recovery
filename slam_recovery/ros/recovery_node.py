@@ -842,6 +842,9 @@ class NativeClosedLoop:
         # truth label is read; the run is labelled by what kind of trigger it used.
         self.scripted_triggers_s: List[float] = []
         self._scripted_done: List[bool] = []
+        # Absolute pose stamps: the reproducible anchor. See _maybe_scripted_trigger.
+        self.scripted_trigger_stamps_ns: List[int] = []
+        self._scripted_done_ns: List[bool] = []
         self._first_frame_ts_ns: Optional[int] = None
         self.scripted_fired: List[Dict[str, Any]] = []
         self.candidate_source = candidate_source
@@ -998,39 +1001,65 @@ class NativeClosedLoop:
         arguments the node's HEALTHY branch builds, then registers the frame exactly as that branch
         does. It does not consult the detector and it never reads a fault label -- the trigger time
         comes from the test declaration, not from the data.
+
+        Two anchors are supported. Seconds-since-first-frame is convenient but not reproducible to
+        the frame: the first *paired* frame moves with startup and load, and a scan whose weak
+        direction is one frame away can be refused where its neighbour is accepted. Absolute pose
+        stamps (``scripted_trigger_stamps_ns``) make a controlled test reproducible: the trigger
+        fires on the first frame at or after the declared stamp, so the declaration names the same
+        frame every run (as long as that frame is paired at all).
         """
-        if not self.scripted_triggers_s:
+        if not self.scripted_triggers_s and not self.scripted_trigger_stamps_ns:
             return False
         if self._first_frame_ts_ns is None:
             self._first_frame_ts_ns = int(ts_ns)
             self._scripted_done = [False] * len(self.scripted_triggers_s)
+            self._scripted_done_ns = [False] * len(self.scripted_trigger_stamps_ns)
         elapsed_s = (int(ts_ns) - self._first_frame_ts_ns) / 1e9
+        for i, at_ns in enumerate(self.scripted_trigger_stamps_ns):
+            if self._scripted_done_ns[i] or int(ts_ns) < int(at_ns):
+                continue
+            if self.node.tx_mgr.state != RecoveryState.HEALTHY:
+                continue                      # a segment is already open; the stamp has passed
+            self._trigger_segment_now(kf_id, ts_ns, pose, scan_body)
+            self._scripted_done_ns[i] = True
+            self.scripted_fired.append({
+                "declared_ns": int(at_ns), "actual_s": round(elapsed_s, 3),
+                "kf_id": int(kf_id), "ts_ns": int(ts_ns),
+                "basis": "CONTROLLED_INTERFACE_TEST (trigger_quarantine called directly, "
+                         "absolute pose stamp)"})
+            return True
         for i, at_s in enumerate(self.scripted_triggers_s):
             if self._scripted_done[i] or elapsed_s < at_s:
                 continue
             if self.node.tx_mgr.state != RecoveryState.HEALTHY:
                 continue                      # a segment is already open; the time has passed
-            fim_6x6, cov_6x6, _min_r, _min_t, weak = compute_6dof_point_to_plane_fim(
-                scan_body, sigma_meas_m=0.075)
-            self.node.tx_mgr.trigger_quarantine(
-                estimated_onset_ns=int(ts_ns),
-                current_ns=int(ts_ns),
-                weak_direction_6d=np.asarray(weak, dtype=np.float64),
-                info_before_6x6=fim_6x6,
-                propagated_cov_norm=float(np.linalg.norm(cov_6x6, ord=2)),
-                weak_direction_frame=TangentFrame("body", "rot_trans", f"scan:{kf_id}"),
-                info_before_frame=TangentFrame("body", "rot_trans", f"scan:{kf_id}"),
-                anchor_pose_world=np.asarray(pose, dtype=np.float64).copy(),
-            )
-            self.node.tx_mgr.register_quarantined_frame(kf_id, int(ts_ns))
+            self._trigger_segment_now(kf_id, ts_ns, pose, scan_body)
             self._scripted_done[i] = True
-            self._first_alarm_ts_ns = int(ts_ns)
             self.scripted_fired.append({
                 "declared_at_s": float(at_s), "actual_s": round(elapsed_s, 3),
                 "kf_id": int(kf_id), "ts_ns": int(ts_ns),
                 "basis": "CONTROLLED_INTERFACE_TEST (trigger_quarantine called directly)"})
             return True
         return False
+
+    def _trigger_segment_now(self, kf_id: int, ts_ns: int, pose: np.ndarray,
+                             scan_body: np.ndarray) -> None:
+        """The body shared by both trigger anchors: same manager entry, same arguments."""
+        fim_6x6, cov_6x6, _min_r, _min_t, weak = compute_6dof_point_to_plane_fim(
+            scan_body, sigma_meas_m=0.075)
+        self.node.tx_mgr.trigger_quarantine(
+            estimated_onset_ns=int(ts_ns),
+            current_ns=int(ts_ns),
+            weak_direction_6d=np.asarray(weak, dtype=np.float64),
+            info_before_6x6=fim_6x6,
+            propagated_cov_norm=float(np.linalg.norm(cov_6x6, ord=2)),
+            weak_direction_frame=TangentFrame("body", "rot_trans", f"scan:{kf_id}"),
+            info_before_frame=TangentFrame("body", "rot_trans", f"scan:{kf_id}"),
+            anchor_pose_world=np.asarray(pose, dtype=np.float64).copy(),
+        )
+        self.node.tx_mgr.register_quarantined_frame(kf_id, int(ts_ns))
+        self._first_alarm_ts_ns = int(ts_ns)
 
     def _record_diag(self, kf_id: int, ts_ns: int, value: Optional[float], source: str,
                      reference: str, status: str, kfs_before: int, pts_before: int) -> None:
@@ -1477,12 +1506,17 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
         # The label has to describe what actually happened, not what was asked for. A run that
         # declared scripted triggers and fired none is an online run, and saying otherwise would
         # let a detector-driven result be quoted as a controlled one.
-        "run_mode": ("CONTROLLED_INTERFACE_TEST" if (loop.scripted_triggers_s
-                                                    and len(loop.scripted_fired) == len(loop.scripted_triggers_s))
-                     else "CONTROLLED_TRIGGERS_NOT_FIRED" if loop.scripted_triggers_s
-                     else "ONLINE_DETECTION"),
+        "run_mode": (
+            "CONTROLLED_INTERFACE_TEST"
+            if (loop.scripted_triggers_s or loop.scripted_trigger_stamps_ns)
+            and len(loop.scripted_fired) == (len(loop.scripted_triggers_s)
+                                             + len(loop.scripted_trigger_stamps_ns))
+            else "CONTROLLED_TRIGGERS_NOT_FIRED"
+            if (loop.scripted_triggers_s or loop.scripted_trigger_stamps_ns)
+            else "ONLINE_DETECTION"),
         "scripted_triggers": {
             "declared_s": list(loop.scripted_triggers_s),
+            "declared_ns": list(loop.scripted_trigger_stamps_ns),
             "fired": loop.scripted_fired,
             "note": ("the segment was opened by calling trigger_quarantine directly at a declared "
                      "time; no detector output and no fault label was used, so this run says "
@@ -1779,6 +1813,12 @@ def main(argv: Optional[List[str]] = None) -> int:
                     help="CONTROLLED_INTERFACE_TEST only: comma-separated seconds from the first "
                          "frame at which the loop opens a quarantine through trigger_quarantine, "
                          "without the detector. Empty = the detector decides, as in every other run")
+    ap.add_argument("--scripted-trigger-stamps", default="",
+                    help="CONTROLLED_INTERFACE_TEST only: comma-separated absolute pose stamps "
+                         "(ns). Fires on the first frame at or after each stamp. Unlike seconds "
+                         "from the first frame this names the same frame across runs, which a "
+                         "controlled test needs when the gate's answer differs between "
+                         "neighbouring scans")
     ap.add_argument("--checkpoint-dir", default="",
                     help="directory shared with the host's native checkpoint poll; empty = the "
                          "host is not asked to snapshot or restore anything")
@@ -1816,6 +1856,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     if args.scripted_triggers:
         loop.scripted_triggers_s = [float(x) for x in args.scripted_triggers.split(",") if x.strip()]
         loop._scripted_done = [False] * len(loop.scripted_triggers_s)
+    if args.scripted_trigger_stamps:
+        loop.scripted_trigger_stamps_ns = [int(x) for x in args.scripted_trigger_stamps.split(",")
+                                           if x.strip()]
+        loop._scripted_done_ns = [False] * len(loop.scripted_trigger_stamps_ns)
     driver = RosDriver(loop, args.pose_topic, args.scan_topic, args.status_topic)
 
     started = time.time()

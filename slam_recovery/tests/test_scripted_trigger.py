@@ -82,6 +82,18 @@ class ScriptedTriggerTest(unittest.TestCase):
         self.assertEqual(len(self.mgr.calls), 1)
         self.assertEqual(len(self.loop.scripted_fired), 1)
 
+    def test_an_absolute_stamp_names_the_frame_not_the_elapsed_time(self):
+        # Seconds from the first frame move with startup; a stamp does not. The trigger is the
+        # first frame at or after the stamp, so a missing frame shifts it by one, never by the
+        # jitter in which frame was first paired.
+        self.loop.scripted_trigger_stamps_ns = [1_300_000_000]
+        self.assertFalse(self.loop._maybe_scripted_trigger(1, 1_000_000_000, self.pose, self.scan))
+        self.assertFalse(self.loop._maybe_scripted_trigger(2, 1_299_999_999, self.pose, self.scan))
+        self.assertTrue(self.loop._maybe_scripted_trigger(3, 1_300_000_000, self.pose, self.scan))
+        self.assertEqual(len(self.mgr.calls), 1)
+        self.assertEqual(self.loop.scripted_fired[0]["declared_ns"], 1_300_000_000)
+        self.assertEqual(self.loop.scripted_fired[0]["ts_ns"], 1_300_000_000)
+
     def test_the_detector_is_never_asked(self):
         asked = {"n": 0}
 
