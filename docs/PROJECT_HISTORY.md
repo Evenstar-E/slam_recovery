@@ -445,3 +445,11 @@ actual driver/client复用模拟正常partial候选：reprocess未applied就set_
 [核验](review_20261112_bbe916f/README.md)接受outbox保持reprocess→set_state→resume成功ack顺序、received不推进及queued wall发送前None；1项本机test0.010s与actual-node absolute stamp控制PASS，目标Git blob内存加载非旧工作树冒充。首跑缺pytest exit1未装/shim，选定scripted test未跑、实际节点控制替代；无全suite/ROS/bag。普通完整准入控制提供FAIL reprocess后仍flush旧尾set_state x20（修复尾x2）、后可resume，FAIL_REPRODUCED_LOCAL。最低恢复链按applied成功推进、失败未知停依赖、同stamp/准入来源，不新RPC。
 
 开发新报告受控accepted run fl_native_20261112T020634Z_4148249：32commit/71deferred、地图219/0/448、reprocess0、events停hold及收尾double free；引用原件目录在目标树不存在，仅DEVELOPER_REPORTED，不把较早98c“尚无run”继承到后续报告，也不称串行化后原生重跑已核。manager/hostpatch/研究未变，旧close释放新段及晚checkpoint断点保留不重测。A8/A10/B2仅局部解除、A5/A6/B4/B11未闭合，不全表升分；S1/S2下一900s actual修复→原生重估/内部地图→接回/E2尾段或具体首断点，S2并行归档现原件、S3旧范围/参数停。当前remote执行/意见接收UNCONFIRMED，记录仅本地、push拒绝未解除未绕过/private保护。
+
+## 53. 3dec39a：原生重放原件局部通过，最新主线为所有宿主第二事件矩阵（仅本地）
+
+[核验](review_20261112_3dec39a/README.md)两新run原件各25/25哈希一致，解除§52引用目录缺失。串行后022158Z有实际hold→reprocess→set_state→resume/host重放416group/内部地图19194vox、362286点/继续输入；成功原生组件接受，但host_poses/detection off/repair应用0、只一trigger/一decision，没有E2。020634Z重放未执行及double free保留。相同trigger stamp在两run是kf132/140不混编号，candidate deferred53/81与后续关闭unresolved71/100分人口。ack_wall为driver观察非精确apply；旧FAIL依赖/旧尾/段release/晚checkpoint未修不重测。A2/A6/A10原件局部推进，B4/B11未闭合、不全表升分。
+
+**最新真实用户要求（2026-11-12）**：汇总所有宿主第二事件，有记录报结果、无记录报未执行原因，并强调此前要求先跑所有宿主第二事件矩阵。此直接要求优先于旧单宿主选择/不扩多宿主矩阵交接；下一唯一主线改为五宿主第二事件执行矩阵，不拿继续修LIVO或门研究代替。MM-LINS Campus12历史双sleep有记录、ORB Atlas多次原生恢复有log、LIVO受控双拒绝有原件；独立FAST-LIO2/LIO-SAM连续恢复E2未找到，前者无独立工作区只是旧范围选择、后者原因UNKNOWN。历史原生多事件与slam_recovery实际修复分别记账；不要求每宿主先造通用checkpoint，不拿E2=Experiment2或同窗多故障充第二事件。
+
+S1认领矩阵/真实分工，S2复用已有宿主环境和run，逐项实际E1→接回→E2/尾段或首文件函数BLOCKED/NOT_STARTED真实理由，状态+命令/source/input/run/原件；现有预算外安装/适配具体报告，不无限扩实验。S3门旁支/旧参数仍停、冻结门不放宽。原生修复整链首次完成仍立即单报。当前执行/接收UNCONFIRMED；本机无host/bag/算法实验，记录仅本地push拒绝未解除未绕过/private保护。
