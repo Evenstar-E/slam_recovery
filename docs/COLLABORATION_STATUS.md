@@ -2620,3 +2620,12 @@ trigger 17.002940433 s / deadline 21.002940433 s、**303 条尾行（179 条在 
 `join.mode/status` 派生（真实跨度→PASS；机械→`HEURISTIC_UNPROVEN`），v11 不受影响。
 
 **更正 §172 笔误**：v7 尾段是 **47 行（pose≥54 s）/ 12 块 / 51 行块成员**，§172 写成"47 行/51 块"有误；51 是块成员行数不是块数。
+
+## 174. `RAW_HEADER_CONTAINMENT` 已按 join 模式派生；v7 不再自相矛盾
+
+S3 `4796f97`（已合入 main）：`RAW_HEADER_CONTAINMENT` 由 join 模式派生——`true_span_512 → PASS`、
+`mechanical_prev_last → HEURISTIC_UNPROVEN`。本机核对：
+- v11：`RAW_HEADER_CONTAINMENT=PASS` + `join_status=TRUE_SPAN_CONTAINMENT_WITH_512NS_QUANTIZATION` ✔
+- v7：`RAW_HEADER_CONTAINMENT=HEURISTIC_UNPROVEN` + `join_status=HEURISTIC_UNPROVEN` ✔（矛盾消除）
+- `T2_V11_RESULTS` §5 拆三层、事件行补 deadline 前 179/后 303；v7 尾段统一为"47 行 / 12 块 / 51 行块成员"。
+原数字、tail、零约束、完整人口不变。
