@@ -72,3 +72,11 @@ vec6(6) Ppre6x6(36) Ppost6x6(36)
 进程内 `getenv` 跟踪显示：从 OpenCV 初始化起，**所有** ROS 变量（以及 `CMAKE_PREFIX_PATH`）都返回 NULL，而 `environ` 指针未变；
 `OMP_NUM_THREADS=1` 时同一位置变成 SIGSEGV —— 指向早期初始化阶段的内存损坏，不是启动 shell 没 source、也不是 rospack 缓存。
 `mat_pre.txt`/`mat_out.txt` 已被失败的启动 trunc 成 0 字节；最后一次成功 run 的绝对位姿轨迹另存在 `last_good_pose/`。
+
+## 6. 后续修订（2026-11-12 晚，仍属 v7）
+
+- **逐行 `std::endl` → `'\n'` + 每 32 行 flush**：逐行 flush 在 `Log/`（近满网络挂载）上会 stall 宿主，实测导致命令迟到、扫描组 span 丢失、修复 23 条全丢；缓冲后 replay/修复恢复（库 `49f2f941…`）。
+- **新增列**：`grp_idx`（采集时分配、随组复制，跨 replay 唯一）、`scan_first_ns` / `scan_last_ns`（合并扫描跨度两端的 header 戳）；`include/common_lib.h` 的 `LidarMeasureGroup` 增加 `native_group_index`。
+- **`phase` 语义确认**：`replay_mode_`，只在 `reprocessCheckpoint()` 内为 1；实测 1208 行中 322 行 phase=1，恰为重复 grp 的第二次出现（readers 应按列名取，不要按位置）。
+- 最终库 sha：`49f2f941cc0a90357e088d2271f21e60fdeb18c88b5b89a1c6acce5f55e48eda`；构建日志 `host_build_v7u.log`。
+- availability sidecar 在 `--detection off` 下为 `status=DISABLED`、`support=null`；`--detection on` 下才有 support/旧 status（见 `trace_fl_native_20261112T115734Z_483777/`）。
