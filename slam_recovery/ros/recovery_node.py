@@ -1585,44 +1585,68 @@ class NativeClosedLoop:
             # host's next processed frame, which lags the trigger under a playback backlog.
             self.cp.hold()
 
-    def _checkpoint_expectation(self, ep: "Episode") -> Optional[int]:
-        """The stamp this segment's checkpoint should carry, when the driver declared it.
+    def _checkpoint_boundary(self, ep: "Episode") -> Optional[int]:
+        """The latest checkpoint stamp a segment may legitimately roll back to.
 
-        A scripted segment is armed at ``trigger - confirmation margin`` (see ``main``), so the
-        expected stamp is known before the run. An online segment's checkpoint is whichever
-        rolling snapshot the host happened to hold; the driver does not know its stamp, and
-        saying otherwise would invent one.
+        A scripted segment requests its snapshot at ``trigger - confirmation margin``; the host
+        copies the last group processed at that moment, so a correct restore is at or *before*
+        that stamp, never equal to it by construction. An online segment has no requested stamp;
+        the quarantine start is the boundary it must not roll forward past.
         """
         declared = {int(s) for s in (self.scripted_trigger_stamps_ns or [])}
         if int(ep.trigger_ts_ns) in declared:
             return int(ep.trigger_ts_ns) - int(self.confirmation_margin_ns)
-        return None
+        q_start = getattr(ep, "quarantine_start_ns", None)
+        return int(q_start) if q_start is not None else None
 
     def _record_checkpoint_check(self, ep: "Episode", action: dict) -> None:
-        """Record which checkpoint the host actually used, and whether it was the expected one.
+        """Record which checkpoint the host used, once its ack has arrived.
 
         The host has a single checkpoint slot, so a later snapshot can silently replace the one
-        a segment was armed with. A restore or replay that used a different checkpoint is still
-        executed -- this only makes it visible instead of letting it pass as a clean recovery.
+        a segment was armed with. The ack is written after the command is applied; at the moment
+        the command is issued there is nothing to parse yet, so the entry stays ``PENDING_ACK``
+        and is resolved against the same live event dict when the summary is written.
+        """
+        ep._checkpoint_action = action
+        ep.meta["checkpoint_check"] = {
+            "boundary_stamp_ns": self._checkpoint_boundary(ep),
+            "actual_stamp_ns": None,
+            "actual_frame": None,
+            "status": "PENDING_ACK",
+        }
+
+    def _finalize_checkpoint_checks(self) -> None:
+        """Resolve every PENDING_ACK entry from the ack the client finally received.
+
+        ``AT_OR_BEFORE_BOUNDARY`` is the legitimate case: the host copies the last group it had
+        processed, so the stamp is earlier than the requested boundary. A stamp after the
+        boundary means the segment rolled back to a state that already contains the frames it
+        was quarantining, which is what the online run ep0/ep1 did (3.9 s late).
         """
         import re as _re
-        ack = (action or {}).get("ack", "") or ""
-        stamp = _re.search(r"stamp_ns=(-?\d+)", ack)
-        frame = _re.search(r"frame=(\d+)", ack)
-        actual = int(stamp.group(1)) if stamp else None
-        expected = self._checkpoint_expectation(ep)
-        if actual is None or expected is None:
-            status = "EXPECTED_UNKNOWN"
-        elif actual == expected:
-            status = "MATCH"
-        else:
-            status = "MISMATCH"
-        ep.meta["checkpoint_check"] = {
-            "expected_stamp_ns": expected,
-            "actual_stamp_ns": actual,
-            "actual_frame": int(frame.group(1)) if frame else None,
-            "status": status,
-        }
+        for ep in self.episodes:
+            action = getattr(ep, "_checkpoint_action", None)
+            entry = (getattr(ep, "meta", {}) or {}).get("checkpoint_check")
+            if action is None or entry is None:
+                continue
+            ack = action.get("ack", "") or ""
+            stamp = _re.search(r"stamp_ns=(-?\d+)", ack)
+            frame = _re.search(r"frame=(\d+)", ack)
+            actual = int(stamp.group(1)) if stamp else None
+            boundary = entry.get("boundary_stamp_ns")
+            if actual is None:
+                status = "NO_ACK"
+            elif boundary is None:
+                status = "BOUNDARY_UNKNOWN"
+            elif actual <= boundary:
+                status = "AT_OR_BEFORE_BOUNDARY"
+            else:
+                status = "LATE_AFTER_BOUNDARY"
+            entry.update({
+                "actual_stamp_ns": actual,
+                "actual_frame": int(frame.group(1)) if frame else None,
+                "status": status,
+            })
 
     # -- decision -----------------------------------------------------------------------------
     def _repair_gate(self, ep: "Episode", accepted: bool) -> Tuple[bool, Optional[Dict[str, Any]]]:
@@ -2023,6 +2047,9 @@ class NativeClosedLoop:
 # ---------------------------------------------------------------------------------------------
 def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, Any]:
     rows = loop.records
+    # The ack for the last restore/replay may have arrived after the decision copied its
+    # scalars; resolve the per-segment checkpoint checks against the final actions here.
+    loop._finalize_checkpoint_checks()
     gate_accept = sum(1 for r in rows if r["accepted"] is True)
     gate_reject = sum(1 for r in rows if r["accepted"] is False)
     null_counts = {k: sum(1 for r in rows if r[k] is None) for k in CANDIDATE_KEYS}

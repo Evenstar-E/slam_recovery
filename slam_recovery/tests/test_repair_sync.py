@@ -193,40 +193,74 @@ class RepairGateTest(unittest.TestCase):
         self.assertEqual(d["interval_ns"], [d["checkpoint_stamp_ns"], 1_500])
 
     def test_a_restore_on_a_different_checkpoint_is_marked_as_a_mismatch(self):
-        # The host has one checkpoint slot, so an auto-triggered segment can restore to a stamp
-        # another segment armed. The restore still runs; the run summary has to say which stamp
-        # was used, otherwise a rollback to the wrong point reads as a clean recovery.
+        # The host copies the last group it had processed at the requested boundary, so a correct
+        # checkpoint is at or *before* that boundary -- never equal by construction. A stamp after
+        # the boundary is the failure the online run showed (ep0/ep1 rolled back 3.9 s late).
         loop, ep = self._loop(wait_result=True)
         loop.node.evaluate_and_commit_candidate = lambda *a, **k: _Report(
             accepted=False, committed_pose_keys=[], deferred_pose_keys=[])
         loop.scripted_trigger_stamps_ns = [ep.trigger_ts_ns]
-        expected = ep.trigger_ts_ns - loop.confirmation_margin_ns
-        loop.cp.restore_ack = f"OK restore valid=1 stamp_ns={expected} frame=163\n"
+        boundary = ep.trigger_ts_ns - loop.confirmation_margin_ns
+        loop.cp.restore_ack = f"OK restore valid=1 stamp_ns={boundary - 500} frame=163\n"
         loop.decide(1_500, "test")
+        loop._finalize_checkpoint_checks()
         check = ep.meta["checkpoint_check"]
-        self.assertEqual(check["status"], "MATCH")
-        self.assertEqual(check["expected_stamp_ns"], expected)
+        self.assertEqual(check["status"], "AT_OR_BEFORE_BOUNDARY")
+        self.assertEqual(check["boundary_stamp_ns"], boundary)
         self.assertEqual(check["actual_frame"], 163)
 
         loop2, ep2 = self._loop(wait_result=True)
         loop2.node.evaluate_and_commit_candidate = lambda *a, **k: _Report(
             accepted=False, committed_pose_keys=[], deferred_pose_keys=[])
         loop2.scripted_trigger_stamps_ns = [ep2.trigger_ts_ns]
-        loop2.cp.restore_ack = f"OK restore valid=1 stamp_ns={expected + 999} frame=552\n"
+        loop2.cp.restore_ack = f"OK restore valid=1 stamp_ns={boundary + 999} frame=552\n"
         loop2.decide(1_500, "test")
-        self.assertEqual(ep2.meta["checkpoint_check"]["status"], "MISMATCH")
+        loop2._finalize_checkpoint_checks()
+        self.assertEqual(ep2.meta["checkpoint_check"]["status"], "LATE_AFTER_BOUNDARY")
         self.assertEqual(ep2.meta["checkpoint_check"]["actual_frame"], 552)
 
-    def test_an_online_segment_has_no_expected_checkpoint_stamp(self):
+    def test_an_online_segment_uses_the_quarantine_start_as_boundary(self):
+        # An online segment has no requested stamp; the boundary it must not roll forward past is
+        # its own quarantine start.
         loop, ep = self._loop(wait_result=True)
         loop.node.evaluate_and_commit_candidate = lambda *a, **k: _Report(
             accepted=False, committed_pose_keys=[], deferred_pose_keys=[])
         loop.scripted_trigger_stamps_ns = []          # an online trigger, not a declared stamp
+        ep.quarantine_start_ns = 1_000
+        loop.cp.restore_ack = "OK restore valid=1 stamp_ns=900 frame=5\n"
         loop.decide(1_500, "test")
+        loop._finalize_checkpoint_checks()
         check = ep.meta["checkpoint_check"]
-        self.assertEqual(check["status"], "EXPECTED_UNKNOWN")
-        self.assertIsNone(check["expected_stamp_ns"])
-        self.assertIsNotNone(check["actual_stamp_ns"])
+        self.assertEqual(check["status"], "AT_OR_BEFORE_BOUNDARY")
+        self.assertEqual(check["boundary_stamp_ns"], 1_000)
+
+        loop2, ep2 = self._loop(wait_result=True)
+        loop2.node.evaluate_and_commit_candidate = lambda *a, **k: _Report(
+            accepted=False, committed_pose_keys=[], deferred_pose_keys=[])
+        loop2.scripted_trigger_stamps_ns = []
+        ep2.quarantine_start_ns = 1_000
+        loop2.cp.restore_ack = "OK restore valid=1 stamp_ns=3900 frame=9\n"
+        loop2.decide(1_500, "test")
+        loop2._finalize_checkpoint_checks()
+        self.assertEqual(ep2.meta["checkpoint_check"]["status"], "LATE_AFTER_BOUNDARY")
+
+    def test_an_ack_that_arrives_after_the_decision_is_still_recorded(self):
+        # decide() copies nothing at issue time: the ack is written when the host applies the
+        # command, so the entry stays PENDING_ACK and is resolved when the summary is built.
+        loop, ep = self._loop(wait_result=True)
+        loop.node.evaluate_and_commit_candidate = lambda *a, **k: _Report(
+            accepted=False, committed_pose_keys=[], deferred_pose_keys=[])
+        loop.scripted_trigger_stamps_ns = [ep.trigger_ts_ns]
+        action = {"command": "restore", "ack": ""}
+        loop.cp.restore = lambda: action
+        loop.decide(1_500, "test")
+        self.assertEqual(ep.meta["checkpoint_check"]["status"], "PENDING_ACK")
+        boundary = ep.trigger_ts_ns - loop.confirmation_margin_ns
+        action["ack"] = f"OK restore valid=1 stamp_ns={boundary - 100} frame=7\n"
+        loop._finalize_checkpoint_checks()
+        check = ep.meta["checkpoint_check"]
+        self.assertEqual(check["status"], "AT_OR_BEFORE_BOUNDARY")
+        self.assertEqual(check["actual_stamp_ns"], boundary - 100)
 
     def test_a_decision_queued_for_a_closed_segment_is_skipped(self):
         # The wait limit can close a segment before its queued decision runs. Evaluating then
