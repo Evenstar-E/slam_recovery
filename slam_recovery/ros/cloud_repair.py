@@ -64,6 +64,86 @@ def corrupt_if_in_window(msg, stamp_ns: int, start_ns: Optional[int], end_ns: Op
     return msg, False
 
 
+class ReferenceGrid:
+    """Uniform-cell nearest-neighbour lookup over a reference point cloud.
+
+    scipy is not available in the interpreter the ROS node runs under, and the reference is a few
+    thousand points, so a dict of cells is enough: a query looks in its own cell and the 26
+    neighbours (1.5 m reach at 0.5 m cells) and takes the closest point. Points with no reference
+    inside the reach are reported as +inf and excluded from the cost.
+    """
+
+    def __init__(self, points, cell_m: float = 0.5):
+        self.cell = float(cell_m)
+        pts = np.asarray(points, dtype=np.float64)[:, :3]
+        self.cells = {}
+        if len(pts) == 0:
+            return
+        keys = np.floor(pts / self.cell).astype(np.int64)
+        for k, p in zip(map(tuple, keys), pts):
+            self.cells.setdefault(k, []).append(p)
+        self.cells = {k: np.asarray(v) for k, v in self.cells.items()}
+
+    def nearest_distances(self, queries, reach: int = 1):
+        out = np.full(len(queries), np.inf)
+        if not self.cells:
+            return out
+        for i, q in enumerate(np.asarray(queries, dtype=np.float64)):
+            base = np.floor(q / self.cell).astype(np.int64)
+            best = np.inf
+            for dx in range(-reach, reach + 1):
+                for dy in range(-reach, reach + 1):
+                    for dz in range(-reach, reach + 1):
+                        arr = self.cells.get((int(base[0] + dx), int(base[1] + dy),
+                                              int(base[2] + dz)))
+                        if arr is None:
+                            continue
+                        d = float(np.min(np.linalg.norm(arr - q, axis=1)))
+                        if d < best:
+                            best = d
+            out[i] = best
+        return out
+
+
+def estimate_body_z_bias(scan_body, pose, grid: ReferenceGrid, z_min: float = -0.6,
+                         z_max: float = 1.4, step: float = 0.05, n_samples: int = 80,
+                         min_valid: int = 20):
+    """One-dimensional search for the body-z shift that best fits the reference map.
+
+    The scan is placed with the *incumbent* pose (independent of the host pose that absorbed the
+    bias) and shifted by `-b` along body z; the cost is the median nearest-reference distance.
+    Returns (bias, curve, n_valid). `bias` is the injected corruption, i.e. the value to subtract
+    from the cloud; a +0.5 body-z corruption gives +0.5 here.
+
+    The reference has no normals in this repository's live path, so the cost is point-to-nearest
+    rather than point-to-plane. That is the same direction of information (the scan is displaced
+    along z relative to the map) and does not assume a local plane fit the driver cannot build
+    without scipy.
+    """
+    pts = np.asarray(scan_body, dtype=np.float64)[:, :3]
+    if len(pts) == 0:
+        return 0.0, [], 0
+    if len(pts) > n_samples:
+        idx = np.linspace(0, len(pts) - 1, n_samples).astype(int)
+        pts = pts[idx]
+    R = np.asarray(pose, dtype=np.float64)[:3, :3]
+    t = np.asarray(pose, dtype=np.float64)[:3, 3]
+    best_b, best_cost, n_best = 0.0, float("inf"), 0
+    curve = []
+    for b in np.arange(z_min, z_max + 1e-9, step):
+        shifted = pts.copy()
+        shifted[:, 2] -= b
+        q = shifted @ R.T + t
+        d = grid.nearest_distances(q)
+        valid = np.isfinite(d)
+        n_valid = int(valid.sum())
+        cost = float(np.median(d[valid])) if n_valid else float("inf")
+        curve.append((float(b), cost, n_valid))
+        if n_valid >= min_valid and cost < best_cost:
+            best_b, best_cost, n_best = float(b), cost, n_valid
+    return best_b, curve, n_best
+
+
 def body_z_bias(frames, delta: np.ndarray) -> Tuple[float, int]:
     """Body-frame z component of a world-frame correction, one value per frame.
 
