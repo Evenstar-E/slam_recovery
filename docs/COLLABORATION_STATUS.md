@@ -524,3 +524,9 @@ S2先已有actual hostsource/cmd读取应用ack日志核具体断点；旧公开
 S1/S2最低解除真实single-in-flight/applied依赖、旧close不得release新active、checkpoint不晚于可信隔离边界。70新fullcommit event两testPASS0.007s但本机目标blob控制复现：reprocess/set_state旧尾→未applied再resume覆盖；实际manager串行旧close→新trigger/hold→旧resume释放新段。两反例FAIL非部署接纳实测，不扩RPC/锁/异常矩阵。下一900s预算actual测量修复→原生状态重估/内部地图→接回/E2尾段或具体宿主首断点，逐项PASS/FAIL/BLOCKED/NOT_APPLICABLE+实际命令原件；成功首次及时单报，不等研究。
 
 S3旁支接受62f294对fixed/own与坐标/精度控制的有限纠正，A/B旧逻辑/人口缺口未动；集中修既有缺口/小数值叙述，不开大矩阵、不自动生产部署，旧参数继续停。A/B仅行ID局部变化不新全表评分，远端当前执行/本地意见接收UNCONFIRMED。20min8e05b042、2ha249a2ce、daily7f3f33f6属本会话，旧5min已取消；无双写。记录仅本地、push拒绝未解除不重试/绕过，private保护、不改算法、不合main。
+
+## 54. repair-f3核bbe916f：串行成功局部解除，失败依赖仍需最低修（仅本地）
+
+[核验](review_20261112_bbe916f/README.md)本机目标blob支持outbox成功reprocess→set_state→resume与received不推进，1test0.010s/actual节点absolute stamp控制PASS；pytest缺失导致首跑exit1已记录，未安装/shim、未跑全suite/native。正常准入FAIL reprocess仍自动发旧尾set_state x20（修复x2）及后续resume，FAIL_REPRODUCED_LOCAL；S1/S2最低按applied成功推进依赖、失败未知不放写、实际准入同stamp状态来源。旧段release/晚trusted checkpoint未变不重测，不扩RPC/防御矩阵。
+
+新文档报告accepted run fl_native_20261112T020634Z_4148249有门准入/partial与放写，但reprocess未执行、记账卡头、收尾double free；目标缺所引原件目录，只DEVELOPER_REPORTED，串行化后run未独立确认。S2并行归档现原件保留负结果，S1/S2下一唯一900s actual修复→原生重估/内部地图→接回/E2尾段或具体首断点；逐项PASS/FAIL/BLOCKED/NOT_APPLICABLE+实际命令原件。S3研究无新增/旧范围纠正/参数仍停，不等其收口、不全表升分。三既有Cron单owner无复制，当前remote执行/意见接收UNCONFIRMED；仅本地提交、push拒绝未解除不重试/绕过、private保护。

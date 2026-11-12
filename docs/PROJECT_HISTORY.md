@@ -439,3 +439,9 @@ actual driver/client复用模拟正常partial候选：reprocess未applied就set_
 70新commit_closed局部两test本机PASS0.007s；明确从目标Git blob内存加载，工作树仍3058200。actual driver/client模拟full准入仍先reprocess/set_state写旧尾x20（修复尾x2），下一service未applied再resume覆盖，pending三项、OK resume卡FIFO头；实际manager串行close→新trigger/hold→旧close/resume释放新active，两个正常反例FAIL_REPRODUCED_LOCAL。新原件E2恢复stamp1627785304425766144比隔离起点1627785301425840378晚约3s、比trigger晚约1s，OK restore不能证待隔离贡献撤净。最低现通道applied依赖/single-in-flight、段归属release、可信时刻checkpoint；不扩RPC/异常矩阵。
 
 62f294研究9文件真正纠正fixed/own、旋转/平移控制及精度解释，A/B旧基线/输入缺口原样；小文档数值纠正旁支延期，旧参数停、门不自动部署。A2/A4/A6/A9/A10局部证据推进，A8/B2与B4/B11未闭合，不全表升分。S1/S2下一唯一actual修复→原生重估/内部地图→接回/E2尾段或900s具体首断点，自检逐项状态/命令/原件；本机无ROS/bag/算法实验，当前remote执行/接收UNCONFIRMED。记录仅本地，push拒绝未解除不重试不绕过、private保护。
+
+## 52. bbe916f：成功分支命令串行化局部通过，FAIL重放仍推进旧尾写回（仅本地）
+
+[核验](review_20261112_bbe916f/README.md)接受outbox保持reprocess→set_state→resume成功ack顺序、received不推进及queued wall发送前None；1项本机test0.010s与actual-node absolute stamp控制PASS，目标Git blob内存加载非旧工作树冒充。首跑缺pytest exit1未装/shim，选定scripted test未跑、实际节点控制替代；无全suite/ROS/bag。普通完整准入控制提供FAIL reprocess后仍flush旧尾set_state x20（修复尾x2）、后可resume，FAIL_REPRODUCED_LOCAL。最低恢复链按applied成功推进、失败未知停依赖、同stamp/准入来源，不新RPC。
+
+开发新报告受控accepted run fl_native_20261112T020634Z_4148249：32commit/71deferred、地图219/0/448、reprocess0、events停hold及收尾double free；引用原件目录在目标树不存在，仅DEVELOPER_REPORTED，不把较早98c“尚无run”继承到后续报告，也不称串行化后原生重跑已核。manager/hostpatch/研究未变，旧close释放新段及晚checkpoint断点保留不重测。A8/A10/B2仅局部解除、A5/A6/B4/B11未闭合，不全表升分；S1/S2下一900s actual修复→原生重估/内部地图→接回/E2尾段或具体首断点，S2并行归档现原件、S3旧范围/参数停。当前remote执行/意见接收UNCONFIRMED，记录仅本地、push拒绝未解除未绕过/private保护。

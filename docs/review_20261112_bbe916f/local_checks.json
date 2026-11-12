@@ -1,0 +1,64 @@
+{
+  "target": "bbe916f948d7d8652783757844b0294592bf7c46",
+  "comparison_base": "70f68fbc3450569677659e8220d34fa2e3abaa4b",
+  "worktree_head": "6f3971a82528c754bbf3b2b5a556e3bcd971f07e",
+  "loaded_sources": {
+    "slam_recovery/quarantine/manager.py": {
+      "git_blob": "8c8e6e12f5ef29c64bca339858e3f709cca3a6b5",
+      "sha256": "6a6ddf4324065de72693e39fcca86784b455ae8f353fa4a2f4cc5c06a262d583"
+    },
+    "slam_recovery/ros/recovery_node.py": {
+      "git_blob": "aed58debb07723e64909e25a03097c4a0d4df101",
+      "sha256": "18d92a032835dbfaff8593987bca9c6d5928882d33da876cb1549970646ea225"
+    },
+    "slam_recovery/tests/test_checkpoint_client.py": {
+      "git_blob": "4ede040e02a11d24ccbfdf5039cf7cb1ce1f9b95",
+      "sha256": "bb54e920a860f0e4c7abe3f8e4e6460bf5afc35aaa02f2c9253dd2a8393f8c0d"
+    }
+  },
+  "source_loading": "Target Git blobs in memory; other package dependencies unchanged",
+  "command": "python -B -W ignore docs/review_20261112_bbe916f/run_checks.py",
+  "exit": 0,
+  "selected_tests": {
+    "status": "PASS_LOCAL",
+    "count": 1
+  },
+  "absolute_trigger_control": {
+    "status": "PASS_LOCAL",
+    "declared_ns": 1300000000,
+    "actual_ns": 1300000000,
+    "scope": "Actual target trigger and actual transaction node, no detector/host/bag"
+  },
+  "skipped_scripted_test": "BLOCKED_LOCAL_pytest_dependency; actual-node control used instead, no installation/shim",
+  "serialized_success": {
+    "status": "PASS_LOCAL",
+    "physical_command_order": [
+      "reprocess",
+      "set_state",
+      "resume"
+    ],
+    "received_alone_does_not_advance": true,
+    "queued_wall_unset_until_sent": true,
+    "scope": "Actual target client with controlled file acknowledgements, no native host"
+  },
+  "failed_reprocess_dependency": {
+    "status": "FAIL_REPRODUCED_LOCAL",
+    "initial_cmd_preserved": "reprocess",
+    "before_fail_outbox": [
+      "set_state",
+      "resume"
+    ],
+    "reprocess_ack": "FAIL reprocess replay_failed",
+    "command_after_fail": "set_state",
+    "state_payload_x": 20.0,
+    "trusted_repaired_tail_x": 2.0,
+    "command_after_set_state_ack": "resume",
+    "scope": "Actual target driver/client, simulated full gate report; no deployed accepted run"
+  },
+  "reported_accepted_run_archive": {
+    "status": "UNAVAILABLE_IN_TARGET",
+    "path": "docs/review_20261112_accepted_chain"
+  },
+  "actual_measurement_repair_native_two_event": "NOT_VERIFIED",
+  "publication": "LOCAL_ONLY_PRIOR_PUSH_DENIAL_NOT_RETRIED"
+}
