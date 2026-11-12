@@ -882,3 +882,29 @@ S1 复核 S2 `56a73d1`（合入，191 测试）。
 执行；驱动在启动阶段按脚本触发戳预排 `hold <stamp>` 与 `snapshot <stamp>`，撤掉开段 snapshot。
 这样 checkpoint 与捕获起点都钉在触发帧，`reprocess <frozen_at_ns>` 钉终点；随后 repair/sham 一对应两端逐位一致。
 门/阈值/σ 不动；损坏自注入，不声称真实修复收益。
+
+## 76. 干净 A/B 达成：重放区间两端逐位一致，唯一差别是测量是否被修正
+
+S1 复核 S2 `bec959a`（合入，192 测试；测试已按新语义更新）。
+
+| 项 | repair | sham |
+|---|---|---|
+| 开段 snapshot（声明戳武装） | stamp `1627785276215170048`、frame 221 | **同一 stamp、同一 frame** |
+| 重放区间 | [1627785276.281966925 .. 1627785280.347787857]，`replayed=124` | **逐位相同**，`replayed=124` |
+| `end_stamp` | `1627785280381185627` | 相同 |
+| 修复 | 发布 23（10/10/3, synced），`repairs applied=23 leftover=0`，shift −0.40 | 发布 23，`applied=23 leftover=0`，shift 0 |
+| 偏差估计 | +0.40（MAD 0.05） | +0.40（MAD 0.05） |
+| 门 | accepted 3.1388→7.2960，Wilson .8947，23 committed | accepted →7.2986，Wilson .8947，23 |
+| `set_state` | 差约 1.1 cm | — |
+| 重放后地图 | **17811 voxels / 335054 points** | **17316 / 328516** |
+
+宿主改动（本轮唯一）：`hold`/`snapshot` 可带应用戳，主循环在第一个 `lio_time ≥ 戳` 的组处理前执行；
+控制线程只入队并回 `OK <cmd> deferred stamp=…`。增量 diff 203 行、完整 `deployed_host_v3.diff` 1627 行，
+均 `git apply --check` 通过；新库 sha **`9c0330be…`**（本机核对），`fastlivo_mapping` 仍 `0d7e23de…`。
+
+**归因**：在冻结人口、门、重放区间、修复计数全部一致的前提下，地图差（+495 voxels/+6538 points）
+与 resume 后状态差可归因于**测量是否被修正**；`set_state` 几乎相同（同一 ICP 候选）。**仍不声称真实
+修复收益**——损坏是自注入的；也不外推为恢复成功率。门/阈值/σ 未动。
+
+**声明常量溯源（如实）**：`REPLAY_END_GRACE_NS = 100 ms` 是在观察到"无 grace 时最后一组修复云匹配
+不上（22/23）"之后加的；它只加在重放终点、两臂一致，不接触门/阈值。
