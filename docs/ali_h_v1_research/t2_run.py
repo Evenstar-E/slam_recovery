@@ -461,6 +461,7 @@ def main(argv=None):
             "pose_join_mode": "time_with_duplicate_order", "duplicate_time_groups": ambiguous_groups,
         },
         "join": {
+            "status": "HEURISTIC_UNPROVEN",
             "availability_rows": len(av), "mapped": len(mapped) - len(unmapped),
             "unmapped": len(unmapped), "exact_equality": exact,
             "trace_rows_per_group": dict(map_counts),
