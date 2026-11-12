@@ -1,0 +1,58 @@
+{
+ "checks": {
+  "both_topics_received": {
+   "pose_messages": 606,
+   "scan_messages": 598,
+   "ok": true
+  },
+  "pairing": {
+   "paired": 402,
+   "fraction_of_poses": 0.6633663366336634,
+   "fraction_of_scans": 0.6722408026755853,
+   "max_abs_dt_ns": 39959192,
+   "ok": true
+  },
+  "nis_provenance": {
+   "computed": 401,
+   "carried_forward": 0,
+   "unavailable": 1,
+   "reference_node_map": 123,
+   "reference_prev_scan": 278,
+   "fed_to_step_frame": 95,
+   "ingested_without_detection": 307,
+   "detection_status": {
+    "AVAILABLE": 95,
+    "UNAVAILABLE": 307,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "ok": true
+  },
+  "gate_reachable": {
+   "episodes": 3,
+   "decisions": 3,
+   "accepted": 0,
+   "rejected": 3,
+   "errored": 0,
+   "incumbent_basis": [
+    "CONSTANT_VELOCITY",
+    "CONSTANT_VELOCITY",
+    "CONSTANT_VELOCITY"
+   ],
+   "evidence_reasons": [
+    "passed_wilson_sequential_benefit_and_boundary_continuity",
+    "passed_wilson_sequential_benefit_and_boundary_continuity",
+    "passed_wilson_sequential_benefit_and_boundary_continuity"
+   ],
+   "status": "APPLICABLE",
+   "ok": true
+  },
+  "same_process_group": {
+   "recovery_pid": 189077,
+   "host_pid": 189076,
+   "recovery_pgid": 189074,
+   "host_pgid": 189074,
+   "ok": true
+  }
+ },
+ "all_ok": true
+}
