@@ -1,0 +1,39 @@
+{
+  "main": "23e019bf7f9ac4bab71db9e50a009db704ffb952",
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261113_23e019b/consumer_checks.py",
+  "header": "# idx rel_s abs_ns grp_idx scan_first_ns scan_last_ns n_scans has_out phase eff r_mean r_med r_abs_mean r_chi2 r_chi2w vec6 Ppre6x6 Ppost6x6 pose7 pre_pose7",
+  "header_origin": "Fixed a812302 run header reported by independent archive reader; archive_checks.json retains header and trace SHA",
+  "field_layout": "15+6+36+36+7+7=107; Ppost6x6 followed by two block names, not 14 scalar field names",
+  "current_reader_expected_width_for_header": [
+    93,
+    95
+  ],
+  "actual_declared_width": 107,
+  "controls": [
+    {
+      "parser": "t2_run.py",
+      "sha256": "b483fd30600b4ab1cc0b306a4a941045b254ddda81158c42b184fac3a3ecdef1",
+      "parsed_rows": 0,
+      "malformed": [
+        {
+          "line": 2,
+          "ncols": 107
+        }
+      ],
+      "status": "FAIL_REPRODUCED_BLOCK_HEADER_107"
+    },
+    {
+      "parser": "t2_join_upgrade.py",
+      "sha256": "3f2abd74850c7cf9fa55ebca0cbabb8383a46cc2ae1ea5482efbd71ee99995d3",
+      "parsed_rows": 0,
+      "malformed": [
+        {
+          "line": 2,
+          "ncols": 107
+        }
+      ],
+      "status": "FAIL_REPRODUCED_BLOCK_HEADER_107"
+    }
+  ],
+  "no_archived_CLI_or_host_execution": true
+}

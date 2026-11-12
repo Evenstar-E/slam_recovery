@@ -1,0 +1,1195 @@
+{
+  "sha": "a812302e3a9acd17b1e6f318d332b88563910069",
+  "v11_source_sha": "c5bc05763b553ebc7d5adc585ba8e84013e9fb6c",
+  "main_claim_sha": "23e019bf7f9ac4bab71db9e50a009db704ffb952",
+  "run": "docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/",
+  "scope": "only original blobs; no archive code executed",
+  "receipt_inputs": {
+    "bag": "/tmp/fastlivo/hall01_two_event_v1.bag",
+    "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+    "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+    "host_binary_sha256": "6dd7195390bb1bb34f8e154ca8bd6029376d505b563f81ad4abdd10b5fb9f08b",
+    "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+    "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+    "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+    "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+    "recovery_node_source": "c5efdd733cdcf65fadc4fc28fd1f509ad9ccd2e87a644b9d38165a80554cc830",
+    "runtime_library": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+    "runtime_library_sha256": "81b35f9243e0c44f69233b8a08285323012026c6a0f7610aa4df655e2a511055"
+  },
+  "receipt_launch": {
+    "rate": "1.0",
+    "drain_s": "40",
+    "duration_s": "0",
+    "max_pairs": "0",
+    "candidate_source": "icp_reregistration",
+    "detection": "on",
+    "sigma_meas_m": "0.884",
+    "scripted_triggers_s": "",
+    "scripted_triggers_ns": "",
+    "confirmation_margin_sec": "4.0",
+    "relay_shift_z": "0.5",
+    "relay_start_ns": "1627785276215170145",
+    "relay_end_ns": "1627785282215170145",
+    "injection": "INJECTION_DECLARED_Z_BIAS",
+    "repair_publish": "1",
+    "run_mode": "ONLINE_DETECTION",
+    "group_model": "host and recovery node are children of one setsid supervisor"
+  },
+  "termination": "PLANNED_KILL_AFTER_DRAIN",
+  "exit_codes": {
+    "play": "0",
+    "supervisor": "null",
+    "recovery_node": "0",
+    "roscore": "null"
+  },
+  "manifest_checks": [
+    {
+      "path": "./receipt.json",
+      "matches": true,
+      "expected": "8529773b1de68accf61b8a7061cef5b4af4eb645f7ea8709062fe8d35866e5aa",
+      "actual": "8529773b1de68accf61b8a7061cef5b4af4eb645f7ea8709062fe8d35866e5aa"
+    },
+    {
+      "path": "./run_summary.json",
+      "matches": true,
+      "expected": "f3b7b71b2f2508398921f3e54386d8e94faad1effce3287aeda5b7d13e596ac6",
+      "actual": "f3b7b71b2f2508398921f3e54386d8e94faad1effce3287aeda5b7d13e596ac6"
+    },
+    {
+      "path": "./wiring.json",
+      "matches": true,
+      "expected": "d94520439e4edf3c279c7890f8f50015e5bed9cf469d2effe9cac1a195081021",
+      "actual": "d94520439e4edf3c279c7890f8f50015e5bed9cf469d2effe9cac1a195081021"
+    },
+    {
+      "path": "./launch_pair.sh",
+      "matches": true,
+      "expected": "b321d06354dd1d20250ab3e3b090c300d3312ed28535087146b7033cefb07c29",
+      "actual": "b321d06354dd1d20250ab3e3b090c300d3312ed28535087146b7033cefb07c29"
+    },
+    {
+      "path": "./SHA256SUMS",
+      "matches": false,
+      "expected": "7ee0ebbec9725e976e4b7a12fce5d4c3c52c98ce1c090bd3bd04beff5c119ee6",
+      "actual": "87e1049745a68a4f98210856b3b29967d8f7d78a1e2fe3532fdfe4eefcc922dc"
+    },
+    {
+      "path": "./availability_frames.jsonl.gz",
+      "matches": true,
+      "expected": "36d11af7d8b8cd486c1dc16fc1371e123f8690275252003698036da99e85b633",
+      "actual": "36d11af7d8b8cd486c1dc16fc1371e123f8690275252003698036da99e85b633"
+    }
+  ],
+  "recovery_source_matches_receipt": true,
+  "sources": {
+    "src_LIVMapper.cpp": {
+      "same": false,
+      "diff": "--- v11\n+++ v12\n@@ -358,6 +358,10 @@\n   fout_out.open(DEBUG_FILE_DIR(\"mat_out.txt\"), std::ios::out);\n   g_lio_pre.open(DEBUG_FILE_DIR(\"mat_lio_pre.txt\"), std::ios::out);\n   g_lio_out.open(DEBUG_FILE_DIR(\"mat_lio_out.txt\"), std::ios::out);\n+  // Default stream precision (6 significant digits) truncates e.g. 104.8683278; use the same\n+  // 10 digits as the trace so the two can be compared exactly.\n+  g_lio_pre << std::setprecision(10);\n+  g_lio_out << std::setprecision(10);\n   // ALI-H v1 trace. Off unless ~trace_cov is set; truncated per run like mat_pre/mat_out,\n   // so the caller must archive it right after the run.\n   if (trace_cov_en)\n@@ -792,7 +796,7 @@\n             << _state.pos_end.transpose() << \" \" << _state.vel_end.transpose() << \" \" << _state.bias_g.transpose() << \" \"\n             << _state.bias_a.transpose() << \" \" << V3D(_state.inv_expo_time, 0, 0).transpose() << \" \" << feats_undistort->points.size() << std::endl;\n   if (g_lio_out.is_open())\n-    g_lio_out << (trace_cov_rows > 0 ? trace_cov_rows - 1 : 0) << ' '\n+    g_lio_out << trace_cov_rows << ' '\n               << (long long)LidarMeasures.native_group_index << ' ' << (replay_mode_ ? 1 : 0) << ' '\n               << setw(20) << LidarMeasures.last_lio_update_time - _first_lidar_time << \" \"\n               << euler_cur.transpose() * 57.3 << \" \" << _state.pos_end.transpose() << \" \"\n"
+    },
+    "src_voxel_map.cpp": {
+      "same": true
+    },
+    "include_LIVMapper.h": {
+      "same": true
+    },
+    "include_voxel_map.h": {
+      "same": true
+    },
+    "include_common_lib.h": {
+      "same": true
+    }
+  },
+  "actual_idx_header": "# idx rel_s abs_ns grp_idx scan_first_ns scan_last_ns n_scans has_out phase eff r_mean r_med r_abs_mean r_chi2 r_chi2w vec6 Ppre6x6 Ppost6x6 pose7 pre_pose7",
+  "header_width": {
+    "tokens": 20,
+    "expanded": 107,
+    "blocks": {
+      "idx": [
+        0,
+        1
+      ],
+      "rel_s": [
+        1,
+        2
+      ],
+      "abs_ns": [
+        2,
+        3
+      ],
+      "grp_idx": [
+        3,
+        4
+      ],
+      "scan_first_ns": [
+        4,
+        5
+      ],
+      "scan_last_ns": [
+        5,
+        6
+      ],
+      "n_scans": [
+        6,
+        7
+      ],
+      "has_out": [
+        7,
+        8
+      ],
+      "phase": [
+        8,
+        9
+      ],
+      "eff": [
+        9,
+        10
+      ],
+      "r_mean": [
+        10,
+        11
+      ],
+      "r_med": [
+        11,
+        12
+      ],
+      "r_abs_mean": [
+        12,
+        13
+      ],
+      "r_chi2": [
+        13,
+        14
+      ],
+      "r_chi2w": [
+        14,
+        15
+      ],
+      "vec6": [
+        15,
+        21
+      ],
+      "Ppre6x6": [
+        21,
+        57
+      ],
+      "Ppost6x6": [
+        57,
+        93
+      ],
+      "pose7": [
+        93,
+        100
+      ],
+      "pre_pose7": [
+        100,
+        107
+      ]
+    }
+  },
+  "trace": {
+    "rows": 792,
+    "widths": {
+      "107": 792
+    },
+    "idx_contiguous": true,
+    "has_out": {
+      "0": 67,
+      "1": 725
+    },
+    "phase": {
+      "0": 792
+    },
+    "grp_unique": 792,
+    "finite": true,
+    "first": {
+      "idx": 0,
+      "rel_s": 0.0,
+      "abs_ns": 1627785261079016192,
+      "grp_idx": 0,
+      "scan_first_ns": 1627785261079016192,
+      "scan_last_ns": 1627785261079016192,
+      "n_scans": 1,
+      "has_out": 0,
+      "eff": 0,
+      "pose7": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "pre_pose7": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    },
+    "last": {
+      "idx": 791,
+      "rel_s": 52.83821177,
+      "abs_ns": 1627785313917228032,
+      "grp_idx": 1582,
+      "scan_first_ns": 1627785313882294272,
+      "scan_last_ns": 1627785313882294272,
+      "n_scans": 1,
+      "has_out": 1,
+      "eff": 6967,
+      "pose7": [
+        -1195.747311,
+        727.1085127,
+        -136.9244231,
+        0.3115307462,
+        -0.2133604986,
+        0.8827914423,
+        -0.2794730063
+      ],
+      "pre_pose7": [
+        -1195.744263,
+        727.0658893,
+        -136.9475212,
+        0.3133497999,
+        -0.2123470401,
+        0.8837053404,
+        -0.2752916795
+      ]
+    },
+    "early_pre_position_nonzero": 63,
+    "early_pre_quat_norm_min": 0.9999999999416376,
+    "early_post_cov_all_zero": true,
+    "updates_prepost_position_changed": 688,
+    "abs_ns_strict_increase": false,
+    "rel_s_span": 52.83821177,
+    "abs_ns_distinct": 789,
+    "zero_eff_has_out": 37
+  },
+  "span": {
+    "first_missing": 0,
+    "last_missing": 0,
+    "first_gt_last": 0,
+    "scan_count_distribution": {
+      "1": 792
+    },
+    "first_equals_last": 792,
+    "distinct_scan_headers": 528,
+    "scan_last_monotone": true,
+    "note": "span endpoints represent raw scan header timestamps, not point-time coverage"
+  },
+  "mat_lio_pre.txt": {
+    "rows": 793,
+    "widths": {
+      "22": 793
+    },
+    "join_delta": 0,
+    "joined": 792,
+    "unjoined": [
+      {
+        "idx": 792,
+        "grp": 1584,
+        "rel_s": 52.9047
+      }
+    ],
+    "grp_equal": 792,
+    "phase_equal": 792,
+    "time_round6_ok": 792,
+    "pos_round6_ok": 792,
+    "max_pos_rounding_abs": 0.004978999999821099,
+    "last": [
+      792.0,
+      1584.0,
+      0.0,
+      52.9047,
+      -38.1915,
+      -24.6699,
+      -134.763,
+      -1195.74,
+      727.004,
+      -136.945,
+      0.36408,
+      -1.8448,
+      -0.421621,
+      0.0222811,
+      0.0123553,
+      0.0740581,
+      -3.96247,
+      -3.70593,
+      -0.27933,
+      0.0544884,
+      0.0,
+      0.0
+    ]
+  },
+  "mat_lio_out.txt": {
+    "rows": 726,
+    "widths": {
+      "23": 726
+    },
+    "join_delta": 1,
+    "joined": 725,
+    "unjoined": [
+      {
+        "idx": 791,
+        "grp": 1584,
+        "rel_s": 52.9047
+      }
+    ],
+    "grp_equal": 725,
+    "phase_equal": 725,
+    "time_round6_ok": 725,
+    "pos_round6_ok": 725,
+    "max_pos_rounding_abs": 0.004922999999962485,
+    "last": [
+      791.0,
+      1584.0,
+      0.0,
+      52.9047,
+      -38.2855,
+      -24.7485,
+      -134.909,
+      -1195.76,
+      727.07,
+      -136.898,
+      0.133624,
+      -1.12774,
+      0.0719718,
+      0.0225052,
+      0.0124515,
+      0.0742957,
+      -3.95661,
+      -3.65696,
+      -0.280395,
+      0.0543168,
+      0.0,
+      0.0,
+      33242.0
+    ]
+  },
+  "mat_pre.txt": {
+    "rows": 1585,
+    "widths": {
+      "19": 1585
+    },
+    "last": [
+      52.9047,
+      -38.1915,
+      -24.6699,
+      -134.763,
+      -1195.74,
+      727.004,
+      -136.945,
+      0.36408,
+      -1.8448,
+      -0.421621,
+      0.0222811,
+      0.0123553,
+      0.0740581,
+      -3.96247,
+      -3.70593,
+      -0.27933,
+      0.0544884,
+      0.0,
+      0.0
+    ]
+  },
+  "mat_out.txt": {
+    "rows": 1451,
+    "widths": {
+      "20": 1451
+    },
+    "last": [
+      52.9047,
+      -38.2855,
+      -24.7485,
+      -134.909,
+      -1195.76,
+      727.07,
+      -136.898,
+      0.133624,
+      -1.12774,
+      0.0719718,
+      0.0225052,
+      0.0124515,
+      0.0742957,
+      -3.95661,
+      -3.65696,
+      -0.280395,
+      0.0543168,
+      0.0,
+      0.0,
+      33242.0
+    ]
+  },
+  "M2DGR_room_02.txt": {
+    "rows": 726,
+    "widths": {
+      "8": 726
+    },
+    "last": [
+      1627785313.98372,
+      -1195.757366,
+      727.070334,
+      -136.897875,
+      0.309783,
+      -0.218163,
+      0.879162,
+      -0.288986
+    ]
+  },
+  "paired_sidecar": {
+    "rows": 482,
+    "kf_ids_unique": 482,
+    "pose_stamps_unique": 482,
+    "scan_stamps_unique": 482,
+    "max_abs_dt_ns": 39959192,
+    "dt_arithmetic_consistent": true,
+    "status_counts": {
+      "UNAVAILABLE": 353,
+      "AVAILABLE": 129
+    },
+    "first_pose_stamp_ns": 1627785261403843403,
+    "last_pose_stamp_ns": 1627785313983719587,
+    "last_scan_stamp_ns": 1627785313982718945,
+    "last_manager": {
+      "state": "HEALTHY",
+      "trusted_version": 220,
+      "trusted_keyframes": 294,
+      "active_segment": null
+    },
+    "stamp_span_s": 52.579876184
+  },
+  "episodes": [
+    {
+      "index": 0,
+      "trigger_ns": 1627785265674491405,
+      "trigger_rel_s": 4.595475213,
+      "decision_basis": "confirmation_margin",
+      "checkpoint_check": {
+        "boundary_stamp_ns": 1627785261507921600,
+        "actual_stamp_ns": 1627785264140073472,
+        "actual_frame": 42,
+        "status": "LATE_AFTER_BOUNDARY",
+        "rollback_support": "UNSUPPORTED_AT_OR_BEFORE_QSTART"
+      },
+      "late_s": 2.632151872,
+      "restore_ack": {
+        "valid": "1",
+        "stamp_ns": "1627785264140073472",
+        "frame": "42",
+        "voxels": "9233",
+        "nodes": "16607",
+        "points": "167333",
+        "restores": "1",
+        "live_voxels": "9233",
+        "live_points": "167333",
+        "state_pos": "1.691114,-0.101861,-0.012673",
+        "hold": "1",
+        "held_frames": "90",
+        "held_points": "1487356",
+        "hold_commands": "1",
+        "repair_received": "0",
+        "repair_applied": "0",
+        "repair_dropped": "0",
+        "repair_queued": "0",
+        "multi_scan_groups": "0",
+        "merged_scans": "107",
+        "set_state": "0",
+        "repair_merged_away": "0",
+        "replay_within_end": "0",
+        "replay_suffix": "0",
+        "control_valid": "0",
+        "control_pos": "0.000000,0.000000,0.000000",
+        "control_points": "0",
+        "hist_k": "1",
+        "hist_bytes": "0",
+        "hist": ""
+      },
+      "restore_disposition": {
+        "scope": "STATE_AND_MAP_ROLLBACK_ONLY",
+        "checkpoint_stamp_ns": 1627785261674491405,
+        "decision_ts_ns": 1627785269868847370,
+        "interval_ns": [
+          1627785261674491405,
+          1627785269868847370
+        ],
+        "consumed_input_in_interval": "NOT_REPLAYED",
+        "subsequent_input": "CONTINUES_FROM_RESTORED_STATE",
+        "catch_up": "NOT_IMPLEMENTED"
+      }
+    },
+    {
+      "index": 1,
+      "trigger_ns": 1627785278081956625,
+      "trigger_rel_s": 17.002940433,
+      "decision_basis": "confirmation_margin",
+      "checkpoint_check": {
+        "boundary_stamp_ns": 1627785273781757259,
+        "actual_stamp_ns": 1627785276281966848,
+        "actual_frame": 222,
+        "status": "LATE_AFTER_BOUNDARY",
+        "rollback_support": "UNSUPPORTED_AT_OR_BEFORE_QSTART"
+      },
+      "late_s": 2.500209589,
+      "restore_ack": {
+        "valid": "1",
+        "stamp_ns": "1627785276281966848",
+        "frame": "222",
+        "voxels": "15493",
+        "nodes": "29778",
+        "points": "309688",
+        "restores": "2",
+        "live_voxels": "15493",
+        "live_points": "309688",
+        "state_pos": "3.763658,0.324532,0.074764",
+        "hold": "1",
+        "held_frames": "186",
+        "held_points": "2182710",
+        "hold_commands": "3",
+        "repair_received": "0",
+        "repair_applied": "0",
+        "repair_dropped": "0",
+        "repair_queued": "0",
+        "multi_scan_groups": "0",
+        "merged_scans": "263",
+        "set_state": "0",
+        "repair_merged_away": "0",
+        "replay_within_end": "0",
+        "replay_suffix": "0",
+        "control_valid": "0",
+        "control_pos": "0.000000,0.000000,0.000000",
+        "control_points": "0",
+        "hist_k": "1",
+        "hist_bytes": "0",
+        "hist": ""
+      },
+      "restore_disposition": {
+        "scope": "STATE_AND_MAP_ROLLBACK_ONLY",
+        "checkpoint_stamp_ns": 1627785274081956625,
+        "decision_ts_ns": 1627785283146483421,
+        "interval_ns": [
+          1627785274081956625,
+          1627785283146483421
+        ],
+        "consumed_input_in_interval": "NOT_REPLAYED",
+        "subsequent_input": "CONTINUES_FROM_RESTORED_STATE",
+        "catch_up": "NOT_IMPLEMENTED"
+      }
+    }
+  ],
+  "gate": {
+    "accepted": 0,
+    "rejected": 2,
+    "errored": 0,
+    "modes": [
+      "MODE3_SOFT_BRIDGE_WAIT",
+      "MODE3_SOFT_BRIDGE_WAIT"
+    ],
+    "committed_key_total": 0,
+    "deferred_key_total": 0
+  },
+  "lifecycle": {
+    "state": "HEALTHY",
+    "unresolved_segments": 2,
+    "events": [
+      {
+        "event": "wait_limit_closed",
+        "segment_id": "quar_4_1627785261507921600",
+        "wait_started_ns": 1627785271600115061,
+        "closed_ns": 1627785273611036301,
+        "wait_limit_ns": 2000000000,
+        "t_start_ns": 1627785261507921600,
+        "t_end_ns": 1627785273477093220,
+        "frames_unresolved": 120,
+        "trusted_version": 4
+      },
+      {
+        "event": "rearm",
+        "from_state": "ABORTED",
+        "trusted_version": 4,
+        "n_sleeping_submaps": 0
+      },
+      {
+        "event": "wait_limit_closed",
+        "segment_id": "quar_8_1627785273781757259",
+        "wait_started_ns": 1627785286144850731,
+        "closed_ns": 1627785288210371256,
+        "wait_limit_ns": 2000000000,
+        "t_start_ns": 1627785273781757259,
+        "t_end_ns": 1627785288143747568,
+        "frames_unresolved": 100,
+        "trusted_version": 8
+      },
+      {
+        "event": "rearm",
+        "from_state": "ABORTED",
+        "trusted_version": 8,
+        "n_sleeping_submaps": 0
+      }
+    ]
+  },
+  "checkpoint": {
+    "enabled": true,
+    "host_ready": true,
+    "snapshot_ack_timeouts": 21,
+    "snapshots_superseded": 0,
+    "dir": "/tmp/fl_native_20261112T165438Z_669633/host_control",
+    "snapshot_period_s": 2.0,
+    "snapshots": 15,
+    "restores": 2,
+    "reprocesses": 0,
+    "holds": 2,
+    "resumes": 2,
+    "failures": 21,
+    "note": "the checkpoint is the host's own _state and voxel map plus the IMU pre-integrator's cross-frame values; a snapshot taken while healthy is the trusted checkpoint, and its age at the trigger is the snapshot period",
+    "events_by_command_result": {
+      "status:True": 1,
+      "snapshot:True": 15,
+      "hold:True": 2,
+      "restore:True": 2,
+      "resume:True": 2,
+      "snapshot:False": 21
+    },
+    "last_successful_ack": {
+      "command": "snapshot",
+      "wall": 1794502587.253,
+      "sent_wall": 1794502587.253,
+      "received_wall": 1794502587.25792,
+      "received_s": 0.005,
+      "ok": true,
+      "ack": "OK snapshot valid=1 stamp_ns=1627785312654052352 frame=706 voxels=576707 nodes=779318 points=3944635 restores=2 live_voxels=576707 live_points=3944635 state_pos=-1194.806380,719.204401,-140.160478 hold=0 held_frames=209 held_points=2229096 hold_commands=4 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=515 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0 hist_k=1 hist_bytes=0 hist=",
+      "ack_wall": 1794502587.753
+    },
+    "last_event": {
+      "command": "snapshot",
+      "wall": 1794502597.457,
+      "sent_wall": 1794502597.457,
+      "received_wall": 1794502597.45821,
+      "received_s": 0.001,
+      "ok": false,
+      "error": "snapshot_ack_timeout"
+    }
+  },
+  "growth_from_snapshot_acks": {
+    "snapshots": [
+      {
+        "stamp_ns": 1627785261079016192,
+        "rel_s": 0.0,
+        "wall": 1794502498.509,
+        "ack_wall": 1794502499.009,
+        "frame": 0,
+        "voxels": 0,
+        "points": 0
+      },
+      {
+        "stamp_ns": 1627785262610132480,
+        "rel_s": 1.531116288,
+        "wall": 1794502500.511,
+        "ack_wall": 1794502501.009,
+        "frame": 19,
+        "voxels": 7453,
+        "points": 138785
+      },
+      {
+        "stamp_ns": 1627785264140073472,
+        "rel_s": 3.06105728,
+        "wall": 1794502503.009,
+        "ack_wall": 1794502503.509,
+        "frame": 42,
+        "voxels": 9233,
+        "points": 167333
+      },
+      {
+        "stamp_ns": 1627785274281222400,
+        "rel_s": 13.202206208,
+        "wall": 1794502515.356,
+        "ack_wall": 1794502515.856,
+        "frame": 194,
+        "voxels": 13617,
+        "points": 234642
+      },
+      {
+        "stamp_ns": 1627785276281966848,
+        "rel_s": 15.202950656,
+        "wall": 1794502517.367,
+        "ack_wall": 1794502517.856,
+        "frame": 222,
+        "voxels": 15493,
+        "points": 309688
+      },
+      {
+        "stamp_ns": 1627785289350365696,
+        "rel_s": 28.271349504,
+        "wall": 1794502526.753,
+        "ack_wall": 1794502527.253,
+        "frame": 376,
+        "voxels": 18498,
+        "points": 326905
+      },
+      {
+        "stamp_ns": 1627785291892441088,
+        "rel_s": 30.813424896,
+        "wall": 1794502529.253,
+        "ack_wall": 1794502529.757,
+        "frame": 413,
+        "voxels": 34153,
+        "points": 407545
+      },
+      {
+        "stamp_ns": 1627785294425639936,
+        "rel_s": 33.346623744,
+        "wall": 1794502531.771,
+        "ack_wall": 1794502532.253,
+        "frame": 439,
+        "voxels": 52747,
+        "points": 502099
+      },
+      {
+        "stamp_ns": 1627785311589517056,
+        "rel_s": 50.510500864,
+        "wall": 1794502567.253,
+        "ack_wall": 1794502567.753,
+        "frame": 690,
+        "voxels": 561126,
+        "points": 3787473
+      },
+      {
+        "stamp_ns": 1627785312454470400,
+        "rel_s": 51.375454208,
+        "wall": 1794502574.253,
+        "ack_wall": 1794502574.753,
+        "frame": 703,
+        "voxels": 574307,
+        "points": 3916819
+      },
+      {
+        "stamp_ns": 1627785312454470400,
+        "rel_s": 51.375454208,
+        "wall": 1794502576.253,
+        "ack_wall": 1794502576.753,
+        "frame": 703,
+        "voxels": 574307,
+        "points": 3916819
+      },
+      {
+        "stamp_ns": 1627785312521000704,
+        "rel_s": 51.441984512,
+        "wall": 1794502580.753,
+        "ack_wall": 1794502581.379,
+        "frame": 704,
+        "voxels": 574706,
+        "points": 3921394
+      },
+      {
+        "stamp_ns": 1627785312587527680,
+        "rel_s": 51.508511488,
+        "wall": 1794502582.753,
+        "ack_wall": 1794502583.253,
+        "frame": 705,
+        "voxels": 575581,
+        "points": 3930601
+      },
+      {
+        "stamp_ns": 1627785312587527680,
+        "rel_s": 51.508511488,
+        "wall": 1794502585.253,
+        "ack_wall": 1794502585.753,
+        "frame": 705,
+        "voxels": 575581,
+        "points": 3930601
+      },
+      {
+        "stamp_ns": 1627785312654052352,
+        "rel_s": 51.57503616,
+        "wall": 1794502587.253,
+        "ack_wall": 1794502587.753,
+        "frame": 706,
+        "voxels": 576707,
+        "points": 3944635
+      }
+    ],
+    "rates": [
+      {
+        "a_rel_s": 0.0,
+        "b_rel_s": 1.531116288,
+        "dt_stamp_s": 1.531116288,
+        "dt_wall_s": 2.001999855041504,
+        "d_voxels": 7453,
+        "d_points": 138785,
+        "voxels_per_stamp_s": 4867.690363176386,
+        "points_per_stamp_s": 90643.0171814618,
+        "voxels_per_wall_s": 3722.7774923317816
+      },
+      {
+        "a_rel_s": 1.531116288,
+        "b_rel_s": 3.06105728,
+        "dt_stamp_s": 1.529940992,
+        "dt_wall_s": 2.498000144958496,
+        "d_voxels": 1780,
+        "d_points": 28548,
+        "voxels_per_stamp_s": 1163.4435637109852,
+        "points_per_stamp_s": 18659.543177989442,
+        "voxels_per_wall_s": 712.5700146945245
+      },
+      {
+        "a_rel_s": 3.06105728,
+        "b_rel_s": 13.202206208,
+        "dt_stamp_s": 10.141148928,
+        "dt_wall_s": 12.346999883651733,
+        "d_voxels": 4384,
+        "d_points": 67309,
+        "voxels_per_stamp_s": 432.298157844389,
+        "points_per_stamp_s": 6637.2164019954325,
+        "voxels_per_wall_s": 355.06601128300923
+      },
+      {
+        "a_rel_s": 13.202206208,
+        "b_rel_s": 15.202950656,
+        "dt_stamp_s": 2.000744448,
+        "dt_wall_s": 2.011000156402588,
+        "d_voxels": 1876,
+        "d_points": 75046,
+        "voxels_per_stamp_s": 937.6509838002061,
+        "points_per_stamp_s": 37509.03823575174,
+        "voxels_per_wall_s": 932.8691467413482
+      },
+      {
+        "a_rel_s": 15.202950656,
+        "b_rel_s": 28.271349504,
+        "dt_stamp_s": 13.068398848,
+        "dt_wall_s": 9.385999917984009,
+        "d_voxels": 3005,
+        "d_points": 17217,
+        "voxels_per_stamp_s": 229.94400729205537,
+        "points_per_stamp_s": 1317.4529030107547,
+        "voxels_per_wall_s": 320.1576844511027
+      },
+      {
+        "a_rel_s": 28.271349504,
+        "b_rel_s": 30.813424896,
+        "dt_stamp_s": 2.542075392,
+        "dt_wall_s": 2.5,
+        "d_voxels": 15655,
+        "d_points": 80640,
+        "voxels_per_stamp_s": 6158.353937600289,
+        "points_per_stamp_s": 31722.111882982263,
+        "voxels_per_wall_s": 6262.0
+      },
+      {
+        "a_rel_s": 30.813424896,
+        "b_rel_s": 33.346623744,
+        "dt_stamp_s": 2.533198848,
+        "dt_wall_s": 2.5179998874664307,
+        "d_voxels": 18594,
+        "d_points": 94554,
+        "voxels_per_stamp_s": 7340.126502378703,
+        "points_per_stamp_s": 37325.92886446789,
+        "voxels_per_wall_s": 7384.432418981945
+      },
+      {
+        "a_rel_s": 33.346623744,
+        "b_rel_s": 50.510500864,
+        "dt_stamp_s": 17.16387712,
+        "dt_wall_s": 35.48200011253357,
+        "d_voxels": 508379,
+        "d_points": 3285374,
+        "voxels_per_stamp_s": 29619.12372395265,
+        "points_per_stamp_s": 191412.11376838383,
+        "voxels_per_wall_s": 14327.799965831733
+      },
+      {
+        "a_rel_s": 50.510500864,
+        "b_rel_s": 51.375454208,
+        "dt_stamp_s": 0.864953344,
+        "dt_wall_s": 7.0,
+        "d_voxels": 13181,
+        "d_points": 129346,
+        "voxels_per_stamp_s": 15238.972242183736,
+        "points_per_stamp_s": 149541.01385611846,
+        "voxels_per_wall_s": 1883.0
+      },
+      {
+        "a_rel_s": 51.375454208,
+        "b_rel_s": 51.375454208,
+        "dt_stamp_s": 0.0,
+        "dt_wall_s": 2.0,
+        "d_voxels": 0,
+        "d_points": 0,
+        "voxels_per_stamp_s": null,
+        "points_per_stamp_s": null,
+        "voxels_per_wall_s": 0.0
+      },
+      {
+        "a_rel_s": 51.375454208,
+        "b_rel_s": 51.441984512,
+        "dt_stamp_s": 0.066530304,
+        "dt_wall_s": 4.5,
+        "d_voxels": 399,
+        "d_points": 4575,
+        "voxels_per_stamp_s": 5997.267049914577,
+        "points_per_stamp_s": 68765.65602345663,
+        "voxels_per_wall_s": 88.66666666666667
+      },
+      {
+        "a_rel_s": 51.441984512,
+        "b_rel_s": 51.508511488,
+        "dt_stamp_s": 0.066526976,
+        "dt_wall_s": 2.0,
+        "d_voxels": 875,
+        "d_points": 9207,
+        "voxels_per_stamp_s": 13152.559346752812,
+        "points_per_stamp_s": 138394.98732063215,
+        "voxels_per_wall_s": 437.5
+      },
+      {
+        "a_rel_s": 51.508511488,
+        "b_rel_s": 51.508511488,
+        "dt_stamp_s": 0.0,
+        "dt_wall_s": 2.5,
+        "d_voxels": 0,
+        "d_points": 0,
+        "voxels_per_stamp_s": null,
+        "points_per_stamp_s": null,
+        "voxels_per_wall_s": 0.0
+      },
+      {
+        "a_rel_s": 51.508511488,
+        "b_rel_s": 51.57503616,
+        "dt_stamp_s": 0.066524672,
+        "dt_wall_s": 2.0,
+        "d_voxels": 1126,
+        "d_points": 14034,
+        "voxels_per_stamp_s": 16926.051134833102,
+        "points_per_stamp_s": 210959.32648867473,
+        "voxels_per_wall_s": 563.0
+      }
+    ],
+    "first_to_third": {
+      "dt_stamp_s": 3.06105728,
+      "voxels": 9233,
+      "points": 167333
+    },
+    "observed_max_rate": {
+      "a_rel_s": 33.346623744,
+      "b_rel_s": 50.510500864,
+      "dt_stamp_s": 17.16387712,
+      "dt_wall_s": 35.48200011253357,
+      "d_voxels": 508379,
+      "d_points": 3285374,
+      "voxels_per_stamp_s": 29619.12372395265,
+      "points_per_stamp_s": 191412.11376838383,
+      "voxels_per_wall_s": 14327.799965831733
+    },
+    "note": "sparse observations, restores/holds and timeouts; no per-frame host map inventory archived; cannot establish reported true peak/final 593925"
+  },
+  "trace_update_diagnostics": {
+    "all_valid": {
+      "rows": 725,
+      "has_out": 725,
+      "eff": {
+        "min": 0,
+        "median": 3339,
+        "max": 21589
+      },
+      "r_abs_mean_m_median": 0.04978878593,
+      "r_med_abs_m_median": 0.026911892,
+      "r_chi2_per_eff_median": 0.0074662020165796195,
+      "r_chi2w_per_eff_median": 3.0366231822206036,
+      "post_translation_norm_max_m": 1406.1911346641223
+    },
+    "first_30_stamp_s": {
+      "rows": 401,
+      "has_out": 401,
+      "eff": {
+        "min": 0,
+        "median": 4061,
+        "max": 21589
+      },
+      "r_abs_mean_m_median": 0.04222647208,
+      "r_med_abs_m_median": 0.02356077358,
+      "r_chi2_per_eff_median": 0.005233845744976061,
+      "r_chi2w_per_eff_median": 2.3786311462425926,
+      "post_translation_norm_max_m": 329.67086351025824
+    },
+    "last_after_30_stamp_s": {
+      "rows": 324,
+      "has_out": 324,
+      "eff": {
+        "min": 1,
+        "median": 1125.5,
+        "max": 17812
+      },
+      "r_abs_mean_m_median": 0.11003032374999999,
+      "r_med_abs_m_median": 0.088043700905,
+      "r_chi2_per_eff_median": 0.01987288692240858,
+      "r_chi2w_per_eff_median": 5.463973427728365,
+      "post_translation_norm_max_m": 1406.1911346641223
+    },
+    "note": "eff count and final-iteration measurement summaries; no correspondence denominator/GT; not proof of cause or stability"
+  },
+  "final_summary": {
+    "final_state": "HEALTHY",
+    "quarantine_open_at_exit": false,
+    "trusted_keyframes_at_exit": 295,
+    "pairing": {
+      "pair_window_ns": 40000000,
+      "poses_received": 726,
+      "scans_received": 598,
+      "paired": 482,
+      "poses_unpaired": 244,
+      "scans_unpaired": 116,
+      "paired_fraction_of_poses": 0.6639118457300276,
+      "paired_fraction_of_scans": 0.8060200668896321,
+      "max_abs_dt_ns": 39959192,
+      "max_backlog_messages": 119,
+      "messages_considered": 1324,
+      "pairing_rule": "nearest pose within 40 ms, no pose reused"
+    },
+    "runtime": {
+      "wall_sec": 111.644,
+      "pid": 670715,
+      "pgid": 670711,
+      "peak_rss_kb": 1024664,
+      "pose_messages": 726,
+      "scan_messages": 598,
+      "callback_errors": [],
+      "callback_error_count": 0
+    }
+  },
+  "producer_headers": {
+    "v11": "# idx rel_s abs_ns grp_idx scan_first_ns scan_last_ns n_scans has_out phase eff r_mean r_med r_abs_mean r_chi2 r_chi2w vec6 Ppre6x6 Ppost6x6 pose7 pre_pose7",
+    "v12": "# idx rel_s abs_ns grp_idx scan_first_ns scan_last_ns n_scans has_out phase eff r_mean r_med r_abs_mean r_chi2 r_chi2w vec6 Ppre6x6 Ppost6x6 pose7 pre_pose7",
+    "all_match_actual": true
+  },
+  "conclusions": {
+    "prepost": "Readable same-row same handleLIO update for has_out=1, confirmed source capture/write placement plus rounded mat_lio joins. Ppre/Ppost are not covariance of their difference; no cross-covariance or S exported. Early has_out=0 has no valid posterior even though pose7 is written.",
+    "covariance_tangent": "Source right-multiplies rotation, but position increment is additive world-frame, not full body-frame SE3 tangent as prose suggests. StatesGroup operator+= lines 192-193 / operator- lines 205-207. Avoid whole-6D body adjoint without establishing mixed coordinates.",
+    "v12": "Only LIVMapper cpp changed: lio stream precision6 to10 and out idx rows-1 to rows; other four blobs identical. No v12 run measured here.",
+    "actual_closure": "0 accepted / 2 rejected / 0 commit. ACK holds/restores/resumes2 each; no replay or repair observed. lifecycle.unresolved_segments=2 even though final HEALTHY and quarantine closed.",
+    "trace_terminal_gap": "793 mat_lio_pre / 726 mat_lio_out and absolute pose output, but792 trace /725 has_out: one last completed output has no archived trace posterior. Buffered tail loss possible; cause UNKNOWN.",
+    "growth": "Developer-reported 593925 voxels/4.15M points, peak42.9k/s at301.6s,722frames,first30s andeff13227 are not reproducible from sparse ACK inventory and missing growth script/host.log; no per-frame host map inventory in trace. ACK arithmetic supports large later net map growth, not exact peak/timing/causal mechanism.",
+    "minimal_unblock": "Read-only fix block header expansion and join v11 out idx+1; exclude unjoined final posterior/has_out=0. Obtain already-existing archived map-count series, original time origin/script and terminal host status if available, no new host run/build/ASan authorization. Missing evidence remains UNKNOWN/DEVELOPER_REPORTED.",
+    "scope": "No fetch, production modifications, archived CLI/ROS/build/algorithm, dependency install or delegation. Did not read excluded private handoff."
+  },
+  "hashes": {
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/receipt.json": {
+      "sha256": "8529773b1de68accf61b8a7061cef5b4af4eb645f7ea8709062fe8d35866e5aa",
+      "git_blob": "637d9ccf17dc5d75c6a0e16d570b488273591bb4",
+      "bytes": 2018
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/run_summary.json": {
+      "sha256": "f3b7b71b2f2508398921f3e54386d8e94faad1effce3287aeda5b7d13e596ac6",
+      "git_blob": "bc6bd2c6d7b885394e45d85ab7d2924a29b867f3",
+      "bytes": 223484
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/wiring.json": {
+      "sha256": "d94520439e4edf3c279c7890f8f50015e5bed9cf469d2effe9cac1a195081021",
+      "git_blob": "ade31e2d0c2d7b25942e4bf13f0b3d40f456d178",
+      "bytes": 1188
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/launch_pair.sh": {
+      "sha256": "b321d06354dd1d20250ab3e3b090c300d3312ed28535087146b7033cefb07c29",
+      "git_blob": "b98e305ee38e064fbb2fe15d7b2f2d0371ad2327",
+      "bytes": 1521
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/SHA256SUMS": {
+      "sha256": "87e1049745a68a4f98210856b3b29967d8f7d78a1e2fe3532fdfe4eefcc922dc",
+      "git_blob": "ba91245b38abe909ef1a622cba31c4b1d8998263",
+      "bytes": 505
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/availability_frames.jsonl.gz": {
+      "sha256": "36d11af7d8b8cd486c1dc16fc1371e123f8690275252003698036da99e85b633",
+      "git_blob": "5fa74fa29b75391aaeb94ee433b79b42111b4798",
+      "bytes": 24102192
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:slam_recovery/ros/recovery_node.py": {
+      "sha256": "c5efdd733cdcf65fadc4fc28fd1f509ad9ccd2e87a644b9d38165a80554cc830",
+      "git_blob": "94a94b69ecbe9ff93603dca5769e24c06d7ebbf5",
+      "bytes": 141254
+    },
+    "c5bc05763b553ebc7d5adc585ba8e84013e9fb6c:docs/review_20261112_four_host/host_change_trace_cov/src_LIVMapper.cpp.v11": {
+      "sha256": "aad3fa01386977b6c6ae4c420aeef46bf64a8ef4bf3b3c9f9ad203f836fa724b",
+      "git_blob": "429f478dd6429e5c3f509eaca6771593af8ff14c",
+      "bytes": 107187
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/host_change_trace_cov/src_LIVMapper.cpp.v12": {
+      "sha256": "0857c5420fc0093a459dcac9b041245c8cd3b24ae37c414799ab342d4e261229",
+      "git_blob": "57022b446633097244762e35d3c1c8bf788c4a33",
+      "bytes": 107390
+    },
+    "c5bc05763b553ebc7d5adc585ba8e84013e9fb6c:docs/review_20261112_four_host/host_change_trace_cov/src_voxel_map.cpp.v11": {
+      "sha256": "b9e52c940a30ff9e54abec0e37d28d73b5997fd661ad9e76be42f17605be1c05",
+      "git_blob": "8f44a0e12c0d18bf7fbc37daf7a0f9d25bcf330f",
+      "bytes": 39039
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/host_change_trace_cov/src_voxel_map.cpp.v12": {
+      "sha256": "b9e52c940a30ff9e54abec0e37d28d73b5997fd661ad9e76be42f17605be1c05",
+      "git_blob": "8f44a0e12c0d18bf7fbc37daf7a0f9d25bcf330f",
+      "bytes": 39039
+    },
+    "c5bc05763b553ebc7d5adc585ba8e84013e9fb6c:docs/review_20261112_four_host/host_change_trace_cov/include_LIVMapper.h.v11": {
+      "sha256": "2bdf972fd8b6f7c298de2cf049d03a112e11ae18a6236adfae37b127b16b2b3e",
+      "git_blob": "c544eb2f28014acc219eb1cfcb350aed6e0a4f0e",
+      "bytes": 13566
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/host_change_trace_cov/include_LIVMapper.h.v12": {
+      "sha256": "2bdf972fd8b6f7c298de2cf049d03a112e11ae18a6236adfae37b127b16b2b3e",
+      "git_blob": "c544eb2f28014acc219eb1cfcb350aed6e0a4f0e",
+      "bytes": 13566
+    },
+    "c5bc05763b553ebc7d5adc585ba8e84013e9fb6c:docs/review_20261112_four_host/host_change_trace_cov/include_voxel_map.h.v11": {
+      "sha256": "1059f02c071adf64cfdafc939173a1d69c25bac705e09ad1921d86450c0715b6",
+      "git_blob": "a4ffcda70836eb5287056b5f3a623fe833e92052",
+      "bytes": 8019
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/host_change_trace_cov/include_voxel_map.h.v12": {
+      "sha256": "1059f02c071adf64cfdafc939173a1d69c25bac705e09ad1921d86450c0715b6",
+      "git_blob": "a4ffcda70836eb5287056b5f3a623fe833e92052",
+      "bytes": 8019
+    },
+    "c5bc05763b553ebc7d5adc585ba8e84013e9fb6c:docs/review_20261112_four_host/host_change_trace_cov/include_common_lib.h.v11": {
+      "sha256": "453285d9d49cdd95da3151f0125015f38014002ce3684622125658f8434fa249",
+      "git_blob": "4fedbff49e4bc7d161652fc02bef8ee5c9df8946",
+      "bytes": 7590
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/host_change_trace_cov/include_common_lib.h.v12": {
+      "sha256": "453285d9d49cdd95da3151f0125015f38014002ce3684622125658f8434fa249",
+      "git_blob": "4fedbff49e4bc7d161652fc02bef8ee5c9df8946",
+      "bytes": 7590
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/host_logs/trace_cov.txt": {
+      "sha256": "b14d4f57e4c488f64365e5fa48c72c32d946ef51d00371a4f21456ac87ccd736",
+      "git_blob": "2d5d6f331c873be682ff51f43838740334d694bc",
+      "bytes": 1213515
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/host_logs/mat_lio_pre.txt": {
+      "sha256": "0153dd350455f377b11f75bd1ec652bf106c68eac6d64e23e5d6c7ec11113fda",
+      "git_blob": "36371686c1ff4836f7d2efdef01f8c354a84b830",
+      "bytes": 169014
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/host_logs/mat_lio_out.txt": {
+      "sha256": "a50ce2788e31742aa4f2efcfabe78930cfc8abd82f6ba40677500290e1fff47c",
+      "git_blob": "1f21f0a6e8bda7d374bc26f7ce45ec02eb7a9645",
+      "bytes": 159299
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/host_logs/mat_pre.txt": {
+      "sha256": "d387d8f6d02d01ff49f73727e894b1c6c7ff7f4f91db5878716b02d4ec6c59e7",
+      "git_blob": "ee99b8020ba94faca59ceae4ba4b7d6e36fd24ce",
+      "bytes": 321765
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/host_logs/mat_out.txt": {
+      "sha256": "0f92feb9f95044da60a74285ccec957f28961c05717e7248a0e19bd1759b1635",
+      "git_blob": "8dbc8a6fc1c8bdfb097f4fc3010e309433a2d72c",
+      "bytes": 300932
+    },
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/host_logs/M2DGR_room_02.txt": {
+      "sha256": "3b8ce8e7b9d0be25f4274943bfcafab1fc1b9507b4ce05b9368e90b3512adad2",
+      "git_blob": "85e43fdcf5bac2d9e0d4e83a2d6988dc183bb538",
+      "bytes": 63005
+    }
+  }
+}
