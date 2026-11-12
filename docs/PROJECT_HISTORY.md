@@ -758,3 +758,9 @@ growth只新38行文字无map序列/原脚本，report0.43/12.7是回溯边界�
 [增量核验](review_20261113_cdd3bf7/README.md)固定02:05:55 fetch maincdd3bf7/ca384cf。v11三层与18 eff0/Log0保人口实交，462派生mode改同行而数字/四输入hash未变；从本run第二episode读17.003触发/21.003deadline，303精确尾行与64尾块/304块成员复核，106全UNKNOWN非正常真值/catchup，81.957ms边界差说明。不重跑已验消费者/数学/宿主；旧531/504数值未改、24 eff0保留，47尾行/12尾块/51块成员仍legacy54s，不把51误写块。
 
 新t2_run RAW_HEADER_CONTAINMENT无条件常量PASS，保存旧v7 meta也PASS，与实际1041完整行first全−1和join HEURISTIC_UNPROVEN冲突。标准库-I只读AST/原件控制exit0复现，最低S3/S1从现join模式派生该字段并保旧heuristic/数字/人口，不新成员架构或宿主run；只阻误用旧来源资格、不阻v11数值或原生主线。下一仍S1/S2现MM-LINS两节点测量修复→native状态map→PGO后继或具体首断点/S2认领；S3最小一层并行，不让旁支代主线。A1/A11/A3/B3局部非整链/性能/新总分，四Cron/私人/08:53/手调停门不降，中文SSH review不算法ROS/main历史/日报。
+
+## 95. 18297d1：旧档header资格误标关闭，主线运行结果未增加
+
+[有限关闭核验](review_20261113_18297d1/README.md)固定02:25:55 fetch main18297d1/开发4796f97。已读资格表达式两个正常分支true_span_512→PASS、mechanical_prev_last→HEURISTIC_UNPROVEN实测成立，旧v7 summary仅这一字段变，其余全JSON不变；两join及v11 summary逐字相同，完整数字/人口/零约束/tail/UNKNOWN保留。旧反例在此版本关闭不重开；v11正文三层和deadline前179/后303、旧47行/12块/51块成员对齐接受，标准库-I有限控制exit0非新宿主/效果，原生主线结果未增加。
+
+下一仍S1/S2现MM-LINS两节点测量修复→native状态map→PGO真实后继/E2或具体函数首断点/最低解除及实认领；S3最小修正/S1集成已核、真实正常校准/标签并行，不让文案/防御/参数串行替主线。A1/A11记录局部非A4/A6/B4/B11整链/新总分；四Cron/private/08:53/手调停门不降，中文SSH关闭增量不算法ROS/main历史/开发日报。
