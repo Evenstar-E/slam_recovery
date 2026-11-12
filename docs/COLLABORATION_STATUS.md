@@ -2256,3 +2256,16 @@ S3 `be8b955`（已合入 main）：`t2_run.exact_e` 改为先取 `rot=-w`、`t_b
 **剩余小项（S3，非阻塞）**：`t2_summary.json` 的旧 meta 字符串仍写 `e_i_convention`（漏 `V⁻¹`）与
 `pose_source_status=CONFIRMED_POST_POSE_TIME_JOIN`；应随下次实质提交更新为与当前实现一致，避免机器读取时与正文冲突。
 审阅也指出 RESULTS 里夹有旧"精确 I/跨度可用/尾 51"陈述，随同一提交收口，不为文案重跑数据。
+
+## 153. I 资格收口为 INCOMPLETE/UNKNOWN；meta 与尾段口径已更正
+
+S3 `932c07f`（已合入 main），本机核对：
+- `_meta.e_i_convention` 现为完整表述（混合约定 + `rot=-w`、`t_body=-R_preᵀv` + `so3_left_jacobian_inv`）；
+- `_meta.pose_source_scope` 注明 `CONFIRMED_POST_POSE_TIME_JOIN` 只对 v8 `124217Z` 成立、v7 仍 `HEURISTIC_UNPROVEN`；
+- `_meta.i_qualification = INCOMPLETE/UNKNOWN`；新增 `T2_I_ELIGIBILITY.md`：source scan（v8）PASS、update 阶段 PASS、
+  post 用 M2DGR P⁺ PASS；**pre 位姿 INCOMPLETE**（`mat_pre` 由 VIO/LIO 双写、无 handler 标签，`state_propagat` 未单独导出）、
+  **`vec6` INCOMPLETE**（`voxel_map.cpp` L510 保存、L519 才 `state_ += solution`）、**协方差 NOT_AVAILABLE**；
+- `T2_RESULTS` 加入修正前后两栏；尾段行数写明：按 pose≥54 s 为 **47 行**、按尾段块为 **51 行**（边界块含 4 行 <54 s）。
+
+结论：`I_present=504` 是数值行数，**不是 504 个合格独立 I 证据**；解锁需 S2 提供最终 solution 位姿、带 handler 标签的
+pre/post，以及声明切空间的协方差。
