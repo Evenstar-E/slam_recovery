@@ -2185,3 +2185,7 @@ S2 更正并给出解析脚本 `docs/review_20261112_four_host/analyze_cp_candid
 **存在时间上非常接近边界的合法候选**（37 ms），"早期 rolling 太稀疏导致时间不可用"的说法不成立；候选是 frame 2
 只是因为该段在 run 开始 0.43 s 就触发、地图仅 4834 voxels——真正要评估的代价是**回滚后需重放的帧数与地图体量**，
 不是时间偏移。明天的多段统计须同时记 `delta_s`（候选 vs 边界）与"候选 frame 与实际 frame 差"。
+
+**补（S2 `53f5c2a`，已推）**：`analyze_cp_candidates.py` 与 `cp_candidates.txt` 增加 `cand_bytes`（候选体量估算）
+与 `frame_gap`（实际 cp 与候选的帧差）；本轮 f2 候选 `cand_bytes=2,036,096`、`frame_gap=51`。
+`BUILD.md` §8/§9 已写 `cp_history_k` 默认 1 的等价说明、布局/file-static 结论、37 ms 更正与可执行文件重链声明。
