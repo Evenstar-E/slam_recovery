@@ -110,3 +110,10 @@ resume 221.37→221.87。命令串行化与 receipt 屏障都按设计工作。
 从 0.027 m 放大到 **0.815 m**（偏差可见），但拟合未收敛（706 inliers，0.5 m 对应门限），候选被
 Wilson 0.2855 拒绝，**没有发布修复、没有 bias 实测**。按任务规则没有跑对照，断点与下一步写在
 该报告里。
+
+## 9. 后续：解耦偏差估计的第三次尝试
+
+`decoupled_bias/REPORT.md`：同声明、同窗口；候选保持宿主位姿 ICP（accepted），偏差改用
+incumbent 位姿下的 body-z 一维搜索。结果 **bias median +0.40 m（MAD 0.05，26 帧，容差内）**，
+门 accepted；但宿主订阅队列只有 20 条，26 条一次性发布丢了 6 条，`repair_received=20`，
+receipt 屏障拒绝重放（无 `reprocess #`、无 applied）。断点与发布节流的修法写在那个报告里。
