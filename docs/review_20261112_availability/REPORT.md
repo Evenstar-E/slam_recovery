@@ -116,3 +116,13 @@ within 比例、NIS 均值和最终 status；**正常帧只保存 20/200 与 20/
 | `segment_53_117.tsv` | 65 帧段的逐帧 support fraction / raw / effective NIS |
 | `receipt.json` / `wiring.json` / `run_summary.json` / `candidates.jsonl` | 运行原件 |
 | `recovery_node.log` / `machine_load.txt` / `recovery_node_source.sha256` | 运行环境与版本 |
+
+## 8. 后续：位姿-地图分解（第二次诊断）
+
+`predicted_pose/REPORT.md`：同输入、检测 on 的第二次诊断，S1 新增
+`support_under_predicted_pose`。本 run 544 行（paired 544；上一轮 402，人口随 run 变化）、
+预测支持非空 480、null 64。联合计数：both_low 301、both_pass 82、only_host_low 50、
+only_pred_low 47。分段落判读：**位姿漂移段 147 帧**（147–173、228–280、396–462，预测中位
+0.48–0.515 vs 宿主 0.0–0.025，50 帧预测位姿过阈值）、**覆盖不足段 191 帧**（两套都低）、
+预测更低 54 帧（UNKNOWN）、null 64 帧。上一轮同戳窗口在本 run 已有 37/65 帧 AVAILABLE——
+UNAVAILABLE 依赖该 run 的地图/位姿状态，不是输入的固定属性。检测/阈值/门/模型未改。
