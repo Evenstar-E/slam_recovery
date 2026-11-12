@@ -1,0 +1,486 @@
+{
+  "target": "fafbaf173b873502d248164adff8cd185dfa0dfc",
+  "exit": 0,
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261112_fafbaf1/check_archive.py",
+  "scope": "Fixed Git hashes, pose timestamp population and three saved-sample distance checks. No ICP, GT or causal experiment.",
+  "integrity": {
+    "new_archive": [
+      {
+        "path": "REPORT.md",
+        "expected": "77c2be08b51596c8ec0e0bd318258c9a9aabd014d81167d3dbf1b7f4515e4b71",
+        "actual": "77c2be08b51596c8ec0e0bd318258c9a9aabd014d81167d3dbf1b7f4515e4b71",
+        "ok": true
+      },
+      {
+        "path": "all_downsampled_points.pcd",
+        "expected": "f1367c1c38ea1aa903c1b7442247235e395ed3f74c038a99ea5ea44002ecb9bb",
+        "actual": "f1367c1c38ea1aa903c1b7442247235e395ed3f74c038a99ea5ea44002ecb9bb",
+        "ok": true
+      },
+      {
+        "path": "host.log",
+        "expected": "4f74ecf202d36c5c622a0486f6ba6a93a0fa83d236a4a0bcce8bedbb4544aa24",
+        "actual": "4f74ecf202d36c5c622a0486f6ba6a93a0fa83d236a4a0bcce8bedbb4544aa24",
+        "ok": true
+      },
+      {
+        "path": "lidar_poses.txt",
+        "expected": "443da1cd9c06a1925f1a8f43530059b421335b827a863a9326576787e902b863",
+        "actual": "443da1cd9c06a1925f1a8f43530059b421335b827a863a9326576787e902b863",
+        "ok": true
+      },
+      {
+        "path": "machine_load.txt",
+        "expected": "e92eebdafe4059ef6ec611d67148b0f9b37e767e5560192de8faa9b5987d071e",
+        "actual": "e92eebdafe4059ef6ec611d67148b0f9b37e767e5560192de8faa9b5987d071e",
+        "ok": true
+      },
+      {
+        "path": "pcd_sha256.txt",
+        "expected": "ff660d7437d7800dafa767e6f70a999a24a3e158ea3c40f5884e3aa9fdb20cb6",
+        "actual": "ff660d7437d7800dafa767e6f70a999a24a3e158ea3c40f5884e3aa9fdb20cb6",
+        "ok": true
+      },
+      {
+        "path": "play.log",
+        "expected": "7226d97e0655ad588d8aeddd0db9bc321b4739723c4c251fed9439f5743cee1e",
+        "actual": "7226d97e0655ad588d8aeddd0db9bc321b4739723c4c251fed9439f5743cee1e",
+        "ok": true
+      },
+      {
+        "path": "receipt.json",
+        "expected": "6d1ab19548dd4186df5255ed3f2dd26e8cb2259f1c8444193510d4b3c5633a9c",
+        "actual": "6d1ab19548dd4186df5255ed3f2dd26e8cb2259f1c8444193510d4b3c5633a9c",
+        "ok": true
+      },
+      {
+        "path": "recovery_node.log",
+        "expected": "3088451df120160c4f86fa83e3dbaf897b191b1700c46ed1341e6e59b4d3df37",
+        "actual": "3088451df120160c4f86fa83e3dbaf897b191b1700c46ed1341e6e59b4d3df37",
+        "ok": true
+      },
+      {
+        "path": "recovery_node_source.sha256",
+        "expected": "4a7fea75f857d632fd35adee95893081aa4c6499237bd29f41cdd6b28acdb60a",
+        "actual": "4a7fea75f857d632fd35adee95893081aa4c6499237bd29f41cdd6b28acdb60a",
+        "ok": true
+      },
+      {
+        "path": "refmap_m2dgr.yaml",
+        "expected": "94ffa5dbf29a025a8338d6e7680f4609241db449e65942f510895ee8e0ecd7dc",
+        "actual": "94ffa5dbf29a025a8338d6e7680f4609241db449e65942f510895ee8e0ecd7dc",
+        "ok": true
+      },
+      {
+        "path": "run_summary.json",
+        "expected": "4992ce57ac7cb7bbcb145c146e919238cc62f8e0819eec6fc01e183c6a0423a0",
+        "actual": "4992ce57ac7cb7bbcb145c146e919238cc62f8e0819eec6fc01e183c6a0423a0",
+        "ok": true
+      }
+    ],
+    "new_matched": 12,
+    "new_total": 12,
+    "previous_archive": [
+      {
+        "path": "REPORT.md",
+        "expected": "ab3e2b4cf4f4c4548dc71b6e73f82aca07908e67db1e5eeae83ffb968cfbeae8",
+        "actual": "c97c14f6bae548b897e5ecb05fdcafcbbbcb66e91e62e0f29252dfb37af42feb",
+        "ok": false
+      },
+      {
+        "path": "all_downsampled_points.pcd",
+        "expected": "001bfb45fabb23fe4cd4ca350bda27172e805cd3ff64f8e4d5ce7d9ad5e30876",
+        "actual": "001bfb45fabb23fe4cd4ca350bda27172e805cd3ff64f8e4d5ce7d9ad5e30876",
+        "ok": true
+      },
+      {
+        "path": "host.log",
+        "expected": "76fcf1890f3265855c819398e9f760411db5ab1cd87b1e14575d2bc08ed354d8",
+        "actual": "76fcf1890f3265855c819398e9f760411db5ab1cd87b1e14575d2bc08ed354d8",
+        "ok": true
+      },
+      {
+        "path": "lidar_poses.txt",
+        "expected": "8fc27ceeb7163614eb83cc3ab59a18da7a248913fa3a3709e733c83d5c6b9e93",
+        "actual": "8fc27ceeb7163614eb83cc3ab59a18da7a248913fa3a3709e733c83d5c6b9e93",
+        "ok": true
+      },
+      {
+        "path": "machine_load.txt",
+        "expected": "20556ad5a0bf887a05df1bae240ca63236ef285eaee008ecd432b74aabd92821",
+        "actual": "20556ad5a0bf887a05df1bae240ca63236ef285eaee008ecd432b74aabd92821",
+        "ok": true
+      },
+      {
+        "path": "pcd_sha256.txt",
+        "expected": "04aed808d5747bd087934b02f60c3a9a3be2d8ea86b5f1787ee8343343c27896",
+        "actual": "04aed808d5747bd087934b02f60c3a9a3be2d8ea86b5f1787ee8343343c27896",
+        "ok": true
+      },
+      {
+        "path": "receipt.json",
+        "expected": "e960f07bb74cad12f2091203d2d7ac5d1bf45c6cf4b964face1bffac0b8067bb",
+        "actual": "e960f07bb74cad12f2091203d2d7ac5d1bf45c6cf4b964face1bffac0b8067bb",
+        "ok": true
+      },
+      {
+        "path": "recovery_node.log",
+        "expected": "e77610c96ba245864fc9b908d13d6251cf99cfc78a62a8bc7efbc016e1ae0612",
+        "actual": "e77610c96ba245864fc9b908d13d6251cf99cfc78a62a8bc7efbc016e1ae0612",
+        "ok": true
+      },
+      {
+        "path": "recovery_node_source.sha256",
+        "expected": "4a7fea75f857d632fd35adee95893081aa4c6499237bd29f41cdd6b28acdb60a",
+        "actual": "4a7fea75f857d632fd35adee95893081aa4c6499237bd29f41cdd6b28acdb60a",
+        "ok": true
+      },
+      {
+        "path": "refmap_m2dgr.yaml",
+        "expected": "94ffa5dbf29a025a8338d6e7680f4609241db449e65942f510895ee8e0ecd7dc",
+        "actual": "94ffa5dbf29a025a8338d6e7680f4609241db449e65942f510895ee8e0ecd7dc",
+        "ok": true
+      },
+      {
+        "path": "run_summary.json",
+        "expected": "7e16cd8bda196bfb61fe37e3e977347d6777dd4aa7aa1368b32d8b2f9d77e31b",
+        "actual": "7e16cd8bda196bfb61fe37e3e977347d6777dd4aa7aa1368b32d8b2f9d77e31b",
+        "ok": true
+      }
+    ],
+    "previous_matched": 10,
+    "previous_total": 11,
+    "previous_report_failure": "Target appends section6 to REPORT but preserves original SHA256SUMS; other10 artifacts unchanged."
+  },
+  "run": {
+    "receipt": {
+      "status": "OK",
+      "reason": "all wiring checks passed",
+      "termination": "PLANNED_KILL_AFTER_DRAIN",
+      "run_id": "fl_native_20261112T085719Z_276974",
+      "inputs": {
+        "bag": "/tmp/fastlivo/hall01_two_event_v1.bag",
+        "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+        "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+        "host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+        "config_m2dgr": "/tmp/fastlivo/refmap_m2dgr.yaml",
+        "config_m2dgr_sha256": "94ffa5dbf29a025a8338d6e7680f4609241db449e65942f510895ee8e0ecd7dc",
+        "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+        "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+        "recovery_node_source": "4742dbc148cfd2633cc278e2b2203cd9ec646be984a08a0f381d94e73a1751c3",
+        "runtime_library": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+        "runtime_library_sha256": "9e7d8cdf368ed4214906c6671504f1db6daeecd66b1592a52e7bb28c25663b0a"
+      },
+      "machine_load_at_launch": "70.07 129.25 220.12 20/64898 277009\nnproc=128",
+      "launch": {
+        "rate": "1.0",
+        "drain_s": "60",
+        "duration_s": "0",
+        "max_pairs": "0",
+        "candidate_source": "host_poses",
+        "detection": "off",
+        "sigma_meas_m": "0.12",
+        "scripted_triggers_s": "",
+        "scripted_triggers_ns": "",
+        "confirmation_margin_sec": "2.0",
+        "relay_shift_z": "",
+        "relay_start_ns": "",
+        "relay_end_ns": "",
+        "injection": "NONE",
+        "repair_publish": "1",
+        "run_mode": "ONLINE_DETECTION",
+        "group_model": "host and recovery node are children of one setsid supervisor"
+      },
+      "exit_codes": {
+        "play": "0",
+        "supervisor": "null",
+        "recovery_node": "0",
+        "roscore": "null"
+      },
+      "recovery_summary_present": true,
+      "recovery_summary_headline": {
+        "paired": 544,
+        "fed_to_step_frame": 0,
+        "episodes": 0,
+        "decisions": 0,
+        "accepted": 0,
+        "final_state": "HEALTHY"
+      }
+    },
+    "pairing": {
+      "pair_window_ns": 40000000,
+      "poses_received": 819,
+      "scans_received": 598,
+      "paired": 544,
+      "poses_unpaired": 275,
+      "scans_unpaired": 54,
+      "paired_fraction_of_poses": 0.6642246642246642,
+      "paired_fraction_of_scans": 0.9096989966555183,
+      "max_abs_dt_ns": 39959192,
+      "max_backlog_messages": 183,
+      "messages_considered": 1417,
+      "pairing_rule": "nearest pose within 40 ms, no pose reused"
+    },
+    "frames": {
+      "paired": 544,
+      "ingested": 544,
+      "fed_to_step_frame": 0,
+      "ingested_without_detection": 0,
+      "consumed_after_first_decision": 0,
+      "first_decision_ts_ns": null
+    },
+    "runtime": {
+      "wall_sec": 135.484,
+      "pid": 278177,
+      "pgid": 278174,
+      "peak_rss_kb": 1010636,
+      "pose_messages": 819,
+      "scan_messages": 598,
+      "callback_errors": [],
+      "callback_error_count": 0
+    },
+    "first_paired_ns": 1627785261403843403,
+    "last_paired_ns": 1627785320909073830,
+    "pose_rows": 819,
+    "pose_start_ns": 1627785261403843000,
+    "pose_end_ns": 1627785320909074000,
+    "pose_span_s": 59.505231,
+    "pose_xyz_ranges": [
+      [
+        0.002225,
+        8.810375
+      ],
+      [
+        -0.12154,
+        8.80215
+      ],
+      [
+        -0.61515,
+        0.298558
+      ]
+    ],
+    "play_footer": [
+      "",
+      " [RUNNING]  Bag Time: 1627785320.976322   Duration: 59.975822 / 59.993771               ",
+      "",
+      " [RUNNING]  Bag Time: 1627785320.977680   Duration: 59.977179 / 59.993771               ",
+      "",
+      " [RUNNING]  Bag Time: 1627785320.981842   Duration: 59.981342 / 59.993771               ",
+      "Done."
+    ],
+    "host_footer": [
+      "\u001b[32mRaw point cloud data saved to: /home/R26534/fast_livo2_ws/src/FAST-LIVO2/Log/pcd/all_raw_points.pcd with point count: 2889123\u001b[0m",
+      "\u001b[32mDownsampled point cloud data saved to: /home/R26534/fast_livo2_ws/src/FAST-LIVO2/Log/pcd/all_downsampled_points.pcd with point count after filtering: 15647\u001b[0m",
+      "terminate called without an active exception"
+    ],
+    "host_last_snapshot_lines": [
+      "\u001b[0m[ INFO] [1794473983.239897725]: [NATIVE_CHECKPOINT] snapshot stamp=1627785320.909073830 frame=819 voxels=50310 nodes=149626 points=1316187\u001b[0m"
+    ],
+    "native_checkpoint_counters": {
+      "snapshots": 44,
+      "restores": 0,
+      "reprocesses": 0,
+      "holds": 0,
+      "resumes": 0,
+      "failures": 6,
+      "snapshot_ack_timeouts": 6
+    },
+    "detection_enabled": false,
+    "actual_repair_publish": false
+  },
+  "pcd": {
+    "points": 15647,
+    "bytes": 250534,
+    "sha256": "f1367c1c38ea1aa903c1b7442247235e395ed3f74c038a99ea5ea44002ecb9bb",
+    "raw_pcd": "NOT_READ_remote_hash_only",
+    "quality": "UNKNOWN_not_GT"
+  },
+  "diagnostic_run": {
+    "run_id": "fl_native_20261112T070801Z_197026",
+    "inputs": {
+      "bag": "/tmp/fastlivo/hall01_two_event_v1.bag",
+      "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+      "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+      "host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+      "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+      "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+      "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+      "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+      "recovery_node_source": "43c65a9d527b071c200a2c522c7fcef85a510715d54092a91ed608c0531ac048",
+      "runtime_library": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+      "runtime_library_sha256": "9c0330beffa2d93564ba10d36751e938baa54768fa218b21b75fe17bb8f700db"
+    },
+    "launch": {
+      "rate": "1.0",
+      "drain_s": "20",
+      "duration_s": "0",
+      "max_pairs": "0",
+      "candidate_source": "host_poses",
+      "detection": "on",
+      "sigma_meas_m": "0.884",
+      "scripted_triggers_s": "",
+      "scripted_triggers_ns": "",
+      "confirmation_margin_sec": "2.0",
+      "relay_shift_z": "",
+      "relay_start_ns": "",
+      "relay_end_ns": "",
+      "injection": "NONE",
+      "repair_publish": "1",
+      "run_mode": "ONLINE_DETECTION",
+      "group_model": "host and recovery node are children of one setsid supervisor"
+    },
+    "native_checkpoint_counters": {
+      "restores": 8,
+      "reprocesses": 0,
+      "holds": 8,
+      "resumes": 7
+    },
+    "first_actions": [
+      {
+        "command": "hold",
+        "wall": 1794467304.727,
+        "received_wall": 1794467304.731591,
+        "received_s": 0.005,
+        "ok": true,
+        "ack": "OK hold valid=1 stamp_ns=1627785262942770688 frame=24 voxels=7935 nodes=13597 points=146667 restores=0 live_voxels=8743 live_points=162569 state_pos=1.405605,-0.120245,-0.016020 hold=1 held_frames=0 held_points=0 hold_commands=1 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=26 set_state=0 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+        "ack_wall": 1794467304.957
+      },
+      {
+        "command": "restore",
+        "wall": 1794467307.458,
+        "received_wall": 1794467307.458586,
+        "received_s": 0.001,
+        "ok": true,
+        "ack": "OK restore valid=1 stamp_ns=1627785262942770688 frame=24 voxels=7935 nodes=13597 points=146667 restores=1 live_voxels=7935 live_points=146667 state_pos=0.957742,-0.078652,-0.013227 hold=1 held_frames=33 held_points=566750 hold_commands=1 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=48 set_state=0 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+        "ack_wall": 1794467307.957
+      },
+      {
+        "command": "resume",
+        "wall": 1794467309.457,
+        "trigger": "rearm",
+        "received_wall": 1794467309.462635,
+        "received_s": 0.006,
+        "ok": true,
+        "ack": "OK resume valid=1 stamp_ns=1627785262942770688 frame=24 voxels=7935 nodes=13597 points=146667 restores=1 live_voxels=7935 live_points=146667 state_pos=-3.635735,-4.911430,-0.054820 hold=0 held_frames=72 held_points=1216527 hold_commands=2 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=74 set_state=0 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+        "ack_wall": 1794467309.957
+      }
+    ]
+  },
+  "comparability": {
+    "same_input_bag_hash": true,
+    "same_host_binary_hash": true,
+    "same_runtime_library_hash": false,
+    "same_driver_hash": false,
+    "same_config_hash": false,
+    "same_544_pose_stamp_population": true,
+    "max_pose_log_rounding_delta_ns": 500,
+    "maximum_unregistered_difference": {
+      "kf_id": 173,
+      "stamp_ns": 1627785281080858469,
+      "pose_log_stamp_delta_ns": -469,
+      "diagnostic_position": [
+        -48.38762263654734,
+        -50.64866809417196,
+        -2.360176513891731
+      ],
+      "map_run_position": [
+        8.034339,
+        6.0109,
+        0.209056
+      ],
+      "unregistered_position_difference_m": 80.00215851615859
+    },
+    "first_over_1m_unregistered": {
+      "kf_id": 46,
+      "stamp_ns": 1627785266007305384,
+      "pose_log_stamp_delta_ns": -384,
+      "diagnostic_position": [
+        1.0472031176134131,
+        -0.12925443506076362,
+        -0.037402436079140275
+      ],
+      "map_run_position": [
+        2.765435,
+        0.253328,
+        0.020113
+      ],
+      "unregistered_position_difference_m": 1.7612490302777035
+    },
+    "causal_verdict": "UNKNOWN_intervention_host_library_driver_config_and_execution_differ_not_paired_control",
+    "independent_reference_rule": "Different estimated trajectories do not alone invalidate an independent scene reference; registration, visible support and reference validity must be established. Do not force diagnostic poses into reference to manufacture agreement."
+  },
+  "three_frame_saved_sample_controls": [
+    {
+      "kf_id": 22,
+      "stamp_ns": 1627785263607979774,
+      "pose_log_stamp_delta_ns": 226,
+      "diagnostic_position": [
+        1.3605349112178053,
+        -0.12154000862629272,
+        -0.00859822575211717
+      ],
+      "map_run_position": [
+        1.360535,
+        -0.12154,
+        -0.008598
+      ],
+      "unregistered_position_difference_m": 2.4273588410026913e-07,
+      "support_population": 200,
+      "saved_samples": 20,
+      "within_1m": 20,
+      "saved_sample_fraction": 1.0,
+      "median_distance_m": 0.24889918814121087,
+      "partial_sample": true,
+      "score_scope": "Saved samples at recorded pose, identity gauge only; not independently registered/GT quality"
+    },
+    {
+      "kf_id": 157,
+      "stamp_ns": 1627785278081956625,
+      "pose_log_stamp_delta_ns": 375,
+      "diagnostic_position": [
+        -25.784429710530905,
+        -18.470772812049205,
+        0.46506446171292326
+      ],
+      "map_run_position": [
+        6.797516,
+        4.564043,
+        0.167162
+      ],
+      "unregistered_position_difference_m": 39.90331654957655,
+      "support_population": 200,
+      "saved_samples": 200,
+      "within_1m": 0,
+      "saved_sample_fraction": 0.0,
+      "median_distance_m": 18.437114697707717,
+      "partial_sample": false,
+      "score_scope": "Saved samples at recorded pose, identity gauge only; not independently registered/GT quality"
+    },
+    {
+      "kf_id": 228,
+      "stamp_ns": 1627785288611696720,
+      "pose_log_stamp_delta_ns": 280,
+      "diagnostic_position": [
+        -19.93203168384149,
+        -10.402712816785227,
+        -1.7960061886011527
+      ],
+      "map_run_position": [
+        6.751957,
+        8.769257,
+        0.288375
+      ],
+      "unregistered_position_difference_m": 32.92330973147291,
+      "support_population": 200,
+      "saved_samples": 200,
+      "within_1m": 0,
+      "saved_sample_fraction": 0.0,
+      "median_distance_m": 8.997566089129815,
+      "partial_sample": false,
+      "score_scope": "Saved samples at recorded pose, identity gauge only; not independently registered/GT quality"
+    }
+  ],
+  "all_302_frames_or_icp_scoring": "NOT_EXECUTED_no_new_complete_score_artifact",
+  "ali_h_new_implementation_or_receipt": "NOT_FOUND_in_development_delta",
+  "no_native_bag_or_parameter_execution": true
+}

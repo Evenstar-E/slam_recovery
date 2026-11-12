@@ -796,3 +796,11 @@ S1证据解释/共享成功依赖单写，S2原生合法隔离起点cp→物理�
 2026-11-12用户要求通过GitHub交接[ALI-H §10任务](ADAPTIVE_LOW_INFORMATION_HEALTH_V1_20261112.md#10-用户明确交接的下一单一交付真实数据验证-ali-h)：先分别核旧402/544行真实通道/缺项/校准，HEALTHY非正常真值；优先复用真实IMU preupdate与LiDAR update状态，缺导出由S1/S2确认一次最小已有预算导出，不造零bias/占位、不换地图无限解释；交同trace同人口旧方法/shadow漏检、误报、延迟、错误NORMAL、UNKNOWN数量/时长/原因与成本。新run内证据不能贴回旧run冒同步；缺标签NOT_EVALUABLE，不降首版或旧阈值强二分。
 
 S1分发/确认owner branch HEAD预算并单写共享接口，S3唯一research执行，S2现trace/必要最小导出，保持1研究+2native/旧参数停；本机不算法/host，自动审阅继续、不重复建任务。不自动暂停原生开发，研究不直接接入实际检测/地图提交；一次有限真实结论交用户后再决定生产动作。逐项PASS/FAIL/BLOCKED/NOT_APPLICABLE及命令原件/人口/缺项，发布不等认领/开工。交接fetch fafbaf1新地图redo/分叉仅开发报告，另审不作为本任务已证明因果或新重跑许可。
+
+## repair-f3 / fafbaf1：新地图尾部通过，干预因果/参考规则需限定
+
+[核验](review_20261112_fafbaf1/README.md)新085719Z 12SHA一致、play Done/819pose/544paired到诊断同末戳/native819、downsample15647/raw2889123保存接受；detection off/no恢复动作、44snapshot/6timeout/末terminate，不新增原生恢复结果。旧REPORT加后续说明但原清单未变10/11（仅REPORT），集中版本化补来源、不动历史/重跑。
+
+同戳位置差真实：kf157/228未注册差39.903/32.923m，各全200保存样本距新图0/200；kf22仅20/200裁样本20命中非全帧或gauge真值。完整544差最大80.002m、首>1m kf46，不精确15s起点/GT漂移。diag v3库9c0330be/driver43c65a9d/config47a1bfd9 vs新v5 9e7d8cdf/4742dbc1/94ffa5db，bag/binary同不单一干预控制；8restore/7resume是候选机制非已证唯一因果。独立图需同场景合法注册/覆盖而非相同估计轨迹，复制诊断pose造图不能当独立位姿参考；当前有效性UNKNOWN，不再clean矩阵。
+
+S1原因/人口限定只阻相关评价结论，S1/S2合法cp/成功依赖及物理native整链继续；S3用户105b5be ALI-H§10真实数据交付优先旧402/544资格/真实I/同人口风险与UNKNOWN成本，不等独立地图；新target未含最新任务，不指控忽略/不冒认领或测试。1研究+2native/旧参数停，逐项状态/命令原件/source input library/人口/失败质量成本自检，A/B局部不总分；Python-I reader无host/bag/ICP/参数，三Cron单owner，review白名单SSH/private保护不合main不改算法历史。
