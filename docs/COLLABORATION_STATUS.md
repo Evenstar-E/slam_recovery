@@ -768,3 +768,11 @@ E2无注入/detection off、滚动cp晚trigger1.607814s/晚隔离起点5.607814s
 本次直接授权仅此方法隔离实现/有限测试，先shadow不改变旧检测/manager/native，生产部署另需用户确认，不扩双参考/数据宿主矩阵或恢复旧参数任务。本机只设计/审阅；S3保持唯一研究角色，在已有门研究时段安排并回实际预算/branch/认领；S1共享接口单写、S2继续native，先复用已有402/544行原件和必要最小synthetic控制，有明确缺项才复用原生trace或至多一次预算内有限导出。完整人口/标签/误报漏检延迟/弃权/资源与负结果，缺I或健康低支持参照明确UNKNOWN，不把改名当解决。
 
 20min/2h/日报actual owner repair-f3保持、未新增任务；新main5f54a44的armed/final原生E2独立并行核验，不凭完成标题验收。方案DESIGNED/NOT_IMPLEMENTED/NOT_EXECUTED，S1/S3实际接收待回执，发布不冒运行；A3/B3计划非新评分。SSH独立review提交推送/private保护不合main不改历史冻结门。
+
+## repair-f3 / 5f54a44原生增量：双事件尾段接受，检查点需对齐隔离起点而非仅trigger
+
+[核验](review_20261112_5f54a44_native/README.md)新armed/final34原件SHA一致、341全manifest完整性核；实际b1bce5e driver与target四changed entry AST一致，整source不同诊断merge不冒最新全实跑。armed修复23/437=124+313suffix/无set_state但E2未close/resume/open；final修复23/503=124+379suffix/map21578/403642/无set_state→接回→E2拒绝restore/close/ABORTED rearm/resume→39paired/4.65064s尾段，受控执行接受，不自动恢复/GT收益或全部状态等价。
+
+实际cp晚隔离起点：两E1约4s，armed E2 3.999999942s，final E2 3.932198216s，早trigger67.8ms只解除晚trigger范围；最低实际应用历史cp不晚quarantine_start并保input归宿，或明确拒绝回溯不支持，不调margin/重新框架/无限移E2戳。旧collect未知失败写回/物理候选仍未改不重测，59shift仅23修/未解101,138保人口。总结final before20.3222非22.064/Wilson0、superseded0非1等集中更正不重跑。
+
+S1共享成功依赖/可信边界、S2下一合法历史恢复→完整接回后继尾段或能力断点；S3按新用户ALI-H v1有限shadow研究授权且旧参数停、既有研究预算顺序回执，native不等研究。availability旧state交叉不真值/唯一pose因果，论文受控限定保留。-I reader/source控制PASS，早reader断言只修辅助，无host/bag，build目标成功整体ABI失败不抹。实际automation owner无双写，16:29DNS失败不冒remote latest，A/B局部不总分、自检状态/命令/原件/人口/失败/质量成本UNKNOWN，review SSH推送/private保护不合main不改算法历史冻结门，接收新意见待回执。

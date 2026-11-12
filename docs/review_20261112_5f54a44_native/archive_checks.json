@@ -1,0 +1,452 @@
+{
+  "target": "5f54a449650e203a1c1d3bba29486a8476fb53ae",
+  "baseline": "70e3e7cab942839e88727579787c7210012ef5f9",
+  "mode": "read-only Git bytes + Python -I; no archive script/host/bag/dependency install",
+  "manifest": {
+    "listed": 341,
+    "matched": 341,
+    "mismatches": []
+  },
+  "source": {
+    "target_driver_sha256": "4742dbc148cfd2633cc278e2b2203cd9ec646be984a08a0f381d94e73a1751c3",
+    "run_driver_sha256": "a7cf030ce8f04e99cd87469f6cfe9c2c2ce68cb2b340f357a4aa3f1ca7156942",
+    "run_driver_git_revision": "b1bce5ef7b3c4258f65371e32b4930f7ca2147ea",
+    "changed_entry_ast_equal_run_and_target": {
+      "arm_scripted_checkpoints": true,
+      "_open_episode": true,
+      "service": true,
+      "main": true
+    },
+    "minimal_source_controls": {
+      "arm_sorted_all_stamps": true,
+      "open_cancels_before_hold": true,
+      "scripted_rolling_disabled": true,
+      "online_rolling_preserved": true
+    },
+    "normal_minimal_boundary_scenario": {
+      "trigger_ns": 10000000000,
+      "quarantine_start_ns": 6000000000,
+      "current_arm_ns": 10000000000,
+      "unreverted_prefix_s": 4
+    }
+  },
+  "build": {
+    "command": "catkin_make -j8 (archived only)",
+    "overall_exit_code": 1,
+    "host_target_built_log_marker": true,
+    "abi_failure_retained": true,
+    "runtime_library_declared_in_build_matches_both_receipts": true,
+    "clean_independent_rebuild": "NOT_EXECUTED"
+  },
+  "runs": [
+    {
+      "archive": "two_event_armed_checkpoint_20261112",
+      "run_id": "fl_native_20261112T080204Z_228057",
+      "checks": {
+        "run_id_receipt_summary_candidates_bound": true,
+        "receipt_driver_equals_known_git_run_source": true,
+        "receipt_driver_equals_target_source": false,
+        "declared_fired_candidate_episode_trigger_stamps_equal": true,
+        "repair_published_received_applied_23": true,
+        "published_and_applied_stamps_equal_at_host_double_precision": true,
+        "published_stamps_equal_actual_applied_stamps_exact_ns": false,
+        "all_repaired_stamps_in_shifted_population": true,
+        "candidate_detail_population_bound": true,
+        "candidate_pose_and_published_scan_stamps_within_pair_window": true,
+        "replay_total_equals_window_plus_suffix": true,
+        "host_replay_counts_equal_ack": true,
+        "reprocess_resume_native_boundary_xyz_equal": true,
+        "no_set_state_command": true,
+        "lifecycle_archive_equals_summary": true,
+        "checkpoint_archive_equals_summary": true,
+        "pose_scan_pair_population_balances": true,
+        "launch_mentions_exact_run_and_trigger_stamps": true
+      },
+      "listed_file_hashes": 17,
+      "inputs": {
+        "bag": "/tmp/fastlivo/hall01_two_event_v1.bag",
+        "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+        "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+        "host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+        "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+        "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+        "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+        "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+        "recovery_node_source": "a7cf030ce8f04e99cd87469f6cfe9c2c2ce68cb2b340f357a4aa3f1ca7156942",
+        "runtime_library": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+        "runtime_library_sha256": "9e7d8cdf368ed4214906c6671504f1db6daeecd66b1592a52e7bb28c25663b0a"
+      },
+      "full_package_source_identity": "UNKNOWN (only driver Git source and host patch/library declaration bound)",
+      "run_mode": "CONTROLLED_INTERFACE_TEST",
+      "detection_enabled": false,
+      "declared_trigger_stamps": [
+        1627785276215170145,
+        1627785308048271418
+      ],
+      "gate_candidates": [
+        {
+          "candidate_id": "cand_0000",
+          "t_trigger_ns": 1627785276215170145,
+          "t_decision_ns": 1627785280281185627,
+          "mode": "MODE2_ATOMIC_COMMIT",
+          "accepted": true,
+          "weak_dir_info_before": 3.138785109598945,
+          "weak_dir_info_after": 7.286746650064143,
+          "wilson_lower_bound": 0.8947318770599499,
+          "committed": 23,
+          "deferred_at_decision": 65
+        },
+        {
+          "candidate_id": "cand_0001",
+          "t_trigger_ns": 1627785308048271418,
+          "t_decision_ns": 1627785316989562035,
+          "mode": "MODE3_SOFT_BRIDGE_WAIT",
+          "accepted": false,
+          "weak_dir_info_before": 22.064140659111526,
+          "weak_dir_info_after": 18.18314883764857,
+          "wilson_lower_bound": 0.016684786037393845,
+          "committed": 0,
+          "deferred_at_decision": 0
+        }
+      ],
+      "icp": [
+        {
+          "status": "CONVERGED",
+          "icp_converged": true,
+          "icp_residual": 0.05151108007318528,
+          "frames_candidate": 23
+        },
+        {
+          "status": "ITERATION_LIMIT",
+          "icp_converged": false,
+          "icp_residual": 0.05267979039018848,
+          "frames_candidate": 40
+        }
+      ],
+      "repair": {
+        "estimated_bias_z_m": 0.4,
+        "shift_z_m": -0.4,
+        "published_received_applied": [
+          23,
+          23,
+          23
+        ],
+        "shifted_scans": 59,
+        "shifted_but_not_repaired_scans": 36,
+        "leftover": 0,
+        "baseline": 0,
+        "published_scan_stamps_sha256": "6d56f5bb19fa6bf63e80a2b599a4614ad9058819e3eb773598e13c8afeef6621",
+        "actual_applied_log_stamps_sha256": "581cec66f4f8e65f8898f08b2c1a81865a871e22eac04b20c1baf71384053952",
+        "max_published_to_applied_log_precision_delta_ns": 239,
+        "stamp_matching_note": "Exact integer published stamps are relay-bound; host prints double seconds (0..239 ns conversion difference), uniquely matched within one double ULP, not claimed bitwise-identical."
+      },
+      "replay": {
+        "groups": 437,
+        "start_ns": 1627785276281966925,
+        "end_ns": 1627785290824749470,
+        "within_end": 124,
+        "suffix": 313,
+        "terminal_payload_ns": 1627785280381185627,
+        "map_voxels": 20154,
+        "map_points": 375577
+      },
+      "checkpoints": [
+        {
+          "event": 1,
+          "trigger_ns": 1627785276215170145,
+          "quarantine_start_ns": 1627785272215170145,
+          "snapshot_log_ns": 1627785276215170145,
+          "checkpoint_ack_ns": 1627785276215170048,
+          "checkpoint_minus_trigger_ns": -97,
+          "checkpoint_minus_quarantine_start_ns": 3999999903,
+          "checkpoint_no_later_than_trigger": true,
+          "checkpoint_no_later_than_quarantine_start": false,
+          "native_state_and_map_fully_equivalent": "UNKNOWN"
+        },
+        {
+          "event": 2,
+          "trigger_ns": 1627785308048271418,
+          "quarantine_start_ns": 1627785304048271418,
+          "snapshot_log_ns": 1627785308048271418,
+          "checkpoint_ack_ns": 1627785308048271360,
+          "checkpoint_minus_trigger_ns": -58,
+          "checkpoint_minus_quarantine_start_ns": 3999999942,
+          "checkpoint_no_later_than_trigger": true,
+          "checkpoint_no_later_than_quarantine_start": false,
+          "native_state_and_map_fully_equivalent": "UNKNOWN"
+        }
+      ],
+      "lifecycle": [
+        {
+          "event": "wait_limit_closed",
+          "closed_ns": 1627785287544073105,
+          "from_state": null,
+          "unresolved_frames": 85
+        },
+        {
+          "event": "rearm",
+          "closed_ns": null,
+          "from_state": "ABORTED",
+          "unresolved_frames": 0
+        }
+      ],
+      "final_state": "WAITING_FOR_EVIDENCE",
+      "quarantine_open_at_exit": true,
+      "tail_after_e2_close_paired_frames": 0,
+      "tail_after_e2_close_duration_s": null,
+      "last_paired_stamp_ns": 1627785320909073830,
+      "native_snapshot_counters": {
+        "snapshots": 2,
+        "snapshots_superseded": 0,
+        "snapshot_ack_timeouts": 0,
+        "failures": 0
+      },
+      "runtime": {
+        "wall_sec": 102.116,
+        "pid": 229148,
+        "pgid": 229144,
+        "peak_rss_kb": 901364,
+        "pose_messages": 819,
+        "scan_messages": 598,
+        "callback_errors": [],
+        "callback_error_count": 0
+      },
+      "independent_recovery_quality": "UNKNOWN",
+      "command_sequence": [
+        "hold",
+        "snapshot",
+        "hold",
+        "snapshot",
+        "hold",
+        "status",
+        "status",
+        "status",
+        "status",
+        "status",
+        "status",
+        "status",
+        "reprocess",
+        "resume",
+        "hold",
+        "restore"
+      ]
+    },
+    {
+      "archive": "two_event_final_20261112",
+      "run_id": "fl_native_20261112T080914Z_233068",
+      "checks": {
+        "run_id_receipt_summary_candidates_bound": true,
+        "receipt_driver_equals_known_git_run_source": true,
+        "receipt_driver_equals_target_source": false,
+        "declared_fired_candidate_episode_trigger_stamps_equal": true,
+        "repair_published_received_applied_23": true,
+        "published_and_applied_stamps_equal_at_host_double_precision": true,
+        "published_stamps_equal_actual_applied_stamps_exact_ns": false,
+        "all_repaired_stamps_in_shifted_population": true,
+        "candidate_detail_population_bound": true,
+        "candidate_pose_and_published_scan_stamps_within_pair_window": true,
+        "replay_total_equals_window_plus_suffix": true,
+        "host_replay_counts_equal_ack": true,
+        "reprocess_resume_native_boundary_xyz_equal": true,
+        "no_set_state_command": true,
+        "lifecycle_archive_equals_summary": true,
+        "checkpoint_archive_equals_summary": true,
+        "pose_scan_pair_population_balances": true,
+        "launch_mentions_exact_run_and_trigger_stamps": true
+      },
+      "listed_file_hashes": 17,
+      "inputs": {
+        "bag": "/tmp/fastlivo/hall01_two_event_v1.bag",
+        "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+        "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+        "host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+        "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+        "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+        "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+        "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+        "recovery_node_source": "a7cf030ce8f04e99cd87469f6cfe9c2c2ce68cb2b340f357a4aa3f1ca7156942",
+        "runtime_library": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+        "runtime_library_sha256": "9e7d8cdf368ed4214906c6671504f1db6daeecd66b1592a52e7bb28c25663b0a"
+      },
+      "full_package_source_identity": "UNKNOWN (only driver Git source and host patch/library declaration bound)",
+      "run_mode": "CONTROLLED_INTERFACE_TEST",
+      "detection_enabled": false,
+      "declared_trigger_stamps": [
+        1627785276215170145,
+        1627785306371636152
+      ],
+      "gate_candidates": [
+        {
+          "candidate_id": "cand_0000",
+          "t_trigger_ns": 1627785276215170145,
+          "t_decision_ns": 1627785280880943775,
+          "mode": "MODE2_ATOMIC_COMMIT",
+          "accepted": true,
+          "weak_dir_info_before": 3.138785109598945,
+          "weak_dir_info_after": 7.300120585291017,
+          "wilson_lower_bound": 0.8947318770599499,
+          "committed": 23,
+          "deferred_at_decision": 82
+        },
+        {
+          "candidate_id": "cand_0001",
+          "t_trigger_ns": 1627785306371636152,
+          "t_decision_ns": 1627785310457931280,
+          "mode": "MODE3_SOFT_BRIDGE_WAIT",
+          "accepted": false,
+          "weak_dir_info_before": 20.322206051544587,
+          "weak_dir_info_after": 19.615581316005706,
+          "wilson_lower_bound": 0.0,
+          "committed": 0,
+          "deferred_at_decision": 0
+        }
+      ],
+      "icp": [
+        {
+          "status": "CONVERGED",
+          "icp_converged": true,
+          "icp_residual": 0.07121717949469764,
+          "frames_candidate": 23
+        },
+        {
+          "status": "ITERATION_LIMIT",
+          "icp_converged": false,
+          "icp_residual": 0.08569421355991821,
+          "frames_candidate": 40
+        }
+      ],
+      "repair": {
+        "estimated_bias_z_m": 0.45,
+        "shift_z_m": -0.45,
+        "published_received_applied": [
+          23,
+          23,
+          23
+        ],
+        "shifted_scans": 59,
+        "shifted_but_not_repaired_scans": 36,
+        "leftover": 0,
+        "baseline": 0,
+        "published_scan_stamps_sha256": "6d56f5bb19fa6bf63e80a2b599a4614ad9058819e3eb773598e13c8afeef6621",
+        "actual_applied_log_stamps_sha256": "581cec66f4f8e65f8898f08b2c1a81865a871e22eac04b20c1baf71384053952",
+        "max_published_to_applied_log_precision_delta_ns": 239,
+        "stamp_matching_note": "Exact integer published stamps are relay-bound; host prints double seconds (0..239 ns conversion difference), uniquely matched within one double ULP, not claimed bitwise-identical."
+      },
+      "replay": {
+        "groups": 503,
+        "start_ns": 1627785276281966925,
+        "end_ns": 1627785293025721073,
+        "within_end": 124,
+        "suffix": 379,
+        "terminal_payload_ns": 1627785280381185627,
+        "map_voxels": 21578,
+        "map_points": 403642
+      },
+      "checkpoints": [
+        {
+          "event": 1,
+          "trigger_ns": 1627785276215170145,
+          "quarantine_start_ns": 1627785272215170145,
+          "snapshot_log_ns": 1627785276215170145,
+          "checkpoint_ack_ns": 1627785276215170048,
+          "checkpoint_minus_trigger_ns": -97,
+          "checkpoint_minus_quarantine_start_ns": 3999999903,
+          "checkpoint_no_later_than_trigger": true,
+          "checkpoint_no_later_than_quarantine_start": false,
+          "native_state_and_map_fully_equivalent": "UNKNOWN"
+        },
+        {
+          "event": 2,
+          "trigger_ns": 1627785306371636152,
+          "quarantine_start_ns": 1627785302371636152,
+          "snapshot_log_ns": 1627785306303834438,
+          "checkpoint_ack_ns": 1627785306303834368,
+          "checkpoint_minus_trigger_ns": -67801784,
+          "checkpoint_minus_quarantine_start_ns": 3932198216,
+          "checkpoint_no_later_than_trigger": true,
+          "checkpoint_no_later_than_quarantine_start": false,
+          "native_state_and_map_fully_equivalent": "UNKNOWN"
+        }
+      ],
+      "lifecycle": [
+        {
+          "event": "wait_limit_closed",
+          "closed_ns": 1627785289148792028,
+          "from_state": null,
+          "unresolved_frames": 101
+        },
+        {
+          "event": "rearm",
+          "closed_ns": null,
+          "from_state": "ABORTED",
+          "unresolved_frames": 0
+        },
+        {
+          "event": "wait_limit_closed",
+          "closed_ns": 1627785316258434057,
+          "from_state": null,
+          "unresolved_frames": 138
+        },
+        {
+          "event": "rearm",
+          "closed_ns": null,
+          "from_state": "ABORTED",
+          "unresolved_frames": 0
+        }
+      ],
+      "final_state": "HEALTHY",
+      "quarantine_open_at_exit": false,
+      "tail_after_e2_close_paired_frames": 39,
+      "tail_after_e2_close_duration_s": 4.650639773,
+      "last_paired_stamp_ns": 1627785320909073830,
+      "native_snapshot_counters": {
+        "snapshots": 2,
+        "snapshots_superseded": 0,
+        "snapshot_ack_timeouts": 0,
+        "failures": 0
+      },
+      "runtime": {
+        "wall_sec": 104.079,
+        "pid": 234145,
+        "pgid": 234141,
+        "peak_rss_kb": 945212,
+        "pose_messages": 819,
+        "scan_messages": 598,
+        "callback_errors": [],
+        "callback_error_count": 0
+      },
+      "independent_recovery_quality": "UNKNOWN",
+      "command_sequence": [
+        "hold",
+        "snapshot",
+        "hold",
+        "snapshot",
+        "hold",
+        "status",
+        "status",
+        "status",
+        "status",
+        "status",
+        "status",
+        "reprocess",
+        "resume",
+        "hold",
+        "restore",
+        "resume"
+      ]
+    }
+  ],
+  "source_only_unchanged_ack_failure_path": {
+    "target_lines": "1852-1867",
+    "changed_in_this_delta": false,
+    "observation": "collect None or FAIL is not required to be successful before suffix parsing; suffix missing falls through elif ep.frames to set_state. Old finding retained, not rerun and not asserted to have occurred in these new runs."
+  },
+  "documentation_corrections": {
+    "armed_REPORT_superseded_claim": 1,
+    "armed_archived_summary_superseded_actual": 0,
+    "final_REPORT_shifted_claim": 60,
+    "final_actual_relay_shifted": 59,
+    "classification": "nonblocking text corrections; no rerun needed"
+  },
+  "verdict": "PARTIAL: final controlled repaired-input replay/suffix/resume/E2/tail executed; checkpoint legality at quarantine_start NOT satisfied; full-state equivalence/quality/automatic detection NOT established"
+}

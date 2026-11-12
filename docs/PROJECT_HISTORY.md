@@ -563,3 +563,11 @@ E2无新注入/detection off；cp1627785309656085248晚trigger1.607814s、晚qua
 最新授权允许此方法独立研究实现与有限测试，不直接替换生产策略、不自动批准其他新方法/双参考矩阵，不解除旧参数暂停。本机设计/核验不实现算法、不代host；S3单研究会话在既有门研究时段安排并回预算/认领，S1共享接口单写、S2继续native。先复用402/544旧原件做缺项/资格与最小synthetic控制，缺真实I/健康低支持校准明确UNKNOWN；必要时复用原生trace或至多一次既定预算有限真实导出，不为分类重开大诊断矩阵。完整人口/独立标签/漏检误报延迟/弃权与资源一起交；无生产动作不冒地图安全验证。
 
 20min审阅/2h/日报actual owner repair-f3保持，未新增重复任务；同轮fetch5f54a44的新armed/final原生E2另独立并行核验，不凭标题验收。方案DESIGNED、开发实现/运行NOT_IMPLEMENTED/NOT_EXECUTED，GitHub发布不等已接收。旧原生可信cp/成功依赖/物理一致未验项照证据处理，研究不阻native；A3/B3方法计划非新评分。独立review SSH提交推送、私人handoff保护不合main不改历史冻结门。
+
+## 69. 5f54a44：新武装双事件与39帧尾段接受，隔离起点前可信cp仍未过
+
+[核验](review_20261112_5f54a44_native/README.md)新armed/final各17SHA一致、全manifest341/341完整性核，实际driver b1bce5e/a7cf030c非target诊断版4742dbc1，四个changed entry AST同且排序arm/open取消先于hold/scripted禁rolling/online保rolling小控制PASS。armed E1修复23→437=124+313suffix→无set_state/接回，E2拒绝restore但未close/resume、终WAITING/open；final E1修复23→503=124+379suffix/map21578/403642→无set_state/resume边界XYZ同→E2拒绝restore/ABORTED rearm/resume→尾39paired/4.650639773s，HEALTHY/open=false。真实更长受控尾段推进，不首次E2、不抹armed负结果。
+
+新cp早trigger范围解除但不等合法隔离边界：E1晚quarantine_start3.999999903s；armed E2晚3.999999942s，final E2晚3.932198216s（虽早trigger67.8ms）。trigger10s/margin4s/arm10s仍不能撤6–10s贡献；本次E1污染从trigger才起/E2无注入，不指控该4s必污染，明确回溯契约未闭合。最低S1/S2实际cp不晚声明可信隔离起点、后继输入归宿，或显式拒绝不支持范围，不调margin/新框架/无限E2移戳追HEALTHY。旧失败UNKNOWN collect写回/物理候选未改不重测；59shift仅23修复/36未修、两close未解决101/138、独立净收益UNKNOWN。
+
+研究/论文限定受控执行接受，不称完整可信state-map回退/自动链成功；final E2 before20.3222/after19.6156/Wilson0不是旧22.064，文本数字随后继集中更正。新availability按manager标签交叉仅旧原件分析，标签非健康真值/点数恒定非图几何等价，不唯一归因pose。ALI-H v1用户直接有限测试授权/b7ad580已推送优先于旧暂停转述，S3单研究/旧参数停，S1共享接口/S2 native并行，接收待回执。代理-I reader无host/bag/归档脚本，早schema/浮点断言失败仅修reader最终PASS，target build成功但整体ABI失败保留。16:29fetch DNS失败不能声称remote最新无增量；A2/A6/A10局部推进、A4/A8/A9/B2/B4/B11未闭合不总分，独立review SSH提交推送/private保护不合main不改历史冻结门。
