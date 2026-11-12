@@ -62,6 +62,8 @@ FAST-LIO2 必须标 **SHARED_EXECUTION**：本机只有一个 `fastlio_mapping`
 | `injection_repair_20261112/decoupled_bias/control_dryrun/REPORT.md` | dry-run 对照（同损坏、不发布）：0 条修复、重放 529 帧、地图 20427；帧集不同，效应未隔离 |
 | `injection_repair_20261112/freeze_ab/REPORT.md` | 候选帧集冻结后的 A/B：人口 23/23、门一致、修复 23/23 vs 0/0；重放跨度仍差 5.3 s（发布+回执推迟 reprocess），停并报因 |
 | `injection_repair_20261112/freeze_ab/sham/REPORT.md` | sham 对照（同发布、零修正）：23/23 synced、set_state 差 3 mm、逐帧 z 差 0.40 m；重放跨度仍差 4.33 s，非分批固定代价 |
+| `host_change_terminal_stamp/BUILD.md` | 已批准的宿主改动：`reprocess` 终止戳；增量/完整 diff、构建日志、新库 sha `f27d1730…`（无关 vikit 测试链接失败已记录） |
+| `injection_repair_20261112/freeze_ab/terminal_stamp/REPORT.md` | 终止戳 + 开段快照的一对：终止戳逐位一致生效；开段快照在积压下落于触发后 1.9–2.9 s，起点仍差 1 s，停并报因 |
 | `run_fastlio2_shared.sh` | 本项使用的运行脚本（可复算；内含共享执行注释） |
 | `analyze_run_bag.py` | 从输出 bag 计算 E1/E2 位姿、间隔、步长、尾段的分析脚本 |
 

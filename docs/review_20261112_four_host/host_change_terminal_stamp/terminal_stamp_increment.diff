@@ -1,0 +1,87 @@
+--- a/include/LIVMapper.h
++++ b/include/LIVMapper.h
+@@ -47,7 +47,8 @@
+ 
+   bool snapshotCheckpoint();
+   bool restoreCheckpoint();
+-  bool reprocessCheckpoint(bool apply_repairs = true, bool keep_buffer = false);
++  bool reprocessCheckpoint(bool apply_repairs = true, bool keep_buffer = false,
++                           int64_t end_stamp_ns = 0);
+   void pollCheckpointControl();
+   // Control channel: a thread watches the command directory and acknowledges receipt at once; the
+   // command itself is applied at a frame boundary by the main loop. The thread never touches the
+--- a/src/LIVMapper.cpp
++++ b/src/LIVMapper.cpp
+@@ -915,7 +915,8 @@
+ // Restore, then re-run the host's own propagation and LIO update for every group captured since
+ // the snapshot. This is reprocessing in the host, not a Python rollback: the map is rebuilt by
+ // UpdateVoxelMap and the state comes out of VoxelMapManager::StateEstimation.
+-bool LIVMapper::reprocessCheckpoint(bool apply_repairs, bool keep_buffer)
++bool LIVMapper::reprocessCheckpoint(bool apply_repairs, bool keep_buffer,
++                                    int64_t end_stamp_ns)
+ {
+   const size_t n = replay_buffer_.size();
+   if (!restoreCheckpoint())
+@@ -938,9 +939,24 @@
+   std::vector<double> group_times;              // lio_time of every replayed group
+   group_spans.reserve(n);
+   group_times.reserve(n);
++  size_t replayed = 0, truncated = 0;
+   for (size_t i = 0; i < n; ++i)
+   {
+-    LidarMeasures = replay_buffer_[i];
++    // An optional terminal stamp bounds the replay to the frames the decision actually scored.
++    // Without it, the host captures every frame that arrives while the driver publishes repairs
++    // and waits for receipts, and the replay span moves with wall-clock compute.
++    const LidarMeasureGroup &cand = replay_buffer_[i];
++    double cand_end = (!cand.measures.empty() && cand.measures.back().lio_time > 0)
++                          ? cand.measures.back().lio_time
++                          : -1.0;
++    if (end_stamp_ns > 0 && cand_end > 0 &&
++        (int64_t)std::llround(cand_end * 1e9) > end_stamp_ns)
++    {
++      ++truncated;
++      continue;
++    }
++    LidarMeasures = cand;
++    ++replayed;
+     // A repaired scan for this frame replaces the measurement the host originally used. This is
+     // where the substitution belongs: a repair is decided after the frame was processed, so it can
+     // only enter through the replay -- the live path has usually consumed the group already.
+@@ -1024,14 +1040,16 @@
+     cp_control_valid_ = true;
+   }
+   cp_replays_++;
+-  cp_replay_frames_ += n;
++  cp_replay_frames_ += replayed;
+   ROS_INFO("[NATIVE_CHECKPOINT] replay points: with_points=%zu empty=%zu total_undistorted=%zu "
+            "| LIO frames=%zu with_points=%zu empty=%zu | VIO frames=%zu",
+            replay_frames_with_points_, replay_frames_empty_, replay_points_total_,
+            replay_lio_frames_, replay_lio_with_points_, replay_lio_empty_, replay_vio_frames_);
+   ROS_INFO("[NATIVE_CHECKPOINT] reprocess #%zu: %zu frames replayed over [%.9f .. %.9f], "
+-           "repairs applied=%zu queued=%zu, map now %zu voxels/%zu points",
+-           cp_replays_, n, span_lo, span_hi, repaired_applied_, repaired_clouds_.size(),
++           "repairs applied=%zu queued=%zu, replayed=%zu truncated=%zu end_stamp=%lld, "
++           "map now %zu voxels/%zu points",
++           cp_replays_, replayed, span_lo, span_hi, repaired_applied_, repaired_clouds_.size(),
++           replayed, truncated, (long long)end_stamp_ns,
+            voxelmap_manager->voxel_map_.size(),
+            native_checkpoint::countPoints(voxelmap_manager->voxel_map_));
+   return true;
+@@ -1139,7 +1157,15 @@
+   }
+   else if (cmd == "reprocess")
+   {
+-    ok = reprocessCheckpoint(true, false);
++    // Optional payload: terminal stamp (ns). Empty keeps the historical replay-everything
++    // behaviour; a stamp bounds the replay to the frames the decision scored.
++    int64_t end_stamp_ns = 0;
++    if (!payload.empty())
++    {
++      try { end_stamp_ns = std::stoll(payload); }
++      catch (...) { end_stamp_ns = 0; }
++    }
++    ok = reprocessCheckpoint(true, false, end_stamp_ns);
+     detail = checkpointStatus();
+   }
+   else if (cmd == "hold")
