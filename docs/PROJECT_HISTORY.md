@@ -673,3 +673,11 @@ ALI-B2记录未变/用户确认空，78de840最低解除意见尚未入target不
 cp ACK可核：ep0/1晚qstart3.900276288/3.833658888s，ep3早8.695748613s；早晚范围不是EXPECTED_UNKNOWN就免验。新增metadata在async发送后/collect前复制actual，五段null但四实际ACK已有戳，最小正常控制复现；scripted request980/actual975合法前组仍错MISMATCH，最低现poll/collect/summary晚派生ACK、请求/边界与actual分开关系，不精确等值或新容差。旧restore记录trigger-margin错来源未修、catchup未实现，记录收口并行不挡native。cand0004实际No active quarantine，恢复无ACK/末HEALTHY/openfalse不抹异常未决4，S1最小段生命周期同步。
 
 42修复扫描全部在声明注入窗后，bias估+.75m，应用不证明注入测量修回/正常后继未误改；最低现点/候选/参考/时间人口确认修复对象与独立代价，未知不硬判全错或净收益。availability529=194A335U/computed528，trace1568全92列/phase682/hasout1439但first全−1，pre/out3145/2887仍无物理配对。S3声称旧115734 T2 I504/rank6/120全UNKNOWN/1.97s218MB无脚本结果manifest上main或online，仍devreported；上一不同last分箱非成员证明，−vec非精确SE3、混合cov与完整尾人口问题沿fa355不重测。ALI-B2无实际用户确认，S1合法rolling/active段/物理一致native→全部归宿，S2宿主、S3真实资格标签并行/noCodex/手调停；四Cron/状态命令原件自检、局部不全表分，中文review SSH/private保护，不算法ROS/main历史冻结门。
+
+## 84. 18:37–20:37部分推进：T2实交与闭段skip接受，新的exact_e路径须复用已有正确Log
+
+[两小时总结兼增量核验](review_20261112_1e25298/README.md)绑定20:37 fetch的1e25298（汇总20:37:10略晚窗口，窗口实交止8c60b76/9f18218）。复用窗口内研究三组件修正/真实trace原件及e991纯在线42应用证据，结论部分推进非只有日志；可信cp/修复对象物理一致/全部归宿/ALI性能未闭合，主工程断点在线合法回退与active段，科学依赖真实成员/同次pre-post/正常校准标签，参数无同版本同人口规律能解除、旧手调停，A/B局部不总分。
+
+新T2实现/t2_join531行/summary来源SHA已上传并绑定实际档，旧仅回报缺口解除，join HEURISTIC_UNPROVEN/cov NOT_AVAILABLE/s诊断诚实收窄；保存120块60s全UNKNOWN=54+6，尾行实际47非COLLAB51，非效果/正常真值/独立成本。新active segment_id控制无段/换段skip、同段继续，原生修后未跑，skip仍未判不计安全拒绝。新exact_e执行路径漏Jinv平移，即使vec/post理想对应，.2rad/.1m实际(.1,0,0)非rho(.0996664,-.01,0)，正常控制已复现；最低复用t2_input_check已修公式及一个旧控制，不重新造/调门。host vec在最终solution前采集，配最终post不源码保证精确差，最终v7u绑定/重复时间phase关系待核，不能2µs/顺序自证；仅阻相应I资格/数值结论不挡工程。
+
+下一唯一合法纯在线回退→物理一致实际修复→native状态map→全部后继闭合，S1已实交driver集成、S2真实run、S3T2原件认领确认，新最小解除认领/部署回执待后继。校准与标签两缺项待实际用户GitHub确认、不代选C/重复既有注入授权，不停未阻工作；四Cron/noCodex/完整人口风险UNKNOWN自检。新增残差反例与T2实交和2h总结合一个中文review SSH记录，无重复总结/原件/算法ROS/main历史门/private/日报。
