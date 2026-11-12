@@ -1,0 +1,544 @@
+{
+  "target": "35c2d62b6412d5b651ef6d211a5c8d16a77cc5f1",
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261112_35c2d62/check_archive.py",
+  "integrity": [
+    {
+      "name": "t0_A.json",
+      "bytes": 30986,
+      "sha256": "99f276bee7ca2ca7f9779ea5e90351823b7993f4e6037b2414a950f208b2166f"
+    },
+    {
+      "name": "t0_B.json",
+      "bytes": 40826,
+      "sha256": "e8194850140977db6a524a830e2effed49ef7b0f476525a2d0e9b8ca75792c7e"
+    },
+    {
+      "name": "shadow_A.jsonl",
+      "bytes": 652502,
+      "sha256": "1123e0168ff24004e66527ebe6f324c9a24a37707607504687992a9628b56ec3"
+    },
+    {
+      "name": "shadow_B.jsonl",
+      "bytes": 891001,
+      "sha256": "343f9811e86bfd440a1dfb616a37d8eeb06eae000230676ee97bfa2d7a628db2"
+    },
+    {
+      "name": "t1_selftest.json",
+      "bytes": 4797,
+      "sha256": "66aebb4be895ef404b0f15527c0407297aef80f29b795228d8c46622ab0320ae"
+    }
+  ],
+  "code_hash_matches_manifest": true,
+  "runs": [
+    {
+      "run": "A",
+      "frames": 402,
+      "saved_blocks": 90,
+      "frame_containing_blocks": 90,
+      "empty_blocks": [],
+      "states": {
+        "UNKNOWN": 402
+      },
+      "injection": "NONE",
+      "sigma_meas_m": "0.884"
+    },
+    {
+      "run": "B",
+      "frames": 544,
+      "saved_blocks": 120,
+      "frame_containing_blocks": 119,
+      "empty_blocks": [
+        {
+          "block_id": 3255570637,
+          "n_frames": 0,
+          "context": "NO_DATA",
+          "median_score": {
+            "M": null,
+            "T": null,
+            "I": null
+          },
+          "fresh_count": {
+            "M": 0,
+            "T": 0,
+            "I": 0
+          },
+          "state": "UNKNOWN",
+          "scope": "NONE",
+          "reason_codes": [
+            "NO_DATA_BLOCK"
+          ]
+        }
+      ],
+      "states": {
+        "UNKNOWN": 544
+      },
+      "injection": "NONE",
+      "sigma_meas_m": "0.884"
+    }
+  ],
+  "old_availability_unchanged": true,
+  "recorded_tests": {
+    "t1_selftest.json": {
+      "marker": "SYNTHETIC_UNIT",
+      "tests": [
+        {
+          "test": "T1.1 low support cross-modal consistency / T-only",
+          "status": "PASS",
+          "detail": {
+            "i_plus_t": {
+              "block_id": 1,
+              "state": "NORMAL_CONSISTENT",
+              "scope": "RELATIVE_MOTION_ONLY",
+              "reason_codes": [],
+              "last_suspect_block": null,
+              "verdicts": {
+                "M": null,
+                "T": "NORMAL",
+                "I": "NORMAL"
+              },
+              "u": {
+                "M": null,
+                "T": null,
+                "I": null
+              }
+            },
+            "t_only": {
+              "block_id": 1,
+              "state": "UNKNOWN",
+              "scope": "NONE",
+              "reason_codes": [
+                "T_NORMAL_ONLY_RELATIVE"
+              ],
+              "last_suspect_block": null,
+              "verdicts": {
+                "M": null,
+                "T": "NORMAL",
+                "I": "MISSING"
+              },
+              "u": {
+                "M": null,
+                "T": null,
+                "I": null
+              }
+            }
+          }
+        },
+        {
+          "test": "T1.2 low support qualified conflict -> SUSPECT",
+          "status": "PASS",
+          "detail": {
+            "i_conflict": {
+              "block_id": 1,
+              "state": "SUSPECT",
+              "scope": "RELATIVE_MOTION_ONLY",
+              "reason_codes": [
+                "POSITIVE_CONFLICT:I"
+              ],
+              "last_suspect_block": 1,
+              "verdicts": {
+                "M": null,
+                "T": null,
+                "I": "ALARM"
+              },
+              "u": {
+                "M": null,
+                "T": null,
+                "I": null
+              }
+            },
+            "m_conflict": {
+              "block_id": 1,
+              "state": "SUSPECT",
+              "scope": "MAP_AND_MOTION",
+              "reason_codes": [
+                "POSITIVE_CONFLICT:M"
+              ],
+              "last_suspect_block": 1,
+              "verdicts": {
+                "M": "ALARM",
+                "T": null,
+                "I": null
+              },
+              "u": {
+                "M": null,
+                "T": null,
+                "I": null
+              }
+            }
+          }
+        },
+        {
+          "test": "T1.3 missing / carried semantics",
+          "status": "PASS",
+          "detail": {
+            "after_missing": {
+              "block_id": 2,
+              "state": "UNKNOWN",
+              "scope": "NONE",
+              "reason_codes": [
+                "NO_QUALIFIED_EVIDENCE:I"
+              ],
+              "last_suspect_block": 1,
+              "verdicts": {
+                "M": null,
+                "T": null,
+                "I": "MISSING"
+              },
+              "u": {
+                "M": null,
+                "T": null,
+                "I": null
+              }
+            },
+            "missing_channel": {
+              "channel": "I",
+              "present": false,
+              "fresh": false,
+              "score": null,
+              "verdict": "MISSING",
+              "calibration": "NOT_APPLICABLE",
+              "u": null,
+              "reason": "no_imu"
+            },
+            "carried_channel": {
+              "channel": "T",
+              "present": true,
+              "fresh": false,
+              "score": 1.0,
+              "verdict": "STALE",
+              "calibration": "NOT_USED",
+              "u": null,
+              "reason": "carried_forward_not_new_evidence"
+            }
+          }
+        },
+        {
+          "test": "T1.4 per-source calibration and scope",
+          "status": "PASS",
+          "detail": {
+            "M": {
+              "channel": "M",
+              "present": true,
+              "fresh": true,
+              "score": 1.0,
+              "verdict": "NORMAL",
+              "calibration": "OK",
+              "u": 0.09523809523809523,
+              "reason": null
+            },
+            "T": {
+              "channel": "T",
+              "present": true,
+              "fresh": true,
+              "score": 1.0,
+              "verdict": "ALARM",
+              "calibration": "OK",
+              "u": 1.0,
+              "reason": null
+            },
+            "M_LOW_without_LOW_ref": {
+              "channel": "M",
+              "present": true,
+              "fresh": true,
+              "score": 1.0,
+              "verdict": "UNQUALIFIED",
+              "calibration": "OUT_OF_SUPPORT",
+              "u": null,
+              "reason": "no_reference_for_context:LOW"
+            }
+          }
+        },
+        {
+          "test": "T1.5 SE(3) and time contract",
+          "status": "PASS",
+          "detail": {
+            "relative_diff": 1.6619847851410495e-16,
+            "block_id": 3255570524,
+            "pose_scan_dt_ns": null
+          }
+        },
+        {
+          "test": "T1.6 shadow leaves old decision unchanged",
+          "status": "PASS",
+          "detail": {
+            "single_row_unchanged": true,
+            "real_trace_frames": 402,
+            "real_trace_blocks": 90,
+            "frame_to_block": "402 rows grouped into 90 0.5 s blocks",
+            "toggle_identical": true,
+            "old_fields_match_input": true,
+            "block_counts": {
+              "UNKNOWN": 90
+            },
+            "state_counts_frames": {
+              "UNKNOWN": 402
+            }
+          }
+        },
+        {
+          "test": "T1.7 dwell does not cross a missing block",
+          "status": "PASS",
+          "detail": {
+            "gap_only_last": {
+              "block_id": 12,
+              "state": "UNKNOWN",
+              "scope": "NONE",
+              "reason_codes": [
+                "INSUFFICIENT_PERSISTENCE_OR_CALIBRATION"
+              ],
+              "last_suspect_block": 9,
+              "verdicts": {
+                "M": "ALARM",
+                "T": null,
+                "I": null
+              },
+              "u": {
+                "M": null,
+                "T": null,
+                "I": null
+              }
+            },
+            "no_data_last": {
+              "block_id": 11,
+              "state": "UNKNOWN",
+              "scope": "NONE",
+              "reason_codes": [
+                "INSUFFICIENT_PERSISTENCE_OR_CALIBRATION"
+              ],
+              "last_suspect_block": 9,
+              "verdicts": {
+                "M": "ALARM",
+                "T": null,
+                "I": null
+              },
+              "u": {
+                "M": null,
+                "T": null,
+                "I": null
+              }
+            },
+            "filled_block_ids": [
+              8,
+              9,
+              10,
+              11,
+              12
+            ]
+          }
+        }
+      ],
+      "failed": 0
+    },
+    "t2_prep_selftest.json": {
+      "marker": "SYNTHETIC_UNIT",
+      "t2_real_status": "NOT_EXECUTED",
+      "tests": [
+        {
+          "test": "valid manifest is READY",
+          "status": "PASS",
+          "detail": {
+            "status": "READY",
+            "missing": [],
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "missing P_minus is INCOMPLETE",
+          "status": "PASS",
+          "detail": {
+            "status": "INCOMPLETE",
+            "missing": [
+              "exports.P_minus"
+            ],
+            "errors": [],
+            "warnings": []
+          }
+        },
+        {
+          "test": "measurement-space S rejected",
+          "status": "PASS",
+          "detail": {
+            "status": "INCOMPLETE",
+            "missing": [],
+            "errors": [
+              "covariance must not be S (measurement-space/information matrix)"
+            ],
+            "warnings": []
+          }
+        },
+        {
+          "test": "old run id rejected",
+          "status": "PASS",
+          "detail": {
+            "status": "INCOMPLETE",
+            "missing": [],
+            "errors": [
+              "run_id_is_an_old_archive_run"
+            ],
+            "warnings": []
+          }
+        },
+        {
+          "test": "unit-only manifest is READY_UNIT_ONLY",
+          "status": "PASS",
+          "detail": {
+            "status": "READY_UNIT_ONLY",
+            "missing": [],
+            "errors": [],
+            "warnings": [
+              "unit_weighted_only:no_pose_block"
+            ]
+          }
+        },
+        {
+          "test": "left perturbation is refused",
+          "status": "PASS",
+          "detail": {
+            "status": "INCOMPLETE",
+            "missing": [],
+            "errors": [
+              "declarations.perturbation must be right for this e_I convention"
+            ],
+            "warnings": []
+          }
+        },
+        {
+          "test": "covariance in another frame is refused",
+          "status": "PASS",
+          "detail": {
+            "status": "INCOMPLETE",
+            "missing": [],
+            "errors": [
+              "covariance.frame must be pre_body (the tangent of inv(pre)*post)"
+            ],
+            "warnings": []
+          }
+        },
+        {
+          "test": "missing covariance frame is refused",
+          "status": "PASS",
+          "detail": {
+            "status": "INCOMPLETE",
+            "missing": [],
+            "errors": [
+              "covariance.frame must be pre_body (the tangent of inv(pre)*post)"
+            ],
+            "warnings": []
+          }
+        },
+        {
+          "test": "identity gives zero e_I",
+          "status": "PASS",
+          "detail": {
+            "e": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          }
+        },
+        {
+          "test": "rotvec+V^-1 translation recovered",
+          "status": "PASS",
+          "detail": {
+            "e": [
+              0.0,
+              0.0,
+              0.2,
+              0.09966644423259238,
+              -0.010000000000000002,
+              0.0
+            ],
+            "expected_trans": [
+              0.099666444232592,
+              -0.01,
+              0.0
+            ],
+            "old_bug_value_rejected": true
+          }
+        },
+        {
+          "test": "state order is honoured",
+          "status": "PASS",
+          "detail": {
+            "e": [
+              0.09966644423259238,
+              -0.010000000000000002,
+              0.0,
+              0.0,
+              0.0,
+              0.2
+            ]
+          }
+        },
+        {
+          "test": "identity covariance gives |e|^2",
+          "status": "PASS",
+          "detail": {
+            "status": "OK",
+            "s": 0.05003340010596846,
+            "rank": 6,
+            "e": [
+              0.0,
+              0.0,
+              0.2,
+              0.09966644423259238,
+              -0.010000000000000002,
+              0.0
+            ]
+          }
+        },
+        {
+          "test": "rank-deficient covariance uses observable subspace",
+          "status": "PASS",
+          "detail": {
+            "status": "OK",
+            "s": 0.05003340010596846,
+            "rank": 5,
+            "e": [
+              0.0,
+              0.0,
+              0.2,
+              0.09966644423259238,
+              -0.010000000000000002,
+              0.0
+            ]
+          }
+        },
+        {
+          "test": "no covariance -> unit-weighted only",
+          "status": "PASS",
+          "detail": {
+            "status": "NOT_AVAILABLE",
+            "reason": "no_pose_covariance",
+            "unit_weighted": [
+              0.0,
+              0.0,
+              0.2,
+              0.09966644423259238,
+              -0.010000000000000002,
+              0.0
+            ],
+            "sum_squares": 0.05003340010596846
+          }
+        }
+      ],
+      "failed": 0
+    }
+  },
+  "archived_tests_executed": false,
+  "probe_and_patch_files_in_target": [],
+  "host_diagnosis": "DEVELOPER_REPORTED; no trace_cov_v7.diff or probe artifacts in target",
+  "host_root_cause": "UNKNOWN; before first LIO does not exclude startup effects of changed code",
+  "major_blocker": "ALI-B2-NORMAL-LABELS-20261112-01; user confirmation absent in target",
+  "normal_prefix_and_event_labels_required_for_full_evaluation": true,
+  "native_checkpoint_event_schema": {
+    "type": "list",
+    "count": 18
+  },
+  "no_host_ROS_parameter_or_archived_code_execution": true
+}

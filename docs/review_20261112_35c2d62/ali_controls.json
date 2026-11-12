@@ -1,0 +1,435 @@
+{
+  "target": "35c2d62b6412d5b651ef6d211a5c8d16a77cc5f1",
+  "base": "e0d403b",
+  "numpy": "2.5.4",
+  "source_sha256": {
+    "t2_input_check.py": "912ca942c09b7d1d2f744477f8dc59f91fcbe36f7cf2e05f7059d89824386cc9",
+    "ali_h_v1.py": "7da88fa97ceaf55093b9d7263a1f7d4756b30fbd1e682192860ce9a4ca4b0e08"
+  },
+  "scope": "Reviewed named functions and literal constants compiled in memory. No archived imports, CLI/selftests, ROS, host, new trace, or repository writes.",
+  "D1_planar": {
+    "old_e": [
+      0.0,
+      0.0,
+      0.2,
+      0.1,
+      0.0,
+      0.0
+    ],
+    "new_e": [
+      0.0,
+      0.0,
+      0.2,
+      0.09966644423259238,
+      -0.010000000000000002,
+      0.0
+    ],
+    "expected_e": [
+      0.0,
+      0.0,
+      0.2,
+      0.0996664442325924,
+      -0.01,
+      0.0
+    ],
+    "old_s": 0.05000000000000001,
+    "new_s": 100.04993340010603
+  },
+  "D1_normal_roundtrips": [
+    {
+      "theta": 0.0,
+      "max_error": 2.7755575615628914e-16,
+      "world_left_reexpression_error": 0.0,
+      "order_error": 0.0
+    },
+    {
+      "theta": 1e-05,
+      "max_error": 1.942890293094024e-16,
+      "world_left_reexpression_error": 4.440892098500626e-16,
+      "order_error": 0.0
+    },
+    {
+      "theta": 8e-05,
+      "max_error": 6.938893903907228e-17,
+      "world_left_reexpression_error": 4.481820730511954e-17,
+      "order_error": 0.0
+    },
+    {
+      "theta": 0.0002,
+      "max_error": 1.3877787807814457e-16,
+      "world_left_reexpression_error": 6.678685382510707e-17,
+      "order_error": 0.0
+    },
+    {
+      "theta": 0.2,
+      "max_error": 3.191891195797325e-16,
+      "world_left_reexpression_error": 2.220446049250313e-16,
+      "order_error": 0.0
+    },
+    {
+      "theta": 0.8,
+      "max_error": 1.1102230246251565e-16,
+      "world_left_reexpression_error": 2.0816681711721685e-16,
+      "order_error": 0.0
+    }
+  ],
+  "D2": {
+    "old_alarm_gap": "SUSPECT",
+    "new_alarm_gap": "UNKNOWN",
+    "old_normal_gap": "NORMAL_CONSISTENT",
+    "new_normal_gap": "UNKNOWN",
+    "explicit_NO_DATA_and_recovery": [
+      {
+        "block_id": 8,
+        "state": "UNKNOWN",
+        "scope": "NONE",
+        "reason_codes": [
+          "INSUFFICIENT_PERSISTENCE_OR_CALIBRATION"
+        ],
+        "last_suspect_block": null,
+        "verdicts": {
+          "M": "ALARM",
+          "T": "MISSING",
+          "I": "MISSING"
+        },
+        "u": {
+          "M": null,
+          "T": null,
+          "I": null
+        }
+      },
+      {
+        "block_id": 9,
+        "state": "SUSPECT",
+        "scope": "MAP_AND_MOTION",
+        "reason_codes": [
+          "POSITIVE_CONFLICT:M"
+        ],
+        "last_suspect_block": 9,
+        "verdicts": {
+          "M": "ALARM",
+          "T": "MISSING",
+          "I": "MISSING"
+        },
+        "u": {
+          "M": null,
+          "T": null,
+          "I": null
+        }
+      },
+      {
+        "block_id": 10,
+        "state": "UNKNOWN",
+        "scope": "NONE",
+        "reason_codes": [
+          "NO_DATA_BLOCK"
+        ],
+        "last_suspect_block": 9,
+        "verdicts": {
+          "M": "NO_DATA",
+          "T": "NO_DATA",
+          "I": "NO_DATA"
+        },
+        "u": {
+          "M": null,
+          "T": null,
+          "I": null
+        }
+      },
+      {
+        "block_id": 11,
+        "state": "UNKNOWN",
+        "scope": "NONE",
+        "reason_codes": [
+          "INSUFFICIENT_PERSISTENCE_OR_CALIBRATION"
+        ],
+        "last_suspect_block": 9,
+        "verdicts": {
+          "M": "ALARM",
+          "T": "MISSING",
+          "I": "MISSING"
+        },
+        "u": {
+          "M": null,
+          "T": null,
+          "I": null
+        }
+      },
+      {
+        "block_id": 12,
+        "state": "SUSPECT",
+        "scope": "MAP_AND_MOTION",
+        "reason_codes": [
+          "POSITIVE_CONFLICT:M"
+        ],
+        "last_suspect_block": 12,
+        "verdicts": {
+          "M": "ALARM",
+          "T": "MISSING",
+          "I": "MISSING"
+        },
+        "u": {
+          "M": null,
+          "T": null,
+          "I": null
+        }
+      }
+    ],
+    "unchanged_adjacent_controls": {
+      "M_alarm": {
+        "state": "SUSPECT",
+        "scope": "MAP_AND_MOTION"
+      },
+      "I_alarm": {
+        "state": "SUSPECT",
+        "scope": "RELATIVE_MOTION_ONLY"
+      },
+      "T_alarm": {
+        "state": "SUSPECT",
+        "scope": "RELATIVE_MOTION_ONLY"
+      },
+      "I_T_normal": {
+        "state": "NORMAL_CONSISTENT",
+        "scope": "RELATIVE_MOTION_ONLY"
+      },
+      "I_M_normal": {
+        "state": "NORMAL_CONSISTENT",
+        "scope": "MAP_AND_MOTION"
+      },
+      "T_only": {
+        "state": "UNKNOWN",
+        "scope": "NONE"
+      }
+    }
+  },
+  "D2_full_pipeline": [
+    {
+      "block_id": 10,
+      "n_frames": 1,
+      "context": "LOW",
+      "state": "UNKNOWN",
+      "reason_codes": [
+        "INSUFFICIENT_PERSISTENCE_OR_CALIBRATION"
+      ],
+      "last_suspect_block": null
+    },
+    {
+      "block_id": 11,
+      "n_frames": 0,
+      "context": "NO_DATA",
+      "state": "UNKNOWN",
+      "reason_codes": [
+        "NO_DATA_BLOCK"
+      ],
+      "last_suspect_block": null
+    },
+    {
+      "block_id": 12,
+      "n_frames": 1,
+      "context": "LOW",
+      "state": "UNKNOWN",
+      "reason_codes": [
+        "INSUFFICIENT_PERSISTENCE_OR_CALIBRATION"
+      ],
+      "last_suspect_block": null
+    },
+    {
+      "block_id": 13,
+      "n_frames": 1,
+      "context": "LOW",
+      "state": "SUSPECT",
+      "reason_codes": [
+        "POSITIVE_CONFLICT:M"
+      ],
+      "last_suspect_block": 13
+    }
+  ],
+  "D3": {
+    "old_left_world_status": {
+      "status": "READY",
+      "missing": [],
+      "errors": [],
+      "warnings": []
+    },
+    "new_left_world_status": {
+      "status": "INCOMPLETE",
+      "missing": [],
+      "errors": [
+        "declarations.perturbation must be right for this e_I convention",
+        "covariance.perturbation must be right",
+        "covariance.frame must be pre_body (the tangent of inv(pre)*post)"
+      ],
+      "warnings": []
+    },
+    "manifest_cases": {
+      "valid": {
+        "status": "READY",
+        "missing": [],
+        "errors": [],
+        "warnings": []
+      },
+      "decl_left": {
+        "status": "INCOMPLETE",
+        "missing": [],
+        "errors": [
+          "declarations.perturbation must be right for this e_I convention"
+        ],
+        "warnings": []
+      },
+      "cov_left": {
+        "status": "INCOMPLETE",
+        "missing": [],
+        "errors": [
+          "covariance.perturbation must be right"
+        ],
+        "warnings": []
+      },
+      "cov_world": {
+        "status": "INCOMPLETE",
+        "missing": [],
+        "errors": [
+          "covariance.frame must be pre_body (the tangent of inv(pre)*post)"
+        ],
+        "warnings": []
+      },
+      "cov_frame_missing": {
+        "status": "INCOMPLETE",
+        "missing": [],
+        "errors": [
+          "covariance.frame must be pre_body (the tangent of inv(pre)*post)"
+        ],
+        "warnings": []
+      },
+      "unit_only": {
+        "status": "READY_UNIT_ONLY",
+        "missing": [],
+        "errors": [],
+        "warnings": [
+          "unit_weighted_only:no_pose_block"
+        ]
+      },
+      "unit_only_left": {
+        "status": "READY_UNIT_ONLY",
+        "missing": [],
+        "errors": [],
+        "warnings": [
+          "perturbation_not_right_but_unit_only",
+          "unit_weighted_only:no_pose_block"
+        ]
+      }
+    },
+    "right_residual": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -1.0,
+      0.0
+    ],
+    "direct_unmatched_helper_score": 1.0,
+    "matched_covariance_score": 0.01,
+    "scope": "Validator closes manifest mismatch; low-level s_i still assumes caller supplied matching covariance. No delivered trace caller."
+  },
+  "saved_artifact_integrity": [
+    {
+      "artifact": "t0_A.json",
+      "hash_and_size_match": true
+    },
+    {
+      "artifact": "t0_B.json",
+      "hash_and_size_match": true
+    },
+    {
+      "artifact": "shadow_A.jsonl",
+      "hash_and_size_match": true
+    },
+    {
+      "artifact": "shadow_B.jsonl",
+      "hash_and_size_match": true
+    },
+    {
+      "artifact": "t1_selftest.json",
+      "hash_and_size_match": true
+    }
+  ],
+  "T0_independent_readonly_recomputation": [
+    {
+      "run": "A",
+      "frames": 402,
+      "old_observed_blocks": 90,
+      "new_time_population_blocks": 90,
+      "no_data_block_ids": [],
+      "state_counts_by_frame": {
+        "UNKNOWN": 402
+      },
+      "channel_counts": {
+        "M": {
+          "MISSING": 55,
+          "UNQUALIFIED/OUT_OF_SUPPORT": 6,
+          "UNQUALIFIED/BLOCKED": 29
+        },
+        "T": {
+          "UNQUALIFIED/BLOCKED": 56,
+          "UNQUALIFIED/OUT_OF_SUPPORT": 2,
+          "MISSING": 32
+        },
+        "I": {
+          "NOT_AVAILABLE": 90
+        }
+      },
+      "saved_blocks_and_shadow_match_recomputed": true
+    },
+    {
+      "run": "B",
+      "frames": 544,
+      "old_observed_blocks": 119,
+      "new_time_population_blocks": 120,
+      "no_data_block_ids": [
+        3255570637
+      ],
+      "state_counts_by_frame": {
+        "UNKNOWN": 544
+      },
+      "channel_counts": {
+        "M": {
+          "MISSING": 62,
+          "UNQUALIFIED/OUT_OF_SUPPORT": 15,
+          "UNQUALIFIED/BLOCKED": 42,
+          "NO_DATA": 1
+        },
+        "T": {
+          "UNQUALIFIED/BLOCKED": 63,
+          "UNQUALIFIED/OUT_OF_SUPPORT": 8,
+          "MISSING": 48,
+          "NO_DATA": 1
+        },
+        "I": {
+          "NOT_AVAILABLE": 119,
+          "NO_DATA": 1
+        }
+      },
+      "saved_blocks_and_shadow_match_recomputed": true
+    }
+  ],
+  "saved_tests_not_executed": {
+    "t1_selftest.json": {
+      "test_count": 7,
+      "saved_pass_count": 7,
+      "saved_failed": 0,
+      "t2_real_status": null,
+      "independently_executed_selftest": false
+    },
+    "t2_prep_selftest.json": {
+      "test_count": 14,
+      "saved_pass_count": 14,
+      "saved_failed": 0,
+      "t2_real_status": "NOT_EXECUTED",
+      "independently_executed_selftest": false
+    }
+  },
+  "empty_population_delta": {
+    "base": [],
+    "target_exception": "min() iterable argument is empty",
+    "scope": "Empty input batch only; not the nonempty A/B archive paths, no real trace failure claim."
+  }
+}
