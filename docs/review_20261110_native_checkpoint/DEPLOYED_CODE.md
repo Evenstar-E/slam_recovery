@@ -107,3 +107,52 @@ bag 与 `inputs.bag_sha256` 一致。源码文件 mtime 均早于二进制（`LI
 `config/m2dgr.yaml`、`config/camera_m2dgr.yaml`、`config/m2dgr_noimg.yaml`、`config/m2dgr_vio10.yaml`、
 `launch/mapping_m2dgr.launch` 在宿主仓库里是未跟踪文件，不进入 `deployed_host.diff`；前三个是实际部署物，
 按第 4.2 节的 sha 绑定。
+
+## 8. v3 更新（2026-11-12）：终止戳与声明戳 hold/snapshot
+
+本节把本文件绑定到当前部署，不改前 1–7 节的历史内容；v1/v2 的原件与 sha 保留。
+
+### 8.1 版本链
+
+| 版本 | 完整 patch | 行数 / sha256 | 运行时库 sha256 | 可执行文件 sha256 |
+|---|---|---|---:|---|
+| v1（2026-11-10） | `deployed_host.diff` | 1501 行 / 见文件 | `0eacffe1017b…65659` | `0d7e23de…af6c1` |
+| v2（终止戳） | `../review_20261112_four_host/host_change_terminal_stamp/deployed_host_v2.diff` | 1528 行 / `2ffc5f6e…59a0` | `f27d1730927e…79d0c` | `0d7e23de…af6c1` |
+| **v3（当前）** | `../review_20261112_four_host/host_change_deferred_stamp/deployed_host_v3.diff` | **1627 行 / `46648b4c…ab28`** | **`9c0330be…00db`** | `0d7e23de…af6c1` |
+
+增量 patch（都在上一版树上 `git apply --check` 通过）：
+
+| 增量 | 相对 | 行数 / sha256 |
+|---|---|---:|
+| `host_change_terminal_stamp/terminal_stamp_increment.diff` | v1 | 87 行 / `4419d401…2530` |
+| `host_change_deferred_stamp/deferred_increment.diff` | v2 | 203 行 / `adc61753…4be8` |
+
+**可执行文件未变、库变了**：`fastlivo_mapping` 一直动态链接 `liblaser_mapping.so`，宿主的行为在库
+里。每次运行的 receipt 以 `/proc/<pid>/maps` 解析实际加载的库并哈希，所以 run 身份应看
+`runtime_library_sha256`，不能只看可执行文件 sha。053647Z/053917Z 绑定 `f27d1730…`，
+055727Z/055931Z 绑定 `9c0330be…`。
+
+### 8.2 v2/v3 的能力增量
+
+- **v2（终止戳）**：`reprocess` payload 可带终止戳（ns），重放只处理组结束 ≤ 该戳的条目；
+  日志新增 `replayed=… truncated=… end_stamp=…`；空 payload 保持旧行为。
+- **v3（声明戳 hold/snapshot）**：`hold`/`snapshot` payload 可带应用戳；控制线程只入队并回
+  `OK <cmd> deferred stamp=…`，主循环在第一个带 lidar 测量的组的 `lio_time ≥ 戳` 时、处理该组
+  之前执行（先 hold 后 snapshot）；不带戳保持立即语义。执行分支重构为
+  `executeControlCommand`，主循环每帧调用 `applyDeferredControlCommands`；`late_ms` 以毫秒记录。
+  控制线程仍不碰地图、状态或 LIO。
+
+### 8.3 构建记录
+
+`host_change_terminal_stamp/BUILD.md`、`host_change_deferred_stamp/BUILD.md` 记录命令
+（`catkin_make -j8`）、日志与复现检查。两次构建的退出码都是 1，但**宿主目标已成功**：
+`Built target laser_mapping`（91%）；失败在无关的 `rpg_vikit` 测试可执行文件
+`test_vk_common_patch_score`——`/usr/bin/ld: /home/R26534/mm/ros/lib/libIlmThread.so.32:
+undefined reference to __cxa_call_terminate@CXXABI_1.3.15`（mm ROS 库的 ABI 不匹配），
+`fastlivo_mapping`/`liblaser_mapping.so` 不受影响。
+
+### 8.4 复现验证（已做）
+
+- v3 完整 patch 在干净 `0d2c034` 树上 `git apply --check` 通过；
+- 两份增量在各自上一版树上 `git apply --check` 通过；
+- `strings liblaser_mapping.so | grep 'deferred apply'` 命中，v3 库确含新代码。
