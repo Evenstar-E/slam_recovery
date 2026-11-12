@@ -1,0 +1,49 @@
+{
+ "status": "OK",
+ "reason": "all wiring checks passed",
+ "termination": "PLANNED_KILL_AFTER_DRAIN",
+ "run_id": "fl_native_20261112T020634Z_4148249",
+ "inputs": {
+  "bag": "/tmp/fastlivo/hall01_two_event_v1.bag",
+  "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+  "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+  "host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+  "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+  "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+  "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+  "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+  "recovery_node_source": "fb746dddc1a0f4e4041e27dddd75ab4f85559c88b18694510f25a582e8b36e18",
+  "runtime_library": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+  "runtime_library_sha256": "0eacffe1017b9ccf4331ad4752cb0d336aaac4457d9f66ff056d66965cd35659"
+ },
+ "machine_load_at_launch": "51.77 69.58 99.39 9/58143 4148285\nnproc=128",
+ "launch": {
+  "rate": "1.0",
+  "drain_s": "30",
+  "duration_s": "0",
+  "max_pairs": "0",
+  "candidate_source": "host_poses",
+  "detection": "off",
+  "sigma_meas_m": "0.884",
+  "scripted_triggers_s": "",
+  "scripted_triggers_ns": "1627785276215170145",
+  "confirmation_margin_sec": "4.0",
+  "run_mode": "CONTROLLED_INTERFACE_TEST",
+  "group_model": "host and recovery node are children of one setsid supervisor"
+ },
+ "exit_codes": {
+  "play": "0",
+  "supervisor": "null",
+  "recovery_node": "0",
+  "roscore": "null"
+ },
+ "recovery_summary_present": true,
+ "recovery_summary_headline": {
+  "paired": 512,
+  "fed_to_step_frame": 1,
+  "episodes": 1,
+  "decisions": 1,
+  "accepted": 1,
+  "final_state": "HEALTHY"
+ }
+}
