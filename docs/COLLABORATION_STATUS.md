@@ -2340,3 +2340,20 @@ S3 `129b184`（已合入 main），本机核对：
   v7/v8 仍 `INCOMPLETE`/`ASSERTED_NOT_VERIFIED`；`vec6` 仍 `NOT_VERIFIED`；协方差 `NOT_AVAILABLE`、I 主量单位权。
 
 **S2 的开跑前置（"parser 已支持 107"）现已满足**。
+
+## 159. 增长率判据 run（v11）已核；`mat_lio_out` off-by-one；判据结论=非触发对齐
+
+`fl_native_20261112T165438Z_669633`（库 `81b35f92…` v11、driver `c5efdd73…`、K=1、detection on、无 scripted、
+探针 5/5）。本机核对：trace **792 行 × 107 列**、`idx` 单调、`has_out=1` **725**、`has_out=0` 67（`pre_pose` 非零）、
+2 段均 `LATE_AFTER_BOUNDARY`、paired 482、终态 HEALTHY/kf 295。
+**`mat_lio_out` off-by-one 已独立复现**（其 idx 4 的 pos `(0.0498243,−0.00475442,−0.0238)` = trace idx 5 的 `pose7`）：
+本 run 只用 trace 同行 `pose7`/`pre_pose7`，`mat_lio_*` 仅以 `idx+1` 作交叉核对；S2 已在 v12 修正（`trace_cov_rows` 写入、
+精度 10 位，库 `b6c1f3a4…`、探针 5/5）。
+
+**增长率判据（S2 报告值）**：第 2 段前 30 s voxels 0→9,233（≈3.0k/s）、points 0→167k（≈55k/s）、`eff` 中位 13,227；
+全程 52.6 s、722 帧，地图 0→593,925 voxels / 4.15M points，**峰值在 ≈301.6 s（42.9k voxels/s）**，比两段触发
+（261.5 / 273.8）晚约 28 s——**爆炸性增长不与隔离窗口对齐**，更像 LIO 匹配退化后的持续写入。此为判据而非结论。
+
+**S1 决定**：不跑 K=3/K=1 对照（K=1 基线本身后段失控）；先用本 run 已有数据做**只读**匹配退化分析
+（`eff`/`r_mean`/`r_med`/`r_chi2`/`r_chi2w` 时序 vs 地图增速拐点），再决定是否上 ASan。归档已推
+`exp/growth-run → a812302`（run 原件 + v12 快照 + `trace_cov_v12_full.diff` 518 行 + BUILD §13）。
