@@ -925,6 +925,7 @@ class NativeClosedLoop:
         repair_publish: bool = False,
         repair_sync_timeout_s: float = 5.0,
         repair_dry_run: bool = False,
+        repair_sham: bool = False,
     ) -> None:
         self.node = node
         self.run_id = run_id
@@ -976,10 +977,14 @@ class NativeClosedLoop:
         # host parses x,y,z,intensity,time,ring.
         self._scan_msgs: Dict[int, Any] = {}
         self._scan_index: Dict[int, Tuple[int, Any]] = {}
-        self.repair_publish_enabled = bool(repair_publish)
+        self.repair_publish_enabled = bool(repair_publish or repair_sham)
         # Control mode: run the same bias estimation (so the decision costs the same) but publish
         # nothing and send no replay gate. Used to isolate the repair's effect from the corruption.
         self.repair_dry_run = bool(repair_dry_run)
+        # Sham control: same publisher, batching, receipts and command time, but the cloud is
+        # forwarded unchanged (zero shift). The only difference from the repair arm is whether the
+        # measurement is corrected, so replay spans and timing must match.
+        self.repair_sham = bool(repair_sham)
         self.publish_repair = None            # callable(PointCloud2), set by the ROS driver
         self.repair_sync_timeout_s = float(repair_sync_timeout_s)
         self._last_icp_delta: Optional[np.ndarray] = None
@@ -1438,7 +1443,12 @@ class NativeClosedLoop:
             out["reason"] = est.get("reason", "no_bias_estimate")
             return out
         bias = float(est["bias_z_m"])
-        out["repair_shift_z_m"] = round(-bias, 4)
+        # Sham control publishes the same number of clouds with the same receipts and command
+        # time, but the cloud is unchanged (shift 0). Comparing it with the repair arm isolates
+        # the correction itself from every timing and transport effect.
+        shift = 0.0 if self.repair_sham else -bias
+        out["sham"] = bool(self.repair_sham)
+        out["repair_shift_z_m"] = round(float(shift), 4)
         # The host's repaired-scan subscriber queues 20 (LIVMapper.cpp:320-321). A burst of 26 in
         # one decision dropped six before any callback saw them, so publish in batches and wait for
         # the cumulative receipt after each one. The receipt is the host's own count, not a timer.
@@ -1450,7 +1460,7 @@ class NativeClosedLoop:
                 continue
             scan_ns, msg = rec
             # bias is the estimated injected corruption; the repair removes it.
-            items.append((int(scan_ns), shift_z_cloud(msg, -bias)))
+            items.append((int(scan_ns), shift_z_cloud(msg, shift)))
         baseline = self.cp.read_repair_received(timeout_s=1.0)
         out["repair_received_baseline"] = baseline
         base = int(baseline or 0)
@@ -2159,6 +2169,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--repair-dry-run", action="store_true", default=False,
                     help="control for the INJECTION test: run the same bias estimation (same "
                          "decision cost) but publish nothing; the replay uses the original scans")
+    ap.add_argument("--repair-sham", action="store_true", default=False,
+                    help="sham control: publish the same number of clouds with the same batching "
+                         "and receipts, but unchanged (zero shift); isolates the correction")
     args, _unknown = ap.parse_known_args(argv)
 
     import rospy
@@ -2185,6 +2198,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         repair_publish=args.repair_publish,
         repair_sync_timeout_s=args.repair_sync_timeout_sec,
         repair_dry_run=args.repair_dry_run,
+        repair_sham=args.repair_sham,
     )
     if args.scripted_triggers:
         loop.scripted_triggers_s = [float(x) for x in args.scripted_triggers.split(",") if x.strip()]
