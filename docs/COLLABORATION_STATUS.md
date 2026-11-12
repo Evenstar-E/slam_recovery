@@ -1659,3 +1659,26 @@ fork 前记录 `ROS_PACKAGE_PATH/ROS_HOME`，并**在拿到该证据前不进行
 `last_lio_update_time` ↔ `scan_stamp_ns` 精确相等，trace 必须同时导出 `scan_header_stamp` 与
 `last_lio_update_time`；偏移非常数或只给 header 戳 → `INCOMPLETE:join_key_unresolved`；契约与
 `t2_input_check.py` 同步，11/11 仍 PASS。
+
+## 122. v7 trace 身份已核；宿主启动崩溃定位为进程内内存损坏；S1 批准诊断构建 A
+
+S2（r11070-c3）回报，本机逐项核对：
+
+| 项 | 实测 |
+|---|---|
+| 驱动 | `/tmp/wt-sim`，branch `exp/m0-updated`，HEAD `584604c`；未提交：`run_native_loop.sh` 的 `TRACE_COV` 与 rospack 预热 |
+| v7 改动 | 4 文件 +145/−5（`LIVMapper.{h,cpp}`、`voxel_map.{h,cpp}`）；diff 归档在 `docs/review_20261112_four_host/host_change_trace_cov/trace_cov_v7.diff` |
+| 当前库 | `0308c216…`（v6 为 `ca9126c4…`；首次构建 `691d7334…`），可执行文件仍 `0d7e23de…` |
+| 两次 FAIL | `100744Z_326380`/`101116Z_329791` 均为 trace-off 尝试，0 帧，**不构成 A/B 证据** |
+| `Log/mat_pre.txt`/`mat_out.txt` | **已 0 字节**（被失败启动 trunc），不可复用 |
+| 可用位姿旁证 | `last_good_pose/M2DGR_room_02.txt` 1127 行、sha `7cd8a90f…`、`…263.142320–…320.909074`；仅 P⁺、无协方差、无帧号，不作 trace |
+
+**崩溃定位（S2 最小诊断，本机未复跑）**：不经过 runner 直跑二进制、`env -i` 最小环境、预热 rospack 缓存后仍崩；
+同 shell/ROS_HOME 下 `image_transport` 探针正常；LD_PRELOAD 显示进入 OpenCV 初始化后 ROS 变量返回 NULL（`environ`
+指针未变），`OMP_NUM_THREADS=1` 时 terminate 变 SIGSEGV。判定：**宿主进程早期内存损坏**，与 trace 代码无关
+（崩溃发生在第一帧 LIO 前）。
+
+**S1 批准的下一步（诊断构建 A）**：恢复 v6 源码快照增量重建（≤3 min）→ 只做启动探针（不跑 bag/不起 play/检测关，
+存活 ≥10 s）→ 记录新库 sha、`ROS_PACKAGE_PATH/ROS_HOME/LD_LIBRARY_PATH`、探针输出。若 v6 也崩，先回报证据，
+再执行已批准的 B（`catkin_make clean` 全量重建，≤15 min）；若 v6 通过而 v7 崩，按四文件逐块二分（先 `voxel_map.cpp`）。
+**不批准 C**（跳过 image_transport publisher，改宿主输出）。探针期间不跑 bag，不产生新 run 身份。
