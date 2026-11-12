@@ -48,6 +48,7 @@ import numpy as np
 
 from slam_recovery.core import BackendDelta, RecoveryState, TangentFrame
 from slam_recovery.repair.pose_reregistration import ICP_CONFIG, reregister_segment
+from slam_recovery.ros.cloud_repair import body_z_bias, shift_z_cloud
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
 from slam_recovery.validation import (
     compute_6dof_point_to_plane_fim,
@@ -787,6 +788,32 @@ class CheckpointClient:
         with self._lock:
             return bool(self._pending or self._outbox)
 
+    def wait_for_repair_count(self, expected: int, timeout_s: float = 5.0) -> bool:
+        """Block until the host's ack reports `repair_received >= expected`.
+
+        The repair clouds travel on a topic while `reprocess` travels on the command file. The
+        host's ack already carries `repair_received` (checkpointStatus), so the receipt itself is
+        the barrier: no new host interface is needed. A status command queues behind any command in
+        flight (the client is serialized), and its ack is collected here.
+        """
+        import re
+        import time as _time
+
+        expected = int(expected)
+        deadline = _time.time() + float(timeout_s)
+        while _time.time() < deadline:
+            event = self._send("status")
+            try_until = min(deadline, _time.time() + 1.0)
+            while _time.time() < try_until and not event.get("ack"):
+                self.poll()
+                _time.sleep(0.01)
+            ack = event.get("ack") or ""
+            m = re.search(r"repair_received=(\d+)", ack)
+            if m and int(m.group(1)) >= expected:
+                return True
+            _time.sleep(0.05)
+        return False
+
     def hold(self) -> Optional[Dict[str, Any]]:
         """Stop the host writing its map, without waiting: this is called from a callback."""
         return self._write("hold", preempt_snapshot=True)
@@ -874,6 +901,8 @@ class NativeClosedLoop:
         detection_enabled: bool = True,
         icp_time_budget_s: float = 0.0,
         checkpoint_client: Optional["CheckpointClient"] = None,
+        repair_publish: bool = False,
+        repair_sync_timeout_s: float = 5.0,
     ) -> None:
         self.node = node
         self.run_id = run_id
@@ -919,6 +948,16 @@ class NativeClosedLoop:
         # reason as `icp_details`: the 18-key stream is frozen.
         self.candidate_details: List[Dict[str, Any]] = []
         self.icp_seconds_total = 0.0
+        # The measurement-repair path (INJECTION test). The raw scan message and its own stamp are
+        # kept per keyframe so an accepted candidate's frames can be republished on the host's
+        # repair channel; the original message is kept, not a re-encoded xyz array, because the
+        # host parses x,y,z,intensity,time,ring.
+        self._scan_msgs: Dict[int, Any] = {}
+        self._scan_index: Dict[int, Tuple[int, Any]] = {}
+        self.repair_publish_enabled = bool(repair_publish)
+        self.publish_repair = None            # callable(PointCloud2), set by the ROS driver
+        self.repair_sync_timeout_s = float(repair_sync_timeout_s)
+        self._last_icp_delta: Optional[np.ndarray] = None
         # 0 = no budget. A budget that is hit is recorded, because truncating the candidate
         # changes what the gate sees and must never happen silently.
         self.icp_time_budget_s = float(icp_time_budget_s)
@@ -953,7 +992,8 @@ class NativeClosedLoop:
     def _fed(self, ts_ns: int) -> bool:
         return self._first_decision_ts_ns is None or ts_ns <= self._first_decision_ts_ns
 
-    def on_pair(self, pose_stamp_ns: int, pose: np.ndarray, scan_body: np.ndarray) -> None:
+    def on_pair(self, pose_stamp_ns: int, pose: np.ndarray, scan_body: np.ndarray,
+                scan_ns: Optional[int] = None) -> None:
         ts_ns = int(pose_stamp_ns)
         self._last_ts_ns = ts_ns
         self.bag_end_ts_ns = ts_ns
@@ -966,6 +1006,14 @@ class NativeClosedLoop:
         # only makes the support predicate usable before the decision to gate or not.
         self.node.scan_buffer_body[kf_id] = np.asarray(scan_body, dtype=np.float64)[:, :3].copy()
         self.node._kf_timestamps[kf_id] = ts_ns
+        # Keep the scan's own stamp and original message for the repair channel. The host matches
+        # a repaired cloud by the scan stamp (not the pose stamp), and it re-parses the full point
+        # layout, so a re-encoded xyz array would not do.
+        if scan_ns is not None:
+            self._scan_index[kf_id] = (int(scan_ns), self._scan_msgs.get(int(scan_ns)))
+            if len(self._scan_index) > 256:
+                for stale in list(self._scan_index)[:64]:
+                    self._scan_index.pop(stale, None)
 
         value, source, reference = self.nis.measure(pose, scan_body, now_ts_ns=ts_ns)
         support_ref = self.nis.support_reference(ts_ns)
@@ -1222,6 +1270,9 @@ class NativeClosedLoop:
                             + inits[k][:3, 3] for k, v in sorted(scans.items())]) \
             if scans else np.zeros((0, 3))
         delta = np.asarray(res.pose, dtype=np.float64)
+        # The same correction that makes the candidate poses also describes the measurement bias
+        # for the frames it covers; the repair publisher projects it onto the declared body axis.
+        self._last_icp_delta = delta.copy()
         poses = {k: delta @ np.asarray(inits[k], dtype=np.float64) for k in inits}
         detail = {
             "mode": "single_rigid_transform_for_the_segment",
@@ -1262,6 +1313,56 @@ class NativeClosedLoop:
             self.cp.hold()
 
     # -- decision -----------------------------------------------------------------------------
+    def _repair_gate(self, ep: "Episode", accepted: bool) -> Tuple[bool, Optional[Dict[str, Any]]]:
+        """Publish the repaired measurements and decide whether the replay may be sent.
+
+        Returns (proceed, repair_meta). When repairs were published but the host did not confirm
+        receiving them, `proceed` is False and no `reprocess` may be issued: a replay that cannot
+        see the repaired measurements would repeat the previous run's `repairs applied=0`.
+        """
+        if not (accepted and self.repair_publish_enabled):
+            return True, None
+        rep = self._publish_repaired_scans(ep)
+        if rep.get("published") and not rep.get("synced"):
+            return False, rep
+        return True, rep
+
+    def _publish_repaired_scans(self, ep: "Episode") -> Dict[str, Any]:
+        """Republish the episode's frames with the estimated body-z bias removed.
+
+        INJECTION test only. The correction is the body-frame z component of the same rigid
+        registration that produced the candidate poses: it is the part of the correction along the
+        declared corruption axis. Every frame keeps its own header stamp and full point layout;
+        only x/y/z bytes change. The clouds go out before `reprocess` and the caller waits for the
+        host to acknowledge receipt, because the command and the topic travel on different paths.
+        """
+        out: Dict[str, Any] = {"enabled": True, "published": 0, "bias_z_m": None,
+                               "frames_with_pose": 0, "missing_clouds": 0,
+                               "synced": False, "frames": []}
+        if self._last_icp_delta is None:
+            out["reason"] = "no_measurement_correction"
+            return out
+        if self.publish_repair is None:
+            out["reason"] = "no_repair_publisher"
+            return out
+        bias, n = body_z_bias(ep.frames, self._last_icp_delta)
+        out["bias_z_m"] = round(float(bias), 6)
+        out["frames_with_pose"] = int(n)
+        for kf, _ts, _pose in ep.frames:
+            rec = self._scan_index.get(kf)
+            if not rec or rec[1] is None:
+                out["missing_clouds"] += 1
+                continue
+            scan_ns, msg = rec
+            self.publish_repair(shift_z_cloud(msg, float(bias)))
+            out["published"] += 1
+            out["frames"].append(int(scan_ns))
+        if out["published"]:
+            out["synced"] = bool(
+                self.cp.wait_for_repair_count(out["published"],
+                                              timeout_s=self.repair_sync_timeout_s))
+        return out
+
     def decide(self, now_ts_ns: int, basis: str) -> Optional[Dict[str, Any]]:
         ep = self._open
         if ep is None or ep.decided:
@@ -1364,6 +1465,18 @@ class NativeClosedLoop:
         # re-derived from that checkpoint through the host's own estimator. Both are recorded with
         # the host's ack, because "the command was sent" and "the host did it" are different facts.
         if self.cp is not None:
+            # INJECTION measurement repair: publish the corrected clouds before the replay command
+            # and wait until the host has queued them. The host applies the command at a frame
+            # boundary; the clouds arrive on a ROS topic. Without the receipt check, `reprocess`
+            # can run on a queue that is still empty, which is exactly what the previous run
+            # recorded (repair_received=0, repairs applied=0).
+            proceed, repair = self._repair_gate(ep, row.get("accepted") is True)
+            if repair is not None:
+                ep.meta["repair_publish"] = repair
+            if not proceed:
+                # Do not send a replay that cannot see the repaired measurements.
+                ep.meta["native_checkpoint_skipped"] = "repair_sync_timeout"
+                return row
             # The event object is the one poll() will account for; appending it here as well would
             # list the same command twice.
             action = self.cp.reprocess() if row.get("accepted") is True else self.cp.restore()
@@ -1768,7 +1881,16 @@ class RosDriver:
         self._pub = rospy.Publisher(status_topic, String, queue_size=20)
         self._sub_pose = rospy.Subscriber(pose_topic, Odometry, self._on_pose, queue_size=200)
         self._sub_scan = rospy.Subscriber(scan_topic, PointCloud2, self._on_scan, queue_size=20)
-        rospy.loginfo("[slam_recovery] listening on %s and %s", pose_topic, scan_topic)
+        # INJECTION measurement repair: the corrected clouds go to the host's existing channel.
+        # The publisher lives here because the node owns the trusted map the correction came from;
+        # a separate process would have no reference to repair against.
+        self._pub_repair = None
+        if loop.repair_publish_enabled:
+            self._pub_repair = rospy.Publisher("/native_recovery/repaired_scan", PointCloud2,
+                                               queue_size=200)
+            loop.publish_repair = self._pub_repair.publish
+        rospy.loginfo("[slam_recovery] listening on %s and %s (repair publisher: %s)",
+                      pose_topic, scan_topic, "on" if self._pub_repair else "off")
 
     @staticmethod
     def _stamp_ns(stamp) -> int:
@@ -1786,8 +1908,8 @@ class RosDriver:
             self.errors.append({"topic": "pose", "stamp_ns": ns,
                                 "error": f"{type(exc).__name__}: {exc}"})
             return
-        for pose_ns, _scan_ns, pose, scan in self.loop.pairer.add_pose(ns, T):
-            self._dispatch(pose_ns, pose, scan)
+        for pose_ns, scan_ns, pose, scan in self.loop.pairer.add_pose(ns, T):
+            self._dispatch(pose_ns, pose, scan, scan_ns)
 
     def _on_scan(self, msg) -> None:
         self.scan_count += 1
@@ -1801,12 +1923,18 @@ class RosDriver:
         if len(xyz) == 0:
             self.errors.append({"topic": "scan", "stamp_ns": ns, "error": "empty_cloud"})
             return
-        for pose_ns, _scan_ns, pose, scan in self.loop.pairer.add_scan(ns, xyz):
-            self._dispatch(pose_ns, pose, scan)
+        # Keep the message itself: the repair channel republishes the original point layout.
+        self.loop._scan_msgs[ns] = msg
+        if len(self.loop._scan_msgs) > 512:
+            for stale in list(self.loop._scan_msgs)[:128]:
+                self.loop._scan_msgs.pop(stale, None)
+        for pose_ns, scan_ns, pose, scan in self.loop.pairer.add_scan(ns, xyz):
+            self._dispatch(pose_ns, pose, scan, scan_ns)
 
-    def _dispatch(self, pose_ns: int, pose: np.ndarray, scan: np.ndarray) -> None:
+    def _dispatch(self, pose_ns: int, pose: np.ndarray, scan: np.ndarray,
+                  scan_ns: Optional[int] = None) -> None:
         try:
-            self.loop.on_pair(pose_ns, pose, scan)
+            self.loop.on_pair(pose_ns, pose, scan, scan_ns)
         except Exception as exc:                       # recorded, never swallowed
             self.errors.append({"stage": "on_pair", "stamp_ns": int(pose_ns),
                                 "error": f"{type(exc).__name__}: {exc}"})
@@ -1877,6 +2005,13 @@ def main(argv: Optional[List[str]] = None) -> int:
                     help="close a Mode 3 wait as unresolved after this many seconds without "
                          "evidence and re-arm (0 = wait indefinitely, which means a refused "
                          "first event can never be followed by a second one)")
+    ap.add_argument("--repair-publish", action="store_true", default=False,
+                    help="INJECTION test only: on an accepted candidate, republish its frames on "
+                         "/native_recovery/repaired_scan with the estimated body-z bias removed, "
+                         "then wait for the host's repair_received receipt before reprocess")
+    ap.add_argument("--repair-sync-timeout-sec", type=float, default=5.0,
+                    help="how long to wait for repair_received to reach the published count; on "
+                         "timeout the replay is not sent")
     args, _unknown = ap.parse_known_args(argv)
 
     import rospy
@@ -1900,6 +2035,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         checkpoint_client=(
             CheckpointClient(args.checkpoint_dir, snapshot_period_s=args.checkpoint_period_sec)
             if args.checkpoint_dir else None),
+        repair_publish=args.repair_publish,
+        repair_sync_timeout_s=args.repair_sync_timeout_sec,
     )
     if args.scripted_triggers:
         loop.scripted_triggers_s = [float(x) for x in args.scripted_triggers.split(",") if x.strip()]

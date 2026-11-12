@@ -55,6 +55,7 @@ FAST-LIO2 必须标 **SHARED_EXECUTION**：本机只有一个 `fastlio_mapping`
 | `fastlio2_shared_campus12_20261112/REPORT.md` | FAST-LIO2（SHARED_EXECUTION）同上 |
 | `fastlio2_shared_campus12_20261112/{run.log,fastlio_node.log,record.log,analysis.json,events.json}` | 原件副本 |
 | `REPAIR_GAP.md` | `repair_received/applied=0` 的逐条代码对点与最小接线方案（无新运行） |
+| `injection_repair_20261112/REPORT.md` | INJECTION 测量修复的一次受控运行：传输链成立（25/25/25），估计偏差 0.003 m 而非注入的 0.5 m，原因与最小修法 |
 | `run_fastlio2_shared.sh` | 本项使用的运行脚本（可复算；内含共享执行注释） |
 | `analyze_run_bag.py` | 从输出 bag 计算 E1/E2 位姿、间隔、步长、尾段的分析脚本 |
 
