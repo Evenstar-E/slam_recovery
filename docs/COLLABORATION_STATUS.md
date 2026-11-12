@@ -1592,3 +1592,39 @@ S1/S2最低复用buffer/重推明确拒绝与需追赶input/IMU视觉归宿，�
 §116计划测量S=H Pminus H^T+R不能直接作SE3 eI协方差，H_T_H非S/6维压缩需对应映射、pre/post相关不能简单相加。S1/S2/S3最低同time frame/tangent/rank residual-Sigma定义，缺cov用单位残差/条件经验校准，保NOT_AVAILABLE不假概率/不新模型/巨大矩阵；导出phase/replay早退与绝对戳归宿同核。同新trace旧方法/shadow风险误报漏检延迟错误NORMAL/UNKNOWN时长成本才下一实交。
 
 S3上传研究/配对评价、S2一次现预算真实导出、S1共享集成与原生最小归宿并行，最新15h任务2c优先、不凭未合推忽略，旧参数停/无Codex/1研究+2集成。暂只是可解除trace依赖，不新全面重大阻塞；真缺证据/超范围立即中文GitHub选择，未阻工作继续。逐项状态命令原件/source人口/label失败质量成本，不test数/全UNKNOWN假安全；本机不算法/host，A/B局部不总分，三周期+截止单owner，review中文SSH/private保护不合main历史冻结门。
+
+## 119. 15 小时任务已获取并分发；一次 trace run 因环境 FAIL；导出残差空间按审阅更正
+
+### 119.1 用户新任务（2026-11-12 17:53–11-13 08:53 UTC+8）
+
+审阅分支 `2c838c7` 发布 `docs/OVERNIGHT_ALI_AUTODETECTION_TASK_20261112.md`：15 小时内完成 ALI-H 真实数据验证、
+推进有限自动检测接线、交一次明确结果或中文重大阻塞；中文提交/报告；普通失败不停整体任务；无 Codex 辅助。已合入 main（`4e66f39`）。
+
+### 119.2 本机观察到的宿主运行（只记录，未干预、未重跑）
+
+`fl_native_20261112T101116Z_329791`（18:11 起，scripted 两事件 + `--repair-publish`，detection off）**已结束，status FAIL**：
+- `host.log` 末：`[rospack] Error: package 'image_transport' not found` → `image_transport::Exception: No plugins found!`，宿主启动即 terminate；
+- `wiring.json`：`pose_messages: 0`、`scan_messages: 598`、`paired: 0`；recovery 写 0 候选；
+- `receipt.inputs.runtime_library_sha256` = `691d7334…`（≠ v6 的 `ca9126c4…`，为重建库）。
+判定：环境/插件路径类普通失败，不是检测或写回逻辑失败；已把原件位置回报 S2，由其做最小诊断，S1 不重跑。
+
+### 119.3 导出残差空间更正（S1 批准内容修正）
+
+审阅 `5e05826` 指出、本机同意：`H` 将 6 维状态映射到 m 个点面残差，`S = H·P⁻·Hᵀ + R` 是 **m×m 测量空间**协方差，
+`H_T_H` 是信息阵，二者都不是 ALI-H `e_I`（6 维 SE(3) 切空间）的协方差。批准内容更正为：
+
+| 导出 | 要求 |
+|---|---|
+| `P⁻`/`P⁺` 位姿块 | 6×6；声明状态顺序、旋转参数化、扰动左/右、body/world |
+| `vec` | 6；同上声明 |
+| `effct_feat_num` | 实际参与点数 m |
+| 测量空间统计 | 单独命名（mean/median/chi2、维度 m），**不得称 S、不得当 e_I 协方差** |
+| 时间/身份 | 绝对戳 + `has_out` + run/phase（replay 可能重复同戳） |
+
+禁止：`P⁻`+`P⁺` 相加当 e_I 协方差；无协方差时补单位阵或造假卡方。无协方差则交带单位权残差并标 `NOT_AVAILABLE`。
+
+### 119.4 旧档标签不一致（本机复算）
+
+Run A（402）中 285 个 UNAVAILABLE 帧的 `support.reason` 仍是 `ok`（fraction 低于阈值却未更新原因字段）；
+Run B（544）为 `fraction_below_threshold` 351。S3 的 `insufficient_support` 是派生值，与审阅结论一致；
+后续引用须注明该字段在旧 Run A 中不可直接当判据。
