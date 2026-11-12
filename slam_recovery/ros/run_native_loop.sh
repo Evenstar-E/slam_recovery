@@ -25,6 +25,7 @@ RATE=1.0; DRAIN=20; DURATION=0; MAX_PAIRS=0; CAND_SRC=host_poses; DETECTION=on; 
 WAIT_LIMIT="${WAIT_LIMIT:-0}"; SNAP_PERIOD="${SNAP_PERIOD:-2.0}"; SCRIPTED="${SCRIPTED:-}"
 SCRIPTED_STAMPS="${SCRIPTED_STAMPS:-}"; MARGIN="${MARGIN:-2.0}"
 RELAY_SHIFT="${RELAY_SHIFT:-}"; RELAY_START_NS="${RELAY_START_NS:-}"; RELAY_END_NS="${RELAY_END_NS:-}"
+AVAILABILITY="${AVAILABILITY:-0}"
 while [ $# -gt 0 ]; do
   case "$1" in
     --rate) RATE="$2"; shift 2 ;;
@@ -224,6 +225,7 @@ RELAY_ON=0
 # REPAIR_PUBLISH=0 keeps the identical pipeline and corruption but stops the repair clouds, which
 # is the control that isolates the repair's effect from the corruption itself.
 REPAIR_PUBLISH="${REPAIR_PUBLISH:-1}"
+[ "$AVAILABILITY" = "1" ] && REC_ARGS+=(--availability-log "$RUN_DIR/availability_frames.jsonl")
 case "$REPAIR_PUBLISH" in
   1) [ "$RELAY_ON" -eq 1 ] && REC_ARGS+=(--repair-publish) ;;
   sham) [ "$RELAY_ON" -eq 1 ] && REC_ARGS+=(--repair-sham) ;;
