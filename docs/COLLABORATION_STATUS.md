@@ -2189,3 +2189,18 @@ S2 更正并给出解析脚本 `docs/review_20261112_four_host/analyze_cp_candid
 **补（S2 `53f5c2a`，已推）**：`analyze_cp_candidates.py` 与 `cp_candidates.txt` 增加 `cand_bytes`（候选体量估算）
 与 `frame_gap`（实际 cp 与候选的帧差）；本轮 f2 候选 `cand_bytes=2,036,096`、`frame_gap=51`。
 `BUILD.md` §8/§9 已写 `cp_history_k` 默认 1 的等价说明、布局/file-static 结论、37 ms 更正与可执行文件重链声明。
+
+## 148. 审阅接受 37 ms 更正；但 K=3 run 的 driver 来源对不上（receipt ≠ main ≠ 工作树）
+
+审阅 `164777d`（已合入 main）独立算得 hist frame2 比 qstart 早 **36,967,360 ns（−36.97 ms）**，与 §147 一致；
+同时给出当前 C′ 的两条硬限制：
+1. **历史条目不是可用的完整旧检查点**：`src_LIVMapper.cpp.v9:17–43,1002–1068` 的 `CpHistoryEntry` 只保存
+   state/propagat/map/stamp/frame，**没有 `cp_last_imu`、`last_prop_end_time`、`acc_s_last`、`angvel_last`，也没有旧
+   snapshot 的 replay capture**；snapshot 把旧 map move 进 history 后便 `replay_buffer_.clear()`。`restoreCheckpoint`
+   与 v8 逐字相同、仍用当前槽。即"只保留+报告、不改选择语义"属实，但**要启用历史恢复必须先补齐配套状态与可重放区间**。
+2. **来源对不上**：K=3 run `131213Z_563253` 的 `receipt.inputs.recovery_node_source` = `7cfcccf7…`，
+   而 main 的 `recovery_node.py` = `c5efdd73…`、S2 工作树 = `a6c0380c…`（本机实测，三者互不相同）。
+   该 run 不能算"c915 修后的原生验证"，须补实际执行源码/diff 后才能引用。
+
+另：审阅指出 `restore_disposition.checkpoint_stamp_ns` 仍用 `trigger−margin` 而非实际 ACK，属已知口径问题（§85 已记）。
+探针记录：v9=4 FAIL/1 PASS、v9b=5 FAIL、v9c=5 PASS——不能笼统说"任何布局变化必崩"，但 v9c 的稳定性仍只是启动探针层面。
