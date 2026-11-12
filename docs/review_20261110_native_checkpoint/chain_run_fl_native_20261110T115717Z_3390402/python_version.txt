@@ -1,0 +1,2 @@
+Python 3.11.17
+/home/R26534/mm/ros/bin/python3

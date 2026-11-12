@@ -14,9 +14,9 @@
 | `src/LIVMapper.cpp:679` `snapshotCheckpoint()` | 复制 `_state`、`state_propagat`、voxel map、IMU 预处理跨帧四值；同时清空并**开始捕获**后续 `LidarMeasureGroup` |
 | `src/LIVMapper.cpp:700` `restoreCheckpoint()` | 释放当前 map，装入快照；写回 `_state`/`state_propagat`/`voxelmap_manager->state_`/IMU 四值；`lidar_map_inited=true` |
 | `src/LIVMapper.cpp:728` `reprocessCheckpoint()` | 恢复后把捕获的每个 group 依次 `processImu()` + `stateEstimationAndMapping()`，**走宿主自己的** LIO 更新与 `UpdateVoxelMap` |
-| `src/LIVMapper.cpp:776` `pollCheckpointControl()` | 目录文件通道：`<dir>/cmd` 被宿主先改名 `cmd.done` 再执行（保证恰好执行一次），结果写 `<dir>/ack` |
+| `src/LIVMapper.cpp` `startControlThread()` / `controlThreadLoop()` | 目录文件通道：独立线程把 `<dir>/cmd` 改名为 `cmd.done`（保证恰好执行一次）、立即写 `ack_received`，命令进待应用槽；主循环每帧开始处 `applyPendingControlCommand()` 应用并写 `OK <cmd> ...`。线程不碰 `_state`/地图/LIO（这是最终形态，早先的 `pollCheckpointControl()` 已由它取代） |
 | `include/IMU_Processing.h` | `getCheckpointState/setCheckpointState`：暴露 `last_imu`、`last_prop_end_time`、`acc_s_last`、`angvel_last` |
-| `slam_recovery/ros/recovery_node.py` `CheckpointClient` | 驱动侧：健康期每 2 s 滚动快照；决策后拒绝→`restore`，接纳→`reprocess`；每次等待 ack 并记录 |
+| `slam_recovery/ros/recovery_node.py` `CheckpointClient` | 驱动侧：健康期每 2 s 滚动快照；决策后拒绝→`restore`，接纳→`reprocess`；命令**异步**发出，`poll()` 收 ack，received/applied 分记，单 in-flight（见 `ACCEPTANCE_CONTRACT.md`） |
 
 重放期间 `publish_odometry/publish_path/publish_mavros/publish_effect_world` 全部静默，
 否则旧时间戳会被恢复节点当成新输入二次配对。
@@ -698,7 +698,36 @@ run `/tmp/fl_native_20261110T115717Z_3390402`，pgid `3391481`，wall 103.1 s，
 最大 1.066 s（单次离群）。**本趟 restore 之后 LIO 并没有变慢**——之前那次 30 s 超时不是 LIO 变慢造成的，
 更可能是旧同步设计下"主循环在等 ack"与当时负载叠加。这一点我按实测写，不沿用旧解释。
 
+> 归档状态：这一行是**当次会话内的探针读数，逐帧原始记录没有落盘**，归档里无法复核。
+> 同段的其它数字（received/applied、调度延迟、评估耗时、快照计数）都有原件，见
+> `chain_run_fl_native_20261110T115717Z_3390402/LIO_TIMING_STATUS.md`。引用这组毫秒数时请写成
+> "会话内测得"，不要当作归档事实。
+
 副作用记账：30 次滚动快照里 **7 次 ack 超时**（0.5 s 预算内没应用完），已弃的快照不再计入失败。
+
+## 3v. 交付原件（本轮只做归档与契约，不新增运行）
+
+审阅要求把"交付原件补齐"。四份文件：
+
+| 文件 | 内容 |
+|---|---|
+| `deployed_host.diff` | **实际部署**的宿主 patch（含 hold/restore/resume、控制线程、修复通道、`set_state`、深拷贝） |
+| `DEPLOYED_CODE.md` | patch 的生成/复现验证，以及源码、二进制、库、配置、launch、bag 的 sha256 绑定 |
+| `chain_run_fl_native_20261110T115717Z_3390402/INDEX.md` | 受控整链的原件归档索引（receipt/wiring/run_summary/candidates/host.log/ack/lifecycle/时间账本） |
+| `ACCEPTANCE_CONTRACT.md` | 单 in-flight 与 ack 恰好一次、接纳后 `resume` 契约、partial 提交隔离 |
+| `SIDECAR_SEMANTICS.md` | `candidates_detail.jsonl` = 输入全集，不是评分集；真正的评分集合单列 |
+
+两件必须点名的核对结论：
+
+1. **旧 patch 不能用**：`fastlivo2_worktree.diff` 是控制线程改造前的快照，里面检索不到
+   `map_hold_`/`resume`/`set_state`/`controlThreadLoop`，与真正跑过的二进制不一致。
+   `deployed_host.diff` 已用"干净 `0d2c034` 树 + `git apply` + `diff -r`"验证可逐字节还原部署源码。
+2. **接纳路径没有 `resume` 契约（缺口）**：`resume` 只在 `rearm` 事件之后发，而完整接纳
+   （Mode 2 提交、pending 清空）在 manager 里**不产生任何 lifecycle 事件**，所以宿主会一直保持
+   `map_hold_=true`。本趟两段都是拒绝，没有暴露这条路径。补法二选一，已写在
+   `ACCEPTANCE_CONTRACT.md` §2.3，属于设计决定，本轮没有动代码。
+
+另外：§3u 的逐帧 LIO 毫秒数**不在归档内**（原始记录未落盘），引用口径见上面那处注记。
 
 ## 4. 边界
 
