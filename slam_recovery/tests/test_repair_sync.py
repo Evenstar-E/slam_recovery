@@ -57,13 +57,17 @@ class _CountingHost(threading.Thread):
 
 
 class _FakeCP:
-    def __init__(self, wait_result):
+    def __init__(self, wait_result, counts=None):
         self.wait_result = wait_result
+        self.counts = list(counts or [0, 2])
         self.reprocess_calls = 0
         self.restore_calls = 0
         self.set_state_calls = 0
         self.expected = None
         self._last_snapshot_wall = 0.0
+
+    def read_repair_received(self, timeout_s=1.0):
+        return self.counts.pop(0) if self.counts else 0
 
     def wait_for_repair_count(self, n, timeout_s=5.0):
         self.expected = n
@@ -180,6 +184,83 @@ class RepairGateTest(unittest.TestCase):
         self.assertAlmostEqual(rep["bias_z_m"], 0.5, delta=0.06)
         self.assertAlmostEqual(rep["repair_shift_z_m"], -0.5, delta=0.06)
         self.assertEqual(rep["published"], 2)
+        raw = np.frombuffer(loop.published[0].data, dtype=np.uint8).reshape(-1, 24)
+        z = raw[:, 8:12].view(np.float32).reshape(-1)
+        self.assertAlmostEqual(float(z[0]), 0.0, delta=0.06)
+
+
+class _ScriptedCP(_FakeCP):
+    """Scripts the per-batch receipt results and the baseline/final count reads."""
+
+    def __init__(self, wait_results, counts):
+        super().__init__(True, counts=counts)
+        self.wait_results = list(wait_results)
+        self.waits = []
+
+    def wait_for_repair_count(self, n, timeout_s=5.0):
+        self.waits.append(int(n))
+        return self.wait_results.pop(0) if self.wait_results else True
+
+
+class BatchPublishTest(unittest.TestCase):
+    def _loop(self, n, wait_results, counts):
+        from slam_recovery.tests.test_cloud_repair import _plane
+
+        node = _FakeLoopNode(trigger_at=10 ** 9)
+        plane = _plane()
+        node.support_reference = lambda: plane
+        corrupted = _plane(z=0.5)[::4]
+        node.scan_buffer_body = {k: corrupted for k in range(n)}
+        loop = NativeClosedLoop(node, run_id="run")
+        loop.repair_publish_enabled = True
+        loop.published = []
+        loop.publish_repair = loop.published.append
+        loop.cp = _ScriptedCP(wait_results, counts)
+        for k in range(n):
+            cloud = _Cloud()
+            cloud.header.stamp.nsecs = 1000 + k
+            cloud.set_points([(float(x), float(y), float(z), 0.0, 0.0, 0)
+                              for x, y, z in corrupted])
+            loop._scan_index[k] = (1000 + k, cloud)
+        loop._last_incumbent = {k: np.eye(4) for k in range(n)}
+        ep = Episode(0, 1_000, np.eye(4), 2_000)
+        ep.frames = [(k, 1_000 + k, np.eye(4)) for k in range(n)]
+        return loop, ep
+
+    def test_each_batch_waits_for_its_own_receipt(self):
+        loop, ep = self._loop(25, [True, True, True], [0, 25])
+        rep = loop._publish_repaired_scans(ep)
+        self.assertEqual(loop.cp.waits, [10, 20, 25])
+        self.assertEqual([b["in_batch"] for b in rep["batches"]], [10, 10, 5])
+        self.assertEqual(rep["published"], 25)
+        self.assertTrue(rep["synced"])
+        self.assertEqual(len(loop.published), 25)
+
+    def test_a_batch_without_a_receipt_stops_before_the_next(self):
+        loop, ep = self._loop(25, [True, False], [0])
+        rep = loop._publish_repaired_scans(ep)
+        self.assertEqual(loop.cp.waits, [10, 20])
+        self.assertEqual(rep["published"], 20)
+        self.assertFalse(rep["synced"])
+        self.assertEqual(rep["reason"], "batch_receipt_timeout")
+        self.assertEqual(len(loop.published), 20)
+        self.assertEqual(len(rep["batches"]), 2)
+
+    def test_a_final_count_mismatch_blocks_the_replay(self):
+        loop, ep = self._loop(25, [True, True, True], [0, 24])
+        rep = loop._publish_repaired_scans(ep)
+        self.assertEqual(rep["published"], 25)
+        self.assertFalse(rep["synced"])
+        self.assertEqual(rep["reason"], "receipt_mismatch")
+        proceed, _ = loop._repair_gate(ep, accepted=True)
+        self.assertFalse(proceed)
+
+    def test_header_stamps_and_order_survive_the_repair(self):
+        loop, ep = self._loop(12, [True, True], [0, 12])
+        rep = loop._publish_repaired_scans(ep)
+        self.assertEqual([m.header.stamp.nsecs for m in loop.published],
+                         [1000 + k for k in range(12)])
+        self.assertEqual(rep["frames"], [1000 + k for k in range(12)])
         raw = np.frombuffer(loop.published[0].data, dtype=np.uint8).reshape(-1, 24)
         z = raw[:, 8:12].view(np.float32).reshape(-1)
         self.assertAlmostEqual(float(z[0]), 0.0, delta=0.06)
