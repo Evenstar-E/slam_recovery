@@ -80,3 +80,15 @@ vec6(6) Ppre6x6(36) Ppost6x6(36)
 - **`phase` 语义确认**：`replay_mode_`，只在 `reprocessCheckpoint()` 内为 1；实测 1208 行中 322 行 phase=1，恰为重复 grp 的第二次出现（readers 应按列名取，不要按位置）。
 - 最终库 sha：`49f2f941cc0a90357e088d2271f21e60fdeb18c88b5b89a1c6acce5f55e48eda`；构建日志 `host_build_v7u.log`。
 - availability sidecar 在 `--detection off` 下为 `status=DISABLED`、`support=null`；`--detection on` 下才有 support/旧 status（见 `trace_fl_native_20261112T115734Z_483777/`）。
+
+## 7. 已知数据缺陷（2026-11-12 夜，如实标注）
+
+1. **`scan_first_ns` 恒为 `-1`（不可用）**：本模式下 `LidarMeasureGroup::lidar_frame_beg_time` 为 0
+   （见 `src/LIVMapper.cpp:824` 注释），span 只在 VIO 合并分支写（`src/LIVMapper.cpp:2079`），
+   于是写进 0，trace 把非正值映射为 `-1`。`scan_last_ns` 是真实值。**不得用
+   `[scan_first, scan_last]` 做区间包含**（`-1 <= ts` 恒真）；应使用"上一个不同的 `scan_last` < stamp <= 当前 `scan_last`"。
+   最小修法：合并循环开头记录首条扫描头戳，写
+   `native_scan_first = (lidar_frame_beg_time > 0 ? lidar_frame_beg_time : first_merged_time)`。
+2. **最后一行可能不完整**：宿主被 SIGTERM 杀死时可能截断正在写的行（`113855Z` 末行 44 列、
+   `115734Z` 末行 53 列，正常 92 列；`121127Z` 未截断）。读取端丢弃列数不足 92 的行。
+3. `phase` 语义：只在 `reprocessCheckpoint()` 内为 1。
