@@ -1019,3 +1019,22 @@ S2 的部分：在现有宿主/输入与预算内跑**一次检测 on** 的有�
   另有 support fraction 与布尔一致、carried_forward 的 age/kf、2500 行不截断等测试。
 
 下一步（S2）：用现有宿主/输入跑**一次检测 on** 的有限诊断，交每帧原件与按原因计数；本任务不新开参数/矩阵。
+
+## 88. S3 可用性源码审计：UNAVAILABLE 主要是**支持谓词**结果，不是 NIS 缺失
+
+S1 复核 S3 `4e18de9`（合入）。基准 `eeedb7f`（node hash 5877388c）；源码引用检查 41/41 PASS。
+本机重跑 `availability_source_audit.py --scan-tmp` 结果与其归档一致（口径见下）。
+
+| 项 | 实际 |
+|---|---|
+| 判决式 | `available = bool(supported) and value is not None`（当时 recovery_node.py:1100） |
+| 支持侧失败点 | ref 空（377）、scan/pose 缺（383）、pose 非法（386）、scan 空（389）、比例 <60%（200 点、1 m、分母=实际抽点数，392-395） |
+| NIS 侧失败点 | 无参考（484-494）、current<10（504）、非有限（507）、无沿用值（517-527） |
+| 归档统计（其快照） | 21 个 detection-on run、4128 帧 UNAVAILABLE；**4107 帧 NIS 已算出且有限**；`carried_forward=0`；唯一 21 个例外=每个 run 首帧（ref 空且无 NIS）；空 reference 1656 / 比例不足 2472 / 歧义 0 |
+| 一处纠正 | `carried_forward` **单独不会造成 UNAVAILABLE**（value 非 None）；真实问题是支持通过时检测器把旧 NIS 当本帧证据，status 看不出来 |
+| E2 窗口（run 3349738） | [42,52] s（各自首帧为原点）83 帧全 UNAVAILABLE、83/83 NIS computed、83/83 prev_scan、map_points 36k–90k ⇒ 分支只能是 60% 比例测试 + 3 m 邻域 <30 点；该窗口 NIS 是 prev_scan 自比较，不是独立证据 |
+| 版本关系 | S3 基准早于 S1 的 `c35b162`/`8bbef74`；其"字段审查"对应实现前清单。S1 实现已补 support 比例/分母/mask/点级证据与 NIS raw/沿用/branch 字段（§87） |
+| 重跑差异 | 本机重跑时 `/tmp` 多出一个 S2 新 run（`20261112T065500Z`），聚合变为 22 run/4435 帧；**归档 json 绑定其快照**，不以本机重跑数字替换 |
+
+仍 BLOCKED：比例数值、参考快照身份、kf26–64 二次空 reference 原因、与漂移的因果——正是 `--availability-log`
+要交的原件。S3 另列了 3 个候选选项（诊断分解/双参考支持/位姿-地图分解），只列未实现，留待用户选择。
