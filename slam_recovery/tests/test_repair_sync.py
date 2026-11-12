@@ -171,6 +171,25 @@ class RepairGateTest(unittest.TestCase):
         # the replay is bounded by the frozen decision stamp
         self.assertEqual(loop.cp.reprocess_end_stamp, ep.frozen_at_ns + 100_000_000)
 
+    def test_a_refusal_records_that_the_consumed_interval_was_not_replayed(self):
+        # restore + resume releases the map hold; it does not replay the input the host consumed
+        # between its checkpoint and the refusal. The run summary has to say so, or a run that
+        # only rolled back its state reads as a full historical recovery.
+        loop, ep = self._loop(wait_result=True)
+        loop.node.evaluate_and_commit_candidate = lambda *a, **k: _Report(
+            accepted=False, committed_pose_keys=[], deferred_pose_keys=[])
+        loop.decide(1_500, "test")
+        self.assertEqual(loop.cp.restore_calls, 1)
+        self.assertEqual(loop.cp.reprocess_calls, 0)
+        d = ep.meta["restore_disposition"]
+        self.assertEqual(d["scope"], "STATE_AND_MAP_ROLLBACK_ONLY")
+        self.assertEqual(d["consumed_input_in_interval"], "NOT_REPLAYED")
+        self.assertEqual(d["catch_up"], "NOT_IMPLEMENTED")
+        self.assertEqual(d["decision_ts_ns"], 1_500)
+        self.assertEqual(d["checkpoint_stamp_ns"],
+                         ep.trigger_ts_ns - loop.confirmation_margin_ns)
+        self.assertEqual(d["interval_ns"], [d["checkpoint_stamp_ns"], 1_500])
+
     def test_the_sham_publishes_unchanged_clouds_with_the_same_receipts(self):
         loop, ep = self._loop(wait_result=True)
         loop.repair_sham = True

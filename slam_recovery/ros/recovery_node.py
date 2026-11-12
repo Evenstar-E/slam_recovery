@@ -1869,6 +1869,21 @@ class NativeClosedLoop:
                     ep.meta["native_writeback"] = writeback
             else:
                 ep.meta["native_checkpoint"] = self.cp.restore()
+                # A restore rolls the host's state and map back to its own checkpoint, and the
+                # `resume` that follows only releases the map hold: nothing replays the input the
+                # host consumed between that checkpoint and this decision. Record the disposition
+                # explicitly so "restore + resume" cannot be read as a full historical recovery.
+                # The interval starts at the armed checkpoint (trigger - confirmation margin).
+                checkpoint_ts = int(ep.trigger_ts_ns) - int(self.confirmation_margin_ns)
+                ep.meta["restore_disposition"] = {
+                    "scope": "STATE_AND_MAP_ROLLBACK_ONLY",
+                    "checkpoint_stamp_ns": checkpoint_ts,
+                    "decision_ts_ns": int(now_ts_ns),
+                    "interval_ns": [checkpoint_ts, int(now_ts_ns)],
+                    "consumed_input_in_interval": "NOT_REPLAYED",
+                    "subsequent_input": "CONTINUES_FROM_RESTORED_STATE",
+                    "catch_up": "NOT_IMPLEMENTED",
+                }
             # The decision is made; the next event needs its own trusted checkpoint.
             self.cp._last_snapshot_wall = time.time()
         return row

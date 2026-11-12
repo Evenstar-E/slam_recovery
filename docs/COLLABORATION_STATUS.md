@@ -1682,3 +1682,19 @@ S2（r11070-c3）回报，本机逐项核对：
 存活 ≥10 s）→ 记录新库 sha、`ROS_PACKAGE_PATH/ROS_HOME/LD_LIBRARY_PATH`、探针输出。若 v6 也崩，先回报证据，
 再执行已批准的 B（`catkin_make clean` 全量重建，≤15 min）；若 v6 通过而 v7 崩，按四文件逐块二分（先 `voxel_map.cpp`）。
 **不批准 C**（跳过 image_transport publisher，改宿主输出）。探针期间不跑 bag，不产生新 run 身份。
+
+## 123. 拒绝回退后的输入归宿：driver 现在显式记录"只回滚、不重放"（S1 实现）
+
+审阅 `13002e6` §3 指出的最小原生缺口：E2 restore 后 `resume` 仅释放 map hold，302–311 s 已消费输入的归宿
+没有显式记录，容易把"restore+resume"读成完整历史恢复。S1 在 driver 侧做最小记录（**不改变任何控制行为**）：
+
+- `decide()` 拒绝分支在 `cp.restore()` 后写 `ep.meta["restore_disposition"]`：
+  `scope=STATE_AND_MAP_ROLLBACK_ONLY`、`checkpoint_stamp_ns=trigger−confirmation_margin`、`decision_ts_ns`、
+  `interval_ns=[checkpoint, decision]`、`consumed_input_in_interval=NOT_REPLAYED`、
+  `subsequent_input=CONTINUES_FROM_RESTORED_STATE`、`catch_up=NOT_IMPLEMENTED`。
+- 该 meta 已随 `run_summary.quarantine.episode_detail` 落盘（现有结构，不新增 schema 文件）。
+- 新测试 `test_repair_sync.py::test_a_refusal_records_that_the_consumed_interval_was_not_replayed`
+  （拒绝路径 1 次 restore、0 次 reprocess、字段与区间正确）。全量：**202 tests OK**。
+
+这**不是**追赶实现：不做历史重放、不扩大缓存、不改阈值。它只把"拒绝区间内的输入未重放"从隐含变成可核字段；
+真正的重放/接回能力仍需 S2 宿主侧与新的受控 run 证据。本轮无宿主运行，NOT_EXECUTED。
