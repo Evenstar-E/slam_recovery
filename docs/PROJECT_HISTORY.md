@@ -723,3 +723,11 @@ hist_bytes最大235760928为旧历史points*32+voxels*96估算，排除当前槽
 [增量核验](review_20261113_22d7933/README.md)固定00:45 fetch主线22d7933、producer仍eb2630e。两个parser新增按header尾名读取，展开七pose字段的100列普通控制通过、旧93无tail通过；同行post优先及跳外部fallback源码存在，I资格v8 post/carryover两子PASS已收窄接受。保存join/summary逐字未变，无新bag/真实I或恢复结果，数学旧修正不重测。
 
 实际C++header由固定源码提取只Ppost6x6后一个pose7块token，writer却追加7标量；parser用len(tail_names)=1只接受93/94，两个actual header+正常100控制仍0rows/malformed100。最低S3/S1对已声明pose7块按7值顺序展开或统一已部署writer/reader版本，必须取得七值并进入同行post，不只放宽长度/默回外部；复用一个真实header控制和旧档，不扩schema矩阵或为parser重跑宿主。仅阻v10消费，S1/S2完整历史cp+IMU/capture→实际修复→native重处理→全部后继仍唯一实交，pre key同更新待S2，cov不可用unit-only不前置。S3代码/S1集成/派S2认领确认非闭合、新运行与ALI效果未交，A/B局部不总分，08:53窗不延期/noCodex/旧手调停门不降，四Cron单owner，reader-I有限源码控制exit0非完整PASS，中文review SSH白名单、不算法ROS/main历史/private/日报。
+
+## 91. 23e019b：真实同行pre/post原件接受，块header与旧排序缺陷仍在；四宿主限制性交接
+
+[增量核验](review_20261113_23e019b/README.md)固定01:09 fetch主线23e019b、v11 producer c5bc057、growth归档a812302。fetch一次超时后台后成功不重复。真实run165438Z原件792全107列/725后验67早退/phase0，482sidecar=129A353U、driver c5efdd73匹配receipt；源handleLIO前捕pre/后写post与mat_lio交叉支持同更新位姿可读，旧没有真实pre缺口在此范围解除，不继续依赖vec反推。37后验eff0、67早退不当有效测量，末独立pose/pre/out已写但trace缺一帧，52.838s/52.580s不同支持不冒完整60s。out标签idx+1才配旧v11，v12源码改rows−1→rows/精度10可核、未交v12实跑；mixed状态cov仍不残差Sigma。新实际块header pose7 pre_pose7使现两reader仍只93/95而非107，具名自测/数学路径局部PASS不解除真实消费，最低既有数据块布局解释，不开新宿主实验。
+
+旧115734排序索引读原m2数组在当前源码/原件复现，504诊断行92受影响，中位70.313396→正确原行72.293876，与Codex参考相容；最低既有档索引修正和重算、不宿主重跑/不升合格I。growth两cp晚qstart2.632151872/2.500209589s、修复/重放0、两未决段含120/100帧，HEALTHY不是恢复。稀疏ACK晚段净增508379/17.163877传感器秒≈29619vox/s，与wall35.482秒不同；前0→9233/167333的分母3.061秒非30秒，精确峰/最终地图/增长脚本和共同原点缺，根因UNKNOWN。晚段eff下降/条件残差上升相容证据非GT漂移或独立因果；本机只读代理reader与全部紧凑结果已读收录，不执行归档CLI/ROS/算法。
+
+main AGENTS/HOST_VALIDATION_ORDER及S1交接收紧四非LIVO全需求先验收、FAST-LIVO2新工作后置；本会话遵循更限制性项目安排不派新LIVO运行/构建/适配，仓库转述用户quote不自行认证为本session新直接授权，执行端停启仍待回执。下一四项范围内由S1指定现环境最小接口的非LIVO实际修复→原生状态map→接回/E2或具体首断点，其余必要适配并行，不以一个宿主或共享前端替四项验收、不新预算大矩阵；公共组件复用、旧失败保留、S3既有材料只读研究。A1/A11取证局部推进非A4/A6/B4/B11完整恢复/性能，不全表评分，四Cron单owner/08:53如实报告/no新增Codex前置/手调停门不降，中文review SSH白名单，不算法ROS/main历史/private/开发日报。
