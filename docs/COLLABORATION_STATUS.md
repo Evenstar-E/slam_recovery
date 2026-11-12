@@ -1257,3 +1257,22 @@ S1 复核 S2 `b201f25`（合入，209 测试）。run `two_event_final_20261112`
 
 **边界（不得越过）**：损坏为自注入（INJECTION），不声称真实自然故障的修复收益或恢复成功率；门/阈值/σ 未动；
 detection off（受控接口测试），不是自动检测链；可用性诊断仍暂停；`commit_closed→resume` 仍不可达（partial 接纳）。
+
+## 102. 归档收口：v1→v5 版本链、终点 run、全仓 SHA 校验 0 失败
+
+S1 复核 S2 `6faa695`（合入，209 测试），无新运行，宿主运行保持冻结。
+
+| 项 | 实际 |
+|---|---|
+| 版本链（`DEPLOYED_CODE.md` §9） | v1 1501 行/`b12ae153…`/库 `0eacffe1`；v2 1528/`2ffc5f6e`/`f27d1730`；v3 1627/`46648b4c`/`9c0330be`；v4 1625/`f025329c`/`c0833d9f`；v5 1632/`e444adac`/`9e7d8cdf`；每版列出"解决的断点/当时仍缺" |
+| 驱动侧收尾单列 | 开段先 expire 再 hold、每戳预演武装、scripted 关滚动、终止戳 +100 ms grace、`replay_suffix>0` 跳过写回 |
+| 终点 run | `two_event_final_20261112`（`080914Z_233068`）标为断点链终点；更早 run（拒绝/丢帧/跨度不一致/尾部不足）全部保留 |
+| SHA 校验 | 全仓 7 个 SHA256SUMS 全部通过，**0 失败** |
+| 未闭合项 | 已写入 `review_20261112_four_host/README.md`：真实自然故障修复（现为注入）、自动检测链（UNAVAILABLE 暂停/根因 UNKNOWN）、`commit_closed→resume`（partial，wait+rearm 放写）、第二事件武装 checkpoint 仅声明戳、无 GT 质量评价 |
+
+**本轮主线完成项**（可引用的实际证据）：
+1. 受控 + 声明注入的同一实例整链：修复测量进入原生重放（23/23）→ 状态/地图停在重放边界 → 接回 →
+   第二事件关闭/rearm/resume → 尾段 39 帧 → 终态 HEALTHY；
+2. 四宿主第二事件矩阵各一次实际运行（MM-LINS/FAST-LIO2 原生 PASS，LIO-SAM/ORB 原生 FAIL；修复链均 NOT_IMPLEMENTED）；
+3. 纯位姿修正不改变 body 点云、修复传输/门控/回执/串行化/终止戳/后缀重推/set_state 回拨等断点的逐项解除；
+4. UNAVAILABLE 取证与选项页（暂停，待用户选）。
