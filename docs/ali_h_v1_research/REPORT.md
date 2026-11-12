@@ -122,7 +122,7 @@ T1 全部标记 `marker: SYNTHETIC_UNIT`，不称真实恢复，不产生真实 
 | 真实 I 通道 | **BLOCKED** | 两份归档无 IMU preupdate/update、区间、外参、协方差；输入 bag 只有 raw IMU/LiDAR，无 `imu_prop_odom`。需 S1/S2 在 LiDAR 更新点做**一次最小导出**（正常前缀 + 已声明退化窗 + 尾段），并先给 wall/message 预算 |
 | normal 参照 | **BLOCKED** | 无独立确认的健康前缀；不能用 HEALTHY/trusted/无注入替代。已登记 `ALI-B2-NORMAL-LABELS-20261112-01`，等用户选择 A/B/C |
 | 独立事件标签 | **NOT_EVALUABLE（归档）** | 两份归档没有事件标签；自注入标签只能离线评价，不能生成训练/评价真值 |
-| T2 最小 trace | **NOT_EXECUTED** | S2 的 `fl_native_20261112T101116Z_329791` 宿主启动即 `image_transport` 插件缺失 terminate（`pose_messages: 0`、`paired: 0`），trace 未导出；不自行造 trace、不拼旧档 |
+| T2 最小 trace | **NOT_EXECUTED** | S2 的 `fl_native_20261112T101116Z_329791` 宿主启动即 `image_transport` 插件缺失 terminate（`pose_messages: 0`、`paired: 0`），trace 未导出；不自行造 trace、不拼旧档。已知列序按名读取：`grp_idx`（322 值各两次、同 `abs_ns`）为物理扫描身份，`phase=1` 为 replay 窗口（第 489–810 行）；E2 后 rel≈54 s 尾段因 `catch_up=NOT_IMPLEMENTED` 发散到 520 m，只单列 `POST_E2_NO_CATCHUP`，不参与分类 |
 | T3 同人口对照 | **NOT_EXECUTED** | 依赖 T2；当前只能交 T0 的证据资格与边界 |
 
 ## 5. 逐项自检（§8/§10.3 格式）
@@ -140,7 +140,7 @@ T1 全部标记 `marker: SYNTHETIC_UNIT`，不称真实恢复，不产生真实 
 | shadow 开关不变性 | **PASS（限定控制）** | T1.6，Run A 402 行逐条相同 | — | — |
 | 真实 I trace | **BLOCKED/NOT_EXECUTED** | §4 | — | 等 S1/S2 |
 | 同人口误报/漏检/延迟 | **NOT_EVALUABLE** | 无标签、无 I、无 normal 参照 | — | 等 T2 |
-| T2 输入契约/校验器 | **PASS（准备，SYNTHETIC）** | `T2_INPUT_CONTRACT.md`、`t2_input_check.py`；16/16 合成测试（manifest 缺项/拒绝 S 与 H_T_H/旧 run id/左扰动与异切空间拒绝/恒定 offset 但身份不成立/缺时间对应/V⁻¹ e_I/s_I/单位权） | 真实 T2 仍 `NOT_EXECUTED` | 收到 trace 后按契约 §6 顺序核声明 |
+| T2 输入契约/校验器 | **PASS（准备，SYNTHETIC）** | `T2_INPUT_CONTRACT.md`、`t2_input_check.py`；18/18 合成测试（manifest 缺项/拒绝 S 与 H_T_H/旧 run id/左扰动与异切空间拒绝/恒定 offset 但身份不成立/缺时间对应/detection off/DISABLED availability/V⁻¹ e_I/s_I/单位权） | 真实 T2 仍 `NOT_EXECUTED` | 收到 trace 后按契约 §6 顺序核声明 |
 | 计算成本/内存 | **PASS（T0 本地）** | T0 两份归档合计 **3.03 s**、峰值 RSS **28.4 MB**；shadow 输出 **652,502 B + 891,001 B**（`wc -c`，生成后未追加） | — | T2 时补生产侧成本 |
 | 旧归档文件改写 | **NOT_APPLICABLE** | 只读；新文件全部在本目录 | — | — |
 | 生产集成 | **NOT_APPLICABLE（未授权）** | shadow 不写 manager/native | — | 用户另行确认 |
