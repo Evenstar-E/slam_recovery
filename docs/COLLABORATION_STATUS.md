@@ -1934,3 +1934,25 @@ frame 552（`repair_applied=0 / dropped=42`）。这统一解释了 `115203Z` �
 **决定**：暂不做 (a) 多槽身份化（host+协议 ~100 行、需重过版本链）；不采用 (c) 抑制自动段（会改变验证面）。
 下一轮验证用**纯在线触发**（无 scripted）的 detection-on run：滚动快照提供槽，每段的 `checkpoint_check` 如实记录
 回滚点与期望是否一致；混合模式下的 `115203Z`/`115734Z` 自动段结论按"回滚到非本段 checkpoint"标注，不再用于收益统计。
+
+## 136. 纯在线自动链 run 落地：5 段自动触发、1 段接受且修复 42 条生效；scan_first 为哨兵需更正
+
+**run `121127Z_497953`（S2，新 driver `19496a7`、库 `49f2f941…`、无 scripted、detection on、trace+availability）**，本机核对：
+`status OK`、paired 529、终态 HEALTHY/open=false/kf 182；门 **accepted 1（Mode2，committed 11）/ rejected 3 / errored 1**；
+`checkpoint_checks` 5 段全 `EXPECTED_UNKNOWN`（在线段期望值按设计未知）；被接受段 **`repair_applied=42 / dropped=0`、
+replay 759 within + 615 suffix**——首次"自动检测→接受→修复→replay"全链路真实生效；trace 1574 行（5+1568）、
+sha `435fff50…`、`has_out=1` 1439、`phase=1` 682；availability 194 AVAILABLE / 335 UNAVAILABLE。
+归档已推：`exp/online-trace`（`7814502` runner + `e991eaf` run）。
+
+**缺陷（未修，只定位）**：`cand_0004` 报 `RuntimeError: No active quarantine segment to validate`（ep4，41 帧候选，
+决策时该段已不在 `active_quarantine`）。在修复前，纯在线的拒绝/接回统计须标注"含 1 段未决"。
+
+**S1 更正（重要）**：`scan_first_ns` 在 `115734Z` 与 `121127Z` 的 trace 中**全部为 `-1` 哨兵**（1042/1042、1568/1568）。
+此前 §134 的"531/531 落在 `[scan_first, scan_last]` 内"因此**不成立**（`-1 ≤ ts` 恒真）。有效的 join 是 S3 实现的
+"上一个不同的 `scan_last` < `scan_stamp_ns` ≤ 当前 `scan_last`"；`scan_first` 要么补实现、要么在文件头标为不可用。
+另：`115734Z` trace 最后一行只有 53 列（应 92），疑似退出未 flush 完整，已让 S2 查；S3 按 1041/1042 可解析处理。
+
+**S3 的 T2（输入 `115734Z`）**：I 通道可用（504 行、Ppre 秩 6）、M 444 / T 86；120 个 0.5 s 块全 UNKNOWN；
+51 行尾段单列 `POST_E2_NO_CATCHUP`；NORMAL/SUSPECT/误报/漏检/延迟/错误 NORMAL 因缺独立正常参照与标签
+（`ALI-B2`）全部 `NOT_EVALUABLE`；该 run 的修复为 `applied=0/dropped=42`，不用于修复收益。成本 1.97 s / 218 MB。
+S1 已更正 `e_I ≈ −vec6` 只在小增量成立（本批 |e| 最大 1.545），要求以 `mat_pre/mat_out` 的 `Log(inv(pre)·post)` 为主结果。
