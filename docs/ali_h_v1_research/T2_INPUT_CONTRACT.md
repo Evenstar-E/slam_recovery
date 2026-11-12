@@ -69,10 +69,13 @@ SE(3) Log 的平移是 `rho = V(w)^-1 * t`（`V` 为左 Jacobian），**不是�
 本 trace 的 `vec6 = (state_propagat - state_)[0..5]`（`has_out=1` 时在 StateEstimation 之后）。
 **源约定是混合的**：`rot = R*Exp(d_rot)`（body 右增量）、`pos = p + d_pos`（world 加性）；
 精确 e_I 显式把平移转回 pre-body（`-R_pre^T v`），不能写成"统一 body SE(3)"。
-`Ppre/Ppost` 为混合约定下的 rot+pos 块，**不能**当 e_I 的已验证协方差；协方差只允许
+`vec6` 为 `NOT_VERIFIED`（在最终 solution 前保存，同次 pre/post/carryover 成员未证），
+不能仅凭 `vec6` 推断物理意义。`Ppre/Ppost` 为混合约定下的 rot+pos 块，**不能**当 e_I 的已验证协方差；协方差只允许
 `READY_UNIT_ONLY` / `NOT_AVAILABLE`，不得把 `P⁻+P⁺` 或字符串改 frame 当转换。
 按 host `StatesGroup::operator-`，`vec6 = [Log(R_post^T R_pre), pos_pre − pos_post]`；精确
-`e_I = [-vec6_rot, −R_pre^T vec6_pos]`，其中 `R_pre = R_post·Exp(vec6_rot)`。
+`rot = −vec6_rot`、`t_body = −R_pre^T vec6_pos`，**SE(3) Log** 的平移还要乘
+`V(rot)⁻¹`：`e_I = [rot, V(rot)⁻¹ t_body]`；其中 `R_pre = R_post·Exp(vec6_rot)`。
+（2026-11-12 修正：此前漏了 `V⁻¹`，与 `t2_input_check.e_i` 不一致。）
 `R_post` 必须来自同帧的 post 位姿（`M2DGR_room_02.txt` 或可配对的 `mat_out`），不能只用 `−vec6`
 （仅小角近似；本数据平移方向最大差 2.64 m）。`Ppre` 为预测协方差；`s_i`/`|e_I|` 对符号不变，
 但平移方向与各向异性 `s_i` 需要精确值。
