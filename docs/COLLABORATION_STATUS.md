@@ -697,3 +697,24 @@ LIO-SAM/ORB-SLAM3 在同等"连续输入 + 两事件"下不存活。**没有任�
 
 身份缺口（如实）：MM-LINS 两个二进制 mtime（10-30 / 11-05）早于运行的源码 HEAD `2ef0169`，
 本机无构建记录把它们绑到该 HEAD；可核的是运行时的二进制 sha。LIO-SAM/ORB 同样只绑定二进制 sha。
+
+## 67. 修复测量缺口定位（无运行、无实现）：纯位姿修正不可能变成测量修复
+
+S1 复核 S2 `54f5027`（合入）。`docs/review_20261112_four_host/REPAIR_GAP.md` 三条原因均已对到行，
+本机逐条核对成立：
+
+| # | 原因 | 代码位置（本机核对） |
+|---|---|---|
+| 1 | 驱动从不发布修复点云 | `recovery_node.py` 全文件只有 status publisher（:1768）；唯一发布者 `inject_repaired_scan.py:60`，受控 run 未启动它 |
+| 2 | `reprocess` 重放原始扫描 | `LIVMapper.cpp:943` 用 `replay_buffer_` 原样；`:956` 仅在队列非空时 `applyRepairedScan`；`applyRepairedScan` 首行 `if (repaired_clouds_.empty()) return false`（:728）——`repairs applied=0` 是必然，不是匹配失败 |
+| 3 | 候选是位姿不是测量 | 候选 `ΔT @ inits`（`pose_reregistration.py:296`），`CandidateMap` 只有 `repaired_poses`（`core.py:304-320`），门 NIS 用原始 `scan_buffer_body` |
+
+**语义结论（S1 认可）**：设修复位姿 `T' = ΔT·T`，把世界点重新表达回修复后 body 系得 `T'⁻¹ΔT·T·p = p`，
+body 点云不变；而宿主 `applyRepairedScan` 替换的正是 body 系测量。所以纯位姿"修复"即使发云，
+也只让 `repair_applied` 计数非零、估计不变。真正的测量修复必须改变几何（去动态点、纠去畸变或
+已知损坏修复），该生产者在仓库里不存在——这是需要用户先定的语义，不是驱动 bug。
+
+**最小接线（待用户定语义后实施，本轮未做）**：驱动保留 scan header stamp 与原始 PointCloud2
+（`_on_scan` 有 stamp、`_dispatch` 未传），新增修复云 publisher，header 用原始 scan stamp；
+轮询 status ack 的 `repair_received` ≥ N 再发 `reprocess`；顺序 hold → 发布/确认 → reprocess →
+set_state → resume。宿主最小 0 行（`repaired_clouds_` 64 条上限是唯一硬限制）；manager 0 行。
