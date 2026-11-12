@@ -782,3 +782,11 @@ S1共享成功依赖/可信边界、S2下一合法历史恢复→完整接回后
 [核验](review_20261112_26ba3a3/README.md)新PCD/独立支持工具5相关test target Git bytes PASS，Scipy ICP未跑不装；target无新PCD/receipt/评分运行。正常pose不变只换参考fraction0→1不证明pose错；裁20/200保存点fraction1/真全样本.1仍入主both_pass，最低完整分母/partial单列、中性解释与现prefix gauge/共同支持，不能每帧ICP自拟合冒独立评价。ASCII COUNT兼容候选不声明binary input主阻断。S1§103派S2clean pass仅开发转述认领/用户选，本机无新直接选择不扩授权；ALI-H v1用户已直接授权隔离shadow研究b7ad580优先，实际接收待回执，S3唯一研究角色不占S2整轮诊断。
 
 14:37–16:37结论部分推进：后缀真实重推/成功skip旧pose/修复后同实例E2与39尾帧原生证据接受，不日志或test数；首工程cp晚隔离起点及UNKNOWN/FAIL依赖仍未过，算法/评价物理候选/全损坏人口/独立净收益未知，参数无同版本同人口规律/上限证据可解、旧sigma/κ/floor停。目标库运行/整体ABI测试失败次要；DNS恢复fetch最新26ba3a3，不猜远端停工。S1成功依赖/共享集成、S2合法历史cp/完整input归宿→实际修复接回后继尾段或显式不支持，复用已验suffix/skip不扩框架；S3既定研究/native不等。自检状态/命令/原件/全人口/失败/质量成本UNKNOWN，A/B局部不总分，只新评价增量提交SSH不重复2h空报告/private保护不合main不改算法历史冻结门。
+
+## repair-f3 / eeda122：新参考图归档接受，静止与320秒归因需原件纠正
+
+[核验与下一交付](review_20261112_eeda122/README.md)：11SHA一致、目标driver/config副本绑定、无注入/detection off地图确保存raw2,498,791/downsample13,493点，退出末terminate异常保留。新partial主分母/中性cause/单gauge工具7相关test本机PASS，Scipy ICP未跑不装；SAVE_WAIT只bash语法/源码核，不代host。支持旁支真实交付，原生恢复主线未增加。
+
+目标§111静止原因FAIL：同档749pose行最大|p|11.98754m、724行>1m、x/y最大8.808419/8.833413。地图范围不等移动范围，不能据此查pcd_save输出分支或重做clean pass。pose54.119872s/诊断尾前5.385359s只证明时间支持不足；396paired/598scan不证明bag截断，320s无bag起止证据/不能读epoch尾数为duration。302帧0pass/ICP/gauge RMS3.51仅DEVELOPER_REPORTED且score命令/输出/健康prefix单变换/共同支持未归档，独立参考有效性UNKNOWN；先复用现有证据纠正与绑定，不本轮新授权重跑、不因诊断串行挡native。
+
+S1证据解释/共享成功依赖单写，S2原生合法隔离起点cp→物理一致修复/完整state-map重估→全部input归宿/后继尾段或显式不支持；复用已验suffix/skip/受控E2，不重复旧反例或扩门参数。ALI-H设计合main不等认领或实现，S3唯一研究角色先按已授权T0资格/缺项回真实预算/branch/进展，缺I与低support正常参照保UNKNOWN/native不等。逐项PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令原件/版本人口/失败质量成本；A/B局部不总分/三Cron无双写，review SSH白名单提交推送/private保护不合main不改算法历史冻结门。

@@ -1,0 +1,258 @@
+{
+  "target": "eeda1224da57fa9d380811f4009cb954615286c7",
+  "exit": 0,
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261112_eeda122/check_archive.py",
+  "scope": "Git bytes/hash, scalar trajectory and PCD geometry only; no archived scoring/host/bag execution",
+  "integrity": {
+    "matched": 11,
+    "total": 11,
+    "checks": [
+      {
+        "path": "REPORT.md",
+        "ok": true
+      },
+      {
+        "path": "all_downsampled_points.pcd",
+        "ok": true
+      },
+      {
+        "path": "host.log",
+        "ok": true
+      },
+      {
+        "path": "lidar_poses.txt",
+        "ok": true
+      },
+      {
+        "path": "machine_load.txt",
+        "ok": true
+      },
+      {
+        "path": "pcd_sha256.txt",
+        "ok": true
+      },
+      {
+        "path": "receipt.json",
+        "ok": true
+      },
+      {
+        "path": "recovery_node.log",
+        "ok": true
+      },
+      {
+        "path": "recovery_node_source.sha256",
+        "ok": true
+      },
+      {
+        "path": "refmap_m2dgr.yaml",
+        "ok": true
+      },
+      {
+        "path": "run_summary.json",
+        "ok": true
+      }
+    ]
+  },
+  "identity": {
+    "run_id": "fl_native_20261112T083858Z_263020",
+    "inputs": {
+      "bag": "/tmp/fastlivo/hall01_two_event_v1.bag",
+      "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+      "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+      "host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+      "config_m2dgr": "/tmp/fastlivo/refmap_m2dgr.yaml",
+      "config_m2dgr_sha256": "94ffa5dbf29a025a8338d6e7680f4609241db449e65942f510895ee8e0ecd7dc",
+      "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+      "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+      "recovery_node_source": "4742dbc148cfd2633cc278e2b2203cd9ec646be984a08a0f381d94e73a1751c3",
+      "runtime_library": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+      "runtime_library_sha256": "9e7d8cdf368ed4214906c6671504f1db6daeecd66b1592a52e7bb28c25663b0a"
+    },
+    "matches_target_driver": true,
+    "config_copy_hash_matches_receipt": true,
+    "launch": {
+      "rate": "1.0",
+      "drain_s": "10",
+      "duration_s": "0",
+      "max_pairs": "0",
+      "candidate_source": "host_poses",
+      "detection": "off",
+      "sigma_meas_m": "0.12",
+      "scripted_triggers_s": "",
+      "scripted_triggers_ns": "",
+      "confirmation_margin_sec": "2.0",
+      "relay_shift_z": "",
+      "relay_start_ns": "",
+      "relay_end_ns": "",
+      "injection": "NONE",
+      "repair_publish": "1",
+      "run_mode": "ONLINE_DETECTION",
+      "group_model": "host and recovery node are children of one setsid supervisor"
+    },
+    "actual_args": {
+      "run_dir": "/tmp/fl_native_20261112T083858Z_263020",
+      "pose_topic": "/aft_mapped_to_init",
+      "scan_topic": "/velodyne_points",
+      "status_topic": "/slam_recovery/gate_status",
+      "candidate_source": "host_poses",
+      "confirmation_margin_sec": 2.0,
+      "pair_dt_ms": 40.0,
+      "scan_cap": 6000,
+      "sigma_meas_m": 0.12,
+      "duration_sec": 0.0,
+      "max_pairs": 0,
+      "icp_time_budget_sec": 0.0,
+      "detection": "off",
+      "scripted_triggers": "",
+      "scripted_trigger_stamps": "",
+      "checkpoint_dir": "/tmp/fl_native_20261112T083858Z_263020/host_control",
+      "checkpoint_period_sec": 2.0,
+      "wait_limit_sec": 0.0,
+      "repair_publish": false,
+      "repair_sync_timeout_sec": 5.0,
+      "repair_dry_run": false,
+      "availability_log": "",
+      "repair_sham": false
+    },
+    "termination": "PLANNED_KILL_AFTER_DRAIN"
+  },
+  "pose_log": {
+    "rows": 749,
+    "start_s": 1627785261.403843,
+    "end_s": 1627785315.523715,
+    "duration_s": 54.119872093200684,
+    "xyz_ranges": [
+      [
+        0.002225,
+        8.808419
+      ],
+      [
+        -0.12154,
+        8.833413
+      ],
+      [
+        -0.380372,
+        0.288689
+      ]
+    ],
+    "norm_min_max": [
+      0.0031690309244310003,
+      11.98753989444031
+    ],
+    "positions_over_1m": 724,
+    "max_norm_row": {
+      "index": 312,
+      "values": [
+        1627785285.078785,
+        8.577013,
+        8.372015,
+        0.212898,
+        -0.000197,
+        -0.009654,
+        0.830796,
+        0.556494
+      ]
+    },
+    "first_row": [
+      1627785261.403843,
+      0.002225,
+      0.002216,
+      0.000426,
+      -0.000149,
+      8.6e-05,
+      0.001562,
+      0.999999
+    ],
+    "last_row": [
+      1627785315.523715,
+      1.576706,
+      1.134459,
+      -0.021749,
+      -0.087629,
+      -0.007284,
+      -0.340456,
+      0.93614
+    ],
+    "delta_last_vs_previous_run_last_s": 5.385359048843384,
+    "claim_all_positions_under_1m": false,
+    "pose_map_inconsistency_causal_verdict": "UNKNOWN_not_proven_by_extent"
+  },
+  "pcd": {
+    "points": 13493,
+    "file_bytes": 216070,
+    "sha256": "001bfb45fabb23fe4cd4ca350bda27172e805cd3ff64f8e4d5ce7d9ad5e30876",
+    "xyz_ranges": [
+      [
+        -63.904541015625,
+        87.05154418945312
+      ],
+      [
+        -78.6418685913086,
+        55.133323669433594
+      ],
+      [
+        -8.499032974243164,
+        13.341578483581543
+      ]
+    ],
+    "raw_pcd": "NOT_READ_external_path_hash_only",
+    "full_map_quality": "UNKNOWN"
+  },
+  "run": {
+    "frames": {
+      "paired": 396,
+      "ingested": 396,
+      "fed_to_step_frame": 0,
+      "ingested_without_detection": 0,
+      "consumed_after_first_decision": 0,
+      "first_decision_ts_ns": null
+    },
+    "pairing": {
+      "pair_window_ns": 40000000,
+      "poses_received": 597,
+      "scans_received": 598,
+      "paired": 396,
+      "poses_unpaired": 201,
+      "scans_unpaired": 202,
+      "paired_fraction_of_poses": 0.6633165829145728,
+      "paired_fraction_of_scans": 0.6622073578595318,
+      "max_abs_dt_ns": 39959192,
+      "max_backlog_messages": 209,
+      "messages_considered": 1195,
+      "pairing_rule": "nearest pose within 40 ms, no pose reused"
+    },
+    "runtime": {
+      "wall_sec": 86.467,
+      "pid": 264246,
+      "pgid": 264243,
+      "peak_rss_kb": 999252,
+      "pose_messages": 597,
+      "scan_messages": 598,
+      "callback_errors": [],
+      "callback_error_count": 0
+    },
+    "paired_start_ns": 1627785261403843403,
+    "paired_end_ns": 1627785305359041929,
+    "detection_enabled": false,
+    "quarantine": {
+      "episodes": 0,
+      "trigger_ts_ns": [],
+      "decisions": 0,
+      "second_and_later_events": 0
+    },
+    "save_lines": [
+      "\u001b[32mRaw point cloud data saved to: /home/R26534/fast_livo2_ws/src/FAST-LIVO2/Log/pcd/all_raw_points.pcd with point count: 2498791\u001b[0m",
+      "\u001b[32mDownsampled point cloud data saved to: /home/R26534/fast_livo2_ws/src/FAST-LIVO2/Log/pcd/all_downsampled_points.pcd with point count after filtering: 13493\u001b[0m"
+    ],
+    "host_exit_footer": "terminate called without an active exception",
+    "host_graceful_exit_verified": false
+  },
+  "reported_scoring": {
+    "gauge_rms_3_51m_and_302_before_after_zero": "DEVELOPER_REPORTED_no_score_or_gauge_artifact_in_target",
+    "independent_reference_result": "NOT_ACCEPTED_no_coverage_and_gauge_validated_result",
+    "pose_static_claim": "FAIL_conflicts_with_original_xyz",
+    "time_limit": "Pose log does not cover previous diagnostic tail; absolute timestamp ending near315s is not a320s bag duration."
+  },
+  "ali_h_task_present": true,
+  "no_native_or_parameter_execution": true
+}
