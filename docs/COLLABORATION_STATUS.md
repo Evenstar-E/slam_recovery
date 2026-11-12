@@ -494,6 +494,9 @@ S3专用研究纠正这个小控制并保留缺candidate/独立质量BLOCKED；S
 - INDEX 初版三处数值与自身 JSON 不符（after 7.2154、holdout 0.4369 / 0.4677），S2 已按
   `candidates.jsonl` 改正并留修订注脚；其中 0.4369 追到 `fl_native_20261110T113447Z_3372448` 的
   `cand_0000.holdout_nis = 0.4368596204571292`（本机 `/tmp` 原件核对存在）。
+- 输入身份（`README.md` §0，字段取自三份 `receipt.json → inputs`，S1 已逐项核对）：宿主二进制
+  `0d7e23de…` 与运行时库 `0eacffe1…` 三次**逐位相同**；`recovery_node_source` 在命令串行化（`bbe916f`）
+  前后不同（`fb746ddd…` → `18d92a03…`），run 2/3 相同。
 - **限制**：第二事件是事件、不是第二次接纳；`commit_closed` 仍不可达（用户已定保持现协议）；
   `repairs applied=0` 表示重放用宿主原始扫描，修复仅经 `set_state` 进入；该 run 的 hold 窗口不能用
   `Update Voxel Map` 计数判断停写（reprocess/restore 都会写图），普通帧看 `held_frames` 126 / 248。
