@@ -501,3 +501,11 @@ S1共享生命周期/失败公开一致集成，S2已有流控派工与物理一
 本机target小控制非零baseline25→期待35/45/50、第二批失败停止、deadline crossing冻结21后24帧不扩/首次wall不覆盖PASS；baseline None被当0仍E2旧累计25/本次0误sync FAIL，最低未知不发表/先有效baseline、不新RPC。成功传输首断点局部解除，不重造；旧坏云candidate与新修复云物理不一致、native失败成功依赖/同stamp状态map及尾set_state来源source未修不重测。新test modules因pytest辅助未跑、旧cloud tests不重复，无host/bag；Git Bash语法exit0，首PS bash为WSL入口exit1未安装。
 
 下一唯一有限物理一致实际修复→native完整state/map→接回→E2尾段或断点；S1共享集成成功来源，S2产物/现流控/有限run，S3研究参数停。sham仅可控制发布成本、同批次不保证实际重放支持相同，核stamp人口不要求随机逐值一致，仍不一致报断点不无限A/B；不以对照循环代E2/新测量候选准入。PLAN写26而actual32/23、deferred与时间/4.7cm更正集中旁支保历史、不为文字重跑。自检逐项状态/实际命令/原件/质量/失败；A1/A2/A5/A6/A12局部推进，A7/A8/B2/A9/A10/B4/B11未闭合、不全表新评分。独立review SSH提交推送、不合main/不改算法/private保护，开发接收待实际回执。
+
+## 61. d193680：终点限制通过，晚开段快照与截断后缀清空不支持完整接回
+
+[核验](review_20261112_d193680/README.md)三新run原件59/59本轮清单SHA一致，各driver版本绑定，新terminal两run实际加载库hash与f27d1730构建记录一致；build laser_mapping目标成功、整体vikit ABI链接失败保留，不称全构建PASS/本机复现。旧sham23应用/686group，新terminal两臂23received但仅7/12applied、16/11leftover并dropped，34/64group重放；payload和真实终点均1627785280281185627、候选23个pose stamp同，起点差.999728918s、snapshot晚trigger2.933/1.934s，前段候选无group。只endpoint组件局部通过，received23不改称applied23；三run各一事件无E2，尾段263/300/286配对帧非有效恢复。
+
+新C++分支跳过end之后group，随后现clear删除已消费后缀/capture=false，本次truncated451/509；source-bound算术[1,2,3,4]重放到2/clear3,4/下一live5说明归宿缺口，非执行C++动态轨迹。最低可信同stamp完整checkpoint、不以晚held map/state覆唯一可信历史；保留后缀按序native catch-up再接回或显式拒绝，不为A/B端点齐牺牲持续输入。7应用/23准入仍set_state/resume的实际原件要求成功公开依赖核真实人口，旧candidate物理不一致/source未修不重测。按脚本戳arm只是开发受控方案/派工，未验收且不等自动迟检测。
+
+本机actual driver/client hold→snapshot串行/end payload/default空及sham点data不变控制PASS、Git Bash语法exit0；新测试Windows fake-host/pytest依赖未跑不安装，未代host/bag。reader首取receipt顶层null导致假library mismatch，改嵌套inputs重跑最终一致，不报真实身份失败。S1共享成功依赖集成、S2可信checkpoint/真实产物/保后缀，下一唯一有限修复→native state/map→追赶→接回/E2或首断点；S3研究参数停、四宿主不重开，逐项状态/实际命令/原件/未知/独立质量自检。A2/A6/A12局部推进，A4/A5/A8/A10新正常FAIL、A9/B4/B11未闭合、不全表评分。独立review SSH提交推送、不合main不改算法旧历史/private保护，实际接收待回执。
