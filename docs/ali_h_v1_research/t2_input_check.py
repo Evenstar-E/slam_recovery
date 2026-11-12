@@ -28,7 +28,8 @@ REQUIRED_TOP = ("run_id", "same_build_off_on", "inputs", "behavior_control", "ex
                 "declarations", "covariance")
 REQUIRED_INPUTS = ("bag_sha256", "library_sha256", "config_sha256")
 REQUIRED_EXPORTS = ("P_minus", "P_plus", "vec", "effct_feat_num",
-                    "pose_pre", "pose_post", "stamps", "has_out")
+                    "pose_pre", "pose_post", "stamps", "has_out",
+                    "scan_header_stamp", "last_lio_update_time")
 REQUIRED_DECL = ("state_order", "rotation_param", "perturbation", "pose_frame",
                  "vec_frame", "extrinsic", "bias_source")
 VALID_STATE_ORDER = {"rot_trans", "trans_rot"}

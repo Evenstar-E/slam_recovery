@@ -21,8 +21,13 @@
 
 - 新 trace 必须带同一次运行的 **availability 日志**（S1 的 `availability_frames.jsonl`）与
   **旧检测/manager 决定**；三者同 run id、同一 build、同一输入/配置/library sha256。
-- join 键：`scan_stamp_ns` **精确相等**；不近似、不 nearest。trace 的 `stamp_post`（LiDAR 更新）
-  与 availability 的 `scan_stamp_ns` 必须对同一扫描。
+- join 键：**`last_lio_update_time` ↔ availability 的 `scan_stamp_ns` 精确相等**；不近似、不 nearest。
+  availability 的 `scan_stamp_ns` 是消息 header 戳，而宿主 `mat_pre`/`mat_out` 的第一列是
+  `last_lio_update_time`（LiDAR 帧末时刻），两者不一定逐位相等。因此要求 trace **同时导出**
+  `scan_header_stamp` 与 `last_lio_update_time` 两列；若样本内两者存在**同比偏移**，另声明映射并
+  报告偏移分布（`scan_header_stamp - last_lio_update_time` 的 min/median/max），映射后的
+  `last_lio_update_time` 仍按精确相等 join。join 不上的行照旧记 `NO_AVAILABILITY_ROW` 进分母。
+  若偏移不是常数、或只给 header 戳：该列记 `INCOMPLETE:join_key_unresolved`，**不做 nearest 近似**。
 - join 不上的 trace 行记 `NO_AVAILABILITY_ROW`；availability 有而 trace 无的行记
   `NO_TRACE_ROW`。两者都进分母，明确列出，不静默删除。
 - 若 trace 与 availability 的 run id/build/输入 sha256 不一致：**STOP**，不作跨 run 贴接。
@@ -122,7 +127,8 @@
    bias 来源），或声明互相矛盾；
 2. `pose_pre`/`pose_post` 不是同一实际区间/同一基，或 `has_out=false` 被当作更新后状态；
 3. `P⁻/P⁺` 不是 6×6 位姿块，或把 `S`/`H_T_H` 当 6D 协方差；
-4. trace 与 availability 的 run id/build/输入 sha256 不一致，或 join 键不能精确对应；
+4. trace 与 availability 的 run id/build/输入 sha256 不一致，或 join 键不能精确对应
+   （含 `last_lio_update_time` 缺失、偏移非常数且未声明映射）；
 5. 正常前缀不可得/非独立确认，导致校准 `INCOMPLETE`：可继续报资格/UNKNOWN，但
    **NORMAL/SUSPECT 与错误率 `NOT_EVALUABLE`**，不把全 UNKNOWN 当零风险；
 6. 需要新数据/安装/换宿主/改科学门才能继续；或超出既有预算；
