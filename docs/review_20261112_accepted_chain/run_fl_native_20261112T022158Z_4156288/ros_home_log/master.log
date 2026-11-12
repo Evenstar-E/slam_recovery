@@ -1,0 +1,169 @@
+[rosmaster.main][INFO] 2026-11-12 10:22:08,569: initialization complete, waiting for shutdown
+[rosmaster.main][INFO] 2026-11-12 10:22:08,569: Starting ROS Master Node
+[xmlrpc][INFO] 2026-11-12 10:22:08,570: XML-RPC server binding to 127.0.0.1:41525
+[xmlrpc][INFO] 2026-11-12 10:22:08,570: Started XML-RPC server [http://127.0.0.1:41525/]
+[xmlrpc][INFO] 2026-11-12 10:22:08,570: xml rpc node: starting XML-RPC server
+[rosmaster.master][INFO] 2026-11-12 10:22:08,570: Master initialized: port[41525], uri[http://127.0.0.1:41525/]
+[rosmaster.master][INFO] 2026-11-12 10:22:08,635: +PARAM [/run_id] by /roslaunch
+[rosmaster.master][INFO] 2026-11-12 10:22:08,635: +PARAM [/roslaunch/uris/host_127_0_0_1__40929] by /roslaunch
+[rosmaster.master][INFO] 2026-11-12 10:22:09,484: +PARAM [/rosversion] by /roslaunch
+[rosmaster.master][INFO] 2026-11-12 10:22:09,484: +PARAM [/rosdistro] by /roslaunch
+[rosmaster.master][INFO] 2026-11-12 10:22:09,589: +SERVICE [/rosout/get_loggers] /rosout http://127.0.0.1:32917/
+[rosmaster.master][INFO] 2026-11-12 10:22:09,589: +SERVICE [/rosout/set_logger_level] /rosout http://127.0.0.1:32917/
+[rosmaster.master][INFO] 2026-11-12 10:22:09,590: +PUB [/rosout_agg] /rosout http://127.0.0.1:32917/
+[rosmaster.master][INFO] 2026-11-12 10:22:09,591: +SUB [/rosout] /rosout http://127.0.0.1:32917/
+[rosmaster.master][INFO] 2026-11-12 10:22:10,353: +PARAM [/common/img_topic] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,361: +PARAM [/common/lid_topic] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,362: +PARAM [/common/imu_topic] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,363: +PARAM [/common/img_en] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,364: +PARAM [/common/lidar_en] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,365: +PARAM [/common/ros_driver_bug_fix] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,374: +PARAM [/extrin_calib/extrinsic_T] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,375: +PARAM [/extrin_calib/extrinsic_R] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,376: +PARAM [/extrin_calib/Rcl] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,377: +PARAM [/extrin_calib/Pcl] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,377: +PARAM [/time_offset/imu_time_offset] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,388: +PARAM [/time_offset/img_time_offset] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,389: +PARAM [/time_offset/exposure_time_init] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,389: +PARAM [/preprocess/point_filter_num] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,390: +PARAM [/preprocess/filter_size_surf] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,398: +PARAM [/preprocess/lidar_type] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,399: +PARAM [/preprocess/velodyne_time_scale] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,403: +PARAM [/preprocess/scan_line] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,403: +PARAM [/preprocess/blind] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,407: +PARAM [/vio/max_iterations] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,412: +PARAM [/vio/outlier_threshold] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,415: +PARAM [/vio/img_point_cov] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,416: +PARAM [/vio/patch_size] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,416: +PARAM [/vio/patch_pyrimid_level] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,417: +PARAM [/vio/normal_en] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,418: +PARAM [/vio/raycast_en] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,418: +PARAM [/vio/inverse_composition_en] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,426: +PARAM [/vio/exposure_estimate_en] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,427: +PARAM [/vio/inv_expo_cov] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,428: +PARAM [/imu/imu_en] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,428: +PARAM [/imu/imu_int_frame] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,429: +PARAM [/imu/acc_cov] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,437: +PARAM [/imu/gyr_cov] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,438: +PARAM [/imu/b_acc_cov] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,439: +PARAM [/imu/b_gyr_cov] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,440: +PARAM [/lio/max_iterations] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,441: +PARAM [/lio/dept_err] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,450: +PARAM [/lio/beam_err] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,451: +PARAM [/lio/min_eigen_value] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,452: +PARAM [/lio/voxel_size] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,453: +PARAM [/lio/max_layer] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,454: +PARAM [/lio/max_points_num] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,462: +PARAM [/lio/layer_init_num] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,463: +PARAM [/local_map/map_sliding_en] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,464: +PARAM [/local_map/half_map_size] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,464: +PARAM [/local_map/sliding_thresh] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,466: +PARAM [/uav/imu_rate_odom] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,467: +PARAM [/uav/gravity_align_en] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,473: +PARAM [/publish/dense_map_en] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,484: +PARAM [/publish/pub_effect_point_en] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,484: +PARAM [/publish/pub_plane_en] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,485: +PARAM [/publish/pub_scan_num] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,486: +PARAM [/publish/blind_rgb_points] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,486: +PARAM [/evo/seq_name] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,487: +PARAM [/evo/pose_output_en] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,488: +PARAM [/pcd_save/pcd_save_en] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,488: +PARAM [/pcd_save/type] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,495: +PARAM [/pcd_save/colmap_output_en] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,496: +PARAM [/pcd_save/filter_size_pcd] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,496: +PARAM [/pcd_save/interval] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,497: +PARAM [/image_save/img_save_en] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,497: +PARAM [/image_save/interval] by /rosparam-4157568
+[rosmaster.master][INFO] 2026-11-12 10:22:10,609: +PARAM [/laserMapping/cam_model] by /rosparam-4157631
+[rosmaster.master][INFO] 2026-11-12 10:22:10,610: +PARAM [/laserMapping/cam_width] by /rosparam-4157631
+[rosmaster.master][INFO] 2026-11-12 10:22:10,611: +PARAM [/laserMapping/cam_height] by /rosparam-4157631
+[rosmaster.master][INFO] 2026-11-12 10:22:10,611: +PARAM [/laserMapping/scale] by /rosparam-4157631
+[rosmaster.master][INFO] 2026-11-12 10:22:10,620: +PARAM [/laserMapping/cam_fx] by /rosparam-4157631
+[rosmaster.master][INFO] 2026-11-12 10:22:10,621: +PARAM [/laserMapping/cam_fy] by /rosparam-4157631
+[rosmaster.master][INFO] 2026-11-12 10:22:10,621: +PARAM [/laserMapping/cam_cx] by /rosparam-4157631
+[rosmaster.master][INFO] 2026-11-12 10:22:10,622: +PARAM [/laserMapping/cam_cy] by /rosparam-4157631
+[rosmaster.master][INFO] 2026-11-12 10:22:10,623: +PARAM [/laserMapping/cam_d0] by /rosparam-4157631
+[rosmaster.master][INFO] 2026-11-12 10:22:10,623: +PARAM [/laserMapping/cam_d1] by /rosparam-4157631
+[rosmaster.master][INFO] 2026-11-12 10:22:10,624: +PARAM [/laserMapping/cam_d2] by /rosparam-4157631
+[rosmaster.master][INFO] 2026-11-12 10:22:10,624: +PARAM [/laserMapping/cam_d3] by /rosparam-4157631
+[rosmaster.master][INFO] 2026-11-12 10:22:12,451: +PUB [/rosout] /slam_recovery_native_loop http://127.0.0.1:44407/
+[rosmaster.master][INFO] 2026-11-12 10:22:12,455: +SERVICE [/slam_recovery_native_loop/get_loggers] /slam_recovery_native_loop http://127.0.0.1:44407/
+[rosmaster.master][INFO] 2026-11-12 10:22:12,456: +SERVICE [/slam_recovery_native_loop/set_logger_level] /slam_recovery_native_loop http://127.0.0.1:44407/
+[rosmaster.master][INFO] 2026-11-12 10:22:12,485: publisherUpdate[/rosout] -> http://127.0.0.1:32917/ ['http://127.0.0.1:44407/']
+[rosmaster.master][INFO] 2026-11-12 10:22:12,506: publisherUpdate[/rosout] -> http://127.0.0.1:32917/ ['http://127.0.0.1:44407/']: sec=0.02, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-11-12 10:22:13,125: +PUB [/slam_recovery/gate_status] /slam_recovery_native_loop http://127.0.0.1:44407/
+[rosmaster.master][INFO] 2026-11-12 10:22:13,127: +SUB [/aft_mapped_to_init] /slam_recovery_native_loop http://127.0.0.1:44407/
+[rosmaster.master][INFO] 2026-11-12 10:22:13,127: +SUB [/velodyne_points] /slam_recovery_native_loop http://127.0.0.1:44407/
+[rosmaster.master][INFO] 2026-11-12 10:22:13,128: +CACHEDPARAM [/rosout_disable_topics_generation] by /slam_recovery_native_loop
+[rosmaster.master][INFO] 2026-11-12 10:22:13,129: +CACHEDPARAM [/rosout/omit_topics] by /rosout
+[rosmaster.master][INFO] 2026-11-12 10:22:24,744: +PARAM [/laserMapping/native_checkpoint_dir] by /laserMapping
+[rosmaster.master][INFO] 2026-11-12 10:22:24,746: +PUB [/rosout] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:24,747: +SERVICE [/laserMapping/get_loggers] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:24,747: +SERVICE [/laserMapping/set_logger_level] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:24,794: publisherUpdate[/rosout] -> http://127.0.0.1:32917/ ['http://127.0.0.1:44407/', 'http://127.0.0.1:39901/']
+[rosmaster.master][INFO] 2026-11-12 10:22:24,819: publisherUpdate[/rosout] -> http://127.0.0.1:32917/ ['http://127.0.0.1:44407/', 'http://127.0.0.1:39901/']: sec=0.02, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-11-12 10:22:26,272: +PUB [/rosout] /play_1794450146267016611 http://127.0.0.1:33699/
+[rosmaster.master][INFO] 2026-11-12 10:22:26,272: +SERVICE [/play_1794450146267016611/get_loggers] /play_1794450146267016611 http://127.0.0.1:33699/
+[rosmaster.master][INFO] 2026-11-12 10:22:26,272: +SERVICE [/play_1794450146267016611/set_logger_level] /play_1794450146267016611 http://127.0.0.1:33699/
+[rosmaster.master][INFO] 2026-11-12 10:22:26,273: +PUB [/clock] /play_1794450146267016611 http://127.0.0.1:33699/
+[rosmaster.master][INFO] 2026-11-12 10:22:26,273: +SERVICE [/play_1794450146267016611/pause_playback] /play_1794450146267016611 http://127.0.0.1:33699/
+[rosmaster.master][INFO] 2026-11-12 10:22:26,273: +CACHEDPARAM [/rosout_disable_topics_generation] by /play_1794450146267016611
+[rosmaster.master][INFO] 2026-11-12 10:22:26,296: publisherUpdate[/rosout] -> http://127.0.0.1:32917/ ['http://127.0.0.1:44407/', 'http://127.0.0.1:39901/', 'http://127.0.0.1:33699/']
+[rosmaster.master][INFO] 2026-11-12 10:22:26,315: publisherUpdate[/rosout] -> http://127.0.0.1:32917/ ['http://127.0.0.1:44407/', 'http://127.0.0.1:39901/', 'http://127.0.0.1:33699/']: sec=0.02, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-11-12 10:22:29,729: +CACHEDPARAM [/rosout_disable_topics_generation] by /laserMapping
+[rosmaster.master][INFO] 2026-11-12 10:22:29,740: +PUB [/handsfree/imu] /play_1794450146267016611 http://127.0.0.1:33699/
+[rosmaster.master][INFO] 2026-11-12 10:22:29,741: +PUB [/camera/color/image_raw] /play_1794450146267016611 http://127.0.0.1:33699/
+[rosmaster.master][INFO] 2026-11-12 10:22:29,741: +PUB [/velodyne_points] /play_1794450146267016611 http://127.0.0.1:33699/
+[rosmaster.master][INFO] 2026-11-12 10:22:29,818: publisherUpdate[/velodyne_points] -> http://127.0.0.1:44407/ ['http://127.0.0.1:33699/']
+[rosmaster.master][INFO] 2026-11-12 10:22:29,819: publisherUpdate[/velodyne_points] -> http://127.0.0.1:44407/ ['http://127.0.0.1:33699/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-11-12 10:22:30,439: +SUB [/velodyne_points] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,440: +SUB [/handsfree/imu] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,441: +SUB [/camera/color/image_raw] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,442: +SUB [/native_recovery/repaired_scan] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,442: +PUB [/cloud_registered] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,443: +PUB [/visualization_marker] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,443: +PUB [/cloud_visual_sub_map_before] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,443: +PUB [/cloud_effected] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,443: +PUB [/Laser_map] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,443: +PUB [/aft_mapped_to_init] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,444: +PUB [/path] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,444: +PUB [/planner_normal] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,444: +PUB [/voxels] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,444: +PUB [/dyn_obj] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,444: +PUB [/dyn_obj_removed] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,444: +PUB [/dyn_obj_dbg_hist] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,445: +PUB [/mavros/vision_pose/pose] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,447: +PUB [/rgb_img] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,447: +PUB [/LIVO2/imu_propagate] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,448: +PUB [/planes] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:22:30,520: publisherUpdate[/aft_mapped_to_init] -> http://127.0.0.1:44407/ ['http://127.0.0.1:39901/']
+[rosmaster.master][INFO] 2026-11-12 10:22:30,521: publisherUpdate[/aft_mapped_to_init] -> http://127.0.0.1:44407/ ['http://127.0.0.1:39901/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-11-12 10:22:31,125: +PUB [/tf] /laserMapping http://127.0.0.1:39901/
+[rosmaster.master][INFO] 2026-11-12 10:23:30,146: -PUB [/rosout] /play_1794450146267016611 http://127.0.0.1:33699/
+[rosmaster.master][INFO] 2026-11-12 10:23:30,146: -PUB [/clock] /play_1794450146267016611 http://127.0.0.1:33699/
+[rosmaster.master][INFO] 2026-11-12 10:23:30,146: -PUB [/handsfree/imu] /play_1794450146267016611 http://127.0.0.1:33699/
+[rosmaster.master][INFO] 2026-11-12 10:23:30,146: -PUB [/camera/color/image_raw] /play_1794450146267016611 http://127.0.0.1:33699/
+[rosmaster.master][INFO] 2026-11-12 10:23:30,147: -PUB [/velodyne_points] /play_1794450146267016611 http://127.0.0.1:33699/
+[rosmaster.master][INFO] 2026-11-12 10:23:30,147: -SERVICE [/play_1794450146267016611/get_loggers] /play_1794450146267016611 rosrpc://127.0.0.1:36501
+[rosmaster.master][INFO] 2026-11-12 10:23:30,147: -SERVICE [/play_1794450146267016611/set_logger_level] /play_1794450146267016611 rosrpc://127.0.0.1:36501
+[rosmaster.master][INFO] 2026-11-12 10:23:30,147: -SERVICE [/play_1794450146267016611/pause_playback] /play_1794450146267016611 rosrpc://127.0.0.1:36501
+[rosmaster.master][INFO] 2026-11-12 10:23:30,148: -CACHEDPARAM [/rosout_disable_topics_generation] by /play_1794450146267016611
+[rosmaster.master][INFO] 2026-11-12 10:23:30,192: publisherUpdate[/rosout] -> http://127.0.0.1:32917/ ['http://127.0.0.1:44407/', 'http://127.0.0.1:39901/']
+[rosmaster.master][INFO] 2026-11-12 10:23:30,193: publisherUpdate[/rosout] -> http://127.0.0.1:32917/ ['http://127.0.0.1:44407/', 'http://127.0.0.1:39901/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-11-12 10:23:30,193: publisherUpdate[/handsfree/imu] -> http://127.0.0.1:39901/ []
+[rosmaster.master][INFO] 2026-11-12 10:23:30,201: publisherUpdate[/velodyne_points] -> http://127.0.0.1:44407/ []
+[rosmaster.master][INFO] 2026-11-12 10:23:30,205: publisherUpdate[/velodyne_points] -> http://127.0.0.1:44407/ []: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-11-12 10:23:30,222: publisherUpdate[/handsfree/imu] -> http://127.0.0.1:39901/ []: sec=0.03, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-11-12 10:23:30,222: publisherUpdate[/camera/color/image_raw] -> http://127.0.0.1:39901/ []
+[rosmaster.master][INFO] 2026-11-12 10:23:30,222: publisherUpdate[/camera/color/image_raw] -> http://127.0.0.1:39901/ []: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-11-12 10:23:30,222: publisherUpdate[/velodyne_points] -> http://127.0.0.1:39901/ []
+[rosmaster.master][INFO] 2026-11-12 10:23:30,222: publisherUpdate[/velodyne_points] -> http://127.0.0.1:39901/ []: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-11-12 10:24:00,319: -SUB [/aft_mapped_to_init] /slam_recovery_native_loop http://127.0.0.1:44407/
+[rosmaster.master][INFO] 2026-11-12 10:24:00,319: -SUB [/velodyne_points] /slam_recovery_native_loop http://127.0.0.1:44407/
+[rosmaster.master][INFO] 2026-11-12 10:24:00,319: -PUB [/rosout] /slam_recovery_native_loop http://127.0.0.1:44407/
+[rosmaster.master][INFO] 2026-11-12 10:24:00,319: -PUB [/slam_recovery/gate_status] /slam_recovery_native_loop http://127.0.0.1:44407/
+[rosmaster.master][INFO] 2026-11-12 10:24:00,319: -SERVICE [/slam_recovery_native_loop/get_loggers] /slam_recovery_native_loop rosrpc://127.0.0.1:39835
+[rosmaster.master][INFO] 2026-11-12 10:24:00,319: -SERVICE [/slam_recovery_native_loop/set_logger_level] /slam_recovery_native_loop rosrpc://127.0.0.1:39835
+[rosmaster.master][INFO] 2026-11-12 10:24:00,338: publisherUpdate[/rosout] -> http://127.0.0.1:32917/ ['http://127.0.0.1:39901/']
+[rosmaster.master][INFO] 2026-11-12 10:24:00,338: publisherUpdate[/rosout] -> http://127.0.0.1:32917/ ['http://127.0.0.1:39901/']: sec=0.00, result=[1, '', 0]
+[rosmaster.master][INFO] 2026-11-12 10:24:00,933: +CACHEDPARAM [/rosout_disable_topics_generation] by /slam_recovery_native_loop

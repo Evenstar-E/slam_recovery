@@ -1,0 +1,25 @@
+{
+ "method": "count of '[ LIO ] Update Voxel Map' lines between timestamped INFO anchors",
+ "boundaries": {
+  "hold_applied_wall": 1794450174.63,
+  "resume_received_wall": 1794450183.67281,
+  "resume_time_source": "native_checkpoint_events.resume.received_wall"
+ },
+ "line_index": {
+  "hold": 9686,
+  "resume": 22454,
+  "end": 39442
+ },
+ "update_voxel_map": {
+  "before_hold": 227,
+  "during_hold": 164,
+  "after_resume": 413
+ },
+ "lio_frames_processed": {
+  "before_hold": 1390,
+  "during_hold": 1924,
+  "after_resume": 2496
+ },
+ "host_ack_at_resume": "OK resume valid=1 stamp_ns=1627785274681471232 frame=192 voxels=15161 nodes=31576 points=298650 restores=1 live_voxels=19194 live_points=362286 state_pos=8.390058,8.517568,-1.144904 hold=0 held_frames=171 held_points=495589 hold_commands=2 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=298 set_state=1 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+ "reprocess_log_lines": 1
+}
