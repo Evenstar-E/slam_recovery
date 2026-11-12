@@ -117,3 +117,13 @@ Wilson 0.2855 拒绝，**没有发布修复、没有 bias 实测**。按任务�
 incumbent 位姿下的 body-z 一维搜索。结果 **bias median +0.40 m（MAD 0.05，26 帧，容差内）**，
 门 accepted；但宿主订阅队列只有 20 条，26 条一次性发布丢了 6 条，`repair_received=20`，
 receipt 屏障拒绝重放（无 `reprocess #`、无 applied）。断点与发布节流的修法写在那个报告里。
+
+## 10. 后续：分批回执的成功运行与 dry-run 对照
+
+- `decoupled_bias/success_batched/REPORT.md`：32 条修复云按 10/10/10/2 四批发完，累计回执
+  32/32，宿主 `repair_received=32 repair_applied=32`，`reprocess` 676 帧、
+  `repairs applied=32`，地图 22334 voxels/417461 points，`[NATIVE_REPAIR] applied` 32 行。
+  bias median +0.45（MAD 0.05），门 accepted（Wilson 0.9220）。
+- `decoupled_bias/control_dryrun/REPORT.md`：同管线、同损坏、只关发布（`--repair-dry-run`）。
+  0 条修复、重放 529 帧、地图 20427 voxels。两次的 episode 帧数（32 vs 23）与重放跨度不同，
+  地图/状态差异不能全部归因于修复；能干净比较的只有修复计数 32/32 vs 0/0。
