@@ -2122,3 +2122,27 @@ Codex 据此发布 [ALI-B2 路线回复](ali_h_v1_research/CODEX_REPLY_ALI_B2_20
 原生恢复/接回/第二事件不因 ALI 标签缺项自动暂停；现有分工不变，不增等待 Codex 的执行前置。
 
 发布前核到 `846d121`：承认 v8 对应关系升级的开发记录，保留其 49.11 s/444 paired 覆盖限制；旧 v7 未证明映射与正常参照/标签缺项分别记账。本轮未独立复算 v8，未调整 A/B 评分。开发接收/执行仍待实际回执。
+
+## 145. Codex 的 ALI-B2 回复合入（属建议，不是用户批准）；summary 崩溃已修；K=3 首测结果
+
+**Codex 回复**（远端 main `4b5e63c`，已合并）：`docs/ali_h_v1_research/CODEX_REPLY_ALI_B2_20261112.md`，记录用户原话
+"你给一个你认为最合理的回复然后提交到github上，标注好信息"。**这只是建议与工作交接，不是用户对 A/B/C 的选择**；
+`ALI-B2-NORMAL-LABELS-20261112-01` 状态**仍为等待用户确认**，S3 的分类/误报/漏检继续 `NOT_EVALUABLE`。
+其内容与我们的判断一致：当前按 C 如实交付；先核已有材料（正常参照/事件依据/输入对应/覆盖/授权五问表）；
+条件齐备后做一次预先声明机制的有限离线对照（B）；真实场景需 A 的独立证据。不新增运行授权。
+
+**S1 修复（S2 报告的真实崩溃）**：`build_summary` 中 `ep.meta.get(...)` 在**未决策的段**上抛 `AttributeError`
+（`Episode` 构造时无 `meta`），整个 summary 写不出、run 判 FAIL（`130945Z_560715` 即死于此）。已改为 `getattr`，
+并新增回归测试 `test_summary_survives_an_episode_that_never_decided`；**208 tests OK**。
+
+**C′ 低风险半（S2，库 `18e039e1…`、`host_build_v9c.log`）**：`~cp_history_k` 私有参数默认 1（与 v8 一致），
+环形存储与计数全为 `LIVMapper.cpp` 的 file-static，**类布局与 v8 逐字节一致**（S2 先试成员版：启动探针 5/5 SIGSEGV，
+改 file-static 后 5/5 PASS——再次验证"任何布局变化都会唤醒既有启动期内存故障"）；restore/reprocess 选择逻辑未改。
+K=3 run `131213Z_563253`：paired 341、accepted 0/rejected 1、终态 HEALTHY；环形工作正常（`hist_bytes` 2.0→239 MB 估算）。
+**但该 run 后段宿主地图失控**（frame 478→514：voxels 323k→453k、points 1.7M→2.4M、RSS 峰值 6.97 GB），
+属已知运行期不稳定，**本次不能作 K=3 vs K=1 的干净内存对照**。
+**唯一一段的候选分析**：边界 `…261.507921600`，实际用 `…264.873980928`（+3.36 s，LATE）；当时环形里有
+`261.470954/frame 2` 与 `263.142319/frame 27`，**前者 ≤ 边界、是合法候选**，但早 3.68 s 且只是第 2 帧——
+即 C′ 能找到合法快照，代价可能是回滚到极早期。多段覆盖率需在宿主不发散的 run 上统计。
+
+归档：`exp/online-v2` → `f5212e5`（已由 S1 推送）。
