@@ -2510,3 +2510,22 @@ us 9% / sy 20% / id 57% / **wa 15%**，另有 5 个卡在 `fuse_lock_inode` 的 
 **门控修订（已通知 S2）**：保留"120 s 内 play 速率 <0.8× → EARLY_STOP_RATE"作为主判据；增加容器 `cpu.stat`
 （`usage_usec` 增量、`nr_throttled`）判据；`load1 > 200` 由硬门改为警告并继续采样；仍保留 1800 s 兜底与
 SIGINT→wait→info 退出顺序。FAST-LIO2 记 `BLOCKED_LOAD`，主线转 MM-LINS 接口只读分析。
+
+## 167. FAST-LIO2 失败原件与门控改动已入库；MM-LINS 接口只读分析完成（关键结论：无测量注入点）
+
+S2 提交（`exp/growth-run`，已推至 `54943bf`）：
+- `9b767c5` FAST-LIO2 独立构建 + 环境阻塞 run 原件（`run1/` 日志、身份取证、`play.log`、`REPORT.md`）；两个 1.6 GB 的 bag
+  未入库（reindex 后 0 条可读消息），sha 与路径记在 `run1/bag_sha256.txt`，文件保留在磁盘；
+- `4156aca` 门控改为运行时判据：删 `load1>200` 硬门（改 `WARN_HOST_LOAD`）、保留 120 s 早停（<0.8×→`EARLY_STOP_RATE`）、
+  新增 `/sys/fs/cgroup/cpu.stat` 的 `nr_throttled`/`throttled_usec` 差值，保留 1800 s 兜底与 SIGINT→wait→info 顺序；
+- `54943bf` `docs/four_host/MMLINS_RECOVERY_INTERFACE_20261113.md`（只读）。
+
+**MM-LINS 接口分析的关键结论**（本机核过文档，证据均带 `文件:行`）：
+1. SC-PGO 是 **4 节点松耦合链**（`scanRegistration → laserOdometry → laserMapping → laserPosegraphOptimization`）+
+   可选 FAST-LIO 前端，**无单一状态所有者**——这是接线首要约束；
+2. `slam_recovery` 的 `cmd`/`ack` 与隔离/段语义可原样复用；宿主需新增命令轮询（每节点 ~40 行）、odometry 状态快照
+   （~80 行）、建图立方体深拷贝/恢复、输入缓冲与 `reprocess` 驱动（~60 行 + 内存预算）；
+3. **测量级修复没有注入点**：特征在 `scanRegistration` 生成、`laserOdometry` 消费，替换测量等于重跑整条链，
+   与 FAST-LIVO2"重放时替换扫描"不等价——这是四宿主主线的结构性结论；
+4. 天然可用：PGO 的**关键帧图 + iSAM2** 作软回滚对象、`SleepMapList` 作粗粒度回滚点、`Issleeping`/`Isbuilding` 已是现成
+   停写/重建信号；未确认项（立方体深拷贝开销、iSAM2 序列化、`re_slam()` 后关键帧连续性、命令通道时序影响）单列 §7。
