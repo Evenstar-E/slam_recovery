@@ -2546,3 +2546,21 @@ MM-LINS 为 4 节点、无单一状态所有者、**无测量注入点**。
 
 **四宿主恢复层的共同前提（采纳）**：必须先区分"输入故障 vs 算法故障"；把降采样帧当正常输入重放会重演发散。
 这条写入恢复层设计前提，适用于全部四个宿主。
+
+## 169. 四宿主接口对比表与 ORB-SLAM3 失败分析完成；FAST-LIO2 重跑进行中
+
+S2 `5c3bf54`（`exp/growth-run`，已推）新增两份只读文档：
+
+**`ORBSLAM3_FAILURE_20261113.md`**：性质是**单目惯性初始化无法稳定**，不是跟踪中被事件打断——351.65 s 内 80 次新建地图、
+385 次 `Not enough motion for initializing`、43 次 `bad imu flag` 重置，首次 11.35 s、平均每 4.4 s 重建，结束后 Atlas 只剩
+1 张 **0 KF** 地图、`exit=139`；E1/E2 窗口内 4/6 次重建。接口差异：**不是话题节点**（`LoadImages`+`TrackMonocular`），
+**无话题级注入点**；但它是四宿主里**唯一有官方 Atlas 存取 API** 的（`SaveAtlas/LoadAtlas`、`ActivateLocalizationMode`）。
+
+**`FOUR_HOST_RECOVERY_COMPARISON_20261113.md`** 总表要点：
+- **能承载"替换单帧测量→重放"的只有 FAST-LIO2 与 LIO-SAM**（话题级 relay）；MM-LINS 与 ORB-SLAM3 不具备；
+- **回滚成本排序**：ORB-SLAM3（官方 Atlas API）< FAST-LIO2（已实现）< LIO-SAM（需写快照）< MM-LINS（跨进程）；
+- **输入退化是四宿主共同前提**（LIO-SAM 130 s、ORB 低视差、FAST-LIO2 地图暴涨都先于恢复逻辑）；不能把 FAST-LIVO2 的实现默认平移；
+- 既有闭环证据：MM-LINS 原生双事件 PASS / 恢复层 NOT_IMPLEMENTED；FAST-LIO2 共享版 PASS、独立版 BLOCKED_LOAD；
+  LIO-SAM 原生 FAIL（输入退化）；ORB-SLAM3 原生 FAIL（未稳定跟踪）。
+
+**FAST-LIO2 重跑**：新门控下通过 120 s 速率检查（0.83×），当前 bag 211.9/469.4 s（≈0.88×），未触发早停；结果待交。
