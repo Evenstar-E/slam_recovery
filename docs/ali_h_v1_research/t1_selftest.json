@@ -1,0 +1,200 @@
+{
+ "marker": "SYNTHETIC_UNIT",
+ "tests": [
+  {
+   "test": "T1.1 low support cross-modal consistency / T-only",
+   "status": "PASS",
+   "detail": {
+    "i_plus_t": {
+     "block_id": 1,
+     "state": "NORMAL_CONSISTENT",
+     "scope": "RELATIVE_MOTION_ONLY",
+     "reason_codes": [],
+     "last_suspect_block": null,
+     "verdicts": {
+      "M": null,
+      "T": "NORMAL",
+      "I": "NORMAL"
+     },
+     "u": {
+      "M": null,
+      "T": null,
+      "I": null
+     }
+    },
+    "t_only": {
+     "block_id": 1,
+     "state": "UNKNOWN",
+     "scope": "NONE",
+     "reason_codes": [
+      "T_NORMAL_ONLY_RELATIVE"
+     ],
+     "last_suspect_block": null,
+     "verdicts": {
+      "M": null,
+      "T": "NORMAL",
+      "I": "MISSING"
+     },
+     "u": {
+      "M": null,
+      "T": null,
+      "I": null
+     }
+    }
+   }
+  },
+  {
+   "test": "T1.2 low support qualified conflict -> SUSPECT",
+   "status": "PASS",
+   "detail": {
+    "i_conflict": {
+     "block_id": 1,
+     "state": "SUSPECT",
+     "scope": "RELATIVE_MOTION_ONLY",
+     "reason_codes": [
+      "POSITIVE_CONFLICT:I"
+     ],
+     "last_suspect_block": 1,
+     "verdicts": {
+      "M": null,
+      "T": null,
+      "I": "ALARM"
+     },
+     "u": {
+      "M": null,
+      "T": null,
+      "I": null
+     }
+    },
+    "m_conflict": {
+     "block_id": 1,
+     "state": "SUSPECT",
+     "scope": "MAP_AND_MOTION",
+     "reason_codes": [
+      "POSITIVE_CONFLICT:M"
+     ],
+     "last_suspect_block": 1,
+     "verdicts": {
+      "M": "ALARM",
+      "T": null,
+      "I": null
+     },
+     "u": {
+      "M": null,
+      "T": null,
+      "I": null
+     }
+    }
+   }
+  },
+  {
+   "test": "T1.3 missing / carried semantics",
+   "status": "PASS",
+   "detail": {
+    "after_missing": {
+     "block_id": 2,
+     "state": "UNKNOWN",
+     "scope": "NONE",
+     "reason_codes": [
+      "NO_QUALIFIED_EVIDENCE:I"
+     ],
+     "last_suspect_block": 1,
+     "verdicts": {
+      "M": null,
+      "T": null,
+      "I": "MISSING"
+     },
+     "u": {
+      "M": null,
+      "T": null,
+      "I": null
+     }
+    },
+    "missing_channel": {
+     "channel": "I",
+     "present": false,
+     "fresh": false,
+     "score": null,
+     "verdict": "MISSING",
+     "calibration": "NOT_APPLICABLE",
+     "u": null,
+     "reason": "no_imu"
+    },
+    "carried_channel": {
+     "channel": "T",
+     "present": true,
+     "fresh": false,
+     "score": 1.0,
+     "verdict": "STALE",
+     "calibration": "NOT_USED",
+     "u": null,
+     "reason": "carried_forward_not_new_evidence"
+    }
+   }
+  },
+  {
+   "test": "T1.4 per-source calibration and scope",
+   "status": "PASS",
+   "detail": {
+    "M": {
+     "channel": "M",
+     "present": true,
+     "fresh": true,
+     "score": 1.0,
+     "verdict": "NORMAL",
+     "calibration": "OK",
+     "u": 0.09523809523809523,
+     "reason": null
+    },
+    "T": {
+     "channel": "T",
+     "present": true,
+     "fresh": true,
+     "score": 1.0,
+     "verdict": "ALARM",
+     "calibration": "OK",
+     "u": 1.0,
+     "reason": null
+    },
+    "M_LOW_without_LOW_ref": {
+     "channel": "M",
+     "present": true,
+     "fresh": true,
+     "score": 1.0,
+     "verdict": "UNQUALIFIED",
+     "calibration": "OUT_OF_SUPPORT",
+     "u": null,
+     "reason": "no_reference_for_context:LOW"
+    }
+   }
+  },
+  {
+   "test": "T1.5 SE(3) and time contract",
+   "status": "PASS",
+   "detail": {
+    "relative_diff": 1.6619847851410495e-16,
+    "block_id": 3255570524,
+    "pose_scan_dt_ns": null
+   }
+  },
+  {
+   "test": "T1.6 shadow leaves old decision unchanged",
+   "status": "PASS",
+   "detail": {
+    "single_row_unchanged": true,
+    "real_trace_frames": 402,
+    "real_trace_blocks": 90,
+    "frame_to_block": "402 rows grouped into 90 0.5 s blocks",
+    "toggle_identical": true,
+    "old_fields_match_input": true,
+    "block_counts": {
+     "UNKNOWN": 90
+    },
+    "state_counts_frames": {
+     "UNKNOWN": 402
+    }
+   }
+  }
+ ],
+ "failed": 0
+}
