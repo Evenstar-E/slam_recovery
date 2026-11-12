@@ -1,0 +1,108 @@
+{
+  "main": "1f7a6dc35e720b807502acdc258b2f0891c53f47",
+  "comparison": "23e019bf7f9ac4bab71db9e50a009db704ffb952",
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261113_1f7a6dc/run_checks.py",
+  "scope": "reviewed AST functions/statements plus data blobs only; not full T2 CLI, native or build",
+  "parser_checks": [
+    {
+      "parser": "t2_run.py",
+      "status": "PASS_ACTUAL_ARCHIVED_107",
+      "rows": 792,
+      "malformed": 0,
+      "all_fourteen_pose_values_equal": true
+    },
+    {
+      "parser": "t2_join_upgrade.py",
+      "status": "PASS_ACTUAL_ARCHIVED_107",
+      "rows": 792,
+      "malformed": 0,
+      "all_fourteen_pose_values_equal": true
+    }
+  ],
+  "legacy_closure": {
+    "status": "PASS_EXISTING_DEFECT_CLOSED",
+    "population": 531,
+    "diagnostics": 504,
+    "changed_scores": 92,
+    "median_s": 72.29387608528863,
+    "unchanged_non_i_fields": true
+  },
+  "v11": {
+    "source_pre_post_rows": 725,
+    "independently_checked_logs": 725,
+    "paired": 482,
+    "mapped": 481,
+    "missing": {
+      "HAS_OUT_0": 19,
+      "NO_TRACE_ROW": 1
+    },
+    "multi_to_one": 246,
+    "selected_I": 462,
+    "saved_i_fields_equal": true,
+    "norm": {
+      "p10": 0.006450603256478907,
+      "p50": 0.03424097551055872,
+      "p90": 0.11370155469414255,
+      "max": 0.5907060086278499
+    },
+    "unit_energy": {
+      "p10": 4.1610585925197795e-05,
+      "p50": 0.0011725995676058923,
+      "p90": 0.01293147814182785,
+      "max": 0.34893358862904555
+    },
+    "diagnostic_s": {
+      "p10": 1.4606851303322301,
+      "p50": 57.68161179668192,
+      "p90": 497.43980349691776,
+      "max": 25799.653791629757
+    },
+    "blocks": 106,
+    "unknown_blocks": 106,
+    "all_482_states_unknown": true,
+    "selected_zero_eff": 18,
+    "selected_zero_eff_idx": [
+      226,
+      235,
+      395,
+      396,
+      398,
+      399,
+      401,
+      402,
+      404,
+      405,
+      407,
+      408,
+      410,
+      411,
+      413,
+      414,
+      416,
+      417
+    ],
+    "selected_zero_eff_nonzero_log": 0,
+    "all_hasout_zero_eff": 37,
+    "scope_limits": [
+      "raw-header containment is not full point/carryover membership",
+      "eff=0 is not positive measurement information",
+      "same-row log arithmetic is not calibrated detection or recovery performance",
+      "legacy vec/mixed-cov qualification remains unchanged"
+    ]
+  },
+  "bindings": {
+    "1f7a6dc35e720b807502acdc258b2f0891c53f47:docs/ali_h_v1_research/t2_run.py": "7aa06529559d33752de18a0cd1e15886fe33216b594a93421705a44cac92bc51",
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/host_logs/trace_cov.txt": "b14d4f57e4c488f64365e5fa48c72c32d946ef51d00371a4f21456ac87ccd736",
+    "1f7a6dc35e720b807502acdc258b2f0891c53f47:docs/ali_h_v1_research/t2_join_upgrade.py": "d1bb85d4b595bb554a4fee3f5c6f081275389d4cfbee305802f0cc3bfd4bd4a7",
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/availability_frames.jsonl.gz": "36d11af7d8b8cd486c1dc16fc1371e123f8690275252003698036da99e85b633",
+    "1f7a6dc35e720b807502acdc258b2f0891c53f47:docs/ali_h_v1_research/t2_v11_summary.json": "a4cdb7a07004a4e230ee982548b620b778fe695f7d39b6953fd859652f216057",
+    "1f7a6dc35e720b807502acdc258b2f0891c53f47:docs/ali_h_v1_research/t2_v11_join.jsonl": "860957b6290a2d993f2f9a987b97250640ffab6cc4127172dd354d01df756fdb",
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/receipt.json": "8529773b1de68accf61b8a7061cef5b4af4eb645f7ea8709062fe8d35866e5aa",
+    "a812302e3a9acd17b1e6f318d332b88563910069:docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/run_summary.json": "f3b7b71b2f2508398921f3e54386d8e94faad1effce3287aeda5b7d13e596ac6",
+    "290aae8441fedc24dfbf316b8150880b63fae0b1:docs/review_20261112_four_host/trace_fl_native_20261112T115734Z_483777/host_logs/trace_cov.txt": "8c0d6a24cb71416c50916b404867356628eebe28c41db2447f7ad3e4f75ff62d",
+    "290aae8441fedc24dfbf316b8150880b63fae0b1:docs/review_20261112_four_host/trace_fl_native_20261112T115734Z_483777/availability_frames.jsonl.gz": "9f562a23668416ab448fd2363c8245fd81f5a2dd0d79f217667599ddf9b33fc1",
+    "290aae8441fedc24dfbf316b8150880b63fae0b1:docs/review_20261112_four_host/trace_fl_native_20261112T115734Z_483777/host_logs/M2DGR_room_02.txt": "cac87e9b6df866d0c47cbc04311547251c28d7f4bfa74d73c38e4098d00bc970",
+    "23e019bf7f9ac4bab71db9e50a009db704ffb952:docs/ali_h_v1_research/t2_join.jsonl": "496d99ab5149cbd56c70f5476eda7faaeaa049a01e4832444e28d04686472bea",
+    "1f7a6dc35e720b807502acdc258b2f0891c53f47:docs/ali_h_v1_research/t2_join.jsonl": "e62e28170ba8c213b38af42ecee1c0a24518a19d94e05979e300843f31cc8623"
+  }
+}
