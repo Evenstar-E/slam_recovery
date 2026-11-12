@@ -2462,3 +2462,21 @@ S3 `6e35d30`（已合入 main）：
 `… Ppost6x6 pose7 pre_pose7`，行解析出 `pose_tail`/`pre_pose` 两个具名块。`129b184`/`6e35d30` 之后真实 v11 表头已能正确解析，
 无需再改表头或放宽宽度。审阅其余要求仍有效：验收必须取得七值并进入同行 post 分支——本机 792 行解析与
 `same_row_pre_post_rows=725` 已满足。
+
+## 164. FAST-LIO2 独立 run #1 FAIL（环境阻塞，未覆盖尾段）；批准 1 次重跑 + load 门控
+
+S2 首次独立 run：节点身份已取证（PID 692359 → `/home/R26534/fastlio2_ws/...`，`process_identity.txt`）、私有 master、
+同 bag/`--clock`/rate 1.0；但**播放远慢于实时**（900 s 外层 timeout 到期时 play 仅到 376.0/469.4 s，无 `Done`），
+外层 timeout 先杀导致 `rosbag record` 未写完索引；`rosbag reindex` 后 **0 条可读消息** → 本次无可用 `/Odometry` 与事件数据。
+原件保留在 `fastlio2_independent_20261113/run1/`（`fastlio_node.log`、`play.log`、`frontend.orig.bag`、reindex 后的
+`frontend.bag`、身份取证文件）。旁证（不构成验收）：覆盖的 376 s 内出现 4 次 `Over-degeneracy → construct a new map`、
+323 次 `IMU Initial Done`（共享版整段 2 次），在 load 360 下**不能归因于代码**。
+
+**环境实测**：本机 loadavg **359.52**（128 核），来源是一批 **2026-11-06 启动、仍在运行**的 `mmlins_ws` 进程
+（ALOAM 系列 + `fast_lio/fastlio_mapping`，PID 641409/641424/641429/641607/641723 等）。按"不终止不明进程"规则未处置；
+已分别询问 r11070-bb / r11070-9a 是否为它们的遗留。
+
+**S1 决定**：批准 **1 次重跑**，条件为：超时 1800 s、**开跑后 120 s 内 play 速率 <0.8× 即早期止损**、只录
+`/Odometry /path /Issleeping /Isbuilding`、结束顺序 SIGINT `record`→`wait`→确认索引→退出、开跑前 loadavg(1m) >200 不开
+且不消耗授权、run 中每 60 s 记 loadavg。若 load 门控始终不过，按 **BLOCKED（环境）** 记录，FAST-LIO2 原生验证被环境阻塞，
+不与代码质量混同，四宿主主线继续推进其它宿主。
