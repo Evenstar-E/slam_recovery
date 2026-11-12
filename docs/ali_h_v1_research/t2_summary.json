@@ -74,6 +74,7 @@
   "duplicate_time_groups": 156
  },
  "join": {
+  "status": "HEURISTIC_UNPROVEN",
   "availability_rows": 531,
   "mapped": 530,
   "unmapped": 1,
