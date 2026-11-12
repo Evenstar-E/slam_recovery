@@ -1,0 +1,407 @@
+{
+ "rows": 544,
+ "predicted_present": 480,
+ "predicted_null": 64,
+ "predicted_null_runs": [
+  [
+   0,
+   20,
+   21
+  ],
+  [
+   23,
+   65,
+   43
+  ]
+ ],
+ "joint": {
+  "no_prediction": 64,
+  "both_pass": 82,
+  "both_low": 301,
+  "only_pred_low": 47,
+  "only_host_low": 50
+ },
+ "unavailable_runs": [
+  {
+   "rows": [
+    0,
+    20
+   ],
+   "frames": 21,
+   "host": {
+    "fraction": null,
+    "pass": 0,
+    "n": 0
+   },
+   "predicted": {
+    "fraction": null,
+    "pass": 0,
+    "n": 0
+   },
+   "reading": "null_prediction"
+  },
+  {
+   "rows": [
+    26,
+    86
+   ],
+   "frames": 61,
+   "host": {
+    "fraction": {
+     "p10": 0.476,
+     "median": 0.55,
+     "p90": 0.57
+    },
+    "pass": 0,
+    "n": 21
+   },
+   "predicted": {
+    "fraction": {
+     "p10": 0.432,
+     "median": 0.49,
+     "p90": 0.535
+    },
+    "pass": 0,
+    "n": 21
+   },
+   "reading": "both_low"
+  },
+  {
+   "rows": [
+    147,
+    173
+   ],
+   "frames": 27,
+   "host": {
+    "fraction": {
+     "p10": 0.0,
+     "median": 0.025,
+     "p90": 0.403
+    },
+    "pass": 0,
+    "n": 27
+   },
+   "predicted": {
+    "fraction": {
+     "p10": 0.349,
+     "median": 0.48,
+     "p90": 0.627
+    },
+    "pass": 5,
+    "n": 27
+   },
+   "reading": "host_low_predicted_recovered"
+  },
+  {
+   "rows": [
+    179,
+    191
+   ],
+   "frames": 13,
+   "host": {
+    "fraction": {
+     "p10": 0.095,
+     "median": 0.31,
+     "p90": 0.519
+    },
+    "pass": 0,
+    "n": 13
+   },
+   "predicted": {
+    "fraction": {
+     "p10": 0.109,
+     "median": 0.25,
+     "p90": 0.296
+    },
+    "pass": 0,
+    "n": 13
+   },
+   "reading": "both_low"
+  },
+  {
+   "rows": [
+    208,
+    212
+   ],
+   "frames": 5,
+   "host": {
+    "fraction": {
+     "median": 0.55
+    },
+    "pass": 0,
+    "n": 5
+   },
+   "predicted": {
+    "fraction": {
+     "median": 0.16
+    },
+    "pass": 0,
+    "n": 5
+   },
+   "reading": "predicted_lower"
+  },
+  {
+   "rows": [
+    217,
+    217
+   ],
+   "frames": 1,
+   "host": {
+    "fraction": {
+     "median": 0.5
+    },
+    "pass": 0,
+    "n": 1
+   },
+   "predicted": {
+    "fraction": {
+     "median": 0.12
+    },
+    "pass": 0,
+    "n": 1
+   },
+   "reading": "predicted_lower"
+  },
+  {
+   "rows": [
+    219,
+    220
+   ],
+   "frames": 2,
+   "host": {
+    "fraction": {
+     "median": 0.57
+    },
+    "pass": 0,
+    "n": 2
+   },
+   "predicted": {
+    "fraction": {
+     "median": 0.21
+    },
+    "pass": 0,
+    "n": 2
+   },
+   "reading": "predicted_lower"
+  },
+  {
+   "rows": [
+    228,
+    280
+   ],
+   "frames": 53,
+   "host": {
+    "fraction": {
+     "p10": 0.0,
+     "median": 0.025,
+     "p90": 0.481
+    },
+    "pass": 0,
+    "n": 53
+   },
+   "predicted": {
+    "fraction": {
+     "p10": 0.027,
+     "median": 0.515,
+     "p90": 0.87
+    },
+    "pass": 25,
+    "n": 53
+   },
+   "reading": "host_low_predicted_recovered"
+  },
+  {
+   "rows": [
+    298,
+    368
+   ],
+   "frames": 71,
+   "host": {
+    "fraction": {
+     "p10": 0.081,
+     "median": 0.105,
+     "p90": 0.12
+    },
+    "pass": 0,
+    "n": 71
+   },
+   "predicted": {
+    "fraction": {
+     "p10": 0.075,
+     "median": 0.095,
+     "p90": 0.115
+    },
+    "pass": 0,
+    "n": 71
+   },
+   "reading": "both_low"
+  },
+  {
+   "rows": [
+    373,
+    394
+   ],
+   "frames": 22,
+   "host": {
+    "fraction": {
+     "p10": 0.515,
+     "median": 0.555,
+     "p90": 0.5835
+    },
+    "pass": 0,
+    "n": 22
+   },
+   "predicted": {
+    "fraction": {
+     "p10": 0.5115,
+     "median": 0.5725,
+     "p90": 0.59
+    },
+    "pass": 0,
+    "n": 22
+   },
+   "reading": "both_low"
+  },
+  {
+   "rows": [
+    396,
+    462
+   ],
+   "frames": 67,
+   "host": {
+    "fraction": {
+     "p10": 0.0,
+     "median": 0.0,
+     "p90": 0.384
+    },
+    "pass": 0,
+    "n": 67
+   },
+   "predicted": {
+    "fraction": {
+     "p10": 0.0,
+     "median": 0.505,
+     "p90": 0.726
+    },
+    "pass": 20,
+    "n": 67
+   },
+   "reading": "host_low_predicted_recovered"
+  },
+  {
+   "rows": [
+    472,
+    517
+   ],
+   "frames": 46,
+   "host": {
+    "fraction": {
+     "p10": 0.27,
+     "median": 0.3375,
+     "p90": 0.44
+    },
+    "pass": 0,
+    "n": 46
+   },
+   "predicted": {
+    "fraction": {
+     "p10": 0.0,
+     "median": 0.0,
+     "p90": 0.01
+    },
+    "pass": 0,
+    "n": 46
+   },
+   "reading": "predicted_lower"
+  },
+  {
+   "rows": [
+    520,
+    522
+   ],
+   "frames": 3,
+   "host": {
+    "fraction": {
+     "median": 0.58
+    },
+    "pass": 0,
+    "n": 3
+   },
+   "predicted": {
+    "fraction": {
+     "median": 0.4
+    },
+    "pass": 0,
+    "n": 3
+   },
+   "reading": "predicted_lower"
+  },
+  {
+   "rows": [
+    524,
+    543
+   ],
+   "frames": 20,
+   "host": {
+    "fraction": {
+     "p10": 0.1325,
+     "median": 0.395,
+     "p90": 0.5445
+    },
+    "pass": 0,
+    "n": 20
+   },
+   "predicted": {
+    "fraction": {
+     "p10": 0.3465,
+     "median": 0.38,
+     "p90": 0.4095
+    },
+    "pass": 0,
+    "n": 20
+   },
+   "reading": "both_low"
+  }
+ ],
+ "stamp_windows_from_previous_run": {
+  "prev_53_117": {
+   "frames": 65,
+   "host": {
+    "fraction": {
+     "p10": 0.5245,
+     "median": 0.75,
+     "p90": 0.7955
+    },
+    "pass": 37
+   },
+   "predicted": {
+    "fraction": {
+     "p10": 0.4545,
+     "median": 0.705,
+     "p90": 0.75
+    },
+    "pass": 36
+   }
+  },
+  "prev_199_401": {
+   "frames": 203,
+   "host": {
+    "fraction": {
+     "p10": 0.005,
+     "median": 0.12,
+     "p90": 0.78
+    },
+    "pass": 37
+   },
+   "predicted": {
+    "fraction": {
+     "p10": 0.077,
+     "median": 0.185,
+     "p90": 0.87
+    },
+    "pass": 46
+   }
+  }
+ },
+ "window_note": "the previous run had 402 paired frames and its segment 53-117 was a continuous UNAVAILABLE run; this run has a different paired population and different map/pose state, so the same stamps are not the same status run"
+}
