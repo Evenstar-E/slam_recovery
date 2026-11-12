@@ -915,6 +915,7 @@ class NativeClosedLoop:
         checkpoint_client: Optional["CheckpointClient"] = None,
         repair_publish: bool = False,
         repair_sync_timeout_s: float = 5.0,
+        repair_dry_run: bool = False,
     ) -> None:
         self.node = node
         self.run_id = run_id
@@ -967,6 +968,9 @@ class NativeClosedLoop:
         self._scan_msgs: Dict[int, Any] = {}
         self._scan_index: Dict[int, Tuple[int, Any]] = {}
         self.repair_publish_enabled = bool(repair_publish)
+        # Control mode: run the same bias estimation (so the decision costs the same) but publish
+        # nothing and send no replay gate. Used to isolate the repair's effect from the corruption.
+        self.repair_dry_run = bool(repair_dry_run)
         self.publish_repair = None            # callable(PointCloud2), set by the ROS driver
         self.repair_sync_timeout_s = float(repair_sync_timeout_s)
         self._last_icp_delta: Optional[np.ndarray] = None
@@ -1345,6 +1349,13 @@ class NativeClosedLoop:
         receiving them, `proceed` is False and no `reprocess` may be issued: a replay that cannot
         see the repaired measurements would repeat the previous run's `repairs applied=0`.
         """
+        if self.repair_dry_run:
+            # Same estimator, same decision cost, no publication: the control for the repair run.
+            if not accepted:
+                return True, None
+            est = self._estimate_repair_bias(ep)
+            est.update({"dry_run": True, "published": 0, "synced": False, "batches": []})
+            return True, est
         if not (accepted and self.repair_publish_enabled):
             return True, None
         rep = self._publish_repaired_scans(ep)
@@ -2115,6 +2126,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--repair-sync-timeout-sec", type=float, default=5.0,
                     help="how long to wait for repair_received to reach the published count; on "
                          "timeout the replay is not sent")
+    ap.add_argument("--repair-dry-run", action="store_true", default=False,
+                    help="control for the INJECTION test: run the same bias estimation (same "
+                         "decision cost) but publish nothing; the replay uses the original scans")
     args, _unknown = ap.parse_known_args(argv)
 
     import rospy
@@ -2140,6 +2154,7 @@ def main(argv: Optional[List[str]] = None) -> int:
             if args.checkpoint_dir else None),
         repair_publish=args.repair_publish,
         repair_sync_timeout_s=args.repair_sync_timeout_sec,
+        repair_dry_run=args.repair_dry_run,
     )
     if args.scripted_triggers:
         loop.scripted_triggers_s = [float(x) for x in args.scripted_triggers.split(",") if x.strip()]

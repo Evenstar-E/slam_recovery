@@ -163,6 +163,17 @@ class RepairGateTest(unittest.TestCase):
         self.assertEqual(loop.cp.set_state_calls, 1)
         self.assertTrue(ep.meta["repair_publish"]["synced"])
 
+    def test_the_dry_run_estimates_but_publishes_nothing(self):
+        loop, ep = self._loop(wait_result=True)
+        loop.repair_dry_run = True
+        proceed, rep = loop._repair_gate(ep, accepted=True)
+        self.assertTrue(proceed)
+        self.assertTrue(rep["dry_run"])
+        self.assertEqual(rep["published"], 0)
+        self.assertEqual(len(loop.published), 0)
+        self.assertIsNotNone(rep["bias_z_m"])
+        self.assertAlmostEqual(rep["bias_z_m"], 0.5, delta=0.06)
+
     def test_the_bias_is_estimated_at_the_incumbent_pose_with_a_pinned_sign(self):
         # A synthetic plane map; the frame's cloud is that plane displaced +0.5 in body z. With the
         # incumbent at identity the 1-D search must return +0.5 and the published cloud must carry
