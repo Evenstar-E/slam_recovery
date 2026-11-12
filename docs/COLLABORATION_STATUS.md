@@ -2329,3 +2329,14 @@ S2 `c5bc057`（`exp/online-v2`，已推），本机核对：库 **`81b35f92…`*
 **风险与前置**：S3 的 parser 目前只接受 92/93/100，**107 会再次被判 malformed**。已要求 S3 加 107 档与 107 正常控制，
 并优先用同行 `pre_pose7`/`pose7` 算 e_I（`vec6` 仅对照）。S2 已承诺：在 S1/S3 明确回"parser 已支持 107"之前不开跑，
 且 run 结束后先本地按列名自检 107 可解析，失败先修 parser 不重跑。
+
+## 158. 消费端已支持 107 列（v11 前置解除）；pre 资格标记为 PENDING_v11_RUN
+
+S3 `129b184`（已合入 main），本机核对：
+- 两个 parser 按表头名接受 **92/93/100/107**；`selftest107` 与 `selftest100` 均 `PASS`（`pose`/`pre_pose` 各 7 值逐位一致）；
+- v11 路径直接用同行 `pre_pose7`/`pose7` 算 `e_I=Log(inv(pre)·post)`（含 `V⁻¹`），**不再依赖 `vec6`**；`vec6` 仅对照；
+  100 列用同行 pose+vec6；92/93 旧行才回落 M2DGR 且只作交叉核对；meta 增 `same_row_pre_post_rows`/`same_row_post_pose_rows`；
+- `T2_I_ELIGIBILITY`：pre/post 对 v11 标 **`PENDING_v11_RUN`**（真实 run 且同帧配对验证后升 `PASS_SAME_ROW`），
+  v7/v8 仍 `INCOMPLETE`/`ASSERTED_NOT_VERIFIED`；`vec6` 仍 `NOT_VERIFIED`；协方差 `NOT_AVAILABLE`、I 主量单位权。
+
+**S2 的开跑前置（"parser 已支持 107"）现已满足**。
