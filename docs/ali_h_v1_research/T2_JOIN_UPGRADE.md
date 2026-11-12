@@ -30,13 +30,14 @@ trace **736 行**、paired **444**。**不是 60 s 完整覆盖**，不能当"�
 
 | 项 | 值 |
 |---|---|
-| 行 / 组 | **736 / 736**（每行一个 grp_idx） |
+| 行 / 组 | **736 / 736**（每行一个 grp_idx）；列按**名称**读取（`n_scans` 在第 7 列，`has_out` 第 8、`phase` 第 9） |
 | `n_scans` | **全部 1**（无合并扫描） |
 | `scan_first == scan_last` | **736/736**（单扫描点跨度） |
 | phase | **全部 0**（本 run 无 replay 行） |
 | has_out | 669 行 1 / 67 行 0 |
 | rel 最大值 | **49.1116 s** |
 | 相同 scan stamp 的组 | 246 个时间戳 1 组、**245 个时间戳 2 组**（同一扫描的两条 LIO trace 行） |
+| 多对一来源 | **live+live**（phase 全 0，无 replay）；两条 trace 行同 scan 戳、`n_scans=1` |
 
 ## 3. join 实测（口径：真实跨度包含 + 512 ns 量化保护）
 
@@ -65,6 +66,18 @@ trace **736 行**、paired **444**。**不是 60 s 完整覆盖**，不能当"�
 （打印量化）。旧规则取"下一个 `last`"，当 S 比当前组的 `last` 晚几 ns 时会错跳到下一组；
 加上 512 ns 量化保护后，正确的组就是这个 S 所在的单点组。所以旧规则在该 run **不可用**。
 
+## 4.1 v7 与 v8 并列（两个 run 分开报告，不混用）
+
+| 项 | v7 `115734Z` | v8 `124217Z` |
+|---|---|---|
+| trace | 1042 行（1 截断），`scan_first` 全 -1 | 736 行，93 列，`scan_first` 真实 |
+| join | 机械映射，`HEURISTIC_UNPROVEN` | 真实跨度 + 512 ns 量化，`TRUE_SPAN_CONTAINMENT_WITH_512NS_QUANTIZATION` |
+| availability / 覆盖 | 531 行 / 60.0 s | **444 行 / 49.11 s**（不是完整 60 s） |
+| 匹配 | 530/531，1 `NO_TRACE_ROW` | **444/444**，0 未匹配 |
+| 多对一 | 257 行两个 grp_idx（机械） | **227 行 2 组（live+live）** |
+| 候选 | 5 段，1 accepted（受控接口测试） | **2 段，全拒，0 accepted** |
+| 用途 | 资格/UNKNOWN；修复收益不作结论 | 逐帧资格/UNKNOWN；修复/接纳结论不适用 |
+
 ## 5. 升级结论与边界
 
 - 本 run 的 `join.status` 从 `HEURISTIC_UNPROVEN` 升级为 **`TRUE_SPAN_CONTAINMENT_WITH_512NS_QUANTIZATION`**；
@@ -72,6 +85,7 @@ trace **736 行**、paired **444**。**不是 60 s 完整覆盖**，不能当"�
 - 多对一由**同一 scan stamp 的多条 LIO trace 行**造成（`n_scans=1`，不是合并扫描）；保留 227 行
   多组，不强行拆成一対一。
 - 本 run 只覆盖 49.1 s、444 paired；分类与错误率仍 `NOT_EVALUABLE`（`ALI-B2`）。
+- 本 run **2 段全拒、0 accepted**：只能用逐帧 M/T/I 资格与 UNKNOWN 口径；**修复/接纳相关结论不适用**。
 - **修复对象边界**：审阅 `646d4f2` 指出 ep3 的 42 条修复扫描时间都在声明注入窗之后；涉及
   "修复收益/修复对象"的结论必须写"修复的是点测量还是状态误差尚未区分"，不能称注入测量已修回。
   本 run 的候选全部拒绝，也不用于修复收益。

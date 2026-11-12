@@ -38,14 +38,16 @@ def parse_trace(path):
             if names is None or len(f) not in (92, 93):
                 malformed.append({"line": lineno, "ncols": len(f)})
                 continue
-            has_n = "n_scans" in names
-            base = 6 if has_n else 5
+            # Read scalars by NAME, not by position: n_scans was inserted at column 7 in v8.
+            col = {name: i for i, name in enumerate(names)}
+            vec_start = names.index("r_chi2w") + 1
             rows.append({
-                "idx": int(f[0]), "rel_s": float(f[1]), "abs_ns": int(f[2]),
-                "grp_idx": int(f[3]), "scan_first_ns": int(f[4]), "scan_last_ns": int(f[5]),
-                "n_scans": int(f[6]) if has_n else 1,
-                "has_out": int(f[7] if has_n else f[6]),
-                "phase": int(f[8] if has_n else f[7]),
+                "idx": int(f[col["idx"]]), "rel_s": float(f[col["rel_s"]]),
+                "abs_ns": int(f[col["abs_ns"]]), "grp_idx": int(f[col["grp_idx"]]),
+                "scan_first_ns": int(f[col["scan_first_ns"]]),
+                "scan_last_ns": int(f[col["scan_last_ns"]]),
+                "n_scans": int(f[col["n_scans"]]) if "n_scans" in col else 1,
+                "has_out": int(f[col["has_out"]]), "phase": int(f[col["phase"]]),
             })
     return {"rows": rows, "malformed": malformed, "has_n_scans": "n_scans" in (names or [])}
 

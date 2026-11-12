@@ -85,19 +85,26 @@ def parse_trace(path: str) -> Dict[str, Any]:
             f = line.split()
             if not f:
                 continue
-            if names is None or len(f) != 92:
+            if names is None:
                 malformed.append({"line": lineno, "ncols": len(f)})
                 continue
-            # The header names the first 14 scalars, then vec6 / Ppre6x6 / Ppost6x6 as three
-            # blocks. Parse by the declared block positions, not by zip(names, fields).
+            col = {name: i for i, name in enumerate(names)}
+            vec_start = names.index("r_chi2w") + 1
+            if len(f) != vec_start + 78:
+                malformed.append({"line": lineno, "ncols": len(f)})
+                continue
+            # Read scalars by NAME (v8 inserted n_scans); vec6/Ppre/Ppost are 6+36+36 blocks.
             rows.append({
-                "idx": int(f[0]), "rel_s": float(f[1]), "abs_ns": int(f[2]),
-                "grp_idx": int(f[3]), "scan_first_ns": int(f[4]),
-                "scan_last_ns": int(f[5]), "has_out": int(f[6]),
-                "phase": int(f[7]), "eff": int(float(f[8])),
-                "vec6": np.array([float(x) for x in f[14:20]]),
-                "Ppre": np.array([float(x) for x in f[20:56]]).reshape(6, 6),
-                "Ppost": np.array([float(x) for x in f[56:92]]).reshape(6, 6),
+                "idx": int(f[col["idx"]]), "rel_s": float(f[col["rel_s"]]),
+                "abs_ns": int(f[col["abs_ns"]]), "grp_idx": int(f[col["grp_idx"]]),
+                "scan_first_ns": int(f[col["scan_first_ns"]]),
+                "scan_last_ns": int(f[col["scan_last_ns"]]),
+                "n_scans": int(f[col["n_scans"]]) if "n_scans" in col else 1,
+                "has_out": int(f[col["has_out"]]), "phase": int(f[col["phase"]]),
+                "eff": int(float(f[col["eff"]])),
+                "vec6": np.array([float(x) for x in f[vec_start:vec_start + 6]]),
+                "Ppre": np.array([float(x) for x in f[vec_start + 6:vec_start + 42]]).reshape(6, 6),
+                "Ppost": np.array([float(x) for x in f[vec_start + 42:vec_start + 78]]).reshape(6, 6),
             })
     return {"names": names, "rows": rows, "malformed": malformed}
 
