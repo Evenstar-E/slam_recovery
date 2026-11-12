@@ -18,6 +18,7 @@ import hashlib
 import json
 import math
 import os
+import sys
 from collections import Counter, defaultdict
 from typing import Any, Dict, List, Optional
 
@@ -86,6 +87,24 @@ def sha256(path: str, chunk: int = 1 << 22) -> str:
     return h.hexdigest()
 
 
+def _tail_value(tail: Dict[str, float], leaf: str) -> Optional[float]:
+    for k, v in (tail or {}).items():
+        if k == leaf or k.endswith("_" + leaf):
+            return float(v)
+    return None
+
+
+def pose_from_tail(tail: Dict[str, float]) -> Optional[np.ndarray]:
+    """(x,y,z,qx,qy,qz,qw) from the v10 same-row post-pose tail, by name."""
+    if not tail:
+        return None
+    vals = [_tail_value(tail, k) for k in ("x", "y", "z", "qx", "qy", "qz", "qw")]
+    if any(v is None for v in vals):
+        return None
+    x, y, z, qx, qy, qz, qw = vals
+    return np.array([x, y, z, qx, qy, qz, qw], dtype=np.float64)
+
+
 def parse_trace(path: str) -> Dict[str, Any]:
     names: Optional[List[str]] = None
     rows, malformed = [], []
@@ -104,7 +123,16 @@ def parse_trace(path: str) -> Dict[str, Any]:
                 continue
             col = {name: i for i, name in enumerate(names)}
             vec_start = names.index("r_chi2w") + 1
-            if len(f) != vec_start + 78:
+            block_end = vec_start + 78
+            # v10 appends 7 same-row post-pose scalars after Ppost6x6; parse them by NAME.
+            tail_names = (names[names.index("Ppost6x6") + 1:]
+                          if "Ppost6x6" in names else [])
+            if len(f) == block_end:
+                pose_tail = None
+            elif len(f) == block_end + len(tail_names) and tail_names:
+                pose_tail = {name: float(f[block_end + i])
+                             for i, name in enumerate(tail_names)}
+            else:
                 malformed.append({"line": lineno, "ncols": len(f)})
                 continue
             # Read scalars by NAME (v8 inserted n_scans); vec6/Ppre/Ppost are 6+36+36 blocks.
@@ -119,6 +147,7 @@ def parse_trace(path: str) -> Dict[str, Any]:
                 "vec6": np.array([float(x) for x in f[vec_start:vec_start + 6]]),
                 "Ppre": np.array([float(x) for x in f[vec_start + 6:vec_start + 42]]).reshape(6, 6),
                 "Ppost": np.array([float(x) for x in f[vec_start + 42:vec_start + 78]]).reshape(6, 6),
+                "pose_tail": pose_tail,
             })
     return {"names": names, "rows": rows, "malformed": malformed}
 
@@ -230,6 +259,37 @@ def _phase_i(rows: List[Dict[str, Any]], exact_by_idx: Dict[int, np.ndarray]) ->
     return out
 
 
+def selftest_100col() -> Dict[str, Any]:
+    """One normal control: a 100-column v10 row parses, and the 7 pose values are exact."""
+    import tempfile
+    names = ["idx", "rel_s", "abs_ns", "grp_idx", "scan_first_ns", "scan_last_ns",
+             "n_scans", "has_out", "phase", "eff", "r_mean", "r_med", "r_abs_mean",
+             "r_chi2", "r_chi2w", "vec6", "Ppre6x6", "Ppost6x6",
+             "pose_x", "pose_y", "pose_z", "pose_qx", "pose_qy", "pose_qz", "pose_qw"]
+    pose_vals = [1.5, -2.0, 0.25, 0.1, 0.2, 0.3, 0.92736185]
+    scalars = [7, 12.5, 1627785261379575296, 42, 1627785261379575000,
+               1627785261379575296, 1, 1, 0, 99, 0.1, 0.2, 0.3, 4.0, 5.0]
+    vec6 = [0.01, -0.02, 0.03, -0.04, 0.05, -0.06]
+    Ppre = (np.eye(6) * 0.01).reshape(-1).tolist()
+    Ppost = (np.eye(6) * 0.02).reshape(-1).tolist()
+    fields = scalars + vec6 + Ppre + Ppost + pose_vals
+    assert len(fields) == 100
+    with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as fh:
+        fh.write("# ALI-H v1 trace\n# " + " ".join(names) + "\n")
+        fh.write(" ".join(str(x) for x in fields) + "\n")
+        path = fh.name
+    try:
+        tr = parse_trace(path)
+        ok_rows = len(tr["rows"]) == 1 and not tr["malformed"]
+        p = pose_from_tail(tr["rows"][0]["pose_tail"]) if ok_rows else None
+        ok_pose = p is not None and np.allclose(p, pose_vals, atol=1e-9)
+        return {"status": "PASS" if (ok_rows and ok_pose) else "FAIL",
+                "rows": len(tr["rows"]), "malformed": tr["malformed"],
+                "pose": None if p is None else p.tolist(), "expected": pose_vals}
+    finally:
+        os.unlink(path)
+
+
 def _compare_i(joined: List[Dict[str, Any]]) -> Dict[str, Any]:
     ex, ap, tr, xe, xa = [], [], [], [], []
     for r in joined:
@@ -252,6 +312,10 @@ def _compare_i(joined: List[Dict[str, Any]]) -> Dict[str, Any]:
 
 
 def main(argv=None):
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if argv and argv[0] == "selftest100":
+        print(json.dumps(selftest_100col(), indent=1))
+        return 0
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", required=True)
     args = ap.parse_args(argv)
@@ -267,9 +331,9 @@ def main(argv=None):
     summary = json.load(open(summary_path, encoding="utf-8"))
     # M2DGR is the published post-update pose, in the same order as the has_out trace rows
     # (975 rows vs 974 parsed has_out + 1 truncated). Verify the time offset, then align by order.
-    m2 = np.array([[float(x) for x in l.split()]
-                   for l in open(os.path.join(base, "host_logs", "M2DGR_room_02.txt"))
-                   if l.split()])
+    m2_path = os.path.join(base, "host_logs", "M2DGR_room_02.txt")
+    m2 = (np.array([[float(x) for x in l.split()] for l in open(m2_path) if l.split()])
+          if os.path.exists(m2_path) else np.zeros((0, 8)))
     ho_rows = [r for r in trace["rows"] if r["has_out"] == 1]
     # Join by time, not global row order. Replay repeats timestamps in both files, so within
     # one time group the k-th trace row (phase 0 then 1, trace order) takes the k-th pose row.
@@ -280,10 +344,18 @@ def main(argv=None):
     for i, (ns, _) in enumerate(pose_rows):
         groups[ns].append(i)
     exact_by_idx = {}
+    same_row_pose = 0
+    for r in ho_rows:
+        p = pose_from_tail(r.get("pose_tail"))
+        if p is not None:
+            exact_by_idx[r["idx"]] = exact_e(r["vec6"], quat_to_rot(p[3:7]))
+            same_row_pose += 1
     time_err = []
     used: Dict[int, int] = defaultdict(int)
     ambiguous_groups = 0
     for r in ho_rows:
+        if r["idx"] in exact_by_idx or len(m2) == 0:
+            continue
         ns = r["abs_ns"]
         i = bisect.bisect_left(pose_ns, ns)
         cands = []
@@ -450,6 +522,8 @@ def main(argv=None):
             "e_i_convention": ("host mixed convention: rot = R*Exp(d_rot) (body right), "
                                "pos = p + d_pos (world additive); rot=-w, t_body=-R_pre^T v, "
                                "then SE(3) Log t_log = so3_left_jacobian_inv(rot) @ t_body"),
+            "pose_source": ("same_row_post_pose when the row carries pose_x..qw (v10); "
+                            "M2DGR_room_02.txt time join only for legacy 92/93-column rows"),
             "pose_source_scope": "CONFIRMED_POST_POSE_TIME_JOIN applies to v8 124217Z only; "
                                  "v7 115734Z remains HEURISTIC_UNPROVEN",
             "i_qualification": "INCOMPLETE/UNKNOWN",
