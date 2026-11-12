@@ -61,6 +61,42 @@
    }
   },
   {
+   "test": "left perturbation is refused",
+   "status": "PASS",
+   "detail": {
+    "status": "INCOMPLETE",
+    "missing": [],
+    "errors": [
+     "declarations.perturbation must be right for this e_I convention"
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "test": "covariance in another frame is refused",
+   "status": "PASS",
+   "detail": {
+    "status": "INCOMPLETE",
+    "missing": [],
+    "errors": [
+     "covariance.frame must be pre_body (the tangent of inv(pre)*post)"
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "test": "missing covariance frame is refused",
+   "status": "PASS",
+   "detail": {
+    "status": "INCOMPLETE",
+    "missing": [],
+    "errors": [
+     "covariance.frame must be pre_body (the tangent of inv(pre)*post)"
+    ],
+    "warnings": []
+   }
+  },
+  {
    "test": "identity gives zero e_I",
    "status": "PASS",
    "detail": {
@@ -75,17 +111,23 @@
    }
   },
   {
-   "test": "rotvec+translation recovered",
+   "test": "rotvec+V^-1 translation recovered",
    "status": "PASS",
    "detail": {
     "e": [
      0.0,
      0.0,
      0.2,
-     0.1,
-     0.0,
+     0.09966644423259238,
+     -0.010000000000000002,
      0.0
-    ]
+    ],
+    "expected_trans": [
+     0.099666444232592,
+     -0.01,
+     0.0
+    ],
+    "old_bug_value_rejected": true
    }
   },
   {
@@ -93,8 +135,8 @@
    "status": "PASS",
    "detail": {
     "e": [
-     0.1,
-     0.0,
+     0.09966644423259238,
+     -0.010000000000000002,
      0.0,
      0.0,
      0.0,
@@ -107,14 +149,14 @@
    "status": "PASS",
    "detail": {
     "status": "OK",
-    "s": 0.05000000000000001,
+    "s": 0.05003340010596846,
     "rank": 6,
     "e": [
      0.0,
      0.0,
      0.2,
-     0.1,
-     0.0,
+     0.09966644423259238,
+     -0.010000000000000002,
      0.0
     ]
    }
@@ -124,14 +166,14 @@
    "status": "PASS",
    "detail": {
     "status": "OK",
-    "s": 0.05000000000000001,
+    "s": 0.05003340010596846,
     "rank": 5,
     "e": [
      0.0,
      0.0,
      0.2,
-     0.1,
-     0.0,
+     0.09966644423259238,
+     -0.010000000000000002,
      0.0
     ]
    }
@@ -146,11 +188,11 @@
      0.0,
      0.0,
      0.2,
-     0.1,
-     0.0,
+     0.09966644423259238,
+     -0.010000000000000002,
      0.0
     ],
-    "sum_squares": 0.05000000000000001
+    "sum_squares": 0.05003340010596846
    }
   }
  ],

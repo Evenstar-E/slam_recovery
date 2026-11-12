@@ -20,7 +20,7 @@
 
 | 字段 | 形状/含义 | 用途 |
 |---|---|---|
-| `P_minus` | 6×6，**更新前**位姿块 | 预测不确定度；仅在声明齐全时用 |
+| `P_minus` | 6×6，**更新前**位姿块 | 仅当声明为 **pre_body 的 right perturbation** 时才是 `e_I` 的协方差 |
 | `P_plus` | 6×6，**更新后**位姿块 | 同上 |
 | `vec` | 6，状态修正/扰动向量 | 与 `P` 同一状态顺序/参数化才可组合 |
 | `effct_feat_num` | 有效特征数 | 资格/可观测性上下文，不作概率 |
@@ -42,7 +42,9 @@
 3. 扰动方向：left 或 right（`T ⊞ δ` 的定义）；
 4. `P`、`vec`、位姿各自的 frame：body 或 world，及外参；
 5. bias 来源（真实估计值/常量及来源），不得用零 bias 假冒；
-6. `P_minus/P_plus` 是否可直接作 6D 协方差；若不可，写 `NOT_AVAILABLE`。
+6. `P_minus/P_plus` 是否可直接作 6D 协方差；若可用，必须声明 `covariance.frame = pre_body`
+   且 `covariance.perturbation = right`（`e_I` 的切空间）；left 或其它 frame 不转换，直接
+   `INCOMPLETE`；不可用则写 `NOT_AVAILABLE`。
 
 缺声明时：不猜、不转置、不混合左右扰动；该帧记 `INCOMPLETE` 并列出缺项。
 
@@ -51,6 +53,9 @@
 \[
 e_I = \mathrm{Log}\left(\Delta T_{\text{IMU,preupdate}}^{-1}\,\Delta T_{\text{host,observed}}\right)
 \]
+
+SE(3) Log 的平移是 `rho = V(w)^-1 * t`（`V` 为左 Jacobian），**不是直接取 `t`**；
+`s_i` 只能使用与 `e_I` 同一切空间（pre_body、right）的 6×6 协方差。
 
 - 两端必须对应**相同实际起止传感器时刻**、同一基、同一外参；
 - 平移与旋转**分开保留**，不把米与弧度无声明相加；

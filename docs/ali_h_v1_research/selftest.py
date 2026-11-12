@@ -178,6 +178,33 @@ def test_6_shadow_leaves_old_decision_unchanged():
         "block_counts": block_counts, "state_counts_frames": frame_counts}
 
 
+def test_7_dwell_does_not_cross_missing_block():
+    """A gap (or a NO_DATA block) breaks the two-adjacent-block dwell; last_suspect is kept."""
+    calib = calib_all()
+    # Two adjacent alarms -> SUSPECT at block 9. A later alarm alone after a gap must stay UNKNOWN.
+    out = ali.classify_blocks([block(8, m="ALARM"), block(9, m="ALARM"), block(12, m="ALARM")],
+                              calib)
+    ok_gap = out[1]["state"] == "SUSPECT" and out[-1]["state"] == "UNKNOWN"
+    ok_keep = out[-1]["last_suspect_block"] == 9
+    nodata = {"block_id": 10, "verdicts": {k: {"verdict": "NO_DATA", "u": None}
+                                           for k in ("M", "T", "I")}}
+    out2 = ali.classify_blocks([block(8, m="ALARM"), block(9, m="ALARM"), nodata,
+                                block(11, m="ALARM")], calib)
+    ok_nodata = out2[2]["state"] == "UNKNOWN" and out2[-1]["state"] == "UNKNOWN"
+    ok_keep2 = out2[-1]["last_suspect_block"] == 9
+
+    def fake(bid):
+        return {"block_id": bid, "map_support": "LOW", "old": {"status": "UNAVAILABLE"},
+                "channels": {ch: {"name": ch, "present": False, "fresh": False, "score": None,
+                                  "reason": None} for ch in ("M", "T", "I")}}
+    blocks = ali.block_summary([fake(8), fake(12)], ali.Calibration())
+    ok_fill = ([b["block_id"] for b in blocks] == [8, 9, 10, 11, 12]
+               and all(b["context"] == "NO_DATA" for b in blocks[1:4]))
+    return ok_gap and ok_keep and ok_nodata and ok_keep2 and ok_fill, {
+        "gap_only_last": out[-1], "no_data_last": out2[-1],
+        "filled_block_ids": [b["block_id"] for b in blocks]}
+
+
 TESTS = [
     ("T1.1 low support cross-modal consistency / T-only", test_1_low_support_cross_modal_consistency),
     ("T1.2 low support qualified conflict -> SUSPECT", test_2_low_support_qualified_conflict),
@@ -185,6 +212,7 @@ TESTS = [
     ("T1.4 per-source calibration and scope", test_4_per_source_calibration_and_scope),
     ("T1.5 SE(3) and time contract", test_5_frame_and_time_contract),
     ("T1.6 shadow leaves old decision unchanged", test_6_shadow_leaves_old_decision_unchanged),
+    ("T1.7 dwell does not cross a missing block", test_7_dwell_does_not_cross_missing_block),
 ]
 
 
