@@ -1038,3 +1038,26 @@ S1 复核 S3 `4e18de9`（合入）。基准 `eeedb7f`（node hash 5877388c）；
 
 仍 BLOCKED：比例数值、参考快照身份、kf26–64 二次空 reference 原因、与漂移的因果——正是 `--availability-log`
 要交的原件。S3 另列了 3 个候选选项（诊断分解/双参考支持/位姿-地图分解），只列未实现，留待用户选择。
+
+## 89. 检测 on 诊断原件：UNAVAILABLE 主导原因是支持比例，不是 NIS 缺失
+
+S1 复核 S2 `040fd24`（合入，203 测试）。run `fl_native_20261112T065500Z_187992`：`--detection on`、
+非 scripted、无注入；驱动 sha `93f69356…`（= `c35b162`）、宿主库 `9c0330be…`、bag `c3e905da…`；终态 HEALTHY。
+
+| 项 | 实际（本机从 gz 原件复算） |
+|---|---|
+| 行数 | **402 = paired 402**，无 2000 截断；`status != status_from_conditions` **0 处** |
+| 支持 | `empty_reference` **22**（5.47%）、比例 <0.60 **285**（70.90%）、通过 95（23.63%） |
+| NIS | `computed` **401**（99.75%）、`not_computed:no_reference` **1**；`carried_forward` 0；inf/nan 0 |
+| 联合 | support F & NIS T 306；F & F 1；T & T 95 |
+| 连续段 | 0–21（22）、53–117（65）、118–156（39）、157–170（14）、171–179（9）、180–182（3）、183–198（16）、199–401（203）；早期两段合计 87 帧 |
+| 复算（反例） | kf53：200 抽样、within 39 → 0.195，NIS 300/300、mean χ² 10.156722 = 报告；kf157：63/200 → 0.315、NIS 403.642606、valid 23/300、coverage 0.077；两者 status 重算 UNAVAILABLE |
+| 复算（正常） | kf22 只保存 20/200 与 20/300，子样本复算 0.75 vs 0.88、0.889 vs 18.281 —— 任务允许的固定预算缺项，已记录 |
+
+**结论**：本段 UNAVAILABLE 是**支持谓词比例不足**（285/307），不是 NIS 缺失（401/402 有有限 NIS，含 prev_scan）。
+`carried_forward`、缺 pose/scan 两类分支本 run **NOT_EXERCISED**；精确最近距离诊断 **NOT_EXECUTED**
+（不把首个命中距离当全局最近）；比例为何持续 <0.60 **UNKNOWN**，不从 unsupported 推漂移。
+检测/阈值/门/模型未改。
+
+**版本说明**：S2 运行时 `reason` 字段把"已评估但未过阈值"也写成 `ok`；S1 随后（`8d6e4ed`）改为
+`fraction_below_threshold` 并加测试，原件仍按 pass=false 计数，语义不受影响。
