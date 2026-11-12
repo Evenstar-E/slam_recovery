@@ -474,6 +474,18 @@ class TrustedMapTransactionManager:
             self.provisional_queue.clear()
             self.active_quarantine = new_segment
             self.state = new_state
+            # An accepted candidate that leaves nothing pending ends the quarantine. The driver
+            # releases the host's map hold from lifecycle events, and this path used to emit
+            # none: a full Mode 2 commit returned to HEALTHY silently and the host kept its
+            # map hold, so the repaired map was never written again.
+            if new_state == RecoveryState.HEALTHY and new_segment is None and old_segment is not None:
+                self.lifecycle_events.append({
+                    "event": "commit_closed",
+                    "segment_id": old_segment.segment_id,
+                    "trusted_version": int(new_version),
+                    "n_committed": len(committed_keys),
+                    "t_end_ns": int(old_segment.t_end_ns),
+                })
             if new_state == RecoveryState.WAITING_FOR_EVIDENCE and new_segment is not None:
                 self.wait_started_ns = int(new_segment.t_end_ns)
                 if os.environ.get("SLAM_RECOVERY_WAITDIAG"):

@@ -1,0 +1,137 @@
+{
+ "_meta": {
+  "what": "C-2 research patch, not integrated",
+  "voxel_m": 0.25,
+  "radius_m": 0.6,
+  "min_neighbours": 6,
+  "max_eval_points": 1200,
+  "sigma_fim": 0.075,
+  "changes": [
+   "voxel centroid sample",
+   "radius neighbourhood"
+  ],
+  "unchanged": [
+   "mean over points",
+   "1/sigma^2",
+   "eigen analysis",
+   "weak direction",
+   "1e-6 regularisation"
+  ]
+ },
+ "old_stride_knn": {
+  "rows": [
+   {
+    "input": "8000",
+    "points": 8000,
+    "projection": 40.9111,
+    "min_eig_rot": 807.1444,
+    "min_eig_trans": 40.9111
+   },
+   {
+    "input": "4000_half",
+    "points": 4000,
+    "projection": 40.9111,
+    "min_eig_rot": 807.1444,
+    "min_eig_trans": 40.9111
+   },
+   {
+    "input": "16000_duplicated",
+    "points": 16000,
+    "projection": 45.6685,
+    "min_eig_rot": 895.1644,
+    "min_eig_trans": 44.0424
+   },
+   {
+    "input": "32000_quadrupled",
+    "points": 32000,
+    "projection": 44.8741,
+    "min_eig_rot": 1108.0816,
+    "min_eig_trans": 43.0455
+   }
+  ],
+  "projection_spread": 0.1104,
+  "min_eig_trans_spread": 0.0742
+ },
+ "new_voxel_radius": {
+  "rows": [
+   {
+    "input": "8000",
+    "points": 8000,
+    "projection": 1.121,
+    "min_eig_rot": 262.6958,
+    "min_eig_trans": 8.9884
+   },
+   {
+    "input": "4000_half",
+    "points": 4000,
+    "projection": 3.2381,
+    "min_eig_rot": 179.8074,
+    "min_eig_trans": 7.3638
+   },
+   {
+    "input": "16000_duplicated",
+    "points": 16000,
+    "projection": 1.121,
+    "min_eig_rot": 262.6958,
+    "min_eig_trans": 8.9884
+   },
+   {
+    "input": "32000_quadrupled",
+    "points": 32000,
+    "projection": 1.121,
+    "min_eig_rot": 262.6958,
+    "min_eig_trans": 8.9884
+   }
+  ],
+  "projection_spread": 1.2829,
+  "min_eig_trans_spread": 0.1893
+ },
+ "new_voxel_knn": {
+  "rows": [
+   {
+    "input": "8000",
+    "points": 8000,
+    "projection": 3.8379,
+    "min_eig_rot": 309.7466,
+    "min_eig_trans": 22.1192
+   },
+   {
+    "input": "4000_half",
+    "points": 4000,
+    "projection": 13.903,
+    "min_eig_rot": 367.9915,
+    "min_eig_trans": 33.9195
+   },
+   {
+    "input": "16000_duplicated",
+    "points": 16000,
+    "projection": 3.8379,
+    "min_eig_rot": 309.7466,
+    "min_eig_trans": 22.1192
+   },
+   {
+    "input": "32000_quadrupled",
+    "points": 32000,
+    "projection": 3.8379,
+    "min_eig_rot": 309.7466,
+    "min_eig_trans": 22.1192
+   }
+  ],
+  "projection_spread": 1.584,
+  "min_eig_trans_spread": 0.4707
+ },
+ "same_scan_difference": {
+  "projection_old_own_v": 40.9111,
+  "projection_new_own_v": 1.121,
+  "old_v_in_old": 40.9111,
+  "old_v_in_new": 25.5824,
+  "min_eig_rot_old_new": [
+   807.1444,
+   262.6958
+  ],
+  "min_eig_trans_old_new": [
+   40.9111,
+   1.121
+  ]
+ }
+}

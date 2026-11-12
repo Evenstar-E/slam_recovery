@@ -27,8 +27,21 @@ from slam_recovery.ros.recovery_node import NativeClosedLoop
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
 
 WORLD = TangentFrame("world", "rot_trans", "world")
+FRAME = TangentFrame("body", "rot_trans", "fixture")
 V = np.array([0.0, 0.0, 0.0, 1.0, 0.0, 0.0])
 INFO_BEFORE = np.diag([60.0, 60.0, 60.0, 20.0, 40.0, 40.0])
+
+
+def _delta(ts_sec: float, kf_id: int, x_pos: float):
+    from slam_recovery.core import BackendDelta
+
+    pose = np.eye(4, dtype=np.float64)
+    pose[0, 3] = x_pos
+    return BackendDelta(
+        timestamp_ns=int(ts_sec * 1e9), frame_id="map", pose_se3=pose,
+        velocity=np.zeros(3), bias_acc=np.zeros(3), bias_gyr=np.zeros(3),
+        cov_6x6=np.eye(6) * 0.01, info_6x6=np.eye(6) * 100.0,
+        nis_value=1.0, nis_dof=6, factor_ids=[kf_id * 10], keyframe_id=kf_id)
 
 
 def _open_waiting_segment(mgr, t_end_ns: int = 0):
@@ -70,6 +83,70 @@ class TestWaitLimit(unittest.TestCase):
         mgr.maybe_close_waiting_segment(2_000_000_000)
         self.assertTrue(mgr.rearm())
         self.assertIs(mgr.state, RecoveryState.HEALTHY)
+
+
+class TestAcceptedCommitReleasesTheHold(unittest.TestCase):
+    """An accepted repair must also tell the host it may write again.
+
+    `resume` was sent only for a `rearm` event, and `rearm` is produced only after a wait
+    closed unresolved. A full Mode 2 commit cleared the quarantine directly to HEALTHY and
+    appended nothing, so on the accepted path the host's map hold was never released -- the
+    repair would be committed and map writing would stay stopped for the rest of the run.
+    Both controlled-chain segments were refusals, so this path was never exercised.
+    """
+
+    def _accepted_commit(self):
+        from slam_recovery.core import CandidateMap, GateThresholds
+
+        mgr = TrustedMapTransactionManager(
+            confirmation_margin_ns=int(2.0 * 1e9),
+            gate_thresholds=GateThresholds(tau_abs_min=25.0, tau_val_nis=2.5,
+                                           sigma_tol=0.5, sigma_bridge=4.0),
+        )
+        mgr.step_healthy(_delta(1.0, 1, 1.0))
+        mgr.step_healthy(_delta(4.0, 2, 2.0))
+        segment = mgr.trigger_quarantine(
+            estimated_onset_ns=int(3.5 * 1e9),
+            current_ns=int(6.0 * 1e9),
+            weak_direction_6d=np.array([0, 0, 0, 1, 0, 0], dtype=np.float64),
+            info_before_6x6=np.diag([60, 60, 60, 3.0, 60, 60]),
+            propagated_cov_norm=1.8,
+            weak_direction_frame=FRAME, info_before_frame=FRAME,
+            anchor_pose_world=np.eye(4),
+        )
+        candidate = CandidateMap(
+            candidate_id="accepted_repair",
+            parent_map_version=mgr.trusted_version,
+            repaired_poses={2: np.eye(4)},
+            info_after_6x6=np.diag([60, 60, 60, 45.0, 60, 60]),
+            cov_after_6x6=np.eye(6) * 0.05,
+            holdout_nis=1.2,
+            paired_benefit_approved=True,
+            wilson_lower_bound=0.90,
+            reentry_pos_jump_m=0.05,
+            info_after_frame=FRAME,
+            cov_after_frame=FRAME,
+        )
+        return mgr, segment, mgr.validate_and_resolve(candidate)
+
+    def test_a_full_commit_records_that_the_quarantine_closed(self):
+        mgr, segment, report = self._accepted_commit()
+        self.assertTrue(report.accepted)
+        self.assertIs(mgr.state, RecoveryState.HEALTHY)
+        self.assertIsNone(mgr.active_quarantine)
+        events = [e["event"] for e in mgr.lifecycle_events]
+        self.assertIn("commit_closed", events,
+                      "the accepted path returned to HEALTHY without saying so")
+        event = mgr.lifecycle_events[-1]
+        self.assertEqual(event["event"], "commit_closed")
+        self.assertEqual(event["segment_id"], segment.segment_id)
+        self.assertEqual(event["n_committed"], 1)
+
+    def test_a_refused_candidate_records_no_close(self):
+        mgr = TrustedMapTransactionManager(wait_limit_ns=5_000_000_000)
+        _open_waiting_segment(mgr)
+        self.assertNotIn("commit_closed",
+                         [e["event"] for e in mgr.lifecycle_events])
 
 
 class TestNodeRearm(unittest.TestCase):

@@ -198,6 +198,22 @@ class CheckpointWiringTest(unittest.TestCase):
             time.sleep(0.005)
         self.assertEqual(client.resumes, 1)
 
+    def test_an_accepted_commit_writes_resume(self):
+        # The accepted path ends the quarantine with `commit_closed`, not `rearm`; the host
+        # releases its map hold on the same command either way.
+        client = CheckpointClient(self.dir, ack_timeout_s=5.0)
+        loop, node = self._loop(client)
+        client.collect(timeout_s=5.0)
+        node.tx_mgr.lifecycle_events.append(
+            {"event": "commit_closed", "segment_id": "s", "n_committed": 1})
+        loop._apply_lifecycle()
+        self.assertEqual(self._wait_seen(2), ["hold", "resume"])
+        deadline = time.time() + 3.0
+        while time.time() < deadline and client.resumes == 0:
+            client.poll()
+            time.sleep(0.005)
+        self.assertEqual(client.resumes, 1)
+
     def test_lifecycle_events_are_only_acted_on_once(self):
         client = CheckpointClient(self.dir, ack_timeout_s=5.0)
         loop, node = self._loop(client)
