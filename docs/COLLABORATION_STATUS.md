@@ -1143,3 +1143,19 @@ run `fl_native_20261112T072902Z_207524`（同声明）：
 最小修法（S1 决定并派工）：宿主在 reprocess ack 暴露 `replay_suffix=`（日志已有），驱动在后缀 >0 时**跳过 set_state**；
 约 10 行宿主 + 10 行驱动 + 单测，再跑一次同声明受控 run 验证 resume 时 state/map 同一时刻。
 门/阈值/σ 未动；可用性诊断保持暂停。
+
+## 95. repair-f3 / 70531be增量：诊断分支接受，参考几何因果及修复E2未闭合
+
+[核验](review_20261112_70531be/README.md)S1实现/S2检测on065500Z新原件13SHA一致，402paired全行一致、95可用/307不可用；22参考空+285比例不足，401新算finiteNIS/1无NIS，carried/nonfinite0。306有NIS且support失败包括21空参考，不是306比例不足，后继更正REPORT§6不重跑。kf157 support.315/NIS403.6426前置排除真实，mask/残差内部复算接受，但reference/cache坐标身份未存/KNN不可独立重建/正常边界裁20点不可全复算；post-cap row非原row，target正常反例12原点cap4写0/1/2/3实际0/3/6/9，最低复用finite/stride映射。
+
+三次真实online拒绝/restore/resume和后继重武装接受，实际repair off/0commit/reprocess/applied、14snapshot超时、HEALTHY/wiring非恢复成功；有后两事件路径但无首次修复，不补用户repair后E2。历史87不同身份不合并；S3/tmp跨版本统计仅开发分析。本机12帧9不可用/3可用target/base/log输出与trusted状态同、8test PASS.043s、Git Bash语法PASS，无host/bag/算法参数；pytest辅助两项未跑不装。A3/B3局部取证进步不总分。
+
+S1可并行最小补当时reference/cache身份与必要坐标、原row和少数完整正常边界，S2下一已有预算run随附或具体缺项，不新起诊断矩阵/事后造旧参考；只挡诊断强因果，不把日志挡全部native。S1/S2唯一主线继续物理一致修复→native完整state/map→保后缀追赶→接回/E2或首断点；已验23替换复用、v3后缀/成功依赖未改不重测。S3回既定门研究专用/旧参数停，选项不自动实施；逐项自检状态/实际命令/原件/失败/成本/质量UNKNOWN，不调冻结门。独立review SSH提交推送、不合main不改算法旧历史/private保护，开发新意见接收另待回执。
+
+## 96. repair-f3 / 4740d94增量：预测支持不是独立因果标签，开放终态如实保留
+
+[核验](review_20261112_4740d94/README.md)070801Z新run14SHA/gz/raw及target driver绑定，544paired/480预测完整mask通过；61空参考+351比例不足、132可用/412不可用，301双方低/82双方过/50仅host低/47仅pred低/null64。132=82+47+3无预测host过，不是NIS差；REPORT HEALTHY与三原件WAITING_FOR_EVIDENCE/open=true相反，8拒绝/restore8/resume7/reprocess0真实保留，未修复/E2。预测提高只证明support敏感性，不唯一证明漂移，两者都低不能排除共源pose/外推失效；147段长仅50跨门，分段null/有效人口和191/54标签需集中更正，不为文字重跑。
+
+source预测无horizon界/一trusted返回last非null，kf21原件及actual-method控制确认；最低记录已有key/戳/预测T/horizon、同次reference/cache与原row，旧缺项未修不重测，不先加预测器/阈值。12帧9不可用/3可用base/target/log输出同，全部package Git bytes加载、-I archive reader无host/bag，pytest辅助新test未跑不安装。跨run人口不同不唯一归因负载；S3旧/tmp统计不新同版本证据。仓库“用户选中”仅开发转述无本机直接选择证据，不自动批准双参考或部署替代策略。
+
+S1/S2唯一主线继续物理一致实际修复→native完整state/map→保后缀catch-up→接回/E2或首断点，已验替换复用，v3后缀/成功依赖未改；诊断补元数据/真实分母与因果限定可并行只挡强诊断主张，不继续日志矩阵代native。S3回既定门A/B/C研究专用、旧参数停；自检逐项状态/命令/原件/失败/成本/质量UNKNOWN，A3/B3局部观察不总分。独立review SSH提交推送、不合main不改算法历史/冻结门/private保护；target早于fe56883发布不指控忽略，新意见接收待实际回执。
