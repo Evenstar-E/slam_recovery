@@ -63,8 +63,11 @@ Mode 3 等待超时关闭后产生。Mode 2 完整提交在 `pending` 为空时�
 - 部分提交（`pending` 非空 → `WAITING_FOR_EVIDENCE`）不产生该事件，也不放写（见 §3）。
 - 测试：`test_lifecycle_rearm.py::TestAcceptedCommitReleasesTheHold`（接纳产生事件、拒绝不产生）、
   `test_checkpoint_client.py::test_an_accepted_commit_writes_resume`（`commit_closed` 也写 `resume`）。
-- **边界**：这条路径只有单测覆盖，没有宿主运行证据；下一次受控整链若被接纳，`resume` 的
-  实际发出与应用要在 receipt 的 `native_checkpoint_actions` 里核对。
+- **边界**：两次受控接纳 run（2026-11-12）都**没有走到** `commit_closed`：隔离 population
+  从回滚帧起（kf 95），驱动候选从触发帧起（kf 133），提交必为 partial，`WAITING_FOR_EVIDENCE`
+  保持到 wait 超时，放写由 `rearm` 发出（两 run 的 resume action `trigger` 均为 `rearm`）。
+  用户 2026-11-12 决定**保持现协议**，不把候选总体扩到隔离总体；因此 `commit_closed→resume`
+  仍是单测覆盖的代码路径，不是已观测事实。
 
 ---
 

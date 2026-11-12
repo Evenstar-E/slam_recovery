@@ -457,3 +457,19 @@ S3专用研究纠正这个小控制并保留缺candidate/独立质量BLOCKED；S
 | 断点 3 | 驱动记账卡死（队头 reprocess 永不被认领，`native_checkpoint.events` 停在 `hold`）——同一修复消除；本机复核 events 仅 11 条、末条 `hold` |
 | 未解释 | 宿主收尾时 `double free or corruption (out)` 一行，发生在前两次运行没有；未定位，已记录 |
 | 不能声称 | `commit_closed→resume` 走通、接纳后地图已被 reprocess 重建、驱动侧记录了 resume |
+
+## 43. 串行化验证 run：reprocess→set_state→resume 各一次并执行；协议保持
+
+以下为 S1 复核 S2 原始件 `docs/review_20261112_accepted_chain/run_fl_native_20261112T022158Z_4156288/`
+（合入 `bf965bf`）。
+
+| 项 | 实际状态 |
+|---|---|
+| 门 | 同一绝对戳/声明，Mode 2 accepted：before 3.1388 → after 6.6761（≥6.2776）、Wilson 0.9197、holdout 0.4412；committed 31 / deferred 81（仍 partial） |
+| 命令通道 | `native_checkpoint.events`：hold → reprocess → set_state → resume，**各有且仅各一条**；reprocess 应用耗时 5.5 s，set_state/resume 各 0.5 s；resume `trigger=rearm` |
+| 重放 | `host.log` `[NATIVE_CHECKPOINT] reprocess #1: 416 frames replayed …, map now 19194 voxels/362286 points`（checkpoint 15161/298650）；`repairs applied=0` |
+| 放写 | resume ack `hold=0 held_frames=171`；之后快照持续增长到 56639 voxels（末条） |
+| 口径修正 | “hold 窗口内 `Update Voxel Map`=0” 在有 reprocess 的 run 里不适用：`reprocessCheckpoint` 重放期间临时清 `map_hold_`（`LIVMapper.cpp:933-977`，本机核对），窗口内写图来自重放 |
+| 限制 | `repairs applied=0`：重放用的是宿主自己的原始扫描，候选的“修复”只通过末尾 `set_state` 进入；不能声称“用修复测量重建了地图” |
+| 用户决定 | 2026-11-12：**保持现协议**（候选总体不扩到隔离总体）；`commit_closed` 仍不可达，按接受限制记录 |
+| double free | 本轮未出现；上轮那行保持原记录，未推测 |
