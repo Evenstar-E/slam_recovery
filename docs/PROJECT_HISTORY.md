@@ -665,3 +665,11 @@ ALI-B2记录未变/用户确认空，78de840最低解除意见尚未入target不
 可读最终common_lib混合旋转右body+平移world加性，反证BUILD统一body cov；原vec/P非直接右SE3残差/Sigma，最低真实来源与映射或unit-only，不能改frame字符串冒转换。最终完整v7u LIVMapper/voxel patch未上，清单自hash/host logs未列集中补现来源不为此重跑。v7s5探针原件PASS alive25s但teardown smash保留，不单凭首帧前崩定根因。
 
 新detection-on两run首自动事件restore实际FAIL valid0；on接纳42段cp晚qstart19.914598827s/applied0 dropped42/within0 suffix311，原生具体断点已实证。旧on112753也用E2cp修0/丢23，buffered回E1cp修23但换库，flush/单槽覆盖唯一cause UNKNOWN。S1/S2优先在手事件合法cp/capture绑定→实际修复/明确拒绝→全部后继归宿，不继续trace/参数矩阵追成功；S3真实I资格/完整UNKNOWN与校准标签并行。新协议已知尾结果后删除E2尾段错误率人口，不接受作为预注册完整结果；最低保全部人口/缺测NOT_EVALUABLE、明确偏离与条件子集，尾机制相容非唯一原因/GT标签。ALI-B2用户确认仍空不代选C，未阻工作继续，三组件旧修正复用不重测。A2归档推进但A1/A11关联FAIL、A4/A5/A8/B2自动native范围FAIL，不全表评分/闭环承诺；四Cron/noCodex/参数停、中文review SSH/private保护，不算法ROS/main历史门。
+
+## 83. d7cbbf5＋e991eaf：无scripted自动修复42实际应用接受，前两rolling cp晚与物理修复未知
+
+[核验](review_20261112_d7cbbf5/README.md)固定20:27 fetch主线d7cbbf5/online归档e991eaf。driver SHA62c165d1绑定实际receipt，五数据SHA一致，纯detection on无scripted命令，5自动段/1接纳3拒绝1异常。ep3实际发布/收到/应用42、丢0、759within+615suffix、无set_state，A2/A6/A10局部自动执行实证增加，不沿旧“全受控”结论；门committed11不等42正确修复，ALI未接线/完整净收益未证。
+
+cp ACK可核：ep0/1晚qstart3.900276288/3.833658888s，ep3早8.695748613s；早晚范围不是EXPECTED_UNKNOWN就免验。新增metadata在async发送后/collect前复制actual，五段null但四实际ACK已有戳，最小正常控制复现；scripted request980/actual975合法前组仍错MISMATCH，最低现poll/collect/summary晚派生ACK、请求/边界与actual分开关系，不精确等值或新容差。旧restore记录trigger-margin错来源未修、catchup未实现，记录收口并行不挡native。cand0004实际No active quarantine，恢复无ACK/末HEALTHY/openfalse不抹异常未决4，S1最小段生命周期同步。
+
+42修复扫描全部在声明注入窗后，bias估+.75m，应用不证明注入测量修回/正常后继未误改；最低现点/候选/参考/时间人口确认修复对象与独立代价，未知不硬判全错或净收益。availability529=194A335U/computed528，trace1568全92列/phase682/hasout1439但first全−1，pre/out3145/2887仍无物理配对。S3声称旧115734 T2 I504/rank6/120全UNKNOWN/1.97s218MB无脚本结果manifest上main或online，仍devreported；上一不同last分箱非成员证明，−vec非精确SE3、混合cov与完整尾人口问题沿fa355不重测。ALI-B2无实际用户确认，S1合法rolling/active段/物理一致native→全部归宿，S2宿主、S3真实资格标签并行/noCodex/手调停；四Cron/状态命令原件自检、局部不全表分，中文review SSH/private保护，不算法ROS/main历史冻结门。
