@@ -1,0 +1,67 @@
+--- a/src/LIVMapper.cpp
++++ b/src/LIVMapper.cpp
+@@ -940,24 +940,21 @@
+   std::vector<double> group_times;              // lio_time of every replayed group
+   group_spans.reserve(n);
+   group_times.reserve(n);
+-  size_t replayed = 0, truncated = 0;
++  size_t replayed_within = 0, replayed_suffix = 0;
+   for (size_t i = 0; i < n; ++i)
+   {
+-    // An optional terminal stamp bounds the replay to the frames the decision actually scored.
+-    // Without it, the host captures every frame that arrives while the driver publishes repairs
+-    // and waits for receipts, and the replay span moves with wall-clock compute.
++    // The terminal stamp bounds *repair matching* only. The groups captured after it were already
++    // consumed live once, and the restore rolled that consumption back; skipping them here would
++    // leave the host's state and map behind the boundary it had actually reached. They are
++    // replayed with their original measurements, in order, and counted separately.
+     const LidarMeasureGroup &cand = replay_buffer_[i];
+     double cand_end = (!cand.measures.empty() && cand.measures.back().lio_time > 0)
+                           ? cand.measures.back().lio_time
+                           : -1.0;
+-    if (end_stamp_ns > 0 && cand_end > 0 &&
+-        (int64_t)std::llround(cand_end * 1e9) > end_stamp_ns)
+-    {
+-      ++truncated;
+-      continue;
+-    }
++    const bool within_end = !(end_stamp_ns > 0 && cand_end > 0 &&
++                              (int64_t)std::llround(cand_end * 1e9) > end_stamp_ns);
+     LidarMeasures = cand;
+-    ++replayed;
++    if (within_end) ++replayed_within; else ++replayed_suffix;
+     // A repaired scan for this frame replaces the measurement the host originally used. This is
+     // where the substitution belongs: a repair is decided after the frame was processed, so it can
+     // only enter through the replay -- the live path has usually consumed the group already.
+@@ -970,7 +967,7 @@
+     {
+       group_spans.emplace_back(LidarMeasures.native_scan_first, LidarMeasures.native_scan_last);
+     }
+-    if (apply_repairs) applyRepairedScan(LidarMeasures);
++    if (apply_repairs && within_end) applyRepairedScan(LidarMeasures);
+     handleFirstFrame();
+     processImu();
+     // Whether the frame actually carried points is the difference between a replay and an empty
+@@ -1041,16 +1038,17 @@
+     cp_control_valid_ = true;
+   }
+   cp_replays_++;
+-  cp_replay_frames_ += replayed;
++  cp_replay_frames_ += replayed_within + replayed_suffix;
+   ROS_INFO("[NATIVE_CHECKPOINT] replay points: with_points=%zu empty=%zu total_undistorted=%zu "
+            "| LIO frames=%zu with_points=%zu empty=%zu | VIO frames=%zu",
+            replay_frames_with_points_, replay_frames_empty_, replay_points_total_,
+            replay_lio_frames_, replay_lio_with_points_, replay_lio_empty_, replay_vio_frames_);
+   ROS_INFO("[NATIVE_CHECKPOINT] reprocess #%zu: %zu frames replayed over [%.9f .. %.9f], "
+-           "repairs applied=%zu queued=%zu, replayed=%zu truncated=%zu end_stamp=%lld, "
+-           "map now %zu voxels/%zu points",
+-           cp_replays_, replayed, span_lo, span_hi, repaired_applied_, repaired_clouds_.size(),
+-           replayed, truncated, (long long)end_stamp_ns,
++           "repairs applied=%zu queued=%zu, replayed_within_end=%zu replayed_suffix=%zu "
++           "end_stamp=%lld, map now %zu voxels/%zu points",
++           cp_replays_, replayed_within + replayed_suffix, span_lo, span_hi,
++           repaired_applied_, repaired_clouds_.size(),
++           replayed_within, replayed_suffix, (long long)end_stamp_ns,
+            voxelmap_manager->voxel_map_.size(),
+            native_checkpoint::countPoints(voxelmap_manager->voxel_map_));
+   return true;
