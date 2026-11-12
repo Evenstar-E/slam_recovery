@@ -2302,3 +2302,16 @@ malformed、0 rows**。这是本轮实证的最小接线断点（失败发生在
 
 审阅同时确认：v10 的 inline post pose 源码正确（`StateEstimation` 后写 `_state`）、构建与 5/5 探针档案限定通过、
 协方差仍 `NOT_AVAILABLE_FOR_E_I`（声明文字不产生转换/相关性模型）。
+
+## 156. v10 消费缺口已修：两个 parser 接受 92/93/100，同行 post pose 优先；资格两处收窄
+
+S3 `f90a748`（已合入 main），本机核对：
+- `t2_run.parse_trace` 与 `t2_join_upgrade.parse_trace` 按表头名接受 92/93/100；100 列时 `Ppost6x6` 之后的 7 个
+  `pose_x…qw` 解析为 `pose_tail`；`python -I t2_run.py selftest100` 输出 `status=PASS, rows=1, malformed=[]`，
+  `qw=0.92736185` 与输入逐位一致；
+- 100 列路径**用同行 post pose 算 e_I，不再回落 M2DGR**；仅 92/93 旧行用 M2DGR 且只作交叉核对；meta 增
+  `pose_source`/`same_row_post_pose_rows`；
+- `T2_I_ELIGIBILITY.md`：v8 post → `ASSERTED_NOT_VERIFIED/INCOMPLETE`、v8 carryover → `ASSERTED_NOT_VERIFIED`
+  （`n_scans` 只计新 pop raw、carryover 在 cur/next）；`mat_lio_*` 无 key 前不用于 I 资格。
+
+v7/v8 数值与人口未变；分类/错误率仍 `NOT_EVALUABLE`。等 S2 的 v10 trace + `mat_lio_*` key。
