@@ -57,11 +57,14 @@
     "ncols": 53
    }
   ],
+  "TRUNCATED_ROW": 1,
   "phase1_rows": 156,
   "has_out_rows": 974,
   "groups": 885,
   "duplicate_groups": 156,
-  "scan_first_sentinel_all": true
+  "scan_first_sentinel_all": true,
+  "m2dgr_rows": 975,
+  "m2dgr_time_err_ns_max": 512
  },
  "join": {
   "availability_rows": 531,
@@ -79,6 +82,15 @@
    "2": 117
   },
   "multi_grp_idx_rows": 257,
+  "shared_last_groups": 295,
+  "grp_per_last_distribution": {
+   "1": 295,
+   "2": 295
+  },
+  "avail_rows_per_last_distribution": {
+   "1": 296,
+   "2": 117
+  },
   "multi_grp_idx_row_examples": [
    0,
    1,
@@ -116,29 +128,41 @@
   "I_rank6": 504,
   "I_e_norm": {
    "min": 0.0,
-   "median": 0.018267771874565623,
-   "max": 1.544963135028306
+   "median": 0.01826777187456562,
+   "max": 1.5449631350283055
   },
   "I_s": {
    "min": 0.0,
-   "median": 66.86904947448734,
-   "max": 5937.929410428376
+   "median": 73.02134738121339,
+   "max": 5953.314894251505
   },
   "I_by_phase": {
    "0": {
     "n": 818,
     "e_norm_median": 0.018507255635730017,
-    "e_norm_max": 1.544963135028306,
-    "s_median": 63.6456670175677,
-    "s_max": 5937.929410428376
+    "e_norm_max": 1.5449631350283055,
+    "s_median": 69.2880225827814,
+    "s_max": 5953.314894251505
    },
    "1": {
     "n": 156,
-    "e_norm_median": 0.04250227035716067,
-    "e_norm_max": 0.1451059687292555,
-    "s_median": 831.723651545967,
-    "s_max": 9358.432616286755
+    "e_norm_median": 0.042502270357160685,
+    "e_norm_max": 0.14510596872925555,
+    "s_median": 911.8667588733604,
+    "s_max": 9808.186515758405
    }
+  },
+  "I_compare": {
+   "n": 504,
+   "e_norm_median_exact": 0.01826777187456562,
+   "e_norm_median_approx": 0.018267771874565623,
+   "e_norm_max_exact": 1.5449631350283055,
+   "e_norm_max_approx": 1.544963135028306,
+   "s_median_exact": 73.02134738121339,
+   "s_median_approx": 66.86904947448734,
+   "trans_vector_diff_median": 0.00959039993599696,
+   "trans_vector_diff_max": 2.637508029702121,
+   "rows_trans_diff_gt_1pct": 475
   },
   "old_status_by_M_T": {
    "('UNAVAILABLE', False, False)": 1,

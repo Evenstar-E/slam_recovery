@@ -8,7 +8,8 @@
 
 ## 0. 一句话
 
-新 trace 的 I 通道**存在**（`vec6`+`Ppre`，`has_out=1` 504 个配对帧可算），M/T 也齐全；
+新 trace 的 I 通道**存在**（用 `vec6` + `M2DGR_room_02.txt` 的 post 位姿精确算 `e_I`，
+`has_out=1` 504 个配对帧可算），M/T 也齐全；
 **但校准/标签仍缺**，所以 120 个 0.5 s 块全部 UNKNOWN，分类效果不可评价。这是一次
 "证据资格"结果，不是"ALI-H 有效/无效"的结论。
 
@@ -32,14 +33,18 @@
 |---|---|
 | 文件 | `host_logs/trace_cov.txt`：5 行表头 + **1042 数据行** |
 | 可解析 | **1041 行**（92 列） |
-| 格式异常 | **1 行**（第 1048 行只有 53 列，末尾截断；该行 likely 是第 975 个 `has_out=1`） |
+| 格式异常 | **1 行**（第 1048 行只有 53 列，末尾截断；该行是第 975 个 `has_out=1`；记 `TRUNCATED_ROW=1` 进分母，不删除） |
 | `phase=1` | **156 行**（replay 窗口；每组的副本） |
 | `has_out=1` | 可解析 **974 行** + 1 条截断行 = **975** 个 `has_out=1` |
 | `grp_idx` | 885 个组；156 个组出现两次（live/replay） |
 | `scan_first_ns` | 全为 **-1 哨兵**；有效跨度用 `(previous distinct scan_last, scan_last]` |
 
-`vec6 = state_propagat - state_ [0..5]`（has_out=1 且在 StateEstimation 之后），`Ppre/Ppost` 为
-rot+pos 6×6 块；状态顺序/右扰动/body 由 trace 头声明。`S` 不导出，`r_*` 不是位姿协方差。
+`vec6 = state_propagat - state_ [0..5]`（has_out=1 且在 StateEstimation 之后）；按 host 的
+`StatesGroup::operator-`，`vec6 = [Log(R_post^T R_pre), pos_pre - pos_post]`。因此
+`R_pre = R_post · Exp(vec6_rot)`，`e_I = [-vec6_rot, -R_pre^T vec6_pos]`；
+`R_post` 取 `M2DGR_room_02.txt` 的 post 四元数（975 行按顺序对应 974 个可解析 has_out + 1 截断，
+时间差 ≤512 ns）。`Ppre/Ppost` 为 rot+pos 6×6 块；状态顺序/右扰动/body 由 trace 头声明。
+`S` 不导出，`r_*` 不是位姿协方差；`mat_pre/mat_out` 因 VIO/LIO 双写、handler 不可区分，未用于 e_I。
 
 ## 3. join（跨度包含，多对一）
 
@@ -56,6 +61,11 @@ rot+pos 6×6 块；状态顺序/右扰动/body 由 trace 头声明。`S` 不导�
 | phase 覆盖 | 437 行只对应 live 组；93 行对应含 replay 的组（仍取 phase0） |
 | 未映射的 1 行 | 最后一个 availability 扫描超出最后一个**可解析**组的 `scan_last`；截断行无法提供跨度 → 记 `NO_TRACE_ROW` 进分母，不删除 |
 
+**多对一的真实结构**：`scan_last` 共 **590** 个不同值，其中 **295 个值由 2 个 `grp_idx` 共享**
+（另 295 个只有 1 个），这就是 257 行 availability 出现两个 `grp_idx` 的原因——**合并组/同末时刻的
+capture 组**；每个 availability 行映射到的全部 `grp_idx`、`trace idx`、phase、has_out 都写在
+`t2_join.jsonl`。每组扫描数分布：trace 行/组 1:217、2:276、4:37；availability 行/组 1:296、2:117。
+
 ## 4. 通道证据（531 个 availability 行）
 
 | 通道 | 值 |
@@ -65,7 +75,7 @@ rot+pos 6×6 块；状态顺序/右扰动/body 由 trace 头声明。`S` 不导�
 | I（`vec6`+`Ppre`，`has_out=1`） | **504** 行 present；26 行 `HAS_OUT_0`；1 行 `NO_TRACE_ROW` |
 | I 的 `Ppre` 秩 | 504/504 秩 **6** |
 | I 的 `|e_I|`（与符号无关） | min 0 / median **0.0183** / max **1.545** |
-| I 的 `s_I`（Ppre 可观测子空间） | min 0 / median **66.9** / max **5938** |
+| I 的 `s_I`（精确 e_I，Ppre 可观测子空间） | min 0 / median **73.0** / max **5953** |
 
 旧 status × M/T：
 
@@ -78,10 +88,15 @@ rot+pos 6×6 块；状态顺序/右扰动/body 由 trace 头声明。`S` 不导�
 
 | phase | has_out=1 行 | `|e|` median/max | `s` median/max |
 |---|---:|---|---|
-| 0（live） | 818 | 0.0185 / 1.545 | 63.6 / 5938 |
-| 1（replay） | 156 | 0.0425 / 0.145 | **831.7** / 9358 |
+| 0（live） | 818 | 0.0185 / 1.545 | 69.3 / 5953 |
+| 1（replay） | 156 | 0.0425 / 0.145 | **911.9** / 9808 |
 
 replay 的 `s` 明显更大，说明 replay 的 `Ppre` 尺度与 live 不同；**不能**据此判异常，只作上下文。
+
+**精确 vs 小角近似**（504 行）：`|e_I|` 的范数相同（旋转不改变范数），但平移**方向**不同——
+`‖e_trans_exact − e_trans_approx‖` 中位 **0.0096 m**、最大 **2.64 m**，**475/504 行**差异超过 1%；
+`s_I` 中位 73.0（精确） vs 66.9（近似）。所以**精确值为主结果**，`−vec6` 只作对照；大旋转
+（最大 |e| 1.545 由平移主导）时近似会明显失真。
 
 ## 5. 块与 UNKNOWN 区间
 
@@ -103,7 +118,7 @@ replay 的 `s` 明显更大，说明 replay 的 `Ppre` 尺度与 live 不同；*
 | trace 形状（按名） | **PASS（1 行截断已记录）** | 1041/1042 可解析；第 1048 行 53 列 | 需 S2 补最后一行或声明截断 |
 | join 跨度包含、多对一显式 | **PASS（1 行 NO_TRACE_ROW）** | `t2_join.jsonl` 531 行，含 grp/phases/has_out | — |
 | M/T 证据 | **PASS** | 444 / 86 | — |
-| I 证据存在与可算 | **PASS（504，秩 6）** | `vec6`/`Ppre`；s/|e| 分布 | 符号约定待 S2 确认（s/|e| 不受影响） |
+| I 证据存在与可算 | **PASS（504，秩 6）** | 精确 e_I（vec6 + M2DGR post）；s/|e| 分布 | 与 S2 核对 `operator-` 约定；mat 文件仅可对照 |
 | NORMAL/SUSPECT 分类 | **BLOCKED / NOT_EVALUABLE** | 无独立正常参照/标签（ALI-B2） | 等用户选 A/B/C |
 | 误报/漏检/延迟/错误 NORMAL | **NOT_EVALUABLE** | 同上；受控注入标签只可离线评价 | — |
 | UNKNOWN 区间 | **PASS** | 120 块/60 s，尾段 12 块 | — |

@@ -23,6 +23,41 @@ from typing import Any, Dict, List, Optional
 
 import numpy as np
 
+def so3_exp(w: np.ndarray) -> np.ndarray:
+    w = np.asarray(w, dtype=np.float64).reshape(3)
+    th = float(np.linalg.norm(w))
+    K = np.array([[0.0, -w[2], w[1]], [w[2], 0.0, -w[0]], [-w[1], w[0], 0.0]])
+    if th < 1e-12:
+        return np.eye(3) + K + 0.5 * (K @ K)
+    return (np.eye(3) + math.sin(th) / th * K
+            + (1.0 - math.cos(th)) / (th * th) * (K @ K))
+
+
+def quat_to_rot(q: np.ndarray) -> np.ndarray:
+    x, y, z, w = np.asarray(q, dtype=np.float64)
+    n = math.sqrt(x * x + y * y + z * z + w * w)
+    if n < 1e-12:
+        return np.eye(3)
+    x, y, z, w = x / n, y / n, z / n, w / n
+    return np.array([
+        [1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w)],
+        [2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w)],
+        [2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)],
+    ])
+
+
+def exact_e(vec6: np.ndarray, R_post: np.ndarray) -> np.ndarray:
+    """e_I = Log(inv(T_pre) T_post), with vec6 = state_pre - state_post (operator-).
+
+    operator- returns [Log(R_post^T R_pre), pos_pre - pos_post].  Hence
+    R_pre = R_post Exp(w), and the body-frame translation is -R_pre^T v.
+    """
+    w = np.asarray(vec6[:3], dtype=np.float64)
+    v = np.asarray(vec6[3:], dtype=np.float64)
+    R_pre = R_post @ so3_exp(w)
+    return np.concatenate([-w, -R_pre.T @ v])
+
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 BLOCK_NS = 500_000_000
 E2_REL_S = 54.0
@@ -102,7 +137,8 @@ def build_join(av: List[Dict[str, Any]], trace: Dict[str, Any]) -> Dict[str, Any
     return {"mapped": mapped, "lasts": lasts, "by_last": by_last}
 
 
-def i_evidence(group_rows: List[Dict[str, Any]]) -> Dict[str, Any]:
+def i_evidence(group_rows: List[Dict[str, Any]],
+               exact_by_idx: Optional[Dict[int, np.ndarray]] = None) -> Dict[str, Any]:
     if not group_rows:
         return {"present": False, "reason": "NO_TRACE_ROW"}
     live = [r for r in group_rows if r["phase"] == 0] or group_rows
@@ -121,31 +157,68 @@ def i_evidence(group_rows: List[Dict[str, Any]]) -> Dict[str, Any]:
     keep = w > 1e-9 * max(float(w.max()), 1e-12)
     rank = int(keep.sum())
     s = float(np.sum((V[:, keep].T @ vec) ** 2 / w[keep])) if rank else None
-    out.update({"present": True, "reason": None, "rank": rank, "s_i": s,
-                "e_norm": float(np.linalg.norm(vec)), "e_rot_norm": float(np.linalg.norm(vec[:3])),
-                "e_pos_norm": float(np.linalg.norm(vec[3:]))})
+    approx = -vec
+    e = exact_by_idx.get(r["idx"]) if exact_by_idx else None
+    if e is None:
+        out.update({"present": True, "reason": "NO_M2DGR_POSE", "rank": rank, "s_i": s,
+                    "e_norm": float(np.linalg.norm(approx)),
+                    "mode": "small_angle_approx"})
+        return out
+    wP, VP = np.linalg.eigh(0.5 * (P + P.T))
+    keepP = wP > 1e-9 * max(float(wP.max()), 1e-12)
+    s_exact = float(np.sum((VP[:, keepP].T @ e) ** 2 / wP[keepP])) if keepP.any() else None
+    out.update({"present": True, "reason": None, "rank": rank, "s_i": s_exact,
+                "s_i_approx": s,
+                "e_norm": float(np.linalg.norm(e)),
+                "e_norm_approx": float(np.linalg.norm(approx)),
+                "e_trans_exact": float(np.linalg.norm(e[3:])),
+                "e_trans_approx": float(np.linalg.norm(approx[3:])),
+                "e_trans_diff": float(np.linalg.norm(e[3:] - approx[3:])),
+                "mode": "exact_from_vec6_and_m2dgr_post"})
     return out
 
 
-def _phase_i(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
+def _phase_i(rows: List[Dict[str, Any]], exact_by_idx: Dict[int, np.ndarray]) -> Dict[str, Any]:
     out: Dict[str, Any] = {}
     for ph in (0, 1):
         vals = [r for r in rows if r["phase"] == ph and r["has_out"] == 1]
         if not vals:
             out[str(ph)] = {"n": 0}
             continue
-        e = np.array([np.linalg.norm(r["vec6"]) for r in vals])
+        e = np.array([np.linalg.norm(exact_by_idx.get(r["idx"], -r["vec6"])) for r in vals])
         ss = []
         for r in vals:
+            ev = exact_by_idx.get(r["idx"], -r["vec6"])
             w, V = np.linalg.eigh(0.5 * (r["Ppre"] + r["Ppre"].T))
             keep = w > 1e-9 * max(float(w.max()), 1e-12)
             if keep.any():
-                ss.append(float(np.sum((V[:, keep].T @ r["vec6"]) ** 2 / w[keep])))
+                ss.append(float(np.sum((V[:, keep].T @ ev) ** 2 / w[keep])))
         out[str(ph)] = {"n": len(vals), "e_norm_median": float(np.median(e)),
                         "e_norm_max": float(e.max()),
                         "s_median": float(np.median(ss)) if ss else None,
                         "s_max": max(ss) if ss else None}
     return out
+
+
+def _compare_i(joined: List[Dict[str, Any]]) -> Dict[str, Any]:
+    ex, ap, tr, xe, xa = [], [], [], [], []
+    for r in joined:
+        i = r.get("i") or {}
+        if i.get("mode") == "exact_from_vec6_and_m2dgr_post":
+            ex.append(i["e_norm"]); ap.append(i["e_norm_approx"])
+            tr.append(i.get("e_trans_diff", 0.0))
+            xe.append(i["s_i"]); xa.append(i.get("s_i_approx"))
+    if not ex:
+        return {"n": 0}
+    ex_a, ap_a, tr_a = np.array(ex), np.array(ap), np.array(tr)
+    return {"n": len(ex), "e_norm_median_exact": float(np.median(ex_a)),
+            "e_norm_median_approx": float(np.median(ap_a)),
+            "e_norm_max_exact": float(ex_a.max()), "e_norm_max_approx": float(ap_a.max()),
+            "s_median_exact": float(np.median(xe)) if xe else None,
+            "s_median_approx": float(np.median([x for x in xa if x is not None])) if xa else None,
+            "trans_vector_diff_median": float(np.median(tr_a)),
+            "trans_vector_diff_max": float(tr_a.max()),
+            "rows_trans_diff_gt_1pct": int(np.sum(tr_a > 0.01 * np.maximum(ap_a, 1e-9)))}
 
 
 def main(argv=None):
@@ -162,6 +235,18 @@ def main(argv=None):
     av = parse_availability(av_path)
     receipt = json.load(open(receipt_path, encoding="utf-8"))
     summary = json.load(open(summary_path, encoding="utf-8"))
+    # M2DGR is the published post-update pose, in the same order as the has_out trace rows
+    # (975 rows vs 974 parsed has_out + 1 truncated). Verify the time offset, then align by order.
+    m2 = np.array([[float(x) for x in l.split()]
+                   for l in open(os.path.join(base, "host_logs", "M2DGR_room_02.txt"))
+                   if l.split()])
+    ho_rows = [r for r in trace["rows"] if r["has_out"] == 1]
+    exact_by_idx = {}
+    for j, r in enumerate(ho_rows):
+        if j < len(m2):
+            exact_by_idx[r["idx"]] = exact_e(r["vec6"], quat_to_rot(m2[j, 4:8]))
+    time_err = (np.round(m2[:len(ho_rows), 0] * 1e9).astype(np.int64)
+                - np.array([r["abs_ns"] for r in ho_rows])) if ho_rows else np.array([])
     join = build_join(av, trace)
 
     mapped = join["mapped"]
@@ -185,7 +270,7 @@ def main(argv=None):
         a = m["av"]
         sup = a.get("support") or {}
         nis = a.get("nis") or {}
-        ie = i_evidence(m["rows"])
+        ie = i_evidence(m["rows"], exact_by_idx)
         rel_s = None
         if m["rows"]:
             rel_s = min(r["rel_s"] for r in m["rows"])
@@ -292,11 +377,13 @@ def main(argv=None):
         "trace": {
             "rows_total_lines": len(trace["rows"]) + len(trace["malformed"]),
             "rows_valid": len(trace["rows"]), "malformed": trace["malformed"],
+            "TRUNCATED_ROW": len(trace["malformed"]),
             "phase1_rows": sum(1 for r in trace["rows"] if r["phase"] == 1),
             "has_out_rows": sum(r["has_out"] for r in trace["rows"]),
             "groups": len({r["grp_idx"] for r in trace["rows"]}),
             "duplicate_groups": sum(1 for g, n in Counter(r["grp_idx"] for r in trace["rows"]).items() if n > 1),
             "scan_first_sentinel_all": all(r["scan_first_ns"] == -1 for r in trace["rows"]),
+            "m2dgr_rows": len(m2), "m2dgr_time_err_ns_max": int(np.abs(time_err).max()) if len(time_err) else None,
         },
         "join": {
             "availability_rows": len(av), "mapped": len(mapped) - len(unmapped),
@@ -304,6 +391,12 @@ def main(argv=None):
             "trace_rows_per_group": dict(map_counts),
             "availability_per_group": dict(Counter(av_per_group.values())),
             "multi_grp_idx_rows": sum(1 for r in joined_rows if r["grp_idx"] and len(r["grp_idx"]) > 1),
+            "shared_last_groups": sum(1 for g in {tuple(sorted({r["grp_idx"] for r in rows}))
+                                                  for rows in join["by_last"].values()} if len(g) > 1),
+            "grp_per_last_distribution": dict(Counter(
+                len({r["grp_idx"] for r in rows}) for rows in join["by_last"].values())),
+            "avail_rows_per_last_distribution": dict(Counter(
+                Counter(m["last"] for m in mapped if m["last"] is not None).values())),
             "multi_grp_idx_row_examples": [r["kf_id"] for r in joined_rows
                                             if r["grp_idx"] and len(r["grp_idx"]) > 1][:5],
             "groups_used_by_availability": len(av_per_group),
@@ -325,7 +418,8 @@ def main(argv=None):
             "I_s": {"min": min(i_s) if i_s else None,
                     "median": float(np.median(i_s)) if i_s else None,
                     "max": max(i_s) if i_s else None},
-            "I_by_phase": _phase_i(trace["rows"]),
+            "I_by_phase": _phase_i(trace["rows"], exact_by_idx),
+            "I_compare": _compare_i(joined_rows),
             "old_status_by_M_T": {str(k): v for k, v in joined_counter.items()},
         },
         "states": {
