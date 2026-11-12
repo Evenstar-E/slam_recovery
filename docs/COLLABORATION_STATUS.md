@@ -1839,3 +1839,25 @@ S2 按 R 完成两次 run（同 build `3b26365f…`、各 5 次探针 5/5）：
 逐行 flush 改变扫描分组/span 采集时序。已要求 S2：① trace 改缓冲写入后重跑一次；② 核对 E1 reprocess 使用的
 checkpoint 是否为其 armed stamp（其报告称落在"第二段 checkpoint frame 552"，若属实优先级高于 trace）。
 **B（盲重跑）与 C（重大阻塞）暂不采用**，等这两项结果。
+
+## 131. 缓冲 trace 修复后 run 通过本机核对；phase 列不可用、尾段发散；要求 availability 配对与原件上传
+
+S2 按"缓冲写入"修复后重跑 trace-on：`fl_native_20261112T113855Z_464306`，库 `49f2f941…`，driver `a4aaa58b…`。
+
+| 项 | 本机核对 |
+|---|---|
+| receipt | `OK / all wiring checks passed`，paired 544，终态 HEALTHY/open=false/kf 293 |
+| E1 reprocess | stamp `1627785272199251712`、frame 163（= E1 checkpoint，回到 off 的行为） |
+| 修复 | `repair_applied=23 / dropped=0`（旧 on 为 0/23、`spans=0`） |
+| replay | 244 within + 400 suffix；replay 段中位 \|p\| **8.3 m**（旧 on 363 m） |
+| trace | 1213 行（5 表头 + 1208 数据），sha `55a75615…` |
+
+**仍存问题（已退回 S2）**：
+1. **`phase` 列不可用**：replay 前 489 行中 431 行 `phase=1`；追平后 398 行中 388 行仍为 1。可靠身份是 `grp_idx`——
+   1208 行里 322 个 `grp_idx` 各出现 2 次、两次 `abs_ns` 完全相同；S3 将用 `grp_idx` + 出现序号做身份。
+2. **尾段发散**：`mat_out` 在 t≈54.1 s 后 \|p\| 从 ~3 m 跳到 206 m，末行 **519.9 m**；发生在 E2 restore（rel≈41.3 s）
+   之后十几秒，终态仍报 HEALTHY。解释清楚前，该 run 只能用于 trace/修复/replay 段证据，**不能用于"连续接回正常"**。
+3. **无 availability 日志**：目录中没有 `availability_frames.jsonl`，S3 的 T2 join 无法进行。已批准在 `49f2f941` 上再跑一对
+   **off/on 且都开 availability**（同 bag/config/触发/k、新 run 身份、5 次探针 ≥4/5）。
+4. **原件未入 Git**：审阅 `8676ad7` 将上述全部记为 DEVELOPER_REPORTED，要求上传布局 diff、探针输出、off/on receipt 与
+   `host_logs`+SHA。已要求 S2 推到远端分支（非 main）。
