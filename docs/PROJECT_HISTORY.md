@@ -703,3 +703,9 @@ hist_bytes最大235760928为旧历史points*32+voxels*96估算，排除当前槽
 [增量核验](review_20261112_f890ad8/README.md)固定21:45 fetch主线f890ad8、online-v2 1fde521。新执行driver SHA7cfcccf7与旧131213Z receipt逐字一致，三份provenance SHA及声明补丁hunk一致；完整AST比较除已读checkpoint_checks getattr表达式外均同8d9cd0d（源码同de4360b），只summary绕过不改边界/恢复。§86执行源码不可获取缺口在A2/A12来源层解除，可以准确引用旧K3负结果，但仍不能标成c915或当前main原生验证。新增八档无新run/恢复选择/ALI效果，不计来源补齐为恢复推进，不重跑旧测试/宿主。
 
 候选保存表37ms/cand_bytes2036096/frame_gap51与已验旧ACK一致，delta方向明示，估算不RSS、帧差不实际重放量；开发承认3.68s混比较对象及历史cp缺IMU/capture，接受收窄，完整恢复仍待接口解除。重链6dd71953/链接环境改变只有开发报告，无本增量新receipt/完整binary回执，不改旧0d7e23de receipt或报同二进制公平比较；后继完整身份随真实run交，ASan/增长率归因非自动主线前置、根因UNKNOWN。多处“明天”非用户延期15h/暂停，S1确认窗内实际主线安排，不能本机冒称远端停工。唯一完整历史cp+replay→物理修复→native状态map→全部后继继续，S1唯一集成/S2宿主/S3研究，ALI正常标签未解/参数停/科学门不降/四Cron单owner，局部不全表评分。reader-I exit0为来源核验非恢复PASS，中文review SSH白名单、不算法ROS/main历史/private/日报。
+
+## 88. e351a0b：新T2执行路径SE(3)缺陷关闭，真实I资格与效果仍未评价
+
+[增量核验](review_20261113_e351a0b/README.md)固定2026-11-13 00:05 fetch主线e351a0b，实交be8b955/b4b7aad。exact_e补V⁻¹，复用Rz(.2)/t(.1)普通控制实际rho(.0996664442,−.01,0)与正确t2_input_check/解析期望一致，旧(.1,0,0)缺陷在本执行路径关闭。重算531行除i外字段与states未变、120块全UNKNOWN/实际tail47，四输入SHA绑定旧115734档，保存504诊断行norm/s中位和最大/energy p90内部复算一致；不完整T2 CLI/208 tests/宿主重跑。默认-I NumPy缺失后明确用既有site-packages、不安装，reader实际exit0。
+
+新meta vec6 NOT_VERIFIED/cov NOT_AVAILABLE收窄接受，公式数学正确不补采集最终solution前/同次pre-post/carryover/旧机械join缺项，I504非有效物理证据，误报漏检/正常代价与净收益NOT_EVALUABLE，无新native结果/成本独立测量。旧meta公式/pose CONFIRMED/表格tail51等集中文案，不让其覆盖机读限制、不为文案新矩阵。S3修正实交/S1集成确认，直接回真实运动资格和现材料正常标签；S1/S2唯一完整历史cp+IMU/capture→物理修复→native重处理→全部后继仍待后半，未阻工作继续/08:53窗不延期/noCodex/旧手调停门不降。A3/B3数学组件及A7支持局部解除非性能，A/B不全表评分，四Cron单owner，中文review SSH白名单，不算法ROS/main历史/private/开发日报。
