@@ -368,31 +368,63 @@ class OnlineRecoveryTransactionNode:
         radius_m: float = 1.0,
         min_supported_fraction: float = 0.60,
         index: Optional["_RadiusIndex"] = None,
+        detail: Optional[dict] = None,
     ) -> bool:
         """True when most of this frame's points land near the independent reference cloud.
 
         A frame far outside the reference's coverage cannot be validated: scoring it would compare
         the scan against a plane extrapolated from unrelated geometry.
+
+        ``detail`` is filled with the inputs and the per-sample answer of this same evaluation. It
+        is an observation channel: it never changes the boolean or does a second computation.
         """
-        if len(ref_pts) == 0:
+        def fail(reason: str) -> bool:
+            if detail is not None:
+                detail.update({"reason": reason, "radius_m": float(radius_m),
+                               "threshold_fraction": float(min_supported_fraction),
+                               "reference_points": int(len(ref_pts))})
             return False
+
+        if len(ref_pts) == 0:
+            return fail("empty_reference")
         # A frame with no buffered scan or no candidate pose is *unmeasured*, not unsupported:
         # there is nothing to project, so it cannot contribute evidence. Returning False here and
         # letting the caller record the key as deferred keeps that distinction visible, and stops
         # the helper from raising KeyError on a hole in the scan buffer (P2 fix).
-        if kf_id not in self.scan_buffer_body or kf_id not in repaired_poses:
-            return False
+        if kf_id not in self.scan_buffer_body:
+            return fail("missing_scan")
+        if kf_id not in repaired_poses:
+            return fail("missing_pose")
         T = np.asarray(repaired_poses[kf_id], dtype=np.float64)
         if T.shape != (4, 4) or not np.all(np.isfinite(T)):
-            return False
+            return fail("invalid_pose")
         pts_b = np.asarray(self.scan_buffer_body[kf_id], dtype=np.float64)[:, :3]
         if len(pts_b) == 0:
-            return False
+            return fail("empty_scan")
         pts_w = (pts_b @ T[:3, :3].T) + T[:3, 3]
-        q = pts_w[:: max(1, len(pts_w) // 200)][:200]
+        stride = max(1, len(pts_w) // 200)
+        rows = np.arange(0, len(pts_w), stride)[:200]
+        q = pts_w[rows]
         index = index if index is not None else _RadiusIndex(ref_pts, radius_m)
         inside = index.within_radius_mask(q, radius_m)
-        return bool(np.mean(inside) >= min_supported_fraction)
+        fraction = float(np.mean(inside))
+        passed = bool(fraction >= min_supported_fraction)
+        if detail is not None:
+            detail.update({
+                "reason": "ok", "radius_m": float(radius_m),
+                "threshold_fraction": float(min_supported_fraction),
+                "reference_points": int(len(ref_pts)),
+                "scan_points": int(len(pts_b)), "sampled_query_count": int(len(q)),
+                "query_stride": int(stride),
+                "within_radius_count": int(np.count_nonzero(inside)),
+                "supported_fraction": fraction, "pass": passed,
+                "points": [
+                    {"row": int(rows[i]), "body": [float(v) for v in pts_b[rows[i]]],
+                     "world": [float(v) for v in q[i]], "within_1m": bool(inside[i])}
+                    for i in range(len(q))
+                ],
+            })
+        return passed
 
     @staticmethod
     def _contiguous_runs(keys) -> List[List[int]]:

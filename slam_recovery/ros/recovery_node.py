@@ -48,6 +48,7 @@ import numpy as np
 
 from slam_recovery.core import BackendDelta, RecoveryState, TangentFrame
 from slam_recovery.repair.pose_reregistration import ICP_CONFIG, reregister_segment
+from slam_recovery.ros.availability_log import AvailabilityRecorder
 from slam_recovery.ros.cloud_repair import (
     ReferenceGrid,
     body_z_bias,
@@ -444,6 +445,8 @@ class LiveNis:
         self.refresh_ns = int(refresh_ns)
         self._prev_world: Optional[np.ndarray] = None
         self._last_value: Optional[float] = None
+        self._last_value_kf: Optional[int] = None
+        self._last_value_ts_ns: Optional[int] = None
         self._support_cache: Optional[np.ndarray] = None
         self._support_key: Optional[tuple] = None
         self._last_refresh_ns: Optional[int] = None
@@ -481,43 +484,106 @@ class LiveNis:
         return (self._support_cache if self._support_cache is not None
                 else np.zeros((0, 3), dtype=np.float64))
 
-    def _reference(self, pose: np.ndarray, now_ts_ns: Optional[int] = None
-                   ) -> Tuple[Optional[np.ndarray], str]:
+    def _reference(self, pose: np.ndarray, now_ts_ns: Optional[int] = None,
+                   detail: Optional[dict] = None) -> Tuple[Optional[np.ndarray], str]:
         trusted = self.support_reference(now_ts_ns)
+        near_count = 0
         if len(trusted) >= self.min_train:
             d = np.linalg.norm(trusted - pose[:3, 3], axis=1)
+            near_count = int(np.count_nonzero(d <= self.radius_m))
             near = trusted[d <= self.radius_m]
             if len(near) >= self.min_train:
+                if detail is not None:
+                    detail.update({"trusted_total": int(len(trusted)),
+                                   "near_radius_count": near_count,
+                                   "near_radius_m": float(self.radius_m),
+                                   "prev_scan_points": (None if self._prev_world is None
+                                                        else int(len(self._prev_world))),
+                                   "selected_reference_source": "node_map",
+                                   "selected_reference_points": int(len(near))})
                 return near, "node_map"
         if self._prev_world is not None and len(self._prev_world) >= self.min_train:
+            if detail is not None:
+                detail.update({"trusted_total": int(len(trusted)),
+                               "near_radius_count": near_count,
+                               "near_radius_m": float(self.radius_m),
+                               "prev_scan_points": int(len(self._prev_world)),
+                               "selected_reference_source": "prev_scan",
+                               "selected_reference_points": int(len(self._prev_world))})
             return self._prev_world, "prev_scan"
+        if detail is not None:
+            detail.update({"trusted_total": int(len(trusted)),
+                           "near_radius_count": near_count,
+                           "near_radius_m": float(self.radius_m),
+                           "prev_scan_points": (None if self._prev_world is None
+                                                else int(len(self._prev_world))),
+                           "selected_reference_source": "none",
+                           "selected_reference_points": 0})
         return None, "none"
 
     def measure(self, pose: np.ndarray, scan_body: np.ndarray,
-                now_ts_ns: Optional[int] = None) -> Tuple[Optional[float], str, str]:
-        """Return ``(value, source, reference)``. ``value`` is None only when nothing is available."""
+                now_ts_ns: Optional[int] = None, kf_id: Optional[int] = None,
+                detail: Optional[dict] = None) -> Tuple[Optional[float], str, str]:
+        """Return ``(value, source, reference)``. ``value`` is None only when nothing is available.
+
+        ``detail`` receives the branch that produced this frame's answer, the raw value class, and
+        the provenance of a carried-forward value. Filling it does not change the answer.
+        """
         # Transform first, then resolve the reference: the fallback reference is the *previous*
         # frame's cloud, so it must be read before this frame replaces it.
         world = (np.asarray(scan_body, dtype=np.float64)[:, :3] @ pose[:3, :3].T) + pose[:3, 3]
-        ref, ref_name = self._reference(pose, now_ts_ns)
+        if detail is not None:
+            detail.update({"current_points": int(len(world)),
+                           "sigma": float(self.node.sigma_meas_m),
+                           "min_train": int(self.min_train),
+                           "min_holdout": int(self.min_holdout),
+                           "attempted": False, "computed": False})
+        ref, ref_name = self._reference(pose, now_ts_ns, detail=detail)
         value: Optional[float] = None
         if ref is not None and len(world) >= self.min_holdout:
+            if detail is not None:
+                detail.update({"attempted": True, "train_input_points": int(len(ref)),
+                               "query_input_points": int(len(world))})
+            nis_detail = detail.setdefault("holdout", {}) if detail is not None else None
             v = float(compute_disjoint_holdout_point_to_plane_nis(
-                ref, world, delta_pose_se3=np.eye(4), sigma_meas_m=self.node.sigma_meas_m))
+                ref, world, delta_pose_se3=np.eye(4), sigma_meas_m=self.node.sigma_meas_m,
+                details=nis_detail))
             if math.isfinite(v):
                 value = v
+                if detail is not None:
+                    detail.update({"computed": True, "raw_kind": "finite", "raw_value": float(v)})
             else:
                 self.nonfinite += 1
+                if detail is not None:
+                    kind = "nan" if math.isnan(v) else "inf"
+                    detail.update({"computed": True, "raw_kind": kind, "raw_value": float(v)})
+        elif detail is not None:
+            detail.update({"raw_kind": "not_computed",
+                           "raw_reason": ("no_reference" if ref is None
+                                          else "current_below_min_holdout")})
         if value is not None:
             self._prev_world = world
             self._last_value = value
+            self._last_value_kf = kf_id
+            self._last_value_ts_ns = None if now_ts_ns is None else int(now_ts_ns)
             self.counts["computed"] += 1
             self.counts[f"reference_{ref_name}"] += 1
+            if detail is not None:
+                detail.update({"source": "computed", "effective_nis": float(value),
+                               "carried": None})
             return value, "computed", ref_name
         if self._last_value is not None:
             self._prev_world = world
             self.counts["carried_forward"] += 1
             self.counts["reference_none"] += 1
+            if detail is not None:
+                detail.update({"source": "carried_forward", "effective_nis": float(self._last_value),
+                               "carried": {"kf_id": self._last_value_kf,
+                                           "stamp_ns": self._last_value_ts_ns,
+                                           "age_s": (None if (now_ts_ns is None or
+                                                              self._last_value_ts_ns is None)
+                                                     else round((int(now_ts_ns)
+                                                                 - self._last_value_ts_ns) * 1e-9, 3))}})
             return self._last_value, "carried_forward", "none"
         # No measurement was possible. The frame can still serve as the next frame's reference:
         # it is a real observation, just not one this estimator could score.
@@ -525,6 +591,10 @@ class LiveNis:
             self._prev_world = world
         self.counts["unavailable"] += 1
         self.counts["reference_none"] += 1
+        if detail is not None:
+            detail.update({"source": "unavailable", "effective_nis": None,
+                           "raw_kind": detail.get("raw_kind", "not_computed"),
+                           "raw_reason": detail.get("raw_reason", "no_reference")})
         return None, "unavailable", "none"
 
 
@@ -944,9 +1014,12 @@ class NativeClosedLoop:
         repair_sync_timeout_s: float = 5.0,
         repair_dry_run: bool = False,
         repair_sham: bool = False,
+        availability_log: Optional[str] = None,
     ) -> None:
         self.node = node
         self.run_id = run_id
+        # Per-frame availability evidence, separate from the capped summary diagnostics.
+        self.availability = AvailabilityRecorder(availability_log, run_id=run_id)
         # The host's own state/map checkpoint, if this run was given a control directory. Without
         # one the run is exactly the observational loop it was before.
         self.cp = checkpoint_client if (checkpoint_client is not None
@@ -1064,7 +1137,10 @@ class NativeClosedLoop:
                 for stale in list(self._scan_index)[:64]:
                     self._scan_index.pop(stale, None)
 
-        value, source, reference = self.nis.measure(pose, scan_body, now_ts_ns=ts_ns)
+        nis_detail: Dict[str, Any] = {}
+        value, source, reference = self.nis.measure(
+            pose, scan_body, now_ts_ns=ts_ns, kf_id=kf_id,
+            detail=(nis_detail if self.availability.enabled else None))
         support_ref = self.nis.support_reference(ts_ns)
         # Map size as it stood when this frame's NIS was computed -- not after this frame has been
         # ingested. The diagnostic bins NIS by reference size, so the two must be the same instant.
@@ -1086,20 +1162,26 @@ class NativeClosedLoop:
             # judged. This is how the NIS-versus-map-size curve is obtained without a threshold.
             status = "DISABLED_FOR_DIAGNOSIS"
             self.detection_counts[status] += 1
+            self._record_availability(kf_id, ts_ns, scan_ns, pose, scan_body, {},
+                                      nis_detail, None, value is not None, "DISABLED")
             self._ingest_without_detection(kf_id, ts_ns, pose, scan_body, value)
             self._record_diag(kf_id, ts_ns, value, source, reference, status,
                               kfs_before, pts_before)
             self._track_episode(kf_id, ts_ns, pose)
             return
 
+        support_detail: Dict[str, Any] = {}
         supported = self.node._frame_has_reference_support(
-            kf_id, support_ref, {kf_id: np.asarray(pose, dtype=np.float64)})
+            kf_id, support_ref, {kf_id: np.asarray(pose, dtype=np.float64)},
+            detail=(support_detail if self.availability.enabled else None))
         # Detection is available only when the frame can actually be scored against an independent
         # reference. "Unsupported" and "healthy" are different statements and are recorded as such:
         # an unsupported frame is ingested so the map can grow, but the detector does not judge it.
         available = bool(supported) and value is not None
         status = "AVAILABLE" if available else "UNAVAILABLE"
         self.detection_counts[status] += 1
+        self._record_availability(kf_id, ts_ns, scan_ns, pose, scan_body, support_detail,
+                                  nis_detail, bool(supported), value is not None, status)
 
         before = self.node.tx_mgr.active_quarantine
         if available:
@@ -1214,6 +1296,43 @@ class NativeClosedLoop:
         )
         self.node.tx_mgr.register_quarantined_frame(kf_id, int(ts_ns))
         self._first_alarm_ts_ns = int(ts_ns)
+
+    def _record_availability(self, kf_id: int, ts_ns: int, scan_ns: Optional[int],
+                             pose: np.ndarray, scan_body: np.ndarray,
+                             support: Dict[str, Any], nis: Dict[str, Any],
+                             support_pass: Optional[bool], nis_present: bool,
+                             status: str) -> None:
+        """Write this frame's availability evidence. Derived status is never asserted here."""
+        if not self.availability.enabled:
+            return
+        msg = self._scan_msgs.get(int(scan_ns)) if scan_ns is not None else None
+        frame_id = getattr(getattr(msg, "header", None), "frame_id", None) if msg is not None else None
+        pts = np.asarray(scan_body, dtype=np.float64)[:, :3]
+        finite = int(np.count_nonzero(np.all(np.isfinite(pts), axis=1))) if pts.size else 0
+        mgr = self.node.tx_mgr
+        seg = mgr.active_quarantine
+        derived = ("DISABLED" if status == "DISABLED"
+                   else "AVAILABLE" if (support_pass and nis_present) else "UNAVAILABLE")
+        row = {
+            "kf_id": int(kf_id),
+            "pose_stamp_ns": int(ts_ns),
+            "scan_stamp_ns": None if scan_ns is None else int(scan_ns),
+            "pose_scan_dt_ns": (None if scan_ns is None else int(ts_ns) - int(scan_ns)),
+            "scan_frame_id": frame_id,
+            "T_wb": [float(v) for v in np.asarray(pose, dtype=np.float64).reshape(-1)],
+            "scan": {"points": int(len(pts)), "finite": finite},
+            "manager": {"state": getattr(mgr.state, "value", str(mgr.state)),
+                        "trusted_version": int(mgr.trusted_version),
+                        "trusted_keyframes": int(len(mgr.trusted_poses)),
+                        "active_segment": (None if seg is None else seg.segment_id)},
+            "support": support or None,
+            "nis": nis or None,
+            "support_pass": support_pass,
+            "nis_present": bool(nis_present),
+            "status": status,
+            "status_from_conditions": derived,
+        }
+        self.availability.record(row)
 
     def _record_diag(self, kf_id: int, ts_ns: int, value: Optional[float], source: str,
                      reference: str, status: str, kfs_before: int, pts_before: int) -> None:
@@ -2193,6 +2312,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--repair-dry-run", action="store_true", default=False,
                     help="control for the INJECTION test: run the same bias estimation (same "
                          "decision cost) but publish nothing; the replay uses the original scans")
+    ap.add_argument("--availability-log", default="",
+                    help="write one JSON line per paired frame to this path: the support mask "
+                         "evaluation and the NIS branch that decided whether the frame was fed to "
+                         "the detector. No cap, no change to the decision")
     ap.add_argument("--repair-sham", action="store_true", default=False,
                     help="sham control: publish the same number of clouds with the same batching "
                          "and receipts, but unchanged (zero shift); isolates the correction")
@@ -2223,6 +2346,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         repair_sync_timeout_s=args.repair_sync_timeout_sec,
         repair_dry_run=args.repair_dry_run,
         repair_sham=args.repair_sham,
+        availability_log=(args.availability_log or None),
     )
     if args.scripted_triggers:
         loop.scripted_triggers_s = [float(x) for x in args.scripted_triggers.split(",") if x.strip()]

@@ -109,6 +109,7 @@ def compute_disjoint_holdout_point_to_plane_nis(
     points_holdout_xyz: np.ndarray,
     delta_pose_se3: np.ndarray = np.eye(4),
     sigma_meas_m: float = 0.08,
+    details: Optional[dict] = None,
 ) -> float:
     """
     Compute normalized innovation squared (NIS) exclusively on the disjoint holdout point set
@@ -124,8 +125,10 @@ def compute_disjoint_holdout_point_to_plane_nis(
     t = delta_pose_se3[:3, 3]
     hold_trans = (hold_xyz @ R.T) + t
 
-    t_sub = train_xyz[:: max(1, len(train_xyz) // 600)][:600]
-    h_sub = hold_trans[:: max(1, len(hold_trans) // 300)][:300]
+    t_stride = max(1, len(train_xyz) // 600)
+    h_stride = max(1, len(hold_trans) // 300)
+    t_sub = train_xyz[::t_stride][:600]
+    h_sub = hold_trans[::h_stride][:300]
 
     diff = h_sub[:, None, :] - t_sub[None, :, :]
     dist_sq = np.sum(diff ** 2, axis=-1)
@@ -144,6 +147,33 @@ def compute_disjoint_holdout_point_to_plane_nis(
     inlier_coverage = float(len(valid_res)) / float(max(len(residuals), 1))
     # Coverage gate (R5 fix): if >30% of holdout points exceed the 2.0m truncation bound,
     # do not hide large residuals by dropping them from the denominator!
-    if len(valid_res) == 0 or inlier_coverage < 0.70:
-        return float(np.mean((residuals / sigma_meas_m) ** 2))
-    return float(np.mean((valid_res / sigma_meas_m) ** 2))
+    use_all = bool(len(valid_res) == 0 or inlier_coverage < 0.70)
+    used = residuals if use_all else valid_res
+    nis = float(np.mean((used / sigma_meas_m) ** 2))
+    if details is not None:
+        # Same numbers the decision used: this records them, it does not recompute a second time.
+        chi2 = (used / sigma_meas_m) ** 2
+        details.update({
+            "train_points": int(len(train_xyz)), "holdout_points": int(len(hold_xyz)),
+            "train_stride": int(t_stride), "holdout_stride": int(h_stride),
+            "train_sampled": int(len(t_sub)), "query_sampled": int(len(h_sub)),
+            "k_neighbours": int(k), "sigma": float(sigma_meas_m),
+            "residual_total": int(len(residuals)), "residual_valid": int(len(valid_res)),
+            "inlier_coverage": float(inlier_coverage),
+            "branch": "all_residuals" if use_all else "clipped_residuals",
+            "mean_residual": float(np.mean(used)), "rms_residual": float(np.sqrt(np.mean(used ** 2))),
+            "q50_residual": float(np.percentile(used, 50)), "q90_residual": float(np.percentile(used, 90)),
+            "max_residual": float(np.max(used)),
+            "nis": nis,
+            "points": [
+                {"query": int(i),
+                 "nn_ids": [int(v) for v in nn_idx[i]],
+                 "centroid": [float(v) for v in mean_nn[i]],
+                 "normal": [float(v) for v in normals[i]],
+                 "normal_eigenvalues": [float(v) for v in np.linalg.eigvalsh(covs[i])],
+                 "residual_m": float(residuals[i]),
+                 "chi2": float((residuals[i] / sigma_meas_m) ** 2),
+                 "within_2m": bool(residuals[i] < 2.0)}
+                for i in range(len(residuals))]
+        })
+    return nis

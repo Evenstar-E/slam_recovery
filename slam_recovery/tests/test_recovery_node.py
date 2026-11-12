@@ -304,7 +304,7 @@ class _FakeLoopNode:
         return self._trusted
 
     def _frame_has_reference_support(self, kf_id, ref_pts, repaired_poses,
-                                     radius_m=1.0, min_supported_fraction=0.60):
+                                     radius_m=1.0, min_supported_fraction=0.60, detail=None):
         # the real predicate compares the placed scan against the reference; for the fake, "is
         # there a reference at all" is the same distinction
         return len(ref_pts) >= 30
