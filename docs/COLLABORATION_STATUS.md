@@ -1816,3 +1816,26 @@ S2 的 B1 结果（本机核归档）：`probe_b1b_1` 在启动期 `No plugins f
 
 `episode_detail` 中无 `restore_disposition` 属预期（该字段在 main 后续提交，S2 的 driver 仍是 `a4aaa58b…`），
 不影响 trace run。此 run 记为 trace 开关的 **off 基线**；trace-on 尚未开始，T2 仍 BLOCKED。
+
+## 130. trace off/on 两次 run：off 有效、on 无有效 replay；发散读数需按 replay 段判读
+
+S2 按 R 完成两次 run（同 build `3b26365f…`、各 5 次探针 5/5）：
+
+| | trace-off `112254Z_445825` | trace-on `112753Z_454009` |
+|---|---|---|
+| 状态 | OK / wiring passed | OK / wiring passed |
+| paired | 544 | 544 |
+| 门 | accepted 1（committed 23）/ rejected 1 | 同左 |
+| 原生 | replay 244 within + 439 suffix，repairs applied **23**，无 set_state | replay **0 within + 151 suffix**，repairs **0 / dropped 23（spans=0）** |
+| 终态 | HEALTHY / kf 285 | HEALTHY / kf 227 |
+| trace | 无 | 968 行（6 表头 + 962 数据），sha `88866357…`，`idx 0..961`、`has_out=1` 895、`phase=1` 76、`grp_idx 0..1770` |
+
+**读数更正（S1 复算）**：S2 报告的"host pos"列错位——`mat_out` 列为 `time, euler°(3), pos(3), …`，其数值首项是偏航角。
+按 `pos=v[4:7]` 复算：off 首段最大 179 m、**replay 段 7–23 m 正常**；on 首段最大 **1998 m**，且只有 76 行 phase=1、
+无完整 replay。首段发散是受注入污染、设计上要被回滚的那一段，真正的判据是回滚后的 replay 段。
+
+**判读**：on 这次不是"宿主运行期不稳定"，而是 **trace-on 下修复匹配失败（`spans=0`，23 条修复全丢）**，replay 重放
+未修复数据所以发散未终止；同 build 的 off run `spans>0`、修复 23 条，构成对照。最可疑机制是 trace 每行 `std::endl`
+逐行 flush 改变扫描分组/span 采集时序。已要求 S2：① trace 改缓冲写入后重跑一次；② 核对 E1 reprocess 使用的
+checkpoint 是否为其 armed stamp（其报告称落在"第二段 checkpoint frame 552"，若属实优先级高于 trace）。
+**B（盲重跑）与 C（重大阻塞）暂不采用**，等这两项结果。
