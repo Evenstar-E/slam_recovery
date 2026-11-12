@@ -1533,6 +1533,12 @@ class NativeClosedLoop:
         # The host keeps writing its map until told otherwise. The command is only written here --
         # waiting for the ack inside a subscriber callback would stall the pairing.
         if self.cp is not None:
+            # A rolling snapshot sent before the trigger can be applied after it under a playback
+            # backlog, so the restore would roll back only part of the segment. Drop any snapshot
+            # still queued (read-only, never a state command) before the hold: the host's pending
+            # slot is then overwritten by the hold, and the checkpoint in use is the one taken
+            # before the trigger. Counted as superseded, not as a failure.
+            self.cp.expire_pending(0.0)
             # Idempotent fallback. The checkpoint and capture start are declared at the trigger
             # stamp ahead of time (see main()), because a command sent here is applied at the
             # host's next processed frame, which lags the trigger under a playback backlog.
@@ -1848,7 +1854,12 @@ class NativeClosedLoop:
         # The rolling checkpoint is taken here, on the main thread, while no episode is open: a
         # deep copy of the map inside a subscriber callback would delay exactly the frames the
         # pairing depends on.
-        if self.cp is not None and self.node.tx_mgr.active_quarantine is None:
+        if (self.cp is not None and self.node.tx_mgr.active_quarantine is None
+                and not self.scripted_trigger_stamps_ns):
+            # A scripted run declares its checkpoints at the trigger stamps ahead of time. Rolling
+            # snapshots are not just redundant there: one issued before a trigger can be applied
+            # after it under backlog and overwrite the armed checkpoint, so the restore then rolls
+            # back only part of the segment. Online runs keep the rolling snapshot.
             self.cp.tick(time.time(), quiescent=True)
         if self.cp is not None and self.cp.pending():
             # A command is in flight: no new candidate is built until the host has applied it.
@@ -2210,6 +2221,13 @@ def cloud_to_xyz(msg) -> np.ndarray:
     return out[np.isfinite(out).all(axis=1)]
 
 
+def arm_scripted_checkpoints(cp, stamps) -> None:
+    """Queue hold+snapshot at each declared stamp, in stamp order."""
+    for stamp in sorted(int(s) for s in stamps):
+        cp.hold(stamp)
+        cp.snapshot_now(stamp)
+
+
 class RosDriver:
     def __init__(self, loop: NativeClosedLoop, pose_topic: str, scan_topic: str,
                  status_topic: str) -> None:
@@ -2410,9 +2428,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     # the host just before the first group whose lio_time reaches the trigger. Only scripted runs
     # get this; the online path keeps the immediate behaviour.
     if loop.cp is not None and loop.scripted_trigger_stamps_ns:
-        first_trigger = int(min(loop.scripted_trigger_stamps_ns))
-        loop.cp.hold(first_trigger)
-        loop.cp.snapshot_now(first_trigger)
+        # Every scripted stamp gets its own armed hold/snapshot. The first one was enough while
+        # the run had a single event; a second event otherwise falls back to a rolling checkpoint
+        # that can be applied after its trigger and roll back only part of the segment.
+        arm_scripted_checkpoints(loop.cp, loop.scripted_trigger_stamps_ns)
     driver = RosDriver(loop, args.pose_topic, args.scan_topic, args.status_topic)
 
     started = time.time()

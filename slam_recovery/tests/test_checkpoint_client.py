@@ -13,7 +13,7 @@ import threading
 import time
 import unittest
 
-from slam_recovery.ros.recovery_node import CheckpointClient
+from slam_recovery.ros.recovery_node import CheckpointClient, arm_scripted_checkpoints
 
 
 class _FakeHost(threading.Thread):
@@ -280,7 +280,7 @@ class CheckpointWiringTest(unittest.TestCase):
             time.sleep(0.005)
         return list(self.host.seen)
 
-    def _loop(self, client):
+    def _loop(self, client, open_episode=True):
         import numpy as np
 
         from slam_recovery.ros.recovery_node import NativeClosedLoop
@@ -288,7 +288,8 @@ class CheckpointWiringTest(unittest.TestCase):
 
         node = _FakeLoopNode(trigger_at=10 ** 9)      # no automatic trigger
         loop = NativeClosedLoop(node, run_id="run", checkpoint_client=client)
-        loop._open_episode(1_000_000_000, np.eye(4))
+        if open_episode:
+            loop._open_episode(1_000_000_000, np.eye(4))
         return loop, node
 
     def test_opening_a_segment_holds_the_map(self):
@@ -297,6 +298,32 @@ class CheckpointWiringTest(unittest.TestCase):
         # The checkpoint is declared at the trigger stamp ahead of time (main), so the open only
         # sends the idempotent hold.
         self.assertEqual(self._wait_seen(1), ["hold"])
+
+    def test_opening_a_segment_drops_a_pending_snapshot_before_the_hold(self):
+        # A rolling snapshot sent before the trigger can be applied after it under backlog; the
+        # restore would then roll back only part of the segment. The open discards it first.
+        client = CheckpointClient(self.dir, ack_timeout_s=5.0)
+        loop, node = self._loop(client, open_episode=False)
+        client._write("snapshot")
+        loop._open_episode(1_000_000_000, __import__("numpy").eye(4))
+        self.assertEqual(client.snapshots_superseded, 1)
+        self.assertEqual(self._wait_seen(2)[-1], "hold")
+
+    def test_every_scripted_stamp_gets_its_own_armed_checkpoint(self):
+        class _Recorder:
+            def __init__(self):
+                self.calls = []
+
+            def hold(self, stamp):
+                self.calls.append(("hold", int(stamp)))
+
+            def snapshot_now(self, stamp):
+                self.calls.append(("snapshot", int(stamp)))
+
+        rec = _Recorder()
+        arm_scripted_checkpoints(rec, [200, 100])
+        self.assertEqual(rec.calls, [("hold", 100), ("snapshot", 100),
+                                     ("hold", 200), ("snapshot", 200)])
 
     def test_a_re_arm_writes_resume(self):
         client = CheckpointClient(self.dir, ack_timeout_s=5.0)
@@ -342,6 +369,43 @@ class CheckpointWiringTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ScriptedCheckpointTest(unittest.TestCase):
+    def test_a_scripted_run_does_not_roll_rolling_snapshots(self):
+        import numpy as np
+
+        from slam_recovery.ros.recovery_node import NativeClosedLoop
+        from slam_recovery.tests.test_recovery_node import _FakeLoopNode
+
+        class _CP:
+            def __init__(self):
+                self.ticks = 0
+
+            def poll(self):
+                return None
+
+            def expire_pending(self, _age):
+                return None
+
+            def _apply_lifecycle(self):
+                return None
+
+            def pending(self):
+                return False
+
+            def tick(self, *_a, **_k):
+                self.ticks += 1
+
+        node = _FakeLoopNode(trigger_at=10 ** 9)
+        loop = NativeClosedLoop(node, run_id="run", checkpoint_client=None)
+        loop.cp = _CP()
+        loop.scripted_trigger_stamps_ns = [1_000_000_000]
+        loop.service()
+        self.assertEqual(loop.cp.ticks, 0)
+        loop.scripted_trigger_stamps_ns = []
+        loop.service()
+        self.assertEqual(loop.cp.ticks, 1)
 
 
 class WritebackTest(unittest.TestCase):
