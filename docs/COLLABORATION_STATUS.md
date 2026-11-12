@@ -1723,3 +1723,23 @@ S2（r11070-c3）回报，本机逐项核对：
 
 **宿主侧**：本机无新 run、无进程；两次 FAIL（`100744Z`/`101116Z`）仍只在本机 `/tmp` 与开发回报中，未入仓库，
 按审阅记 DEVELOPER_REPORTED；诊断构建 A 的探针证据未到。
+
+## 125. 诊断构建 A 结果：故障非 v7 独有，v6 本身在 teardown 也 stack smash；批准 B1 二分
+
+S2 的探针（无 bag）已在 `host_change_trace_cov/probe_*` 归档，本机抽核：`probe_v6` 尾行 `*** stack smashing detected ***`、
+`probe_v6min`/`probe_v7` 尾行 `No plugins found!`，与 S2 报告一致。
+
+| 探针 | 库 | 结果 |
+|---|---|---|
+| `probe_v6`/`v6b`/`v6_default2`/`v6_omp1`/`v6_omp4` | `ca9126c4…`（与部署**逐字节相同**） | 5/6 通过（20–25 s），但**通过者也在 teardown smash** |
+| `probe_v6min`（`env -i`） | `ca9126c4…` | FAIL rc=134 @14 s，`No plugins found!` |
+| `probe_v7` + 三次复跑 | `0308c216…` | **4/4 FAIL**（3–15 s 内），同位置 |
+
+结论修正：**不是 v7 独立引入**——v6 重建与成功 run 的库逐字节相同，仍会失败（1/6）；**v7 把失败率放大到 4/4**。
+同一二进制同一 env 症状在 rospack 错误 / terminate / stack smash 之间变化 → 进程内内存损坏或竞态，不是配置或缓存。
+
+S1 决定：批准 **B1 二分**（先 `voxel_map.{h,cpp}`、再 `LIVMapper.h` 成员去掉 `pnh`、最后只 `pnh` 读取；每步 5 次探针，
+预算 ~5 min）；**B2 暂不批准**（v6 可复现且仍偶发，clean 重建大概率无收益）；新增一次性 **ASan 构建**定位既有 stack smash
+（本机无 gdb/valgrind，core 落 `/tmp/core-file/`，预算 ≤10 min，产物不用于正式 run）；**R 启动探针门控重试**批准，
+但须 B1 之后、off/on 同协议同 k、每次 run 前 5 次探针且通过率 ≥4/5。22:00 前若仍无可稳定运行的 v7，按 15h 规则提交
+中文重大阻塞（A 修宿主缺陷 / B 降级为无 trace 有限结果 / C 换宿主），不无限二分。
