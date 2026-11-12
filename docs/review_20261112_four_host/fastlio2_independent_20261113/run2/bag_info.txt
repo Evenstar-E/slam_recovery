@@ -1,0 +1,20 @@
+path:         /tmp/wt-sim/docs/review_20261112_four_host/fastlio2_independent_20261113/run2/frontend.bag
+version:      2.0
+duration:     7:49s (469s)
+start:        Nov 13 2026 01:35:12.82 (1794504912.82)
+end:          Nov 13 2026 01:43:01.82 (1794505381.82)
+size:         868.8 MB
+messages:     12980
+compression:  lz4 [2748/2748 chunks; 35.92%]
+uncompressed:   2.4 GB @ 5.2 MB/s
+compressed:   867.7 MB @ 1.9 MB/s (35.92%)
+types:        nav_msgs/Odometry       [cd5e73d190d741a2f92e81eda573aca7]
+              nav_msgs/Path           [6227e2b7e9cce15051f669a5e197bbf7]
+              sensor_msgs/PointCloud2 [1158d486dd51d683ce2f1be655c3c181]
+              std_msgs/Bool           [8b94c1b53db61fb6aed406028ad6332a]
+topics:       /Isbuilding                 2 msgs    : std_msgs/Bool          
+              /Issleeping                 2 msgs    : std_msgs/Bool          
+              /Odometry                4186 msgs    : nav_msgs/Odometry      
+              /cloud_registered        4186 msgs    : sensor_msgs/PointCloud2
+              /cloud_registered_body   4186 msgs    : sensor_msgs/PointCloud2
+              /path                     418 msgs    : nav_msgs/Path

@@ -1,0 +1,7 @@
+[0m[ INFO] [1794504912.065959453]: Subscribing to /Isbuilding[0m
+[0m[ INFO] [1794504912.073486006]: Subscribing to /Issleeping[0m
+[0m[ INFO] [1794504912.075240706]: Subscribing to /Odometry[0m
+[0m[ INFO] [1794504912.077172310]: Subscribing to /cloud_registered[0m
+[0m[ INFO] [1794504912.083220960]: Subscribing to /cloud_registered_body[0m
+[0m[ INFO] [1794504912.086272986]: Subscribing to /path[0m
+[0m[ INFO] [1794504912.088573588]: Recording to '/tmp/wt-sim/docs/review_20261112_four_host/fastlio2_independent_20261113/run2/frontend.bag'.[0m

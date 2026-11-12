@@ -24,6 +24,7 @@ def main():
     with rosbag.Bag(bag_path) as bag:
         start, end = bag.get_start_time(), bag.get_end_time()
         for topic, msg, _t in bag.read_messages():
+            bag_t_ns = int(_t.to_nsec() if hasattr(_t, "to_nsec") else round(float(_t) * 1e9))
             topics[topic] = topics.get(topic, 0) + 1
             if topic == "/Odometry":
                 odom.append((int(msg.header.stamp.to_nsec()), dyn([msg.pose.pose.position.x,
@@ -31,7 +32,8 @@ def main():
                                                                    msg.pose.pose.position.z])))
             elif topic in flags and hasattr(msg, "data"):
                 if bool(msg.data):
-                    flags[topic].append(int(msg.header.stamp.to_nsec()))
+                    # std_msgs/Bool carries no header: the bag time is the only stamp.
+                    flags[topic].append(bag_t_ns)
     odom.sort(key=lambda x: x[0])
     st = np.array([s for s, _ in odom], dtype=np.int64)
     pos = np.array([p for _, p in odom])
