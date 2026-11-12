@@ -555,3 +555,11 @@ v3仍skip+clear已消费后缀，本次399/372未catch-up；两run只一事件/d
 E2无新注入/detection off；cp1627785309656085248晚trigger1.607814s、晚quarantine_start5.607814s，真实restore不等可信完整回退。close1→trigger2严格185非未说明186，两waitclose仍ABORTED rearm、未解决106/143；59shift仅23修复，36保未修人口。正常成功非零suffix跳灌旧pose局部解除；新collect None/FAIL ack实际target控制仍set_state，开发“缺ACK不盲写”与源码不符，code-review候选已复现。最低合法历史cp/实际应用边界与输入归宿，未知或失败不推进依赖/公开成功，不新RPC/阈值；旧物理候选与新云准入同定义仍未闭合。
 
 诊断最新补cache hash/key/刷新、预测基准/horizon/T、正常边界全样本为源码组件接受，未有新诊断on原件且未保存参考坐标/raw行映射；UNAVAILABLE分支已定位不是行为已修，支持门未改/实际物理根因仍UNKNOWN。本机-I原件核、所有target package Git bytes方法控制，无host/bag/算法参数；首次reader错假设targetSHA只修绑定后PASS，pytest辅助新tests未跑不装。下一S1/S2可信后继checkpoint→完整接回/E2或显式不支持，成功依赖/物理一致最小收口；S3既定研究/旧参数停，不重开诊断或单事件矩阵。A5/A6/A10受控执行局部推进、A4/A8/A9/B2/B4/B11仍未闭合不总分；独立review SSH提交推送并补旧012899f，private保护不合main不改历史冻结门，实际新意见接收待回执。
+
+## 68. 用户直接授权ALI-H v1设计与开发侧有限测试，自动审阅/native主线并行
+
+2026-11-12用户直接要求“你设计一版，然后并行接着做审阅的自动化工作，你设计好后通过github给开发侧做测试”。[ALI-H v1设计与测试交接](ADAPTIVE_LOW_INFORMATION_HEALTH_V1_20261112.md)已完成设计：把参考支持/可观测性与健康观察分开，低信息输出NORMAL_CONSISTENT/SUSPECT/UNKNOWN、限定相对运动或地图范围；不能二分者弃权。地图M/邻帧T/真实宿主IMU preupdate冲突I分来源/支持上下文经验校准，missing/carried/占位不正常，预测非独立健康证据；正常参照仅独立确认的开发健康人口，0.5s块、20块最低探索支持、.95持续两块报警/.80正常相容为首版冻结研究值，不改旧1m/60%或sigma/κ/准入门，不扫参数。
+
+最新授权允许此方法独立研究实现与有限测试，不直接替换生产策略、不自动批准其他新方法/双参考矩阵，不解除旧参数暂停。本机设计/核验不实现算法、不代host；S3单研究会话在既有门研究时段安排并回预算/认领，S1共享接口单写、S2继续native。先复用402/544旧原件做缺项/资格与最小synthetic控制，缺真实I/健康低支持校准明确UNKNOWN；必要时复用原生trace或至多一次既定预算有限真实导出，不为分类重开大诊断矩阵。完整人口/独立标签/漏检误报延迟/弃权与资源一起交；无生产动作不冒地图安全验证。
+
+20min审阅/2h/日报actual owner repair-f3保持，未新增重复任务；同轮fetch5f54a44的新armed/final原生E2另独立并行核验，不凭标题验收。方案DESIGNED、开发实现/运行NOT_IMPLEMENTED/NOT_EXECUTED，GitHub发布不等已接收。旧原生可信cp/成功依赖/物理一致未验项照证据处理，研究不阻native；A3/B3方法计划非新评分。独立review SSH提交推送、私人handoff保护不合main不改历史冻结门。

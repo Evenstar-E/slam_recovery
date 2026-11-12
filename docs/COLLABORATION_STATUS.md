@@ -760,3 +760,11 @@ S1已决定派ACK suffix/driver跳旧pose但target未实施；下一最小保nat
 E2无注入/detection off、滚动cp晚trigger1.607814s/晚隔离起点5.607814s，可信完整回退未过；真实两ABORTED rearm/未解决106,143/59shift仅23修复保人口。新collect None/FAILED ack仍实际target decide发送set_state，与“缺ACK不盲写”不符；成功suffix正例skip已通过，普通未知失败依赖最低停尾命令/不公开成功，不扩防御矩阵/newRPC。S1共享成功依赖/物理一致，S2合法历史cp及input归宿→接回/E2或显式不支持，复用已验后缀/skip，不无限单事件。
 
 诊断最新补reference缓存元数据/预测基准/正常边界全样本只源码组件，未新on运行、参考坐标/raw行仍缺；用户本轮问UNAVAILABLE如何解决，已明确答：分支定位已完成，支持门/处理策略未改、物理根因未知，非已修。不自选方法/调门，S3既定研究参数停。-I archive及target Git bytes方法控制PASS/FAIL反例如实，无host/bag；pytest辅助新tests未跑不装。A/B局部进步不总分、自检状态/命令/原件/实际版本/全人口/失败未知/质量成本，review白名单SSH推送补012899f/private保护不合main不改历史，接收新意见待回执。
+
+## repair-f3 / 用户授权ALI-H v1设计与有限隔离测试（2026-11-12）
+
+用户直接要求“设计一版，并行接着做自动审阅，设计好通过GitHub给开发侧测试”。[ALI-H v1](ADAPTIVE_LOW_INFORMATION_HEALTH_V1_20261112.md)已设计：低支持/弱信息与健康观察分开，NORMAL_CONSISTENT/SUSPECT/UNKNOWN加scope；M地图/T邻帧/I真实preupdate运动冲突按来源和旧support上下文条件校准，预测不当正常独立证据、默认LOSO/sync/零bias不充观测，缺项/校准外/carried保持UNKNOWN。不改旧1m/60%、sigma/κ和准入门；新0.5s块/.95/.80/20块是一次冻结探索配置，不扫描追成绩、非有效概率。
+
+本次直接授权仅此方法隔离实现/有限测试，先shadow不改变旧检测/manager/native，生产部署另需用户确认，不扩双参考/数据宿主矩阵或恢复旧参数任务。本机只设计/审阅；S3保持唯一研究角色，在已有门研究时段安排并回实际预算/branch/认领；S1共享接口单写、S2继续native，先复用已有402/544行原件和必要最小synthetic控制，有明确缺项才复用原生trace或至多一次预算内有限导出。完整人口/标签/误报漏检延迟/弃权/资源与负结果，缺I或健康低支持参照明确UNKNOWN，不把改名当解决。
+
+20min/2h/日报actual owner repair-f3保持、未新增任务；新main5f54a44的armed/final原生E2独立并行核验，不凭完成标题验收。方案DESIGNED/NOT_IMPLEMENTED/NOT_EXECUTED，S1/S3实际接收待回执，发布不冒运行；A3/B3计划非新评分。SSH独立review提交推送/private保护不合main不改历史冻结门。
