@@ -1,0 +1,21 @@
+# Driver actually executed by fl_native_20261112T131213Z_563253
+receipt recovery_node_source = 7cfcccf7ce144d71cacfe47b1b7ea41cf845fe5187dde600a1bbcef2636b8c82
+base: 8d9cd0d (a6c0380c94ad...eddd)
+local patch applied (uncommitted at run time):
+--- /tmp/drv_8d9.py	2026-11-12 21:43:22.882795659 +0800
++++ /tmp/drv_patched.py	2026-11-12 21:43:22.902795719 +0800
+@@ -2165,8 +2165,12 @@
+             "native_checkpoint_actions": loop.cp_actions,
+             # The host has one checkpoint slot; these say whether each segment's restore or
+             # replay used the checkpoint that segment was armed with, or a later one.
+-            "checkpoint_checks": [ep.meta.get("checkpoint_check")
+-                                  for ep in loop.episodes if ep.meta.get("checkpoint_check")],
++            # LOCAL WORKAROUND (not upstream): Episode.meta is only created by decide(); an
++            # episode that never decided made this line raise AttributeError and the run wrote no
++            # summary. Reported to the driver owner; keep getattr until their fix lands.
++            "checkpoint_checks": [getattr(ep, "meta", {}).get("checkpoint_check")
++                                  for ep in loop.episodes
++                                  if getattr(ep, "meta", {}).get("checkpoint_check")],
+         },
+         # The label has to describe what actually happened, not what was asked for. A run that
+         # declared scripted triggers and fired none is an online run, and saying otherwise would

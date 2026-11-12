@@ -118,3 +118,16 @@ vec6(6) Ppre6x6(36) Ppost6x6(36)
 - 重链需要 `-L/home/R26534/mm/ros/lib`（libstdc++ 6.0.36；系统 GCC 11 缺少 GLIBCXX_3.4.32）与
   `-L/home/R26534/fast_livo2_deps/build/Sophus`。**链接环境与早先 run 不同，因此今晚之后的 run
   不能与早先 run 按"同一二进制"直接比较**；每份报告都要声明这一点。
+
+## 10. C′ 历史条目的边界（来源核对后确认，2026-11-12 夜）
+
+- `CpHistoryEntry` 只保存 `state / propagat / map / stamp / frame / 统计`，**没有**
+  `cp_last_imu_ / last_prop_end_time_ / acc_s_last_ / angvel_last_`，也没有该快照对应的
+  可重放区间（`snapshotCheckpoint()` 会 `replay_buffer_.clear()`）。
+- 因此即使按 stamp 选中一份历史条目，也**无法恢复 IMU 延续状态、无法重放该区间**。当前唯一合法的
+  用法是"只保留 + 报告候选"；在补上这些配套字段与可重放区间之前，任何按历史条目恢复的路径都必须
+  **显式拒绝**该范围，而不是悄悄用活动槽。
+- 另附（来源核对）：`cphist_fl_native_20261112T131213Z_563253` 实际执行的 driver 是
+  `8d9cd0d` + 一处本地 `getattr(ep,"meta")` 绕过（sha `7cfcccf7…`，原件见
+  `../run_provenance_131213/`），**不是** `c915197`；该 run 的 LATE 结论仍有效，但不能称为
+  "c915 修复后的验证"。
