@@ -697,3 +697,9 @@ checkpoint晚ACK/合法前组/online qstart边界有限控制通过，关闭旧�
 v9源码只将旧state/propagat/map及计数move进history，缺所选时刻IMU延续字段，snapshot仍清replay_buffer；restore函数与v8一致不选历史。最低S1/S2沿现API保配套完整状态和可重放区间、无历史显式拒绝，再实交恢复→物理修复→native状态map→全部后继，不能只无限保留/报告；只启用历史恢复前须解除，不为现低风险半程扩通用防御。driver receipt7cfcccf7不等main c5efdd73且有限近20 refs未找到，首次reader断言exit1保来源缺口后完成有限核验，不冒此run是c915修后原生验证；最低补实际执行源码/diff不重跑。
 
 hist_bytes最大235760928为旧历史points*32+voxels*96估算，排除当前槽/节点等非全RSS；外部57行峰7136584KB缺采样PID命令，与summary recovery PID564385峰1039732KB分开。pose尾坐标异常只记录非GT/ATE，K1/K3干净比较与根因UNKNOWN。探针v9 4FAIL1PASS/v9b5FAIL/v9c5PASS仅存活25s，不能“任何布局变化必崩”或尾稳定；laser_mapping目标完成而总体make失败口径保。A4局部历史能力增加非完整cp，A3/B3/B4无效果新证据，不全表评分；S1唯一集成/S2宿主/S3研究/四Cron单owner，ALI校准标签未解、仓库推荐非用户新选择、参数停/科学门不降，不以开发“明天”延期15h。中文review SSH白名单，不算法ROS/main历史/private/日报。
+
+## 87. f890ad8：K=3执行driver原件与receipt绑定，主线恢复结果未增加
+
+[增量核验](review_20261112_f890ad8/README.md)固定21:45 fetch主线f890ad8、online-v2 1fde521。新执行driver SHA7cfcccf7与旧131213Z receipt逐字一致，三份provenance SHA及声明补丁hunk一致；完整AST比较除已读checkpoint_checks getattr表达式外均同8d9cd0d（源码同de4360b），只summary绕过不改边界/恢复。§86执行源码不可获取缺口在A2/A12来源层解除，可以准确引用旧K3负结果，但仍不能标成c915或当前main原生验证。新增八档无新run/恢复选择/ALI效果，不计来源补齐为恢复推进，不重跑旧测试/宿主。
+
+候选保存表37ms/cand_bytes2036096/frame_gap51与已验旧ACK一致，delta方向明示，估算不RSS、帧差不实际重放量；开发承认3.68s混比较对象及历史cp缺IMU/capture，接受收窄，完整恢复仍待接口解除。重链6dd71953/链接环境改变只有开发报告，无本增量新receipt/完整binary回执，不改旧0d7e23de receipt或报同二进制公平比较；后继完整身份随真实run交，ASan/增长率归因非自动主线前置、根因UNKNOWN。多处“明天”非用户延期15h/暂停，S1确认窗内实际主线安排，不能本机冒称远端停工。唯一完整历史cp+replay→物理修复→native状态map→全部后继继续，S1唯一集成/S2宿主/S3研究，ALI正常标签未解/参数停/科学门不降/四Cron单owner，局部不全表评分。reader-I exit0为来源核验非恢复PASS，中文review SSH白名单、不算法ROS/main历史/private/日报。
