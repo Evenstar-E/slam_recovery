@@ -125,6 +125,22 @@ def e_i_from_poses(pre7: np.ndarray, post7: np.ndarray) -> np.ndarray:
     return np.concatenate([rot, so3_left_jacobian_inv(rot) @ D[:3, 3]])
 
 
+POSE_LEAVES = ("x", "y", "z", "qx", "qy", "qz", "qw")
+
+
+def expand_tail_names(tail_names: List[str]) -> List[str]:
+    """Expand aggregate pose7 / pre_pose7 names into their 7 scalar field names."""
+    keys = []
+    for name in tail_names:
+        if name == "pose7":
+            keys += [f"pose_{k}" for k in POSE_LEAVES]
+        elif name == "pre_pose7":
+            keys += [f"pre_pose_{k}" for k in POSE_LEAVES]
+        else:
+            keys.append(name)
+    return keys
+
+
 def parse_trace(path: str) -> Dict[str, Any]:
     names: Optional[List[str]] = None
     rows, malformed = [], []
@@ -147,11 +163,12 @@ def parse_trace(path: str) -> Dict[str, Any]:
             # v10 appends pose7; v11 appends pose7 + pre_pose7; parse them by NAME.
             tail_names = (names[names.index("Ppost6x6") + 1:]
                           if "Ppost6x6" in names else [])
+            tail_keys = expand_tail_names(tail_names)
             if len(f) == block_end:
                 pose_tail = None
-            elif len(f) == block_end + len(tail_names) and tail_names:
-                pose_tail = {name: float(f[block_end + i])
-                             for i, name in enumerate(tail_names)}
+            elif len(f) == block_end + len(tail_keys) and tail_keys:
+                pose_tail = {tail_keys[i]: float(f[block_end + i])
+                             for i in range(len(tail_keys))}
             else:
                 malformed.append({"line": lineno, "ncols": len(f)})
                 continue
@@ -190,8 +207,21 @@ def map_support(sup: Dict[str, Any]) -> str:
     return "LOW"
 
 
-def build_join(av: List[Dict[str, Any]], trace: Dict[str, Any]) -> Dict[str, Any]:
+def build_join(av: List[Dict[str, Any]], trace: Dict[str, Any],
+               tol_ns: int = 512) -> Dict[str, Any]:
     rows = trace["rows"]
+    true_span = bool(rows) and all(r["scan_first_ns"] >= 0 for r in rows)
+    if true_span:
+        mapped = []
+        for a in av:
+            S = int(a["scan_stamp_ns"])
+            m = [r for r in rows
+                 if r["scan_first_ns"] - tol_ns <= S <= r["scan_last_ns"] + tol_ns]
+            mapped.append({"av": a,
+                           "last": max((r["scan_last_ns"] for r in m), default=None),
+                           "rows": m})
+        return {"mapped": mapped, "mode": "true_span_512",
+                "status": "TRUE_SPAN_CONTAINMENT_WITH_512NS_QUANTIZATION"}
     by_last: Dict[int, List[Dict[str, Any]]] = defaultdict(list)
     for r in rows:
         by_last[r["scan_last_ns"]].append(r)
@@ -205,7 +235,8 @@ def build_join(av: List[Dict[str, Any]], trace: Dict[str, Any]) -> Dict[str, Any
             continue
         L = lasts[i]
         mapped.append({"av": a, "last": L, "rows": by_last[L]})
-    return {"mapped": mapped, "lasts": lasts, "by_last": by_last}
+    return {"mapped": mapped, "mode": "mechanical_prev_last",
+            "status": "HEURISTIC_UNPROVEN"}
 
 
 def i_evidence(group_rows: List[Dict[str, Any]],
@@ -377,6 +408,7 @@ def main(argv=None):
         return 0
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", required=True)
+    ap.add_argument("--tag", default="", help="optional output tag (t2_<tag>_summary.json)")
     args = ap.parse_args(argv)
     base = os.path.abspath(args.run)
     trace_path = os.path.join(base, "host_logs", "trace_cov.txt")
@@ -441,7 +473,7 @@ def main(argv=None):
             ambiguous_groups += 1 if k == 0 else 0
         j = group_idx[min(k, len(group_idx) - 1)]
         used[key] = k + 1
-        exact_by_idx[r["idx"]] = exact_e(r["vec6"], quat_to_rot(m2[j, 4:8]))
+        exact_by_idx[r["idx"]] = exact_e(r["vec6"], quat_to_rot(pose_rows[j][1][4:8]))
         time_err.append(pose_ns[j] - ns)
     time_err = np.array(time_err, dtype=np.int64)
     join = build_join(av, trace)
@@ -454,8 +486,9 @@ def main(argv=None):
     av_per_group = Counter(min(r["grp_idx"] for r in m["rows"]) for m in mapped if m["rows"])
     phase_coverage = Counter("both" if {r["phase"] for r in m["rows"]} == {0, 1} else "live_only"
                              for m in mapped if m["rows"])
-    exact = sum(1 for m in mapped if m["last"] is not None
-                and int(m["av"]["scan_stamp_ns"]) == int(m["last"]))
+    exact = sum(1 for m in mapped
+                if any(int(r["scan_first_ns"]) == int(m["av"]["scan_stamp_ns"]) == int(r["scan_last_ns"])
+                       for r in m["rows"]))
 
     first_pose_ns = min(int(a["pose_stamp_ns"]) for a in av)
     joined_rows = []
@@ -638,19 +671,26 @@ def main(argv=None):
             "duplicate_groups": sum(1 for g, n in Counter(r["grp_idx"] for r in trace["rows"]).items() if n > 1),
             "scan_first_sentinel_all": all(r["scan_first_ns"] == -1 for r in trace["rows"]),
             "m2dgr_rows": len(m2), "m2dgr_time_err_ns_max": int(np.abs(time_err).max()) if len(time_err) else None,
-            "pose_join_mode": "time_with_duplicate_order", "duplicate_time_groups": ambiguous_groups,
+            "pose_join_mode": ("same_row_pre_post" if same_row_pre_post
+                               else ("same_row_post" if same_row_pose
+                                     else "time_with_duplicate_order")),
+            "duplicate_time_groups": ambiguous_groups,
         },
         "join": {
-            "status": "HEURISTIC_UNPROVEN",
+            "status": join["status"],
+            "mode": join["mode"],
             "availability_rows": len(av), "mapped": len(mapped) - len(unmapped),
             "unmapped": len(unmapped), "exact_equality": exact,
             "trace_rows_per_group": dict(map_counts),
             "availability_per_group": dict(Counter(av_per_group.values())),
             "multi_grp_idx_rows": sum(1 for r in joined_rows if r["grp_idx"] and len(r["grp_idx"]) > 1),
-            "shared_last_groups": sum(1 for g in {tuple(sorted({r["grp_idx"] for r in rows}))
-                                                  for rows in join["by_last"].values()} if len(g) > 1),
+            "shared_last_groups": sum(1 for g in {tuple(sorted({r["grp_idx"] for r in trace["rows"]
+                                                                if r["scan_last_ns"] == L}))
+                                                  for L in {r["scan_last_ns"] for r in trace["rows"]}}
+                                      if len(g) > 1),
             "grp_per_last_distribution": dict(Counter(
-                len({r["grp_idx"] for r in rows}) for rows in join["by_last"].values())),
+                len({r["grp_idx"] for r in trace["rows"] if r["scan_last_ns"] == L})
+                for L in {r["scan_last_ns"] for r in trace["rows"]})),
             "avail_rows_per_last_distribution": dict(Counter(
                 Counter(m["last"] for m in mapped if m["last"] is not None).values())),
             "multi_grp_idx_row_examples": [r["kf_id"] for r in joined_rows
@@ -659,7 +699,9 @@ def main(argv=None):
             "phase_coverage_availability": dict(phase_coverage),
             "phase_sets": {str(k): v for k, v in phase_sets.items()},
             "has_out_sets": {str(k): v for k, v in has_sets.items()},
-            "rule": "effective span containment: previous distinct scan_last < scan_stamp_ns <= scan_last",
+            "rule": ("true span containment: first-512 <= scan_stamp_ns <= last+512"
+                     if join["mode"] == "true_span_512" else
+                     "mechanical: previous distinct scan_last < scan_stamp_ns <= scan_last"),
         },
         "channels": {
             "M_present_all": sum(1 for r in joined_rows if r["M_present"]),
@@ -731,9 +773,10 @@ def main(argv=None):
         "blocks": block_rows,
     }
     os.makedirs(HERE, exist_ok=True)
-    with open(os.path.join(HERE, "t2_summary.json"), "w", encoding="utf-8") as fh:
+    prefix = f"t2_{args.tag}_" if args.tag else "t2_"
+    with open(os.path.join(HERE, prefix + "summary.json"), "w", encoding="utf-8") as fh:
         json.dump(out, fh, indent=1, ensure_ascii=False)
-    with open(os.path.join(HERE, "t2_join.jsonl"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(HERE, prefix + "join.jsonl"), "w", encoding="utf-8") as fh:
         for r in joined_rows:
             fh.write(json.dumps(r, ensure_ascii=False) + "\n")
     print(json.dumps({k: out[k] for k in ("run", "trace", "join", "channels", "states")},
