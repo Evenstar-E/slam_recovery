@@ -764,3 +764,9 @@ growth只新38行文字无map序列/原脚本，report0.43/12.7是回溯边界�
 [有限关闭核验](review_20261113_18297d1/README.md)固定02:25:55 fetch main18297d1/开发4796f97。已读资格表达式两个正常分支true_span_512→PASS、mechanical_prev_last→HEURISTIC_UNPROVEN实测成立，旧v7 summary仅这一字段变，其余全JSON不变；两join及v11 summary逐字相同，完整数字/人口/零约束/tail/UNKNOWN保留。旧反例在此版本关闭不重开；v11正文三层和deadline前179/后303、旧47行/12块/51块成员对齐接受，标准库-I有限控制exit0非新宿主/效果，原生主线结果未增加。
 
 下一仍S1/S2现MM-LINS两节点测量修复→native状态map→PGO真实后继/E2或具体函数首断点/最低解除及实认领；S3最小修正/S1集成已核、真实正常校准/标签并行，不让文案/防御/参数串行替主线。A1/A11记录局部非A4/A6/B4/B11整链/新总分；四Cron/private/08:53/手调停门不降，中文SSH关闭增量不算法ROS/main历史/开发日报。
+
+## 96. d17d552：提前结果总结无新主线实交，版本与选型/归因边界集中收窄
+
+[总结增量审阅](review_20261113_d17d552/README.md)固定07:25:55 fetch maind17d552，唯一新S1结果文档非08:53最终验收。保受控v6局部执行/旧纯在线42applied/C′候选及晚cp/零追赶/四宿主未接/ALI性能不可评价；不重跑旧档。旧121127档实际1568×92、lib49f2f941/binary0d7e23de/driver62c165d1不v11同行165438，新总结错标签须按receipt修；cov NOT_AVAILABLE只是限制声明、不已完成残差Sigma实现。标准库-I有限原件/meta检查exit0，主线恢复/性能未增加。
+
+新总结重复已验边界外的MM-LINS四节点/无测量入口、LIO-SAM单节点选型、独立原版FAST-LIO2及load导致FAIL/地图精确峰排越界写：实际MM两节点/输入面、派生独立workspace及断流、因果UNKNOWN须沿已验反例集中纠正，不重开实验。字母选择不创造正常校准标签、旧声明注入离线与未阻原生接线不默认再等抽象A/B/C；进程权限只实际用户可放行不绕拒绝、不当全部主线必前置。下一S1/S2现MM两节点实际修复→native状态map→PGO后继或具体函数首断点/实认领，S3具体科学数据缺项并行；08:53仍独立如实/四Cron单owner，A/B无新总分，中文SSH review不算法ROS/main历史/私人/开发日报。
