@@ -1,0 +1,32 @@
+{
+  "target": "088906ae7cda17fb50b32580323a1008c542e3b1",
+  "comparison_base": "2ef0169ce4b7ff1b9f8e06d4185f49368bfcdc3a",
+  "scope": "Target Git blob CSV recomputation and selected original log readback, no native host/bag/test/algorithm execution",
+  "execution": "Inline python -I reader exited 0; check_records.py packages the same operations and was not separately rerun",
+  "lio_sam": {
+    "status": "ARCHIVE_RECOMPUTED_NEGATIVE_RESULT",
+    "trajectory_rows": 1120,
+    "path_len_m": 44574.55714972135,
+    "max_step_m": 535.0189004016688,
+    "max_gap_s": 3.20107102394104,
+    "window_anchor_first_output_ns": 1711547453483895000,
+    "E1": {"n_pairs": 96, "max_step_m": 0.5706387430529043, "steps_gt1m": 0, "gaps_gt0p5s": 0},
+    "E2": {"n_pairs": 55, "max_step_m": 535.0189004016688, "steps_gt1m": 26, "gaps_gt0p5s": 9},
+    "tail": {"n_pairs": 240, "max_step_m": 526.6296072091088, "steps_gt1m": 86, "gaps_gt0p5s": 1},
+    "limits": "CSV rounded to six-decimal seconds; window anchor is first output, not independently tied to bag start. Native quality fails but process death is not demonstrated. Receipt file contains JSON followed by a checksum line, not a single valid JSON document. Native input/config/binary/result bag and runner bytes not archived."
+  },
+  "orb_slam3": {
+    "status": "RAW_LOG_VERIFIED_NEGATIVE_RESULT",
+    "initialization_ids": 80,
+    "new_map_lines": 80,
+    "not_enough_motion_lines": 385,
+    "bad_imu_reset_lines": 43,
+    "final_zero_keyframes": true,
+    "exit_139_line": true,
+    "limits": "times.txt and input files are not archived, so 4/6/3 E1/E2/tail window counts are developer-provided, not independently recomputed. No stable tracking before declared windows; no independent second-fault response measurement."
+  },
+  "declaration_scope": "Both declarations state after run start, before analysis; README's before-run wording is not independently supported. Declared observation windows alone do not prove two physical faults occurred.",
+  "matrix_remaining": {"MM_LINS": "DEVELOPER_REPORTED_RUNNING_NO_NEW_ARCHIVE", "FAST_LIO2": "NOT_STARTED_AS_REPORTED_SHARED_EXECUTION_NOT_INDEPENDENT_RUN"},
+  "actual_slam_recovery_chain": "NOT_IMPLEMENTED_FOR_THESE_TWO_HOSTS",
+  "publication_intent": "Independent review branch through existing SSH; do not merge main or include private handoff"
+}

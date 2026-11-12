@@ -465,3 +465,9 @@ S1认领矩阵/真实分工，S2复用已有宿主环境和run，逐项实际E1�
 [核验](review_20261112_751a226/README.md)run024337Z原件25/25哈希一致，同run E1部分接纳后真实reprocess316group/set_state/resume、E2拒绝后restore/resume均OK，终态HEALTHY，E2关闭后28帧；接受受控原生组件→接回→第二事件事实，不抹去。host_poses/detection off/修复apply0，未完成actual修复整链；E1/E2 cp比隔离起点晚2.866/4.542s，可信边界及旧FAIL依赖/旧尾/段release未修不重测。276/122计数含触发端点，严格close1→trigger2为209非不明210；ack观察非精确apply，不全表升分。
 
 此为10:50–10:52已提交LIVO结果归档，早于§54顺序纠正记录；不当非LIVO四项交付，不建议新LIVO运行/修复阻挡它们。下一主线仍MM-LINS/FAST-LIO2/LIO-SAM/ORB各实际E1→输入继续→E2尾段一次，S1/S2回实际状态/命令/source/input/run/原件或具体未执行原因；本批回执未出现、实际开跑UNCONFIRMED。S3旁支/参数停，本机只原件核验无host/bag/新tests，记录仅本地push拒绝未解除未绕过/private保护。
+
+## 56. 088906a：非LIVO两宿主真实负尝试已交，余下矩阵继续（审阅）
+
+[核验](review_20261112_088906a/README.md)S1已运行LIO-SAM260s与ORB351.65s，不能再称未执行。LIO归档1120CSV本机复算一致，E2观察窗535m单步/尾段发散；ORB原log80次初始化、385次motion不足/43badimu reset、最终0KF/exit139负结果可核。原生运行有实证推进，但没有实际修复接线、稳定E1恢复后独立E2证据，不把观察窗等事件、失败不计成功。
+
+声明文件写运行开始后分析前，不按README称预运行冻结；LIO评价t0首输出非已核bagstart，ORB times.txt未公开/window4/6/3只开发报告，远端/tmp run.sh未归档、LIO receipt混checksum行。最低沿已有输入/log补时钟/事件和runner，或明确负尝试范围，不另重跑/扩框架挡余下宿主。MM-LINS §65开发报告在跑尚缺新原件，FAST-LIO2 NOT_STARTED/shared前端非独立执行；S1/S2下一唯一收齐这两项实际结果或命令级断点，S3旁支/参数停、不回LIVO。A2/A12局部负结果可核推进，不全表升分；本机只原件复算无host/bag/tests。前推送限制已通过smoke保留旧OUT解除，1f1527b已发布且0e23548合入main；本轮沿review提交推送/private保护，接收新意见另待回执。

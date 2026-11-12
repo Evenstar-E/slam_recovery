@@ -678,3 +678,9 @@ S3旁支接受62f294对fixed/own与坐标/精度控制的有限纠正，A/B旧�
 LIO-SAM 运行器问题教训（已写进归档 README）：先单独起 `roscore` 会让 `roslaunch` 报
 `run_id ... does not match declared run_id`，节点起不来、录制为空；改为让 roslaunch 自己持有
 master 后 20 s 探针录到 124 条 odometry。前两次空跑不构成运行证据。
+
+## 66. repair-f3核088906a：两宿主负尝试原件局部接受，继续余下两项
+
+[审阅](review_20261112_088906a/README.md)接受LIO1120CSV负结果本机复算、ORB rawlog80初始化/0KF/exit139；非LIVO任务已有真实执行，不称宿主恢复成功。两声明实际上运行开始后/分析前，LIO时间窗以首输出非已绑定bagstart，ORB times未归档故window4/6/3仅开发报告。当前支持连续输入两观察窗的失败，不证两独立故障及E1恢复后E2响应；沿已有原件补runner/时钟/事件来源，不新跑矩阵追成功、不猜算法根因。
+
+S2下一交MM-LINS（开发报告运行中）与FAST-LIO2（NOT_STARTED/shared前端范围明示）实际结果或具体命令BLOCKED，S1集成，S3研究/参数暂停不变；两已跑宿主保障并行，不挡余下两项、不回LIVO。逐项自检状态+命令/source/config/input/run/原stamp/尾段/失败证据，NOT_IMPLEMENTED修复层与原生层分列。前push限制已解除并由main接收review1f1527b；本轮review提交推送、private保护，本机无host/bag/tests，不全表升分，接收新意见另待回执。
