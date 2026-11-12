@@ -1331,3 +1331,16 @@ S1共享成功依赖/可信边界、S2下一合法历史恢复→完整接回后
 [核验](review_20261112_26ba3a3/README.md)新PCD/独立支持工具5相关test target Git bytes PASS，Scipy ICP未跑不装；target无新PCD/receipt/评分运行。正常pose不变只换参考fraction0→1不证明pose错；裁20/200保存点fraction1/真全样本.1仍入主both_pass，最低完整分母/partial单列、中性解释与现prefix gauge/共同支持，不能每帧ICP自拟合冒独立评价。ASCII COUNT兼容候选不声明binary input主阻断。S1§103派S2clean pass仅开发转述认领/用户选，本机无新直接选择不扩授权；ALI-H v1用户已直接授权隔离shadow研究b7ad580优先，实际接收待回执，S3唯一研究角色不占S2整轮诊断。
 
 14:37–16:37结论部分推进：后缀真实重推/成功skip旧pose/修复后同实例E2与39尾帧原生证据接受，不日志或test数；首工程cp晚隔离起点及UNKNOWN/FAIL依赖仍未过，算法/评价物理候选/全损坏人口/独立净收益未知，参数无同版本同人口规律/上限证据可解、旧sigma/κ/floor停。目标库运行/整体ABI测试失败次要；DNS恢复fetch最新26ba3a3，不猜远端停工。S1成功依赖/共享集成、S2合法历史cp/完整input归宿→实际修复接回后继尾段或显式不支持，复用已验suffix/skip不扩框架；S3既定研究/native不等。自检状态/命令/原件/全人口/失败/质量成本UNKNOWN，A/B局部不总分，只新评价增量提交SSH不重复2h空报告/private保护不合main不改算法历史冻结门。
+
+## 110. 独立参考工具按审阅收窄；干净地图 pass 已在本机产出 PCD（待 S2 归档）
+
+审阅 `26ba3a3`（合入）两点已修：
+1. **命名不归因**：`host_low_new_reference_pass` 只说明"同 body 点、同 T_wb 在新参考里命中、在旧参考里不命中"，
+   `summarise.reading` 明确 cause UNKNOWN；per-frame ICP 标为 **fitted compatibility**，不当未拟合判决。
+2. **裁样本不进主表**：`summarise` 主计数只用完整抽样帧，`points_total > saved` 的帧归入
+   `partial_sample_not_evaluable` 单列；新增测试覆盖。
+3. 另加 `estimate_se3`（跨 run 单 SE(3)/匹配前缀，Umeyama）与测试；ICP 仍只作局部拟合量，不替代公平对齐。
+   对同一 bag 的两次运行，两者都从同一起始帧的单位位姿出发，起始 gauge 相同，漂移按每帧对齐处理并标注。
+
+本机状态：S2 的干净 pass 已产出 PCD（`Log/pcd/all_raw_points.pcd` 40 MB、`all_downsampled_points.pcd` 216 KB、
+`lidar_poses.txt`），但尚未提交归档/receipt，故本轮**不评分、不宣称结果**；等 S2 交付 SHA 与配置后再离线评分。
