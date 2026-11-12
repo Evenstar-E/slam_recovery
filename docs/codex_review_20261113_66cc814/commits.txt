@@ -1,0 +1,23 @@
+66cc8146909329ef4bc712cd0728dc4cb4dfd0f4 2026-11-13T00:20:50+08:00 Record the v10 export implementation
+778ebdbe9ef317b7d916e29be070bf0ea550069e 2026-11-13T00:15:33+08:00 Record the I qualification and meta cleanup
+3ff195a27d0df52c46dc46cdfe93d8d0cc5b73bc 2026-11-13T00:14:48+08:00 Integrate the I qualification and meta cleanup
+932c07f731ee89f7ea98fb1b8c833c75302a637a 2026-11-13T00:14:24+08:00 收口 T2 元数据与 I 资格：e_i_convention 更正、tail 47/51、I=INCOMPLETE/UNKNOWN
+9e2d81ff83ce061c99e6dd630e72fa1a530a05e2 2026-11-13T00:12:37+08:00 Record the SE(3) review closure and the remaining meta cleanup
+13f53a3bdd9deccfcdab326bde12242b4b6d4f7c 2026-11-13T00:12:37+08:00 Merge the review closing the SE(3) fix
+220c617ec005fdd1c31fd9d46dd061a46e9443da 2026-11-13T00:11:03+08:00 [Auto-Review] 接受T2执行路径SE3修正并核重算人口与真实I限制
+e351a0bdb5bbab4e543da31ca1092797f350dfce 2026-11-12T23:45:54+08:00 Record the verified SE(3) log correction
+b4b7aade94da0ba58b7e0ca7ec4c384ef84d1b5d 2026-11-12T23:45:13+08:00 Integrate the corrected SE(3) log and the re-run T2 numbers
+be8b955d8abe76117be5fa5a726ece364826260f 2026-11-12T23:44:45+08:00 修正 exact_e：SE(3) Log 平移补 V(ω)⁻¹，并标注 vec6=NOT_VERIFIED
+560230c5012a7b7a0fe845c71a4549d0a3f52637 2026-11-12T23:43:15+08:00 Record the missing SE(3) Jacobian finding
+5c73df1d8b4f5b2e7d405adef0d0d64a3ed8bb16 2026-11-12T23:43:14+08:00 Merge the review daily report
+231de751d67cbdb7672faf1b10225fb7037f4bd0 2026-11-12T23:38:32+08:00 2026-11-12 daily report：记录原生部分推进与ALI及合法恢复缺项
+aed575957be048d0ed94b0b6ef72f5a57e770f91 2026-11-12T22:12:39+08:00 Merge the provenance-closing review
+1675a71fba5bba8fbb08cb3bfcace1c6bd9310ba 2026-11-12T21:50:47+08:00 [Auto-Review] 关闭K3执行driver来源缺口并保留完整恢复未实现边界
+f890ad8064cb42bfbc708732e98735206e2b09ee 2026-11-12T21:44:16+08:00 Record the resolved driver provenance
+05fd0a2d36d02c686d9196bdaae16d17edec8723 2026-11-12T21:42:59+08:00 Record the review findings: history entry limits and the driver source mismatch
+1ce96fcf7e7f55eb213dda6cfe04b63ea514c077 2026-11-12T21:42:48+08:00 Merge the newest review of the checkpoint history
+164777d0b5604d546ed742e5614880084d839fd6 2026-11-12T21:34:06+08:00 [Auto-Review] 核C′历史候选与完整恢复依赖并接受未决段汇总修正
+eb7e7381dd27f0992273bd24a60b136ee6816832 2026-11-12T21:31:15+08:00 Note the candidate-table columns and the BUILD.md sections
+13a46c61a24bb33e1903aba898c20081f4404e61 2026-11-12T21:30:21+08:00 Correct the C-prime candidate delta: 37 ms, not 3.68 s
+f604cef2665142c35b9e4e0efd4e5287885a1647 2026-11-12T21:28:57+08:00 Record the relinked host binary and the deferred ASan plan
+0bdc210aafc29a916929568e4a4ddc10626f0061 2026-11-12T21:20:06+08:00 [Auto-Review] 核验v8关联与在线回退负结果并复现失败ACK误判

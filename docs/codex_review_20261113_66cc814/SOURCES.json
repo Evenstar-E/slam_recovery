@@ -1,0 +1,157 @@
+{
+  "reviewer": "Codex",
+  "purpose": "reference review; pinned read-only reproduction, not native execution",
+  "review_main": "66cc8146909329ef4bc712cd0728dc4cb4dfd0f4",
+  "publication_base": "b3540f0cc814ba44fdf3e920d45747d9165ad814",
+  "inputs": [
+    {
+      "commit": "66cc8146909329ef4bc712cd0728dc4cb4dfd0f4",
+      "path": "docs/ali_h_v1_research/t2_run.py",
+      "destination": "source/docs/ali_h_v1_research/t2_run.py",
+      "bytes": 30803,
+      "sha256": "834fd8b3b76b070a017212a9f7cd525da6cbff03653217cdee6cf61e6999abe1"
+    },
+    {
+      "commit": "66cc8146909329ef4bc712cd0728dc4cb4dfd0f4",
+      "path": "docs/ali_h_v1_research/t2_join_upgrade.py",
+      "destination": "source/docs/ali_h_v1_research/t2_join_upgrade.py",
+      "bytes": 8426,
+      "sha256": "b247681f9e05ce0e0596b42d34fb49b590387494d20f06254323bd2156da5dcb"
+    },
+    {
+      "commit": "66cc8146909329ef4bc712cd0728dc4cb4dfd0f4",
+      "path": "docs/ali_h_v1_research/t2_summary.json",
+      "destination": "source/docs/ali_h_v1_research/t2_summary.json",
+      "bytes": 30627,
+      "sha256": "ce2efe450d9977fb0bb3947e439edb3d8562d73e675f700c0a24fc61f76087aa"
+    },
+    {
+      "commit": "66cc8146909329ef4bc712cd0728dc4cb4dfd0f4",
+      "path": "docs/ali_h_v1_research/t2_join.jsonl",
+      "destination": "source/docs/ali_h_v1_research/t2_join.jsonl",
+      "bytes": 506653,
+      "sha256": "496d99ab5149cbd56c70f5476eda7faaeaa049a01e4832444e28d04686472bea"
+    },
+    {
+      "commit": "66cc8146909329ef4bc712cd0728dc4cb4dfd0f4",
+      "path": "slam_recovery/ros/recovery_node.py",
+      "destination": "source/slam_recovery/ros/recovery_node.py",
+      "bytes": 141254,
+      "sha256": "c5efdd733cdcf65fadc4fc28fd1f509ad9ccd2e87a644b9d38165a80554cc830"
+    },
+    {
+      "commit": "eb2630ef10f827626ee1eaad87fa7ddc39cc825c",
+      "path": "docs/review_20261112_four_host/host_change_trace_cov/src_LIVMapper.cpp.v10",
+      "destination": "experimental/docs/review_20261112_four_host/host_change_trace_cov/src_LIVMapper.cpp.v10",
+      "bytes": 105916,
+      "sha256": "0b029d0a1c40a34467cea25c1e34b065aa6133e16b9feb5445dcfe715d9b2500"
+    },
+    {
+      "commit": "eb2630ef10f827626ee1eaad87fa7ddc39cc825c",
+      "path": "docs/review_20261112_four_host/host_change_trace_cov/probe_v10_pre_1/result.txt",
+      "destination": "experimental/docs/review_20261112_four_host/host_change_trace_cov/probe_v10_pre_1/result.txt",
+      "bytes": 15,
+      "sha256": "186736a29d3e5c978f55d10e67dc59a7ed8e09257f77fff05d00d76d527bd02b"
+    },
+    {
+      "commit": "eb2630ef10f827626ee1eaad87fa7ddc39cc825c",
+      "path": "docs/review_20261112_four_host/host_change_trace_cov/probe_v10_pre_2/result.txt",
+      "destination": "experimental/docs/review_20261112_four_host/host_change_trace_cov/probe_v10_pre_2/result.txt",
+      "bytes": 15,
+      "sha256": "186736a29d3e5c978f55d10e67dc59a7ed8e09257f77fff05d00d76d527bd02b"
+    },
+    {
+      "commit": "eb2630ef10f827626ee1eaad87fa7ddc39cc825c",
+      "path": "docs/review_20261112_four_host/host_change_trace_cov/probe_v10_pre_3/result.txt",
+      "destination": "experimental/docs/review_20261112_four_host/host_change_trace_cov/probe_v10_pre_3/result.txt",
+      "bytes": 15,
+      "sha256": "186736a29d3e5c978f55d10e67dc59a7ed8e09257f77fff05d00d76d527bd02b"
+    },
+    {
+      "commit": "eb2630ef10f827626ee1eaad87fa7ddc39cc825c",
+      "path": "docs/review_20261112_four_host/host_change_trace_cov/probe_v10_pre_4/result.txt",
+      "destination": "experimental/docs/review_20261112_four_host/host_change_trace_cov/probe_v10_pre_4/result.txt",
+      "bytes": 15,
+      "sha256": "186736a29d3e5c978f55d10e67dc59a7ed8e09257f77fff05d00d76d527bd02b"
+    },
+    {
+      "commit": "eb2630ef10f827626ee1eaad87fa7ddc39cc825c",
+      "path": "docs/review_20261112_four_host/host_change_trace_cov/probe_v10_pre_5/result.txt",
+      "destination": "experimental/docs/review_20261112_four_host/host_change_trace_cov/probe_v10_pre_5/result.txt",
+      "bytes": 15,
+      "sha256": "186736a29d3e5c978f55d10e67dc59a7ed8e09257f77fff05d00d76d527bd02b"
+    },
+    {
+      "commit": "eb2630ef10f827626ee1eaad87fa7ddc39cc825c",
+      "path": "docs/review_20261112_four_host/run_provenance_131213/SHA256SUMS",
+      "destination": "experimental/docs/review_20261112_four_host/run_provenance_131213/SHA256SUMS",
+      "bytes": 422,
+      "sha256": "8b8c0ae3adb311ad72d5c83b148ea5a5389bcd60d59e89641be4345c90b574d5"
+    },
+    {
+      "commit": "eb2630ef10f827626ee1eaad87fa7ddc39cc825c",
+      "path": "docs/review_20261112_four_host/run_provenance_131213/driver_patch.diff",
+      "destination": "experimental/docs/review_20261112_four_host/run_provenance_131213/driver_patch.diff",
+      "bytes": 1502,
+      "sha256": "c10369119cb110e1ea66f38f88b16b7760ca995ca30aa143e2044b535344e022"
+    },
+    {
+      "commit": "eb2630ef10f827626ee1eaad87fa7ddc39cc825c",
+      "path": "docs/review_20261112_four_host/run_provenance_131213/recovery_node.executed.py",
+      "destination": "experimental/docs/review_20261112_four_host/run_provenance_131213/recovery_node.executed.py",
+      "bytes": 141037,
+      "sha256": "7cfcccf7ce144d71cacfe47b1b7ea41cf845fe5187dde600a1bbcef2636b8c82"
+    },
+    {
+      "commit": "eb2630ef10f827626ee1eaad87fa7ddc39cc825c",
+      "path": "docs/review_20261112_four_host/run_provenance_131213/run_native_loop.diff",
+      "destination": "experimental/docs/review_20261112_four_host/run_provenance_131213/run_native_loop.diff",
+      "bytes": 1600,
+      "sha256": "75fadac2c0f7be0d488352d8e8f0407e066ff0b09122d3c51a7d324a3c6d39b2"
+    },
+    {
+      "commit": "eb2630ef10f827626ee1eaad87fa7ddc39cc825c",
+      "path": "docs/review_20261112_four_host/cphist_fl_native_20261112T131213Z_563253/cp_candidates.txt",
+      "destination": "experimental/docs/review_20261112_four_host/cphist_fl_native_20261112T131213Z_563253/cp_candidates.txt",
+      "bytes": 334,
+      "sha256": "cd0f8a9f836aa68abd6ecff30aa844e32bc787c233fe30e81ad47b6794802b13"
+    },
+    {
+      "commit": "eb2630ef10f827626ee1eaad87fa7ddc39cc825c",
+      "path": "docs/review_20261112_four_host/cphist_fl_native_20261112T131213Z_563253/receipt.json",
+      "destination": "experimental/docs/review_20261112_four_host/cphist_fl_native_20261112T131213Z_563253/receipt.json",
+      "bytes": 2016,
+      "sha256": "c78dd035d54e0999c14ccea880c2740c6a8bdb77f9effc786610c16f4631c164"
+    },
+    {
+      "commit": "eb2630ef10f827626ee1eaad87fa7ddc39cc825c",
+      "path": "docs/review_20261112_four_host/cphist_fl_native_20261112T131213Z_563253/run_summary.json",
+      "destination": "experimental/docs/review_20261112_four_host/cphist_fl_native_20261112T131213Z_563253/run_summary.json",
+      "bytes": 170641,
+      "sha256": "46fa92486a523490e7d821e59bc3ea68a391108063b8dc5072eedd7bb03e5d7f"
+    },
+    {
+      "commit": "290aae8441fedc24dfbf316b8150880b63fae0b1",
+      "path": "docs/review_20261112_four_host/trace_fl_native_20261112T115734Z_483777/host_logs/trace_cov.txt",
+      "destination": "old_t2/host_logs/trace_cov.txt",
+      "bytes": 1406737,
+      "sha256": "8c0d6a24cb71416c50916b404867356628eebe28c41db2447f7ad3e4f75ff62d"
+    },
+    {
+      "commit": "290aae8441fedc24dfbf316b8150880b63fae0b1",
+      "path": "docs/review_20261112_four_host/trace_fl_native_20261112T115734Z_483777/availability_frames.jsonl.gz",
+      "destination": "old_t2/availability_frames.jsonl.gz",
+      "bytes": 17428925,
+      "sha256": "9f562a23668416ab448fd2363c8245fd81f5a2dd0d79f217667599ddf9b33fc1"
+    },
+    {
+      "commit": "290aae8441fedc24dfbf316b8150880b63fae0b1",
+      "path": "docs/review_20261112_four_host/trace_fl_native_20261112T115734Z_483777/host_logs/M2DGR_room_02.txt",
+      "destination": "experimental/docs/review_20261112_four_host/trace_fl_native_20261112T115734Z_483777/host_logs/M2DGR_room_02.txt",
+      "bytes": 81570,
+      "sha256": "cac87e9b6df866d0c47cbc04311547251c28d7f4bfa74d73c38e4098d00bc970"
+    }
+  ],
+  "comparison_base": "c91519734de99397e97e368d015f17694ffe303f",
+  "original_local_check_sha256": "170e313d0808e93e9558c0d3453da4bbc27e14606698bbc0819add5378a42d41"
+}
