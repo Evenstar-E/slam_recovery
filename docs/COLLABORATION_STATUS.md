@@ -1890,3 +1890,27 @@ S3 HEAD `65f54d5`（`exp/ali-h-v1`）。本机核对：
 - 自测 T2 prep **18/18 PASS**，真实 T2 仍 `NOT_EXECUTED`。
 
 已 `--no-ff` 合入 main，仓库测试 202 OK。T2/T3 继续 BLOCKED（等 detection-on 配对 run 与 `ALI-B2` 用户选择）。
+
+## 134. detection-on 配对 run 落地：T2 输入可用；join 改为"跨度包含"；归档已推送
+
+S2 在 `49f2f941` 上完成 detection on + availability + trace 的 off/on 各一次，本机核对：
+
+| | off `115203Z_476840` | on `115734Z_483777` |
+|---|---|---|
+| paired | 544 | 532 |
+| gate | accepted 0 / rejected 5（全 Mode3） | accepted 1（committed 42）/ rejected 5 |
+| 脚本触发 | 两个都触发 | 只触发第二个 |
+| 终态 | HEALTHY / kf 112 | **WAITING_FOR_EVIDENCE** / kf 60 |
+| availability | 542 行 | **531 行（351 AVAILABLE / 180 UNAVAILABLE，support 531/531 非空）** |
+| trace | — | 1047 行（5 表头 + 1042 数据），sha `8c0d6a24…`；`phase=1` 156、`has_out=1` 975 |
+
+**join 实测（S1 复算）**：`scan_stamp_ns` 与 `scan_last_ns` 精确相等仅 1/531；但 **531/531 满足
+`scan_first_ns ≤ scan_stamp_ns ≤ scan_last_ns`**——语义是"合并组包含该扫描"，多对一。已要求 S3 用跨度包含、
+`grp_idx` 记身份、`abs_ns` 记时间，未落入任何跨度的记 `NO_TRACE_ROW` 并进分母，不用 ±1 ms 近似。
+
+**用途限制**：on run 被接受段 `repair_applied=0 / dropped=42`（detection on 抬高负载、命令迟到，reprocess 落 frame 552），
+因此该 run 不能用于"修复收益"结论；per-frame 证据不受影响。S1 已向 S2 提出新方向：宿主**单 checkpoint 槽**可能被
+自动触发的新快照覆盖，是"脚本段 armed checkpoint 丢失/迟到落错 frame"的同一根因，优先于再补 trace run。
+
+**归档**：`exp/trace-cov` 已推至 `ffd4b13`（含两次 detection-on run 的 receipt/run_summary/wiring/
+`availability_frames.jsonl.gz`/`host_logs`/SHA256SUMS），`.git/config` 无 token。
