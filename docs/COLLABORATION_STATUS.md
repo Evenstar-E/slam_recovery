@@ -2028,3 +2028,28 @@ S3 `8c60b76`（已合入 main），本机核对：
 - 数值与人口未变：M 444 / T 86 / I 504；UNKNOWN 108 块/54.0 s + `POST_E2_NO_CATCHUP` 12 块/6.0 s；分类与错误率 `NOT_EVALUABLE`。
 
 小请求（已发 S3）：在 `t2_summary.json` 的 `join` 里加 `status="HEURISTIC_UNPROVEN"`，便于机器读取与后续升级对照。
+
+## 141. v8 导出修复生效（scan_first 真实、n_scans、无截断）；checkpoint 校验改为边界语义并修 ACK 迟到
+
+**S2 的 v8（库 `1239f35f…`，`host_build_v8.log`，完整源码 `.v8` + `trace_cov_v8_full.diff` 366 行已入仓）**：
+- `native_scan_first` 在 `lidar_frame_beg_time<=0` 时回退到合并组首帧 `frame_header_time`；
+- 新增 `n_scans`（每组包含几条原始扫描）；
+- 行写入改 `ostringstream` 一次写出；runner teardown 先 `kill -INT` 再 TERM。
+
+**新 run `124217Z_521833`**（本机核对）：`status OK`、库 `1239f35f…`、driver `62c165d1…`（`a372557`）、paired 444、
+门 **accepted 0 / rejected 2 / errored 0**、终态 HEALTHY/kf 238；trace **736 数据行、全部 93 列、`scan_first` 无 -1**、
+sha `3728c94c…`；availability 444（**88 AVAILABLE / 356 UNAVAILABLE**）。
+**覆盖不足如实记录**：bag 播满 59.98 s，但宿主只处理到 **rel 49.1 s**（上次为 59.8 s / 529 paired），
+触发 2 段（上次 5 段）；本次数据在 0–49.1 s 内自洽、membership 证据完整，但**全程覆盖不成立**。
+
+**S1 修复（driver，回应审阅 §3.1/§3.2）**：
+- `_record_checkpoint_check` 不再在命令发出时复制标量（那时 ack 尚未到达，导致 `actual_stamp` 恒为 null）；
+  改为持有 action 引用、状态 `PENDING_ACK`，在 `build_summary` 里 `_finalize_checkpoint_checks()` 从最终 ack 解析；
+- 判定改为**边界语义**：scripted 边界 = `trigger−margin`、在线边界 = 该段 `quarantine_start_ns`；
+  `actual ≤ boundary → AT_OR_BEFORE_BOUNDARY`（宿主复制"边界前最后已处理组"，构造上不会相等），
+  `actual > boundary → LATE_AFTER_BOUNDARY`，无 ack → `NO_ACK`。不再用精确相等，也不加模糊容差。
+- 新测试 3 条（边界前后、在线 qstart、ACK 迟到后补记），全量 **207 tests OK**。
+
+**审阅 `646d4f2` 同时指出**（已接受）：ep0/ep1 实际 restore 晚隔离起点约 3.9 s（`ACK cp − qstart`），属**非可信回退**，
+不能因改纯在线就认为回退合法；ep3 修复 42 条扫描全部落在声明注入窗**之后**，不能称"注入测量已修回"，
+需 S1/S3 说明修复对象（点测量错误 vs 状态误差被转成点偏置）与正常后继误干预。
