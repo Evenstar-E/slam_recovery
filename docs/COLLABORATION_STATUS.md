@@ -2315,3 +2315,17 @@ S3 `f90a748`（已合入 main），本机核对：
   （`n_scans` 只计新 pop raw、carryover 在 cur/next）；`mat_lio_*` 无 key 前不用于 I 资格。
 
 v7/v8 数值与人口未变；分类/错误率仍 `NOT_EVALUABLE`。等 S2 的 v10 trace + `mat_lio_*` key。
+
+## 157. v11：同一行 pre/post 配对（行宽 107）与带 key 的 `mat_lio_*`；开跑前置=消费端支持 107
+
+S2 `c5bc057`（`exp/online-v2`，已推），本机核对：库 **`81b35f92…`**、可执行文件仍 `6dd71953…`（未重链）；
+`LIVMapper.cpp:368` 头已含 `pose7 pre_pose7`；5 个启动探针全 `PASS alive 25s`；归档含五个 v11 快照 +
+`trace_cov_v11_full.diff`（514 行 v6→v11）+ BUILD §12。
+
+- **同一行 pre/post**：`pose7`（更新后）之后新增 `pre_pose7`（`StateEstimation` 前捕获），行宽 **100 → 107**；
+  一行即"一次更新"的完整配对，不再需要行间 zip/时间近邻；早退帧也有 `pre_pose7`。
+- **`mat_lio_pre/out` 加 key**：每行前加 `idx grp_idx phase`，可精确配对（仅作交叉核对）。
+
+**风险与前置**：S3 的 parser 目前只接受 92/93/100，**107 会再次被判 malformed**。已要求 S3 加 107 档与 107 正常控制，
+并优先用同行 `pre_pose7`/`pose7` 算 e_I（`vec6` 仅对照）。S2 已承诺：在 S1/S3 明确回"parser 已支持 107"之前不开跑，
+且 run 结束后先本地按列名自检 107 可解析，失败先修 parser 不重跑。
