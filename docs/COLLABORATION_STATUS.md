@@ -859,3 +859,26 @@ S1 复核 S2 `1301c41`（合入）。sham run `052437Z_114016`：23 条按 10/10
 3. 实验声明改为**损坏窗口从触发戳开始**（不再提前 4 s），避免损坏帧进入 checkpoint 地图而无法被修复；
    旧 run 与旧声明保留。
 4. 重编宿主必须归档新二进制 sha、host diff 与构建日志；随后跑 repair/sham 一对，核对两端一致后再比地图。
+
+## 75. 终止戳宿主改动生效：终点逐位对齐，起点仍随积压漂移（开段快照更差）
+
+S1 复核 S2 `56a73d1`（合入，191 测试）。
+
+| 项 | repair | sham |
+|---|---|---|
+| `reprocess` | 34 帧 [279.215 .. **280.281185627**] `truncated=451` | 64 帧 [278.215 .. **280.281185627**] `truncated=509` |
+| 修复消费 | 7 条 | 12 条 |
+| 快照应用 | 触发+2.933 s（frame 252） | 触发+1.934 s（frame 242） |
+| 地图 | 17322 voxels | 17283 voxels |
+
+- 宿主改动（本轮唯一）：`reprocessCheckpoint(..., end_stamp_ns)` + payload 解析 + 日志 `replayed/truncated/end_stamp`；
+  增量 diff 87 行、完整 `deployed_host_v2.diff` 在干净 `0d2c034` 上可 apply；新库 `liblaser_mapping.so`
+  sha **`f27d1730…`**（已在本机核对，`strings` 含 `truncated=`），`fastlivo_mapping` 仍 `0d7e23de…`；
+  构建退出码 1 但宿主目标已 `Built target laser_mapping`，失败在无关 target（`BUILD.md` 有记录）。
+- 终点对齐成功；**起点仍不一致**：开段 snapshot 走命令通道，积压时落在触发后 1.9–2.9 s，两次差约 1 s。
+  S2 的判断成立——本轮"开段立即快照"比滚动快照更差，起点落在触发之后，候选前段没进重放（23 条修复只消费 7/12 条）。
+
+**S1 决定（最后一项宿主改动）**：`hold`/`snapshot` 支持可选应用戳，由宿主在"第一个 `lio_time ≥ 戳` 的组处理之前"
+执行；驱动在启动阶段按脚本触发戳预排 `hold <stamp>` 与 `snapshot <stamp>`，撤掉开段 snapshot。
+这样 checkpoint 与捕获起点都钉在触发帧，`reprocess <frozen_at_ns>` 钉终点；随后 repair/sham 一对应两端逐位一致。
+门/阈值/σ 不动；损坏自注入，不声称真实修复收益。
