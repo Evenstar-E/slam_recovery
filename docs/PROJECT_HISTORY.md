@@ -635,3 +635,19 @@ S1报100744Z/101116Z两次host image_transport启动错误/pose0 paired0，同�
 [两小时总结](MAINLINE_CHECK_20261112_1837.md)绑定18:38 fetch的e0d403b。复用d86受控cp边界实证解除与24研究原件资格核验；自动检测/真实I/完整收益尚未验证，失败trace原件未上传、启动根因UNKNOWN。主要当前工程依赖是实际host启动与有效导出，科学依赖是正常校准/标签和三个已复现数学/缺块问题；没有同版本同人口调参规律能补这些缺项，旧手调继续暂停，不全表重评分。
 
 e0只增加header/end exports及常offset精确join协议，没有真实trace或join caller；header是原消息身份，native更新/分组末时间是不同物理量，偏移非恒定不独自证明身份无法对应、恒定也不证同帧。最低本次导出保实际source scan→group/update/phase关系，同run按原身份关联并核pre/post同一物理时间；缺关系保INCOMPLETE和全部未配对人口，不nearest、不同run贴接或静默删变offset行，不改冻结规则迁就结果。三问题函数未变，不重跑旧控制；本机未见实际错配。S1/S2/S3已认领范围复用，下一单一有效真实I+同新trace完整风险/UNKNOWN人口结果，证据支持后继续有限自动接线；普通修正不停止15h，确需用户选择才中文重大阻塞。四Cron单owner保持、无Codex前置，现review中文SSH提交，只新时间评价限制与整合状态，不算法/ROS/大实验、不合main、不触private/开发日报。
+
+## 79. 35c2d62：ALI三处组件缺陷解除，正常参照/标签重大阻塞已中文登记
+
+[增量核验](review_20261112_35c2d62/README.md)固定19:05 fetch的35c2d62，比较e0d403b，跳过旧审阅/纯merge。五产物hash/code通过，原availability与shadow未变，A402/90、B544/120（119有行+空3255570637 NO_DATA）完整人口可核。独立只读目标函数控制实际确认SE3 Log平移修正、缺块断dwell保last_suspect、right/pre_body资格拒绝left/world；三个旧问题在相应组件层关闭，不继续阻断。真实trace caller/cov来源/UNKNOWN时长评价仍未交，保存7/14自测非本机执行；空列表min回归只在允许空批次时恢复原行为，非A/B阻断。
+
+拒绝meta现明确只回滚/NOT_REPLAYED/catch_up NOT_IMPLEMENTED，诚实范围增加但不实现A5/A10追赶。新checkpoint_stamp仍用trigger-margin代实际cp，最小正常分支控制有效ACK975却记录980复现；既有v6 E2 ACK与请求实际差12.414904ms佐证，无需新run。_send异步，立即CONTINUES_FROM_RESTORED_STATE不等已应用，最低现event/ACK汇总绑实际时间/结果、缺项UNKNOWN，记录收口可并行不新框架/宿主重跑。新增测试因pytest缺失未执行、不安装/伪造依赖，改AST有限控制。
+
+中文ALI-B2-NORMAL-LABELS-20261112-01已main登记等待实际用户确认，现独立正常参照/事件标签缺项成立，不能保证15h检测效果。完整评价须校准与标签两类证据并非二选一；原15h已允许既有声明自注入只离线，不为同范围重复等授权，新数据/正常确认方法/超预算或降级资格-only仍待用户选择。只停受阻效果，S2合法有限诊断/trace与S1原生归宿继续；不替用户选C。宿主v6/v7探针/内存损坏诊断仅开发报告，patch/probe路径本目标为空，首帧前崩不排除新增构造/配置/布局，root UNKNOWN，最低上传现原件不重复矩阵。S1共享集成/S2导出/S3研究责任复用、noCodex/参数停，A3/B3组件增加非效果，A5/A10声明增加非恢复，局部不全表评分，四Cron单owner/中文review SSH/private保护、不算法ROS或main历史冻结门。
+
+## 80. aaf7e28：扫描身份与物理时间双对应资格接受，trace-off实跑仍待原件
+
+[增量核验](review_20261112_aaf7e28/README.md)固定19:25 fetch的aaf7e28，比较35c2d62，跳过15e74fc旧总结/纯merge。目标check_manifest最小-I控制PASS：两对应true声明READY、任一缺失INCOMPLETE，source身份export缺失拒绝，变offset本身不拒；已修原常offset限制，不宣实际逐行join/cov/phase已验。eI/sI/Jinv AST未变、不重跑三控制/946帧，保存16自测只归档读取非实跑。实际source→group需保合并多对一/phase，不强拆组凑一一对应，不以double末戳伪造原end整数。
+
+S1§128/129报告布局/static流修正与探针5/5但teardown仍smash、库007c3bdc、off run111325Z_435333/536paired/E1suffix651/E2拒绝/pre-out复制；目标无run/probe/patch原件，仅DEVELOPER_REPORTED，不能独立核诊断因果/成本/真实I或on-off不变性。最低上传已存原件，不为审阅重跑off；同现预算有限on/off继续，随机配对数量差保留不硬逐值一致。新恢复/自动检测效果没有可核增加，A1/A11/A3/B3准备推进非性能，其他原生项未闭合不全表评分。
+
+ALI-B2记录未变/用户确认空，78de840最低解除意见尚未入target不指控忽略；正常校准+事件标签两依赖，既有注入离线授权不重复等待，新来源/超预算或资格-only待用户选、不代选C。S1共享集成/原生归宿、S2真实导出、S3同新trace完整资格UNKNOWN/校准标签后风险评价仍单一交付，四Cron/noCodex/参数停；状态命令原件/合并组/未配对/无行块/UNKNOWN时长/失败成本自检，不test数当成果。实质修正接受与新运行证据界限中文review SSH发布，不生产算法ROS/main历史冻结门/private/日报。

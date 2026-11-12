@@ -1,0 +1,29 @@
+{
+  "target": "35c2d62b6412d5b651ef6d211a5c8d16a77cc5f1",
+  "command": "C:/Python315/python.exe -B -W ignore D:/REPAIR/slam_recovery_upstream/docs/review_20261112_35c2d62/run_checks.py",
+  "source_sha256": "1c96a7fcae2d7d7e10ae985fe1f9d568eb1314dd1fa36d286a8662759bcc30ad",
+  "source_loading": "Only reviewed exact-target refusal else body compiled in memory",
+  "changed_test": {
+    "status": "NOT_EXECUTED_LOCAL",
+    "reason": "Target test module imports pytest, absent locally; initial import exit1; no installation or shim"
+  },
+  "normal_checkpoint_metadata_control": {
+    "status": "FAIL_REPRODUCED_METADATA",
+    "actual_restore_ack_stamp_ns": 975,
+    "recorded_disposition": {
+      "scope": "STATE_AND_MAP_ROLLBACK_ONLY",
+      "checkpoint_stamp_ns": 980,
+      "decision_ts_ns": 1500,
+      "interval_ns": [
+        980,
+        1500
+      ],
+      "consumed_input_in_interval": "NOT_REPLAYED",
+      "subsequent_input": "CONTINUES_FROM_RESTORED_STATE",
+      "catch_up": "NOT_IMPLEMENTED"
+    },
+    "scope": "Valid restore with earlier processed-group checkpoint; wrong provenance interval, not new input loss or actual native run"
+  },
+  "old_ack_writeback_behavior_not_retested": true,
+  "no_native_ROS_bag_parameter_or_archived_CLI_execution": true
+}
