@@ -1766,3 +1766,17 @@ S3 HEAD `72284f7`（`exp/ali-h-v1`），本机独立复现：
 影响：`NORMAL_CONSISTENT`/`SUSPECT`、误报、漏检/延迟、错误 NORMAL 一律 `NOT_EVALUABLE`；T0/T1/契约/协议与
 「UNKNOWN 区间 + 资格」可继续。选项 A（用户给独立正常前缀+事件标签）/ B（授权自注入标签仅离线 + 独立确认正常前缀）/
 C（不新增数据，只交资格/UNKNOWN）。**S1 不代替用户选择**；trace 依赖单列 `ALI-B1`，仍由 S2 处理。
+
+## 127. 合入两小时总结；join 规则增加"扫描身份"限制；宿主无新运行
+
+审阅 `15e74fc` 发布 `docs/MAINLINE_CHECK_20261112_1837.md`（两小时总结），已 `--no-ff` 合入 main。其要点与本机状态一致：
+受控原生边界有实证进步（cp 早隔离起点 15.918/12.414 ms、23 修复、794 组重放），但自动检测效果、拒绝后历史归宿、
+真实 I trace 仍未闭合。
+
+**新的使用限制（已转给 S3 修订预注册协议）**：`scan_stamp_ns`（header 精确 ns）与 `last_lio_update_time`（更新/分组
+末时刻）是不同物理量；头/末戳不等或 offset 非恒定**不**证明无法关联，恒定 offset 也**不**证明同一扫描。最低要求：
+导出原始 scan 身份 + native group/update/phase 对应，join 须"身份对应 + 时间对应"两条同时成立，缺一记
+`join_key_unresolved`；不得删变 offset 数据凑人口、不得 nearest 猜帧。
+
+**宿主**：本机无 `fastlivo_mapping`/`recovery_node`/`rosbag play` 进程，无新 run 目录（最新仍是两次 FAIL 的
+`100744Z`/`101116Z`）；S2 的 B1 二分/ASan 结果未到，记 NOT_EXECUTED。
