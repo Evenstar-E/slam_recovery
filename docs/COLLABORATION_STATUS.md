@@ -718,3 +718,20 @@ body 点云不变；而宿主 `applyRepairedScan` 替换的正是 body 系测量
 （`_on_scan` 有 stamp、`_dispatch` 未传），新增修复云 publisher，header 用原始 scan stamp；
 轮询 status ack 的 `repair_received` ≥ N 再发 `reprocess`；顺序 hold → 发布/确认 → reprocess →
 set_state → resume。宿主最小 0 行（`repaired_clouds_` 64 条上限是唯一硬限制）；manager 0 行。
+
+## 68. 用户决定：先做"已知损坏修复"（受控注入）作为实际修复测量
+
+2026-11-12 用户选定：**已知损坏修复（受控注入，INJECTION）**，不做去动态点，也不现在收口。
+
+含义与边界（S1 定，交 S2 实现）：
+- 损坏是**声明式**的：受控 run 用 relay 把 bag 的 `/velodyne_points` 转到宿主，在声明窗口内对
+  每帧施加已知的系统性偏差（例如 z 方向 +0.5 m），窗口外原样透传；损坏参数与戳逐帧落盘，
+  标 `INJECTION`。
+- 修复是**测量级**的：驱动/修复生产者对同一损坏帧用可信参考地图做点面配准，估计并去掉该偏差，
+  产出 body 系修复点云（保持 `x,y,z,intensity,time,ring` 布局与原 header stamp），经
+  `/native_recovery/repaired_scan` 送入宿主。
+- 顺序：hold → 发布修复云并轮询 `repair_received` ≥ N → `reprocess`（`apply_repairs=true`）→
+  `set_state`（最后接受位姿）→ rearm/`commit_closed` 后 `resume`。
+- 宿主 0 行改动（`repaired_clouds_` 64 条上限对 32 帧候选够用）；驱动与修复生产者约 150–200 行 + 单测。
+- 能声称：修复测量进入宿主重放、`repair_applied>0`、地图由修复测量重估；**不能**声称真实世界
+  修复收益（损坏是自己注入的），也不改门/阈值/σ。
