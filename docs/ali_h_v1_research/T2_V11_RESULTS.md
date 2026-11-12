@@ -4,6 +4,48 @@
 > detection on、K=1、无 scripted）。**只读既有原件**；按用户 2026-11-13 指令，不新开
 > FAST-LIVO2 运行/构建/适配、不要求新导出。**单独记账，不与 v7/v8 合并。**
 > `ALI-B2` 仍等用户；分类/误报/漏检/延迟/错误 NORMAL 全部 `NOT_EVALUABLE`。
+> **本文件为最终版**；不再为补数据做任何新宿主工作。
+
+## 0. 一页表（最终版）
+
+**人口**
+
+| 项 | 值 |
+|---|---|
+| run | `fl_native_20261112T165438Z_669633`（ONLINE_DETECTION，HEALTHY） |
+| paired / availability | **482 / 482**；129 AVAILABLE / 353 UNAVAILABLE |
+| trace | **792 × 107**；0 malformed/0 truncated；`has_out=1` **725**；phase 全 0 |
+| 同帧 pre/post | **725**（`same_row_pre_post_rows = same_row_post_pose_rows = 725`） |
+| join | **TRUE_SPAN_CONTAINMENT_WITH_512NS_QUANTIZATION**；481/482 映射、1 `NO_TRACE_ROW`、246 行多对一 |
+| 块 | **106 块 / 53.0 s，全部 UNKNOWN**；无尾段 |
+| 段/接纳 | 2 段均 `LATE_AFTER_BOUNDARY`，**0 accepted** |
+
+**通道与 I 分位**
+
+| 项 | 值 |
+|---|---|
+| M / T / neither | **175（36.3%） / 306（63.5%） / 1** |
+| I | **462**（Ppre 秩 6：462） |
+| `|e_I|`（真 SE(3) Log） | p10 **0.00645** / p50 **0.03424** / p90 **0.11370** / max **0.59071** |
+| 单位权 `|e_I|²`（I 主量） | p10 **4.161e-5** / p50 **1.1726e-3** / p90 **1.2931e-2** / max **0.34893** |
+| `s_I`（诊断，不作卡方） | p10 1.461 / p50 **57.68** / p90 497.4 / max 25799.7 |
+
+**资格**
+
+| 项 | 状态 |
+|---|---|
+| source scan | **PASS（真实跨度 + 512 ns 量化）** |
+| pre / post 位姿 | **`PASS_SAME_ROW` / `PASS_SAME_ROW`**（725 行；抽 3 行验证） |
+| `vec6` | **`NOT_VERIFIED`**（仅对照，不是 e_I 来源） |
+| 协方差 | **`NOT_AVAILABLE`**（混合约定；无已验证 6D 切空间） |
+| 总体 I | **`PASS_SAME_ROW_UNIT_WEIGHTED`** |
+
+**三条限定**
+
+1. `vec6` 仍 `NOT_VERIFIED`、协方差 `NOT_AVAILABLE`；`s_I` 只是诊断，**不作卡方/概率**。
+2. 两段均 `LATE_AFTER_BOUNDARY`、0 accepted；**不用于修复/接纳/连续接回**任何结论。
+3. 分类/误报/漏检/延迟/错误 NORMAL 全部 **`NOT_EVALUABLE`**（`ALI-B2` 缺独立正常参照与事件标签）；
+   **"全 UNKNOWN"不是零风险**。
 
 ## 1. 运行与人口
 
@@ -35,6 +77,7 @@
 | T（prev_scan NIS） | **306 / 482（63.5%）** |
 | M 与 T 都无 | 1 |
 | I（同行 pre/post，`has_out=1`） | **462**；`Ppre` 秩 6：462 |
+| I `|e_I|`（真 Log） | p10 0.00645 / **p50 0.03424** / p90 0.11370 / max 0.59071 |
 | I 单位权 `|e_I|²` | p10 4.16e-5 / **p50 1.1726e-3** / p90 1.2931e-2 / max 0.34893 |
 | `s_I`（诊断，不作卡方） | min 0 / median 57.68 / max 25799.7 |
 | 块 | **106 块 / 53.0 s，全部 UNKNOWN**；无尾段（run 未到 E2 之后） |
