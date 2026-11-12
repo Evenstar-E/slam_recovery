@@ -793,3 +793,23 @@ S1 复核 S2 `7e1eb0c`（合入，180 测试）。run `fl_native_20261112T045238
 
 **下一步（已派 S2）**：分批发布 + 回执流控（每批 ≤20，等累计 `repair_received` 到位再发下一批，
 全部到位才发 `reprocess`；超时则不发并记录），不靠固定 sleep；宿主 0 行、门/阈值不动。
+
+## 72. 修复测量首次真正进入宿主重放：32/32 送达并应用；对照尚未干净
+
+S1 复核 S2 `76c06b8`（合入，185 测试）。
+
+| 项 | 修复 run `045944Z_96435` | 对照 dry-run `050645Z_102106` |
+|---|---|---|
+| 门 | Mode 2 accepted 3.1341→6.8326，Wilson 0.9220，holdout 0.3700 | accepted 3.1341→7.3491，Wilson 0.8947 |
+| 偏差 | median **+0.45**、MAD 0.05、32 帧 | +0.40 |
+| 传输 | 4 批 10/10/10/2，累计回执 32，`synced=true` | 不发布，`published=0` |
+| 宿主 | `repair_received=32 applied=32 dropped=0`；`reprocess #1: 676 frames … repairs applied=32`；**32 行** `[NATIVE_REPAIR] applied`；地图 22334 voxels/417461 points | `repair 0/0`；重放 529 帧；地图 20427/373515 |
+| 顺序 | hold → 4 批发布 → receipt 32 → reprocess(9.0 s) → set_state → rearm 后 resume | 同前但无发布 |
+
+**不是干净 A/B**（S2 如实报，S1 认可）：两次 episode 帧数 **32 vs 23**、重放跨度 676 vs 529 帧，
+决策落在不同帧集（2 Hz service tick 决定何时跑决策），地图与 `state_pos` 差约 1.15 m 不能全归因于修复。
+能干净比较的只有计数：`repairs applied=32 vs 0`。**不能声称修复收益或轨迹结论。**
+
+**S1 决定**：先做**候选帧集冻结**（deadline 到达时冻结 episode 帧集，之后到达的帧只进隔离段/延迟集），
+使同一输入下候选人口与重放跨度确定，再跑一对同声明修复/对照。属驱动侧约 10 行 + 单测，
+不改门/阈值/σ/宿主，也不改决策时刻。
