@@ -1404,3 +1404,64 @@ run `fl_native_20261112T092251Z_291996`（终版）：
 审阅多轮保留的"checkpoint 不晚于可信隔离边界"断点**就此解除**（两段均满足）。`within_end` 由 124 增至 244
 是因为重放从 `t_start` 起覆盖确认窗口；修复云仍只匹配候选窗口的 23 帧。门/阈值/σ/检测未动；
 可用性诊断暂停；损坏自注入，不声称修复收益。
+
+## repair-f3 / eeda122：新参考图归档接受，静止与320秒归因需原件纠正
+
+[核验与下一交付](review_20261112_eeda122/README.md)：11SHA一致、目标driver/config副本绑定、无注入/detection off地图确保存raw2,498,791/downsample13,493点，退出末terminate异常保留。新partial主分母/中性cause/单gauge工具7相关test本机PASS，Scipy ICP未跑不装；SAVE_WAIT只bash语法/源码核，不代host。支持旁支真实交付，原生恢复主线未增加。
+
+目标§111静止原因FAIL：同档749pose行最大|p|11.98754m、724行>1m、x/y最大8.808419/8.833413。地图范围不等移动范围，不能据此查pcd_save输出分支或重做clean pass。pose54.119872s/诊断尾前5.385359s只证明时间支持不足；396paired/598scan不证明bag截断，320s无bag起止证据/不能读epoch尾数为duration。302帧0pass/ICP/gauge RMS3.51仅DEVELOPER_REPORTED且score命令/输出/健康prefix单变换/共同支持未归档，独立参考有效性UNKNOWN；先复用现有证据纠正与绑定，不本轮新授权重跑、不因诊断串行挡native。
+
+S1证据解释/共享成功依赖单写，S2原生合法隔离起点cp→物理一致修复/完整state-map重估→全部input归宿/后继尾段或显式不支持；复用已验suffix/skip/受控E2，不重复旧反例或扩门参数。ALI-H设计合main不等认领或实现，S3唯一研究角色先按已授权T0资格/缺项回真实预算/branch/进展，缺I与低support正常参照保UNKNOWN/native不等。逐项PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令原件/版本人口/失败质量成本；A/B局部不总分/三Cron无双写，review SSH白名单提交推送/private保护不合main不改算法历史冻结门。
+
+## repair-f3 / 用户明确交给开发：ALI-H真实数据验证的单一交付
+
+2026-11-12用户要求通过GitHub交接[ALI-H §10任务](ADAPTIVE_LOW_INFORMATION_HEALTH_V1_20261112.md#10-用户明确交接的下一单一交付真实数据验证-ali-h)：先分别核旧402/544行真实通道/缺项/校准，HEALTHY非正常真值；优先复用真实IMU preupdate与LiDAR update状态，缺导出由S1/S2确认一次最小已有预算导出，不造零bias/占位、不换地图无限解释；交同trace同人口旧方法/shadow漏检、误报、延迟、错误NORMAL、UNKNOWN数量/时长/原因与成本。新run内证据不能贴回旧run冒同步；缺标签NOT_EVALUABLE，不降首版或旧阈值强二分。
+
+S1分发/确认owner branch HEAD预算并单写共享接口，S3唯一research执行，S2现trace/必要最小导出，保持1研究+2native/旧参数停；本机不算法/host，自动审阅继续、不重复建任务。不自动暂停原生开发，研究不直接接入实际检测/地图提交；一次有限真实结论交用户后再决定生产动作。逐项PASS/FAIL/BLOCKED/NOT_APPLICABLE及命令原件/人口/缺项，发布不等认领/开工。交接fetch fafbaf1新地图redo/分叉仅开发报告，另审不作为本任务已证明因果或新重跑许可。
+
+## repair-f3 / fafbaf1：新地图尾部通过，干预因果/参考规则需限定
+
+[核验](review_20261112_fafbaf1/README.md)新085719Z 12SHA一致、play Done/819pose/544paired到诊断同末戳/native819、downsample15647/raw2889123保存接受；detection off/no恢复动作、44snapshot/6timeout/末terminate，不新增原生恢复结果。旧REPORT加后续说明但原清单未变10/11（仅REPORT），集中版本化补来源、不动历史/重跑。
+
+同戳位置差真实：kf157/228未注册差39.903/32.923m，各全200保存样本距新图0/200；kf22仅20/200裁样本20命中非全帧或gauge真值。完整544差最大80.002m、首>1m kf46，不精确15s起点/GT漂移。diag v3库9c0330be/driver43c65a9d/config47a1bfd9 vs新v5 9e7d8cdf/4742dbc1/94ffa5db，bag/binary同不单一干预控制；8restore/7resume是候选机制非已证唯一因果。独立图需同场景合法注册/覆盖而非相同估计轨迹，复制诊断pose造图不能当独立位姿参考；当前有效性UNKNOWN，不再clean矩阵。
+
+S1原因/人口限定只阻相关评价结论，S1/S2合法cp/成功依赖及物理native整链继续；S3用户105b5be ALI-H§10真实数据交付优先旧402/544资格/真实I/同人口风险与UNKNOWN成本，不等独立地图；新target未含最新任务，不指控忽略/不冒认领或测试。1研究+2native/旧参数停，逐项状态/命令原件/source input library/人口/失败质量成本自检，A/B局部不总分；Python-I reader无host/bag/ICP/参数，三Cron单owner，review白名单SSH/private保护不合main不改算法历史。
+
+## 114. 合入 fafbaf1 审阅并更正 §111/§112；ALI-H §10 任务已分发
+
+S1 合入审阅分支 `6f89e38`（含 `4455294`/`105b5be`/`6f89e38` 三提交；§110–§113 与审阅侧段落并存，冲突按两侧都保留
+解决）。审阅只改文档，无 `slam_recovery` 实现改动；本机按原件复算下列数字，全部与审阅一致。
+
+### 114.1 本机复算（REAL_HOST 归档原件，不经归档脚本）
+
+| 检查 | 本机结果 |
+|---|---|
+| 重做 clean pass 位姿 | `reference_map_20261112_redo/lidar_poses.txt` 819 行，`1627785261.403843–1627785320.909074`，sha `443da1cd…` ✔ |
+| 重做 clean pass 地图 | `all_downsampled_points.pcd` 250,534 B / 15,647 点，sha `f1367c1c…` ✔ |
+| 同戳未注册位置差 | kf22 `0.000000`（文本精度内）、kf157 `39.903317 m`、kf228 `32.923310 m`；544 对中首个 >1 m 为 kf46 `1.761249 m`，最大 kf173 `80.002159 m` ✔（诊断 `T_wb[3,7,11]` vs 重做位姿，记录坐标，非 GT） |
+| 首版 clean pass 位姿 | 749 行；x `0.002225–8.808419`、y `−0.121540–8.833413`、z `−0.380372–0.288689`；最大 `|p| 11.987540 m`，724/749 >1 m ✔ |
+
+### 114.2 更正
+
+1. **§111 第 2 条作废**：首版 clean pass 的位姿**不是**近静止（最大 11.99 m）。据此安排的 `pcd_save`
+   位姿写出分支排查不再成立；地图范围 ±80 m 与约 12 m 移动不矛盾（扫描可见远处）。几何一致性原因 UNKNOWN。
+2. **§112 "独立参考不可用（BLOCKED）" 收窄为 UNKNOWN**：独立参考只要求同一物理场景、合法坐标注册与可见/评价
+   覆盖，**不要求复制待评价运行的估计轨迹**。本机复算确认两 run 轨迹确有分叉（最大 80 m），但这是"记录坐标差"，
+   不是已注册 ATE 或已证位姿错误；当前图是否可作独立参考仍是 UNKNOWN，不是"原则上不可用"。不允许把诊断
+   `T_wb` 以 `set_state` 写进参考来造同轨迹（那是自参考 proxy，不是独立评价）。
+3. **分叉原因 UNKNOWN**：诊断 host 库 `9c0330be…`(v3) vs 新地图 `9e7d8cdf…`(v5)，driver `43c65a9d…` vs
+   `4742dbc1…`，config `47a1bfd9…` vs `94ffa5db…`，另有 detection on/off、sigma `.884/.12`、drain 20/60。
+   "detection on 的 hold/restore/resume"只是合理候选，不是已分离的唯一原因。
+4. **旧 `reference_map_20261112/REPORT.md` 追加 §6 导致原清单 10/11（仅 REPORT 失配）**：原历史 checksum 保持
+   与当时版本绑定，修正走"补版本化清单/外部追加说明"，不改历史、不为文档 hash 重跑宿主。
+
+主线状态不变：boundary checkpoint（v6）与 §113 的受控两事件结论仍然有效；本次更正只影响"独立参考"这条
+评价旁支的解释，不影响原生 `suffix`/`skip`/受控 E2 与 39 尾帧证据。
+
+### 114.3 任务分发（不写"已执行"）
+
+- `docs/ADAPTIVE_LOW_INFORMATION_HEALTH_V1_20261112.md` §10（用户 2026-11-12 明确交接的 ALI-H 真实数据验证）
+  随本 merge 进入 main；状态仍 **DESIGNED / NOT_IMPLEMENTED / NOT_EXECUTED**。
+- 已把 §10 单一交付（T0 旧 402/544 资格与缺项 → 至多一次最小真实 I 导出 → 同人口旧方法/shadow 对照）
+  分发给 S3（r26534-58，唯一研究执行），并向 S2（r11070-c3）确认宿主真实 IMU preupdate/update 创新导出点与
+  现 trace 是否可复用。**认领/预算/新 branch 以 S3/S2 实际回报为准**，本文件不代填。

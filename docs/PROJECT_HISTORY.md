@@ -577,3 +577,25 @@ E2无新注入/detection off；cp1627785309656085248晚trigger1.607814s、晚qua
 [增量核验](review_20261112_26ba3a3/README.md)新独立参考PCD/score工具5相关test本机target Git bytes PASS1.225s，Scipy ICP未跑不安装；target无clean地图/receipt/评分新结果，S1派S2只是开发报告，不当实际原因归因或新恢复成果。正常控制同pose只换参考fraction0→1，不能按summarise解释pose likely failure；20/200裁样本fraction1而全人口.1仍进both_pass主统计，最低主表只完整分母/裁样本单列、中性归因及跨run健康prefix gauge/共同支持，复用现工具不新框架。ASCII COUNT兼容skill候选无声明binary input实证，延期旁支不挡主线。
 
 两小时结论部分推进：旧后缀skip+clear→v4全捕获重推→v5非零suffix跳旧set_state→实际修23接回E2拒绝/尾17→final39/4.65064s接受。首工程缺口cp晚隔离起点3.932s及失败UNKNOWN依赖，算法/评价缺物理一致候选/完整59shift修复与独立质量；自动检测UNAVAILABLE分支已证但根因未知，方法工具/ALI-H设计不充改善。参数无同版本同人口规律/上限证据能解除，不恢复sigma/κ/floor；目标库能运行整体ABI测试失败次要，DNS恢复fetch26成功非远端停工。S1/S2原生责任有实际交付、最低新修复认领待回执，S3单研究/ALI-H接收UNKNOWN；下一唯一合法历史可信cp→实际修复/完整native state-map→完整input归宿/后继尾段或显式不支持。A/B局部不总分；新实质评价意见并入本增量不造重复2h报告，review SSH推送/private保护不合main不改算法历史冻结门。
+
+## 71. eeda122：参考图保存真实，静止/320秒原因与原件不符，不以误归因重跑
+
+[增量核验](review_20261112_eeda122/README.md)固定eeda122/17:05 fetch；新083858Z档11/11 SHA一致、driver4742dbc1与target一致/config副本hash绑定、v5库声明。无注入/scripted/detection off地图pass真实保存raw2,498,791/downsample13,493点（归档216070B），raw仅远端hash未读；日志最后terminate异常，保存成功不等优雅退出。SAVE_WAIT默认0保旧分支/目标bash语法PASS，本机不执行宿主。
+
+S1 COLLAB§111的“全程|p|<1m/近静止”明确FAIL：原件749行最大范数11.98754m，724行>1m，x/y最大8.808419/8.833413；地图±80m也不直接与运动范围矛盾，不能据此查位姿写出分支或重跑clean pass。pose跨度54.119872s、晚诊断尾前5.385359s是真实时间支持限制，recovery396配对/598scan接收不等native消费或bag截断；“bag320s”无bag起止证据，epoch尾数不能作持续时间。S1的302帧/ICP0通过/gauge RMS3.51仅DEVELOPER_REPORTED，score命令/输出/prefix单变换/共同支持未归档，独立参考有效性仍UNKNOWN而非反向PASS。最低先现有原件纠正/绑定，不新授权重跑。
+
+新工具7相关test目标Git bytes PASS1.280s，Scipy ICP未跑不装；裁20/200现退出主表，cause UNKNOWN中性计数及单gauge复合/known-prefix控制通过，仅支持组件非主线恢复或实际独立评分。ALI-H设计已合main，S3实际认领/预算/实现/测试回执仍未知；1研究+2native并行/旧参数停。主线未新增恢复run，下一仍S1/S2合法隔离边界cp→物理一致修复/完整native state-map→全部input归宿/后继尾段或显式拒绝；旧suffix/skip/受控E2成果复用，旧成功依赖不重测。评价纠正只阻原因结论，不阻native开发；完整逐项状态/命令/原件/人口/失败/质量成本自检，A/B局部不总分，review白名单SSH推送/private保护不合main不改算法历史冻结门。
+
+## 72. 用户明确GitHub交接：下一ALI-H交付为真实数据验证，不再换图解释
+
+2026-11-12用户直接选定并要求GitHub交给开发侧：[ALI-H §10执行任务](ADAPTIVE_LOW_INFORMATION_HEALTH_V1_20261112.md#10-用户明确交接的下一单一交付真实数据验证-ali-h)。唯一研究交付：用真实数据验证旧UNAVAILABLE能否部分可靠区分正常相容/SUSPECT/UNKNOWN。先分别核402/544旧档真实M/T/I、缺项与条件校准，不以HEALTHY/trusted/无注入作正常真值；优先复用真实IMU更新前预测/LiDAR更新后状态，确无导出才S1/S2确认一次最小已有预算导出，不零bias/占位、不继续clean-map矩阵。新trace不能拼到旧run冒同步，旧方法和ALI-H必须同trace同人口，交漏检/误报/延迟/错误NORMAL及UNKNOWN数量/时长/原因/成本；缺标签NOT_EVALUABLE不填0，大量UNKNOWN说明真实缺什么，不降阈值强二分。
+
+S1实际分发/共享接口单写，S3唯一research shadow执行，S2提供已有trace/必要最小导出不阻原生；沿1研究+2native、旧sigma/κ/floor停，本机设计/自动审阅不代算法/host。任务发布不等实际认领或测试开始，首次实质提交回branch/HEAD/owner/预算及逐项PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令原件，不造收到周期。交一次有限结果后先报用户再讨论实际检测动作，生产接入另需确认；不自动暂停原生开发或改变旧门。交接时fetch main fafbaf1含新地图redo/分叉开发报告，未在本任务中独立验收/采信其因果，不扩授权追第三次地图。只更新已有入口/状态，不新起实验或重复Cron。
+
+## 73. fafbaf1：参考地图尾部接受，跨运行差异不等唯一干预因果
+
+[核验](review_20261112_fafbaf1/README.md)新085719Z地图档12/12SHA一致/driver target绑定，play Done/59.993771s、819pose/544paired尾1627785320909073830/native snapshot819，实际map raw2,889,123/downsample15,647（250534B）保存，非恢复/detection off/no动作；44snapshot/6timeout/末terminate保负结果。旧第一pass原静止误读已承认，新尾补足不是之前轨迹静止被修。旧REPORT本target加§6但原manifest未更新，仅REPORT失配10/11，其他10原件同，集中来源旁支不重跑/改历史。
+
+544同pose戳有限复算：kf22裁20/200命中20/20不能证整段gauge或正常；kf157/228全200均0命中、未注册位置差39.903/32.923m；全对应最大kf173 80.002m、首>1m kf46约1.761m，不GT/ATE。diag库v3 9c0330be/driver43c65a9d/config47a1bfd9 vs新v5 9e7d8cdf/4742dbc1/94ffa5db，虽bag与binary同，不只改on/off。diag8hold/8restore/7resume是干预候选解释，唯一因果UNKNOWN，不新矩阵。独立参考需同场景/合法注册/可见支持而非复制被评轨迹；灌诊断pose造图不是独立位姿评价，当前图有效性仍UNKNOWN，不第三次cleanpass。
+
+本轮支持旁支真实尾段/差异核，原生恢复主线无新增实现或run；S1/S2仍合法隔离cp/成功依赖→物理一致native完整重估→全部input接回后继尾段或显式不支持，复用suffix/skip/受控E2。S3按用户105b5be ALI-H真实数据单一交付先旧402/544资格/缺项与真实I，同人口漏检误报延迟错误NORMAL/UNKNOWN时长/成本，不继续换图；target早于任务合入，不指控忽略/不冒认领开工。旧参数停/1研究+2native，逐项自检状态命令原件/source人口/失败质量成本，A/B局部不总分，三Cron单owner/Python-I无host或参数，review白名单SSH推送/private保护不合main不改算法历史。
