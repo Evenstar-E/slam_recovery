@@ -1,0 +1,2332 @@
+{
+ "_meta": {
+  "what": "UNAVAILABLE availability audit: source branches and archive attribution",
+  "written": "2026-11-12",
+  "repo_head": "eeedb7fed53a91905b77bb38705a73aaae4927f3",
+  "source_files": {
+   "slam_recovery/ros/recovery_node.py": "5877388c9d651a8963e3a989146c411764b9fb276058ec1cea7f9a9b83c686d5",
+   "slam_recovery/sim/transaction_manager_node.py": "7d80259689a78cad2789de1eec933f795169a2db1185cf7b34fb3a9f3b5fc4b5",
+   "slam_recovery/validation/fim_and_holdout.py": "9bfb35de9406d93bdb7325e8fec454861fd66aeb217d28c8b2a0ef1060b6652f"
+  },
+  "not_done": [
+   "no host run",
+   "no ROS",
+   "no detector",
+   "no threshold change",
+   "no production edit"
+  ],
+  "window_origin": "first frame_diagnostics row of each run; not the bag start",
+  "discovery": {
+   "detection_off_or_no_status": 36,
+   "paths": [
+    "/tmp/fl_native_20261110T025831Z_2928165/run_summary.json",
+    "/tmp/fl_native_20261110T030300Z_2932931/run_summary.json",
+    "/tmp/fl_native_20261110T030656Z_2938083/run_summary.json",
+    "/tmp/fl_native_20261110T030931Z_2941380/run_summary.json",
+    "/tmp/fl_native_20261110T033411Z_2965306/run_summary.json",
+    "/tmp/fl_native_20261110T033610Z_2971844/run_summary.json",
+    "/tmp/fl_native_20261110T033802Z_2974473/run_summary.json",
+    "/tmp/fl_native_20261110T111459Z_3356257/run_summary.json",
+    "/tmp/fl_native_20261110T111810Z_3358990/run_summary.json",
+    "/tmp/fl_native_20261110T112059Z_3361446/run_summary.json",
+    "/tmp/fl_native_20261110T112727Z_3365609/run_summary.json",
+    "/tmp/fl_native_20261110T113243Z_3369940/run_summary.json",
+    "/tmp/fl_native_20261110T113447Z_3372448/run_summary.json",
+    "/tmp/fl_native_20261110T113953Z_3376351/run_summary.json",
+    "/tmp/fl_native_20261110T114454Z_3380394/run_summary.json",
+    "/tmp/fl_native_20261110T114748Z_3383280/run_summary.json",
+    "/tmp/fl_native_20261110T115359Z_3387579/run_summary.json",
+    "/tmp/fl_native_20261110T115717Z_3390402/run_summary.json",
+    "/tmp/fl_native_20261112T020634Z_4148249/run_summary.json",
+    "/tmp/fl_native_20261112T022158Z_4156288/run_summary.json",
+    "/tmp/fl_native_20261112T024337Z_4166038/run_summary.json",
+    "/tmp/fl_native_20261112T043602Z_79001/run_summary.json",
+    "/tmp/fl_native_20261112T044445Z_85628/run_summary.json",
+    "/tmp/fl_native_20261112T045238Z_92133/run_summary.json",
+    "/tmp/fl_native_20261112T045944Z_96435/run_summary.json",
+    "/tmp/fl_native_20261112T050214Z_98827/run_summary.json",
+    "/tmp/fl_native_20261112T050645Z_102106/run_summary.json",
+    "/tmp/fl_native_20261112T051523Z_107073/run_summary.json",
+    "/tmp/fl_native_20261112T051728Z_109595/run_summary.json",
+    "/tmp/fl_native_20261112T052437Z_114016/run_summary.json",
+    "/tmp/fl_native_20261112T053647Z_122935/run_summary.json",
+    "/tmp/fl_native_20261112T053917Z_128272/run_summary.json",
+    "/tmp/fl_native_20261112T054908Z_138681/run_summary.json",
+    "/tmp/fl_native_20261112T055247Z_144445/run_summary.json",
+    "/tmp/fl_native_20261112T055727Z_148998/run_summary.json",
+    "/tmp/fl_native_20261112T055931Z_151459/run_summary.json"
+   ]
+  }
+ },
+ "source_checks": [
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 69,
+   "expect": "SCAN_CAP = 6000",
+   "actual": "SCAN_CAP = 6000                  # points kept per scan, by uniform stride, for FIM and NIS",
+   "what": "scan point cap",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 70,
+   "expect": "NIS_RADIUS_M = 3.0",
+   "actual": "NIS_RADIUS_M = 3.0               # \"trusted map points near the current pose\"",
+   "what": "NIS reference radius",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 71,
+   "expect": "NIS_MIN_TRAIN = 30",
+   "actual": "NIS_MIN_TRAIN = 30               # below this the estimator itself has no reference",
+   "what": "NIS min train",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 72,
+   "expect": "NIS_MIN_HOLDOUT = 10",
+   "actual": "NIS_MIN_HOLDOUT = 10             # below this the estimator itself has no holdout",
+   "what": "NIS min holdout",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 81,
+   "expect": "REFERENCE_REFRESH_NS",
+   "actual": "REFERENCE_REFRESH_NS = 500_000_000",
+   "what": "support cache refresh",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 1067,
+   "expect": "self.nis.measure(",
+   "actual": "value, source, reference = self.nis.measure(pose, scan_body, now_ts_ns=ts_ns)",
+   "what": "NIS measured",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 1068,
+   "expect": "support_ref = self.nis.support_reference",
+   "actual": "support_ref = self.nis.support_reference(ts_ns)",
+   "what": "support reference resolved",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 1072,
+   "expect": "pts_before = int(len(support_ref))",
+   "actual": "pts_before = int(len(support_ref))",
+   "what": "map_points recorded",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 1095,
+   "expect": "_frame_has_reference_support",
+   "actual": "supported = self.node._frame_has_reference_support(",
+   "what": "support call",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 1100,
+   "expect": "bool(supported) and value is not None",
+   "actual": "available = bool(supported) and value is not None",
+   "what": "availability predicate",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 1101,
+   "expect": "UNAVAILABLE",
+   "actual": "status = \"AVAILABLE\" if available else \"UNAVAILABLE\"",
+   "what": "status assignment",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 1220,
+   "expect": "if len(self.diag) >= self.diag_cap",
+   "actual": "if len(self.diag) >= self.diag_cap:",
+   "what": "diag cap",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 1225,
+   "expect": "\"nis\":",
+   "actual": "\"nis\": None if value is None else float(value),",
+   "what": "diag nis",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 1226,
+   "expect": "\"nis_source\"",
+   "actual": "\"nis_source\": source, \"nis_reference\": reference,",
+   "what": "diag nis_source",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 1226,
+   "expect": "\"nis_reference\"",
+   "actual": "\"nis_source\": source, \"nis_reference\": reference,",
+   "what": "diag nis_reference",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 1227,
+   "expect": "\"detection_status\"",
+   "actual": "\"detection_status\": str(status),",
+   "what": "diag detection_status",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/ros/recovery_node.py",
+   "line": 1231,
+   "expect": "\"map_points\"",
+   "actual": "\"map_points\": int(pts_before),",
+   "what": "diag map_points",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/sim/transaction_manager_node.py",
+   "line": 363,
+   "expect": "def _frame_has_reference_support",
+   "actual": "def _frame_has_reference_support(",
+   "what": "support helper",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/sim/transaction_manager_node.py",
+   "line": 368,
+   "expect": "radius_m: float = 1.0",
+   "actual": "radius_m: float = 1.0,",
+   "what": "support radius",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/sim/transaction_manager_node.py",
+   "line": 369,
+   "expect": "min_supported_fraction: float = 0.60",
+   "actual": "min_supported_fraction: float = 0.60,",
+   "what": "support fraction",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/sim/transaction_manager_node.py",
+   "line": 377,
+   "expect": "if len(ref_pts) == 0",
+   "actual": "if len(ref_pts) == 0:",
+   "what": "empty reference branch",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/sim/transaction_manager_node.py",
+   "line": 383,
+   "expect": "if kf_id not in self.scan_buffer_body or kf_id not in repaired_poses",
+   "actual": "if kf_id not in self.scan_buffer_body or kf_id not in repaired_poses:",
+   "what": "missing scan/pose branch",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/sim/transaction_manager_node.py",
+   "line": 386,
+   "expect": "T.shape != (4, 4)",
+   "actual": "if T.shape != (4, 4) or not np.all(np.isfinite(T)):",
+   "what": "invalid pose branch",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/sim/transaction_manager_node.py",
+   "line": 389,
+   "expect": "if len(pts_b) == 0",
+   "actual": "if len(pts_b) == 0:",
+   "what": "empty scan branch",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/sim/transaction_manager_node.py",
+   "line": 392,
+   "expect": "pts_w[:: max(1, len(pts_w) // 200)][:200]",
+   "actual": "q = pts_w[:: max(1, len(pts_w) // 200)][:200]",
+   "what": "support sampling",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/sim/transaction_manager_node.py",
+   "line": 393,
+   "expect": "index = index if index is not None",
+   "actual": "index = index if index is not None else _RadiusIndex(ref_pts, radius_m)",
+   "what": "radius index",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/sim/transaction_manager_node.py",
+   "line": 394,
+   "expect": "within_radius_mask",
+   "actual": "inside = index.within_radius_mask(q, radius_m)",
+   "what": "inside mask",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/sim/transaction_manager_node.py",
+   "line": 395,
+   "expect": "min_supported_fraction",
+   "actual": "return bool(np.mean(inside) >= min_supported_fraction)",
+   "what": "fraction test",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/sim/transaction_manager_node.py",
+   "line": 81,
+   "expect": "def within_radius_mask",
+   "actual": "def within_radius_mask(self, queries: np.ndarray, radius: float) -> np.ndarray:",
+   "what": "index query",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/sim/transaction_manager_node.py",
+   "line": 103,
+   "expect": "d2.min() <= r2",
+   "actual": "if d2.size and d2.min() <= r2:",
+   "what": "per-query short circuit",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/sim/transaction_manager_node.py",
+   "line": 258,
+   "expect": "get_trusted_map_points(max_pts=1 << 30)",
+   "actual": "pts = self.get_trusted_map_points(max_pts=1 << 30)",
+   "what": "support reference source",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/validation/fim_and_holdout.py",
+   "line": 120,
+   "expect": "len(train_xyz) < 30 or len(hold_xyz) < 10",
+   "actual": "if len(train_xyz) < 30 or len(hold_xyz) < 10:",
+   "what": "estimator input floor",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/validation/fim_and_holdout.py",
+   "line": 127,
+   "expect": "len(train_xyz) // 600",
+   "actual": "t_sub = train_xyz[:: max(1, len(train_xyz) // 600)][:600]",
+   "what": "train cap",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/validation/fim_and_holdout.py",
+   "line": 128,
+   "expect": "len(hold_trans) // 300",
+   "actual": "h_sub = hold_trans[:: max(1, len(hold_trans) // 300)][:300]",
+   "what": "query cap",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/validation/fim_and_holdout.py",
+   "line": 132,
+   "expect": "k = min(8, len(t_sub) - 1)",
+   "actual": "k = min(8, len(t_sub) - 1)",
+   "what": "k neighbours",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/validation/fim_and_holdout.py",
+   "line": 143,
+   "expect": "residuals < 2.0",
+   "actual": "valid_res = residuals[residuals < 2.0]",
+   "what": "2 m truncation",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/validation/fim_and_holdout.py",
+   "line": 147,
+   "expect": "inlier_coverage < 0.70",
+   "actual": "if len(valid_res) == 0 or inlier_coverage < 0.70:",
+   "what": "coverage branch",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/validation/fim_and_holdout.py",
+   "line": 148,
+   "expect": "np.mean((residuals / sigma_meas_m) ** 2)",
+   "actual": "return float(np.mean((residuals / sigma_meas_m) ** 2))",
+   "what": "all-residual branch (no None on low coverage)",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/validation/fim_and_holdout.py",
+   "line": 149,
+   "expect": "np.mean((valid_res / sigma_meas_m) ** 2)",
+   "actual": "return float(np.mean((valid_res / sigma_meas_m) ** 2))",
+   "what": "clipped-residual branch",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/validation/fim_and_holdout.py",
+   "line": 107,
+   "expect": "def compute_disjoint_holdout_point_to_plane_nis",
+   "actual": "def compute_disjoint_holdout_point_to_plane_nis(",
+   "what": "function has no `details` out-parameter at this revision",
+   "status": "PASS"
+  },
+  {
+   "file": "slam_recovery/validation/fim_and_holdout.py",
+   "line": null,
+   "expect": "token absent: details",
+   "actual": "found=False",
+   "what": "HEAD's NIS function has no details out-parameter; per-point values are computed and dropped",
+   "status": "PASS"
+  }
+ ],
+ "source_checks_summary": {
+  "PASS": 41,
+  "FAIL": 0,
+  "of": 41
+ },
+ "runs": [
+  {
+   "path": "/tmp/fl_native_20261110T031851Z_2949682/run_summary.json",
+   "summary_sha256": "fe0843e01a090498f89e47db9636b9e1bfaab18071c2b562c378c2f82ef3f376",
+   "run_id": "fl_native_20261110T031851Z_2949682",
+   "detection_enabled_field": null,
+   "detection_on": true,
+   "frames_paired": 584,
+   "frame_diagnostics_rows": 377,
+   "diag_cap": 2000,
+   "diag_complete": false,
+   "nis_summary": {
+    "computed": 583,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 363,
+    "reference_prev_scan": 220,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.12
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 358,
+    "UNAVAILABLE": 226
+   },
+   "status_counts": {
+    "UNAVAILABLE": 19,
+    "AVAILABLE": 358
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 18,
+    "AVAILABLE|computed": 358
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 18,
+    "AVAILABLE|node_map": 358
+   },
+   "unavailable_total": 19,
+   "unavailable_with_nis_number": 18,
+   "unavailable_with_computed_nis": 18,
+   "unavailable_with_empty_reference": 18,
+   "unavailable_map_nonempty_and_computed": 1,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 1,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 18,
+    "empty_reference_with_computed_nis": 17,
+    "fraction": 1,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 17,
+     "frames": 18,
+     "ts_first_ns": 1627643740512479544,
+     "ts_last_ns": 1627643742511415243
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T032515Z_2954170/run_summary.json",
+   "summary_sha256": "91ec72a6d49d867c01766bc7a379830317e6a8cb4c39761fb7f064bc999a632e",
+   "run_id": "fl_native_20261110T032515Z_2954170",
+   "detection_enabled_field": null,
+   "detection_on": true,
+   "frames_paired": 584,
+   "frame_diagnostics_rows": 584,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 583,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 365,
+    "reference_prev_scan": 218,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.12
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 361,
+    "UNAVAILABLE": 223
+   },
+   "status_counts": {
+    "UNAVAILABLE": 223,
+    "AVAILABLE": 361
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 222,
+    "AVAILABLE|computed": 361
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 218,
+    "AVAILABLE|node_map": 361,
+    "UNAVAILABLE|node_map": 4
+   },
+   "unavailable_total": 223,
+   "unavailable_with_nis_number": 222,
+   "unavailable_with_computed_nis": 222,
+   "unavailable_with_empty_reference": 18,
+   "unavailable_map_nonempty_and_computed": 205,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 201,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 18,
+    "empty_reference_with_computed_nis": 17,
+    "fraction": 205,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 17,
+     "frames": 18,
+     "ts_first_ns": 1627643740512479544,
+     "ts_last_ns": 1627643742511415243
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "window": {
+    "start_s_from_first_frame": 42.0,
+    "end_s_from_first_frame": 52.0,
+    "frames": 100,
+    "kf_first": 416,
+    "kf_last": 515,
+    "status_counts": {
+     "UNAVAILABLE": 100
+    },
+    "nis_source_counts": {
+     "computed": 100
+    },
+    "nis_reference_counts": {
+     "prev_scan": 100
+    },
+    "pose_neighbourhood_below_30": 100,
+    "nis_min": 19.198834527743536,
+    "nis_median": 635.0439534895078,
+    "nis_max": 7112.799970948864
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T035239Z_3002102/run_summary.json",
+   "summary_sha256": "5751ea6e769cab031693cc88032e768b2fe0dc88eb095d16ded5e7c357a4bf1e",
+   "run_id": "fl_native_20261110T035239Z_3002102",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 584,
+   "frame_diagnostics_rows": 584,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 583,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 362,
+    "reference_prev_scan": 221,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 360,
+    "UNAVAILABLE": 224,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 224,
+    "AVAILABLE": 360
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 223,
+    "AVAILABLE|computed": 360
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 221,
+    "AVAILABLE|node_map": 360,
+    "UNAVAILABLE|node_map": 2
+   },
+   "unavailable_total": 224,
+   "unavailable_with_nis_number": 223,
+   "unavailable_with_computed_nis": 223,
+   "unavailable_with_empty_reference": 19,
+   "unavailable_map_nonempty_and_computed": 205,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 203,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 19,
+    "empty_reference_with_computed_nis": 18,
+    "fraction": 205,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 18,
+     "frames": 19,
+     "ts_first_ns": 1627643740512479544,
+     "ts_last_ns": 1627643742644687176
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "window": {
+    "start_s_from_first_frame": 42.0,
+    "end_s_from_first_frame": 52.0,
+    "frames": 100,
+    "kf_first": 416,
+    "kf_last": 515,
+    "status_counts": {
+     "UNAVAILABLE": 100
+    },
+    "nis_source_counts": {
+     "computed": 100
+    },
+    "nis_reference_counts": {
+     "prev_scan": 100
+    },
+    "pose_neighbourhood_below_30": 100,
+    "nis_min": 0.015280987042290453,
+    "nis_median": 0.0463950721664612,
+    "nis_max": 0.6797466767063424
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T035544Z_3005906/run_summary.json",
+   "summary_sha256": "375fb9983c8864e0dd5a474aabb5a529dc324d3c4a82b27fd059b28980e2d971",
+   "run_id": "fl_native_20261110T035544Z_3005906",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 584,
+   "frame_diagnostics_rows": 584,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 583,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 365,
+    "reference_prev_scan": 218,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 363,
+    "UNAVAILABLE": 221,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 221,
+    "AVAILABLE": 363
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 220,
+    "AVAILABLE|computed": 363
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 218,
+    "AVAILABLE|node_map": 363,
+    "UNAVAILABLE|node_map": 2
+   },
+   "unavailable_total": 221,
+   "unavailable_with_nis_number": 220,
+   "unavailable_with_computed_nis": 220,
+   "unavailable_with_empty_reference": 19,
+   "unavailable_map_nonempty_and_computed": 202,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 200,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 19,
+    "empty_reference_with_computed_nis": 18,
+    "fraction": 202,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 18,
+     "frames": 19,
+     "ts_first_ns": 1627643740512479544,
+     "ts_last_ns": 1627643742644687176
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "window": {
+    "start_s_from_first_frame": 42.0,
+    "end_s_from_first_frame": 52.0,
+    "frames": 100,
+    "kf_first": 416,
+    "kf_last": 515,
+    "status_counts": {
+     "UNAVAILABLE": 100
+    },
+    "nis_source_counts": {
+     "computed": 100
+    },
+    "nis_reference_counts": {
+     "prev_scan": 100
+    },
+    "pose_neighbourhood_below_30": 100,
+    "nis_min": 0.020850563225966158,
+    "nis_median": 0.12547669150127866,
+    "nis_max": 0.8998459795893143
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T035825Z_3008585/run_summary.json",
+   "summary_sha256": "d51d20667ea11330fe6ea17253e0f94c847287bf0103470a0f73fd9588bbf63c",
+   "run_id": "fl_native_20261110T035825Z_3008585",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 584,
+   "frame_diagnostics_rows": 584,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 583,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 365,
+    "reference_prev_scan": 218,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 364,
+    "UNAVAILABLE": 220,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 220,
+    "AVAILABLE": 364
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 219,
+    "AVAILABLE|computed": 364
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 218,
+    "AVAILABLE|node_map": 364,
+    "UNAVAILABLE|node_map": 1
+   },
+   "unavailable_total": 220,
+   "unavailable_with_nis_number": 219,
+   "unavailable_with_computed_nis": 219,
+   "unavailable_with_empty_reference": 19,
+   "unavailable_map_nonempty_and_computed": 201,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 200,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 19,
+    "empty_reference_with_computed_nis": 18,
+    "fraction": 201,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 18,
+     "frames": 19,
+     "ts_first_ns": 1627643740512479544,
+     "ts_last_ns": 1627643742644687176
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "window": {
+    "start_s_from_first_frame": 42.0,
+    "end_s_from_first_frame": 52.0,
+    "frames": 100,
+    "kf_first": 416,
+    "kf_last": 515,
+    "status_counts": {
+     "UNAVAILABLE": 100
+    },
+    "nis_source_counts": {
+     "computed": 100
+    },
+    "nis_reference_counts": {
+     "prev_scan": 100
+    },
+    "pose_neighbourhood_below_30": 100,
+    "nis_min": 0.015420565154465233,
+    "nis_median": 0.052586711893169824,
+    "nis_max": 0.6699167178174059
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T042426Z_3020861/run_summary.json",
+   "summary_sha256": "3bcfa588dc3fdf3fee103af76ceb9c9321504b84ddaaad2415ea3aea2fa72b62",
+   "run_id": "fl_native_20261110T042426Z_3020861",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 310,
+   "frame_diagnostics_rows": 310,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 309,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 291,
+    "reference_prev_scan": 18,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 291,
+    "UNAVAILABLE": 19,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 19,
+    "AVAILABLE": 291
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 18,
+    "AVAILABLE|computed": 291
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 18,
+    "AVAILABLE|node_map": 291
+   },
+   "unavailable_total": 19,
+   "unavailable_with_nis_number": 18,
+   "unavailable_with_computed_nis": 18,
+   "unavailable_with_empty_reference": 19,
+   "unavailable_map_nonempty_and_computed": 0,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 0,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 19,
+    "empty_reference_with_computed_nis": 18,
+    "fraction": 0,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 18,
+     "frames": 19,
+     "ts_first_ns": 1627643740512479544,
+     "ts_last_ns": 1627643742644687176
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T043148Z_3025639/run_summary.json",
+   "summary_sha256": "8a1f06334ee045ceabb0e8562a2ac629ef4d7d9289aa8c50e53dbd36d24cd037",
+   "run_id": "fl_native_20261110T043148Z_3025639",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 413,
+   "frame_diagnostics_rows": 413,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 412,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 394,
+    "reference_prev_scan": 18,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 394,
+    "UNAVAILABLE": 19,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 19,
+    "AVAILABLE": 394
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 18,
+    "AVAILABLE|computed": 394
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 18,
+    "AVAILABLE|node_map": 394
+   },
+   "unavailable_total": 19,
+   "unavailable_with_nis_number": 18,
+   "unavailable_with_computed_nis": 18,
+   "unavailable_with_empty_reference": 19,
+   "unavailable_map_nonempty_and_computed": 0,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 0,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 19,
+    "empty_reference_with_computed_nis": 18,
+    "fraction": 0,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 18,
+     "frames": 19,
+     "ts_first_ns": 1627643741445323944,
+     "ts_last_ns": 1627643743510872364
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T044250Z_3031393/run_summary.json",
+   "summary_sha256": "1dcae97eae6d86e6ad0f57a83ecbf230b0b96f969e645ec8a4d7e5ffcbf2e4a9",
+   "run_id": "fl_native_20261110T044250Z_3031393",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 369,
+   "frame_diagnostics_rows": 369,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 368,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 351,
+    "reference_prev_scan": 17,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 351,
+    "UNAVAILABLE": 18,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 18,
+    "AVAILABLE": 351
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 17,
+    "AVAILABLE|computed": 351
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 17,
+    "AVAILABLE|node_map": 351
+   },
+   "unavailable_total": 18,
+   "unavailable_with_nis_number": 17,
+   "unavailable_with_computed_nis": 17,
+   "unavailable_with_empty_reference": 18,
+   "unavailable_map_nonempty_and_computed": 0,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 0,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 18,
+    "empty_reference_with_computed_nis": 17,
+    "fraction": 0,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 17,
+     "frames": 18,
+     "ts_first_ns": 1627643740779025078,
+     "ts_last_ns": 1627643742844584942
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T044830Z_3036955/run_summary.json",
+   "summary_sha256": "4866d3312444af8fae6de1c8d0fede9f78a1980cf3de8f14289f8bdecb82b3bb",
+   "run_id": "fl_native_20261110T044830Z_3036955",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 516,
+   "frame_diagnostics_rows": 516,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 515,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 363,
+    "reference_prev_scan": 152,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 361,
+    "UNAVAILABLE": 155,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 155,
+    "AVAILABLE": 361
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 154,
+    "AVAILABLE|computed": 361
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 152,
+    "AVAILABLE|node_map": 361,
+    "UNAVAILABLE|node_map": 2
+   },
+   "unavailable_total": 155,
+   "unavailable_with_nis_number": 154,
+   "unavailable_with_computed_nis": 154,
+   "unavailable_with_empty_reference": 19,
+   "unavailable_map_nonempty_and_computed": 136,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 134,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 19,
+    "empty_reference_with_computed_nis": 18,
+    "fraction": 136,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 18,
+     "frames": 19,
+     "ts_first_ns": 1627643740512479544,
+     "ts_last_ns": 1627643742644687176
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "window": {
+    "start_s_from_first_frame": 42.0,
+    "end_s_from_first_frame": 52.0,
+    "frames": 100,
+    "kf_first": 416,
+    "kf_last": 515,
+    "status_counts": {
+     "UNAVAILABLE": 100
+    },
+    "nis_source_counts": {
+     "computed": 100
+    },
+    "nis_reference_counts": {
+     "prev_scan": 100
+    },
+    "pose_neighbourhood_below_30": 100,
+    "nis_min": 0.020991376109771812,
+    "nis_median": 0.09063194603742766,
+    "nis_max": 0.9102902829917653
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T045315Z_3040688/run_summary.json",
+   "summary_sha256": "d2ed372911bd05f277cde5e470cf2553f08965227ed09c30d35757b263397fb8",
+   "run_id": "fl_native_20261110T045315Z_3040688",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 209,
+   "frame_diagnostics_rows": 209,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 208,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 190,
+    "reference_prev_scan": 18,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 190,
+    "UNAVAILABLE": 19,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 19,
+    "AVAILABLE": 190
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 18,
+    "AVAILABLE|computed": 190
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 18,
+    "AVAILABLE|node_map": 190
+   },
+   "unavailable_total": 19,
+   "unavailable_with_nis_number": 18,
+   "unavailable_with_computed_nis": 18,
+   "unavailable_with_empty_reference": 19,
+   "unavailable_map_nonempty_and_computed": 0,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 0,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 19,
+    "empty_reference_with_computed_nis": 18,
+    "fraction": 0,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 18,
+     "frames": 19,
+     "ts_first_ns": 1627643740512479544,
+     "ts_last_ns": 1627643742644687176
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T045540Z_3043280/run_summary.json",
+   "summary_sha256": "88d975ba32988bc25e3615b71899dbcec4da3874cce5d42cc120cf76da0bfc9e",
+   "run_id": "fl_native_20261110T045540Z_3043280",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 209,
+   "frame_diagnostics_rows": 209,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 208,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 190,
+    "reference_prev_scan": 18,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 190,
+    "UNAVAILABLE": 19,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 19,
+    "AVAILABLE": 190
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 18,
+    "AVAILABLE|computed": 190
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 18,
+    "AVAILABLE|node_map": 190
+   },
+   "unavailable_total": 19,
+   "unavailable_with_nis_number": 18,
+   "unavailable_with_computed_nis": 18,
+   "unavailable_with_empty_reference": 19,
+   "unavailable_map_nonempty_and_computed": 0,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 0,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 19,
+    "empty_reference_with_computed_nis": 18,
+    "fraction": 0,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 18,
+     "frames": 19,
+     "ts_first_ns": 1627643740512479544,
+     "ts_last_ns": 1627643742644687176
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T050737Z_3052527/run_summary.json",
+   "summary_sha256": "b286ab88e83b5e682c511d5b83d3f25dc3b1e79bf61f6a9597ba874af45416cb",
+   "run_id": "fl_native_20261110T050737Z_3052527",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 584,
+   "frame_diagnostics_rows": 584,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 583,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 368,
+    "reference_prev_scan": 215,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 366,
+    "UNAVAILABLE": 218,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 218,
+    "AVAILABLE": 366
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 217,
+    "AVAILABLE|computed": 366
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 215,
+    "AVAILABLE|node_map": 366,
+    "UNAVAILABLE|node_map": 2
+   },
+   "unavailable_total": 218,
+   "unavailable_with_nis_number": 217,
+   "unavailable_with_computed_nis": 217,
+   "unavailable_with_empty_reference": 19,
+   "unavailable_map_nonempty_and_computed": 199,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 197,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 19,
+    "empty_reference_with_computed_nis": 18,
+    "fraction": 199,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 18,
+     "frames": 19,
+     "ts_first_ns": 1627643740512479544,
+     "ts_last_ns": 1627643742644687176
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "window": {
+    "start_s_from_first_frame": 42.0,
+    "end_s_from_first_frame": 52.0,
+    "frames": 100,
+    "kf_first": 416,
+    "kf_last": 515,
+    "status_counts": {
+     "UNAVAILABLE": 100
+    },
+    "nis_source_counts": {
+     "computed": 100
+    },
+    "nis_reference_counts": {
+     "prev_scan": 100
+    },
+    "pose_neighbourhood_below_30": 100,
+    "nis_min": 0.01491408565714682,
+    "nis_median": 0.04407039086694996,
+    "nis_max": 0.6898373685062331
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T051542Z_3057611/run_summary.json",
+   "summary_sha256": "52e972f45003d13ac716b3f32d7cff5713ba91209f20c4b16063c1cee0a2d978",
+   "run_id": "fl_native_20261110T051542Z_3057611",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 584,
+   "frame_diagnostics_rows": 584,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 583,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 363,
+    "reference_prev_scan": 220,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 361,
+    "UNAVAILABLE": 223,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 223,
+    "AVAILABLE": 361
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 222,
+    "AVAILABLE|computed": 361
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 220,
+    "AVAILABLE|node_map": 361,
+    "UNAVAILABLE|node_map": 2
+   },
+   "unavailable_total": 223,
+   "unavailable_with_nis_number": 222,
+   "unavailable_with_computed_nis": 222,
+   "unavailable_with_empty_reference": 19,
+   "unavailable_map_nonempty_and_computed": 204,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 202,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 19,
+    "empty_reference_with_computed_nis": 18,
+    "fraction": 204,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 18,
+     "frames": 19,
+     "ts_first_ns": 1627643740512479544,
+     "ts_last_ns": 1627643742644687176
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "window": {
+    "start_s_from_first_frame": 42.0,
+    "end_s_from_first_frame": 52.0,
+    "frames": 100,
+    "kf_first": 416,
+    "kf_last": 515,
+    "status_counts": {
+     "UNAVAILABLE": 100
+    },
+    "nis_source_counts": {
+     "computed": 100
+    },
+    "nis_reference_counts": {
+     "prev_scan": 100
+    },
+    "pose_neighbourhood_below_30": 100,
+    "nis_min": 0.015105932593994302,
+    "nis_median": 0.044993657825008394,
+    "nis_max": 0.6765737656924999
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T051744Z_3059939/run_summary.json",
+   "summary_sha256": "7770492568227f6ded0e2abc3206247af5d16f7ca7f56932c935c726dea7d8e6",
+   "run_id": "fl_native_20261110T051744Z_3059939",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 584,
+   "frame_diagnostics_rows": 584,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 583,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 367,
+    "reference_prev_scan": 216,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 365,
+    "UNAVAILABLE": 219,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 219,
+    "AVAILABLE": 365
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 218,
+    "AVAILABLE|computed": 365
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 216,
+    "AVAILABLE|node_map": 365,
+    "UNAVAILABLE|node_map": 2
+   },
+   "unavailable_total": 219,
+   "unavailable_with_nis_number": 218,
+   "unavailable_with_computed_nis": 218,
+   "unavailable_with_empty_reference": 19,
+   "unavailable_map_nonempty_and_computed": 200,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 198,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 19,
+    "empty_reference_with_computed_nis": 18,
+    "fraction": 200,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 18,
+     "frames": 19,
+     "ts_first_ns": 1627643740512479544,
+     "ts_last_ns": 1627643742644687176
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "window": {
+    "start_s_from_first_frame": 42.0,
+    "end_s_from_first_frame": 52.0,
+    "frames": 100,
+    "kf_first": 416,
+    "kf_last": 515,
+    "status_counts": {
+     "UNAVAILABLE": 100
+    },
+    "nis_source_counts": {
+     "computed": 100
+    },
+    "nis_reference_counts": {
+     "prev_scan": 100
+    },
+    "pose_neighbourhood_below_30": 100,
+    "nis_min": 0.020787040251262916,
+    "nis_median": 0.08209316617570053,
+    "nis_max": 1.0557000332649982
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T054559Z_3073038/run_summary.json",
+   "summary_sha256": "2224bb45d266557ce4903c1a06ef290eb99218024311668d1b542f2f3b2cbc68",
+   "run_id": "fl_native_20261110T054559Z_3073038",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 515,
+   "frame_diagnostics_rows": 515,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 514,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 397,
+    "reference_prev_scan": 117,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 440,
+    "UNAVAILABLE": 75,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 75,
+    "AVAILABLE": 440
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 74,
+    "AVAILABLE|computed": 440
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 50,
+    "AVAILABLE|prev_scan": 67,
+    "AVAILABLE|node_map": 373,
+    "UNAVAILABLE|node_map": 24
+   },
+   "unavailable_total": 75,
+   "unavailable_with_nis_number": 74,
+   "unavailable_with_computed_nis": 74,
+   "unavailable_with_empty_reference": 21,
+   "unavailable_map_nonempty_and_computed": 54,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 30,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 21,
+    "empty_reference_with_computed_nis": 20,
+    "fraction": 54,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 20,
+     "frames": 21,
+     "ts_first_ns": 1627785262343971014,
+     "ts_last_ns": 1627785264406431675
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "window": {
+    "start_s_from_first_frame": 42.0,
+    "end_s_from_first_frame": 52.0,
+    "frames": 100,
+    "kf_first": 375,
+    "kf_last": 474,
+    "status_counts": {
+     "AVAILABLE": 100
+    },
+    "nis_source_counts": {
+     "computed": 100
+    },
+    "nis_reference_counts": {
+     "node_map": 100
+    },
+    "pose_neighbourhood_below_30": 0,
+    "nis_min": 0.7832181645161708,
+    "nis_median": 14.164736966431185,
+    "nis_max": 54.127076821398795
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T054753Z_3075620/run_summary.json",
+   "summary_sha256": "d06bb1e26420bf49db5a50a29565313a4fa4aa73fb72ec3e4bdbf26a6cc5a95e",
+   "run_id": "fl_native_20261110T054753Z_3075620",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 519,
+   "frame_diagnostics_rows": 519,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 518,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 5,
+    "reference_prev_scan": 513,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 5,
+    "UNAVAILABLE": 514,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 514,
+    "AVAILABLE": 5
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 513,
+    "AVAILABLE|computed": 5
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 513,
+    "AVAILABLE|node_map": 5
+   },
+   "unavailable_total": 514,
+   "unavailable_with_nis_number": 513,
+   "unavailable_with_computed_nis": 513,
+   "unavailable_with_empty_reference": 514,
+   "unavailable_map_nonempty_and_computed": 0,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 0,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 514,
+    "empty_reference_with_computed_nis": 513,
+    "fraction": 0,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 20,
+     "frames": 21,
+     "ts_first_ns": 1627785261605203390,
+     "ts_last_ns": 1627785263607979774
+    },
+    {
+     "kf_first": 26,
+     "kf_last": 518,
+     "frames": 493,
+     "ts_first_ns": 1627785264206571102,
+     "ts_last_ns": 1627785317856753349
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "window": {
+    "start_s_from_first_frame": 42.0,
+    "end_s_from_first_frame": 52.0,
+    "frames": 100,
+    "kf_first": 376,
+    "kf_last": 475,
+    "status_counts": {
+     "UNAVAILABLE": 100
+    },
+    "nis_source_counts": {
+     "computed": 100
+    },
+    "nis_reference_counts": {
+     "prev_scan": 100
+    },
+    "pose_neighbourhood_below_30": 0,
+    "nis_min": 0.11120753129024602,
+    "nis_median": 0.1819665389281523,
+    "nis_max": 0.2660735644168349
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T104511Z_3336818/run_summary.json",
+   "summary_sha256": "6891d2449da63b70d721999a9133907785d7b988ba5bf2d29b468cb138ce74eb",
+   "run_id": "fl_native_20261110T104511Z_3336818",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 542,
+   "frame_diagnostics_rows": 542,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 541,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 5,
+    "reference_prev_scan": 536,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 5,
+    "UNAVAILABLE": 537,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 537,
+    "AVAILABLE": 5
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 536,
+    "AVAILABLE|computed": 5
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 536,
+    "AVAILABLE|node_map": 5
+   },
+   "unavailable_total": 537,
+   "unavailable_with_nis_number": 536,
+   "unavailable_with_computed_nis": 536,
+   "unavailable_with_empty_reference": 537,
+   "unavailable_map_nonempty_and_computed": 0,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 0,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 537,
+    "empty_reference_with_computed_nis": 536,
+    "fraction": 0,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 20,
+     "frames": 21,
+     "ts_first_ns": 1627785261605203390,
+     "ts_last_ns": 1627785263607979774
+    },
+    {
+     "kf_first": 26,
+     "kf_last": 541,
+     "frames": 516,
+     "ts_first_ns": 1627785264206571102,
+     "ts_last_ns": 1627785320909073830
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "window": {
+    "start_s_from_first_frame": 42.0,
+    "end_s_from_first_frame": 52.0,
+    "frames": 100,
+    "kf_first": 376,
+    "kf_last": 475,
+    "status_counts": {
+     "UNAVAILABLE": 100
+    },
+    "nis_source_counts": {
+     "computed": 100
+    },
+    "nis_reference_counts": {
+     "prev_scan": 100
+    },
+    "pose_neighbourhood_below_30": 0,
+    "nis_min": 1.7063982874816674,
+    "nis_median": 21.928846729670738,
+    "nis_max": 84.86061534650348
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T105118Z_3341023/run_summary.json",
+   "summary_sha256": "911643a9f1a3fd7b3939c8f2bcf949cfc8de77bdf976e77cf2c30e22bd3c268a",
+   "run_id": "fl_native_20261110T105118Z_3341023",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 312,
+   "frame_diagnostics_rows": 312,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 311,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 5,
+    "reference_prev_scan": 306,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 5,
+    "UNAVAILABLE": 307,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 307,
+    "AVAILABLE": 5
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 306,
+    "AVAILABLE|computed": 5
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 306,
+    "AVAILABLE|node_map": 5
+   },
+   "unavailable_total": 307,
+   "unavailable_with_nis_number": 306,
+   "unavailable_with_computed_nis": 306,
+   "unavailable_with_empty_reference": 139,
+   "unavailable_map_nonempty_and_computed": 168,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 168,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 139,
+    "empty_reference_with_computed_nis": 138,
+    "fraction": 168,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 20,
+     "frames": 21,
+     "ts_first_ns": 1627785261403843403,
+     "ts_last_ns": 1627785263408393621
+    },
+    {
+     "kf_first": 26,
+     "kf_last": 143,
+     "frames": 118,
+     "ts_first_ns": 1627785264007068634,
+     "ts_last_ns": 1627785275680882215
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T110042Z_3345912/run_summary.json",
+   "summary_sha256": "5488c3669be8f8fc57d872e42bcf3e3a8cc74cd4c824c9d201ded871ce33a8dc",
+   "run_id": "fl_native_20261110T110042Z_3345912",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 524,
+   "frame_diagnostics_rows": 524,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 523,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 113,
+    "reference_prev_scan": 410,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 68,
+    "UNAVAILABLE": 456,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 456,
+    "AVAILABLE": 68
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 455,
+    "AVAILABLE|computed": 68
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 410,
+    "AVAILABLE|node_map": 68,
+    "UNAVAILABLE|node_map": 45
+   },
+   "unavailable_total": 456,
+   "unavailable_with_nis_number": 455,
+   "unavailable_with_computed_nis": 455,
+   "unavailable_with_empty_reference": 62,
+   "unavailable_map_nonempty_and_computed": 394,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 349,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 62,
+    "empty_reference_with_computed_nis": 61,
+    "fraction": 394,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 20,
+     "frames": 21,
+     "ts_first_ns": 1627785261605203390,
+     "ts_last_ns": 1627785263607979774
+    },
+    {
+     "kf_first": 26,
+     "kf_last": 66,
+     "frames": 41,
+     "ts_first_ns": 1627785264206571102,
+     "ts_last_ns": 1627785268204281092
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "window": {
+    "start_s_from_first_frame": 42.0,
+    "end_s_from_first_frame": 52.0,
+    "frames": 100,
+    "kf_first": 376,
+    "kf_last": 475,
+    "status_counts": {
+     "UNAVAILABLE": 100
+    },
+    "nis_source_counts": {
+     "computed": 100
+    },
+    "nis_reference_counts": {
+     "prev_scan": 100
+    },
+    "pose_neighbourhood_below_30": 100,
+    "nis_min": 23.733855562749493,
+    "nis_median": 119.29541730292922,
+    "nis_max": 228.4228732319083
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T110616Z_3349738/run_summary.json",
+   "summary_sha256": "8c6d3d565d6f0f1cb05fcf586ccc61063af816483255ba2432eca74c7d052b58",
+   "run_id": "fl_native_20261110T110616Z_3349738",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 459,
+   "frame_diagnostics_rows": 459,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 458,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 196,
+    "reference_prev_scan": 262,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 118,
+    "UNAVAILABLE": 341,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 341,
+    "AVAILABLE": 118
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 340,
+    "AVAILABLE|computed": 118
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 262,
+    "AVAILABLE|node_map": 118,
+    "UNAVAILABLE|node_map": 78
+   },
+   "unavailable_total": 341,
+   "unavailable_with_nis_number": 340,
+   "unavailable_with_computed_nis": 340,
+   "unavailable_with_empty_reference": 60,
+   "unavailable_map_nonempty_and_computed": 281,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 203,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 60,
+    "empty_reference_with_computed_nis": 59,
+    "fraction": 281,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 20,
+     "frames": 21,
+     "ts_first_ns": 1627785261403843403,
+     "ts_last_ns": 1627785263408393621
+    },
+    {
+     "kf_first": 26,
+     "kf_last": 64,
+     "frames": 39,
+     "ts_first_ns": 1627785264007068634,
+     "ts_last_ns": 1627785267804941654
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "window": {
+    "start_s_from_first_frame": 42.0,
+    "end_s_from_first_frame": 52.0,
+    "frames": 83,
+    "kf_first": 376,
+    "kf_last": 458,
+    "status_counts": {
+     "UNAVAILABLE": 83
+    },
+    "nis_source_counts": {
+     "computed": 83
+    },
+    "nis_reference_counts": {
+     "prev_scan": 83
+    },
+    "pose_neighbourhood_below_30": 83,
+    "nis_min": 0.687688682021089,
+    "nis_median": 1.0952100437217773,
+    "nis_max": 4.4531190459049075
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/fl_native_20261110T111222Z_3353756/run_summary.json",
+   "summary_sha256": "6a8feb6016d987f73411aa8c402bbbf073f2e74a07181656685b29d800125f41",
+   "run_id": "fl_native_20261110T111222Z_3353756",
+   "detection_enabled_field": true,
+   "detection_on": true,
+   "frames_paired": 469,
+   "frame_diagnostics_rows": 469,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 468,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 409,
+    "reference_prev_scan": 59,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 387,
+    "UNAVAILABLE": 82,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "status_counts": {
+    "UNAVAILABLE": 82,
+    "AVAILABLE": 387
+   },
+   "status_by_nis_source": {
+    "UNAVAILABLE|unavailable": 1,
+    "UNAVAILABLE|computed": 81,
+    "AVAILABLE|computed": 387
+   },
+   "status_by_nis_reference": {
+    "UNAVAILABLE|none": 1,
+    "UNAVAILABLE|prev_scan": 59,
+    "AVAILABLE|node_map": 387,
+    "UNAVAILABLE|node_map": 22
+   },
+   "unavailable_total": 82,
+   "unavailable_with_nis_number": 81,
+   "unavailable_with_computed_nis": 81,
+   "unavailable_with_empty_reference": 60,
+   "unavailable_map_nonempty_and_computed": 22,
+   "unavailable_nis_missing_or_carried": 1,
+   "unavailable_pose_neighbourhood_below_30": 0,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 60,
+    "empty_reference_with_computed_nis": 59,
+    "fraction": 22,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 20,
+     "frames": 21,
+     "ts_first_ns": 1627785261403843403,
+     "ts_last_ns": 1627785263408393621
+    },
+    {
+     "kf_first": 26,
+     "kf_last": 64,
+     "frames": 39,
+     "ts_first_ns": 1627785264007068634,
+     "ts_last_ns": 1627785267804941654
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "UNAVAILABLE",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "window": {
+    "start_s_from_first_frame": 42.0,
+    "end_s_from_first_frame": 52.0,
+    "frames": 93,
+    "kf_first": 376,
+    "kf_last": 468,
+    "status_counts": {
+     "AVAILABLE": 93
+    },
+    "nis_source_counts": {
+     "computed": 93
+    },
+    "nis_reference_counts": {
+     "node_map": 93
+    },
+    "pose_neighbourhood_below_30": 0,
+    "nis_min": 0.952089923618059,
+    "nis_median": 40.02227761140124,
+    "nis_max": 65.77139000326227
+   },
+   "status": "ANALYSED"
+  },
+  {
+   "path": "/tmp/wt-unavail/docs/review_20261110_native_checkpoint/chain_run_fl_native_20261110T115717Z_3390402/run_summary.json",
+   "summary_sha256": "179e8fa543af2200b4dd1d60e7b6f6a112004d699ed494b74666c23ddc2760f8",
+   "run_id": "fl_native_20261110T115717Z_3390402",
+   "detection_enabled_field": false,
+   "detection_on": false,
+   "frames_paired": 544,
+   "frame_diagnostics_rows": 544,
+   "diag_cap": 2000,
+   "diag_complete": true,
+   "nis_summary": {
+    "computed": 543,
+    "carried_forward": 0,
+    "unavailable": 1,
+    "reference_node_map": 523,
+    "reference_prev_scan": 20,
+    "reference_none": 1,
+    "nonfinite_estimator_output": 0,
+    "sigma_meas_m": 0.884
+   },
+   "detection_status_counts": {
+    "AVAILABLE": 0,
+    "UNAVAILABLE": 0,
+    "DISABLED_FOR_DIAGNOSIS": 542
+   },
+   "status_counts": {
+    "DISABLED_FOR_DIAGNOSIS": 542,
+    "SCRIPTED_TRIGGER": 2
+   },
+   "status_by_nis_source": {
+    "DISABLED_FOR_DIAGNOSIS|unavailable": 1,
+    "DISABLED_FOR_DIAGNOSIS|computed": 541,
+    "SCRIPTED_TRIGGER|computed": 2
+   },
+   "status_by_nis_reference": {
+    "DISABLED_FOR_DIAGNOSIS|none": 1,
+    "DISABLED_FOR_DIAGNOSIS|prev_scan": 20,
+    "DISABLED_FOR_DIAGNOSIS|node_map": 521,
+    "SCRIPTED_TRIGGER|node_map": 2
+   },
+   "unavailable_total": 0,
+   "unavailable_with_nis_number": 0,
+   "unavailable_with_computed_nis": 0,
+   "unavailable_with_empty_reference": 0,
+   "unavailable_map_nonempty_and_computed": 0,
+   "unavailable_nis_missing_or_carried": 0,
+   "unavailable_pose_neighbourhood_below_30": 0,
+   "carried_forward_frames": 0,
+   "unavailable_by_support_branch": {
+    "empty_reference": 0,
+    "empty_reference_with_computed_nis": 0,
+    "fraction": 0,
+    "ambiguous_noncomputed_map_present": 0
+   },
+   "empty_reference_blocks": [
+    {
+     "kf_first": 0,
+     "kf_last": 20,
+     "frames": 21,
+     "ts_first_ns": 1627785261403843403,
+     "ts_last_ns": 1627785263408393621
+    }
+   ],
+   "first_frame": {
+    "kf_id": 0,
+    "detection_status": "DISABLED_FOR_DIAGNOSIS",
+    "nis_source": "unavailable",
+    "nis_reference": "none",
+    "map_points": 0
+   },
+   "window": {
+    "start_s_from_first_frame": 42.0,
+    "end_s_from_first_frame": 52.0,
+    "frames": 100,
+    "kf_first": 376,
+    "kf_last": 475,
+    "status_counts": {
+     "DISABLED_FOR_DIAGNOSIS": 99,
+     "SCRIPTED_TRIGGER": 1
+    },
+    "nis_source_counts": {
+     "computed": 100
+    },
+    "nis_reference_counts": {
+     "node_map": 100
+    },
+    "pose_neighbourhood_below_30": 0,
+    "nis_min": 33.030365642218825,
+    "nis_median": 52.33633393769179,
+    "nis_max": 154.80181249859504
+   },
+   "status": "ANALYSED"
+  }
+ ],
+ "aggregate": {
+  "runs_with_detection_on": 21,
+  "unavailable_total": 4128,
+  "unavailable_with_computed_nis": 4107,
+  "unavailable_with_empty_reference": 1656,
+  "unavailable_map_nonempty_and_computed": 2472,
+  "unavailable_nis_missing_or_carried": 21,
+  "unavailable_pose_neighbourhood_below_30": 2286,
+  "carried_forward_frames": 0,
+  "unavailable_by_support_branch": {
+   "empty_reference": 1656,
+   "empty_reference_with_computed_nis": 1635,
+   "fraction": 2472,
+   "ambiguous_noncomputed_map_present": 0
+  },
+  "reading": "UNAVAILABLE is a support predicate outcome, not a missing NIS: in every detection-on run almost every UNAVAILABLE frame has a computed NIS. The exception is the cold-start frame (empty reference and no NIS); it is counted separately and is a multi-cause frame"
+ }
+}
