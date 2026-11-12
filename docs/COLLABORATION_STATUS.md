@@ -1344,3 +1344,22 @@ S1共享成功依赖/可信边界、S2下一合法历史恢复→完整接回后
 
 本机状态：S2 的干净 pass 已产出 PCD（`Log/pcd/all_raw_points.pcd` 40 MB、`all_downsampled_points.pcd` 216 KB、
 `lidar_poses.txt`），但尚未提交归档/receipt，故本轮**不评分、不宣称结果**；等 S2 交付 SHA 与配置后再离线评分。
+
+## 111. 干净参考地图 pass 已交付，但作为独立参考**不可用**（S1 离线评分负结果）
+
+S1 复核 S2 `dafbd50`（合入，217 测试）。归档 `review_20261112_availability/reference_map_20261112/`：
+PCD raw 2,498,791 点 / downsampled 13,493 点、config 副本 `refmap_m2dgr.yaml`（只改 pcd_save）、
+runner 加 `SAVE_WAIT`（SIGINT 后才走 `savePCD()`）——这些均成立。
+
+**S1 离线评分（现有 predicted_pose 544 行 × 该地图）暴露三个不可用原因**：
+1. **覆盖窗口只有约 54 s**（lidar_poses 1627785261.4–1627785315.5），报告写"跑完整 bag（59.99 s）"
+   与 bag 320 s 不符；`run_summary.paired=396`，说明该 pass 只处理了前 60 s；
+2. **`lidar_poses.txt` 的位姿近似静止**（全程 |p| < 1 m，第 100 帧 0.001/-0.009/0.399），
+   而地图范围 ±80 m——位姿日志与地图不一致，无法用它建立跨 run gauge（匹配前缀 Umeyama RMS 3.51 m）；
+3. 用该地图对窗口内 302 个全样本帧做同一支持测试：**before/after per-frame ICP 均 0 通过**
+   （aligned median 0.0、correction median 0、ICP 找不到对应点）——与"扫描/地图不在同一覆盖"一致，
+   **不能据此对诊断 run 下任何覆盖/位姿结论**。
+
+因此本轮**不宣称独立参考结论**；工具本身（PCD 读取、gauge、ICP、裁样本分离）已按审阅修正并有测试。
+下一步：S2 重做 clean pass（完整 bag、确认位姿日志随轨迹移动、地图范围与诊断 run 轨迹匹配）后再评分；
+若位姿日志仍静止，先查 `pcd_save` 的位姿写出分支，不拿不符数据硬评。
