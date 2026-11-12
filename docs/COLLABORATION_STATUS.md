@@ -1706,3 +1706,20 @@ S2（r11070-c3）回报，本机逐项核对：
 两次trace startup image_transport报错/pose paired0仅S1报告，失败日志收据/新库patch未上target，不根因实证；rospack查询成功不等宿主fork环境有效。S2先失败原件/真实进程环境最小修正，证据前不第三次盲重跑，其余15h工作继续，S3现在确认正常校准/label范围、复用实现准备同新trace对照。现可解除依赖不自动全面重大阻塞；真需用户选择/超授权或证据不可得，立即中文GitHub按模板告知，未阻工作继续。S1共享检测/native归宿单写，1研究+2集成/无Codex/参数停，四Cron单owner，完整人口风险UNKNOWN成本/命令原件逐项自检，A/B局部不总分/review SSH/private不合main改算法历史。
 
 源码主会话正常控制实际复现：SE3 Log漏平移Jacobian（.2rad/.1m输出(.1,0,0)非(.0996664,-.01,0)）；整块11缺行而10/12ALARM/NORMAL跨gap累计；left/world READY但P无frame绑定、右eI直接用P同场景score1而搬运.01。S3最低修Log/空块断dwell保last_suspect、S1/S2/S3实际cov扰动frame对应，不以阈值补偿；真实caller还未交，不指控实际host已错判/T0全UNKNOWN无效，不阻现trace环境最小解除。只读代理误fork审阅流程已披露，主会话亲核源码和三控制，无host/算法修改或新Codex角色。
+
+## 124. 审阅在 ALI-H 实现中复现三个真实缺陷；S1 本机复现其中两个并退回 S3
+
+审阅 `febf68d`（已合入 main `2b60ec3`）对 `docs/ali_h_v1_research/` 做了独立只读复算，指出三个缺陷。S1 本机复核：
+
+| # | 缺陷 | 本机复现 |
+|---|---|---|
+| 1 | `e_i()` 的平移漏 `V⁻¹`：返回 `[so3_log(R), D[:3,3]]`，正确应为 `ρ=J_l(ω)⁻¹t` | `Rz(0.2)`+`t=(0.1,0,0)` → 正确 `(0.099666444, −0.01, 0)`，现实现 `(0.1, 0, 0)`；selftest 把错值写成预期 |
+| 2 | 整块缺测仍跨空窗累计 dwell | 块10 M=ALARM、块12 M=ALARM、无块11 → 复现输出块12 `SUSPECT`（应 UNKNOWN）；`block_summary` 不补空块、`classify_blocks` 不检查相邻 |
+| 3 | validator 的 READY 不证明协方差与残差同切空间 | 代码可核：`e_i` 固定算右残差，manifest 声明 `left/world` 仍可 READY，`s_i` 直接用传入 P；未声明转换 |
+
+影响：缺陷 1/3 影响一切 T2 计分，缺陷 2 影响 SUSPECT/NORMAL 的持续性与 UNKNOWN 时长；**T0 的 UNKNOWN 结论不受影响**
+（它是缺项结论，不依赖分类路径）。已要求 S3 修实现与 selftest 预期、补空块、明确 frame/perturbation 对应，并**现在就确认
+现有资料可支持的正常/异常范围与出处**；若现授权内拿不到，按 15h 任务写中文重大阻塞（选项 A/B），不等 trace 才发现。
+
+**宿主侧**：本机无新 run、无进程；两次 FAIL（`100744Z`/`101116Z`）仍只在本机 `/tmp` 与开发回报中，未入仓库，
+按审阅记 DEVELOPER_REPORTED；诊断构建 A 的探针证据未到。
