@@ -585,3 +585,9 @@ E2无新注入/detection off；cp1627785309656085248晚trigger1.607814s、晚qua
 S1 COLLAB§111的“全程|p|<1m/近静止”明确FAIL：原件749行最大范数11.98754m，724行>1m，x/y最大8.808419/8.833413；地图±80m也不直接与运动范围矛盾，不能据此查位姿写出分支或重跑clean pass。pose跨度54.119872s、晚诊断尾前5.385359s是真实时间支持限制，recovery396配对/598scan接收不等native消费或bag截断；“bag320s”无bag起止证据，epoch尾数不能作持续时间。S1的302帧/ICP0通过/gauge RMS3.51仅DEVELOPER_REPORTED，score命令/输出/prefix单变换/共同支持未归档，独立参考有效性仍UNKNOWN而非反向PASS。最低先现有原件纠正/绑定，不新授权重跑。
 
 新工具7相关test目标Git bytes PASS1.280s，Scipy ICP未跑不装；裁20/200现退出主表，cause UNKNOWN中性计数及单gauge复合/known-prefix控制通过，仅支持组件非主线恢复或实际独立评分。ALI-H设计已合main，S3实际认领/预算/实现/测试回执仍未知；1研究+2native并行/旧参数停。主线未新增恢复run，下一仍S1/S2合法隔离边界cp→物理一致修复/完整native state-map→全部input归宿/后继尾段或显式拒绝；旧suffix/skip/受控E2成果复用，旧成功依赖不重测。评价纠正只阻原因结论，不阻native开发；完整逐项状态/命令/原件/人口/失败/质量成本自检，A/B局部不总分，review白名单SSH推送/private保护不合main不改算法历史冻结门。
+
+## 72. 用户明确GitHub交接：下一ALI-H交付为真实数据验证，不再换图解释
+
+2026-11-12用户直接选定并要求GitHub交给开发侧：[ALI-H §10执行任务](ADAPTIVE_LOW_INFORMATION_HEALTH_V1_20261112.md#10-用户明确交接的下一单一交付真实数据验证-ali-h)。唯一研究交付：用真实数据验证旧UNAVAILABLE能否部分可靠区分正常相容/SUSPECT/UNKNOWN。先分别核402/544旧档真实M/T/I、缺项与条件校准，不以HEALTHY/trusted/无注入作正常真值；优先复用真实IMU更新前预测/LiDAR更新后状态，确无导出才S1/S2确认一次最小已有预算导出，不零bias/占位、不继续clean-map矩阵。新trace不能拼到旧run冒同步，旧方法和ALI-H必须同trace同人口，交漏检/误报/延迟/错误NORMAL及UNKNOWN数量/时长/原因/成本；缺标签NOT_EVALUABLE不填0，大量UNKNOWN说明真实缺什么，不降阈值强二分。
+
+S1实际分发/共享接口单写，S3唯一research shadow执行，S2提供已有trace/必要最小导出不阻原生；沿1研究+2native、旧sigma/κ/floor停，本机设计/自动审阅不代算法/host。任务发布不等实际认领或测试开始，首次实质提交回branch/HEAD/owner/预算及逐项PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令原件，不造收到周期。交一次有限结果后先报用户再讨论实际检测动作，生产接入另需确认；不自动暂停原生开发或改变旧门。交接时fetch main fafbaf1含新地图redo/分叉开发报告，未在本任务中独立验收/采信其因果，不扩授权追第三次地图。只更新已有入口/状态，不新起实验或重复Cron。

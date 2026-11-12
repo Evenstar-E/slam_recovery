@@ -790,3 +790,9 @@ S1共享成功依赖/可信边界、S2下一合法历史恢复→完整接回后
 目标§111静止原因FAIL：同档749pose行最大|p|11.98754m、724行>1m、x/y最大8.808419/8.833413。地图范围不等移动范围，不能据此查pcd_save输出分支或重做clean pass。pose54.119872s/诊断尾前5.385359s只证明时间支持不足；396paired/598scan不证明bag截断，320s无bag起止证据/不能读epoch尾数为duration。302帧0pass/ICP/gauge RMS3.51仅DEVELOPER_REPORTED且score命令/输出/健康prefix单变换/共同支持未归档，独立参考有效性UNKNOWN；先复用现有证据纠正与绑定，不本轮新授权重跑、不因诊断串行挡native。
 
 S1证据解释/共享成功依赖单写，S2原生合法隔离起点cp→物理一致修复/完整state-map重估→全部input归宿/后继尾段或显式不支持；复用已验suffix/skip/受控E2，不重复旧反例或扩门参数。ALI-H设计合main不等认领或实现，S3唯一研究角色先按已授权T0资格/缺项回真实预算/branch/进展，缺I与低support正常参照保UNKNOWN/native不等。逐项PASS/FAIL/BLOCKED/NOT_APPLICABLE+命令原件/版本人口/失败质量成本；A/B局部不总分/三Cron无双写，review SSH白名单提交推送/private保护不合main不改算法历史冻结门。
+
+## repair-f3 / 用户明确交给开发：ALI-H真实数据验证的单一交付
+
+2026-11-12用户要求通过GitHub交接[ALI-H §10任务](ADAPTIVE_LOW_INFORMATION_HEALTH_V1_20261112.md#10-用户明确交接的下一单一交付真实数据验证-ali-h)：先分别核旧402/544行真实通道/缺项/校准，HEALTHY非正常真值；优先复用真实IMU preupdate与LiDAR update状态，缺导出由S1/S2确认一次最小已有预算导出，不造零bias/占位、不换地图无限解释；交同trace同人口旧方法/shadow漏检、误报、延迟、错误NORMAL、UNKNOWN数量/时长/原因与成本。新run内证据不能贴回旧run冒同步；缺标签NOT_EVALUABLE，不降首版或旧阈值强二分。
+
+S1分发/确认owner branch HEAD预算并单写共享接口，S3唯一research执行，S2现trace/必要最小导出，保持1研究+2native/旧参数停；本机不算法/host，自动审阅继续、不重复建任务。不自动暂停原生开发，研究不直接接入实际检测/地图提交；一次有限真实结论交用户后再决定生产动作。逐项PASS/FAIL/BLOCKED/NOT_APPLICABLE及命令原件/人口/缺项，发布不等认领/开工。交接fetch fafbaf1新地图redo/分叉仅开发报告，另审不作为本任务已证明因果或新重跑许可。
