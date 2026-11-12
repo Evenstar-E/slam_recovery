@@ -1743,3 +1743,26 @@ S1 决定：批准 **B1 二分**（先 `voxel_map.{h,cpp}`、再 `LIVMapper.h` �
 （本机无 gdb/valgrind，core 落 `/tmp/core-file/`，预算 ≤10 min，产物不用于正式 run）；**R 启动探针门控重试**批准，
 但须 B1 之后、off/on 同协议同 k、每次 run 前 5 次探针且通过率 ≥4/5。22:00 前若仍无可稳定运行的 v7，按 15h 规则提交
 中文重大阻塞（A 修宿主缺陷 / B 降级为无 trace 有限结果 / C 换宿主），不无限二分。
+
+## 126. ALI-H 三缺陷已修并本机复现验证；「无独立正常参照/标签」重大阻塞已登记（待用户确认）
+
+S3 HEAD `72284f7`（`exp/ali-h-v1`），本机独立复现：
+
+| 缺陷 | 修正前 | 修正后（本机实测） |
+|---|---|---|
+| D1 SE(3) Log 平移 | `(0.1, 0, 0)` | `(0.09966644, −0.01, 0)` ✔（`ρ=V⁻¹t`） |
+| D2 缺块 dwell | 块12 = SUSPECT | 块12 = UNKNOWN；块 8/9→NO_DATA(10)→11 也给 UNKNOWN 且 `last_suspect_block=9` ✔ |
+| D3 切空间 | left/world 也 READY | 协方差可用须 `perturbation=right`、`frame=pre_body`，否则 INCOMPLETE ✔ |
+
+自测：T1 **7/7**、T2 prep **14/14**、TO 帧数不变（A 402/90 块，B 544/120 块，多出的 1 块是补齐的 NO_DATA）。
+已 `--no-ff` 合入 main，仓库测试 **202 OK**。
+
+**重大阻塞（已按 15h 模板中文登记）**：`docs/ali_h_v1_research/重大阻塞记录.md`，ID
+`ALI-B2-NORMAL-LABELS-20261112-01`，状态等待用户确认。本机核实其依据成立：
+- 402/544 两份 receipt 的 `injection` 均为 `NONE`、`sigma_meas_m=0.884`——无注入不是正常真值；
+- `reference_map_20261112_redo` 为 `detection_enabled=false`、`sigma=0.12`，无逐帧 availability，不能借分布；
+- `B5_B7_STATUS.md` 归档扫描无「身份+决定+独立标签」记录；KITTI reserve 未下载。
+
+影响：`NORMAL_CONSISTENT`/`SUSPECT`、误报、漏检/延迟、错误 NORMAL 一律 `NOT_EVALUABLE`；T0/T1/契约/协议与
+「UNKNOWN 区间 + 资格」可继续。选项 A（用户给独立正常前缀+事件标签）/ B（授权自注入标签仅离线 + 独立确认正常前缀）/
+C（不新增数据，只交资格/UNKNOWN）。**S1 不代替用户选择**；trace 依赖单列 `ALI-B1`，仍由 S2 处理。
