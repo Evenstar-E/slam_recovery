@@ -678,3 +678,22 @@ S3旁支接受62f294对fixed/own与坐标/精度控制的有限纠正，A/B旧�
 LIO-SAM 运行器问题教训（已写进归档 README）：先单独起 `roscore` 会让 `roslaunch` 报
 `run_id ... does not match declared run_id`，节点起不来、录制为空；改为让 roslaunch 自己持有
 master 后 20 s 探针录到 124 条 odometry。前两次空跑不构成运行证据。
+
+## 66. 四宿主第二事件矩阵完成（各一次实际运行）；无恢复能力是共同结果
+
+S1 复核 S2 原始件并独立复算（main `fb59682`）。四项均已实际运行，均为**宿主原生行为**，
+slam_recovery 层四项一律 `NOT_IMPLEMENTED`（未现造接线）。
+
+| 宿主 | 输入/事件 | 实际结果 | 状态 |
+|---|---|---|---|
+| MM-LINS/SC-PGO | `campus_12_fl`（`a924b5f9…`，469.4 s）；E1/E2 = 首个 IMU + 115.99/230.09 s（manifest 历史休眠起点，声明观察非注入） | 前端两次停发 **23.7 s / 26.8 s**、重建回原点（跨间隔 **60.56 / 71.11 m**）；PGO 两次停 **38.5 / 41.4 s**、跨间隔仅 **0.749 / 0.485 m**（本机按 header 剔除 0 戳占位后复算，与报告一致）；`Issleeping` 2×true、间隔 113.90 s；尾段 PGO 227 s / 967 条 | 原生 **PASS** |
+| FAST-LIO2 | 同一 bag/戳；**SHARED_EXECUTION**：唯一 `fastlio_mapping` sha `59674a8f…` 即 MM-LINS 前端，无独立工作区 | 停发 **23.8 / 26.9 s**、跨间隔 **60.56 / 71.13 m**（本机独立复算一致）；`Isbuilding` 2×true；尾段 239.3 s / 2126 条 | 原生 **PASS**，独立实现验证 **NOT_APPLICABLE** |
+| LIO-SAM | `campus_1(2)-003`（`1fb5d827…`）260 s；E1=[50,70) E2=[190,210) 尾段 | E1 正常；**130.1 s 起发散**（85 次 >1 m、断流 3.201 s）；E2 窗含 535 m 单步；尾段终点 z=625.95 m，未恢复 | 原生 **FAIL** |
+| ORB-SLAM3 | `hall_01` 全序列 351.65 s；E1=[190,220) E2=[300,330) 尾段 | **80 次地图初始化**（E1 4、E2 6、尾段 3），Atlas 终态 1 图 0 KF，`exit=139`；复跑 74 次同模式 | 原生 **FAIL** |
+
+共同结论：MM-LINS/FAST-LIO 前端在两次事件处靠**自有 re_slam 重建**存活；PGO 保持全局图。
+LIO-SAM/ORB-SLAM3 在同等"连续输入 + 两事件"下不存活。**没有任何一项具备原生恢复写回/接回**；
+四项的 slam_recovery 修复链均为缺口，不得把第一层结果写成修复效果。
+
+身份缺口（如实）：MM-LINS 两个二进制 mtime（10-30 / 11-05）早于运行的源码 HEAD `2ef0169`，
+本机无构建记录把它们绑到该 HEAD；可核的是运行时的二进制 sha。LIO-SAM/ORB 同样只绑定二进制 sha。
