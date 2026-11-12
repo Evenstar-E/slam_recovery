@@ -571,7 +571,14 @@ class CheckpointClient:
         # The hold is written from the subscriber callback (a quarantine opens there) while the
         # ack is collected on the main thread; the queue keeps the two from dropping each other.
         self._pending: List[Dict[str, Any]] = []
+        # Commands issued while another is in flight wait here instead of overwriting the shared
+        # `cmd` file. The host polls that file on its own thread; two writes inside one poll
+        # interval meant the second replaced the first unread, and the decision path issued
+        # reprocess and set_state back to back. The lost command also stranded the queue head:
+        # poll() matches the oldest command's name, so a later ack never matched it.
+        self._outbox: List[Tuple[Dict[str, Any], str, str]] = []
         self._lock = threading.Lock()
+        self._io_lock = threading.RLock()
         # Nothing is asked of the host until it has answered once. Its control poll only runs in
         # the host's main loop, which starts ~16 s after launch; a snapshot written before that
         # blocked the driver's main loop for 16.4 s and pushed a decision 18 s past its deadline.
@@ -584,11 +591,39 @@ class CheckpointClient:
         if self.enabled:
             os.makedirs(self.dir, exist_ok=True)
 
-    def _write(self, cmd: str, payload: str = "") -> Dict[str, Any]:
-        """Write one command file. Fast enough for a callback thread; the ack is collected later."""
+    def _write(self, cmd: str, payload: str = "",
+               preempt_snapshot: bool = False) -> Dict[str, Any]:
+        """Issue one command: write it now, or queue it behind the command in flight.
+
+        A snapshot is read-only, so a time-sensitive command may drop it rather than wait; every
+        other command keeps its place. The event is returned immediately either way; its ``wall``
+        is filled in when it is actually written, and the ack is collected by poll()/collect().
+        """
+        event: Dict[str, Any] = {"command": cmd, "wall": None}
+        with self._io_lock:
+            self._start_or_queue(event, cmd, payload, preempt_snapshot)
+        return event
+
+    def _start_or_queue(self, event: Dict[str, Any], cmd: str, payload: str,
+                        preempt_snapshot: bool) -> None:
+        with self._lock:
+            if self._pending:
+                head = self._pending[0]
+                if preempt_snapshot and head.get("command") == "snapshot":
+                    self._pending.pop(0)
+                    self.snapshots_superseded += 1
+                    head.update(ok=False, error="superseded")
+                    self.events.append(head)
+                else:
+                    self._outbox.append((event, cmd, payload))
+                    return
+            event["wall"] = round(time.time(), 3)
+            self._pending.append(event)
+        self._write_file(event, cmd, payload)
+
+    def _write_file(self, event: Dict[str, Any], cmd: str, payload: str) -> None:
         path = os.path.join(self.dir, "cmd")
         ack = os.path.join(self.dir, "ack")
-        event: Dict[str, Any] = {"command": cmd, "wall": round(time.time(), 3)}
         try:
             if os.path.exists(ack):
                 os.unlink(ack)
@@ -597,13 +632,23 @@ class CheckpointClient:
                 fh.write(cmd + "\n" + payload + "\n")
             os.replace(tmp, path)
         except OSError as exc:
-            event.update(ok=False, error=f"write: {exc}")
-            self.failures += 1
-            self.events.append(event)
-            return event
-        with self._lock:
-            self._pending.append(event)
-        return event
+            with self._lock:
+                if self._pending and self._pending[-1] is event:
+                    self._pending.pop()
+                event.update(ok=False, error=f"write: {exc}")
+                self.failures += 1
+                self.events.append(event)
+            self._flush_outbox()
+
+    def _flush_outbox(self) -> None:
+        """Send the next queued command once nothing is in flight. Called after every pop."""
+        while True:
+            with self._io_lock:
+                with self._lock:
+                    if self._pending or not self._outbox:
+                        return
+                    event, cmd, payload = self._outbox.pop(0)
+                self._start_or_queue(event, cmd, payload, preempt_snapshot=False)
 
     def collect(self, timeout_s: Optional[float] = None) -> Optional[Dict[str, Any]]:
         """Wait for the ack of the oldest outstanding command and account for it exactly once."""
@@ -630,6 +675,7 @@ class CheckpointClient:
         else:
             self.failures += 1
         self.events.append(event)
+        self._flush_outbox()
         return event
 
     def _read_ack_for(self, cmd: str) -> str:
@@ -689,6 +735,7 @@ class CheckpointClient:
         else:
             self.failures += 1
         self.events.append(event)
+        self._flush_outbox()
         return event
 
     def _count(self, cmd: str) -> None:
@@ -725,6 +772,7 @@ class CheckpointClient:
             self.snapshots_superseded += 1
             event.update(ok=False, error="superseded")
         self.events.append(event)
+        self._flush_outbox()
 
     def _send(self, cmd: str, payload: str = "") -> Dict[str, Any]:
         """Issue a command without waiting for it to be applied.
@@ -733,15 +781,15 @@ class CheckpointClient:
         gets the event back immediately and poll() fills in received/applied as they arrive.
         """
         self.expire_pending(0.0)
-        return self._write(cmd, payload=payload)
+        return self._write(cmd, payload=payload, preempt_snapshot=True)
 
     def pending(self) -> bool:
         with self._lock:
-            return bool(self._pending)
+            return bool(self._pending or self._outbox)
 
     def hold(self) -> Optional[Dict[str, Any]]:
         """Stop the host writing its map, without waiting: this is called from a callback."""
-        return self._write("hold")
+        return self._write("hold", preempt_snapshot=True)
 
     def tick(self, now_wall: float, quiescent: bool) -> Optional[Dict[str, Any]]:
         """Rolling snapshot while nothing is being judged; nothing at all once stopped.
@@ -752,7 +800,7 @@ class CheckpointClient:
         """
         if not self.enabled or self._stopped or not quiescent:
             return None
-        if self._pending:
+        if self.pending():
             return None                       # one outstanding command at a time
         if now_wall - self._last_snapshot_wall < self.period_s:
             return None

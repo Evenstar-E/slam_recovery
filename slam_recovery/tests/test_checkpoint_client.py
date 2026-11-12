@@ -147,6 +147,62 @@ class CheckpointClientTest(unittest.TestCase):
 
 
 
+    def test_a_second_state_command_waits_for_the_first_ack(self):
+        # decide() used to issue reprocess and set_state inside the same millisecond. The host
+        # polls `cmd` on its own thread every 5 ms, so set_state replaced reprocess unread and
+        # the host never replayed the repaired frames. Measured in the accepted run: zero
+        # `[NATIVE_CHECKPOINT] reprocess` lines and a final ack of set_state.
+        host = self._host(delay=0.15)
+        client = CheckpointClient(self.dir, ack_timeout_s=5.0)
+        first = client._send("reprocess", "1")
+        second = client._send("set_state", "1 2 3 0 0 0 1")
+        time.sleep(0.05)
+        self.assertEqual(host.seen, ["reprocess"],
+                         "the second command reached the host before the first was answered")
+
+        deadline = time.time() + 5.0
+        while time.time() < deadline and not (first.get("ok") and second.get("ok")):
+            client.poll()
+            time.sleep(0.005)
+        self.assertTrue(first["ok"], first)
+        self.assertTrue(second["ok"], second)
+        self.assertEqual(host.seen, ["reprocess", "set_state"])
+        self.assertEqual(client.reprocesses, 1)
+
+    def test_a_queued_command_is_not_timed_out_before_it_is_sent(self):
+        # Queued commands have no wall time yet; expire_pending must leave them alone.
+        client = CheckpointClient(self.dir, ack_timeout_s=5.0)
+        self._host(delay=0.05)
+        client._send("restore", "1")
+        queued = client._send("resume")
+        self.assertIsNone(queued.get("wall"))
+        client.expire_pending(0.5)
+        self.assertTrue(client.pending())
+
+    def test_hold_preempts_a_snapshot_but_never_a_state_command(self):
+        host = self._host(delay=0.2)
+        client = CheckpointClient(self.dir, ack_timeout_s=5.0)
+        client._send("snapshot")
+        time.sleep(0.02)                       # host has consumed the snapshot
+        client.hold()
+        deadline = time.time() + 3.0
+        while time.time() < deadline and len(host.seen) < 2:
+            client.poll()
+            time.sleep(0.005)
+        self.assertEqual(host.seen, ["snapshot", "hold"])
+        # Now a restore is in flight; resume must queue, not overwrite it.
+        client._send("restore", "2")
+        client.resume()
+        time.sleep(0.05)
+        self.assertNotIn("resume", host.seen,
+                         "resume overwrote a restore that had not been answered")
+        deadline = time.time() + 5.0
+        while time.time() < deadline and "resume" not in host.seen:
+            client.poll()
+            time.sleep(0.005)
+        self.assertEqual(host.seen[-1], "resume")
+
+
 class CheckpointWiringTest(unittest.TestCase):
     """The loop must hold the host's map when a segment opens and release it on re-arm."""
 
