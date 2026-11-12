@@ -14,6 +14,9 @@
   "join_status": "HEURISTIC_UNPROVEN",
   "results_conditional_on": "unproven group-membership mapping; not a source-membership proof",
   "e_i_convention": "host mixed convention: rot = R*Exp(d_rot) (body right), pos = p + d_pos (world additive); rot=-w, t_body=-R_pre^T v, then SE(3) Log t_log = so3_left_jacobian_inv(rot) @ t_body",
+  "pose_source": "same-row pre_pose+pose (v11, 107 cols) when both exist; same-row pose only (v10, 100 cols); M2DGR time join only for legacy 92/93-column rows as a cross-check",
+  "same_row_pre_post_rows": 0,
+  "same_row_post_pose_rows": 0,
   "pose_source_scope": "CONFIRMED_POST_POSE_TIME_JOIN applies to v8 124217Z only; v7 115734Z remains HEURISTIC_UNPROVEN",
   "i_qualification": "INCOMPLETE/UNKNOWN",
   "i_qualification_reasons": [

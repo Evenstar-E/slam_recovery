@@ -2286,16 +2286,70 @@ S2 实现（库 **`69dc8ac5…`**，可执行文件仍 `6dd71953…` 未重链�
 **今晚未跑 bag**；明天第一个 run 会带出这些字段。跨今天的 run 与早先 run **不可按同一二进制比较**
 （库 `69dc8ac5…`、可执行文件 `6dd71953…`、链接环境已变）。
 
+## 155. 审阅复现 v10 消费缺口（100 列被两个 parser 判 malformed）；已退回 S3/S2
+
+审阅 `480a038`（已合入 main `b3540f0`）本机复现：`t2_run.py:107` 要求 `len(f)==vec_start+78`（v8 的 93 列）、
+`t2_join_upgrade.py:38` 只接受 92/93；v10 在 93 列后追加 7 个 post pose 标量 → 合法行 100 列，**现在会被判
+malformed、0 rows**。这是本轮实证的最小接线断点（失败发生在值解析前，不是格式恶意）。
+
+已要求：
+- **S3**：两个 parser 接受 92/93/100、100 时按名解析尾部 `pose_x…qw`；新路径优先用同行 post pose，不再回落外部
+  `M2DGR_room_02.txt`；加一个 100 列正常控制；并把 `T2_I_ELIGIBILITY.md` 中两处子 PASS 收窄——v8 carryover 的
+  "PASS 单扫描"（`n_scans` 计新 pop 的 raw、carryover 在 cur/next，完整点成员未证）与 post 的"PASS 时间 join"
+  （grp/首末戳不唯一对应所用更新）改为 `INCOMPLETE/ASSERTED_NOT_VERIFIED`。
+- **S2**：`mat_lio_pre/out` 只有 `rel_s`，无法唯一配对 live/replay、重戳、空点早退与两个更新组；最小修法是每行加
+  `idx/grp_idx/phase` key，或把 pre pose 直接写进 trace 同行。
+
+审阅同时确认：v10 的 inline post pose 源码正确（`StateEstimation` 后写 `_state`）、构建与 5/5 探针档案限定通过、
+协方差仍 `NOT_AVAILABLE_FOR_E_I`（声明文字不产生转换/相关性模型）。
+
+## 156. v10 消费缺口已修：两个 parser 接受 92/93/100，同行 post pose 优先；资格两处收窄
+
+S3 `f90a748`（已合入 main），本机核对：
+- `t2_run.parse_trace` 与 `t2_join_upgrade.parse_trace` 按表头名接受 92/93/100；100 列时 `Ppost6x6` 之后的 7 个
+  `pose_x…qw` 解析为 `pose_tail`；`python -I t2_run.py selftest100` 输出 `status=PASS, rows=1, malformed=[]`，
+  `qw=0.92736185` 与输入逐位一致；
+- 100 列路径**用同行 post pose 算 e_I，不再回落 M2DGR**；仅 92/93 旧行用 M2DGR 且只作交叉核对；meta 增
+  `pose_source`/`same_row_post_pose_rows`；
+- `T2_I_ELIGIBILITY.md`：v8 post → `ASSERTED_NOT_VERIFIED/INCOMPLETE`、v8 carryover → `ASSERTED_NOT_VERIFIED`
+  （`n_scans` 只计新 pop raw、carryover 在 cur/next）；`mat_lio_*` 无 key 前不用于 I 资格。
+
+v7/v8 数值与人口未变；分类/错误率仍 `NOT_EVALUABLE`。等 S2 的 v10 trace + `mat_lio_*` key。
+
+## 157. v11：同一行 pre/post 配对（行宽 107）与带 key 的 `mat_lio_*`；开跑前置=消费端支持 107
+
+S2 `c5bc057`（`exp/online-v2`，已推），本机核对：库 **`81b35f92…`**、可执行文件仍 `6dd71953…`（未重链）；
+`LIVMapper.cpp:368` 头已含 `pose7 pre_pose7`；5 个启动探针全 `PASS alive 25s`；归档含五个 v11 快照 +
+`trace_cov_v11_full.diff`（514 行 v6→v11）+ BUILD §12。
+
+- **同一行 pre/post**：`pose7`（更新后）之后新增 `pre_pose7`（`StateEstimation` 前捕获），行宽 **100 → 107**；
+  一行即"一次更新"的完整配对，不再需要行间 zip/时间近邻；早退帧也有 `pre_pose7`。
+- **`mat_lio_pre/out` 加 key**：每行前加 `idx grp_idx phase`，可精确配对（仅作交叉核对）。
+
+**风险与前置**：S3 的 parser 目前只接受 92/93/100，**107 会再次被判 malformed**。已要求 S3 加 107 档与 107 正常控制，
+并优先用同行 `pre_pose7`/`pose7` 算 e_I（`vec6` 仅对照）。S2 已承诺：在 S1/S3 明确回"parser 已支持 107"之前不开跑，
+且 run 结束后先本地按列名自检 107 可解析，失败先修 parser 不重跑。
+
+## 158. 消费端已支持 107 列（v11 前置解除）；pre 资格标记为 PENDING_v11_RUN
+
+S3 `129b184`（已合入 main），本机核对：
+- 两个 parser 按表头名接受 **92/93/100/107**；`selftest107` 与 `selftest100` 均 `PASS`（`pose`/`pre_pose` 各 7 值逐位一致）；
+- v11 路径直接用同行 `pre_pose7`/`pose7` 算 `e_I=Log(inv(pre)·post)`（含 `V⁻¹`），**不再依赖 `vec6`**；`vec6` 仅对照；
+  100 列用同行 pose+vec6；92/93 旧行才回落 M2DGR 且只作交叉核对；meta 增 `same_row_pre_post_rows`/`same_row_post_pose_rows`；
+- `T2_I_ELIGIBILITY`：pre/post 对 v11 标 **`PENDING_v11_RUN`**（真实 run 且同帧配对验证后升 `PASS_SAME_ROW`），
+  v7/v8 仍 `INCOMPLETE`/`ASSERTED_NOT_VERIFIED`；`vec6` 仍 `NOT_VERIFIED`；协方差 `NOT_AVAILABLE`、I 主量单位权。
+
+**S2 的开跑前置（"parser 已支持 107"）现已满足**。
 
 ## Codex 参考审阅：c915197 → 66cc814（2026-11-13，用户要求发布）
 
 来源 **Codex**，**本轮报告供参考**；用户明确要求“推送本轮”。[完整报告](codex_review_20261113_66cc814/README.md)、[独立结果](codex_review_20261113_66cc814/checks.json)、[可复核入口](codex_review_20261113_66cc814/reproduce_checks.py)。保持原评分标准和主线，不把本报告当新实验授权。
 
 - 新确认：`t2_run` 的时间排序索引读回原数组，现有归档中 92/504 条诊断分数受影响；正确位姿行下中位数 70.3134→72.2939，仍不具备合格 I/检测成绩资格。最低修关联并用既有归档重算，不必为此重跑宿主。
-- 独立确认 v10 100 列被两个消费者拒绝，与已发布自动审阅一致；SE(3) helper 修正、K3 执行 driver 来源和提前 36.97 ms 的候选时差接受。
+- 在固定审阅点 66cc814 独立确认 v10 100 列被两个消费者拒绝；发布前远端已合入 100/107 列支持，不把旧缺口冒称当前仍未修；SE(3) helper 修正、K3 执行 driver 来源和提前 36.97 ms 的候选时差接受。
 - 用户发布前进一步明确：四个非 FAST-LIVO2 宿主的工程与论文需求全部验收后，才适配 FAST-LIVO2；此前不新开该宿主。位姿关联可用已有原件更正，v10 后续工作后置。A4/A9/A10/B11 本轮没有新增完整通过证据。
 
-审阅固定 main `66cc814`、实验归档 `eb2630e`/`290aae8`；发布保留 `b3540f0` 已合入的自动审阅。未改生产代码、门槛、历史结果或运行状态。
+审阅固定 main `66cc814`、实验归档 `eb2630e`/`290aae8`；发布保留至 `4e44949` 的并发提交（包括 100/107 列消费者更新）；新增 Codex 内容为文档和独立复核工具，未改产品代码、门槛、历史结果或运行状态。新消费者实现未在本轮重新验收。
 
 
 ## 用户最新主线指令：四宿主全部工程与论文验收前，不开 FAST-LIVO2（2026-11-13）
@@ -2304,4 +2358,6 @@ S2 实现（库 **`69dc8ac5…`**，可执行文件仍 `6dd71953…` 未重链�
 
 MM-LINS、FAST-LIO2、LIO-SAM、ORB-SLAM3 均须按原 A1–A12/B1–B12逐项给实际证据，全部适用需求完成；不按平均分、局部PASS或运行次数放行。任何需求豁免/宿主删减/提前恢复须用户明确裁决。公共组件可版本化复用，实际原生闭环和论文效果不能由另一宿主代验。
 
-此前不新开 FAST-LIVO2 运行、构建、适配、调试或 v10 后续验证；已有资产保留，实际在途仅原预算安全收尾，不续跑、不终止未知进程。当前四项原件已有失败和NOT_IMPLEMENTED，先核/解决具体断点，不把“都运行过”写成“都完成”。本次只发布指令与参考报告，执行端停启/转向状态待真实回执。
+此前不新开 FAST-LIVO2 运行、构建、适配、调试或 v10/v11 后续开发与验证；已有资产保留，实际在途仅原预算安全收尾，不续跑、不终止未知进程。当前四项原件已有失败和NOT_IMPLEMENTED，先核/解决具体断点，不把“都运行过”写成“都完成”。本次只发布指令与参考报告，执行端停启/转向状态待真实回执。
+
+**明确覆盖上方 §157–158 的开跑安排**：支持 107 列仅是已记录的工程状态，不再构成 FAST-LIVO2 的开跑许可。v11 及后续版本同受四宿主全需求验收门约束；未开始的 run 不启动。已有提交全部保留，不因新顺序回滚代码。

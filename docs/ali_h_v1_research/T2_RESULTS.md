@@ -14,6 +14,8 @@
 > **2026-11-12 修正**：`exact_e` 原先漏了 SE(3) Log 的平移 Jacobian `V(ω)⁻¹`。现改为
 > `rot = −w, t_log = V(rot)⁻¹ · (−R_pre^T v)`，与 `t2_input_check.e_i` 一致。下表为**修正后**值；
 > 文中若出现旧的 `s` 中位 70.39 / `|e|` 0.01826777，已标"修正前"。
+> 读取器已支持 **92/93/100/107** 列；v11（107）同行 `pre_pose7` 已可解析（`selftest107` PASS），
+> 真实 v11 run 到达前 pre 位姿仍记 `PENDING_v11_RUN`。
 > **I 的真实物理资格 = `INCOMPLETE/UNKNOWN`**（见 `T2_I_ELIGIBILITY.md`）：`I_present=504` 是数值行数，
 > **不是 504 个合格独立 I 证据**；`vec6` 在最终 solution 前保存、pre 位姿无独立 LIO 导出、协方差无已验证切空间。
 

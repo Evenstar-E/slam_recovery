@@ -16,21 +16,36 @@ pre 位姿没有独立的 LIO handler 导出，协方差是混合约定且无已
 |---|---|---|---|---|
 | source scan 身份 | trace `grp_idx`、`scan_first_ns`/`scan_last_ns`、`n_scans`；availability `scan_stamp_ns` | 组建立时 | v8 **PASS（含 512 ns 量化）**；v7 **`HEURISTIC_UNPROVEN`** | v7 的 `scan_first` 为 -1；v8 的跨度是单点 + 量化 |
 | update 阶段 | `LIVMapper::handleLIO`：`has_out=0` 在 StateEstimation 前返回；`has_out=1` 在更新后写 trace | 每 LIO 帧 | **PASS（阶段标签）** | — |
-| post 位姿 | `M2DGR_room_02.txt`（`pose_output_en`，StateEstimation 之后，body→world） | update 后 | **PASS（v8 时间 join）**；v7 受 join 限制 | v7 的 join 未证 |
-| pre 位姿 | `mat_pre.txt`：`handleVIO` 与 `handleLIO` 各写一次，**无 handler 标签**；trace 的 `state_propagat` 不单独导出 | update 前 | **INCOMPLETE** | 没有可唯一归属 LIO 的 pre 位姿 |
-| `vec6` | `voxel_map.cpp`：`vec = state_propagat - state_`（L478），`trace_cov_vec_ = vec`（L510），**之后**才 `state_ += solution`（L519） | 最终 solution **之前** | **INCOMPLETE** | 最终 solution 未导出；`vec6` 不是最终 pre−post |
+| post 位姿 | v11/v10 同行 `pose_x…qw`；v7/v8 用 `M2DGR_room_02.txt`（`pose_output_en`，StateEstimation 之后） | update 后 | v11 **`PENDING_v11_RUN`**；v8 **`ASSERTED_NOT_VERIFIED`/`INCOMPLETE`** | v11 待真实 run；v8 的 `grp_idx`/首末戳**不唯一对应**所用更新 |
+| pre 位姿 | v11（107 列）同行 `pre_pose7`；v7/v8 的 `mat_pre.txt` 由 `handleVIO`/`handleLIO` 双写、**无 handler 标签**，`state_propagat` 不单独导出 | update 前 | v11 **`PENDING_v11_RUN`**（parser 已支持，等真实 run 验证同帧配对后升 `PASS_SAME_ROW`）；v7/v8 **INCOMPLETE** | v11 还没有真实 run；v7/v8 无可唯一归属 LIO 的 pre 位姿 |
+| `vec6` | `voxel_map.cpp`：`vec = state_propagat - state_`（L478），`trace_cov_vec_ = vec`（L510），**之后**才 `state_ += solution`（L519） | 最终 solution **之前** | **INCOMPLETE / `NOT_VERIFIED`** | 最终 solution 未导出；v11 起 e_I 改用同行 pre/post，`vec6` **只作对照**，不再作为 e_I 来源 |
 | `Ppre` / `Ppost` | `_state.cov` 6×6 rot+pos 块；Ppre 在 StateEstimation 前取，Ppost 更新后取 | update 前/后 | **`NOT_AVAILABLE`（for e_I）** | 混合约定（rot 右 body、pos 世界加性）；无已验证 6D 切空间转换 |
-| carryover / 成员 | trace `n_scans`、`grp_idx`；v8 全为 1 | — | v8 **PASS（单扫描）**；v7 **UNKNOWN** | v7 无 `n_scans`；跨帧 carryover 未证 |
+| carryover / 成员 | trace `n_scans`、`grp_idx`；v8 全为 1 | — | **`ASSERTED_NOT_VERIFIED`**（v8） / **UNKNOWN**（v7） | `n_scans` 计的是新 pop 的 raw，carryover 在 cur/next；**完整点成员未证**；v7 无 `n_scans` |
 
 ## 2. 结论与影响
 
 - **总体 I 资格：`INCOMPLETE/UNKNOWN`**。数值 `e_I`（含 V⁻¹ 修正）是**派生量**：
-  依赖 `vec6` 是最终 pre−post 的假设（未证）、post 位姿（已证）、以及混合约定。
+  依赖 `vec6` 是最终 pre−post 的假设（未证）、post 位姿（同行优先，但 `grp_idx`/首末戳唯一对应未证）、
+  以及混合约定。
 - 504 个数值行**不是** 504 个合格独立 I 证据；`s_I` 只是诊断，不能作卡方/概率。
 - 不能把 `P⁻+P⁺`、改 frame 字符串、或按行近邻当作补来源/转换。
 - `vec6` 的状态：`NOT_VERIFIED`（最终 solution 前保存；同次 pre/post 与 carryover 成员未证）。
 
+## 2.1 v11（107 列）支持与待验证项
+
+- 两个 parser 已按表头名接受 **92/93/100/107**；107 时 `Ppost6x6` 后的 `pose7` 与 `pre_pose7` 都解析。
+- 正常控制：`python -I t2_run.py selftest107` → **PASS**，`pose` 与 `pre_pose` 7 值均与输入逐位一致；
+  `selftest100` 仍 PASS。
+- 新路径：v11 的 e_I 直接用同行 `pre_pose7`/`pose7` 做 `Log(inv(pre)·post)`（含 V⁻¹），
+  **不再依赖 `vec6`**；`vec6` 只作对照。
+- 仍需真实 v11 run 才能把 pre 位姿从 `PENDING_v11_RUN` 升为 `PASS_SAME_ROW`；在同帧配对
+  验证通过前，I 总体仍 `INCOMPLETE/UNKNOWN`。
+- `mat_lio_pre/out` 已加 `idx/grp_idx/phase`，只作交叉核对，不再是 e_I 的必要来源。
+
 ## 3. 解锁条件（交给 S2/S1 的实际导出）
+
+另：`mat_lio_pre/out` 目前只有 `rel_s`，没有 `idx`/`grp_idx`/`phase`，无法唯一配对 live/replay
+与两个更新组；S2 补 key 前不能用于 I 资格。
 
 需要以下任一组合，才能在 T2 里把 I 从 `INCOMPLETE` 升级为可评价：
 
