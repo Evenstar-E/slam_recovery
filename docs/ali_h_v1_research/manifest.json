@@ -1,0 +1,57 @@
+{
+ "method": "ALI-H v1 (research observer)",
+ "contract": "docs/ADAPTIVE_LOW_INFORMATION_HEALTH_V1_20261112.md (§2-§7, §10)",
+ "code_sha256": "0c165717ba7c988cc57eb39a4436889b40c74956d53ddff493af971a90418f20",
+ "config": {
+  "block_ns": 500000000,
+  "alarm_u": 0.95,
+  "normal_u": 0.8,
+  "min_blocks": 20,
+  "require_two_adjacent_blocks": true,
+  "normal_reference": "none (BLOCKED)",
+  "channels": {
+   "M": "node_map NIS",
+   "T": "prev_scan NIS",
+   "I": "NOT_AVAILABLE"
+  }
+ },
+ "runs": {
+  "A": {
+   "run_id": "fl_native_20261112T065500Z_187992",
+   "frames": "/tmp/wt-ali/docs/review_20261112_availability/availability_frames.jsonl.gz",
+   "frames_sha256": "7a2018456be69ff2e17a918d971b59161918b119d7b3cc9f9dda02937a36f82b"
+  },
+  "B": {
+   "run_id": "fl_native_20261112T070801Z_197026",
+   "frames": "/tmp/wt-ali/docs/review_20261112_availability/predicted_pose/availability_frames.jsonl.gz",
+   "frames_sha256": "7492097a94458fcbe9270b8fd1fe5c4036026fbd23a611d9b52932a8179fa6b1"
+  }
+ },
+ "artifacts": {
+  "t0_A.json": {
+   "path": "/tmp/wt-ali/docs/ali_h_v1_research/t0_A.json",
+   "bytes": 30986,
+   "sha256": "99f276bee7ca2ca7f9779ea5e90351823b7993f4e6037b2414a950f208b2166f"
+  },
+  "t0_B.json": {
+   "path": "/tmp/wt-ali/docs/ali_h_v1_research/t0_B.json",
+   "bytes": 40475,
+   "sha256": "e9638d5f54759632aacd297082390ce8f918cc606b046929c911a46e3e6e383d"
+  },
+  "shadow_A.jsonl": {
+   "path": "/tmp/wt-ali/docs/ali_h_v1_research/shadow_A.jsonl",
+   "bytes": 652502,
+   "sha256": "1123e0168ff24004e66527ebe6f324c9a24a37707607504687992a9628b56ec3"
+  },
+  "shadow_B.jsonl": {
+   "path": "/tmp/wt-ali/docs/ali_h_v1_research/shadow_B.jsonl",
+   "bytes": 891001,
+   "sha256": "343f9811e86bfd440a1dfb616a37d8eeb06eae000230676ee97bfa2d7a628db2"
+  },
+  "t1_selftest.json": {
+   "path": "/tmp/wt-ali/docs/ali_h_v1_research/t1_selftest.json",
+   "bytes": 3906,
+   "sha256": "8cb7594700faa2940cd1a0aa8348421e6d0226f4277fbcb86df3adba3f17ce51"
+  }
+ }
+}
