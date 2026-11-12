@@ -97,6 +97,30 @@
    }
   },
   {
+   "test": "constant offset without identity is refused",
+   "status": "PASS",
+   "detail": {
+    "status": "INCOMPLETE",
+    "missing": [],
+    "errors": [
+     "join_identity_unresolved: scan_source_index/native_group_id do not establish one physical scan"
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "test": "missing time correspondence is refused",
+   "status": "PASS",
+   "detail": {
+    "status": "INCOMPLETE",
+    "missing": [],
+    "errors": [
+     "join_time_unresolved: the two ends are not the same physical interval"
+    ],
+    "warnings": []
+   }
+  },
+  {
    "test": "identity gives zero e_I",
    "status": "PASS",
    "detail": {

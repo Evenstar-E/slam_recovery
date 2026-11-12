@@ -25,11 +25,12 @@ OUT = os.path.join(HERE, "t2_prep_selftest.json")
 OLD_RUN_IDS = {"fl_native_20261112T065500Z_187992", "fl_native_20261112T070801Z_197026"}
 
 REQUIRED_TOP = ("run_id", "same_build_off_on", "inputs", "behavior_control", "exports",
-                "declarations", "covariance")
+                "declarations", "covariance", "join")
 REQUIRED_INPUTS = ("bag_sha256", "library_sha256", "config_sha256")
 REQUIRED_EXPORTS = ("P_minus", "P_plus", "vec", "effct_feat_num",
                     "pose_pre", "pose_post", "stamps", "has_out",
-                    "scan_header_stamp", "last_lio_update_time")
+                    "scan_header_stamp", "last_lio_update_time",
+                    "scan_source_index", "native_group_id", "native_phase")
 REQUIRED_DECL = ("state_order", "rotation_param", "perturbation", "pose_frame",
                  "vec_frame", "extrinsic", "bias_source")
 VALID_STATE_ORDER = {"rot_trans", "trans_rot"}
@@ -74,6 +75,14 @@ def check_manifest(m: dict) -> dict:
     if decl.get("extrinsic") is not True:
         missing.append("declarations.extrinsic")
 
+    join = m.get("join") or {}
+    # A constant header/end offset is not evidence of identity, and a variable offset is not
+    # evidence against it. Both correspondence claims must be established by the exporter.
+    if join.get("identity_correspondence") is not True:
+        errors.append("join_identity_unresolved: scan_source_index/native_group_id do not "
+                      "establish one physical scan")
+    if join.get("time_correspondence") is not True:
+        errors.append("join_time_unresolved: the two ends are not the same physical interval")
     forbidden = set(m.get("not_included") or [])
     cov = m.get("covariance") or {}
     for name in ("S", "H_T_H"):
@@ -201,6 +210,10 @@ def _manifest(**over):
         "covariance": {"usable": True, "blocks": "P_minus/P_plus",
                        "frame": "pre_body", "perturbation": "right"},
         "not_included": ["S", "H_T_H"],
+        "join": {"identity_correspondence": True, "time_correspondence": True,
+                 "identity_method": "scan_source_index + native_group_id",
+                 "time_method": "same physical interval, original ns",
+                 "offset_constant": True},
     }
     m.update(over)
     return m
@@ -254,6 +267,20 @@ def selftest() -> dict:
     r8 = check_manifest(m8)
     add("missing covariance frame is refused", r8["status"] == "INCOMPLETE"
         and any("pre_body" in e for e in r8["errors"]), r8)
+
+    # Constant offset, but identity is not established -> still INCOMPLETE.
+    m9 = _manifest()
+    m9["join"]["identity_correspondence"] = False
+    m9["join"]["offset_constant"] = True
+    r9 = check_manifest(m9)
+    add("constant offset without identity is refused", r9["status"] == "INCOMPLETE"
+        and any("join_identity_unresolved" in e for e in r9["errors"]), r9)
+
+    m10 = _manifest()
+    m10["join"]["time_correspondence"] = False
+    r10 = check_manifest(m10)
+    add("missing time correspondence is refused", r10["status"] == "INCOMPLETE"
+        and any("join_time_unresolved" in e for e in r10["errors"]), r10)
 
     # identity -> zero residual
     I = np.eye(4)

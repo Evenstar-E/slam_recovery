@@ -140,7 +140,7 @@ T1 全部标记 `marker: SYNTHETIC_UNIT`，不称真实恢复，不产生真实 
 | shadow 开关不变性 | **PASS（限定控制）** | T1.6，Run A 402 行逐条相同 | — | — |
 | 真实 I trace | **BLOCKED/NOT_EXECUTED** | §4 | — | 等 S1/S2 |
 | 同人口误报/漏检/延迟 | **NOT_EVALUABLE** | 无标签、无 I、无 normal 参照 | — | 等 T2 |
-| T2 输入契约/校验器 | **PASS（准备，SYNTHETIC）** | `T2_INPUT_CONTRACT.md`、`t2_input_check.py`；14/14 合成测试（manifest 缺项/拒绝 S 与 H_T_H/旧 run id/左扰动与异切空间拒绝/V⁻¹ e_I/s_I/单位权） | 真实 T2 仍 `NOT_EXECUTED` | 收到 trace 后按契约 §6 顺序核声明 |
+| T2 输入契约/校验器 | **PASS（准备，SYNTHETIC）** | `T2_INPUT_CONTRACT.md`、`t2_input_check.py`；16/16 合成测试（manifest 缺项/拒绝 S 与 H_T_H/旧 run id/左扰动与异切空间拒绝/恒定 offset 但身份不成立/缺时间对应/V⁻¹ e_I/s_I/单位权） | 真实 T2 仍 `NOT_EXECUTED` | 收到 trace 后按契约 §6 顺序核声明 |
 | 计算成本/内存 | **PASS（T0 本地）** | T0 两份归档合计 **3.03 s**、峰值 RSS **28.4 MB**；shadow 输出 **652,502 B + 891,001 B**（`wc -c`，生成后未追加） | — | T2 时补生产侧成本 |
 | 旧归档文件改写 | **NOT_APPLICABLE** | 只读；新文件全部在本目录 | — | — |
 | 生产集成 | **NOT_APPLICABLE（未授权）** | shadow 不写 manager/native | — | 用户另行确认 |
