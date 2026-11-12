@@ -1,12 +1,12 @@
 {
  "_meta": {
-  "what": "form 2: observable-subspace gate, and why it is not the scalar",
+  "what": "form 2: observable-subspace gate; what it is, and what it is not",
   "written": "2026-11-10",
   "definition": {
    "variance_floor": 2.0,
    "why_this_number": "1/sigma_tol, the covariance bound the gate already applies",
    "gate": "admit only if m_after == 0 (no direction with lambda < 2.0)",
-   "not_a_scalar": "it is a rank/condition condition over all six directions"
+   "what_it_is": "a full-spectrum minimum-eigenvalue threshold; with P = Lambda^-1 it coincides with the gate's covariance-norm leg"
   },
   "bag": "room02_2x2_O.bag",
   "scans": 24,
@@ -18,11 +18,12 @@
    "lambda_floor": 2.0,
    "lambda_floor_source": "1/sigma_tol, the covariance bound the gate already applies",
    "why_not_a_scalar": "two matrices can share lambda_min and the projection along v and still differ in Loewner order along other directions",
-   "status": "frozen; decision-level comparison BLOCKED on L_after"
+   "status": "frozen; decision-level comparison BLOCKED on L_after",
+   "not_the_only_form": "Loewner survives its controls, but it is one alternative matrix-level condition, not the unique non-degenerate form"
   },
   "form2_scalar_floor_frozen": {
    "condition": "count(eig(L_after) < LAMBDA_FLOOR) == 0",
-   "status": "REJECTED by its own control: it is the scalar in disguise"
+   "status": "this is the COVARIANCE leg in disguise (P = Lambda^-1), not the information leg; see gate_control"
   },
   "not_done": [
    "no host run",
@@ -249,11 +250,12 @@
    "lambda_min_over_max": 0.027247
   }
  ],
- "scalar_vs_subspace": {
+ "tautology_check": {
+  "what": "each matrix's OWN minimum eigenvector vs its lambda_min",
   "pearson_r": 1.0,
   "rank_identical_positions": 24,
   "n": 24,
-  "rank_pairs_scalar_vs_min_eig": [
+  "rank_pairs_own_eigenvector_vs_min_eig": [
    [
     9,
     9
@@ -351,24 +353,236 @@
     20
    ]
   ],
-  "reading": "pearson_r = 1.0 and 24/24 identical positions: the two orderings are the SAME. v is the weakest eigenvector, so v^T L v == lambda_min exactly, and the 'subspace' condition is a second threshold on that one number. This is the degeneracy the form was supposed to avoid, and it is not avoided"
+  "reading": "pearson_r = 1.0 and 24/24 identical positions is ALGEBRA, not a finding: the script compares each matrix with itself (v^T L v == lambda when v is the eigenvector). It says nothing about the gate, whose v is the fixed trigger direction. Kept as a numeric self-check only"
+ },
+ "gate_control": {
+  "what": "actual evaluate_four_mode_gate call, synthetic candidate fixed before the run",
+  "trigger_direction": [
+   0.0,
+   0.0,
+   0.0,
+   1.0,
+   0.0,
+   0.0
+  ],
+  "candidate_diag": [
+   300.0,
+   300.0,
+   300.0,
+   100.0,
+   38.8889,
+   38.8889
+  ],
+  "gate_scalar_along_fixed_direction": 100.0,
+  "lambda_min_after": 38.8889,
+  "fixed_direction_is_candidate_weakest_eigenvector": false,
+  "gate_mode": "MODE2_ATOMIC_COMMIT",
+  "accepted": true,
+  "posterior_cov_norm": 0.025714278367349037,
+  "m_after_at_floor_2": 0,
+  "equivalence_with_covariance_leg": {
+   "statement": "in one basis and with P = Lambda^-1 exactly, min(eig(Lambda)) >= 1/sigma_tol  <=>  ||P||_2 <= sigma_tol",
+   "here_min_eig_ge_2": true,
+   "here_cov_norm_le_sigma_tol": true
+  },
+  "reading": "the candidate's weakest eigenvalue is 38.8889, yet the gate reads 100 and commits (Mode 2): the information leg profiles a FIXED trigger direction, not the candidate's weakest eigenvector. `m_after == 0` therefore is not that leg in another form -- with P = Lambda^-1 it is the covariance-norm leg"
  },
  "gauge_control": {
-  "scalar_relative_diff": 0.21419551793376024,
-  "min_eig_relative_diff": 0.2141955179337524,
+  "transform": "full_se3 30 deg, matrix transported back to the 0-degree anchor",
+  "lambda_min_relative_diff": 0.3260684020212883,
+  "lambda_max_relative_diff": 0.06656591114743558,
+  "spectrum_relative_diff_l2": 0.06304071578646388,
   "m_unconstrained_before_after": [
    0,
    0
   ]
  },
  "rotation_control": {
-  "note": "own_direction mixes matrix and direction changes; fixed_direction transports the 0-degree weak direction and isolates the matrix. The fixed column is the decision-relevant one",
+  "note": "The decision-relevant columns are the `rel` values of `pure_rotation` on the anchored protocol: the same scene re-expressed by a rotation only, with information and direction transported back to one anchor, no re-normalisation. `pure_translation` and `full_se3` are diagnostics. The `mixed_protocol_old` block is the earlier reading (translation + re-normalisation); its percentages are retained and must not be quoted as rotation sensitivity",
   "sources": [
    {
     "source": "room02_2x2_O (/velodyne_points sample, cap 6000)",
+    "protocol": "information transported back to the 0-degree anchor frame; anchor direction unchanged; no re-normalisation",
+    "base_old": 38.95154510264857,
+    "base_new": 27.822059225483766,
+    "rows": [
+     {
+      "transform": "pure_rotation",
+      "rotation_deg": 10,
+      "translation_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "old_rel": 3.6483417224534475e-16,
+      "new_rel": 0.0065649650164305
+     },
+     {
+      "transform": "pure_rotation",
+      "rotation_deg": 30,
+      "translation_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "old_rel": 3.6483417224534475e-16,
+      "new_rel": 0.0038693180243684774
+     },
+     {
+      "transform": "pure_rotation",
+      "rotation_deg": 45,
+      "translation_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "old_rel": 1.8241708612267237e-16,
+      "new_rel": 0.2010079374190215
+     },
+     {
+      "transform": "pure_translation",
+      "rotation_deg": 0,
+      "translation_m": [
+       2.0,
+       -1.0,
+       0.5
+      ],
+      "old_rel": 0.0,
+      "new_rel": 0.006564634057169066
+     },
+     {
+      "transform": "full_se3",
+      "rotation_deg": 10,
+      "translation_m": [
+       2.0,
+       -1.0,
+       0.5
+      ],
+      "old_rel": 1.8241708612267237e-16,
+      "new_rel": 0.011913838285182646
+     },
+     {
+      "transform": "full_se3",
+      "rotation_deg": 30,
+      "translation_m": [
+       2.0,
+       -1.0,
+       0.5
+      ],
+      "old_rel": 5.472512583680171e-16,
+      "new_rel": 0.0038693180243689882
+     },
+     {
+      "transform": "full_se3",
+      "rotation_deg": 45,
+      "translation_m": [
+       2.0,
+       -1.0,
+       0.5
+      ],
+      "old_rel": 0.0,
+      "new_rel": 0.20288516798368933
+     }
+    ]
+   },
+   {
+    "source": "hall01_100_160 (/velodyne_points, 30 m crop, 8000 pts)",
+    "protocol": "information transported back to the 0-degree anchor frame; anchor direction unchanged; no re-normalisation",
+    "base_old": 40.91107484012684,
+    "base_new": 1.120953082029432,
+    "rows": [
+     {
+      "transform": "pure_rotation",
+      "rotation_deg": 10,
+      "translation_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "old_rel": 3.473596030105658e-16,
+      "new_rel": 0.4038784570105485
+     },
+     {
+      "transform": "pure_rotation",
+      "rotation_deg": 30,
+      "translation_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "old_rel": 1.736798015052829e-16,
+      "new_rel": 0.14848561819540754
+     },
+     {
+      "transform": "pure_rotation",
+      "rotation_deg": 45,
+      "translation_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
+      "old_rel": 3.473596030105658e-16,
+      "new_rel": 4.262521253864515
+     },
+     {
+      "transform": "pure_translation",
+      "rotation_deg": 0,
+      "translation_m": [
+       2.0,
+       -1.0,
+       0.5
+      ],
+      "old_rel": 1.736798015052829e-16,
+      "new_rel": 3.104905749856954e-07
+     },
+     {
+      "transform": "full_se3",
+      "rotation_deg": 10,
+      "translation_m": [
+       2.0,
+       -1.0,
+       0.5
+      ],
+      "old_rel": 3.473596030105658e-16,
+      "new_rel": 0.3957662038883162
+     },
+     {
+      "transform": "full_se3",
+      "rotation_deg": 30,
+      "translation_m": [
+       2.0,
+       -1.0,
+       0.5
+      ],
+      "old_rel": 3.473596030105658e-16,
+      "new_rel": 0.14848580793917562
+     },
+     {
+      "transform": "full_se3",
+      "rotation_deg": 45,
+      "translation_m": [
+       2.0,
+       -1.0,
+       0.5
+      ],
+      "old_rel": 1.736798015052829e-16,
+      "new_rel": 4.263465758926781
+     }
+    ]
+   }
+  ],
+  "mixed_protocol_old": [
+   {
+    "source": "room02_2x2_O",
+    "protocol": "SE3 (translation + rotation) AND re-normalised after transport -- the old reading; retained, not used for the conclusion",
     "rows": [
      {
       "rotation_deg": 0,
+      "translation_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
       "old_own_direction_rel": 0.0,
       "new_own_direction_rel": 0.0,
       "old_fixed_direction_rel": 0.0,
@@ -376,6 +590,11 @@
      },
      {
       "rotation_deg": 10,
+      "translation_m": [
+       2.0,
+       -1.0,
+       0.5
+      ],
       "old_own_direction_rel": 3.6483417224534475e-16,
       "new_own_direction_rel": 0.0121032372786252,
       "old_fixed_direction_rel": 1.8241708612267237e-16,
@@ -383,6 +602,11 @@
      },
      {
       "rotation_deg": 30,
+      "translation_m": [
+       2.0,
+       -1.0,
+       0.5
+      ],
       "old_own_direction_rel": 3.6483417224534475e-16,
       "new_own_direction_rel": 0.0006169146134847722,
       "old_fixed_direction_rel": 3.6483417224534475e-16,
@@ -390,6 +614,11 @@
      },
      {
       "rotation_deg": 45,
+      "translation_m": [
+       2.0,
+       -1.0,
+       0.5
+      ],
       "old_own_direction_rel": 3.6483417224534475e-16,
       "new_own_direction_rel": 0.19335440790370617,
       "old_fixed_direction_rel": 0.0,
@@ -398,10 +627,16 @@
     ]
    },
    {
-    "source": "hall01_100_160 (/velodyne_points, 30 m crop, 8000 pts)",
+    "source": "hall01_100_160",
+    "protocol": "SE3 (translation + rotation) AND re-normalised after transport -- the old reading; retained, not used for the conclusion",
     "rows": [
      {
       "rotation_deg": 0,
+      "translation_m": [
+       0.0,
+       0.0,
+       0.0
+      ],
       "old_own_direction_rel": 0.0,
       "new_own_direction_rel": 0.0,
       "old_fixed_direction_rel": 0.0,
@@ -409,6 +644,11 @@
      },
      {
       "rotation_deg": 10,
+      "translation_m": [
+       2.0,
+       -1.0,
+       0.5
+      ],
       "old_own_direction_rel": 3.473596030105658e-16,
       "new_own_direction_rel": 6.228910846352767,
       "old_fixed_direction_rel": 3.473596030105658e-16,
@@ -416,6 +656,11 @@
      },
      {
       "rotation_deg": 30,
+      "translation_m": [
+       2.0,
+       -1.0,
+       0.5
+      ],
       "old_own_direction_rel": 1.736798015052829e-16,
       "new_own_direction_rel": 1.9138900203829596,
       "old_fixed_direction_rel": 1.736798015052829e-16,
@@ -423,6 +668,11 @@
      },
      {
       "rotation_deg": 45,
+      "translation_m": [
+       2.0,
+       -1.0,
+       0.5
+      ],
       "old_own_direction_rel": 1.736798015052829e-16,
       "new_own_direction_rel": 1.5638000916927972,
       "old_fixed_direction_rel": 1.736798015052829e-16,
@@ -430,6 +680,15 @@
      }
     ]
    }
-  ]
+  ],
+  "spd_control": {
+   "base_projection": 0.9999999999999999,
+   "transported_no_renormalisation": 0.9999999999999999,
+   "abs_diff_no_renormalisation": 0.0,
+   "ad_v0_norm_squared": 6.0,
+   "transported_then_renormalised": 0.16666666666666669,
+   "renormalised_over_base": 0.1666666666666667,
+   "reading": "1 -> 1.000000000000016 -> 1/6. The first two differ by round-off; the third differs by ||Ad v0||^2 = 6, a scale introduced by the re-normalisation itself. A protocol that re-normalises is reporting a different Rayleigh quantity and must say so"
+  }
  }
 }
