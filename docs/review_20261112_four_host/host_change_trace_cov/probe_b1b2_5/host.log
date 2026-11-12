@@ -1,0 +1,17 @@
+[0m[ INFO] [1794481747.339544538]: Found parameter: laserMapping/cam_model, value: Pinhole[0m
+[0m[ INFO] [1794481747.340113391]: Found parameter: laserMapping/cam_width, value: 640[0m
+[0m[ INFO] [1794481747.340223541]: Found parameter: laserMapping/cam_height, value: 480[0m
+[0m[ INFO] [1794481747.340352860]: Found parameter: laserMapping/scale, value: 1[0m
+[0m[ INFO] [1794481747.340467081]: Found parameter: laserMapping/cam_fx, value: 617.971[0m
+[0m[ INFO] [1794481747.340577187]: Found parameter: laserMapping/cam_fy, value: 616.445[0m
+[0m[ INFO] [1794481747.340691518]: Found parameter: laserMapping/cam_cx, value: 327.71[0m
+[0m[ INFO] [1794481747.340802253]: Found parameter: laserMapping/cam_cy, value: 253.977[0m
+[0m[ INFO] [1794481747.340915522]: Found parameter: laserMapping/cam_d0, value: 0.148001[0m
+[0m[ INFO] [1794481747.341024890]: Found parameter: laserMapping/cam_d1, value: -0.217835[0m
+[0m[ INFO] [1794481747.341133620]: Found parameter: laserMapping/cam_d2, value: 0[0m
+[0m[ INFO] [1794481747.341239200]: Found parameter: laserMapping/cam_d3, value: 0[0m
+scale: 1
+[rospack] Error: package 'image_transport' not found
+[librospack]: error while executing command
+terminate called after throwing an instance of 'image_transport::Exception'
+  what():  No plugins found! Does `rospack plugins --attrib=plugin image_transport` find any packages?

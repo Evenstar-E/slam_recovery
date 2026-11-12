@@ -1,0 +1,35 @@
+[ 36%] Built target vikit_common
+[ 47%] Built target test_vk_common_triangulation
+[ 47%] Built target test_vk_common_camera
+[ 50%] Linking CXX executable /home/R26534/fast_livo2_ws/devel/lib/vikit_common/test_vk_common_patch_score
+[ 66%] Building CXX object FAST-LIVO2/CMakeFiles/lio.dir/src/voxel_map.cpp.o
+[ 66%] Building CXX object FAST-LIVO2/CMakeFiles/laser_mapping.dir/src/LIVMapper.cpp.o
+[ 66%] Building CXX object FAST-LIVO2/CMakeFiles/vio.dir/src/vio.cpp.o
+[ 66%] Built target pre
+[ 69%] Building CXX object FAST-LIVO2/CMakeFiles/laser_mapping.dir/src/native_checkpoint.cpp.o
+[ 72%] Built target vikit_ros
+[ 77%] Built target imu_proc
+/usr/bin/ld: /home/R26534/mm/ros/lib/libIlmThread.so.32: undefined reference to `__cxa_call_terminate@CXXABI_1.3.15'
+collect2: error: ld returned 1 exit status
+make[2]: *** [rpg_vikit/vikit_common/CMakeFiles/test_vk_common_patch_score.dir/build.make:190: /home/R26534/fast_livo2_ws/devel/lib/vikit_common/test_vk_common_patch_score] Error 1
+make[1]: *** [CMakeFiles/Makefile2:1027: rpg_vikit/vikit_common/CMakeFiles/test_vk_common_patch_score.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+[ 80%] Linking CXX shared library /home/R26534/fast_livo2_ws/devel/lib/libvio.so
+[ 86%] Built target vio
+[ 88%] Linking CXX shared library /home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so
+[ 88%] Built target laser_mapping
+[ 91%] Linking CXX shared library /home/R26534/fast_livo2_ws/devel/lib/liblio.so
+[ 91%] Built target lio
+make: *** [Makefile:146: all] Error 2
+Base path: /home/R26534/fast_livo2_ws
+Source space: /home/R26534/fast_livo2_ws/src
+Build space: /home/R26534/fast_livo2_ws/build
+Devel space: /home/R26534/fast_livo2_ws/devel
+Install space: /home/R26534/fast_livo2_ws/install
+####
+#### Running command: "make cmake_check_build_system" in "/home/R26534/fast_livo2_ws/build"
+####
+####
+#### Running command: "make -j8" in "/home/R26534/fast_livo2_ws/build"
+####
+Invoking "make -j8" failed

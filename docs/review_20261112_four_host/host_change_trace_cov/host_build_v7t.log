@@ -1,0 +1,78 @@
+[ 36%] Built target vikit_common
+[ 47%] Linking CXX executable /home/R26534/fast_livo2_ws/devel/lib/vikit_common/test_vk_common_patch_score
+[ 50%] Built target test_vk_common_camera
+[ 50%] Built target test_vk_common_triangulation
+[ 66%] Building CXX object FAST-LIVO2/CMakeFiles/lio.dir/src/voxel_map.cpp.o
+[ 66%] Building CXX object FAST-LIVO2/CMakeFiles/laser_mapping.dir/src/LIVMapper.cpp.o
+[ 66%] Building CXX object FAST-LIVO2/CMakeFiles/imu_proc.dir/src/IMU_Processing.cpp.o
+[ 66%] Building CXX object FAST-LIVO2/CMakeFiles/pre.dir/src/preprocess.cpp.o
+/usr/bin/ld: /home/R26534/mm/ros/lib/libIlmThread.so.32: undefined reference to `__cxa_call_terminate@CXXABI_1.3.15'
+[ 66%] Building CXX object FAST-LIVO2/CMakeFiles/vio.dir/src/vio.cpp.o
+[ 66%] Building CXX object FAST-LIVO2/CMakeFiles/laser_mapping.dir/src/native_checkpoint.cpp.o
+collect2: error: ld returned 1 exit status
+make[2]: *** [rpg_vikit/vikit_common/CMakeFiles/test_vk_common_patch_score.dir/build.make:190: /home/R26534/fast_livo2_ws/devel/lib/vikit_common/test_vk_common_patch_score] Error 1
+make[1]: *** [CMakeFiles/Makefile2:1027: rpg_vikit/vikit_common/CMakeFiles/test_vk_common_patch_score.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+[ 75%] Built target vikit_ros
+[ 75%] Building CXX object FAST-LIVO2/CMakeFiles/vio.dir/src/frame.cpp.o
+[ 77%] Building CXX object FAST-LIVO2/CMakeFiles/vio.dir/src/visual_point.cpp.o
+In file included from /home/R26534/mm/ros/include/boost/bind.hpp:30,
+                 from /home/R26534/fast_livo2_ws/src/FAST-LIVO2/src/frame.cpp:13:
+/home/R26534/mm/ros/include/boost/config/pragma_message.hpp:24:34: note: ‘#pragma message: The practice of declaring the Bind placeholders (_1, _2, ...) in the global namespace is deprecated. Please use <boost/bind/bind.hpp> + using namespace boost::placeholders, or define BOOST_BIND_GLOBAL_PLACEHOLDERS to retain the current behavior.’
+   24 | # define BOOST_PRAGMA_MESSAGE(x) _Pragma(BOOST_STRINGIZE(message(x)))
+      |                                  ^~~~~~~
+/home/R26534/mm/ros/include/boost/bind.hpp:36:1: note: in expansion of macro ‘BOOST_PRAGMA_MESSAGE’
+   36 | BOOST_PRAGMA_MESSAGE(
+      | ^~~~~~~~~~~~~~~~~~~~
+/home/R26534/fast_livo2_ws/src/FAST-LIVO2/src/LIVMapper.cpp: In member function ‘void LIVMapper::writeTraceCovRow(double, int, const Eigen::Matrix<double, 6, 6>&)’:
+/home/R26534/fast_livo2_ws/src/FAST-LIVO2/src/LIVMapper.cpp:533:29: error: ‘const struct MeasureGroup’ has no member named ‘native_group_index’
+  533 |     grp_idx = (long long)mg.native_group_index;
+      |                             ^~~~~~~~~~~~~~~~~~
+/home/R26534/fast_livo2_ws/src/FAST-LIVO2/src/LIVMapper.cpp:534:12: error: ‘const struct MeasureGroup’ has no member named ‘native_scan_first’
+  534 |     if (mg.native_scan_first > 0) scan_first_ns = (long long)llround(mg.native_scan_first * 1e9);
+      |            ^~~~~~~~~~~~~~~~~
+/home/R26534/fast_livo2_ws/src/FAST-LIVO2/src/LIVMapper.cpp:534:73: error: ‘const struct MeasureGroup’ has no member named ‘native_scan_first’
+  534 |     if (mg.native_scan_first > 0) scan_first_ns = (long long)llround(mg.native_scan_first * 1e9);
+      |                                                                         ^~~~~~~~~~~~~~~~~
+/home/R26534/fast_livo2_ws/src/FAST-LIVO2/src/LIVMapper.cpp:535:12: error: ‘const struct MeasureGroup’ has no member named ‘native_scan_last’
+  535 |     if (mg.native_scan_last > 0) scan_last_ns = (long long)llround(mg.native_scan_last * 1e9);
+      |            ^~~~~~~~~~~~~~~~
+/home/R26534/fast_livo2_ws/src/FAST-LIVO2/src/LIVMapper.cpp:535:71: error: ‘const struct MeasureGroup’ has no member named ‘native_scan_last’
+  535 |     if (mg.native_scan_last > 0) scan_last_ns = (long long)llround(mg.native_scan_last * 1e9);
+      |                                                                       ^~~~~~~~~~~~~~~~
+/home/R26534/fast_livo2_ws/src/FAST-LIVO2/src/LIVMapper.cpp: In member function ‘bool LIVMapper::sync_packages(LidarMeasureGroup&)’:
+/home/R26534/fast_livo2_ws/src/FAST-LIVO2/src/LIVMapper.cpp:1962:7: error: ‘struct MeasureGroup’ has no member named ‘native_group_index’
+ 1962 |     m.native_group_index = scan_group_counter_++;
+      |       ^~~~~~~~~~~~~~~~~~
+/home/R26534/fast_livo2_ws/src/FAST-LIVO2/src/LIVMapper.cpp:2085:9: error: ‘struct MeasureGroup’ has no member named ‘native_group_index’
+ 2085 |       m.native_group_index = scan_group_counter_++;
+      |         ^~~~~~~~~~~~~~~~~~
+/home/R26534/fast_livo2_ws/src/FAST-LIVO2/src/LIVMapper.cpp:2122:9: error: ‘struct MeasureGroup’ has no member named ‘native_group_index’
+ 2122 |       m.native_group_index = scan_group_counter_++;
+      |         ^~~~~~~~~~~~~~~~~~
+/home/R26534/fast_livo2_ws/src/FAST-LIVO2/src/LIVMapper.cpp:2159:7: error: ‘struct MeasureGroup’ has no member named ‘native_group_index’
+ 2159 |     m.native_group_index = scan_group_counter_++;
+      |       ^~~~~~~~~~~~~~~~~~
+[ 80%] Linking CXX shared library /home/R26534/fast_livo2_ws/devel/lib/libpre.so
+[ 80%] Built target pre
+[ 83%] Linking CXX shared library /home/R26534/fast_livo2_ws/devel/lib/libimu_proc.so
+[ 83%] Built target imu_proc
+make[2]: *** [FAST-LIVO2/CMakeFiles/laser_mapping.dir/build.make:79: FAST-LIVO2/CMakeFiles/laser_mapping.dir/src/LIVMapper.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:3555: FAST-LIVO2/CMakeFiles/laser_mapping.dir/all] Error 2
+[ 86%] Linking CXX shared library /home/R26534/fast_livo2_ws/devel/lib/libvio.so
+[ 86%] Built target vio
+[ 88%] Linking CXX shared library /home/R26534/fast_livo2_ws/devel/lib/liblio.so
+[ 88%] Built target lio
+make: *** [Makefile:146: all] Error 2
+Base path: /home/R26534/fast_livo2_ws
+Source space: /home/R26534/fast_livo2_ws/src
+Build space: /home/R26534/fast_livo2_ws/build
+Devel space: /home/R26534/fast_livo2_ws/devel
+Install space: /home/R26534/fast_livo2_ws/install
+####
+#### Running command: "make cmake_check_build_system" in "/home/R26534/fast_livo2_ws/build"
+####
+####
+#### Running command: "make -j8" in "/home/R26534/fast_livo2_ws/build"
+####
+Invoking "make -j8" failed
