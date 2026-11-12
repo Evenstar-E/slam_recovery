@@ -58,6 +58,8 @@ FAST-LIO2 必须标 **SHARED_EXECUTION**：本机只有一个 `fastlio_mapping`
 | `injection_repair_20261112/REPORT.md` | INJECTION 测量修复的一次受控运行：传输链成立（25/25/25），估计偏差 0.003 m 而非注入的 0.5 m，原因与最小修法 |
 | `injection_repair_20261112/incumbent_init_refused/REPORT.md` | incumbent 初值第二次尝试：修正放大到 0.815 m（偏差可见），ICP 未收敛、候选被 Wilson 0.2855 拒绝，修复未发布 |
 | `injection_repair_20261112/decoupled_bias/REPORT.md` | 解耦偏差估计第三次尝试：bias +0.40 m（容差内）、门 accepted；宿主订阅队列 20 条，26 条发布丢 6 条，屏障拒绝重放 |
+| `injection_repair_20261112/decoupled_bias/success_batched/REPORT.md` | 分批回执后修复云 32/32 送达并进入重放；`repairs applied=32`，地图 22334 voxels |
+| `injection_repair_20261112/decoupled_bias/control_dryrun/REPORT.md` | dry-run 对照（同损坏、不发布）：0 条修复、重放 529 帧、地图 20427；帧集不同，效应未隔离 |
 | `run_fastlio2_shared.sh` | 本项使用的运行脚本（可复算；内含共享执行注释） |
 | `analyze_run_bag.py` | 从输出 bag 计算 E1/E2 位姿、间隔、步长、尾段的分析脚本 |
 

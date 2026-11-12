@@ -83,12 +83,12 @@ write_receipt() {
   env -u PYTHONPATH /usr/bin/python3 - "$RUN_DIR" "$STATUS" "$REASON" "$TERMINATION" \
       "$BAG" "$RATE" "$DRAIN" "$DURATION" "$MAX_PAIRS" "$CAND_SRC" "$DETECTION" "$SIGMA" \
       "$BIN" "$CFG" "$CAM" "$PLAY_EXIT" "$PAIR_EXIT" "$REC_EXIT" "$RC_EXIT" "$SCRIPTED" \
-      "$SCRIPTED_STAMPS" "$MARGIN" "$RELAY_SHIFT" "$RELAY_START_NS" "$RELAY_END_NS" <<'PY'
+      "$SCRIPTED_STAMPS" "$MARGIN" "$RELAY_SHIFT" "$RELAY_START_NS" "$RELAY_END_NS" "$REPAIR_PUBLISH" <<'PY'
 import hashlib, json, os, sys
 
 (rd, status, reason, term, bag, rate, drain, duration, max_pairs, cand_src, detection, sigma,
  binp, cfg, cam, play_x, pair_x, rec_x, rc_x, scripted, scripted_ns,
- margin, relay_shift, relay_start_ns, relay_end_ns) = sys.argv[1:]
+ margin, relay_shift, relay_start_ns, relay_end_ns, repair_publish) = sys.argv[1:]
 
 def sha(p):
     if not p or not os.path.exists(p):
@@ -120,6 +120,7 @@ rec = {
                "relay_shift_z": relay_shift, "relay_start_ns": relay_start_ns,
                "relay_end_ns": relay_end_ns,
                "injection": ("INJECTION_DECLARED_Z_BIAS" if relay_shift else "NONE"),
+               "repair_publish": str(repair_publish),
                "run_mode": ("CONTROLLED_INTERFACE_TEST" if (scripted or scripted_ns)
                             else "ONLINE_DETECTION"),
                "group_model": "host and recovery node are children of one setsid supervisor"},
@@ -220,7 +221,12 @@ REC_ARGS+=(--confirmation-margin-sec "$MARGIN")
 # measurement correction has to be published by the node that owns the trusted map.
 RELAY_ON=0
 [ -n "$RELAY_SHIFT" ] && RELAY_ON=1
-[ "$RELAY_ON" -eq 1 ] && REC_ARGS+=(--repair-publish)
+# REPAIR_PUBLISH=0 keeps the identical pipeline and corruption but stops the repair clouds, which
+# is the control that isolates the repair's effect from the corruption itself.
+REPAIR_PUBLISH="${REPAIR_PUBLISH:-1}"
+[ "$RELAY_ON" -eq 1 ] && [ "$REPAIR_PUBLISH" -eq 1 ] && REC_ARGS+=(--repair-publish)
+# Control: same relay, same estimation cost, no publication and no sync.
+[ "$RELAY_ON" -eq 1 ] && [ "$REPAIR_PUBLISH" -eq 0 ] && REC_ARGS+=(--repair-dry-run)
 
 cat > "$RUN_DIR/launch_pair.sh" <<EOF
 #!/bin/bash

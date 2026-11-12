@@ -793,10 +793,10 @@ class CheckpointClient:
         with self._lock:
             return bool(self._pending or self._outbox)
 
-    def wait_for_repair_count(self, expected: int, timeout_s: float = 5.0) -> bool:
-        """Block until the host's ack reports `repair_received >= expected`.
+    def read_repair_received(self, timeout_s: float = 1.0) -> Optional[int]:
+        """One status round-trip; returns the host's cumulative `repair_received`, or None.
 
-        The repair clouds travel on a topic while `reprocess` travels on the command file. The
+        The repair clouds travel on a topic while the commands travel on the command file. The
         host's ack already carries `repair_received` (checkpointStatus), so the receipt itself is
         the barrier: no new host interface is needed. A status command queues behind any command in
         flight (the client is serialized), and its ack is collected here.
@@ -804,17 +804,24 @@ class CheckpointClient:
         import re
         import time as _time
 
+        event = self._send("status")
+        deadline = _time.time() + float(timeout_s)
+        while _time.time() < deadline and not event.get("ack"):
+            self.poll()
+            _time.sleep(0.01)
+        ack = event.get("ack") or ""
+        m = re.search(r"repair_received=(\d+)", ack)
+        return int(m.group(1)) if m else None
+
+    def wait_for_repair_count(self, expected: int, timeout_s: float = 5.0) -> bool:
+        """Block until the host's ack reports `repair_received >= expected`."""
+        import time as _time
+
         expected = int(expected)
         deadline = _time.time() + float(timeout_s)
         while _time.time() < deadline:
-            event = self._send("status")
-            try_until = min(deadline, _time.time() + 1.0)
-            while _time.time() < try_until and not event.get("ack"):
-                self.poll()
-                _time.sleep(0.01)
-            ack = event.get("ack") or ""
-            m = re.search(r"repair_received=(\d+)", ack)
-            if m and int(m.group(1)) >= expected:
+            n = self.read_repair_received(min(1.0, max(0.05, deadline - _time.time())))
+            if n is not None and n >= expected:
                 return True
             _time.sleep(0.05)
         return False
@@ -908,6 +915,7 @@ class NativeClosedLoop:
         checkpoint_client: Optional["CheckpointClient"] = None,
         repair_publish: bool = False,
         repair_sync_timeout_s: float = 5.0,
+        repair_dry_run: bool = False,
     ) -> None:
         self.node = node
         self.run_id = run_id
@@ -960,6 +968,9 @@ class NativeClosedLoop:
         self._scan_msgs: Dict[int, Any] = {}
         self._scan_index: Dict[int, Tuple[int, Any]] = {}
         self.repair_publish_enabled = bool(repair_publish)
+        # Control mode: run the same bias estimation (so the decision costs the same) but publish
+        # nothing and send no replay gate. Used to isolate the repair's effect from the corruption.
+        self.repair_dry_run = bool(repair_dry_run)
         self.publish_repair = None            # callable(PointCloud2), set by the ROS driver
         self.repair_sync_timeout_s = float(repair_sync_timeout_s)
         self._last_icp_delta: Optional[np.ndarray] = None
@@ -1338,6 +1349,13 @@ class NativeClosedLoop:
         receiving them, `proceed` is False and no `reprocess` may be issued: a replay that cannot
         see the repaired measurements would repeat the previous run's `repairs applied=0`.
         """
+        if self.repair_dry_run:
+            # Same estimator, same decision cost, no publication: the control for the repair run.
+            if not accepted:
+                return True, None
+            est = self._estimate_repair_bias(ep)
+            est.update({"dry_run": True, "published": 0, "synced": False, "batches": []})
+            return True, est
         if not (accepted and self.repair_publish_enabled):
             return True, None
         rep = self._publish_repaired_scans(ep)
@@ -1403,6 +1421,10 @@ class NativeClosedLoop:
             return out
         bias = float(est["bias_z_m"])
         out["repair_shift_z_m"] = round(-bias, 4)
+        # The host's repaired-scan subscriber queues 20 (LIVMapper.cpp:320-321). A burst of 26 in
+        # one decision dropped six before any callback saw them, so publish in batches and wait for
+        # the cumulative receipt after each one. The receipt is the host's own count, not a timer.
+        items = []
         for kf, _ts, _pose in ep.frames:
             rec = self._scan_index.get(kf)
             if not rec or rec[1] is None:
@@ -1410,13 +1432,38 @@ class NativeClosedLoop:
                 continue
             scan_ns, msg = rec
             # bias is the estimated injected corruption; the repair removes it.
-            self.publish_repair(shift_z_cloud(msg, -bias))
-            out["published"] += 1
-            out["frames"].append(int(scan_ns))
-        if out["published"]:
-            out["synced"] = bool(
-                self.cp.wait_for_repair_count(out["published"],
-                                              timeout_s=self.repair_sync_timeout_s))
+            items.append((int(scan_ns), shift_z_cloud(msg, -bias)))
+        baseline = self.cp.read_repair_received(timeout_s=1.0)
+        out["repair_received_baseline"] = baseline
+        base = int(baseline or 0)
+        batch_size = 10
+        published = 0
+        out["batches"] = []
+        for start in range(0, len(items), batch_size):
+            batch = items[start:start + batch_size]
+            for scan_ns, cloud in batch:
+                self.publish_repair(cloud)
+                out["frames"].append(scan_ns)
+            published += len(batch)
+            ok = self.cp.wait_for_repair_count(base + published,
+                                               timeout_s=self.repair_sync_timeout_s)
+            out["batches"].append({"batch": len(out["batches"]) + 1,
+                                   "in_batch": len(batch),
+                                   "published_total": published,
+                                   "received_ok": bool(ok)})
+            if not ok:
+                # Do not publish the rest and do not replay with a partial repair set.
+                out["published"] = int(published)
+                out["synced"] = False
+                out["failed_after_published"] = int(published)
+                out["reason"] = "batch_receipt_timeout"
+                return out
+        out["published"] = int(published)
+        final = self.cp.read_repair_received(timeout_s=self.repair_sync_timeout_s)
+        out["final_received"] = final
+        out["synced"] = bool(final is not None and final == base + published)
+        if not out["synced"]:
+            out["reason"] = "receipt_mismatch"
         return out
 
     def decide(self, now_ts_ns: int, basis: str) -> Optional[Dict[str, Any]]:
@@ -2079,6 +2126,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--repair-sync-timeout-sec", type=float, default=5.0,
                     help="how long to wait for repair_received to reach the published count; on "
                          "timeout the replay is not sent")
+    ap.add_argument("--repair-dry-run", action="store_true", default=False,
+                    help="control for the INJECTION test: run the same bias estimation (same "
+                         "decision cost) but publish nothing; the replay uses the original scans")
     args, _unknown = ap.parse_known_args(argv)
 
     import rospy
@@ -2104,6 +2154,7 @@ def main(argv: Optional[List[str]] = None) -> int:
             if args.checkpoint_dir else None),
         repair_publish=args.repair_publish,
         repair_sync_timeout_s=args.repair_sync_timeout_sec,
+        repair_dry_run=args.repair_dry_run,
     )
     if args.scripted_triggers:
         loop.scripted_triggers_s = [float(x) for x in args.scripted_triggers.split(",") if x.strip()]
