@@ -1293,3 +1293,41 @@ UNAVAILABLE**（fraction 中位 0.09）——支持失败不是隔离期独有�
 
 已派 S2：同 bag、detection off、无注入、无 scripted、开 `pcd_save_en`（用副本 config 并记 sha）跑一次
 干净地图 pass，归档 PCD/receipt/config sha；S1 随后离线评分现有 544 行并交分段落结论。
+
+## 104. repair-f3 / c416a68增量：448后缀原生重推通过，set_state实际覆盖边界状态仍FAIL
+
+[核验](review_20261112_c416a68/README.md)新072902Z原件本轮23SHA一致、driver未变target绑定/库c0833d9f匹配build声明；572group=124within+448suffix通过原生IMU/mapping，map21257/379069、23received/applied/leftover0，旧skip+clear捕获后缀断点本范围解除。572含286LIO（226有点/60空）及286VIO，不冒全非空scan/全state等价。实际reprocess边界state[3.167535,6.145446,-.110570]之后仍set_state写candidate key161@280.281的[7.050962,5.921306,-.446735]，重放末295.292晚15.0111s，两ACK差3.904389m且map计数同，旧来源问题实跑确认，不瞬时GT误差。
+
+S1已决定派ACK suffix/driver跳旧pose但target未实施；下一最小保native完整重估边界和成功依赖→接回→修复后E2尾段或首断点，不复制pose/newRPC/阈值扩展。59shift仅23发布、36未修含最后修复后18，suffix原始测量非干净；单scripted/detection off/E2未跑，HEALTHY经waitclose/ABORTED，snapshot8超时/整体build ABI失败保留。S2后缀真实成果接受，不重复v3控制，旧物理候选与成功来源保范围。
+
+诊断选项收窄/方向更正可并行，开发声明暂停及“用户选”仅转述，本机无新直接指令不批准双参考；S3维持门研究专用/旧参数停，不无限诊断代native。-I原件reader最终exit0，初逗号解析失败仅修自写reader，无host/bag/algorithm；driver未变不重跑旧tests。A5/A6/A10局部推进不全表评分，自检逐项状态/命令/原件/人口/失败/质量/成本UNKNOWN；独立review SSH提交推送/private保护不合main不改历史冻结门，target早于d442793发布不指控忽略，接收新意见待回执。
+
+## 105. repair-f3 / 70e3e7c增量：受控实际修复后E2已执行，可信回退/未知依赖仍FAIL
+
+[核验](review_20261112_70e3e7c/README.md)两v5新run40SHA一致、实际driver e39b2b8/0a38e952非随后诊断target c33c0094、库9e7d8cdf绑定build。074154Z真实23应用/454=124+330suffix/无set_state，ACK差实际4.225cm；074744Z E1修复23/.40→原生497=124+373suffix/map20838/379892→无旧pose灌回/resume边界XYZ同→E2拒绝restore/resume→关闭后17paired/1.725149s。首次实际修复后同实例受控E2执行已即时单报用户，不抹执行也不称全部验收成功。
+
+E2无注入/detection off、滚动cp晚trigger1.607814s/晚隔离起点5.607814s，可信完整回退未过；真实两ABORTED rearm/未解决106,143/59shift仅23修复保人口。新collect None/FAILED ack仍实际target decide发送set_state，与“缺ACK不盲写”不符；成功suffix正例skip已通过，普通未知失败依赖最低停尾命令/不公开成功，不扩防御矩阵/newRPC。S1共享成功依赖/物理一致，S2合法历史cp及input归宿→接回/E2或显式不支持，复用已验后缀/skip，不无限单事件。
+
+诊断最新补reference缓存元数据/预测基准/正常边界全样本只源码组件，未新on运行、参考坐标/raw行仍缺；用户本轮问UNAVAILABLE如何解决，已明确答：分支定位已完成，支持门/处理策略未改、物理根因未知，非已修。不自选方法/调门，S3既定研究参数停。-I archive及target Git bytes方法控制PASS/FAIL反例如实，无host/bag；pytest辅助新tests未跑不装。A/B局部进步不总分、自检状态/命令/原件/实际版本/全人口/失败未知/质量成本，review白名单SSH推送补012899f/private保护不合main不改历史，接收新意见待回执。
+
+## 106. repair-f3 / 用户授权ALI-H v1设计与有限隔离测试（2026-11-12）
+
+用户直接要求“设计一版，并行接着做自动审阅，设计好通过GitHub给开发侧测试”。[ALI-H v1](ADAPTIVE_LOW_INFORMATION_HEALTH_V1_20261112.md)已设计：低支持/弱信息与健康观察分开，NORMAL_CONSISTENT/SUSPECT/UNKNOWN加scope；M地图/T邻帧/I真实preupdate运动冲突按来源和旧support上下文条件校准，预测不当正常独立证据、默认LOSO/sync/零bias不充观测，缺项/校准外/carried保持UNKNOWN。不改旧1m/60%、sigma/κ和准入门；新0.5s块/.95/.80/20块是一次冻结探索配置，不扫描追成绩、非有效概率。
+
+本次直接授权仅此方法隔离实现/有限测试，先shadow不改变旧检测/manager/native，生产部署另需用户确认，不扩双参考/数据宿主矩阵或恢复旧参数任务。本机只设计/审阅；S3保持唯一研究角色，在已有门研究时段安排并回实际预算/branch/认领；S1共享接口单写、S2继续native，先复用已有402/544行原件和必要最小synthetic控制，有明确缺项才复用原生trace或至多一次预算内有限导出。完整人口/标签/误报漏检延迟/弃权/资源与负结果，缺I或健康低支持参照明确UNKNOWN，不把改名当解决。
+
+20min/2h/日报actual owner repair-f3保持、未新增任务；新main5f54a44的armed/final原生E2独立并行核验，不凭完成标题验收。方案DESIGNED/NOT_IMPLEMENTED/NOT_EXECUTED，S1/S3实际接收待回执，发布不冒运行；A3/B3计划非新评分。SSH独立review提交推送/private保护不合main不改历史冻结门。
+
+## 107. repair-f3 / 5f54a44原生增量：双事件尾段接受，检查点需对齐隔离起点而非仅trigger
+
+[核验](review_20261112_5f54a44_native/README.md)新armed/final34原件SHA一致、341全manifest完整性核；实际b1bce5e driver与target四changed entry AST一致，整source不同诊断merge不冒最新全实跑。armed修复23/437=124+313suffix/无set_state但E2未close/resume/open；final修复23/503=124+379suffix/map21578/403642/无set_state→接回→E2拒绝restore/close/ABORTED rearm/resume→39paired/4.65064s尾段，受控执行接受，不自动恢复/GT收益或全部状态等价。
+
+实际cp晚隔离起点：两E1约4s，armed E2 3.999999942s，final E2 3.932198216s，早trigger67.8ms只解除晚trigger范围；最低实际应用历史cp不晚quarantine_start并保input归宿，或明确拒绝回溯不支持，不调margin/重新框架/无限移E2戳。旧collect未知失败写回/物理候选仍未改不重测，59shift仅23修/未解101,138保人口。总结final before20.3222非22.064/Wilson0、superseded0非1等集中更正不重跑。
+
+S1共享成功依赖/可信边界、S2下一合法历史恢复→完整接回后继尾段或能力断点；S3按新用户ALI-H v1有限shadow研究授权且旧参数停、既有研究预算顺序回执，native不等研究。availability旧state交叉不真值/唯一pose因果，论文受控限定保留。-I reader/source控制PASS，早reader断言只修辅助，无host/bag，build目标成功整体ABI失败不抹。实际automation owner无双写，16:29DNS失败不冒remote latest，A/B局部不总分、自检状态/命令/原件/人口/失败/质量成本UNKNOWN，review SSH推送/private保护不合main不改算法历史冻结门，接收新意见待回执。
+
+## 108. repair-f3 / 26ba3a3与两小时总结：独立参考仅研究组件，真实主线部分推进
+
+[核验](review_20261112_26ba3a3/README.md)新PCD/独立支持工具5相关test target Git bytes PASS，Scipy ICP未跑不装；target无新PCD/receipt/评分运行。正常pose不变只换参考fraction0→1不证明pose错；裁20/200保存点fraction1/真全样本.1仍入主both_pass，最低完整分母/partial单列、中性解释与现prefix gauge/共同支持，不能每帧ICP自拟合冒独立评价。ASCII COUNT兼容候选不声明binary input主阻断。S1§103派S2clean pass仅开发转述认领/用户选，本机无新直接选择不扩授权；ALI-H v1用户已直接授权隔离shadow研究b7ad580优先，实际接收待回执，S3唯一研究角色不占S2整轮诊断。
+
+14:37–16:37结论部分推进：后缀真实重推/成功skip旧pose/修复后同实例E2与39尾帧原生证据接受，不日志或test数；首工程cp晚隔离起点及UNKNOWN/FAIL依赖仍未过，算法/评价物理候选/全损坏人口/独立净收益未知，参数无同版本同人口规律/上限证据可解、旧sigma/κ/floor停。目标库运行/整体ABI测试失败次要；DNS恢复fetch最新26ba3a3，不猜远端停工。S1成功依赖/共享集成、S2合法历史cp/完整input归宿→实际修复接回后继尾段或显式不支持，复用已验suffix/skip不扩框架；S3既定研究/native不等。自检状态/命令/原件/全人口/失败/质量成本UNKNOWN，A/B局部不总分，只新评价增量提交SSH不重复2h空报告/private保护不合main不改算法历史冻结门。

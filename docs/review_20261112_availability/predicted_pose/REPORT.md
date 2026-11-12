@@ -19,7 +19,7 @@
 | 宿主库 / 可执行 | `9c0330be…` / `0d7e23de…` |
 | 输入 / 配置 | `hall01_two_event_v1.bag` `c3e905da…`；m2dgr/camera sha 见 receipt |
 | 负载 | 见 `machine_load.txt`（nproc 128） |
-| 终态 | HEALTHY（wiring all_ok） |
+| 终态 | **WAITING_FOR_EVIDENCE，`quarantine_open_at_exit=true`**（原先写 HEALTHY 与 receipt/run_summary/lifecycle 矛盾，S1 按原件更正；8 段中 resume 7/8） |
 
 **行数 = 544 = 本次 paired 人口**（`run_summary.frames.paired=544`）。上一轮诊断是 402 行——
 paired 人口随负载/配对变化，**行形状不变**（键相同，新增 `support_under_predicted_pose`），
