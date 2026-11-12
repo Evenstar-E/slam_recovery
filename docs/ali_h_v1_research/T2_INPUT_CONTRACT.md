@@ -10,7 +10,7 @@
 |---|---|
 | run 身份 | **新的 run id**，不能复用 402/544；off/on 两次为**同一 build**、同一输入/config/library |
 | 输入 | bag/scan/imu 的 sha256；host library/executable sha256；config sha256 |
-| 时间 | **绝对传感器戳**（IMU 与 LiDAR 各自），实际起止区间；不用 wall time 代替 |
+| 时间 | **绝对传感器戳**（IMU 与 LiDAR 各自）**且同时给 `scan_header_stamp` 与 `last_lio_update_time`**；不用 wall time 代替；offset 非常数或只有 header 戳 → `INCOMPLETE:join_key_unresolved` |
 | 帧配对 | 每个 LiDAR 更新一行；`has_out` 标明该行是否有更新后状态 |
 | 行为对照 | trace off/on 两次运行，旧检测决定/manager/native 命令逐条相同（最小不变性） |
 
@@ -27,6 +27,8 @@
 | `pose_pre` | 更新前 IMU 传播位姿（SE(3)） | `e_I` 的一端 |
 | `pose_post` | 更新后 LiDAR 位姿（SE(3)） | `e_I` 的另一端 |
 | `stamp_pre` / `stamp_post` | 对应实际传感器时刻（ns） | 同一区间/同基检查 |
+| `scan_header_stamp` | LiDAR 消息 header 戳（ns） | 与 availability 的 `scan_stamp_ns` 对照 |
+| `last_lio_update_time` | LiDAR 帧**末时刻**（宿主首列，ns） | **精确 join** availability 的 `scan_stamp_ns` |
 
 **明确不接收**：
 - `S`（m×m 测量空间量，`S = H P⁻ Hᵀ + R`）——不是 6 维切空间协方差；
