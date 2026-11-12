@@ -1,0 +1,158 @@
+{
+ "marker": "SYNTHETIC_UNIT",
+ "t2_real_status": "NOT_EXECUTED",
+ "tests": [
+  {
+   "test": "valid manifest is READY",
+   "status": "PASS",
+   "detail": {
+    "status": "READY",
+    "missing": [],
+    "errors": [],
+    "warnings": []
+   }
+  },
+  {
+   "test": "missing P_minus is INCOMPLETE",
+   "status": "PASS",
+   "detail": {
+    "status": "INCOMPLETE",
+    "missing": [
+     "exports.P_minus"
+    ],
+    "errors": [],
+    "warnings": []
+   }
+  },
+  {
+   "test": "measurement-space S rejected",
+   "status": "PASS",
+   "detail": {
+    "status": "INCOMPLETE",
+    "missing": [],
+    "errors": [
+     "covariance must not be S (measurement-space/information matrix)"
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "test": "old run id rejected",
+   "status": "PASS",
+   "detail": {
+    "status": "INCOMPLETE",
+    "missing": [],
+    "errors": [
+     "run_id_is_an_old_archive_run"
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "test": "unit-only manifest is READY_UNIT_ONLY",
+   "status": "PASS",
+   "detail": {
+    "status": "READY_UNIT_ONLY",
+    "missing": [],
+    "errors": [],
+    "warnings": [
+     "unit_weighted_only:no_pose_block"
+    ]
+   }
+  },
+  {
+   "test": "identity gives zero e_I",
+   "status": "PASS",
+   "detail": {
+    "e": [
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  },
+  {
+   "test": "rotvec+translation recovered",
+   "status": "PASS",
+   "detail": {
+    "e": [
+     0.0,
+     0.0,
+     0.2,
+     0.1,
+     0.0,
+     0.0
+    ]
+   }
+  },
+  {
+   "test": "state order is honoured",
+   "status": "PASS",
+   "detail": {
+    "e": [
+     0.1,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.2
+    ]
+   }
+  },
+  {
+   "test": "identity covariance gives |e|^2",
+   "status": "PASS",
+   "detail": {
+    "status": "OK",
+    "s": 0.05000000000000001,
+    "rank": 6,
+    "e": [
+     0.0,
+     0.0,
+     0.2,
+     0.1,
+     0.0,
+     0.0
+    ]
+   }
+  },
+  {
+   "test": "rank-deficient covariance uses observable subspace",
+   "status": "PASS",
+   "detail": {
+    "status": "OK",
+    "s": 0.05000000000000001,
+    "rank": 5,
+    "e": [
+     0.0,
+     0.0,
+     0.2,
+     0.1,
+     0.0,
+     0.0
+    ]
+   }
+  },
+  {
+   "test": "no covariance -> unit-weighted only",
+   "status": "PASS",
+   "detail": {
+    "status": "NOT_AVAILABLE",
+    "reason": "no_pose_covariance",
+    "unit_weighted": [
+     0.0,
+     0.0,
+     0.2,
+     0.1,
+     0.0,
+     0.0
+    ],
+    "sum_squares": 0.05000000000000001
+   }
+  }
+ ],
+ "failed": 0
+}
