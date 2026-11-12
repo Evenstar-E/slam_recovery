@@ -485,3 +485,11 @@ S1认领矩阵/真实分工，S2复用已有宿主环境和run，逐项实际E1�
 本机目标cloud8test PASS0.147s及有限实际driver/client控制、无ROS/bag；首-I因numpy不可用exit1保留，无安装，源码控制改既有依赖环境，原件reader另-I exit0。identity精确反例：坏点z1.5配delta_z=-.5时门看世界z1，再施加同-.5到测量且保同候选pose会变世界z.5，证明原坏云门通过不可搬给发布新云，非本次run因果推断。E2旧累计received25/本次0仍sync true，full接纳后sync false仍commit_closed→resume，以及零云仍reprocess三控制FAIL；归档成功传输未声称发生这些失败。最低一致物理修复/候选/符号、实际产物准入和applied成功依赖、本次receipt人口，不扩RPC/阈值/异常矩阵。旧尾set_state/晚cp source未修不重测。
 
 下一单一主线在已声明有限范围交实际去偏→原生完整状态/map→接回→E2尾段或真实首断点；S1集成成功生命周期与E2receipt，S2修复物理定义/有限宿主交付，S3门研究/旧参数停。四宿主前批尝试边界保留，不重开矩阵追成功。纠正window实际触发前7.17ms非0.7s、kf134非132、599记录非599帧、旧protocol仅旁支，不为文字重跑。自检逐项状态/命令/原件/失败/独立质量，A1/A2/A6局部推进、B7负范围保留，A7/A8/A9/A10及B4/B11未闭合、不全表评分。独立review正常SSH提交推送，不合分叉main/private保护，本机不改算法，开发接收待实际回执。
+
+## 59. 2f1f59b：解耦偏差+0.40合理，20/26接收未应用；候选与测量仍不同
+
+[核验](review_20261112_2f1f59b/README.md)两新run原件37/37SHA一致，driver各绑定e472410/bfe2939，后者匹配target。incumbent初值0.815m/未收敛/门拒绝、未发布，hold→restore→resume及214后继帧；不能由范数证明测得0.5bias或初值距真值0.8m。解耦26帧median+0.40/MAD0.05、n_valid全≥27，声明容差内且施加−0.40方向正确，估计组件接受；host received20/queued20/applied0、无reprocess，sync失败后wait关闭/rearm→resume仍发散，263后继帧，两run各一事件无E2。队列20与burst丢6吻合但确切drop层未独立证，旧25/25同队列成功保留，不能说超过20必丢/回调5–10ms已测。
+
+target小控制11cloud test PASS0.399s；自写fake CP首漏enabled exit1后修辅助重跑exit0，不改production、不跑ROS/bag。实际decide/producer合成吸收pose z−.5配坏云z+.5时门world0，修复云body0再配同candidate/set_state−.5→world−.5，旧坏云候选与新测量不一致未解除；改set_state为candidate尾是来源局部改进但不是native完整重估状态。code-review low候选经actual estimator确认：一supported+.5、两非空少支持返回0被median成0，UNKNOWN误计有效0；本run全≥27不是其失败根因。最低真实修复候选/状态同定义、成功公开依赖、分批本次增量receipt/实际applied，少支持标UNKNOWN；不新RPC/阈值/异常矩阵。
+
+S1共享生命周期/失败公开一致集成，S2已有流控派工与物理一致修复、唯一有限native state/map→接回/E2交付或首断点，S3研究/旧参数停；分派记录不冒实际认领。四宿主前批不重跑，truth只评价、容差不生产门，自检逐项状态/实际命令/原件/全人口/失败/质量。A6估计组件及B7负范围局部推进，A7/A8/B2/A9/A10/B4/B11未闭合、不全表新评分。独立review SSH提交推送/private保护、不合main不改算法历史；实际接收待回执。
