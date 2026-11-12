@@ -2438,3 +2438,16 @@ S3 `6e35d30`（已合入 main）：
   已与正文一致；v7 的 `t2_summary.json` 保持 `INCOMPLETE/UNKNOWN / 0 / HEURISTIC_UNPROVEN / LEGACY_M2DGR_TIME_JOIN`，两 run 分开记账。
 
 两段均 `LATE_AFTER_BOUNDARY`、0 accepted：不用于修复/接纳结论；分类/误报/漏检/延迟仍 `NOT_EVALUABLE`（`ALI-B2`）。
+
+## 163. 审阅的 pose7 表头不匹配在目标版本成立、后续提交已闭合（本机实测）
+
+审阅 `c30b569`（目标 `22d7933`）复现：producer 真实表头以**块名 `pose7`** 结尾（一个 token），而消费者按 header token 数推 tail 宽度，
+只接受 93/94，拒绝 100 列——S3 的 selftest 用了展开的七个字段名才通过。该反例在 `22d7933` 上成立。
+
+**但后续提交已闭合**：本机用当前 main 的 `t2_run.parse_trace` 直接解析 v11 真实 trace
+（`/tmp/fl_native_20261112T165438Z_669633/host_logs/trace_cov.txt`）得到 **792 行、0 malformed**，header 尾部为
+`… Ppost6x6 pose7 pre_pose7`，行解析出 `pose_tail`/`pre_pose` 两个具名块。即 `129b184`/`6e35d30` 之后，真实 v11 表头已能
+正确解析，不需要再改表头或放宽宽度。
+
+审阅的其余要求仍有效：不把"硬放宽 100 列但 pose_tail 仍只有块名"当作修好；验收必须取得七值并进入同行 post 分支——
+本机的 792 行解析与 `same_row_pre_post_rows=725` 已满足该条。
