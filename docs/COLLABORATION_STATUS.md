@@ -1127,3 +1127,19 @@ S1 复核 S3 `e9a809c`（合入）。本机独立复算确认其纠正：
 
 同步修正原件口径：`review_20261112_availability/predicted_pose/REPORT.md` 顶部加 S1 注记（数字不变，
 both_low 只说明短时预测解释不了，147 帧里仅 50 帧预测位姿通过）。可用性继续暂停；原生后缀 catch-up 由 S2 进行中。
+
+## 94. 后缀重推成功（v4）：572 帧全部重放，state/map 追到边界；新断点 set_state 回拨 15 s
+
+S1 复核 S2 `f696059`/`c02526d`（合入）。宿主 v4：增量 67 行、完整 `deployed_host_v4.diff` 1625 行、
+新库 sha **`c0833d9f…`**（本机核对）；`reprocess` 不再截断重放，`end_stamp` 只限制修复云匹配。
+
+run `fl_native_20261112T072902Z_207524`（同声明）：
+- `reprocess #1: 572 frames … replayed_within_end=124 replayed_suffix=448`，区间 [276.281966925 .. 295.292295218]（比截断版多 14.94 s）；
+- `repairs applied=23 queued=0 leftover 0`；地图 **21257 voxels/379069 points**（截断版 17811/335054）；
+- reprocess ack `state_pos=3.167535,6.145446,-0.110570` = 边界状态；**随后 `set_state` 写回候选末帧
+  `7.050962,5.921306,-0.446735`（280.28，差约 3.9 m / 15 s），而地图停在 295.29** ⇒ 状态与地图不同步。
+
+结论：审阅 §3 的"已消费后缀重推"断点**已解除**（448 帧后缀按序重推）；新断点是**set_state 在全量重放后回拨**。
+最小修法（S1 决定并派工）：宿主在 reprocess ack 暴露 `replay_suffix=`（日志已有），驱动在后缀 >0 时**跳过 set_state**；
+约 10 行宿主 + 10 行驱动 + 单测，再跑一次同声明受控 run 验证 resume 时 state/map 同一时刻。
+门/阈值/σ 未动；可用性诊断保持暂停。
