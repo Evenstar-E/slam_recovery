@@ -5,7 +5,8 @@
 > `NORMAL_CONSISTENT` / `SUSPECT` / 误报 / 漏检 / 延迟 / 错误 NORMAL 全部 **`NOT_EVALUABLE`**
 > （`ALI-B2-NORMAL-LABELS-20261112-01`）。本文件只交资格、UNKNOWN 区间、M/T/I 证据分布。
 > 未跑宿主、未改共享代码、未改旧归档。
-> **join_status: `HEURISTIC_UNPROVEN`**：`scan_first_ns` 全 -1，`grp_idx` 不是已证身份；下列每一行/
+> **本文件对应 v7 run `115734Z`；join_status: `HEURISTIC_UNPROVEN`**。v8 run `124217Z` 的 join 已单独升级，
+> 见 `T2_JOIN_UPGRADE.md`（真实 `scan_first` + 512 ns 量化保护；不混用两个 run）。`scan_first_ns` 全 -1，`grp_idx` 不是已证身份；下列每一行/
 > 每个统计都**条件于该未证明映射**，不是 source membership 证明。
 > **e_I 源约定是混合的**：`rot=R*Exp(d_rot)`（body 右增量）、`pos=p+d_pos`（world 加性）；
 > 精确 e_I 显式把平移转回 pre-body。**协方差 `Ppre/Ppost` 为混合约定块，不能当 e_I 已验证协方差**，
@@ -30,7 +31,8 @@
 | trace / availability / receipt / summary sha256 | `t2_summary.json._meta`（`t2_run.py` 运行时计算） |
 
 **修复用途限制**：host ack `repair_received=42 / repair_applied=0 / repair_dropped=42`（负载导致命令迟到）。
-因此本 run **不用于**"修复收益"结论；per-frame P/M/T 证据不受影响。
+因此本 run **不用于**"修复收益"结论；per-frame P/M/T 证据不受影响。另按审阅 `646d4f2`：ep3 的
+42 条修复扫描时间都在声明注入窗之后，**修复的是点测量还是状态误差尚未区分**，不能称"注入测量已修回"。
 
 ## 2. trace 形状
 
