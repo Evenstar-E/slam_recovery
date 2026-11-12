@@ -1,0 +1,201 @@
+{
+  "main": "c91519734de99397e97e368d015f17694ffe303f",
+  "archive": "99bfe1e63a1a9b1306018eb9dda19d0ebf89e670",
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261112_c915197/run_checks.py",
+  "summary_expression_controls": [
+    {
+      "name": "undecided",
+      "old": "AttributeError",
+      "new": [],
+      "verdict": "PASS_LOCAL_expression_only"
+    },
+    {
+      "name": "mixed",
+      "old": "AttributeError",
+      "new": [
+        {
+          "status": "NO_ACK"
+        }
+      ],
+      "verdict": "PASS_LOCAL_expression_only"
+    },
+    {
+      "name": "decided",
+      "old": [
+        {
+          "status": "LATE_AFTER_BOUNDARY"
+        }
+      ],
+      "new": [
+        {
+          "status": "LATE_AFTER_BOUNDARY"
+        }
+      ],
+      "verdict": "PASS_LOCAL_expression_only"
+    }
+  ],
+  "driver_sha_matches_run": false,
+  "main_driver_sha256": "c5efdd733cdcf65fadc4fc28fd1f509ad9ccd2e87a644b9d38165a80554cc830",
+  "receipt_driver_sha256": "7cfcccf7ce144d71cacfe47b1b7ea41cf845fe5187dde600a1bbcef2636b8c82",
+  "runtime_driver_source_binding": "UNAVAILABLE in reviewed main; archived ACK/data retained separately",
+  "initial_reader_exit": "1: main driver identity assertion failed; gap preserved, not repaired by changing archive",
+  "run_sha256": {
+    "receipt.json": "c78dd035d54e0999c14ccea880c2740c6a8bdb77f9effc786610c16f4631c164",
+    "run_summary.json": "46fa92486a523490e7d821e59bc3ea68a391108063b8dc5072eedd7bb03e5d7f",
+    "wiring.json": "c0c03e46e717d8149a9f3476c13ff7eddc97ed91f06bbc76279406c8858a2d43",
+    "launch_pair.sh": "d5d8de1c4cb3617edef80259d4eb34c877a82072dd71b09e2d693d8627ad083f",
+    "rss.txt": "fed0e3f682e61c76295e6ee462067c6abeffdfa81b1655a7d4da667393e2e0c2"
+  },
+  "manifest_selected_files_verified": [
+    "receipt.json",
+    "run_summary.json",
+    "wiring.json",
+    "launch_pair.sh",
+    "rss.txt"
+  ],
+  "manifest_self_entry_not_verifiable": true,
+  "host_pose_sha256": "3182e53fee1e56caa3f577eaa17b46e2754ed4614790bf4e2c051d84bb131ebb",
+  "retained_history": [
+    {
+      "stamp_ns": 1627785261470954240,
+      "frame": 2,
+      "voxels": 4834,
+      "points": 49126,
+      "delta_to_qstart_ns": -36967360
+    },
+    {
+      "stamp_ns": 1627785263142319872,
+      "frame": 27,
+      "voxels": 8149,
+      "points": 151948,
+      "delta_to_qstart_ns": 1634398272
+    }
+  ],
+  "time_eligible_history": [
+    {
+      "stamp_ns": 1627785261470954240,
+      "frame": 2,
+      "voxels": 4834,
+      "points": 49126,
+      "delta_to_qstart_ns": -36967360
+    }
+  ],
+  "actual_restore": {
+    "stamp_ns": 1627785264873980928,
+    "frame": 53,
+    "delta_to_qstart_ns": 3366059328,
+    "status": "LATE_AFTER_BOUNDARY",
+    "repair_applied": 0,
+    "replay_within_end": 0,
+    "replay_suffix": 0
+  },
+  "paired": 341,
+  "gate": {
+    "accepted": 0,
+    "rejected": 1,
+    "errored": 0,
+    "modes": [
+      "MODE3_SOFT_BRIDGE_WAIT"
+    ],
+    "committed_key_total": 0,
+    "deferred_key_total": 0
+  },
+  "final_state": "HEALTHY",
+  "unresolved_segments": 1,
+  "restore_disposition": {
+    "scope": "STATE_AND_MAP_ROLLBACK_ONLY",
+    "checkpoint_stamp_ns": 1627785261674491405,
+    "decision_ts_ns": 1627785270068720341,
+    "interval_ns": [
+      1627785261674491405,
+      1627785270068720341
+    ],
+    "consumed_input_in_interval": "NOT_REPLAYED",
+    "subsequent_input": "CONTINUES_FROM_RESTORED_STATE",
+    "catch_up": "NOT_IMPLEMENTED"
+  },
+  "archive_runtime_recovery_node": {
+    "wall_sec": 112.805,
+    "pid": 564385,
+    "pgid": 564381,
+    "peak_rss_kb": 1039732,
+    "pose_messages": 514,
+    "scan_messages": 598,
+    "callback_errors": [],
+    "callback_error_count": 0
+  },
+  "external_rss_samples": {
+    "rows": 57,
+    "peak_value_kb_as_reported": 7136584,
+    "pid_sampling_command": "NOT_ARCHIVED in launch_pair.sh; do not conflate with summary runtime pid"
+  },
+  "history_bytes_ack_estimate_min_max": [
+    0,
+    235760928
+  ],
+  "history_bytes_scope": "retained old entries only, points*32+voxels*96; excludes active checkpoint and explicit node allocations/caches/allocator",
+  "pose_rows": 515,
+  "last_pose_record": [
+    "1627785299.892213",
+    "-714.516916",
+    "-121.906451",
+    "-3697.289494",
+    "0.353334",
+    "0.147789",
+    "-0.444098",
+    "0.809994"
+  ],
+  "source_sha256": {
+    "src_LIVMapper.cpp": "a497c1953a12e3b98bb895cd5ee3b50e245bd1299bb90edf3c78965a562a2a2a",
+    "src_voxel_map.cpp": "b9e52c940a30ff9e54abec0e37d28d73b5997fd661ad9e76be42f17605be1c05",
+    "include_LIVMapper.h": "4e07ec5caf15986d591c39f7f0194d13ba2b6cffb07b840fbd7e2fbc7db6e7a3",
+    "include_common_lib.h": "453285d9d49cdd95da3151f0125015f38014002ce3684622125658f8434fa249",
+    "include_voxel_map.h": "1059f02c071adf64cfdafc939173a1d69c25bac705e09ad1921d86450c0715b6"
+  },
+  "restore_function_unchanged": true,
+  "history_struct": "struct CpHistoryEntry\n{\n  StatesGroup state;\n  StatesGroup propagat;\n  std::unordered_map<VOXEL_LOCATION, VoxelOctoTree *> map;\n  double stamp = -1.0;\n  int frame = 0;\n  size_t voxels = 0, nodes = 0, points = 0;\n};\n",
+  "history_complete_checkpoint": "NOT_IMPLEMENTED: old entry omits matching IMU continuation state/cache fields; no history restore selection executed",
+  "probe_archives": {
+    "v9": {
+      "results": [
+        "FAIL died rc=139 after ~12s",
+        "FAIL died rc=139 after ~2s",
+        "FAIL died rc=139 after ~2s",
+        "FAIL died rc=139 after ~2s",
+        "PASS alive 25s"
+      ],
+      "counts": {
+        "FAIL": 4,
+        "PASS": 1
+      }
+    },
+    "v9b": {
+      "results": [
+        "FAIL died rc=139 after ~12s",
+        "FAIL died rc=139 after ~2s",
+        "FAIL died rc=139 after ~3s",
+        "FAIL died rc=139 after ~3s",
+        "FAIL died rc=139 after ~2s"
+      ],
+      "counts": {
+        "FAIL": 5
+      }
+    },
+    "v9c": {
+      "results": [
+        "PASS alive 25s",
+        "PASS alive 25s",
+        "PASS alive 25s",
+        "PASS alive 25s",
+        "PASS alive 25s"
+      ],
+      "counts": {
+        "PASS": 5
+      }
+    }
+  },
+  "build_scope": "laser_mapping target built, aggregate make failed",
+  "runtime_library_sha256": "18e039e16b3aab6ef1ccea7fd8b420568c9e5c4afd046bd3811b5c4271683d9d",
+  "full_208_tests_or_native_run_executed_locally": false,
+  "no_parameters_ALI_or_production_code_changed": true
+}

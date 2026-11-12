@@ -689,3 +689,11 @@ cp ACK可核：ep0/1晚qstart3.900276288/3.833658888s，ep3早8.695748613s；早
 checkpoint晚ACK/合法前组/online qstart边界有限控制通过，关闭旧记录两缺陷；新run125406实际driver SHA绑定de4360b、544paired/0接纳4拒，四有效ACK中三cp晚qstart3.767115328/3.833355876/4.233352959s，一份早4.839131621s，不支持范围真实可核。878新增support只是summary，不阻止晚restore，也不假称旧run已输出新字段。新普通反例复用115734Z真实FAIL restore valid0/stamp−1000000000，4b finalizer误写AT_OR_BEFORE/WITHIN；本机控制实复现，最低S1先核action失败/有效cp再比较边界，不扩异常矩阵、不据此称本次四valid1负结果失效或实际错接纳。
 
 下一单一合法时间/完整状态capture→物理一致测量修复→native重处理→全部后继归宿；S1唯一集成/S2宿主/S3研究，C′仅开发安排保留K+报告、选择恢复本次未实现，无新run不预测覆盖或成功，不将“明天”安排当用户延期15h。Codex仓库推荐非本session已验证用户选B/C或新增人员前置；现授权内材料核查/声明注入离线评价继续、校准与标签两缺项未解，不停未阻主线/恢复手调。A1/A2/A11来源局部推进、A4/B2负边界明确非闭合，A3/B3/B4/B11未新增性能或净收益；不全表评分。四Cron单owner，两个reader exit0为归档核验/反例成功非目标全PASS，中文review SSH白名单发布，不算法ROS/main历史冻结门/private/开发日报。
+
+## 86. c915197：C′保留历史时间候选已实证，完整旧状态与重放历史仍待交
+
+[增量核验](review_20261112_c915197/README.md)固定21:25 fetch主线c915197、归档online-v2 99bfe1e。新summary无meta表达式控制关闭未决段AttributeError，208全测试未本机跑/130945Z失败档未交，源保障非恢复结果。K3真实131213Z归档五SHA一致/库18e039e1/无scripted旧检测器on，341paired、0接纳1拒绝；hist frame2实际早qstart36.967360ms而非COLLAB早3.68s，frame27晚1.634398272s。实际restore仍frame53晚3.366059328s、修复应用0/replay0、终HEALTHY但未决1/catchup未实现；时间候选保留局部推进非已合法恢复/覆盖率。
+
+v9源码只将旧state/propagat/map及计数move进history，缺所选时刻IMU延续字段，snapshot仍清replay_buffer；restore函数与v8一致不选历史。最低S1/S2沿现API保配套完整状态和可重放区间、无历史显式拒绝，再实交恢复→物理修复→native状态map→全部后继，不能只无限保留/报告；只启用历史恢复前须解除，不为现低风险半程扩通用防御。driver receipt7cfcccf7不等main c5efdd73且有限近20 refs未找到，首次reader断言exit1保来源缺口后完成有限核验，不冒此run是c915修后原生验证；最低补实际执行源码/diff不重跑。
+
+hist_bytes最大235760928为旧历史points*32+voxels*96估算，排除当前槽/节点等非全RSS；外部57行峰7136584KB缺采样PID命令，与summary recovery PID564385峰1039732KB分开。pose尾坐标异常只记录非GT/ATE，K1/K3干净比较与根因UNKNOWN。探针v9 4FAIL1PASS/v9b5FAIL/v9c5PASS仅存活25s，不能“任何布局变化必崩”或尾稳定；laser_mapping目标完成而总体make失败口径保。A4局部历史能力增加非完整cp，A3/B3/B4无效果新证据，不全表评分；S1唯一集成/S2宿主/S3研究/四Cron单owner，ALI校准标签未解、仓库推荐非用户新选择、参数停/科学门不降，不以开发“明天”延期15h。中文review SSH白名单，不算法ROS/main历史/private/日报。
