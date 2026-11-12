@@ -35,12 +35,20 @@ def parse_trace(path):
             f = line.split()
             if not f:
                 continue
-            if names is None or len(f) not in (92, 93):
+            if names is None:
                 malformed.append({"line": lineno, "ncols": len(f)})
                 continue
-            # Read scalars by NAME, not by position: n_scans was inserted at column 7 in v8.
+            # Read scalars by NAME; v8 inserted n_scans, v10 appends 7 post-pose scalars.
             col = {name: i for i, name in enumerate(names)}
             vec_start = names.index("r_chi2w") + 1
+            block_end = vec_start + 78
+            tail_names = (names[names.index("Ppost6x6") + 1:]
+                          if "Ppost6x6" in names else [])
+            if len(f) not in (block_end, block_end + len(tail_names)):
+                malformed.append({"line": lineno, "ncols": len(f)})
+                continue
+            pose = ({name: float(f[block_end + i]) for i, name in enumerate(tail_names)}
+                    if len(f) == block_end + len(tail_names) and tail_names else None)
             rows.append({
                 "idx": int(f[col["idx"]]), "rel_s": float(f[col["rel_s"]]),
                 "abs_ns": int(f[col["abs_ns"]]), "grp_idx": int(f[col["grp_idx"]]),
@@ -48,6 +56,7 @@ def parse_trace(path):
                 "scan_last_ns": int(f[col["scan_last_ns"]]),
                 "n_scans": int(f[col["n_scans"]]) if "n_scans" in col else 1,
                 "has_out": int(f[col["has_out"]]), "phase": int(f[col["phase"]]),
+                "pose_tail": pose,
             })
     return {"rows": rows, "malformed": malformed, "has_n_scans": "n_scans" in (names or [])}
 
