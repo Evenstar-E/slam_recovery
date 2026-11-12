@@ -646,3 +646,20 @@ S3旁支接受62f294对fixed/own与坐标/精度控制的有限纠正，A/B旧�
 [原件核验](review_20261112_751a226/README.md)024337Z受控run有E1partial accepted/reprocess316group/set_state/resume，E2refused/restore/resume及E2关闭后28帧；25SHA一致、状态动作OK，接受局部原生接回/E2，不充actual修复（repair应用0/detection off/host_poses）。cp晚于边界/旧normal缺陷未修、人口计数端点明确，不新防御矩阵或全表评分。
 
 本增量发布早于用户明确四宿主优先，不称其为MM-LINS/FAST-LIO2/LIO-SAM/ORB本批交付；下一仍先各实际一次E1→继续输入→E2尾段，S1/S2逐项自检状态/实际命令原件/具体BLOCKED或NOT_STARTED原因，不等LIVO修完、不起新LIVO轮次、不等S3门研究。当前远端接收/执行UNCONFIRMED，本机仅Git原件核验无host/bag/tests，独立review本地提交、push拒绝未解除不重试/绕过，private保护。
+
+## 64. 接收最新审阅：四宿主第二事件优先；实际环境清点与分工
+
+审阅 `0ee5f3f`/`6e959e9`/`1f1527b` 已合入 main（`0e23548`）。任务
+`docs/NON_FASTLIVO2_SECOND_EVENT_TASK_20261112.md`：先各跑一次 MM-LINS、FAST-LIO2、LIO-SAM、ORB-SLAM3
+的第二事件，再回 FAST-LIVO2。以下为 S1 本机实际清点，不是任务发布。
+
+| 宿主 | 本机实际资产（已核实） | 已知缺口 |
+|---|---|---|
+| MM-LINS/SC-PGO | `~/mmlins_ws` 已构建（`aloam_velodyne/alaser{Mapping,Odometry,PGO}`、`fast_lio/fastlio_mapping`）；`~/run_mmlins.sh` 一键脚本；`~/datasets/mmlins/campus_*(.bag)` | 无两事件触发接口；E1/E2 只能按声明时间窗观察宿主自身行为 |
+| FAST-LIO2 | 无独立工作区；仅 `~/MM-LINS/FAST-LIO` 源码 + `mmlins_ws` 内 `fastlio_mapping` | 与 MM-LINS 前端**同源同二进制**，必须标 `SHARED_EXECUTION`；独立构建尚未验证 |
+| LIO-SAM | `~/catkin_ws/devel/lib/lio_sam/lio_sam_imageProjection` 已构建；`params_mmlins.yaml`（`velodyne_points`/`imu_raw`）；`hall_01.bag`（351 s，3511 云帧）、`campus_1(2)-003.bag` | hall 需 remap `/camera/imu`→`imu_raw`；无 slam_recovery 接线 |
+| ORB-SLAM3 | `~/ORB_SLAM3/build/libORB_SLAM3.so`、`Examples/Monocular-Inertial/mono_inertial_tum_vi`；`~/orb_slam3_results` 有 hall_01 单目惯性 59 s 结果与 ROS 节点配置 | 已知反复 lost/重建；无 slam_recovery 接线 |
+
+分工（实际 owner，非"正在执行"）：**S2 先 MM-LINS、再 FAST-LIO2（SHARED_EXECUTION）；S1 先 LIO-SAM、再 ORB-SLAM3。**
+每项按任务 §4 交 PASS/FAIL/BLOCKED/NOT_STARTED + 实际命令/source/input/run/事件 stamp/原件/尾段。
+当前四项均为 **NOT_STARTED**（本行写于 11:4x，任务刚接收、尚未起进程）。
