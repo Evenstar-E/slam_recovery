@@ -709,3 +709,11 @@ hist_bytes最大235760928为旧历史points*32+voxels*96估算，排除当前槽
 [增量核验](review_20261113_e351a0b/README.md)固定2026-11-13 00:05 fetch主线e351a0b，实交be8b955/b4b7aad。exact_e补V⁻¹，复用Rz(.2)/t(.1)普通控制实际rho(.0996664442,−.01,0)与正确t2_input_check/解析期望一致，旧(.1,0,0)缺陷在本执行路径关闭。重算531行除i外字段与states未变、120块全UNKNOWN/实际tail47，四输入SHA绑定旧115734档，保存504诊断行norm/s中位和最大/energy p90内部复算一致；不完整T2 CLI/208 tests/宿主重跑。默认-I NumPy缺失后明确用既有site-packages、不安装，reader实际exit0。
 
 新meta vec6 NOT_VERIFIED/cov NOT_AVAILABLE收窄接受，公式数学正确不补采集最终solution前/同次pre-post/carryover/旧机械join缺项，I504非有效物理证据，误报漏检/正常代价与净收益NOT_EVALUABLE，无新native结果/成本独立测量。旧meta公式/pose CONFIRMED/表格tail51等集中文案，不让其覆盖机读限制、不为文案新矩阵。S3修正实交/S1集成确认，直接回真实运动资格和现材料正常标签；S1/S2唯一完整历史cp+IMU/capture→物理修复→native重处理→全部后继仍待后半，未阻工作继续/08:53窗不延期/noCodex/旧手调停门不降。A3/B3数学组件及A7支持局部解除非性能，A/B不全表评分，四Cron单owner，中文review SSH白名单，不算法ROS/main历史/private/开发日报。
+
+## 89. 66cc814：v10导出准备接受，100列消费者与同更新pre绑定尚未接通
+
+[增量核验](review_20261113_66cc814/README.md)固定00:25 fetch主线66cc814、online-v2 eb2630e。机读I资格INCOMPLETE/UNKNOWN与完整Jinv约定接受；保存数值行未变，按pose≥54s尾47、尾块成员51含4行早于54s，本机复算成立，旧两口径说明缺口解除不删人口。v10实际源码新增同行post xyz/quaternion和LIO-only pre/out，源顺序pre在StateEstimation前/out与trace在_state更新后，handler混写局部解除；五探针alive25s/库69dc8ac5一致，FAST-LIVO2两目标Built，不全workspace独立构建/尾稳定。新bag/100列实际数据/有效I与恢复结果未交。
+
+两个现reader仍只接受92/93或vec_start+78，普通声明100列行控制都0parsed/malformed100，最低S3/S1沿现schema接pose7及真实消费者，一个正常控制复用旧档，不只放行却继续旧外部pose；不阻旧数据/native其他工作。额外LIO文件只有rel_s且无idx/group/phase，空点早退仅pre，最低S2/S3将所用pre与trace已有key同更新绑定，可直接真实pre/post算残差、不强求final solution或反推vec。其他四源码与v9同，mixed body旋转/world平移未转换，新增body cov声明不能补Log残差Sigma；cov保持NOT_AVAILABLE/unit-only可继续，不把协方差列前置或改frame冒转换。v8 carryover单scan/post时间PASS子主张仍未实证，不靠总体资格收窄洗成独立I。
+
+唯一完整cp+IMU/capture→实际物理修复→native状态map→全部后继仍待后半，S1唯一集成/S2宿主/S3研究；v10开发准备和认领确认非新bag或效果，08:53窗不被“明天”安排延期，未阻工作继续/noCodex/旧手调停科学门不降。A1/A11/A3/B3取证准备与A2/A12档局部增加、不全表评分，reader-I exit0为有限核验及正常缺口复现非端到端PASS，四Cron单owner，中文review SSH白名单、不算法ROS/main历史/private/开发日报。
