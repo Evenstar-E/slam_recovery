@@ -68,15 +68,17 @@ def body_z_bias(frames, delta: np.ndarray) -> Tuple[float, int]:
     """Body-frame z component of a world-frame correction, one value per frame.
 
     The registration returns a world-frame translation `dt`. For a frame whose body-to-world
-    rotation is R, the same correction expressed in the body frame is R^T dt; its z component is
-    the part of the correction along the declared corruption direction, and it is also the value
-    to add to the body cloud's z to undo the bias. The median over frames is used because the
-    constant bias is the same in every frame while pose error is not.
+    rotation is R, the same correction expressed in the body frame is R^T dt. That is the
+    *correction*, i.e. minus the corruption; this function returns the corruption estimate (the
+    value that was injected), so the caller undoes it with `shift_z_cloud(msg, -bias)`. The sign
+    is fixed here rather than at the call site: an inverted sign would double the bias instead of
+    removing it. The median over frames is used because the constant bias is the same in every
+    frame while pose error is not.
     """
     vals = []
     for _kf, _ts, pose in frames:
         R = np.asarray(pose, dtype=np.float64)[:3, :3]
-        vals.append(float((R.T @ np.asarray(delta, dtype=np.float64)[:3, 3])[2]))
+        vals.append(-float((R.T @ np.asarray(delta, dtype=np.float64)[:3, 3])[2]))
     if not vals:
         return 0.0, 0
     return float(np.median(vals)), len(vals)

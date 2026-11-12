@@ -114,13 +114,15 @@ class CorruptRelayTest(unittest.TestCase):
 
 
 class BodyBiasTest(unittest.TestCase):
-    def test_identity_rotation_returns_the_translation_z(self):
+    def test_identity_rotation_returns_the_injected_bias_with_positive_sign(self):
+        # The registration correction for a +0.5 body-z corruption is -0.5; the estimate is the
+        # corruption (+0.5), so `shift_z_cloud(msg, -bias)` removes it. The sign is pinned here.
         T = np.eye(4)
         frames = [(1, 0, T)]
         bias, n = body_z_bias(frames, np.array([[1, 0, 0, 0], [0, 1, 0, 0],
                                                 [0, 0, 1, -0.5], [0, 0, 0, 1]]))
         self.assertEqual(n, 1)
-        self.assertAlmostEqual(bias, -0.5, places=9)
+        self.assertAlmostEqual(bias, 0.5, places=9)
 
     def test_rotation_is_undone_before_projecting(self):
         # A world correction that is the body-z bias rotated into world must project back to -0.5.
@@ -131,7 +133,7 @@ class BodyBiasTest(unittest.TestCase):
         delta = np.eye(4)
         delta[:3, 3] = R @ np.array([0.0, 0.0, -0.5])
         bias, _ = body_z_bias([(1, 0, T)], delta)
-        self.assertAlmostEqual(bias, -0.5, places=9)
+        self.assertAlmostEqual(bias, 0.5, places=9)
 
     def test_median_ignores_one_outlying_frame(self):
         delta = np.eye(4)
@@ -143,7 +145,7 @@ class BodyBiasTest(unittest.TestCase):
         frames.append((99, 0, T))
         bias, n = body_z_bias(frames, delta)
         self.assertEqual(n, 6)
-        self.assertAlmostEqual(bias, -0.5, places=9)
+        self.assertAlmostEqual(bias, 0.5, places=9)
 
 
 if __name__ == "__main__":
