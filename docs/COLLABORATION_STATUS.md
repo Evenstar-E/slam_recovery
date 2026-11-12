@@ -431,3 +431,29 @@ S3专用研究纠正这个小控制并保留缺candidate/独立质量BLOCKED；S
 | S2 归档 | `792d838`（合入 `10900c9`）：`deployed_host.diff` 对干净 `0d2c034` apply 成功，与本机宿主 `diff -r` **0 个已跟踪文件不同**；`SHA256SUMS` 26/26 OK；二进制/库/配置/launch/bag 与 receipt 逐位一致；157 测试通过 |
 | 新修缺口 | `resume` 原本只跟 `rearm`；Mode 2 完整接纳静默置 `HEALTHY`，宿主 `map_hold_` 不释放。已加 `commit_closed` 事件 + 驱动放写；test-first，全量 **160 通过**。**未在宿主上跑过接纳路径** |
 | 未闭合 | §57 LIO 逐帧耗时原始记录未归档（NOT_ARCHIVED）；在线链仍 BLOCKED 在上游检测；接纳路径需一次真实整链验证 |
+
+## 41. S2 触发锚改为绝对 pose 戳；仍未跑新的宿主运行
+
+以下为 S1 复核实测。
+
+| 项 | 实际状态 |
+|---|---|
+| S2 提交 | `55750fc`（S2 侧合 main 后 `b86b889`；S1 合入 main）：新增 `--scripted-trigger-stamps`（ns，首个 ≥ 戳的帧触发）与 `--confirmation-margin-sec` 透传；触发体抽成 `_trigger_segment_now`，两个锚走同一 manager 入口；receipt 记两种声明与 margin；全量 **161 测试通过** |
+| 动机 | 相对首配帧的秒数随启动/负载漂移约 0.2 s，而相邻扫描的门读数一个 3.14（可接受）、下一个 21.14（拒绝），声明 14.6 s 的两次运行并不测同一件事 |
+| 未做 | **没有新的宿主运行**（巡检时无 fastlivo/rosbag/recovery 进程，无新 receipt）；接纳路径的 `commit_closed→resume` 仍只有单测 |
+| S3 | `exp/gate-method-research@62f294b` 无新提交、工作树干净，待命 |
+
+## 42. 受控接纳 run 复核：门真过、宿主真放写；三处断点（串行化已修）
+
+以下为 S1 复核 S2 原始件（`docs/review_20261112_accepted_chain/`）的实测。
+
+| 项 | 实际状态 |
+|---|---|
+| 运行 | `fl_native_20261112T020634Z_4148249`，`CONTROLLED_INTERFACE_TEST`，宿主二进制未变（`0d7e23de…`）；绝对戳触发落在 kf 132 |
+| 门 | before 3.1388 → after 6.6937（≥6.2776），Wilson 0.9220，holdout 0.4421，Mode 2 accepted；committed kf 133–164（32 帧），deferred 95–132 + 165–179（71 帧） |
+| 宿主放写 | 末 ack `OK resume … hold=0 held_frames=104`；`host.log` 的 `Update Voxel Map`：hold 前 219、hold→resume 间 **0**、resume 后 **448**（本机独立计数，667 行总计） |
+| 断点 1 | `commit_closed` 结构性不可达：隔离段 population 含回滚帧 95–132（manager 触发时登记），驱动候选只从触发帧起，故任何候选都无法覆盖全段；本次经 wait 超时 + `rearm` 放写。**属协议选择，未动** |
+| 断点 2 | `reprocess` 从未执行：`decide()` 连发 reprocess→set_state，宿主 5 ms 轮询只读到后者；`host.log` 中 `[NATIVE_CHECKPOINT] reprocess` **0 行**，`restores=0`。**已修**：客户端串行化（`_outbox`，只有快照可被抢占），test-first 2 项在旧代码 FAIL，全量 164 通过 |
+| 断点 3 | 驱动记账卡死（队头 reprocess 永不被认领，`native_checkpoint.events` 停在 `hold`）——同一修复消除；本机复核 events 仅 11 条、末条 `hold` |
+| 未解释 | 宿主收尾时 `double free or corruption (out)` 一行，发生在前两次运行没有；未定位，已记录 |
+| 不能声称 | `commit_closed→resume` 走通、接纳后地图已被 reprocess 重建、驱动侧记录了 resume |

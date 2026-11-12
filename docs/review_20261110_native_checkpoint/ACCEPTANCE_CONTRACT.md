@@ -1,7 +1,7 @@
 # 验收契约（审阅点名的三项）
 
 本文只描述**现在代码里的实际契约**，并标出其中的缺口。§1/§3 的行号对应归档 run 的代码
-`exp/m0-updated` / HEAD `c2b193c`；§2.2 的修复合入后在 main。
+`exp/m0-updated` / HEAD `c2b193c`；§1.1 串行化与 §2.2 的修复合入后在 main。
 
 ---
 
@@ -15,10 +15,14 @@
 - ack 用**命令名**校验：`_read_ack_for`（:635）要求 `ack` 的第二个 token 等于当前命令名，
   否则返回空。迟到的 `hold` ack 不会被当成 `restore` 的 ack——旧问题（迟到 ack 撞上新命令、
   同一条被记两次成功）由这一处关掉。
-- 写新命令前先 `expire_pending(0.0)`（:735）：仍有 pending 的旧快照被记为
-  `superseded`，从 pending 移除，不阻塞新命令；`superseded` 不计失败。
-- 驱动主循环在 `service()` 里 `if self.cp.pending(): return None`（:1323-1325）：
-  有命令在飞时不产生新候选，决策不会跑在"宿主还没应用上一条命令"的状态上。
+- 第二条命令不再覆盖 `cmd` 文件：`_write` 在 `_pending` 非空时把命令放进 `_outbox`，
+  只有前一条被 ack（或快照被 supersede）后才由 `_flush_outbox()` 写出（2026-11-12 修复）。
+  唯一允许抢占的是**只读快照**：`hold`/`restore`/`reprocess`/`set_state`/`resume` 都不会
+  覆盖一条尚未应答的状态命令。修复前 `decide()` 在同一毫秒内连发 `reprocess` + `set_state`，
+  宿主 5 ms 轮询只读到后者：受控接纳 run 的 `host.log` 里 `[NATIVE_CHECKPOINT] reprocess`
+  0 行，终 ack 是 `set_state`（见 `docs/review_20261112_accepted_chain/`）。
+- 驱动主循环在 `service()` 里 `if self.cp.pending(): return None`：`pending()` 现在把
+  `_outbox` 也算作未完成，有命令在飞**或排队**时都不产生新候选。
 
 ### 1.2 宿主侧（`src/LIVMapper.cpp`）
 
@@ -29,11 +33,12 @@
 
 ### 1.3 已知限制（如实写）
 
-ack 的令牌是**命令名，不是序号**。同名命令连续出现时（`snapshot` → `snapshot`），
-一个迟到的旧 ack 在理论上会被下一条同名命令认领。本趟 37 条快照里有 7 条超时，
-这个歧义只影响**快照的计时/计数归属**，不影响决策：快照是只读命令，不改变宿主状态与地图，
-也不参与 hold/restore/resume 链路。`hold/restore/resume/status/set_state` 名称互不相同，
-不存在这个歧义。
+ack 的令牌是**命令名，不是序号**。串行化之后同一时刻只可能有一条命令在飞，同名歧义需要
+"上一条同名命令超时后仍未应答、下一条同名命令又已写出"才成立；`snapshot` 之外不会被
+supersede，`tick()` 也不会在 `pending()` 为真时另发快照，因此实际路径上不再出现。
+超时的状态命令（`restore`/`reprocess`/`set_state`/`resume`）目前**没有超时处理**：
+队头不回 ack 会一直阻塞后续命令与决策——这是有意的"不猜"，但宿主若卡死，驱动侧只会表现为
+不再前进；判据是 `native_checkpoint.events` 长时间没有新行。
 
 ---
 
