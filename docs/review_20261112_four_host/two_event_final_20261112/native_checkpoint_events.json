@@ -1,0 +1,148 @@
+[
+ {
+  "command": "hold",
+  "wall": 1794470963.063,
+  "received_wall": 1794470976.530894,
+  "received_s": 13.468,
+  "ok": true,
+  "ack": "OK hold deferred stamp=1627785276215170145",
+  "ack_wall": 1794470976.657
+ },
+ {
+  "command": "snapshot",
+  "wall": 1794470976.657,
+  "sent_wall": 1794470963.063,
+  "received_wall": 1794470976.658823,
+  "received_s": 0.002,
+  "ok": true,
+  "ack": "OK snapshot deferred stamp=1627785276215170145",
+  "ack_wall": 1794470977.157
+ },
+ {
+  "command": "hold",
+  "wall": 1794470977.157,
+  "received_wall": 1794470977.158464,
+  "received_s": 0.001,
+  "ok": true,
+  "ack": "OK hold deferred stamp=1627785306371636152",
+  "ack_wall": 1794470977.657
+ },
+ {
+  "command": "snapshot",
+  "wall": 1794470977.657,
+  "sent_wall": 1794470963.063,
+  "received_wall": 1794470977.660258,
+  "received_s": 0.003,
+  "ok": true,
+  "ack": "OK snapshot deferred stamp=1627785306371636152",
+  "ack_wall": 1794470978.157
+ },
+ {
+  "command": "hold",
+  "wall": 1794470998.91,
+  "received_wall": 1794470998.911216,
+  "received_s": 0.001,
+  "ok": true,
+  "ack": "OK hold valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15901 nodes=33661 points=308669 restores=0 live_voxels=15901 live_points=308669 state_pos=6.867731,4.690821,-0.304006 hold=1 held_frames=22 held_points=95016 hold_commands=2 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=172 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+  "ack_wall": 1794470999.157
+ },
+ {
+  "command": "status",
+  "wall": 1794471008.255,
+  "received_wall": 1794471008.255578,
+  "received_s": 0.001,
+  "ok": true,
+  "ack": "OK status valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15901 nodes=33661 points=308669 restores=0 live_voxels=15901 live_points=308669 state_pos=12.038027,63.847470,-31.402991 hold=1 held_frames=202 held_points=604755 hold_commands=2 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=317 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+  "ack_wall": 1794471008.265
+ },
+ {
+  "command": "status",
+  "wall": 1794471008.278,
+  "received_wall": 1794471008.255578,
+  "received_s": -0.022,
+  "ok": true,
+  "ack": "OK status valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15901 nodes=33661 points=308669 restores=0 live_voxels=15901 live_points=308669 state_pos=12.038027,63.847470,-31.402991 hold=1 held_frames=202 held_points=604755 hold_commands=2 repair_received=10 repair_applied=0 repair_dropped=0 repair_queued=10 multi_scan_groups=0 merged_scans=317 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+  "ack_wall": 1794471008.288
+ },
+ {
+  "command": "status",
+  "wall": 1794471008.3,
+  "received_wall": 1794471008.281015,
+  "received_s": -0.019,
+  "ok": true,
+  "ack": "OK status valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15901 nodes=33661 points=308669 restores=0 live_voxels=15901 live_points=308669 state_pos=12.232708,65.697487,-32.347474 hold=1 held_frames=202 held_points=604755 hold_commands=2 repair_received=10 repair_applied=0 repair_dropped=0 repair_queued=10 multi_scan_groups=0 merged_scans=318 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+  "ack_wall": 1794471008.31
+ },
+ {
+  "command": "status",
+  "wall": 1794471008.37,
+  "received_wall": 1794471008.301433,
+  "received_s": -0.069,
+  "ok": true,
+  "ack": "OK status valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15901 nodes=33661 points=308669 restores=0 live_voxels=15901 live_points=308669 state_pos=12.431527,67.578255,-33.308067 hold=1 held_frames=203 held_points=608397 hold_commands=2 repair_received=20 repair_applied=0 repair_dropped=0 repair_queued=20 multi_scan_groups=0 merged_scans=319 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+  "ack_wall": 1794471008.381
+ },
+ {
+  "command": "status",
+  "wall": 1794471008.392,
+  "received_wall": 1794471008.37244,
+  "received_s": -0.02,
+  "ok": true,
+  "ack": "OK status valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15901 nodes=33661 points=308669 restores=0 live_voxels=15901 live_points=308669 state_pos=12.431527,67.578255,-33.308067 hold=1 held_frames=203 held_points=608397 hold_commands=2 repair_received=23 repair_applied=0 repair_dropped=0 repair_queued=23 multi_scan_groups=0 merged_scans=319 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+  "ack_wall": 1794471008.402
+ },
+ {
+  "command": "status",
+  "wall": 1794471008.412,
+  "received_wall": 1794471008.392863,
+  "received_s": -0.019,
+  "ok": true,
+  "ack": "OK status valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15901 nodes=33661 points=308669 restores=0 live_voxels=15901 live_points=308669 state_pos=12.431527,67.578255,-33.308067 hold=1 held_frames=203 held_points=608397 hold_commands=2 repair_received=23 repair_applied=0 repair_dropped=0 repair_queued=23 multi_scan_groups=0 merged_scans=319 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+  "ack_wall": 1794471008.422
+ },
+ {
+  "command": "reprocess",
+  "wall": 1794471008.433,
+  "ok": true,
+  "ack": "OK reprocess valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15901 nodes=33661 points=308669 restores=1 live_voxels=21578 live_points=403642 state_pos=4.646801,5.820433,-0.402764 hold=1 held_frames=204 held_points=612032 hold_commands=2 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=319 set_state=0 repair_merged_away=0 replay_within_end=124 replay_suffix=379 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+  "ack_wall": 1794471013.49
+ },
+ {
+  "command": "resume",
+  "wall": 1794471013.49,
+  "trigger": "rearm",
+  "received_wall": 1794471013.490752,
+  "received_s": 0.001,
+  "ok": true,
+  "ack": "OK resume valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15901 nodes=33661 points=308669 restores=1 live_voxels=21578 live_points=403642 state_pos=4.646801,5.820433,-0.402764 hold=0 held_frames=204 held_points=612032 hold_commands=3 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=319 set_state=0 repair_merged_away=0 replay_within_end=124 replay_suffix=379 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+  "ack_wall": 1794471013.991
+ },
+ {
+  "command": "hold",
+  "wall": 1794471039.327,
+  "received_wall": 1794471039.330776,
+  "received_s": 0.004,
+  "ok": true,
+  "ack": "OK hold valid=1 stamp_ns=1627785306303834368 frame=815 voxels=30980 nodes=74725 points=673158 restores=1 live_voxels=30980 live_points=673158 state_pos=0.191157,1.569692,0.010703 hold=1 held_frames=238 held_points=1027644 hold_commands=5 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=475 set_state=0 repair_merged_away=0 replay_within_end=124 replay_suffix=379 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+  "ack_wall": 1794471039.775
+ },
+ {
+  "command": "restore",
+  "wall": 1794471046.709,
+  "received_wall": 1794471046.710617,
+  "received_s": 0.002,
+  "ok": true,
+  "ack": "OK restore valid=1 stamp_ns=1627785306303834368 frame=815 voxels=30980 nodes=74725 points=673158 restores=2 live_voxels=30980 live_points=673158 state_pos=0.207231,1.545243,0.021464 hold=1 held_frames=325 held_points=2206829 hold_commands=5 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=532 set_state=0 repair_merged_away=0 replay_within_end=124 replay_suffix=379 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+  "ack_wall": 1794471047.209
+ },
+ {
+  "command": "resume",
+  "wall": 1794471049.712,
+  "trigger": "rearm",
+  "received_wall": 1794471049.715574,
+  "received_s": 0.004,
+  "ok": true,
+  "ack": "OK resume valid=1 stamp_ns=1627785306303834368 frame=815 voxels=30980 nodes=74725 points=673158 restores=2 live_voxels=30980 live_points=673158 state_pos=2.871945,1.656172,-0.482195 hold=0 held_frames=356 held_points=2731802 hold_commands=6 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=553 set_state=0 repair_merged_away=0 replay_within_end=124 replay_suffix=379 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+  "ack_wall": 1794471050.242
+ }
+]
