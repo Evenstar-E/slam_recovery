@@ -1979,3 +1979,18 @@ S1 已更正 `e_I ≈ −vec6` 只在小增量成立（本批 |e| 最大 1.545�
 - 多对一结构：590 个不同 `scan_last` 中 295 个由 2 个 `grp_idx` 共享；trace 每组行数 1:217/2:276/4:37，availability 1:296/2:117。
 - 结论不变：M 444、T 86、I 504（秩 6）、120 块全 UNKNOWN、51 尾段行单列、分类/错误率 `NOT_EVALUABLE`。
 - 待 S2 确认：`M2DGR_room_02.txt` 是否为 `state_` 的 post 位姿、且与 trace `abs_ns` 同帧（S3 按顺序对齐）。
+
+## 138. `M2DGR_room_02.txt` 语义已确认（P⁺、LIO 路径、同帧）；trace 分支已推送
+
+S2 回答、S1 核源码（`LIVMapper.cpp:603` 的 `pose_output_en` 块位于 `StateEstimation` 之后，写 `last_lio_update_time`
++ `_state.pos_end` + `_state.rot_end` 四元数，只有 LIO 路径写）：
+
+- `host_logs/M2DGR_room_02.txt` = **P⁺（更新后）位姿**，body→world，列 `abs_time_s x y z qx qy qz qw`；
+  与 trace 的 `abs_ns` 同源同帧，实测时间差 ≤512 ns（double 秒量化/ulp，不是漂移）。
+- 与 `Log/pcd/lidar_poses.txt` 不是同一份（后者用 `measures.back().lio_time`、仅 `pcd_save_en` 时写）；pre 位姿在
+  `mat_pre.txt`（含 VIO/LIO 双写，handler 不可区分）。
+- 对应规则：**按时间 join，不按行序**；只对 `has_out=1` 的行用 `P⁻/P⁺/vec`（`121127Z` 有 5 个戳在 pose 有、
+  trace `has_out=0`）；replay 也写进两份文件，用 `phase` 区分。
+
+S3 因此可解除 `PENDING_POSE_SOURCE_CONFIRMATION`，但须按上述三点重算。归档推送：`exp/trace-cov` → `290aae8`
+（含 BUILD.md 的 `scan_first` 哨兵与截断行说明），`exp/online-trace` 远端 `e991eaf`；`.git/config` 无 token。
