@@ -1,0 +1,51 @@
+{
+  "main": "4b5e63cbdba6b8e936a5d3b13fa6770c2d212424",
+  "archive": "553e2b8b74f11ab675b3f0afc5d5565498268c99",
+  "old_archive": "290aae8441fedc24dfbf316b8150880b63fae0b1",
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261112_4b5e63c/provenance_checks.py",
+  "old_summary_sha256": "2c3db8eab7bb3f6324a3e3fd952fdbc14f6225f69ee2838e0783f18cb8620962",
+  "scripted_boundary_control": {
+    "status": "PASS_LOCAL",
+    "checkpoint_check": {
+      "boundary_stamp_ns": 980,
+      "actual_stamp_ns": 975,
+      "actual_frame": 1,
+      "status": "AT_OR_BEFORE_BOUNDARY",
+      "rollback_support": "WITHIN_DECLARED_BOUNDARY"
+    }
+  },
+  "archived_failed_restore_metadata_control": {
+    "status": "FAIL_REPRODUCED",
+    "source_episode": 0,
+    "original_action": {
+      "command": "restore",
+      "wall": 1794484692.196,
+      "received_wall": 1794484692.199353,
+      "received_s": 0.003,
+      "ok": false,
+      "ack": "FAIL restore valid=0 stamp_ns=-1000000000 frame=0 voxels=0 nodes=0 points=0 restores=0 live_voxels=10869 live_points=200811 state_pos=4.817617,2.223225,0.027650 hold=1 held_frames=95 held_points=1568369 hold_commands=1 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=111 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+      "ack_wall": 1794484692.698
+    },
+    "checkpoint_check": {
+      "boundary_stamp_ns": 1627785261507921600,
+      "actual_stamp_ns": -1000000000,
+      "actual_frame": 0,
+      "status": "AT_OR_BEFORE_BOUNDARY",
+      "rollback_support": "WITHIN_DECLARED_BOUNDARY"
+    },
+    "scope": "Apply reviewed main metadata methods to previously archived ordinary failed restore, not a new native run"
+  },
+  "v8_source_and_build_sha256": {
+    "src_LIVMapper.cpp.v8": "868d4d69b6f37e183813e8aad59daf1e251596cbbb291642a678ea36d5da058e",
+    "src_voxel_map.cpp.v8": "b9e52c940a30ff9e54abec0e37d28d73b5997fd661ad9e76be42f17605be1c05",
+    "include_common_lib.h.v8": "453285d9d49cdd95da3151f0125015f38014002ce3684622125658f8434fa249",
+    "include_LIVMapper.h.v8": "80deeb01fa84a9aba682c52abb2db1734fd1edb69bcadade95e8170ac39c74c2",
+    "include_voxel_map.h.v8": "1059f02c071adf64cfdafc939173a1d69c25bac705e09ad1921d86450c0715b6",
+    "host_build_v8.log": "78fae0ca38dc639f672c519c5b1bdaea5bb34f335431ea979b37fda59adf273f",
+    "v8_sha.txt": "4242dfb14243e2aa17d11d1e8466e68fa056a36f4c3e6ea08a24d83d2f90071e"
+  },
+  "v8_library_declared_hash_matches_run_receipt": true,
+  "v8_build_status": "laser_mapping target built; aggregate make failed at test_vk_common_patch_score CXXABI symbol",
+  "source_to_executed_binary_independent_rebuild": "NOT_EXECUTED",
+  "native_execution": false
+}

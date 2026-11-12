@@ -681,3 +681,19 @@ cp ACK可核：ep0/1晚qstart3.900276288/3.833658888s，ep3早8.695748613s；早
 新T2实现/t2_join531行/summary来源SHA已上传并绑定实际档，旧仅回报缺口解除，join HEURISTIC_UNPROVEN/cov NOT_AVAILABLE/s诊断诚实收窄；保存120块60s全UNKNOWN=54+6，尾行实际47非COLLAB51，非效果/正常真值/独立成本。新active segment_id控制无段/换段skip、同段继续，原生修后未跑，skip仍未判不计安全拒绝。新exact_e执行路径漏Jinv平移，即使vec/post理想对应，.2rad/.1m实际(.1,0,0)非rho(.0996664,-.01,0)，正常控制已复现；最低复用t2_input_check已修公式及一个旧控制，不重新造/调门。host vec在最终solution前采集，配最终post不源码保证精确差，最终v7u绑定/重复时间phase关系待核，不能2µs/顺序自证；仅阻相应I资格/数值结论不挡工程。
 
 下一唯一合法纯在线回退→物理一致实际修复→native状态map→全部后继闭合，S1已实交driver集成、S2真实run、S3T2原件认领确认，新最小解除认领/部署回执待后继。校准与标签两缺项待实际用户GitHub确认、不代选C/重复既有注入授权，不停未阻工作；四Cron/noCodex/完整人口风险UNKNOWN自检。新增残差反例与T2实交和2h总结合一个中文review SSH记录，无重复总结/原件/算法ROS/main历史门/private/日报。
+
+## 85. 4b5e63c：v8来源推进与在线三晚负结果，失败ACK资格须最小修正
+
+[增量核验](review_20261112_4b5e63c/README.md)固定21:08 fetch主线4b5e63c、online-trace553e2b8和online-v2 8ca5575。v8完整五源码/构建/库声明已到，实际run124217 trace736全93列/phase0/has_out669，availability444=88A356U；四输入SHA与保存结果一致，真实first/last+n_scans增加header关联证据，512ns候选217行一组/227行两组，覆盖49.11162591s非全60s。不机械沿旧全−1、不把v8资格搬v7；carryover cur/next与仅新raw时更新成员字段，n_scans1尚不证明完整点云单source或唯一post，v8 vec仍在最终solution前保存，旧exact_e缺Jinv未修，最低现source→update→pre/post阶段对应并复用正确Log，缺项UNKNOWN/cov不可用，仅阻受影响I评价。laser_mapping目标构建完成但整体make测试链接CXXABI失败，库声明SHA与run一致、独立重建未执行，不报全构建通过。
+
+checkpoint晚ACK/合法前组/online qstart边界有限控制通过，关闭旧记录两缺陷；新run125406实际driver SHA绑定de4360b、544paired/0接纳4拒，四有效ACK中三cp晚qstart3.767115328/3.833355876/4.233352959s，一份早4.839131621s，不支持范围真实可核。878新增support只是summary，不阻止晚restore，也不假称旧run已输出新字段。新普通反例复用115734Z真实FAIL restore valid0/stamp−1000000000，4b finalizer误写AT_OR_BEFORE/WITHIN；本机控制实复现，最低S1先核action失败/有效cp再比较边界，不扩异常矩阵、不据此称本次四valid1负结果失效或实际错接纳。
+
+下一单一合法时间/完整状态capture→物理一致测量修复→native重处理→全部后继归宿；S1唯一集成/S2宿主/S3研究，C′仅开发安排保留K+报告、选择恢复本次未实现，无新run不预测覆盖或成功，不将“明天”安排当用户延期15h。Codex仓库推荐非本session已验证用户选B/C或新增人员前置；现授权内材料核查/声明注入离线评价继续、校准与标签两缺项未解，不停未阻主线/恢复手调。A1/A2/A11来源局部推进、A4/B2负边界明确非闭合，A3/B3/B4/B11未新增性能或净收益；不全表评分。四Cron单owner，两个reader exit0为归档核验/反例成功非目标全PASS，中文review SSH白名单发布，不算法ROS/main历史冻结门/private/开发日报。
+
+## 86. c915197：C′保留历史时间候选已实证，完整旧状态与重放历史仍待交
+
+[增量核验](review_20261112_c915197/README.md)固定21:25 fetch主线c915197、归档online-v2 99bfe1e。新summary无meta表达式控制关闭未决段AttributeError，208全测试未本机跑/130945Z失败档未交，源保障非恢复结果。K3真实131213Z归档五SHA一致/库18e039e1/无scripted旧检测器on，341paired、0接纳1拒绝；hist frame2实际早qstart36.967360ms而非COLLAB早3.68s，frame27晚1.634398272s。实际restore仍frame53晚3.366059328s、修复应用0/replay0、终HEALTHY但未决1/catchup未实现；时间候选保留局部推进非已合法恢复/覆盖率。
+
+v9源码只将旧state/propagat/map及计数move进history，缺所选时刻IMU延续字段，snapshot仍清replay_buffer；restore函数与v8一致不选历史。最低S1/S2沿现API保配套完整状态和可重放区间、无历史显式拒绝，再实交恢复→物理修复→native状态map→全部后继，不能只无限保留/报告；只启用历史恢复前须解除，不为现低风险半程扩通用防御。driver receipt7cfcccf7不等main c5efdd73且有限近20 refs未找到，首次reader断言exit1保来源缺口后完成有限核验，不冒此run是c915修后原生验证；最低补实际执行源码/diff不重跑。
+
+hist_bytes最大235760928为旧历史points*32+voxels*96估算，排除当前槽/节点等非全RSS；外部57行峰7136584KB缺采样PID命令，与summary recovery PID564385峰1039732KB分开。pose尾坐标异常只记录非GT/ATE，K1/K3干净比较与根因UNKNOWN。探针v9 4FAIL1PASS/v9b5FAIL/v9c5PASS仅存活25s，不能“任何布局变化必崩”或尾稳定；laser_mapping目标完成而总体make失败口径保。A4局部历史能力增加非完整cp，A3/B3/B4无效果新证据，不全表评分；S1唯一集成/S2宿主/S3研究/四Cron单owner，ALI校准标签未解、仓库推荐非用户新选择、参数停/科学门不降，不以开发“明天”延期15h。中文review SSH白名单，不算法ROS/main历史/private/日报。
