@@ -1,0 +1,80 @@
+{
+  "target": "70f68fbc3450569677659e8220d34fa2e3abaa4b",
+  "comparison_base": "ebf76f59993d9d2b965f0d8e29f9a6cb0d237296",
+  "worktree_head": "305820052f8d34bf6b2f7d833d6ee74d400cc4c4",
+  "source_loading": "Target Git blobs executed in memory; other tracked package dependencies unchanged",
+  "loaded_sources": {
+    "slam_recovery/quarantine/manager.py": {
+      "git_blob": "8c8e6e12f5ef29c64bca339858e3f709cca3a6b5",
+      "sha256": "6a6ddf4324065de72693e39fcca86784b455ae8f353fa4a2f4cc5c06a262d583"
+    },
+    "slam_recovery/ros/recovery_node.py": {
+      "git_blob": "b988ae55abdffab613da81b679c25e9f7bc1e523",
+      "sha256": "fa3474edccdc56418cead767c37477399060ea3faada18e8a1e2c5094be07e7a"
+    },
+    "slam_recovery/tests/test_lifecycle_rearm.py": {
+      "git_blob": "911aa20638daf00986f46caceb56589fc001b564",
+      "sha256": "d331d6157ca51161fc1be85bdbacef173a3c009844d38366ce13c1668f2624c2"
+    }
+  },
+  "selected_tests": {
+    "status": "PASS_LOCAL",
+    "count": 2
+  },
+  "accepted_native_order": {
+    "status": "FAIL_REPRODUCED_LOCAL",
+    "pending_at_decision": [
+      "reprocess",
+      "set_state"
+    ],
+    "command_at_decision": "set_state",
+    "state_payload_x": 20.0,
+    "trusted_repaired_tail_x": 2.0,
+    "pending_after_service": [
+      "reprocess",
+      "set_state",
+      "resume"
+    ],
+    "command_after_service": "resume",
+    "any_reprocess_applied_ack": false,
+    "resume_ack_blocked_by_fifo_head": true,
+    "scope": "Actual target driver/client, simulated full gate report; no deployed host"
+  },
+  "stale_close_releases_new_segment": {
+    "status": "FAIL_REPRODUCED_LOCAL",
+    "old_segment": "quar_1_1500000000",
+    "active_segment": "quar_2_6000000000",
+    "command_after_old_close": "resume",
+    "pending": [
+      "hold",
+      "resume"
+    ],
+    "scope": "Actual target manager close/reopen and driver; serial normal calls, no host"
+  },
+  "archive_checkpoint_order": {
+    "status": "ARCHIVE_READBACK",
+    "e2_trigger_ns": 1627785303425840378,
+    "e2_last_snapshot_event": {
+      "command": "snapshot",
+      "wall": 1794311912.382,
+      "sent_wall": 1794311912.382,
+      "received_wall": 1794311912.386515,
+      "received_s": 0.005,
+      "ok": true,
+      "ack": "OK snapshot valid=1 stamp_ns=1627785304425766144 frame=583 voxels=30748 nodes=72970 points=697947 restores=1 live_voxels=30748 live_points=697947 state_pos=1.265450,-2.927928,-0.176536 hold=0 held_frames=71 held_points=295874 hold_commands=2 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=433 set_state=0 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+      "ack_wall": 1794311912.883
+    },
+    "e2_restore_event": {
+      "command": "restore",
+      "wall": 1794311916.968,
+      "received_wall": 1794311916.969108,
+      "received_s": 0.001,
+      "ok": true,
+      "ack": "OK restore valid=1 stamp_ns=1627785304425766144 frame=583 voxels=30748 nodes=72970 points=697947 restores=2 live_voxels=30748 live_points=697947 state_pos=1.265450,-2.927928,-0.176536 hold=1 held_frames=109 held_points=761610 hold_commands=3 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=469 set_state=0 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+      "ack_wall": 1794311917.468
+    },
+    "scope": "Archived d356 controlled two-refusal run, not target70 native execution"
+  },
+  "actual_measurement_repair_native_two_event": "NOT_COMPLETED_BY_THIS_CHECK",
+  "publication": "LOCAL_ONLY_PRIOR_PUSH_DENIAL_NOT_RETRIED"
+}

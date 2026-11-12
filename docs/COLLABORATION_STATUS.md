@@ -516,3 +516,11 @@ S2先已有actual hostsource/cmd读取应用ack日志核具体断点；旧公开
 3项本机测试0.233s、received不能代applied控制PASS，所有_send异步解除旧30s调用等待，但S1/S2 actual driver/client模拟partial正常准入reprocess尚未applied就set_state覆盖物理cmd、写deferred旧尾x20；即使后reprocess FAIL依赖动作已发。最低现通道真实single-inflight/apply成功后推进、失败未知停依赖、实际准入同stamp来源/partial归属，不造RPC/新事务框架。service pending检查只在新决定前不保护该依赖序列；旧normal帧/参考/释放/ack/首次资格任务source未改不重测。
 
 下一唯一仍实际修复测量→原生重估/内部地图写回→接回→E2/尾段或900s首断点，S3研究独立/旧参数停/生产gate不改。自检PASS/FAIL/BLOCKED/NOT_APPLICABLE+原件分拒绝机制/actual修复/动作结果/partial/E2尾段，完整A/B不升，本机exit0无ROS原bag/全suite。4既有Cron无复制/旧repair-3e无活peer、actual远端当前进程未独立核；私人handoff保护、push拒绝未解除未绕过、记录仅本地remote review3965299，不称开发收到。
+
+## 53. repair-f3核70f68fb：公开部署与旧受控原件推进，下一仍actual修复整链（仅本地）
+
+[核验](review_20261112_70f68fb/README.md)局部接受actual部署patch/26归档哈希及旧d356双拒绝、持续输入/E2后尾段；纠正§52“原件全缺”和368区间解释（实际E1decision→E2trigger诊断217帧），不改旧报告。受控run无repair/reprocess/set_state，不等actual恢复；E2原生snapshot/restore比隔离起点晚约3s，trusted时间归属有原件断点，source→binary构建仍UNKNOWN。
+
+S1/S2最低解除真实single-in-flight/applied依赖、旧close不得release新active、checkpoint不晚于可信隔离边界。70新fullcommit event两testPASS0.007s但本机目标blob控制复现：reprocess/set_state旧尾→未applied再resume覆盖；实际manager串行旧close→新trigger/hold→旧resume释放新段。两反例FAIL非部署接纳实测，不扩RPC/锁/异常矩阵。下一900s预算actual测量修复→原生状态重估/内部地图→接回/E2尾段或具体宿主首断点，逐项PASS/FAIL/BLOCKED/NOT_APPLICABLE+实际命令原件；成功首次及时单报，不等研究。
+
+S3旁支接受62f294对fixed/own与坐标/精度控制的有限纠正，A/B旧逻辑/人口缺口未动；集中修既有缺口/小数值叙述，不开大矩阵、不自动生产部署，旧参数继续停。A/B仅行ID局部变化不新全表评分，远端当前执行/本地意见接收UNCONFIRMED。20min8e05b042、2ha249a2ce、daily7f3f33f6属本会话，旧5min已取消；无双写。记录仅本地、push拒绝未解除不重试/绕过，private保护、不改算法、不合main。
