@@ -14,6 +14,8 @@
 > **2026-11-12 修正**：`exact_e` 原先漏了 SE(3) Log 的平移 Jacobian `V(ω)⁻¹`。现改为
 > `rot = −w, t_log = V(rot)⁻¹ · (−R_pre^T v)`，与 `t2_input_check.e_i` 一致。下表为**修正后**值；
 > 文中若出现旧的 `s` 中位 70.39 / `|e|` 0.01826777，已标"修正前"。
+> **I 的真实物理资格 = `INCOMPLETE/UNKNOWN`**（见 `T2_I_ELIGIBILITY.md`）：`I_present=504` 是数值行数，
+> **不是 504 个合格独立 I 证据**；`vec6` 在最终 solution 前保存、pre 位姿无独立 LIO 导出、协方差无已验证切空间。
 
 ## 0. 一句话
 
@@ -107,6 +109,16 @@ S2 补出实际首戳与成员前，这些只作机械描述。
 | I 的 `s_I`（**诊断，不作卡方**；混合约定协方差未验证） | min 0 / median **70.31** / max **5955** |
 | I 的主量：单位权 `|e_I|²` | min 0 / p50 **0.000333713** / p90 **0.00369013** / max **2.38735** |
 
+**修正前 / 修正后（SE(3) Log V⁻¹）**：
+
+| 量 | 修正前（无 V⁻¹） | 修正后 |
+|---|---:|---:|
+| `|e_I|` p50 | 0.01826777 | **0.01826778** |
+| `|e_I|` max | 1.54496 | **1.54511** |
+| `s_I` p50（诊断） | 70.39 | **70.31** |
+| `s_I` p90 | 413.8 | **414.2** |
+| `s_I` max | 5953.3 | **5955.1** |
+
 旧 status × M/T：
 
 | 旧 status | M only | T only | 都无 |
@@ -153,7 +165,7 @@ replay 的 `s` 明显更大，说明 replay 的 `Ppre` 尺度与 live 不同；*
 | 原因 | `CALIBRATION_BLOCKED:no_normal_reference`；部分块另带 `I_HAS_OUT_0`/`I_NO_TRACE_ROW` |
 | 普通 UNKNOWN | **108 块 / 54.0 s**，最长连续 **54.0 s**（0–54 s，单段） |
 | `POST_E2_NO_CATCHUP` | **12 块 / 6.0 s**，最长连续 **6.0 s**（54–60 s，单段） |
-| 非尾段 / 尾段行 | 480 / **51** |
+| 尾段行数 | 按 pose 时间 ≥54 s：**47**；按尾段块：**51**（边界块含 4 行 <54 s） |
 | 尾段处理 | E2 后宿主发散到约 520 m、`catch_up=NOT_IMPLEMENTED`；只作分段报告，不作连续接回正常证据 |
 
 **`NORMAL_CONSISTENT` / `SUSPECT` / 误报 / 漏检 / 延迟 / 错误 NORMAL 全部 `NOT_EVALUABLE`**：
@@ -170,7 +182,7 @@ replay 的 `s` 明显更大，说明 replay 的 `Ppre` 尺度与 live 不同；*
 | trace 形状（按名） | **PASS（1 行截断已记录）** | 1041/1042 可解析；第 1048 行 53 列 | 需 S2 补最后一行或声明截断 |
 | join 机械映射、多对一显式 | **PASS（`HEURISTIC_UNPROVEN`；1 行 NO_TRACE_ROW）** | `t2_join.jsonl` 531 行，含 grp/phases/has_out；所有结果条件于该映射 | 等 S2 实际首戳/成员后升级 |
 | M/T 证据 | **PASS** | 444 / 86 | — |
-| I 证据存在与可算 | **PASS（504）** | 修正后 SE(3) Log（含 V⁻¹）精确 e_I（vec6 + M2DGR P⁺，时间 join、phase 分开）；|e|/|e|² 分位表；`s_I` 仅诊断；`vec6` 标 NOT_VERIFIED | 等 S2 补协方差切空间后才可谈 s_I |
+| I 数值行（非资格） | **504 numeric / 0 qualified** | `I_QUALIFICATION=INCOMPLETE/UNKNOWN`；修正后 SE(3) Log（含 V⁻¹）精确 e_I（vec6 + M2DGR P⁺，时间 join、phase 分开）；|e|/|e|² 分位表；`s_I` 仅诊断；`vec6` 标 NOT_VERIFIED | 等 S2 补协方差切空间后才可谈 s_I |
 | NORMAL/SUSPECT 分类 | **BLOCKED / NOT_EVALUABLE** | 无独立正常参照/标签（ALI-B2） | 等用户选 A/B/C |
 | 误报/漏检/延迟/错误 NORMAL | **NOT_EVALUABLE** | 同上；受控注入标签只可离线评价 | — |
 | UNKNOWN 区间 | **PASS** | 120 块/60 s，尾段 12 块 | — |
