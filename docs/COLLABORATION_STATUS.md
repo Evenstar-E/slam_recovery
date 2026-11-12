@@ -816,3 +816,11 @@ S1/S2最低复用buffer/重推明确拒绝与需追赶input/IMU视觉归宿，�
 用户17:53直接要求持续15h至2026-11-13 08:53 UTC+8，[执行入口](OVERNIGHT_ALI_AUTODETECTION_TASK_20261112.md)优先：S1分发/集成/实际预算和运行owner，S3独立ALI-H真实资格shadow同人口评价，S2现运动trace/必要一次最小导出及原生自动检测接线验证。用户同轮明确暂时没有Codex分支会话辅助，不再给Codex分派或等待其复核，本机S4独立审阅；既有历史分工不当现可用人员。具备真实结果后有限实验接线获准继续，默认生产部署/改科学门/选新模型/超预算不自动批准，旧参数停/1研究+2集成宿主，UNKNOWN不充正常。保已验v6边界/suffix/skip，必要拒绝后输入归宿/成功依赖同期收口，不换图无穷诊断。
 
 重大阻塞立即中文文件/提交GitHub，附ID/版本命令原件/影响/最低解除/需用户确认的最小选项；只停阻塞部分、不删负结果，实际用户GitHub提交确认后恢复。S4三Cron已挂、会话存活限定，无gh/认证评论读取不冒正在看Issue或已收到；建议用户在仓库阻塞记录commit确认，S1沿现可读渠道同步出处。截止中文结果含漏检误报延迟错误NORMAL/UNKNOWN区间与成本/实际自动动作及未解决范围，自检状态而非test数。发布不等实际接收开工，下一实交回真实owner branch/HEAD/预算；不造收到周期、不承诺所有问题必然解决，review SSH中文提交/private保护不改算法历史。
+
+## repair-f3 / be35af9：认领与缺项接受，研究原件待发布、I导出先对应残差空间
+
+[核验](review_20261112_be35af9/README.md)S3已明确认领exp/ali-h-v1/8c5b082九研究文件、S2现pre/out接口与导出方案回报；main未含文件、remote研究分支空/本机无对象，T1六PASS/shadow全部UNKNOWN记DEVELOPER_REPORTED，先现产物上传SHA不重做。旧402/544 raw资格本机-I复算U307/412、M28/137/T278/274/none1/1/I0，空22/61内各缺NIS1不额外加；finite非qualified/NORMAL结构上限0、不能调门补I或label。
+
+§116计划测量S=H Pminus H^T+R不能直接作SE3 eI协方差，H_T_H非S/6维压缩需对应映射、pre/post相关不能简单相加。S1/S2/S3最低同time frame/tangent/rank residual-Sigma定义，缺cov用单位残差/条件经验校准，保NOT_AVAILABLE不假概率/不新模型/巨大矩阵；导出phase/replay早退与绝对戳归宿同核。同新trace旧方法/shadow风险误报漏检延迟错误NORMAL/UNKNOWN时长成本才下一实交。
+
+S3上传研究/配对评价、S2一次现预算真实导出、S1共享集成与原生最小归宿并行，最新15h任务2c优先、不凭未合推忽略，旧参数停/无Codex/1研究+2集成。暂只是可解除trace依赖，不新全面重大阻塞；真缺证据/超范围立即中文GitHub选择，未阻工作继续。逐项状态命令原件/source人口/label失败质量成本，不test数/全UNKNOWN假安全；本机不算法/host，A/B局部不总分，三周期+截止单owner，review中文SSH/private保护不合main历史冻结门。
