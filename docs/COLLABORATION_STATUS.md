@@ -544,3 +544,9 @@ S3旁支接受62f294对fixed/own与坐标/精度控制的有限纠正，A/B旧�
 用户2026-11-12再次纠正偏回仅FAST-LIVO2，直接要求先跑其余宿主。[执行任务](NON_FASTLIVO2_SECOND_EVENT_TASK_20261112.md)明确S1/S2下一优先MM-LINS、FAST-LIO2、LIO-SAM、ORB-SLAM3四项，各实际E1→输入继续→E2/尾段；不等LIVO全部问题修完、不用历史摘要代新执行、不以完整事务适配挡原生机制测试。现有已启动任务原预算安全收尾后转向，不擅自停未知进程，不再新开LIVO轮次替代。S1实际分工/owner/执行回执待确认，S3研究旁支及参数停不变。
 
 逐项PASS/FAIL/BLOCKED及命令/source/input/run/事件stamp/原件/尾段；未启动给NOT_STARTED真实原因，不猜环境或算法不能跑。FAST-LIO2与MM前端共享身份明示、不冒两次独立执行。审阅侧顺序交接错误已纠正，本机不代跑；本地提交不等收到/开工，push拒绝未解除不重试/绕过，private保护。
+
+## 57. repair-f3核751a226：保存既有LIVO双事件局部成果，不替代四宿主先跑（仅本地）
+
+[原件核验](review_20261112_751a226/README.md)024337Z受控run有E1partial accepted/reprocess316group/set_state/resume，E2refused/restore/resume及E2关闭后28帧；25SHA一致、状态动作OK，接受局部原生接回/E2，不充actual修复（repair应用0/detection off/host_poses）。cp晚于边界/旧normal缺陷未修、人口计数端点明确，不新防御矩阵或全表评分。
+
+本增量发布早于用户明确四宿主优先，不称其为MM-LINS/FAST-LIO2/LIO-SAM/ORB本批交付；下一仍先各实际一次E1→继续输入→E2尾段，S1/S2逐项自检状态/实际命令原件/具体BLOCKED或NOT_STARTED原因，不等LIVO修完、不起新LIVO轮次、不等S3门研究。当前远端接收/执行UNCONFIRMED，本机仅Git原件核验无host/bag/tests，独立review本地提交、push拒绝未解除不重试/绕过，private保护。

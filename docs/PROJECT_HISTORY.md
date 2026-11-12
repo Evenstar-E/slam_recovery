@@ -459,3 +459,9 @@ S1认领矩阵/真实分工，S2复用已有宿主环境和run，逐项实际E1�
 2026-11-12用户直接要求“先把除了fast-livo2的第二事件都跑一遍”。[明确执行任务](NON_FASTLIVO2_SECOND_EVENT_TASK_20261112.md)覆盖旧单宿主选择及§53未明确先后的五宿主矩阵：下一批先MM-LINS、FAST-LIO2、LIO-SAM、ORB-SLAM3各实际执行一次E1→继续输入→E2→尾段，然后再回FAST-LIVO2；不等其检测/门/命令/checkpoint问题解决，不先给四宿主造完整事务适配。已有启动运行沿原预算收尾保留，不擅自杀进程，随后转向；不新开LIVO轮次替代本批。
 
 复用历史环境/runner但旧归档不能充本次各跑一遍；宿主自身原生机制与slam_recovery实际修复分列，缺后者不挡前者。FAST-LIO2实际source/与MM-LINS共享前端明确身份，不把同bag前端/backend当两次独立执行。S1确认owner并分配两个主线会话，逐项实际命令/事件stamp/run/原件/状态或具体BLOCKED/NOT_STARTED原因，未知不猜不能跑；旧参数停、S3旁支不挡、本机不代跑。顺序纠正源于审阅交接未落实用户要求，不能说用户要求不清或单宿主研究天然前置。记录仅本地、推送拒绝未解除未绕过、接收/开跑UNCONFIRMED。
+
+## 55. 751a226：既有受控接纳/接回/E2原件局部接受，四宿主优先不变（仅本地）
+
+[核验](review_20261112_751a226/README.md)run024337Z原件25/25哈希一致，同run E1部分接纳后真实reprocess316group/set_state/resume、E2拒绝后restore/resume均OK，终态HEALTHY，E2关闭后28帧；接受受控原生组件→接回→第二事件事实，不抹去。host_poses/detection off/修复apply0，未完成actual修复整链；E1/E2 cp比隔离起点晚2.866/4.542s，可信边界及旧FAIL依赖/旧尾/段release未修不重测。276/122计数含触发端点，严格close1→trigger2为209非不明210；ack观察非精确apply，不全表升分。
+
+此为10:50–10:52已提交LIVO结果归档，早于§54顺序纠正记录；不当非LIVO四项交付，不建议新LIVO运行/修复阻挡它们。下一主线仍MM-LINS/FAST-LIO2/LIO-SAM/ORB各实际E1→输入继续→E2尾段一次，S1/S2回实际状态/命令/source/input/run/原件或具体未执行原因；本批回执未出现、实际开跑UNCONFIRMED。S3旁支/参数停，本机只原件核验无host/bag/新tests，记录仅本地push拒绝未解除未绕过/private保护。
