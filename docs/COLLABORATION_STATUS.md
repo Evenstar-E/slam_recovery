@@ -1640,3 +1640,17 @@ S3 HEAD `63b9029`（`exp/ali-h-v1`，只动 `docs/ali_h_v1_research/`），本�
 - `t2_prep_selftest.json`：11 项、`failed: 0`（含 S 拒绝、旧 run id 拒绝、e_I 手算、秩亏协方差、单位权）。
 
 已 `--no-ff` 合入 main，测试 `python -m unittest discover` 通过。真实 T2 **仍 NOT_EXECUTED**，等 S2 trace。
+
+## 121. T2 协议已预注册并合入；两次 trace run 同因 FAIL，环境证据待补
+
+S3 HEAD `0d929f2`（`exp/ali-h-v1`）新增 `docs/ali_h_v1_research/T2_PROTOCOL.md`（155 行）：写定于看到任何新 trace
+结果之前，冻结 0.5 s 块 / u≥0.95 / u≤0.80 / ≥20 块 / 两相邻块、**不扫参数**；定义 `scan_stamp_ns` 精确 join、
+`NO_AVAILABILITY_ROW`/`NO_TRACE_ROW` 单列进分母、三状态最小证据、校准与评价分离、错误与 UNKNOWN 口径、停止条件
+（含拿 `S`/`H_T_H` 当协方差即 STOP）。已 `--no-ff` 合入 main，201 tests OK。
+
+**宿主侧（本机观察，未干预）**：`100744Z_326380` 与 `101116Z_329791` 两次 run **同一失败**——
+`pose_messages: 0`、`scan 598`、`paired 0`，`host.log` 均为 `[rospack] Error: package 'image_transport' not found`
+→ `image_transport::Exception: No plugins found!`；两 run 同库 `691d7334…`，driver `a4aaa58b…`（≠归档 run 的 `4742dbc1…`）。
+本机按 runner 相同方式 source 后复现：`ROS_PACKAGE_PATH=/home/R26534/fast_livo2_ws/src:/home/R26534/mm/ros/share`，
+`rospack plugins --attrib=plugin image_transport` 正常返回，说明失败在**进程环境**而非插件缺失。已要求 S2 在宿主
+fork 前记录 `ROS_PACKAGE_PATH/ROS_HOME`，并**在拿到该证据前不进行第三次重跑**；本轮仍记 NOT_EXECUTED。
