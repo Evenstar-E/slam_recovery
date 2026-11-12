@@ -773,3 +773,23 @@ S1 复核 S2 `bc7bd98`（合入，177 测试）。run `fl_native_20261112T044445
 **S1 决定采用 S2 的方案 2（解耦）**：候选继续用宿主位姿初值（已 accepted、Wilson 0.90），
 偏差另用 incumbent 位姿下的一维 body-z 搜索估计（点面残差最小），按该 bias 发布修复云；
 **不改 `IcpConfig`、不改门/阈值/σ/宿主**。约 15 行 + 单测，再跑一次同声明受控 run。
+
+## 71. 解耦偏差估计合理（+0.40 m），但 26 条修复云只到 20 条，重放被正确拦下
+
+S1 复核 S2 `7e1eb0c`（合入，180 测试）。run `fl_native_20261112T045238Z_92133`：
+
+| 项 | 实际值 |
+|---|---|
+| 偏差估计 | 26 帧逐帧 body-z 一维搜索：median **+0.40**、MAD 0.05、逐帧 0.25–0.55；`|0.40−0.5|=0.10 ≤ 0.15`（运行前声明） |
+| 门 | Mode 2 accepted：3.1341→6.8216，Wilson 0.9057，holdout 0.3882，committed 26 |
+| 传输 | 发布 26；宿主 ack `repair_received=20 repair_applied=0 repair_dropped=0`；`synced=false` |
+| 结果 | `_repair_gate` 拦下 `reprocess`（无 `reprocess #`、无 `[NATIVE_REPAIR] applied`）；wait 超时→rearm→resume；终态 HEALTHY |
+
+根因：宿主 `/native_recovery/repaired_scan` 订阅队列 20（`LIVMapper.cpp:320-321`），26 条一次性发布，
+回调处理前的 6 条在传输层丢失（`repair_dropped` 只统计宿主内部队列）。
+
+**旁证（原生效应，不是修复）**：损坏窗口内宿主发散到 `state_pos≈(-1823,1488,-1387)`、
+`voxels=582146`，resume 后仍继续发散；修复未重放，所以这段发散未被纠正。
+
+**下一步（已派 S2）**：分批发布 + 回执流控（每批 ≤20，等累计 `repair_received` 到位再发下一批，
+全部到位才发 `reprocess`；超时则不发并记录），不靠固定 sleep；宿主 0 行、门/阈值不动。
