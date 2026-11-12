@@ -2095,3 +2095,18 @@ AT_OR_BEFORE → `WITHIN_DECLARED_BOUNDARY`、其余 `UNKNOWN`。207 tests OK。
 **S3 同步**：trace 读取改按列名（v7 92 列 / v8 93 列共用）；`T2_JOIN_UPGRADE.md` 写明本 run `phase` 全 0、无 replay，
 227 行多对一是**同 scan 戳的两条 live 行**而非 live+replay，可进逐帧资格人口但仍不拆组；v7/v8 并列表已建。
 归档已推：`exp/online-v2` → `45d0fee`（远端新建）。
+
+## 144. 在线回退负结果已归档；C′（保留 K 份带戳 checkpoint）只批"保留+报告"一半
+
+S2 `8ca5575`（分支 `exp/online-v2`，已推）新增
+`docs/review_20261112_four_host/ONLINE_ROLLBACK_NEGATIVE_20261112.md`：四段边界数据、结论、修复语义口径，以及
+三个方向的评估——A（在线 snapshot 带 `apply_stamp`）无效（宿主不能按 stamp 回到过去）；B（episode-id keyed）
+只解决身份不解决时间；**C′**（保留最近 K 份带时间戳 checkpoint，按"不晚于 S 的最新一份"选择）才是可能路径。
+
+**S1 决定**：今晚只批准 C′ 的**低风险一半**——环形保留 K 份（默认 K=1，行为与现状一致）、ack/状态报告每份
+stamp/frame/voxels/points/内存、**不修改 restore/reprocess 的选择语义**；driver 侧新增只读字段列出某段 qstart 之前
+可用份数与最近一份 stamp。验证用 K=3 的纯在线 run（trace/availability 关、探针 5/5），只回答"能否找到 ≤ qstart 的
+合法快照、内存代价、帧数/决定是否与 K=1 一致"。
+
+**不启用**按 stamp 选择 restore（需 v9 与版本链，明天做）；若 K=3 下合法候选覆盖率为 0，则 C′ 也不成立，须报负结果
+并重新考虑（更频繁 snapshot 或外部状态历史）。恢复语义一旦启用，回滚更远、`replay_suffix` 变大，代价须在明天量化。
