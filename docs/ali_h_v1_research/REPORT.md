@@ -4,7 +4,8 @@
 > 状态：**T0 EXECUTED / T1 EXECUTED / T2–T3 BLOCKED**。0 次宿主运行、0 个新参数矩阵；
 > shadow 观察器只读归档，不写 manager/recovery 共享代码，不改旧归档文件。
 > 实现：`ali_h_v1.py`（观察器）、`selftest.py`（T1）；配置/身份：`manifest.json`。
-> T2 输入契约：`T2_INPUT_CONTRACT.md`（S2 导出未到，T2/T3 仍 `BLOCKED`）。
+> T2 输入契约：`T2_INPUT_CONTRACT.md`；T2 评价协议（预注册）：`T2_PROTOCOL.md`
+> （trace 结果前写死，不扫参数；S2 导出未到，T2/T3 仍 `BLOCKED`）。
 > 15 小时任务：`docs/OVERNIGHT_ALI_AUTODETECTION_TASK_20261112.md`；本文件是其中 S3 的研究交付。
 
 ## 0. 一句话结果
