@@ -19,6 +19,15 @@
 
 ### 1.1 输入与 join
 
+**join_status: `HEURISTIC_UNPROVEN`。** `scan_first_ns` 全为 -1 使字面跨度包含失效；`grp_idx` 的
+出现次数/序号**不是**扫描身份的证明。下面的有效跨度只是**机械映射**，不是 source membership 证明；
+本文件与 T2 结果中每一行/块/统计都**条件于该未证明映射**。分母保留全部 531，`NO_TRACE_ROW` 与
+多义行单列。只有 S2 补出每组**实际首戳与扫描成员**后，才可把 join 升级为已证。
+
+机械规模（审阅复算）：字面 `last >= stamp` 产生 **296,310** 条候选边、**530/531** 多义、
+**1035** 个 trace 行涵盖多条 availability；本机复算为 **295,779 / 529/531 / 1037**（差几个，规则边界不同），
+均说明这是机械匹配而非成员关系。
+
 - 新 trace 必须带同一次运行的 **availability 日志**（S1 的 `availability_frames.jsonl`）与
   **旧检测/manager 决定**；三者同 run id、同一 build、同一输入/配置/library sha256；
   **detection=on**（旧 402/544 也是 on），availability 的 `status` 不能全是 DISABLED，
