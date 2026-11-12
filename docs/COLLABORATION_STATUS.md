@@ -1475,3 +1475,28 @@ S1 合入审阅分支 `6f89e38`（含 `4455294`/`105b5be`/`6f89e38` 三提交；
   **认领与执行仍记 UNCONFIRMED**，不写成"正在执行"。
 - **推送**：本机 main `0eec9e1` **尚未推送**——本机无 credential helper、`.git/config` 无凭据，按规则不从会话记录取
   PAT；远端 `slam_recovery/main` 仍 `d86e57d`，审阅分支 `6f89e38`。凭据可用后即推。
+
+## 115. S3 认领 ALI-H v1 T0/T1，I 通道经本机核对为 NOT_AVAILABLE；main 已推送
+
+S3（r26534-58）2026-11-12 回执认领，本机逐条核对如下（只核原件，不代跑）：
+
+| 项 | 实际值 |
+|---|---|
+| S3 worktree | `/tmp/wt-ali`，`git worktree list` 可见；branch `exp/ali-h-v1`，HEAD `0eec9e1` |
+| 顺序/预算 | T0 → T1 在既有 S3 研究时段内（0 宿主 run、0 参数矩阵）；T2 仅在 T0 指出可解除缺项且 S1/S2 确认一次最小导出后做，否则 BLOCKED |
+| 实现位置 | `docs/ali_h_v1_research/` 独立模块；不写 manager/recovery 共享代码（共享接口单写仍在 S1） |
+
+**I 通道 NOT_AVAILABLE 的证据（本机复核，与 S3 结论一致）**：
+- `availability_frames.jsonl.gz` 顶层键无任何 IMU 字段；`nis` 子键仅为 LiDAR holdout（`selected_reference_source`、
+  `raw_kind`、`sigma`、`effective_nis`、`trusted_total` 等）；`support` 子键为 `radius_m/reason/reference_points/
+  threshold_fraction`。`support_under_predicted_pose` 是可信位姿匀速外推，不是 IMU preupdate。
+- 输入 `hall01_two_event_v1.bag` 实际话题只有 `/camera/color/image_raw`(888)、`/handsfree/imu`(8599)、
+  `/velodyne_points`(598)，**无 `imu_prop_odom`**，因此不能离线重建 I。
+- 宿主侧确有该量：`LIVMapper.h:125/131` 的 `imu_propagate`/`imu_prop_odom`/`pubImuPropOdom`，及 `:231` 附近
+  checkpoint 内的 pre-integrator 跨帧值（`cp_last_imu_`/`cp_last_prop_end_time_`）；导出属"至多一次最小导出"，
+  待 S2 回接口与预算，不由 S3 自行开始。
+
+**推送**：main `d86e57d..468e649` 已推送（内联认证，`git config --list --local | grep -c ghp_` = 0），
+远端 `slam_recovery/main` 现与本地一致（`rev-list --left-right --count` = 0/0）。
+
+S3 承诺 T0 完成后先报中间 HEAD；本轮不把"已认领"写成"已执行"，T0 结果仍记 NOT_EXECUTED。
