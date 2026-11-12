@@ -450,6 +450,7 @@ class LiveNis:
         self._support_cache: Optional[np.ndarray] = None
         self._support_key: Optional[tuple] = None
         self._last_refresh_ns: Optional[int] = None
+        self._support_hash: Optional[str] = None
         self.refresh_count = 0
         self.counts = {
             "computed": 0,
@@ -480,9 +481,23 @@ class LiveNis:
             self._support_cache = self.node.support_reference()
             self._support_key = key
             self._last_refresh_ns = now if now is not None else self._last_refresh_ns
+            # Identity of the cloud this and the support test both use. Hashed once per refresh:
+            # a per-frame hash of tens of thousands of points would make the diagnostic the cost.
+            import hashlib
+            arr = np.ascontiguousarray(np.asarray(self._support_cache, dtype=np.float32)[:, :3])
+            self._support_hash = hashlib.sha256(arr.tobytes()).hexdigest()
             self.refresh_count += 1
         return (self._support_cache if self._support_cache is not None
                 else np.zeros((0, 3), dtype=np.float64))
+
+    def reference_identity(self) -> Dict[str, Any]:
+        """What reference this frame was scored against, without recomputing it."""
+        return {
+            "cache_key": (None if self._support_key is None else list(self._support_key)),
+            "refresh_ns": self._last_refresh_ns,
+            "points": (None if self._support_cache is None else int(len(self._support_cache))),
+            "sha256": self._support_hash,
+        }
 
     def _reference(self, pose: np.ndarray, now_ts_ns: Optional[int] = None,
                    detail: Optional[dict] = None) -> Tuple[Optional[np.ndarray], str]:
@@ -1020,6 +1035,7 @@ class NativeClosedLoop:
         self.run_id = run_id
         # Per-frame availability evidence, separate from the capped summary diagnostics.
         self.availability = AvailabilityRecorder(availability_log, run_id=run_id)
+        self._last_avail_status: Optional[str] = None
         # The host's own state/map checkpoint, if this run was given a control directory. Without
         # one the run is exactly the observational loop it was before.
         self.cp = checkpoint_client if (checkpoint_client is not None
@@ -1175,9 +1191,11 @@ class NativeClosedLoop:
             kf_id, support_ref, {kf_id: np.asarray(pose, dtype=np.float64)},
             detail=(support_detail if self.availability.enabled else None))
         predicted_support: Optional[Dict[str, Any]] = None
+        prediction_basis: Optional[Dict[str, Any]] = None
         if self.availability.enabled:
-            predicted = self._predicted_pose(ts_ns)
-            if predicted is not None:
+            predicted_result = self._predicted_pose(ts_ns)
+            if predicted_result is not None:
+                predicted, prediction_basis = predicted_result
                 predicted_support = {}
                 self.node._frame_has_reference_support(
                     kf_id, support_ref, {kf_id: predicted}, detail=predicted_support)
@@ -1189,7 +1207,8 @@ class NativeClosedLoop:
         self.detection_counts[status] += 1
         self._record_availability(kf_id, ts_ns, scan_ns, pose, scan_body, support_detail,
                                   nis_detail, bool(supported), value is not None, status,
-                                  predicted_support=predicted_support)
+                                  predicted_support=predicted_support,
+                                  prediction_basis=prediction_basis)
 
         before = self.node.tx_mgr.active_quarantine
         if available:
@@ -1305,7 +1324,7 @@ class NativeClosedLoop:
         self.node.tx_mgr.register_quarantined_frame(kf_id, int(ts_ns))
         self._first_alarm_ts_ns = int(ts_ns)
 
-    def _predicted_pose(self, ts_ns: int) -> Optional[np.ndarray]:
+    def _predicted_pose(self, ts_ns: int) -> Optional[Tuple[np.ndarray, Dict[str, Any]]]:
         """Short-horizon constant-velocity prediction from the last two trusted poses.
 
         Used only by the availability diagnostic: it answers whether the support fraction is low
@@ -1317,24 +1336,36 @@ class NativeClosedLoop:
             return None
         keys = sorted(poses)
         if len(keys) < 2:
-            return np.asarray(poses[keys[-1]], dtype=np.float64).copy()
+            T = np.asarray(poses[keys[-1]], dtype=np.float64).copy()
+            return T, {"mode": "last_pose", "base_keys": [int(keys[-1])],
+                       "base_stamps_ns": [self.node._kf_timestamps.get(keys[-1])],
+                       "velocity_mps": None, "horizon_s": None,
+                       "predicted_T": [float(v) for v in T.reshape(-1)]}
         k2, k1 = keys[-1], keys[-2]
         t2 = self.node._kf_timestamps.get(k2)
         t1 = self.node._kf_timestamps.get(k1)
         T = np.asarray(poses[k2], dtype=np.float64).copy()
         if t1 is None or t2 is None or int(t2) == int(t1):
-            return T
+            return T, {"mode": "last_pose", "base_keys": [int(k2)],
+                       "base_stamps_ns": [t2], "velocity_mps": None, "horizon_s": None,
+                       "predicted_T": [float(v) for v in T.reshape(-1)]}
         v = (np.asarray(poses[k2], dtype=np.float64)[:3, 3]
              - np.asarray(poses[k1], dtype=np.float64)[:3, 3]) / ((int(t2) - int(t1)) * 1e-9)
-        T[:3, 3] = np.asarray(poses[k2], dtype=np.float64)[:3, 3] + v * ((int(ts_ns) - int(t2)) * 1e-9)
-        return T
+        horizon = (int(ts_ns) - int(t2)) * 1e-9
+        T[:3, 3] = np.asarray(poses[k2], dtype=np.float64)[:3, 3] + v * horizon
+        return T, {"mode": "velocity", "base_keys": [int(k1), int(k2)],
+                   "base_stamps_ns": [int(t1), int(t2)],
+                   "velocity_mps": [float(x) for x in v],
+                   "horizon_s": round(horizon, 3),
+                   "predicted_T": [float(x) for x in T.reshape(-1)]}
 
     def _record_availability(self, kf_id: int, ts_ns: int, scan_ns: Optional[int],
                              pose: np.ndarray, scan_body: np.ndarray,
                              support: Dict[str, Any], nis: Dict[str, Any],
                              support_pass: Optional[bool], nis_present: bool,
                              status: str,
-                             predicted_support: Optional[Dict[str, Any]] = None) -> None:
+                             predicted_support: Optional[Dict[str, Any]] = None,
+                             prediction_basis: Optional[Dict[str, Any]] = None) -> None:
         """Write this frame's availability evidence. Derived status is never asserted here."""
         if not self.availability.enabled:
             return
@@ -1358,8 +1389,12 @@ class NativeClosedLoop:
                         "trusted_version": int(mgr.trusted_version),
                         "trusted_keyframes": int(len(mgr.trusted_poses)),
                         "active_segment": (None if seg is None else seg.segment_id)},
+            "reference": self.nis.reference_identity(),
             "support": support or None,
             "support_under_predicted_pose": predicted_support,
+            "prediction": prediction_basis,
+            "boundary": bool(self._last_avail_status is not None
+                             and self._last_avail_status != status),
             "nis": nis or None,
             "support_pass": support_pass,
             "nis_present": bool(nis_present),
@@ -1367,6 +1402,7 @@ class NativeClosedLoop:
             "status_from_conditions": derived,
         }
         self.availability.record(row)
+        self._last_avail_status = status
 
     def _record_diag(self, kf_id: int, ts_ns: int, value: Optional[float], source: str,
                      reference: str, status: str, kfs_before: int, pts_before: int) -> None:

@@ -55,7 +55,7 @@ class AvailabilityRecorder:
         self.rows += 1
 
     def _trim(self, row: Dict[str, Any]) -> None:
-        if row.get("status") == "AVAILABLE":
+        if row.get("status") == "AVAILABLE" and not row.get("boundary"):
             for key in ("support", "nis"):
                 block = row.get(key)
                 if not isinstance(block, dict):

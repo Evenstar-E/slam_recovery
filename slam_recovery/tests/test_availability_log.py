@@ -62,6 +62,8 @@ class TestPredictedPoseSupport(unittest.TestCase):
                 row = json.loads(fh.readline())
         self.assertIn("support_under_predicted_pose", row)
         self.assertIsNotNone(row["support_under_predicted_pose"])
+        self.assertIsNotNone(row["prediction"])
+        self.assertIsNotNone(row["reference"]["cache_key"])
 
     def test_prediction_extrapolates_the_last_two_trusted_poses(self):
         from slam_recovery.ros.recovery_node import NativeClosedLoop
@@ -73,8 +75,11 @@ class TestPredictedPoseSupport(unittest.TestCase):
         T1[0, 3] = 2.0                      # 2 m/s along x
         node.tx_mgr.trusted_poses = {1: T0, 2: T1}
         loop = NativeClosedLoop(node, run_id="run")
-        predicted = loop._predicted_pose(2_000_000_000)
+        predicted, basis = loop._predicted_pose(2_000_000_000)
         self.assertAlmostEqual(float(predicted[0, 3]), 4.0, places=6)
+        self.assertEqual(basis["mode"], "velocity")
+        self.assertEqual(basis["horizon_s"], 1.0)
+        self.assertAlmostEqual(basis["velocity_mps"][0], 2.0, places=6)
 
 
 class TestDecisionsUnchanged(unittest.TestCase):
