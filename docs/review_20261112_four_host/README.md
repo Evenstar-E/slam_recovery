@@ -4,6 +4,25 @@
 FAST-LIO2、LIO-SAM、ORB-SLAM3 的第二事件，再回 FAST-LIVO2）。分工：S2 负责 MM-LINS 与
 FAST-LIO2，S1 负责 LIO-SAM 与 ORB-SLAM3。本目录只收 S2 的两项。
 
+## 0. 证据链（按运行）
+
+库 sha 是宿主实际加载的 `liblaser_mapping.so`（receipt 的 `runtime_library_sha256`）；
+可执行文件始终 `0d7e23de…`。"损坏声明"一列写该 run 是否注入、窗口与幅度。
+
+| run | 驱动 sha | 库 sha | 损坏声明 | 关键证据 | 能 / 不能声称 |
+|---|---|---|---|---|---|
+| `020634Z_4148249` | `fb746ddd` | `0eacffe1` | 无 | Mode 2 accepted（3.1388→6.6937，Wilson .9220）；`reprocess` 命令被覆盖、无 `reprocess #`，set_state/resume 生效 | 能：接纳与 hold/resume；不能：地图重建、`commit_closed` |
+| `022158Z_4156288` | `18d92a03` | `0eacffe1` | 无 | accepted（6.6761）；串行化后 `reprocess` 416 帧、`repairs applied=0`；rearm 放写 | 能：命令串行化；不能：测量修复 |
+| `024337Z_4166038` | `18d92a03` | `0eacffe1` | 无 | 同实例两事件：接受 + 拒绝各一；两次 close/rearm/resume；2 行候选，终态 HEALTHY | 能：两事件整链；不能：第二次接纳、`commit_closed` |
+| `044445Z_85628` | `f62dbd55` | `0eacffe1` | INJECTION +0.5 z，[276.208, 282.215) | incumbent 初值：ICP 修正 0.815 m，`ITERATION_LIMIT`，Wilson 0.2855 拒绝；无修复 | 能：偏差在独立位姿下可见；不能：接纳或修复 |
+| `045238Z_92133` | `c144deb3` | `0eacffe1` | 同上 | 解耦 bias +0.40（容差内），accepted；发布 26、宿主收到 20、synced=false → 无 reprocess | 能：偏差估计；不能：传输完整性 |
+| `045944Z_96435` | `1acb0b4d` | `0eacffe1` | 同上 | 分批 10/10/10/2，32/32 收到并应用；`repairs applied=32`，地图 22334/417461 | 能：测量修复进入重放；不能：干净 A/B（跨度不同） |
+| `050645Z_102106` | `721b9f15` | `0eacffe1` | 同上 | dry-run 对照：0 条修复、529 帧、地图 20427；帧集/跨度与修复臂不同 | 能：对照管线可跑；不能：效应归因 |
+| `051523Z_107073` / `051728Z_109595` | `6f90ad9e` | `0eacffe1` | 同上 | 冻结人口 23/23；重放 815 vs 692 帧；地图 24503 vs 21870 | 能：人口冻结；不能：跨度一致、地图归因 |
+| `052437Z_114016` | `231b0ed2` | `0eacffe1` | 同上 | sham：23/23、shift 0；重放 686 vs 815；set_state 差 3 mm；地图 21744 vs 24503 | 能：修正唯一差别（set_state）；不能：跨度一致 |
+| `053647Z_122935` / `053917Z_128272` | `cae046ec` | `f27d1730` | 同上 | 终止戳：end_stamp 逐位相同（280.281185627）；开段快照落于触发后 2.9/1.9 s，重放 34 vs 64 帧、应用 7 vs 12 | 能：终止戳正确；不能：起点一致 |
+| `055727Z_148998` / `055931Z_151459` | `5877388c` | `9c0330be` | 同上（窗口从触发戳起） | 声明戳 hold/snapshot + 终止戳：snapshot stamp/frame 相同、重放区间逐位相同、124 帧、23/23、leftover 0；地图 17811/335054 vs 17316/328516；仅 shift −0.40 vs 0 | 能：测量是否修正改变重放结果；不能：真实修复收益（注入损坏） |
+
 ## 状态
 
 | 宿主 | 实际运行 | 宿主原生双事件 | slam_recovery 修复链 | 报告 |
