@@ -1,0 +1,6 @@
+{
+"out":"/tmp/s1_orb_run/r1_20261112T115200Z", "binary":"/home/R26534/ORB_SLAM3/Examples/Monocular-Inertial/mono_inertial_euroc", "vocab":"/home/R26534/ORB_SLAM3/Vocabulary/ORBvoc.txt", "config":"/home/R26534/ORB_SLAM3/Examples/Monocular-Inertial/Hall01_color_imu.yaml",
+"data":"/tmp/orb_hall01", "times":"/tmp/orb_hall01/times.txt", "wall_s":374,
+"binary_sha256":"5efa7ff1221f9c70770f333e149f9826c2f49138069d11a9c4dff1d7eaf3a0e5",
+"config_sha256":"26cde907b683dd2659cbcd7ef15deebb9a6aef5ea0f5d78edca3a80eb2d77a52"
+}

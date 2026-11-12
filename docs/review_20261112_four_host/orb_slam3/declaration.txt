@@ -1,0 +1,17 @@
+ORB-SLAM3 两事件声明（写于运行开始后、任何轨迹/日志分析之前）
+
+宿主：ORB-SLAM3 单目惯性 `Examples/Monocular-Inertial/mono_inertial_euroc`
+配置：Examples/Monocular-Inertial/Hall01_color_imu.yaml
+输入：/tmp/orb_hall01（M2DGR hall_01 全序列彩色 TUM + EuRoC IMU，5229 帧，约 351 s）
+模式：无头（不设 ORB_USE_VIEWER），离线按 times.txt 处理
+
+窗口选择依据：既有 59 s 结果显示该序列后段才初始化成功，故把 E1 放在初始化附近而不是
+序列开头；这是先验信息，不是本轮结果。
+E1 = 序列相对时刻 [190, 220] s
+E2 = [300, 330] s
+尾段 = [330, 351] s
+
+判据（运行前声明）：在窗口内看宿主是否处于跟踪状态、是否发生 Track lost / 重定位 /
+新建地图（Atlas）；E2 后是否仍能继续输出轨迹到序列末尾。没有 slam_recovery 接线：
+宿主自身行为与 slam_recovery 层（NOT_IMPLEMENTED）分开记录。
+2026-11-12T11:51:28+08:00
