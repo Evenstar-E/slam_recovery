@@ -1994,3 +1994,23 @@ S2 回答、S1 核源码（`LIVMapper.cpp:603` 的 `pose_output_en` 块位于 `S
 
 S3 因此可解除 `PENDING_POSE_SOURCE_CONFIRMATION`，但须按上述三点重算。归档推送：`exp/trace-cov` → `290aae8`
 （含 BUILD.md 的 `scan_first` 哨兵与截断行说明），`exp/online-trace` 远端 `e991eaf`；`.git/config` 无 token。
+
+## 139. 审阅对真实 trace 的独立读回：join 仅机械匹配、约定为混合；批准最小导出修复
+
+审阅 `fa35519`（已合入 main `c96d756`）独立读回三个 run 的 trace/availability，结论与本机一致并更严：
+
+- **join 未成立**：`scan_first` 全 -1 → 有效跨度 0/531；"上一个不同 `scan_last` < stamp ≤ 当前 `scan_last`"在实际数据里
+  产生 296,310 条候选边、530/531 多义、1035 个 trace 行机械涵盖多条 availability。属机械匹配，**不是 source membership**。
+  已要求 S3 把 join 标 `HEURISTIC_UNPROVEN`，结论条件于该映射，全部 531 行/多义行/`NO_TRACE_ROW` 单列。
+- **约定是混合的**：归档源码 `include_common_lib.h.v7u:173–204` 显示 `rot=R*Exp(delta_rot)`（右 body 增量）、
+  `pos=p+delta_pos`（世界加性）。S3 的 `e_I=[−w,−R_preᵀv]` 数学上等价于 `Log(T_pre⁻¹T_post)`，可保留，但报告须写明
+  "源约定混合、平移显式转到 pre-body"，不得沿用"统一 body SE(3)"；协方差只能 `READY_UNIT_ONLY/NOT_AVAILABLE`。
+- **`mat_pre/mat_out` 不是按行号同键的 SE3 文件**（LIO/VIO 双写、无 group/idx/phase 表头）；最终 v7u 完整 patch/源码
+  未入 Git，绑定只能停在候选。
+
+**S1 决定（调整上一轮"暂缓"）**：批准 S2 做**最小导出修复**——`scan_first` 在 `lidar_frame_beg_time<=0` 时回退到合并组首帧
+header、并新增每组扫描成员数/首末；同一 build 顺带修截断（整行拼 `std::string` 一次写、runner teardown 先 SIGINT）；
+一次纯在线 run 验证；同时上传 v7u 最终补丁与完整源码快照。预算 1 次重建 + 1 次 run。
+
+**S3 的 T2 补充（已核并合入）**：UNKNOWN 108 块/54.0 s（单段）+ 12 块/6.0 s（`POST_E2_NO_CATCHUP`）；
+I_s 中位 70.39（p90 413.8、max 5953.3）、|e| 中位 0.01827；M 444 / T 86 / neither 1，AVAILABLE 351 全 M。
