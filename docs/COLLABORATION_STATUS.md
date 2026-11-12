@@ -2014,3 +2014,17 @@ header、并新增每组扫描成员数/首末；同一 build 顺带修截断（
 
 **S3 的 T2 补充（已核并合入）**：UNKNOWN 108 块/54.0 s（单段）+ 12 块/6.0 s（`POST_E2_NO_CATCHUP`）；
 I_s 中位 70.39（p90 413.8、max 5953.3）、|e| 中位 0.01827；M 444 / T 86 / neither 1，AVAILABLE 351 全 M。
+
+## 140. S3 已把 join 降级为 HEURISTIC_UNPROVEN、e_I 写明混合约定；s_I 降为诊断量
+
+S3 `8c60b76`（已合入 main），本机核对：
+- `T2_PROTOCOL.md`/`T2_RESULTS.md` 均标 `HEURISTIC_UNPROVEN`，写清"每行/块/统计条件于该映射"，分母 531 保留、
+  `NO_TRACE_ROW` 与多义行单列；审阅复算规模（296,310 边 / 530/531 多义 / 1035 行）与本机复算（295,779 / 529/531 / 1037，
+  边界规则差异）并列。
+- e_I 源约定写明为混合：`rot=R*Exp(d_rot)`（body 右增量）、`pos=p+d_pos`（world 加性）；精确 `e_I=[-w,-R_preᵀv]`
+  显式把平移转回 pre-body；`Ppre/Ppost` 是混合约定块，**不作 e_I 已验证协方差**，只允许 `READY_UNIT_ONLY/NOT_AVAILABLE`。
+- `s_I` 降为**诊断量**（`status=DIAGNOSTIC_ONLY_MIXED_CONVENTION_NOT_A_CHI2`）；I 主量改为单位权 `|e_I|²`
+  （p50 3.34e-4、p90 3.69e-3、max 2.387）。
+- 数值与人口未变：M 444 / T 86 / I 504；UNKNOWN 108 块/54.0 s + `POST_E2_NO_CATCHUP` 12 块/6.0 s；分类与错误率 `NOT_EVALUABLE`。
+
+小请求（已发 S3）：在 `t2_summary.json` 的 `join` 里加 `status="HEURISTIC_UNPROVEN"`，便于机器读取与后续升级对照。
