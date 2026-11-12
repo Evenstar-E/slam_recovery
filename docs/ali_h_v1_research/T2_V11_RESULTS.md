@@ -17,15 +17,17 @@
 | trace | **792 × 107**；0 malformed/0 truncated；`has_out=1` **725**；phase 全 0 |
 | 同帧 pre/post | **725**（`same_row_pre_post_rows = same_row_post_pose_rows = 725`） |
 | join | **TRUE_SPAN_CONTAINMENT_WITH_512NS_QUANTIZATION**；481/482 映射、1 `NO_TRACE_ROW`、246 行多对一 |
-| 块 | **106 块 / 53.0 s，全部 UNKNOWN**；无尾段 |
-| 段/接纳 | 2 段均 `LATE_AFTER_BOUNDARY`，**0 accepted** |
+| 块 | **106 块 / 53.0 s，全部 UNKNOWN**；普通 42 块/21.0 s，E2 后 **64 块/32.0 s**（21.0–53.0 s） |
+| 事件 | 第 2 段 trigger **rel 17.0029 s**、deadline **21.0029 s**（从本 run `episode_detail` 读取，非旧 54 s） |
+| 段/接纳 | 2 段均 `LATE_AFTER_BOUNDARY`，**0 accepted**；E2 后输出不是合法 catch-up |
 
 **通道与 I 分位**
 
 | 项 | 值 |
 |---|---|
 | M / T / neither | **175（36.3%） / 306（63.5%） / 1** |
-| I | **462**（Ppre 秩 6：462） |
+| I | **462**（Ppre 秩 6：462）；其中 **18 条 `eff=0` 且 Log 全零**（无有效点面约束），保留在分母；全 725 行中 `eff=0` **37** 条 |
+| I（有效点面约束） | **444**（462 − 18；仅作分母说明，不剔除） |
 | `|e_I|`（真 SE(3) Log） | p10 **0.00645** / p50 **0.03424** / p90 **0.11370** / max **0.59071** |
 | 单位权 `|e_I|²`（I 主量） | p10 **4.161e-5** / p50 **1.1726e-3** / p90 **1.2931e-2** / max **0.34893** |
 | `s_I`（诊断，不作卡方） | p10 1.461 / p50 **57.68** / p90 497.4 / max 25799.7 |
@@ -34,18 +36,23 @@
 
 | 项 | 状态 |
 |---|---|
-| source scan | **PASS（真实跨度 + 512 ns 量化）** |
-| pre / post 位姿 | **`PASS_SAME_ROW` / `PASS_SAME_ROW`**（725 行；抽 3 行验证） |
+| `RAW_HEADER_CONTAINMENT` | **PASS**（真实 header 跨度 + 512 ns 量化，数值成立） |
+| `SAME_UPDATE_PRE_POST` | **PASS**（725 行同行 pre/post；抽 3 行） |
+| `COMPLETE_POINT_MEMBERSHIP` | **`ASSERTED_NOT_VERIFIED`**（cur 接上次 next carryover；`n_scans` 只计新 pop raw；同一 header 可出现在两个更新组） |
+| `COVARIANCE_6D` | **`NOT_AVAILABLE`** |
 | `vec6` | **`NOT_VERIFIED`**（仅对照，不是 e_I 来源） |
 | 协方差 | **`NOT_AVAILABLE`**（混合约定；无已验证 6D 切空间） |
-| 总体 I | **`PASS_SAME_ROW_UNIT_WEIGHTED`** |
+| 总体 I | **`PASS_SAME_ROW_UNIT_WEIGHTED`**（限定：不是 462 个合格独立 I 观测；18 条零约束单列） |
 
 **三条限定**
 
 1. `vec6` 仍 `NOT_VERIFIED`、协方差 `NOT_AVAILABLE`；`s_I` 只是诊断，**不作卡方/概率**。
-2. 两段均 `LATE_AFTER_BOUNDARY`、0 accepted；**不用于修复/接纳/连续接回**任何结论。
+2. 两段均 `LATE_AFTER_BOUNDARY`、0 accepted；**不用于修复/接纳/连续接回**任何结论；E2 后 64 块/
+   32 s 只是"宿主继续在回滚地图上输出"，不是 catch-up。
 3. 分类/误报/漏检/延迟/错误 NORMAL 全部 **`NOT_EVALUABLE`**（`ALI-B2` 缺独立正常参照与事件标签）；
    **"全 UNKNOWN"不是零风险**。
+4. **18 条 `eff=0` 且 Log 全零**（全 725 行中 37 条）：零修正不证明 IMU 与 LiDAR 物理一致，
+   **不能作为 NORMAL 的 I 支持**；保留在分母，不悄悄剔除。
 
 ## 1. 运行与人口
 
@@ -57,6 +64,8 @@
 | trace | **792 行 × 107 列**，0 malformed / 0 truncated；`has_out=1` **725**、`has_out=0` 67；phase 全 0 |
 | 同帧 pre/post | `same_row_pre_post_rows = 725`；同行 `pose7`+`pre_pose7` |
 | 两个段 | `checkpoint_checks` 均 `LATE_AFTER_BOUNDARY`；**0 accepted** |
+| E2（第 2 段） | trigger rel 17.0029 s、deadline 21.0029 s；输出到约 53 s → E2 后 64 块/32 s |
+| eff=0 | 725 行中 37 条；462 条 I 中 18 条 Log 全零（无有效点面约束） |
 | 修复/接纳 | **不用于**修复收益或连续接回结论 |
 
 ## 2. join（v11 真实跨度 + 512 ns 量化）
@@ -80,7 +89,7 @@
 | I `|e_I|`（真 Log） | p10 0.00645 / **p50 0.03424** / p90 0.11370 / max 0.59071 |
 | I 单位权 `|e_I|²` | p10 4.16e-5 / **p50 1.1726e-3** / p90 1.2931e-2 / max 0.34893 |
 | `s_I`（诊断，不作卡方） | min 0 / median 57.68 / max 25799.7 |
-| 块 | **106 块 / 53.0 s，全部 UNKNOWN**；无尾段（run 未到 E2 之后） |
+| 块 | **106 块 / 53.0 s，全部 UNKNOWN**；普通 42 块/21.0 s；E2 后 64 块/32.0 s |
 
 ## 4. 同帧配对验证（升级依据）
 
@@ -103,7 +112,7 @@
 | post 位姿 | **`PASS_SAME_ROW`** | 同行 `pose7`；与 M2DGR 同时间一致 |
 | `vec6` | `NOT_VERIFIED` | 仅作对照，不再作为 e_I 来源 |
 | 协方差 | **`NOT_AVAILABLE`** | 混合约定；无已验证 6D 切空间 |
-| 总体 I | **`PASS_SAME_ROW_UNIT_WEIGHTED`** | e_I 真实；主量为单位权 `|e_I|²`，不作卡方 |
+| 总体 I | **`PASS_SAME_ROW_UNIT_WEIGHTED`**（限定：不是 462 个合格独立 I 观测；18 条零约束单列） | e_I 真实；主量为单位权 `|e_I|²`，不作卡方 |
 
 ## 6. 能推出 / 不能推出
 

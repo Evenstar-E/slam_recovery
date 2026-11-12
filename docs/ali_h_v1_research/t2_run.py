@@ -240,7 +240,8 @@ def build_join(av: List[Dict[str, Any]], trace: Dict[str, Any],
 
 
 def i_evidence(group_rows: List[Dict[str, Any]],
-               exact_by_idx: Optional[Dict[int, np.ndarray]] = None) -> Dict[str, Any]:
+               exact_by_idx: Optional[Dict[int, np.ndarray]] = None,
+               exact_mode_by_idx: Optional[Dict[int, str]] = None) -> Dict[str, Any]:
     if not group_rows:
         return {"present": False, "reason": "NO_TRACE_ROW"}
     live = [r for r in group_rows if r["phase"] == 0] or group_rows
@@ -270,13 +271,15 @@ def i_evidence(group_rows: List[Dict[str, Any]],
     keepP = wP > 1e-9 * max(float(wP.max()), 1e-12)
     s_exact = float(np.sum((VP[:, keepP].T @ e) ** 2 / wP[keepP])) if keepP.any() else None
     out.update({"present": True, "reason": None, "rank": rank, "s_i": s_exact,
+                "eff": r.get("eff"), "zero_constraint": bool(r.get("eff") == 0),
                 "s_i_approx": s,
                 "e_norm": float(np.linalg.norm(e)),
                 "e_norm_approx": float(np.linalg.norm(approx)),
                 "e_trans_exact": float(np.linalg.norm(e[3:])),
                 "e_trans_approx": float(np.linalg.norm(approx[3:])),
                 "e_trans_diff": float(np.linalg.norm(e[3:] - approx[3:])),
-                "mode": "exact_from_vec6_and_m2dgr_post"})
+                "mode": (exact_mode_by_idx.get(r["idx"], "exact_from_vec6_and_m2dgr_post")
+                         if exact_mode_by_idx else "exact_from_vec6_and_m2dgr_post")})
     return out
 
 
@@ -435,6 +438,7 @@ def main(argv=None):
     for i, (ns, _) in enumerate(pose_rows):
         groups[ns].append(i)
     exact_by_idx = {}
+    exact_mode = {}
     same_row_pose = 0
     same_row_pre_post = 0
     for r in ho_rows:
@@ -444,6 +448,7 @@ def main(argv=None):
             same_row_pose += 1
         if pre is not None and post is not None:
             exact_by_idx[r["idx"]] = e_i_from_poses(pre, post)
+            exact_mode[r["idx"]] = "same_row_pre_post"
             same_row_pre_post += 1
     for r in ho_rows:
         if r["idx"] in exact_by_idx:
@@ -451,6 +456,7 @@ def main(argv=None):
         p = pose_from_tail(r.get("pose_tail"), "pose")
         if p is not None:
             exact_by_idx[r["idx"]] = exact_e(r["vec6"], quat_to_rot(p[3:7]))
+            exact_mode[r["idx"]] = "exact_from_vec6_and_m2dgr_post"
     time_err = []
     used: Dict[int, int] = defaultdict(int)
     ambiguous_groups = 0
@@ -475,6 +481,7 @@ def main(argv=None):
         j = group_idx[min(k, len(group_idx) - 1)]
         used[key] = k + 1
         exact_by_idx[r["idx"]] = exact_e(r["vec6"], quat_to_rot(pose_rows[j][1][4:8]))
+        exact_mode[r["idx"]] = "exact_from_vec6_and_m2dgr_post"
         time_err.append(pose_ns[j] - ns)
     time_err = np.array(time_err, dtype=np.int64)
     join = build_join(av, trace)
@@ -491,6 +498,15 @@ def main(argv=None):
                 if any(int(r["scan_first_ns"]) == int(m["av"]["scan_stamp_ns"]) == int(r["scan_last_ns"])
                        for r in m["rows"]))
 
+    episodes = (summary.get("quarantine") or {}).get("episode_detail") or []
+    trace_start_ns = min(int(r["abs_ns"]) for r in trace["rows"]) if trace["rows"] else 0
+    if len(episodes) == 2:
+        e2_trigger_rel = (int(episodes[1]["trigger_ts_ns"]) - trace_start_ns) / 1e9
+        e2_deadline_rel = (int(episodes[1]["deadline_ns"]) - trace_start_ns) / 1e9
+        e2_basis = "second_episode_deadline"
+    else:
+        e2_trigger_rel = e2_deadline_rel = E2_REL_S
+        e2_basis = "legacy_54s_not_run_bound"
     first_pose_ns = min(int(a["pose_stamp_ns"]) for a in av)
     joined_rows = []
     state_counts = Counter()
@@ -502,9 +518,10 @@ def main(argv=None):
         a = m["av"]
         sup = a.get("support") or {}
         nis = a.get("nis") or {}
-        ie = i_evidence(m["rows"], exact_by_idx)
-        rel_av_s = (int(a["pose_stamp_ns"]) - first_pose_ns) / 1e9
-        tail = bool(rel_av_s >= E2_REL_S)
+        ie = i_evidence(m["rows"], exact_by_idx, exact_mode)
+        ref_ns = first_pose_ns if e2_basis.startswith("legacy") else trace_start_ns
+        rel_av_s = (int(a["pose_stamp_ns"]) - ref_ns) / 1e9
+        tail = bool(rel_av_s >= e2_deadline_rel)
         if tail:
             tail_rows += 1
         m_status = map_support(sup)
@@ -641,6 +658,15 @@ def main(argv=None):
             "receipt_sha256": sha256(receipt_path), "summary_sha256": sha256(summary_path),
             "protocol": "T2_PROTOCOL.md (pre-registered)", "block_ns": BLOCK_NS,
             "e2_rel_s": E2_REL_S,
+            "e2_trigger_rel_s": e2_trigger_rel, "e2_deadline_rel_s": e2_deadline_rel,
+            "e2_basis": e2_basis,
+            "i_qualification_layers": {
+                "RAW_HEADER_CONTAINMENT": "PASS",
+                "SAME_UPDATE_PRE_POST": ("PASS" if same_row_pre_post else "INCOMPLETE"),
+                "COMPLETE_POINT_MEMBERSHIP": "ASSERTED_NOT_VERIFIED",
+                "COVARIANCE_6D": "NOT_AVAILABLE"},
+            "i_qualification_caveat": ("numeric rows are not qualified independent I "
+                                       "observations; complete point membership is unverified"),
             "pose_source_status": ("SAME_ROW_PRE_POST" if same_row_pre_post
                                    else ("SAME_ROW_POST" if same_row_pose
                                          else "LEGACY_M2DGR_TIME_JOIN")),
@@ -734,6 +760,13 @@ def main(argv=None):
                                                           if k.startswith("missing_")},
             "I_phase": {k: v for k, v in i_stats.items() if k.startswith("phase_")},
             "I_rank6": sum(1 for r in joined_rows if r["i"].get("rank") == 6),
+            "I_zero_eff_rows": sum(1 for r in joined_rows
+                                   if r["i"].get("present") and r["i"].get("eff") == 0),
+            "I_zero_eff_zero_log_rows": sum(
+                1 for r in joined_rows if r["i"].get("present") and r["i"].get("eff") == 0
+                and r["i"].get("e_norm", 1.0) <= 1e-12),
+            "has_out_eff0_rows": sum(1 for r in trace["rows"]
+                                     if r["has_out"] == 1 and r["eff"] == 0),
             "I_e_norm": {"min": min(i_norms) if i_norms else None,
                          "median": float(np.median(i_norms)) if i_norms else None,
                          "max": max(i_norms) if i_norms else None},
@@ -775,8 +808,10 @@ def main(argv=None):
             "by_status_and_tail": {str(k): v for k, v in state_counts.items()},
             "blocks": len(block_rows), "unknown_blocks": unknown_blocks,
             "tail_rows": tail_rows, "tail_blocks": len(tail_blocks),
-            "tail_rows_by_pose_rel_54": sum(
-                1 for r in joined_rows if (int(r["pose_stamp_ns"]) - first_pose_ns) / 1e9 >= E2_REL_S),
+            "tail_rows_by_pose_rel_e2": sum(
+                1 for r in joined_rows
+                if (int(r["pose_stamp_ns"]) - (first_pose_ns if e2_basis.startswith("legacy")
+                                               else trace_start_ns)) / 1e9 >= e2_deadline_rel),
             "tail_rows_by_block": sum(
                 1 for r in joined_rows
                 if (int(r["pose_stamp_ns"]) // BLOCK_NS) in {b["block_id"] for b in block_rows if b["tail"]}),

@@ -10,6 +10,16 @@
   "protocol": "T2_PROTOCOL.md (pre-registered)",
   "block_ns": 500000000,
   "e2_rel_s": 54.0,
+  "e2_trigger_rel_s": 17.002940433,
+  "e2_deadline_rel_s": 21.002940433,
+  "e2_basis": "second_episode_deadline",
+  "i_qualification_layers": {
+   "RAW_HEADER_CONTAINMENT": "PASS",
+   "SAME_UPDATE_PRE_POST": "PASS",
+   "COMPLETE_POINT_MEMBERSHIP": "ASSERTED_NOT_VERIFIED",
+   "COVARIANCE_6D": "NOT_AVAILABLE"
+  },
+  "i_qualification_caveat": "numeric rows are not qualified independent I observations; complete point membership is unverified",
   "pose_source_status": "SAME_ROW_PRE_POST",
   "join_status": "TRUE_SPAN_CONTAINMENT_WITH_512NS_QUANTIZATION",
   "results_conditional_on": "true span containment with 512 ns quantization; multi-to-one kept",
@@ -133,6 +143,9 @@
    "phase_0": 462
   },
   "I_rank6": 462,
+  "I_zero_eff_rows": 18,
+  "I_zero_eff_zero_log_rows": 18,
+  "has_out_eff0_rows": 37,
   "I_e_norm": {
    "min": 0.0,
    "median": 0.034240975510529,
@@ -156,74 +169,30 @@
    }
   },
   "I_compare": {
-   "n": 462,
-   "e_norm_median_exact": 0.034240975510529,
-   "e_norm_median_approx": 0.032836245191243355,
-   "e_norm_max_exact": 0.5907060086278522,
-   "e_norm_max_approx": 0.6375463506320435,
-   "s_median_exact": 57.681611796709326,
-   "s_median_approx": 55.444301080337254,
-   "trans_vector_diff_median": 0.014639053738016092,
-   "trans_vector_diff_max": 1.0619895448604355,
-   "rows_trans_diff_gt_1pct": 442
+   "n": 0
   },
   "I_unit_energy": {
-   "n": 462,
-   "min": 0.0,
-   "p10": 4.1610585925197795e-05,
-   "p50": 0.001172599567603834,
-   "p90": 0.012931478141827851,
-   "max": 0.34893358862904816
+   "n": 0
   },
   "I_s_status": "DIAGNOSTIC_ONLY_MIXED_CONVENTION_NOT_A_CHI2",
   "I_quantiles": {
    "e_norm_exact": {
-    "n": 462,
-    "min": 0.0,
-    "p10": 0.006450603256478907,
-    "p50": 0.034240975510529,
-    "p90": 0.11370155469414255,
-    "max": 0.5907060086278522
+    "n": 0
    },
    "e_norm_approx": {
-    "n": 462,
-    "min": 0.0,
-    "p10": 0.006481579205773579,
-    "p50": 0.032836245191243355,
-    "p90": 0.10791030349612561,
-    "max": 0.6375463506320435
+    "n": 0
    },
    "s_exact": {
-    "n": 462,
-    "min": 0.0,
-    "p10": 1.4606851303317196,
-    "p50": 57.681611796709326,
-    "p90": 497.4398034969166,
-    "max": 25799.653791648892
+    "n": 0
    },
    "s_approx": {
-    "n": 462,
-    "min": 0.0,
-    "p10": 0.6546983916923795,
-    "p50": 55.444301080337254,
-    "p90": 433.3130424807025,
-    "max": 20690.46274310118
+    "n": 0
    },
    "e_trans_exact": {
-    "n": 462,
-    "min": 0.0,
-    "p10": 0.00458782478242564,
-    "p50": 0.023285410870842217,
-    "p90": 0.10573142978512311,
-    "max": 0.5868245385729178
+    "n": 0
    },
    "e_trans_approx": {
-    "n": 462,
-    "min": 0.0,
-    "p10": 0.004548203763272653,
-    "p50": 0.022804140127286626,
-    "p90": 0.10262073511368945,
-    "max": 0.63624855832922
+    "n": 0
    }
   },
   "M_T_denominators": {
@@ -244,37 +213,49 @@
  },
  "states": {
   "by_status_and_tail": {
-   "('UNKNOWN', False)": 482
+   "('UNKNOWN', False)": 179,
+   "('UNKNOWN', True)": 303
   },
   "blocks": 106,
   "unknown_blocks": 106,
-  "tail_rows": 0,
-  "tail_blocks": 0,
-  "tail_rows_by_pose_rel_54": 0,
-  "tail_rows_by_block": 0,
+  "tail_rows": 303,
+  "tail_blocks": 64,
+  "tail_rows_by_pose_rel_e2": 303,
+  "tail_rows_by_block": 304,
   "span_s": 53.0,
   "unknown_normal": {
-   "blocks": 106,
-   "duration_s": 53.0,
-   "longest_run": 53.0,
+   "blocks": 42,
+   "duration_s": 21.0,
+   "longest_run": 21.0,
    "runs": [
     {
      "block_first": 3255570522,
-     "block_last": 3255570627,
-     "blocks": 106,
-     "duration_s": 53.0,
+     "block_last": 3255570563,
+     "blocks": 42,
+     "duration_s": 21.0,
      "rel_start_s": 0.0,
-     "rel_end_s": 53.0,
+     "rel_end_s": 21.0,
      "start_ns": 1627785261000000000,
-     "end_ns": 1627785314000000000
+     "end_ns": 1627785282000000000
     }
    ]
   },
   "unknown_post_e2": {
-   "blocks": 0,
-   "duration_s": 0.0,
-   "longest_run": 0.0,
-   "runs": []
+   "blocks": 64,
+   "duration_s": 32.0,
+   "longest_run": 32.0,
+   "runs": [
+    {
+     "block_first": 3255570564,
+     "block_last": 3255570627,
+     "blocks": 64,
+     "duration_s": 32.0,
+     "rel_start_s": 21.0,
+     "rel_end_s": 53.0,
+     "start_ns": 1627785282000000000,
+     "end_ns": 1627785314000000000
+    }
+   ]
   },
   "not_evaluable": [
    "NORMAL_CONSISTENT",
@@ -710,640 +691,704 @@
    "block_id": 3255570564,
    "n_frames": 3,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570565,
    "n_frames": 3,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570566,
    "n_frames": 2,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570567,
    "n_frames": 3,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570568,
    "n_frames": 2,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570569,
    "n_frames": 3,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570570,
    "n_frames": 3,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570571,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570572,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570573,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570574,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570575,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570576,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570577,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570578,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570579,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570580,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570581,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570582,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570583,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570584,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570585,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570586,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570587,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570588,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570589,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570590,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570591,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570592,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570593,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570594,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570595,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570596,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570597,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570598,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570599,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570600,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570601,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570602,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570603,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570604,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570605,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570606,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570607,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570608,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570609,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570610,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570611,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570612,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570613,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570614,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570615,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570616,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570617,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570618,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570619,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570620,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570621,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570622,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570623,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570624,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570625,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570626,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   },
   {
    "block_id": 3255570627,
    "n_frames": 5,
    "phase": 0,
-   "tail": false,
+   "tail": true,
    "state": "UNKNOWN",
    "reason_codes": [
-    "CALIBRATION_BLOCKED:no_normal_reference"
+    "CALIBRATION_BLOCKED:no_normal_reference",
+    "POST_E2_NO_CATCHUP"
    ]
   }
  ]
