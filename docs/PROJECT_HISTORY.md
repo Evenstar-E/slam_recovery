@@ -523,3 +523,11 @@ S1共享生命周期/失败公开一致集成，S2已有流控派工与物理一
 v3仍skip+clear已消费后缀，本次399/372未catch-up；两run只一事件/detection off，尾317/300帧、HEALTHY经wait关闭/ABORTED rearm不等有效恢复/E2，sham21诊断失败保留。预置仅min脚本戳，deferred OK是receipt非应用，在线/后继保证未验。target1新receipt测试PASS0.040s与actual file payload/仅hold开段控制，未代host；旧多命令Windows/pytest辅助测试未跑不安装，构建目标成功但整体ABI失败保留。
 
 下一唯一有限物理一致修复→native state/map→保后缀追赶→接回/E2或实际不支持范围，S1成功公开/共享集成、S2实际产物/native追赶，S3参数停/研究。用户UNAVAILABLE诊断ddd0fb7比target晚发布，target尚未实现不指控无视，S1认领/S2检测on有限取证与native并行、不改门；自检逐项状态/命令/原件/质量/全人口/未知。A2/A4/A6/A12局部推进、自动检测与A5/A8/A9/A10/B4/B11未闭合，不全表升分。独立review SSH提交推送、不合main/private保护、不改算法历史；接收执行待真实回执。
+
+## 64. 70531be：逐帧UNAVAILABLE已实施并实跑，分支原因接受，几何因果仍UNKNOWN
+
+[核验](review_20261112_70531be/README.md)S1诊断实现/S2检测on新run065500Z_187992，13/13原件SHA一致、402全paired逐行对应、307UNAVAILABLE/95AVAILABLE；606pose/598scan、204/196未配对单列。实际22参考空（21仍有prev_scan NIS）、285比例<.60、401finite新NIS/1无参考，carried/nonfinite0；306是有NIS且support失败，不是306比例失败，REPORT§6最低更正。285完整support mask、306完整NIS残差按clipped/all复算接受，kf157支持.315/NIS403.6426仍前置排除为实证；不从unsupported推漂移。正常边界仅20点不能复现200/300总体，当时reference/cache身份和坐标未存、KNN/PCA不可独立重建、raw row映射缺失，本机正常12点cap4保存row0/1/2/3实际原row0/3/6/9反例确认，限制的是强归因/点身份而非判决布尔错误。
+
+三次online触发/拒绝→native restore/resume ACK→wait close/ABORTED重武装真实接受；repair实际off/无commit/reprocess/applied，14snapshot超时保留，HEALTHY/wiring不等检测可靠或恢复成功。后两事件路径确有执行，但未发生首次测量修复，不能补用户修复后E2；22+65=87不充历史87同人口。驱动SHA与run版本及target一致，库hash匹配v3构建声明，当前无hostlog/库实体不称重新核进程加载。S3旧/tmp跨source汇总仅开发分析，不本机重跑/混同版本趋势。
+
+本机所有模块target Git bytes内存加载，12帧9不可用/3可用的base/target/log开关输出及trusted状态同；8相关test PASS.043s、runner Git Bash语法PASS，无host/bag/参数。两pytest辅助test未跑，初辅助属性错exit1只修自写控制后PASS。S1最低现取证入口保参考/cache快照身份、原row与少数全边界样本，可并行且只挡诊断强主张；S2下一已有授权run随附或明确缺项，不为文档/追同值另开矩阵。原生唯一主线仍物理一致修复→native完整state/map→保后缀追赶→接回/E2，旧v3后缀与成功依赖未解除不重测；S3研究专用/旧参数停。A3/B3取证局部推进、不全表升分；独立review SSH推送/private保护、不合main不改算法历史，开发新意见接收待回执。

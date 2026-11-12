@@ -1,0 +1,916 @@
+{
+  "target": "70531bef27467519e370ac4819609398f1933533",
+  "scope": "docs/review_20261112_availability/",
+  "reader_uses": "python -I; subprocess git show; gzip in memory; JSON only; no archived scripts executed",
+  "hashes": {
+    "manifest_files": 13,
+    "all_match": true,
+    "mismatches": [],
+    "unlisted": [
+      "SHA256SUMS"
+    ],
+    "compressed_bytes": 12812124,
+    "raw_bytes": 46896127,
+    "compressed_sha256": "7a2018456be69ff2e17a918d971b59161918b119d7b3cc9f9dda02937a36f82b",
+    "raw_sha256": "50170392a486ecc2d0afaefa84ddef9ff4529c496b82e8e83fbaf49504949846"
+  },
+  "identity": {
+    "run_id": "fl_native_20261112T065500Z_187992",
+    "inputs": {
+      "bag": "/tmp/fastlivo/hall01_two_event_v1.bag",
+      "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+      "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+      "host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+      "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+      "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+      "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+      "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+      "recovery_node_source": "93f693566111cca38f1dfa28e77347babc5b140c3b8f315603fc0679ce5a077c",
+      "runtime_library": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+      "runtime_library_sha256": "9c0330beffa2d93564ba10d36751e938baa54768fa218b21b75fe17bb8f700db"
+    },
+    "driver_sidecar_matches_receipt": true,
+    "launch": {
+      "rate": "1.0",
+      "drain_s": "20",
+      "duration_s": "0",
+      "max_pairs": "0",
+      "candidate_source": "host_poses",
+      "detection": "on",
+      "sigma_meas_m": "0.884",
+      "scripted_triggers_s": "",
+      "scripted_triggers_ns": "",
+      "confirmation_margin_sec": "2.0",
+      "relay_shift_z": "",
+      "relay_start_ns": "",
+      "relay_end_ns": "",
+      "injection": "NONE",
+      "repair_publish": "1",
+      "run_mode": "ONLINE_DETECTION",
+      "group_model": "host and recovery node are children of one setsid supervisor"
+    },
+    "actual_node_launch_args": {
+      "run_dir": "/tmp/fl_native_20261112T065500Z_187992",
+      "pose_topic": "/aft_mapped_to_init",
+      "scan_topic": "/velodyne_points",
+      "status_topic": "/slam_recovery/gate_status",
+      "candidate_source": "host_poses",
+      "confirmation_margin_sec": 2.0,
+      "pair_dt_ms": 40.0,
+      "scan_cap": 6000,
+      "sigma_meas_m": 0.884,
+      "duration_sec": 0.0,
+      "max_pairs": 0,
+      "icp_time_budget_sec": 0.0,
+      "detection": "on",
+      "scripted_triggers": "",
+      "scripted_trigger_stamps": "",
+      "checkpoint_dir": "/tmp/fl_native_20261112T065500Z_187992/host_control",
+      "checkpoint_period_sec": 2.0,
+      "wait_limit_sec": 2.0,
+      "repair_publish": false,
+      "repair_sync_timeout_sec": 5.0,
+      "repair_dry_run": false,
+      "availability_log": "/tmp/fl_native_20261112T065500Z_187992/availability_frames.jsonl",
+      "repair_sham": false
+    },
+    "runtime": {
+      "wall_sec": 94.328,
+      "pid": 189077,
+      "pgid": 189074,
+      "peak_rss_kb": 1008996,
+      "pose_messages": 606,
+      "scan_messages": 598,
+      "callback_errors": [],
+      "callback_error_count": 0
+    },
+    "machine_load": "77.05 143.72 198.72 38/61582 188028\nnproc=128",
+    "termination": "PLANNED_KILL_AFTER_DRAIN",
+    "identity_limit": "Receipt attests hashes; archive has no actual library bytes, process mapped-library proof, bag/config bytes or driver source bytes to independently establish loaded identity."
+  },
+  "population": {
+    "rows": 402,
+    "summary_diagnostics": 402,
+    "run_ids": {
+      "fl_native_20261112T065500Z_187992": 402
+    },
+    "kf_contiguous_0_401": true,
+    "unique_pose_stamps": 402,
+    "unique_scan_stamps": 402,
+    "strict_pose_order": true,
+    "strict_scan_order": true,
+    "max_abs_dt_ns": 39959192,
+    "pairing": {
+      "pair_window_ns": 40000000,
+      "poses_received": 606,
+      "scans_received": 598,
+      "paired": 402,
+      "poses_unpaired": 204,
+      "scans_unpaired": 196,
+      "paired_fraction_of_poses": 0.6633663366336634,
+      "paired_fraction_of_scans": 0.6722408026755853,
+      "max_abs_dt_ns": 39959192,
+      "max_backlog_messages": 159,
+      "messages_considered": 1204,
+      "pairing_rule": "nearest pose within 40 ms, no pose reused"
+    },
+    "frames": {
+      "paired": 402,
+      "ingested": 402,
+      "fed_to_step_frame": 95,
+      "ingested_without_detection": 307,
+      "consumed_after_first_decision": 349,
+      "first_decision_ts_ns": 1627785266273471594
+    },
+    "pairing_diagnosis": {
+      "pose_stamps_logged": 606,
+      "scan_stamps_logged": 598,
+      "stamp_log_cap": 4000,
+      "truncated": false,
+      "nearest_pose_dt_ms": {
+        "min": -14321.337938,
+        "median": -14.228225,
+        "mean": -1715.284072439799,
+        "max": 929.15821,
+        "p10": -8339.1674993,
+        "p90": 29.323124600000007
+      },
+      "fraction_within_window": 0.6722408026755853,
+      "nearest_pose_dt_ms_p10_median_p90": [
+        -8339.1674993,
+        -14.228225,
+        29.323124600000007
+      ],
+      "same_matcher_at_20_and_40_ms": {
+        "20ms": {
+          "window_ns": 20000000,
+          "paired": 229,
+          "fraction_of_scans": 0.38294314381270905,
+          "fraction_of_poses": 0.3778877887788779,
+          "max_abs_dt_ns": 19858838
+        },
+        "40ms": {
+          "window_ns": 40000000,
+          "paired": 402,
+          "fraction_of_scans": 0.6722408026755853,
+          "fraction_of_poses": 0.6633663366336634,
+          "max_abs_dt_ns": 39959192
+        }
+      },
+      "comparability": "the offline arms pair at 20 ms; a run at 40 ms is a different pairing and must not be pooled with them in one table",
+      "pose_interarrival_ms": {
+        "median": 66.663503,
+        "min": 65.635443
+      },
+      "scan_interarrival_ms": {
+        "median": 100.196123
+      }
+    },
+    "scan_points_min_max": [
+      4940,
+      6000
+    ],
+    "all_scan_points_finite": true
+  },
+  "counts": {
+    "status": {
+      "UNAVAILABLE": 307,
+      "AVAILABLE": 95
+    },
+    "support_reason": {
+      "empty_reference": 22,
+      "ok": 380
+    },
+    "support_false_nis_true_reasons": {
+      "empty_reference": 21,
+      "ok": 285
+    },
+    "condition_combinations": {
+      "False/False": 1,
+      "False/True": 306,
+      "True/True": 95
+    },
+    "nis_raw_source": {
+      "not_computed/unavailable": 1,
+      "finite/computed": 401
+    },
+    "nis_reference_status": {
+      "none/UNAVAILABLE": 1,
+      "prev_scan/UNAVAILABLE": 278,
+      "node_map/AVAILABLE": 95,
+      "node_map/UNAVAILABLE": 28
+    },
+    "nis_nonfinite": 0
+  },
+  "runs": [
+    {
+      "status": "UNAVAILABLE",
+      "first_row": 0,
+      "last_row": 21,
+      "frames": 22,
+      "start_pose_stamp_ns": 1627785262008174419,
+      "end_pose_stamp_ns": 1627785264073572397
+    },
+    {
+      "status": "AVAILABLE",
+      "first_row": 22,
+      "last_row": 52,
+      "frames": 31,
+      "start_pose_stamp_ns": 1627785264206571102,
+      "end_pose_stamp_ns": 1627785267205767155
+    },
+    {
+      "status": "UNAVAILABLE",
+      "first_row": 53,
+      "last_row": 117,
+      "frames": 65,
+      "start_pose_stamp_ns": 1627785267272356749,
+      "end_pose_stamp_ns": 1627785273678019524
+    },
+    {
+      "status": "AVAILABLE",
+      "first_row": 118,
+      "last_row": 156,
+      "frames": 39,
+      "start_pose_stamp_ns": 1627785273812009573,
+      "end_pose_stamp_ns": 1627785279081910849
+    },
+    {
+      "status": "UNAVAILABLE",
+      "first_row": 157,
+      "last_row": 170,
+      "frames": 14,
+      "start_pose_stamp_ns": 1627785279281777620,
+      "end_pose_stamp_ns": 1627785281680577278
+    },
+    {
+      "status": "AVAILABLE",
+      "first_row": 171,
+      "last_row": 179,
+      "frames": 9,
+      "start_pose_stamp_ns": 1627785281880469561,
+      "end_pose_stamp_ns": 1627785283346364737
+    },
+    {
+      "status": "UNAVAILABLE",
+      "first_row": 180,
+      "last_row": 182,
+      "frames": 3,
+      "start_pose_stamp_ns": 1627785283546281815,
+      "end_pose_stamp_ns": 1627785283946079731
+    },
+    {
+      "status": "AVAILABLE",
+      "first_row": 183,
+      "last_row": 198,
+      "frames": 16,
+      "start_pose_stamp_ns": 1627785284145961285,
+      "end_pose_stamp_ns": 1627785286211474180
+    },
+    {
+      "status": "UNAVAILABLE",
+      "first_row": 199,
+      "last_row": 401,
+      "frames": 203,
+      "start_pose_stamp_ns": 1627785286344705820,
+      "end_pose_stamp_ns": 1627785306575157404
+    }
+  ],
+  "analysis_runs_match": true,
+  "segment_tsv_rows": 65,
+  "segment_tsv_mismatches": 0,
+  "recompute": {
+    "complete_support_frames": 285,
+    "complete_nis_frames": 306,
+    "support_saved_population": {
+      "UNAVAILABLE/0": 22,
+      "AVAILABLE/20": 95,
+      "UNAVAILABLE/200": 285
+    },
+    "nis_saved_population": {
+      "UNAVAILABLE/0": 1,
+      "UNAVAILABLE/300": 306,
+      "AVAILABLE/20": 95
+    },
+    "full_nis_branch_coverage": {
+      "clipped_residuals": {
+        "frames": 134,
+        "coverage_min_max": [
+          0.74,
+          1.0
+        ]
+      },
+      "all_residuals": {
+        "frames": 172,
+        "coverage_min_max": [
+          0.0,
+          0.6966666666666667
+        ]
+      }
+    },
+    "all_logged_branch_counts": {
+      "not_computed": 1,
+      "clipped_residuals": 154,
+      "all_residuals": 247
+    },
+    "observed_branch_rule": "coverage >= 0.7: mean over abs(residual)<2; else mean over all saved residuals; chi2=(residual/0.884)^2",
+    "errors": {},
+    "max_abs_numeric_errors": {
+      "chi2_from_residual": 2.2737367544323206e-13,
+      "coverage": 0.0,
+      "branch_nis": 2.2737367544323206e-13,
+      "mean_residual": 3.552713678800501e-15,
+      "rms_residual": 3.552713678800501e-15,
+      "max_residual": 0.0,
+      "q50_residual": 0.0,
+      "q90_residual": 0.0,
+      "body_world_transform": 2.2737367544323206e-13,
+      "saved_plane_residual_intersections": 7.105427357601002e-15
+    },
+    "saved_plane_query_intersections": 24120
+  },
+  "examples": [
+    {
+      "kf_id": 1,
+      "status": "UNAVAILABLE",
+      "pose_stamp_ns": 1627785262075368643,
+      "scan_stamp_ns": 1627785262080963612,
+      "pose_scan_dt_ns": -5594969,
+      "manager": {
+        "state": "HEALTHY",
+        "trusted_version": 0,
+        "trusted_keyframes": 0,
+        "active_segment": null
+      },
+      "support_reference_points": 0,
+      "support_saved_total": [
+        0,
+        0
+      ],
+      "support_saved_within": 0,
+      "support_reported_within": null,
+      "support_reported_fraction": null,
+      "nis_reference": "prev_scan",
+      "nis_reference_points": 6000,
+      "nis_saved_total": [
+        300,
+        300
+      ],
+      "nis_reported": 0.14273028135932653,
+      "nis_saved_branch_mean": 0.14273028135932653,
+      "coverage_saved_valid": 294,
+      "coverage_reported_valid": 294,
+      "coverage_reported": 0.98,
+      "branch": "clipped_residuals"
+    },
+    {
+      "kf_id": 22,
+      "status": "AVAILABLE",
+      "pose_stamp_ns": 1627785264206571102,
+      "scan_stamp_ns": 1627785264186785698,
+      "pose_scan_dt_ns": 19785404,
+      "manager": {
+        "state": "HEALTHY",
+        "trusted_version": 1,
+        "trusted_keyframes": 1,
+        "active_segment": null
+      },
+      "support_reference_points": 902,
+      "support_saved_total": [
+        20,
+        200
+      ],
+      "support_saved_within": 15,
+      "support_reported_within": 176,
+      "support_reported_fraction": 0.88,
+      "nis_reference": "node_map",
+      "nis_reference_points": 34,
+      "nis_saved_total": [
+        20,
+        300
+      ],
+      "nis_reported": 18.280525337810758,
+      "nis_saved_branch_mean": 0.889421627996148,
+      "coverage_saved_valid": 19,
+      "coverage_reported_valid": 202,
+      "coverage_reported": 0.6733333333333333,
+      "branch": "all_residuals"
+    },
+    {
+      "kf_id": 50,
+      "status": "AVAILABLE",
+      "pose_stamp_ns": 1627785267006020546,
+      "scan_stamp_ns": 1627785266990944862,
+      "pose_scan_dt_ns": 15075684,
+      "manager": {
+        "state": "QUARANTINED",
+        "trusted_version": 3,
+        "trusted_keyframes": 2,
+        "active_segment": "quar_3_1627785262106571102"
+      },
+      "support_reference_points": 1553,
+      "support_saved_total": [
+        20,
+        200
+      ],
+      "support_saved_within": 20,
+      "support_reported_within": 180,
+      "support_reported_fraction": 0.9,
+      "nis_reference": "node_map",
+      "nis_reference_points": 54,
+      "nis_saved_total": [
+        20,
+        300
+      ],
+      "nis_reported": 1.1934513403424554,
+      "nis_saved_branch_mean": 0.8000638406798434,
+      "coverage_saved_valid": 20,
+      "coverage_reported_valid": 210,
+      "coverage_reported": 0.7,
+      "branch": "clipped_residuals"
+    },
+    {
+      "kf_id": 53,
+      "status": "UNAVAILABLE",
+      "pose_stamp_ns": 1627785267272356749,
+      "scan_stamp_ns": 1627785267291151047,
+      "pose_scan_dt_ns": -18794298,
+      "manager": {
+        "state": "WAITING_FOR_EVIDENCE",
+        "trusted_version": 3,
+        "trusted_keyframes": 2,
+        "active_segment": "quar_3_1627785262106571102"
+      },
+      "support_reference_points": 1553,
+      "support_saved_total": [
+        200,
+        200
+      ],
+      "support_saved_within": 39,
+      "support_reported_within": 39,
+      "support_reported_fraction": 0.195,
+      "nis_reference": "node_map",
+      "nis_reference_points": 32,
+      "nis_saved_total": [
+        300,
+        300
+      ],
+      "nis_reported": 10.156722370991561,
+      "nis_saved_branch_mean": 10.156722370991561,
+      "coverage_saved_valid": 181,
+      "coverage_reported_valid": 181,
+      "coverage_reported": 0.6033333333333334,
+      "branch": "all_residuals"
+    },
+    {
+      "kf_id": 157,
+      "status": "UNAVAILABLE",
+      "pose_stamp_ns": 1627785279281777620,
+      "scan_stamp_ns": 1627785279314662933,
+      "pose_scan_dt_ns": -32885313,
+      "manager": {
+        "state": "WAITING_FOR_EVIDENCE",
+        "trusted_version": 31,
+        "trusted_keyframes": 49,
+        "active_segment": "quar_31_1627785271712009573"
+      },
+      "support_reference_points": 30991,
+      "support_saved_total": [
+        200,
+        200
+      ],
+      "support_saved_within": 63,
+      "support_reported_within": 63,
+      "support_reported_fraction": 0.315,
+      "nis_reference": "node_map",
+      "nis_reference_points": 57,
+      "nis_saved_total": [
+        300,
+        300
+      ],
+      "nis_reported": 403.6426057098469,
+      "nis_saved_branch_mean": 403.6426057098469,
+      "coverage_saved_valid": 23,
+      "coverage_reported_valid": 23,
+      "coverage_reported": 0.07666666666666666,
+      "branch": "all_residuals"
+    },
+    {
+      "kf_id": 199,
+      "status": "UNAVAILABLE",
+      "pose_stamp_ns": 1627785286344705820,
+      "scan_stamp_ns": 1627785286329509258,
+      "pose_scan_dt_ns": 15196562,
+      "manager": {
+        "state": "WAITING_FOR_EVIDENCE",
+        "trusted_version": 35,
+        "trusted_keyframes": 72,
+        "active_segment": "quar_35_1627785279780469561"
+      },
+      "support_reference_points": 39340,
+      "support_saved_total": [
+        200,
+        200
+      ],
+      "support_saved_within": 87,
+      "support_reported_within": 87,
+      "support_reported_fraction": 0.435,
+      "nis_reference": "node_map",
+      "nis_reference_points": 241,
+      "nis_saved_total": [
+        300,
+        300
+      ],
+      "nis_reported": 28.890674775027655,
+      "nis_saved_branch_mean": 28.890674775027655,
+      "coverage_saved_valid": 22,
+      "coverage_reported_valid": 22,
+      "coverage_reported": 0.07333333333333333,
+      "branch": "all_residuals"
+    },
+    {
+      "kf_id": 401,
+      "status": "UNAVAILABLE",
+      "pose_stamp_ns": 1627785306575157404,
+      "scan_stamp_ns": 1627785306568071365,
+      "pose_scan_dt_ns": 7086039,
+      "manager": {
+        "state": "HEALTHY",
+        "trusted_version": 209,
+        "trusted_keyframes": 261,
+        "active_segment": null
+      },
+      "support_reference_points": 168820,
+      "support_saved_total": [
+        200,
+        200
+      ],
+      "support_saved_within": 0,
+      "support_reported_within": 0,
+      "support_reported_fraction": 0.0,
+      "nis_reference": "prev_scan",
+      "nis_reference_points": 6000,
+      "nis_saved_total": [
+        300,
+        300
+      ],
+      "nis_reported": 794.1427615586034,
+      "nis_saved_branch_mean": 794.1427615586034,
+      "coverage_saved_valid": 20,
+      "coverage_reported_valid": 20,
+      "coverage_reported": 0.06666666666666667,
+      "branch": "all_residuals"
+    }
+  ],
+  "geometry_reproduction_limits": [
+    "Full UNAVAILABLE masks/residuals permit internal arithmetic reproduction, not independent support or nearest-neighbor geometry reproduction.",
+    "Support query body/world and post-cap row/stride exist. No support reference coordinates or immutable reference snapshot/hash is archived.",
+    "NIS nn_ids index the sampled train array; train/holdout strides and query ordinal exist, but actual selected reference/train coordinates and original raw/bag row mapping are absent.",
+    "Saved centroid/normal permit plane residual checks at 24,120 support/holdout query intersections, but do not independently verify KNN selection or PCA normal derivation.",
+    "Manager trusted_version/counts and native snapshot stamp/frame/counts are metadata, not linked reproducible coordinate snapshots."
+  ],
+  "detector": {
+    "enabled": true,
+    "run_mode": "ONLINE_DETECTION",
+    "scripted_trigger_lists": {
+      "declared_s": [],
+      "declared_ns": [],
+      "fired": []
+    },
+    "warmup_counts": {
+      "AVAILABLE": 95,
+      "UNAVAILABLE": 307,
+      "DISABLED_FOR_DIAGNOSIS": 0
+    },
+    "trigger_frame_diagnostics": [
+      {
+        "kf_id": 23,
+        "ts_ns": 1627785264272873640,
+        "nis": 18.40307529519044,
+        "nis_source": "computed",
+        "nis_reference": "node_map",
+        "detection_status": "AVAILABLE",
+        "detector_state": "QUARANTINED",
+        "cusum": 33.983600633001195,
+        "suspect_dwell": 2,
+        "map_points": 902,
+        "trusted_keyframes": 3
+      },
+      {
+        "kf_id": 119,
+        "ts_ns": 1627785273879016399,
+        "nis": 70.17588794448753,
+        "nis_source": "computed",
+        "nis_reference": "node_map",
+        "detection_status": "AVAILABLE",
+        "detector_state": "QUARANTINED",
+        "cusum": 130.07628282294928,
+        "suspect_dwell": 2,
+        "map_points": 30991,
+        "trusted_keyframes": 50
+      },
+      {
+        "kf_id": 172,
+        "ts_ns": 1627785282080349922,
+        "nis": 371.3884596337302,
+        "nis_source": "computed",
+        "nis_reference": "node_map",
+        "detection_status": "AVAILABLE",
+        "detector_state": "QUARANTINED",
+        "cusum": 652.8874216748395,
+        "suspect_dwell": 2,
+        "map_points": 38748,
+        "trusted_keyframes": 73
+      }
+    ]
+  },
+  "episodes": [
+    {
+      "index": 0,
+      "trigger_ts_ns": 1627785264272873640,
+      "candidate_decision_ts_ns": 1627785266273471594,
+      "frame_freeze": {
+        "frozen": true,
+        "frozen_at_ns": 1627785266273471594,
+        "frozen_frames": 21,
+        "frames_after_freeze": 75
+      },
+      "first_alarm_ts_ns": 1627785264206571102,
+      "accepted": false,
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "refusal_reason": "Insufficient verified info; maintaining soft bridge while waiting for new evidence",
+      "committed_keys": [],
+      "deferred_keys": [],
+      "paired_evidence": {
+        "num_paired_frames": 21,
+        "required_paired_frames": 8,
+        "candidate_keyframes": 21,
+        "pairable_frames": 21,
+        "frames_without_independent_reference": 0,
+        "reference_frames_from_candidate": 2,
+        "num_improved_frames": 21,
+        "improved_fraction": 1.0,
+        "wilson_lower_bound": 0.8858507489129873,
+        "approved": true,
+        "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+        "incumbent_mean_residual": 0.8406185362893361,
+        "candidate_mean_residual": 0.2673060975435493,
+        "reentry_pos_jump_m": 1.3577490514813466
+      },
+      "state_after": "WAITING_FOR_EVIDENCE",
+      "native_restore_ok": true,
+      "native_restore_ack_fields": {
+        "valid": "1",
+        "stamp_ns": "1627785263807537920",
+        "frame": "28",
+        "voxels": "7986",
+        "nodes": "13729",
+        "points": "147560",
+        "restores": "1",
+        "live_voxels": "7986",
+        "live_points": "147560",
+        "state_pos": "1.124225,-0.080630,-0.007242",
+        "hold": "1",
+        "held_frames": "42",
+        "held_points": "712547",
+        "hold_commands": "1",
+        "repair_received": "0",
+        "repair_applied": "0",
+        "repair_dropped": "0",
+        "repair_queued": "0",
+        "multi_scan_groups": "0",
+        "merged_scans": "56",
+        "set_state": "0",
+        "repair_merged_away": "0",
+        "control_valid": "0",
+        "control_pos": "0.000000,0.000000,0.000000",
+        "control_points": "0"
+      }
+    },
+    {
+      "index": 1,
+      "trigger_ts_ns": 1627785273879016399,
+      "candidate_decision_ts_ns": 1627785276081583500,
+      "frame_freeze": {
+        "frozen": true,
+        "frozen_at_ns": 1627785275881222010,
+        "frozen_frames": 20,
+        "frames_after_freeze": 33
+      },
+      "first_alarm_ts_ns": 1627785264206571102,
+      "accepted": false,
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "refusal_reason": "Insufficient verified info; maintaining soft bridge while waiting for new evidence",
+      "committed_keys": [],
+      "deferred_keys": [],
+      "paired_evidence": {
+        "num_paired_frames": 20,
+        "required_paired_frames": 8,
+        "candidate_keyframes": 20,
+        "pairable_frames": 20,
+        "frames_without_independent_reference": 0,
+        "reference_frames_from_candidate": 49,
+        "num_improved_frames": 20,
+        "improved_fraction": 1.0,
+        "wilson_lower_bound": 0.8808234818732034,
+        "approved": true,
+        "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+        "incumbent_mean_residual": 696.025731324713,
+        "candidate_mean_residual": 86.24532300851683,
+        "reentry_pos_jump_m": 1.3451374721139264
+      },
+      "state_after": "WAITING_FOR_EVIDENCE",
+      "native_restore_ok": true,
+      "native_restore_ack_fields": {
+        "valid": "1",
+        "stamp_ns": "1627785273073156608",
+        "frame": "167",
+        "voxels": "44344",
+        "nodes": "81061",
+        "points": "626028",
+        "restores": "2",
+        "live_voxels": "44344",
+        "live_points": "626028",
+        "state_pos": "-1.700826,-5.564907,51.409109",
+        "hold": "1",
+        "held_frames": "144",
+        "held_points": "1921751",
+        "hold_commands": "3",
+        "repair_received": "0",
+        "repair_applied": "0",
+        "repair_dropped": "0",
+        "repair_queued": "0",
+        "multi_scan_groups": "0",
+        "merged_scans": "174",
+        "set_state": "0",
+        "repair_merged_away": "0",
+        "control_valid": "0",
+        "control_pos": "0.000000,0.000000,0.000000",
+        "control_points": "0"
+      }
+    },
+    {
+      "index": 2,
+      "trigger_ts_ns": 1627785282080349922,
+      "candidate_decision_ts_ns": 1627785284345819950,
+      "frame_freeze": {
+        "frozen": true,
+        "frozen_at_ns": 1627785284145961285,
+        "frozen_frames": 12,
+        "frames_after_freeze": 218
+      },
+      "first_alarm_ts_ns": 1627785264206571102,
+      "accepted": false,
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "refusal_reason": "Insufficient verified info; maintaining soft bridge while waiting for new evidence",
+      "committed_keys": [],
+      "deferred_keys": [
+        180,
+        181,
+        182
+      ],
+      "paired_evidence": {
+        "num_paired_frames": 9,
+        "required_paired_frames": 8,
+        "candidate_keyframes": 9,
+        "pairable_frames": 9,
+        "frames_without_independent_reference": 0,
+        "reference_frames_from_candidate": 72,
+        "num_improved_frames": 9,
+        "improved_fraction": 1.0,
+        "wilson_lower_bound": 0.7688348521381084,
+        "approved": true,
+        "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+        "incumbent_mean_residual": 100.55486829923383,
+        "candidate_mean_residual": 35.250457553056364,
+        "reentry_pos_jump_m": 1.6007188909548986
+      },
+      "state_after": "WAITING_FOR_EVIDENCE",
+      "native_restore_ok": true,
+      "native_restore_ack_fields": {
+        "valid": "1",
+        "stamp_ns": "1627785281480673024",
+        "frame": "267",
+        "voxels": "45625",
+        "nodes": "83141",
+        "points": "649297",
+        "restores": "3",
+        "live_voxels": "45625",
+        "live_points": "649297",
+        "state_pos": "-0.904945,-4.665549,51.335705",
+        "hold": "1",
+        "held_frames": "177",
+        "held_points": "2053072",
+        "hold_commands": "5",
+        "repair_received": "0",
+        "repair_applied": "0",
+        "repair_dropped": "0",
+        "repair_queued": "0",
+        "multi_scan_groups": "0",
+        "merged_scans": "234",
+        "set_state": "0",
+        "repair_merged_away": "0",
+        "control_valid": "0",
+        "control_pos": "0.000000,0.000000,0.000000",
+        "control_points": "0"
+      }
+    }
+  ],
+  "gate": {
+    "accepted": 0,
+    "rejected": 3,
+    "errored": 0,
+    "modes": [
+      "MODE3_SOFT_BRIDGE_WAIT",
+      "MODE3_SOFT_BRIDGE_WAIT",
+      "MODE3_SOFT_BRIDGE_WAIT"
+    ],
+    "committed_key_total": 0,
+    "deferred_key_total": 3
+  },
+  "native": {
+    "headline": {
+      "enabled": true,
+      "host_ready": true,
+      "snapshot_ack_timeouts": 14,
+      "snapshots_superseded": 0,
+      "dir": "/tmp/fl_native_20261112T065500Z_187992/host_control",
+      "snapshot_period_s": 2.0,
+      "snapshots": 15,
+      "restores": 3,
+      "reprocesses": 0,
+      "holds": 3,
+      "resumes": 3,
+      "failures": 14
+    },
+    "event_counts": {
+      "status/True": 1,
+      "snapshot/True": 15,
+      "hold/True": 3,
+      "restore/True": 3,
+      "resume/True": 3,
+      "snapshot/False": 14
+    },
+    "failed_snapshot_example": {
+      "command": "snapshot",
+      "wall": 1794466563.928,
+      "sent_wall": 1794466563.928,
+      "received_wall": 1794466563.932609,
+      "received_s": 0.005,
+      "ok": false,
+      "error": "snapshot_ack_timeout"
+    },
+    "wait_closes": [
+      {
+        "event": "wait_limit_closed",
+        "segment_id": "quar_3_1627785262106571102",
+        "wait_started_ns": 1627785267072604656,
+        "closed_ns": 1627785269202704191,
+        "wait_limit_ns": 2000000000,
+        "t_start_ns": 1627785262106571102,
+        "t_end_ns": 1627785269069603682,
+        "trusted_version": 3,
+        "unresolved_frame_count": 70
+      },
+      {
+        "event": "wait_limit_closed",
+        "segment_id": "quar_31_1627785271712009573",
+        "wait_started_ns": 1627785277481386900,
+        "closed_ns": 1627785279481660843,
+        "wait_limit_ns": 2000000000,
+        "t_start_ns": 1627785271712009573,
+        "t_end_ns": 1627785279281777620,
+        "trusted_version": 31,
+        "unresolved_frame_count": 60
+      },
+      {
+        "event": "wait_limit_closed",
+        "segment_id": "quar_35_1627785279780469561",
+        "wait_started_ns": 1627785284745639086,
+        "closed_ns": 1627785286811158657,
+        "wait_limit_ns": 2000000000,
+        "t_start_ns": 1627785279780469561,
+        "t_end_ns": 1627785286744526625,
+        "trusted_version": 35,
+        "unresolved_frame_count": 44
+      }
+    ],
+    "rearms": 3,
+    "final_state": "HEALTHY",
+    "quarantine_open_at_exit": false,
+    "E2_limit": "Second and third online admission/restore/rearm cycles exercised; zero accepts/commits/reprocesses/repair applications. No independent fault labels, recovery-success measure or expected two-event alignment is archived."
+  },
+  "report_corrections_and_limits": [
+    "REPORT section 6 says 306 UNAVAILABLE frames had fraction<0.60. Actual: 285 fraction failures + 22 empty_reference (21 with fresh finite prev_scan NIS, one with no NIS). 306 is support_false AND nis_present, not the fraction-failure count.",
+    "No saved support points exist for 22 empty_reference frames; no NIS points for the one no_reference frame. Full samples exist for 285 evaluated unsupported frames and 306 NIS-computed UNAVAILABLE frames.",
+    "Receipt repair_publish='1' disagrees with actual node launch_args repair_publish=false and recovery_node.log repair publisher off. Actual native hold/restore/resume is distinct from repair publication.",
+    "wiring.all_ok and HEALTHY are operational/state labels, not detection or recovery success. 14 snapshot_ack_timeout failures are recorded.",
+    "Historical87 comparison is only 22+65=87; scoped archive does not establish old-run identity or population/event equivalence.",
+    "No-log/log decision invariance and S1 tests are claims not independently demonstrated by this single scoped archive.",
+    "UNAVAILABLE/high-NIS establishes recorded support failure with available NIS, not proven pose drift or its cause.",
+    "pose_convention.one_frame_check is REVERSED_SELECTED; 18.280525337810758 forward vs 15.871990342592234 reverse. This is a recorded diagnostic, not a causal orientation verdict.",
+    "All three episode first_alarm_ts_ns repeat 1627785264206571102; later episode onset/trigger timestamps differ. Do not treat that field as fresh per-episode evidence."
+  ],
+  "wiring_all_ok": true,
+  "report_contains_fraction_306_claim": true
+}

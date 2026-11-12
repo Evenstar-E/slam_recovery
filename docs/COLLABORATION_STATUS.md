@@ -728,3 +728,11 @@ S1最低native成功依赖与失败公开一致；S2按已派分批流控复用�
 [核验](review_20261112_e82d900/README.md)两run41SHA一致/target driver/新库绑定，按戳snapshot时刻frame同、replay两端124group同、23stamp人口及23全应用接受，旧晚cp/部分应用该范围解除。修复前snapshot地图及state不同，不要求随机逐值一致，但单对不能宣称唯一因素/全部map和resume差归因；质量UNKNOWN。v3仍skip+clear后缀399/372、无catch-up，单事件/detection off、尾帧不是E2，deferred ACK非应用且预置仅首脚本戳。S1成功依赖/真实人口、S2物理一致产物及后缀追赶→接回E2或能力断点优先，S3研究/参数停，非无限单事件A/B。
 
 用户诊断任务ddd0fb7晚于target发布，现main无实现不说开发已无视；S1实际认领共享逐帧取证、S2检测on有限分支/样本复算，native并行不调门。逐项自检状态/实际命令/原件/失败/质量/未知，A/B局部推进不总分。本机1receipt test/control无host/bag，独立review SSH推送、不合main不改算法/private保护，实际接收待回执。
+
+## repair-f3 / 70531be增量：诊断分支接受，参考几何因果及修复E2未闭合
+
+[核验](review_20261112_70531be/README.md)S1实现/S2检测on065500Z新原件13SHA一致，402paired全行一致、95可用/307不可用；22参考空+285比例不足，401新算finiteNIS/1无NIS，carried/nonfinite0。306有NIS且support失败包括21空参考，不是306比例不足，后继更正REPORT§6不重跑。kf157 support.315/NIS403.6426前置排除真实，mask/残差内部复算接受，但reference/cache坐标身份未存/KNN不可独立重建/正常边界裁20点不可全复算；post-cap row非原row，target正常反例12原点cap4写0/1/2/3实际0/3/6/9，最低复用finite/stride映射。
+
+三次真实online拒绝/restore/resume和后继重武装接受，实际repair off/0commit/reprocess/applied、14snapshot超时、HEALTHY/wiring非恢复成功；有后两事件路径但无首次修复，不补用户repair后E2。历史87不同身份不合并；S3/tmp跨版本统计仅开发分析。本机12帧9不可用/3可用target/base/log输出与trusted状态同、8test PASS.043s、Git Bash语法PASS，无host/bag/算法参数；pytest辅助两项未跑不装。A3/B3局部取证进步不总分。
+
+S1可并行最小补当时reference/cache身份与必要坐标、原row和少数完整正常边界，S2下一已有预算run随附或具体缺项，不新起诊断矩阵/事后造旧参考；只挡诊断强因果，不把日志挡全部native。S1/S2唯一主线继续物理一致修复→native完整state/map→保后缀追赶→接回/E2或首断点；已验23替换复用、v3后缀/成功依赖未改不重测。S3回既定门研究专用/旧参数停，选项不自动实施；逐项自检状态/实际命令/原件/失败/成本/质量UNKNOWN，不调冻结门。独立review SSH提交推送、不合main不改算法旧历史/private保护，开发新意见接收另待回执。
