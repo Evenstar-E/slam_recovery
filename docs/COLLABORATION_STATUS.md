@@ -373,7 +373,7 @@ S1/S2报告当前具体改动/已启动运行，沿原预算收尾并保存代�
 | 主链状态 | `main@5bae7bf`；双事件包 `/tmp/fastlivo/hall01_two_event_v1.bag`（`c3e905da…`）保留；原生两事件**尚未开始** |
 | 已知交付缺陷 | `test_checkpoint_client.py` 为 pytest 风格，`unittest discover` 发现 0 项；已要求 S2 改为 TestCase |
 
-## 34. 20:12 实质交付：受控两事件整链完成；在线链仍 BLOCKED 在上游检测
+## 39. 20:12 实质交付：受控两事件整链完成；在线链仍 BLOCKED 在上游检测
 
 以下均为实际运行/提交，不是任务发布。main `d35671f`。
 
