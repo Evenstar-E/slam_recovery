@@ -1,0 +1,13 @@
+{
+ "run": "ts_20261112T120000Z",
+ "n_map_initialisations": 74,
+ "init_counts_by_window": {
+  "pre_E1": 39,
+  "E1": 7,
+  "mid": 21,
+  "E2": 6,
+  "tail": 1
+ },
+ "last_t_s": 346.72,
+ "note": "repeat of the same input/config for log instrumentation; no parameter changed"
+}

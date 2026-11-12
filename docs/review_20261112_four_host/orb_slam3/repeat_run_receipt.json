@@ -1,0 +1,4 @@
+{
+"out":"/tmp/s1_orb_run/ts_20261112T120000Z","binary":"/home/R26534/ORB_SLAM3/Examples/Monocular-Inertial/mono_inertial_euroc","config":"/home/R26534/ORB_SLAM3/Examples/Monocular-Inertial/Hall01_color_imu.yaml","data":"/tmp/orb_hall01","wall_s":372,
+"binary_sha256":"5efa7ff1221f9c70770f333e149f9826c2f49138069d11a9c4dff1d7eaf3a0e5","exit":"139"
+}
