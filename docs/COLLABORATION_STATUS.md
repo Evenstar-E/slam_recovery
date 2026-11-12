@@ -1197,3 +1197,24 @@ run `fl_native_20261112T074154Z_215075`（同声明）：
    16 维 predicted_T）；`reference` 块（cache_key[version,nposes]、refresh_ns、点数、sha256——每次刷新算一次，
    不是每帧）；`boundary` 帧（与前一帧状态不同）保留全部点级样本；参考 hash 与点数随行保存。
 5. 未改预测器本身、未加新阈值/防御；下一轮诊断如需再跑，由用户决定（当前暂停）。
+
+## 99. 主线达成（受控+注入）：同一实例"修复写回 → 接回 → 第二事件 → 尾段"
+
+S1 复核 S2 `b2efe95`（合入，206 测试）。run `two_event_v5_20261112`，宿主 v5（库 `9e7d8cdf…`，本机核对），
+驱动 `0a38e952…`；损坏只在第一窗口（触发 1 起 6 s）。
+
+| 项 | 事件 1 | 事件 2 |
+|---|---|---|
+| 触发 | `1627785276215170145`（kf 146） | `1627785308048271418`（kf 422） |
+| 决策 | +4.27 s | 312.255 |
+| 门 | **Mode 2 accepted**：3.1388→7.3114，Wilson .8947，committed 23 | **Mode 3 refused**：22.064→18.216（Wilson .8954 本身过线，信息增益不过 2×） |
+| 原生 | hold → 发布 23（synced）→ reprocess 497 帧 [276.282..292.826]（within 124 / **suffix 373**，repairs 23，leftover 0）→ **无 set_state**（suffix>0 跳过）→ 关闭 289.417 → rearm → resume | hold → restore（ckpt `1627785309656085248` frame 863）→ resume |
+| 关闭 | wait_limit_closed → rearm v102 | wait_limit_closed → rearm v246 |
+
+- 触发 1→2 **276 帧**；第一次关闭→触发 2 **186 帧**；触发 2→bag 末 **122 帧**；`candidates.jsonl` **2 行**；
+  `lifecycle.events` **4 条**；终态 **HEALTHY**、`open=false`；holds 3 / resumes 2 / restores 1 / reprocesses 1。
+- **新发现（如实）**：第二事件 restore 使用的 checkpoint 戳 `309.656` 晚于第二触发 `308.048` **1.6 s**
+  （滚动 snapshot 命令在触发前发出、宿主积压后于触发后才应用）——回滚只到 segment 内 1.6 s 处，
+  不是完整回退；这正是审阅多轮保留的"checkpoint 不晚于可信隔离边界"断点。
+- 边界：预排武装 hold/snapshot 只针对 `min(stamps)`，第二事件走滚动 checkpoint；门/阈值/σ 未动；
+  可用性诊断暂停；损坏自注入，不声称真实修复收益或恢复成功率。
