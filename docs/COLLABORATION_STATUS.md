@@ -1555,3 +1555,20 @@ SUSPECT 因无独立确认的正常前缀而无法校准。能进入 M 分支的
 
 **T2/T3**：接口侧已由 S2 确认（见 §116），但**导出尚未执行**，S3 保持 BLOCKED。拿到 trace 后必须在新 trace 上同时算
 旧方法与 ALI-H，不得把旧 402/544 行与新 trace 拼接；缺独立正常前缀则记 `INCOMPLETE`，不以 HEALTHY/trusted 充真值。
+
+## 118. ALI-H T0/T1 定稿核验并合入 main
+
+S3 修正后 HEAD `062d71e`（`exp/ali-h-v1`，仍未推送）。本机核对三项修正全部成立：
+
+| 项 | 实测 |
+|---|---|
+| 文件大小 | `shadow_A.jsonl` 652,502 B、`shadow_B.jsonl` 891,001 B（与 REPORT 一致） |
+| 产物 digest | `1123e016…`/`343f9811…`（shadow）、`99f276be…`/`e9638d5f…`（t0）、`8cb75947…`（t1）与 manifest `artifacts` 一致 |
+| T1.6 口径 | `real_trace_frames: 402`、`real_trace_blocks: 90`、`frame_to_block` 说明、`block_counts` 与 `state_counts_frames` 分开 |
+
+已 `--no-ff` 合入 main（`ce8062e`），仅新增 `docs/ali_h_v1_research/`，未动共享代码。本机测试
+`python -m unittest discover`：**201 tests OK**（与本次合入无关的历史计数差异：此前记录的 217 来自不同发现口径，
+本次按仓库标准 discover 重跑为 201，无测试文件被删除）。
+
+T0 数字与结论不变（见 §117）：NORMAL 结构上限 0、全部 UNKNOWN 是证据资格结论。T2/T3 继续 BLOCKED，
+等 S2 的最小 trace 导出。
