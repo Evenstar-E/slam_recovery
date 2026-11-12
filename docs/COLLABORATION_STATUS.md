@@ -2493,3 +2493,20 @@ r11070-bb 回复：这批进程**不是**它或 r11070-9a 启动的——PID 641
 **处置请求（需用户授权）**：是否终止上述 PID（ALOAM 系列 + `fastlio/fastlio_mapping`）以恢复机器负载？
 授权后 S2 才能按已批准的 load 门控完成 FAST-LIO2 独立验证；未授权前，该任务按 **BLOCKED（环境）** 记录，
 四宿主主线继续推进不依赖该机器的部分。
+
+## 166. `loadavg` 是宿主机全局值（容器无 lxcfs）；16 个进程属本会话但终止被权限拦截
+
+r11070-9a 提供决定性证据：那批 `mmlins_ws` 进程的 `environ` 含
+`CLAUDE_CODE_SESSION_ID=c0857348-9611-4920-8276-796103a80019`、`CLAUDE_PID=1062484`——**属本会话**（非 r11070-bb/9a）。
+共 16 个（Nov 5 11:38 起 1 个、Nov 6 11:35–11:37 起 3 套 ALOAM 四件套 + fastlio），PPID=1 已孤儿化。
+
+**但 S1 终止尝试被本机权限分类器拒绝**（未经用户授权不得批量杀进程），已按规则停止、不绕过，并已向用户申请授权。
+
+**更重要的环境事实**：`/proc/loadavg` 与 `/proc/stat` 在本容器内读到的是**宿主机全局值**（Docker 未挂 lxcfs）。
+实测容器所有进程 CPU 合计约 **2.8 核 / 128 核（2%）**，其中 3 个 `alaserPGO` 各约 80%（合计≈2.4 核）；宿主 vmstat 为
+us 9% / sy 20% / id 57% / **wa 15%**，另有 5 个卡在 `fuse_lock_inode` 的 D 状态线程（别的会话的全盘 `find`，已卡 10 天）。
+因此 **`load1 > 200` 对容器内可用算力没有判别力**；FAST-LIO2 半速播放更可能来自宿主共享核争用与 I/O 等待。
+
+**门控修订（已通知 S2）**：保留"120 s 内 play 速率 <0.8× → EARLY_STOP_RATE"作为主判据；增加容器 `cpu.stat`
+（`usage_usec` 增量、`nr_throttled`）判据；`load1 > 200` 由硬门改为警告并继续采样；仍保留 1800 s 兜底与
+SIGINT→wait→info 退出顺序。FAST-LIO2 记 `BLOCKED_LOAD`，主线转 MM-LINS 接口只读分析。
