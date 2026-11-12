@@ -717,3 +717,10 @@ hist_bytes最大235760928为旧历史points*32+voxels*96估算，排除当前槽
 两个现reader仍只接受92/93或vec_start+78，普通声明100列行控制都0parsed/malformed100，最低S3/S1沿现schema接pose7及真实消费者，一个正常控制复用旧档，不只放行却继续旧外部pose；不阻旧数据/native其他工作。额外LIO文件只有rel_s且无idx/group/phase，空点早退仅pre，最低S2/S3将所用pre与trace已有key同更新绑定，可直接真实pre/post算残差、不强求final solution或反推vec。其他四源码与v9同，mixed body旋转/world平移未转换，新增body cov声明不能补Log残差Sigma；cov保持NOT_AVAILABLE/unit-only可继续，不把协方差列前置或改frame冒转换。v8 carryover单scan/post时间PASS子主张仍未实证，不靠总体资格收窄洗成独立I。
 
 唯一完整cp+IMU/capture→实际物理修复→native状态map→全部后继仍待后半，S1唯一集成/S2宿主/S3研究；v10开发准备和认领确认非新bag或效果，08:53窗不被“明天”安排延期，未阻工作继续/noCodex/旧手调停科学门不降。A1/A11/A3/B3取证准备与A2/A12档局部增加、不全表评分，reader-I exit0为有限核验及正常缺口复现非端到端PASS，四Cron单owner，中文review SSH白名单、不算法ROS/main历史/private/开发日报。
+
+
+## 2026-11-13 用户再次收紧主线：四宿主工程与论文全部验收后才适配 FAST-LIVO2
+
+用户明确：“把主线调整为在四项宿主上所有我们的工程和论文的需求全都解决了再在fast-livo2上做适配，否则不要开fast-livo2”。执行以 [HOST_VALIDATION_ORDER_20261113](HOST_VALIDATION_ORDER_20261113.md)为准，覆盖旧单宿主选择、FAST-LIVO2优先和四项仅各跑一次的返回条件。四项为MM-LINS/FAST-LIO2/LIO-SAM/ORB-SLAM3，分别沿原A/B需求和证据验收；任何不适用、范围缩减或提前恢复交用户明确决定，不擅自放行。FAST-LIVO2新增运行/构建/适配/v10后续工作全部后置，旧资产与负结果保留，实际在途只原预算安全收尾、不续跑；发布不冒称远端已停止。
+
+本轮 [Codex参考报告](codex_review_20261113_66cc814/README.md)固定审阅c915197→66cc814，补实际T2归档的排序索引错配：92/504诊断s变化、中位70.3134→72.2939，仍非合格I。v10格式缺口与既有自动审阅相容；SE3 helper/来源/候选时差的接受范围保留。只读复核入口21份固定输入校SHA，输出与原审阅一致；没有原生实验、产品代码修改或新效果结论。本次由用户要求推送，作者Codex、报告供参考；路线顺序是用户决定，不是报告建议。
