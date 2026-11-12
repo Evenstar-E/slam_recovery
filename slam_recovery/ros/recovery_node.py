@@ -958,6 +958,7 @@ class NativeClosedLoop:
         self.publish_repair = None            # callable(PointCloud2), set by the ROS driver
         self.repair_sync_timeout_s = float(repair_sync_timeout_s)
         self._last_icp_delta: Optional[np.ndarray] = None
+        self._last_repair_inits: Dict[int, np.ndarray] = {}
         # 0 = no budget. A budget that is hit is recorded, because truncating the candidate
         # changes what the gate sees and must never happen silently.
         self.icp_time_budget_s = float(icp_time_budget_s)
@@ -1247,7 +1248,7 @@ class NativeClosedLoop:
                                                <= out["nis_reversed_T_bw"]) else "REVERSED_SELECTED"
         return out
 
-    def _icp_candidate(self, ep: "Episode"):
+    def _icp_candidate(self, ep: "Episode", incumbent_poses: Optional[Dict[int, np.ndarray]] = None):
         """One rigid correction for the whole segment, fitted against the frozen trusted map.
 
         A per-frame registration costs 13 s per frame live -- 23 frames would be five minutes
@@ -1257,10 +1258,20 @@ class NativeClosedLoop:
 
         The reference is the trusted map as it stood when the quarantine opened: frozen, so the
         candidate cannot be scored against geometry it produced.
+
+        The initial poses matter for a measurement bias. A uniform body-frame shift is absorbed by
+        the estimator into its own pose, so registering at the host's pose sees the corrupted cloud
+        already aligned and reports ~0 (run 043602Z: 0.003 m against an injected 0.5 m). The
+        trusted map's constant-velocity extrapolation (`incumbent_poses`) is an independent pose:
+        there the corrupted cloud is displaced by the bias and the fit can recover it.
         """
         scans = {kf: self.node.scan_buffer_body[kf]
                  for kf, _ts, _p in ep.frames if kf in self.node.scan_buffer_body}
-        inits = {kf: pose for kf, _ts, pose in ep.frames}
+        if incumbent_poses:
+            inits = {kf: np.asarray(incumbent_poses[kf], dtype=np.float64)
+                     for kf, _ts, _p in ep.frames if kf in incumbent_poses}
+        else:
+            inits = {kf: pose for kf, _ts, pose in ep.frames}
         reference = self.node.get_trusted_map_points(max_pts=1 << 30)
         started = time.perf_counter()
         res = reregister_segment(scans, inits, reference, ICP_CONFIG)
@@ -1271,11 +1282,14 @@ class NativeClosedLoop:
             if scans else np.zeros((0, 3))
         delta = np.asarray(res.pose, dtype=np.float64)
         # The same correction that makes the candidate poses also describes the measurement bias
-        # for the frames it covers; the repair publisher projects it onto the declared body axis.
+        # for the frames it covers; the repair publisher projects it onto the declared body axis,
+        # using the rotations of the same initial poses.
         self._last_icp_delta = delta.copy()
+        self._last_repair_inits = dict(inits)
         poses = {k: delta @ np.asarray(inits[k], dtype=np.float64) for k in inits}
         detail = {
             "mode": "single_rigid_transform_for_the_segment",
+            "init_poses": "incumbent" if incumbent_poses else "host_poses",
             "seconds": elapsed,
             "frames_with_scan": len(scans),
             "frames_candidate": len(poses),
@@ -1345,16 +1359,22 @@ class NativeClosedLoop:
         if self.publish_repair is None:
             out["reason"] = "no_repair_publisher"
             return out
-        bias, n = body_z_bias(ep.frames, self._last_icp_delta)
+        # The bias is estimated at the independent (incumbent) poses used for the registration,
+        # not at the host poses that already absorbed it.
+        frames_for_bias = [(kf, ts, self._last_repair_inits.get(kf, pose))
+                           for kf, ts, pose in ep.frames]
+        bias, n = body_z_bias(frames_for_bias, self._last_icp_delta)
         out["bias_z_m"] = round(float(bias), 6)
         out["frames_with_pose"] = int(n)
+        out["repair_shift_z_m"] = round(float(-bias), 6)
         for kf, _ts, _pose in ep.frames:
             rec = self._scan_index.get(kf)
             if not rec or rec[1] is None:
                 out["missing_clouds"] += 1
                 continue
             scan_ns, msg = rec
-            self.publish_repair(shift_z_cloud(msg, float(bias)))
+            # bias is the estimated injected corruption; the repair removes it.
+            self.publish_repair(shift_z_cloud(msg, float(-bias)))
             out["published"] += 1
             out["frames"].append(int(scan_ns))
         if out["published"]:
@@ -1378,22 +1398,25 @@ class NativeClosedLoop:
         repaired = {kf: pose for kf, _ts, pose in ep.frames}
         ts_by_key = {kf: ts for kf, ts, _p in ep.frames}
 
+        # The incumbent is computed first: the ICP source registers at these independent poses,
+        # because a uniform measurement bias is absorbed by the host's own pose and is invisible
+        # when the corrupted cloud is placed with that pose.
+        incumbent, anchor, extrap_basis = extrapolate_incumbent(
+            self.node.tx_mgr.trusted_poses, self.node._kf_timestamps, ts_by_key)
+
         icp_detail = None
         if self.candidate_source == "icp_reregistration":
             # A failure while building the candidate must leave a record, not a silent gap: the
             # episode is already marked decided by the time we get here, so an uncaught exception
             # would drop the decision entirely and the stream would show nothing happened.
             try:
-                repaired, icp_detail = self._icp_candidate(ep)
+                repaired, icp_detail = self._icp_candidate(ep, incumbent_poses=incumbent)
                 self.icp_details.append({"candidate_id": ep.candidate_id, **icp_detail})
             except BaseException as exc:
                 self.decision_errors.append({
                     "candidate_id": ep.candidate_id, "stage": "icp_candidate",
                     "error": f"{type(exc).__name__}: {exc}"})
                 repaired = {}          # no candidate; do not silently substitute the host poses
-
-        incumbent, anchor, extrap_basis = extrapolate_incumbent(
-            self.node.tx_mgr.trusted_poses, self.node._kf_timestamps, ts_by_key)
         # The anchor is the last trusted keyframe; its timestamp is what makes the re-entry bound
         # an elapsed-time envelope instead of a bare distance.
         anchor_ts_ns = None
@@ -1483,8 +1506,11 @@ class NativeClosedLoop:
             ep.meta["native_checkpoint"] = action
             if row.get("accepted") is True and ep.frames:
                 # An accepted repair is only accepted if the host continues from it: the last
-                # repaired pose becomes the host's state, and the next frames propagate from there.
-                writeback = self.cp.set_state(ep.frames[-1][2])
+                # candidate pose becomes the host's state, and the next frames propagate from
+                # there. Use the same (bias-corrected) pose the candidate and the repairs used,
+                # not the host pose the corrected measurements were meant to replace.
+                last_key = ep.frames[-1][0]
+                writeback = self.cp.set_state(repaired.get(last_key, ep.frames[-1][2]))
                 writeback["trigger"] = "accepted_pose"
                 ep.meta["native_writeback"] = writeback
             # The decision is made; the next event needs its own trusted checkpoint.

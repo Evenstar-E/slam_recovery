@@ -1,0 +1,2 @@
+[INFO] [1794458694.266290]: [slam_recovery] listening on /aft_mapped_to_init and /velodyne_points (repair publisher: on)
+[INFO] [1794458797.271075]: [slam_recovery] wrote 1 candidate rows to /tmp/fl_native_20261112T044445Z_85628

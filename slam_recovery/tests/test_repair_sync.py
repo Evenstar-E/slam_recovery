@@ -153,6 +153,27 @@ class RepairGateTest(unittest.TestCase):
         self.assertEqual(loop.cp.set_state_calls, 1)
         self.assertTrue(ep.meta["repair_publish"]["synced"])
 
+    def test_the_bias_is_estimated_at_the_incumbent_poses(self):
+        # Host poses are rotated about x, which would project the world correction to ~0; the
+        # incumbent poses are identity, where a -0.5 world-z correction is a +0.5 body-z
+        # corruption. The test fails if the code falls back to the host poses or flips the sign.
+        loop, ep = self._loop(wait_result=True)
+        delta = np.eye(4)
+        delta[2, 3] = -0.5
+        loop._last_icp_delta = delta
+        loop._last_repair_inits = {0: np.eye(4), 1: np.eye(4)}
+        host = np.eye(4)
+        host[:3, :3] = np.array([[1.0, 0, 0], [0, 0, -1.0], [0, 1.0, 0]])
+        ep.frames = [(k, 1_000, host) for k in (0, 1)]
+        loop.decide(1_500, "test")
+        rep = ep.meta["repair_publish"]
+        self.assertAlmostEqual(rep["bias_z_m"], 0.5, places=6)
+        self.assertAlmostEqual(rep["repair_shift_z_m"], -0.5, places=6)
+        # the published cloud actually carries the -0.5 shift
+        raw = np.frombuffer(loop.published[0].data, dtype=np.uint8).reshape(-1, 24)
+        z = raw[:, 8:12].view(np.float32).reshape(-1)
+        self.assertAlmostEqual(float(z[0]), ROWS[0][2] - 0.5, places=5)
+
 
 if __name__ == "__main__":
     unittest.main()
