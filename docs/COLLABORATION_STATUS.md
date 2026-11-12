@@ -1218,3 +1218,22 @@ S1 复核 S2 `b2efe95`（合入，206 测试）。run `two_event_v5_20261112`，
   不是完整回退；这正是审阅多轮保留的"checkpoint 不晚于可信隔离边界"断点。
 - 边界：预排武装 hold/snapshot 只针对 `min(stamps)`，第二事件走滚动 checkpoint；门/阈值/σ 未动；
   可用性诊断暂停；损坏自注入，不声称真实修复收益或恢复成功率。
+
+## 100. 武装 checkpoint 修复成立：第二段 restore 戳早于触发 58 ns；但第二段尾部差 0.47 s
+
+S1 复核 S2 `8b378b6`（合入，209 测试）。驱动改动：开段先 `expire_pending(0.0)` 再发幂等 hold（pending 快照记
+superseded）；**每个 scripted 戳各预排一次** `hold <stamp>`+`snapshot <stamp>`；**scripted run 关闭滚动快照**
+（根因：滚动快照在触发前发出、触发后才应用，会覆盖武装 checkpoint；上一 run 的 308.590 即此）。
+
+run `fl_native_20261112T080204Z_228057`：
+
+| 项 | 实际（本机核对） |
+|---|---|
+| 武装快照 | `snapshots=2`，无滚动快照；第一段 reprocess/resume ack stamp `1627785276215170048` |
+| **第二段 restore** | `stamp_ns=1627785308048271360`，比触发 `1627785308048271418` **早 58 ns** —— 目标成立 |
+| 第一段 | Mode 2 accepted（after 7.3024，Wilson .8947）、`repairs applied=23`、within 124 / suffix 313、地图 20154/375577、**无 set_state**、close→rearm→resume |
+| 第二段 | 触发 308.048、决策 312.25、Mode 3 拒绝、restore 用武装 checkpoint；`wait_offset=7.335 s` ⇒ 关闭应在 **321.383**，bag 最后帧 **320.909**，**差 474 ms**；退出 `WAITING_FOR_EVIDENCE / open=true` |
+| 结论 | checkpoint 目标成立；两项目标（restore 戳 + 第二段完整关闭）**未在同一 run 同时成立** |
+
+可用最晚戳：关闭 = 触发 + margin 4 + wait_offset 7.335 + wait 2 = 触发 + 13.335 s ≤ 320.909 ⇒ 触发 ≤ 307.574。
+考虑尾部余量，S1 要求 S2 用 **≤306.4 s 的戳**（关闭后至少约 10 帧尾段）再跑一次；不重制 bag、不改门/阈值。
