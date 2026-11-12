@@ -1276,3 +1276,20 @@ S1 复核 S2 `6faa695`（合入，209 测试），无新运行，宿主运行保
 2. 四宿主第二事件矩阵各一次实际运行（MM-LINS/FAST-LIO2 原生 PASS，LIO-SAM/ORB 原生 FAIL；修复链均 NOT_IMPLEMENTED）；
 3. 纯位姿修正不改变 body 点云、修复传输/门控/回执/串行化/终止戳/后缀重推/set_state 回拨等断点的逐项解除；
 4. UNAVAILABLE 取证与选项页（暂停，待用户选）。
+
+## 103. 用户选"独立参考诊断"；工具已实现，S2 跑干净地图 pass
+
+既有原件补充分析（无新运行，写入选项页 §7）：隔离期可信地图确实冻结（6 个 QUARANTINED 段
+`trusted_keyframes` 首末不变；全 run 增长转换几乎都在 HEALTHY），但 **HEALTHY 状态 166 帧里 152 帧仍
+UNAVAILABLE**（fraction 中位 0.09）——支持失败不是隔离期独有，更像宿主位姿与可信地图不一致；
+短时预测只救回 50 帧。根因仍 UNKNOWN。
+
+按用户选择实现独立参考工具（`f2befe9`，215 测试）：
+- `slam_recovery/validation/independent_reference.py`：读 PCD（binary/ascii）→ 用 availability 行保存的
+  body 样本 + `T_wb` 对**另一 run 的地图**做同一 1 m/60% 支持测试；可选 ICP 对齐（种子=宿主位姿），
+  报告对齐修正量、对齐后 fraction、both_low / host_low_independent_pass 计数；
+- 测试：带 intensity 字段的二值 PCD、both_low 与反转结果、trimmed 行、gzip、known-offset ICP 恢复；
+- 边界：独立地图仍来自同一传感器/宿主，若两图同向漂移，both_low 仍不能完全分离覆盖与位姿。
+
+已派 S2：同 bag、detection off、无注入、无 scripted、开 `pcd_save_en`（用副本 config 并记 sha）跑一次
+干净地图 pass，归档 PCD/receipt/config sha；S1 随后离线评分现有 544 行并交分段落结论。
