@@ -599,3 +599,11 @@ S1实际分发/共享接口单写，S3唯一research shadow执行，S2提供已�
 544同pose戳有限复算：kf22裁20/200命中20/20不能证整段gauge或正常；kf157/228全200均0命中、未注册位置差39.903/32.923m；全对应最大kf173 80.002m、首>1m kf46约1.761m，不GT/ATE。diag库v3 9c0330be/driver43c65a9d/config47a1bfd9 vs新v5 9e7d8cdf/4742dbc1/94ffa5db，虽bag与binary同，不只改on/off。diag8hold/8restore/7resume是干预候选解释，唯一因果UNKNOWN，不新矩阵。独立参考需同场景/合法注册/可见支持而非复制被评轨迹；灌诊断pose造图不是独立位姿评价，当前图有效性仍UNKNOWN，不第三次cleanpass。
 
 本轮支持旁支真实尾段/差异核，原生恢复主线无新增实现或run；S1/S2仍合法隔离cp/成功依赖→物理一致native完整重估→全部input接回后继尾段或显式不支持，复用suffix/skip/受控E2。S3按用户105b5be ALI-H真实数据单一交付先旧402/544资格/缺项与真实I，同人口漏检误报延迟错误NORMAL/UNKNOWN时长/成本，不继续换图；target早于任务合入，不指控忽略/不冒认领开工。旧参数停/1研究+2native，逐项自检状态命令原件/source人口/失败质量成本，A/B局部不总分，三Cron单owner/Python-I无host或参数，review白名单SSH推送/private保护不合main不改算法历史。
+
+## 74. d86e57d：受控隔离边界cp实际解除，拒绝回退后的历史归宿待闭合
+
+[核验](review_20261112_d86e57d/README.md)新092251Z/host v6 ca9126c4，driver a4aaa58b=target、23changed SHA一致。scripted提前trigger-margin与snapshot取前已处理组，最小changed test/10s-margin4s→6s正常控制PASS；actual host snapshot/apply核cp早E1/E2隔离起点15,918,433/12,414,904ns，旧晚qstart具体FAIL本次解除，不自动推广rolling/onset迟到与全state-cache等价。laser_mapping Built/整体vikit ABI exit1保留。
+
+E1实际23修复收到应用/leftover0/no set_state，原生794=244within+550suffix（397LIO334有点/63空+397VIO）map27805/564227，reprocess约19.397s，接回ACKXYZ差.0533222m非GT跳变；E1关闭至E2 trigger144paired，E2拒绝restore/wait-close/ABORTED rearm/resume→17paired/1.725149s尾段。两段未解128/160、59shift仅23修/36未修18晚最后，E2无注入/detection off/净收益未知；完整成功不冒HEALTHY。E2无第二reprocess，源码resume仅释放hold，回退后已消费历史/健康后缀的归宿及同一时间边界连续性未证明，未来输出不等完整追赶。最低复用buffer/重处理明确拒绝测量与需追赶input/IMU视觉归宿，或显式不支持，不无条件重放拒绝污染或扩框架；旧UNKNOWN/FAIL写回分支未改不重测。
+
+原生S1/S2下一收口拒绝后归宿/成功依赖与物理一致，S3用户ALI-H真实资格/运动证据与同人口风险成本并行，旧参数停。target未合105b任务不指控忽略/开工，审阅中用户17:53新15h连续执行/重大阻塞中文GitHub告知授权另任务发布。source/archive本机control无host/算法，状态命令原件人口/失败质量成本自检，A4局部时间边界与A2/A6/A10实证推进不全表评分，review SSH/private保护不合main不改历史冻结门。

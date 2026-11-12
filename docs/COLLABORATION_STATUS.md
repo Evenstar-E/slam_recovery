@@ -804,3 +804,9 @@ S1分发/确认owner branch HEAD预算并单写共享接口，S3唯一research�
 同戳位置差真实：kf157/228未注册差39.903/32.923m，各全200保存样本距新图0/200；kf22仅20/200裁样本20命中非全帧或gauge真值。完整544差最大80.002m、首>1m kf46，不精确15s起点/GT漂移。diag v3库9c0330be/driver43c65a9d/config47a1bfd9 vs新v5 9e7d8cdf/4742dbc1/94ffa5db，bag/binary同不单一干预控制；8restore/7resume是候选机制非已证唯一因果。独立图需同场景合法注册/覆盖而非相同估计轨迹，复制诊断pose造图不能当独立位姿参考；当前有效性UNKNOWN，不再clean矩阵。
 
 S1原因/人口限定只阻相关评价结论，S1/S2合法cp/成功依赖及物理native整链继续；S3用户105b5be ALI-H§10真实数据交付优先旧402/544资格/真实I/同人口风险与UNKNOWN成本，不等独立地图；新target未含最新任务，不指控忽略/不冒认领或测试。1研究+2native/旧参数停，逐项状态/命令原件/source input library/人口/失败质量成本自检，A/B局部不总分；Python-I reader无host/bag/ICP/参数，三Cron单owner，review白名单SSH/private保护不合main不改算法历史。
+
+## repair-f3 / d86e57d：两事件真实cp早隔离起点，拒绝后历史归宿仍未验
+
+[核验](review_20261112_d86e57d/README.md)新092251Z/23SHA/source target/v6库绑定，scripted trigger-margin及前已处理组cp，真实apply early E1 15.918433ms/E2 12.414904ms，具体晚边界断点解除。E1修23/原生794=244+550/map27805,564227/无set_state→接回→E2拒绝restore/关闭rearm/resume/尾17,1.725149s接受，受控/detection off/E2无注入非自动收益。未解128/160、59shift23修36未修保留；E2无第二reprocess，fullpatch resume只map_hold=false，消费历史/健康后缀归宿与时间连续性UNKNOWN，未来输出不充追赶。
+
+S1/S2最低复用buffer/重推明确拒绝与需追赶input/IMU视觉归宿，或不支持范围显式拒绝；不重放已拒污染/不重做时间边界旧FAIL。旧失败UNKNOWN写回/物理候选范围保不重测，S3用户ALI-H同人口真实验证继续，旧参数停。changed test及正常10s-margin4s控制PASS/no源码新review发现，laser_mapping Built/整体ABI failed保；status负延迟只字段旁支，来源人口/失败质量成本自检，A/B局部不总分/Python-I不host/private保护。用户17:53新15h连续执行与重大阻塞中文GitHub确认任务另发布，不冒本target已认领新要求。
