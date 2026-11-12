@@ -1,0 +1,33 @@
+--- a/include/LIVMapper.h
++++ b/include/LIVMapper.h
+@@ -264,6 +264,9 @@
+   // Last replay's split, exposed in the status ack so the driver can decide whether the host's own
+   // state already reached the captured boundary.
+   size_t cp_replay_within_ = 0, cp_replay_suffix_ = 0;
++  // lio_time of the last group the estimator actually folded in. A snapshot copies that state,
++  // so this, not the incoming group's time, is the checkpoint's true timestamp.
++  double cp_last_processed_lio_ = -1.0;
+   std::string cp_ctrl_dir_;
+   std::thread cp_ctrl_thread_;
+   std::atomic<bool> cp_ctrl_stop_{false};
+--- a/src/LIVMapper.cpp
++++ b/src/LIVMapper.cpp
+@@ -878,7 +878,8 @@
+   replay_buffer_.clear();
+   replay_capture_ = true;
+   cp_valid_ = true;
+-  cp_stamp_ = LidarMeasures.last_lio_update_time;
++  cp_stamp_ = (cp_last_processed_lio_ > 0.0 ? cp_last_processed_lio_
++                                            : LidarMeasures.last_lio_update_time);
+   cp_frame_num_ = frame_num;
+   cp_voxels_ = cp_map_.size();
+   cp_nodes_ = native_checkpoint::countNodes(cp_map_);
+@@ -1437,6 +1438,8 @@
+     // if (!p_imu->imu_time_init) continue;
+ 
+     stateEstimationAndMapping();
++    if (!LidarMeasures.measures.empty() && LidarMeasures.measures.back().lio_time > 0.0)
++      cp_last_processed_lio_ = LidarMeasures.measures.back().lio_time;
+ #ifdef TRACE_GROUP
+     // independent of DET_SYNC; declared inside its own scope so it does not collide with the
+     // package block's copy when DET_SYNC is also on
