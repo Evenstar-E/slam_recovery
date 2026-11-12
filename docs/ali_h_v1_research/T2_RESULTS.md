@@ -42,8 +42,11 @@
 `vec6 = state_propagat - state_ [0..5]`（has_out=1 且在 StateEstimation 之后）；按 host 的
 `StatesGroup::operator-`，`vec6 = [Log(R_post^T R_pre), pos_pre - pos_post]`。因此
 `R_pre = R_post · Exp(vec6_rot)`，`e_I = [-vec6_rot, -R_pre^T vec6_pos]`；
-`R_post` 取 `M2DGR_room_02.txt` 的 post 四元数（975 行按顺序对应 974 个可解析 has_out + 1 截断，
-时间差 ≤512 ns）。`Ppre/Ppost` 为 rot+pos 6×6 块；状态顺序/右扰动/body 由 trace 头声明。
+`R_post` 取 `M2DGR_room_02.txt` 的 P⁺ 位姿（S2/审阅已确认：`pose_output_en` 在 StateEstimation
+之后写 `_state.pos_end/rot_end`，body→world；与 trace 的 `abs_ns` 同源同帧）。join **按时间**、
+只用 `has_out=1`；replay 时间重复，同一时间组内按 trace 顺序（phase0 先、phase1 后）取 pose 行。
+975 行对 974 个可解析 has_out + 1 截断，时间差 ≤512 ns（double 秒量化/ulp，不是漂移）；
+重复时间组 156 个，已按 phase 分开统计。`Ppre/Ppost` 为 rot+pos 6×6 块；状态顺序/右扰动/body 由 trace 头声明。
 `S` 不导出，`r_*` 不是位姿协方差；`mat_pre/mat_out` 因 VIO/LIO 双写、handler 不可区分，未用于 e_I。
 
 ## 3. join（跨度包含，多对一）
@@ -74,8 +77,9 @@ capture 组**；每个 availability 行映射到的全部 `grp_idx`、`trace idx
 | T（prev_scan NIS） | **86** 行 present |
 | I（`vec6`+`Ppre`，`has_out=1`） | **504** 行 present；26 行 `HAS_OUT_0`；1 行 `NO_TRACE_ROW` |
 | I 的 `Ppre` 秩 | 504/504 秩 **6** |
+| pose join | **CONFIRMED_POST_POSE_TIME_JOIN**；重复时间组 156 个，phase 分开 |
 | I 的 `|e_I|`（与符号无关） | min 0 / median **0.0183** / max **1.545** |
-| I 的 `s_I`（精确 e_I，Ppre 可观测子空间） | min 0 / median **73.0** / max **5953** |
+| I 的 `s_I`（精确 e_I，Ppre 可观测子空间） | min 0 / median **70.39** / max **5953** |
 
 旧 status × M/T：
 
@@ -84,30 +88,52 @@ capture 组**；每个 availability 行映射到的全部 `grp_idx`、`trace idx
 | AVAILABLE（351） | 351 | 0 | 0 |
 | UNAVAILABLE（180） | 93 | 86 | 1 |
 
+**M/T 分母与覆盖**（531 个 availability 行）：
+
+| 通道 | present | 占比 | both | neither |
+|---|---:|---:|---:|---:|
+| M（node_map） | **444** | 83.6% | 0 | — |
+| T（prev_scan） | **86** | 16.2% | 0 | 1 |
+
+**I 的分位表**（精确 e_I，n=504；`−vec6` 近似作对照）：
+
+| 量 | min | p10 | p50 | p90 | max |
+|---|---:|---:|---:|---:|---:|
+| `|e_I|` 精确 | 0 | 0.00602 | **0.01827** | 0.06075 | 1.54496 |
+| `|e_I|` 近似 | 0 | 0.00602 | 0.01827 | 0.06075 | 1.54496 |
+| `s_I` 精确 | 0 | 4.047 | **70.39** | 413.8 | 5953.3 |
+| `s_I` 近似 | 0 | 3.914 | 66.87 | 411.6 | 5937.9 |
+| 平移 `|e_t|` 精确 | 0 | 0.00508 | 0.01662 | 0.05365 | 1.54424 |
+
 **按 phase 的 I 描述统计**（不分类）：
 
 | phase | has_out=1 行 | `|e|` median/max | `s` median/max |
 |---|---:|---|---|
-| 0（live） | 818 | 0.0185 / 1.545 | 69.3 / 5953 |
-| 1（replay） | 156 | 0.0425 / 0.145 | **911.9** / 9808 |
+| 0（live） | 818 | 0.0185 / 1.545 | 67.0 / 5953 |
+| 1（replay） | 156 | 0.0425 / 0.145 | **869.1** / 9714 |
 
 replay 的 `s` 明显更大，说明 replay 的 `Ppre` 尺度与 live 不同；**不能**据此判异常，只作上下文。
 
 **精确 vs 小角近似**（504 行）：`|e_I|` 的范数相同（旋转不改变范数），但平移**方向**不同——
 `‖e_trans_exact − e_trans_approx‖` 中位 **0.0096 m**、最大 **2.64 m**，**475/504 行**差异超过 1%；
-`s_I` 中位 73.0（精确） vs 66.9（近似）。所以**精确值为主结果**，`−vec6` 只作对照；大旋转
+`s_I` 中位 70.39（精确） vs 66.87（近似）。所以**精确值为主结果**，`−vec6` 只作对照；大旋转
 （最大 |e| 1.545 由平移主导）时近似会明显失真。
 
 ## 5. 块与 UNKNOWN 区间
 
 | 项 | 值 |
 |---|---|
-| 0.5 s 块 | **120** 块（覆盖 **60.0 s**） |
-| 状态 | **120/120 UNKNOWN** |
+| 0.5 s 块 | **120** 块（覆盖 **60.0 s**），全部 UNKNOWN |
 | 原因 | `CALIBRATION_BLOCKED:no_normal_reference`；部分块另带 `I_HAS_OUT_0`/`I_NO_TRACE_ROW` |
+| 普通 UNKNOWN | **108 块 / 54.0 s**，最长连续 **54.0 s**（0–54 s，单段） |
+| `POST_E2_NO_CATCHUP` | **12 块 / 6.0 s**，最长连续 **6.0 s**（54–60 s，单段） |
 | 非尾段 / 尾段行 | 480 / **51** |
-| 尾段块 | **12** 块（rel≥54 s） |
-| 尾段处理 | 单列 `POST_E2_NO_CATCHUP`：E2 后宿主发散到约 520 m、`catch_up=NOT_IMPLEMENTED`；不作连续接回正常证据 |
+| 尾段处理 | E2 后宿主发散到约 520 m、`catch_up=NOT_IMPLEMENTED`；只作分段报告，不作连续接回正常证据 |
+
+**`NORMAL_CONSISTENT` / `SUSPECT` / 误报 / 漏检 / 延迟 / 错误 NORMAL 全部 `NOT_EVALUABLE`**：
+原因不是实现，而是 `ALI-B2-NORMAL-LABELS-20261112-01` 缺独立正常参照与事件标签。
+**“全 UNKNOWN”不等于零风险**——它表示这些帧的可信状态未知、不能据此判定正常；
+不得用 UNKNOWN 数量冒充误报为零。
 
 ## 6. 逐项自检
 
@@ -118,7 +144,7 @@ replay 的 `s` 明显更大，说明 replay 的 `Ppre` 尺度与 live 不同；*
 | trace 形状（按名） | **PASS（1 行截断已记录）** | 1041/1042 可解析；第 1048 行 53 列 | 需 S2 补最后一行或声明截断 |
 | join 跨度包含、多对一显式 | **PASS（1 行 NO_TRACE_ROW）** | `t2_join.jsonl` 531 行，含 grp/phases/has_out | — |
 | M/T 证据 | **PASS** | 444 / 86 | — |
-| I 证据存在与可算 | **PASS（504，秩 6）** | 精确 e_I（vec6 + M2DGR post）；s/|e| 分布 | 与 S2 核对 `operator-` 约定；mat 文件仅可对照 |
+| I 证据存在与可算 | **PASS（504，秩 6）** | 精确 e_I（vec6 + M2DGR P⁺，时间 join、phase 分开）；s/|e| 分位表 | — |
 | NORMAL/SUSPECT 分类 | **BLOCKED / NOT_EVALUABLE** | 无独立正常参照/标签（ALI-B2） | 等用户选 A/B/C |
 | 误报/漏检/延迟/错误 NORMAL | **NOT_EVALUABLE** | 同上；受控注入标签只可离线评价 | — |
 | UNKNOWN 区间 | **PASS** | 120 块/60 s，尾段 12 块 | — |

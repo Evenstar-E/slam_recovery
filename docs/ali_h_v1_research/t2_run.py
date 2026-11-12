@@ -178,6 +178,15 @@ def i_evidence(group_rows: List[Dict[str, Any]],
     return out
 
 
+def _qs(vals: List[float]) -> Dict[str, Any]:
+    if not vals:
+        return {"n": 0}
+    a = np.asarray(vals, dtype=np.float64)
+    return {"n": len(vals), "min": float(a.min()), "p10": float(np.percentile(a, 10)),
+            "p50": float(np.percentile(a, 50)), "p90": float(np.percentile(a, 90)),
+            "max": float(a.max())}
+
+
 def _phase_i(rows: List[Dict[str, Any]], exact_by_idx: Dict[int, np.ndarray]) -> Dict[str, Any]:
     out: Dict[str, Any] = {}
     for ph in (0, 1):
@@ -241,12 +250,39 @@ def main(argv=None):
                    for l in open(os.path.join(base, "host_logs", "M2DGR_room_02.txt"))
                    if l.split()])
     ho_rows = [r for r in trace["rows"] if r["has_out"] == 1]
+    # Join by time, not global row order. Replay repeats timestamps in both files, so within
+    # one time group the k-th trace row (phase 0 then 1, trace order) takes the k-th pose row.
+    pose_rows = [(int(round(float(x[0]) * 1e9)), x) for x in m2]
+    pose_rows.sort(key=lambda t: t[0])
+    pose_ns = [t[0] for t in pose_rows]
+    groups: Dict[int, List[int]] = defaultdict(list)
+    for i, (ns, _) in enumerate(pose_rows):
+        groups[ns].append(i)
     exact_by_idx = {}
-    for j, r in enumerate(ho_rows):
-        if j < len(m2):
-            exact_by_idx[r["idx"]] = exact_e(r["vec6"], quat_to_rot(m2[j, 4:8]))
-    time_err = (np.round(m2[:len(ho_rows), 0] * 1e9).astype(np.int64)
-                - np.array([r["abs_ns"] for r in ho_rows])) if ho_rows else np.array([])
+    time_err = []
+    used: Dict[int, int] = defaultdict(int)
+    ambiguous_groups = 0
+    for r in ho_rows:
+        ns = r["abs_ns"]
+        i = bisect.bisect_left(pose_ns, ns)
+        cands = []
+        for j in (i - 1, i, i + 1):
+            if 0 <= j < len(pose_rows) and abs(pose_ns[j] - ns) <= 2000:
+                cands.append(j)
+        if not cands:
+            continue
+        # group candidates by identical pose time; within a group, consume in pose-file order
+        # as trace rows of the same time appear (phase 0 first, replay later)
+        key = min(pose_ns[j] for j in cands)
+        group_idx = sorted(groups.get(key, cands))
+        k = used[key]
+        if len(group_idx) > 1:
+            ambiguous_groups += 1 if k == 0 else 0
+        j = group_idx[min(k, len(group_idx) - 1)]
+        used[key] = k + 1
+        exact_by_idx[r["idx"]] = exact_e(r["vec6"], quat_to_rot(m2[j, 4:8]))
+        time_err.append(pose_ns[j] - ns)
+    time_err = np.array(time_err, dtype=np.int64)
     join = build_join(av, trace)
 
     mapped = join["mapped"]
@@ -260,6 +296,7 @@ def main(argv=None):
     exact = sum(1 for m in mapped if m["last"] is not None
                 and int(m["av"]["scan_stamp_ns"]) == int(m["last"]))
 
+    first_pose_ns = min(int(a["pose_stamp_ns"]) for a in av)
     joined_rows = []
     state_counts = Counter()
     block_map: Dict[int, List[Dict[str, Any]]] = defaultdict(list)
@@ -271,10 +308,8 @@ def main(argv=None):
         sup = a.get("support") or {}
         nis = a.get("nis") or {}
         ie = i_evidence(m["rows"], exact_by_idx)
-        rel_s = None
-        if m["rows"]:
-            rel_s = min(r["rel_s"] for r in m["rows"])
-        tail = bool(rel_s is not None and rel_s >= E2_REL_S)
+        rel_av_s = (int(a["pose_stamp_ns"]) - first_pose_ns) / 1e9
+        tail = bool(rel_av_s >= E2_REL_S)
         if tail:
             tail_rows += 1
         m_status = map_support(sup)
@@ -330,7 +365,36 @@ def main(argv=None):
                            "tail": tails, "state": "UNKNOWN",
                            "reason_codes": ["CALIBRATION_BLOCKED:no_normal_reference"]
                            + (["POST_E2_NO_CATCHUP"] if tails else [])})
+    # An empty block inside the post-E2 span inherits the tail flag; otherwise a zero-row gap
+    # would look like a normal UNKNOWN interval inside the tail.
+    tail_ids = [b["block_id"] for b in block_rows if b["tail"]]
+    if tail_ids:
+        lo, hi = tail_ids[0], tail_ids[-1]
+        for b in block_rows:
+            if b["n_frames"] == 0 and lo <= b["block_id"] <= hi:
+                b["tail"] = True
     unknown_blocks = sum(1 for b in block_rows if b["state"] == "UNKNOWN")
+    def _runs(bs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        if not bs:
+            return []
+        out, start, prev = [], bs[0]["block_id"], bs[0]["block_id"]
+        for b in bs[1:]:
+            if b["block_id"] == prev + 1:
+                prev = b["block_id"]
+            else:
+                out.append((start, prev)); start = prev = b["block_id"]
+        out.append((start, prev))
+        first = block_rows[0]["block_id"]
+        return [{"block_first": a, "block_last": b, "blocks": b - a + 1,
+                 "duration_s": (b - a + 1) * (BLOCK_NS / 1e9),
+                 "rel_start_s": (a - first) * (BLOCK_NS / 1e9),
+                 "rel_end_s": (b - first + 1) * (BLOCK_NS / 1e9),
+                 "start_ns": a * BLOCK_NS, "end_ns": (b + 1) * BLOCK_NS}
+                for a, b in out]
+    normal_blocks = [b for b in block_rows if not b["tail"]]
+    tail_blocks = [b for b in block_rows if b["tail"]]
+    normal_runs = _runs(normal_blocks)
+    tail_runs = _runs(tail_blocks)
 
     joined_counter = Counter()
     for r in joined_rows:
@@ -359,8 +423,11 @@ def main(argv=None):
             "receipt_sha256": sha256(receipt_path), "summary_sha256": sha256(summary_path),
             "protocol": "T2_PROTOCOL.md (pre-registered)", "block_ns": BLOCK_NS,
             "e2_rel_s": E2_REL_S,
-            "i_sign_note": "s_i and |e| are sign-invariant; e_I = -vec6 under the trace header "
-                           "(vec6 = state_propagat - state_ after StateEstimation).",
+            "pose_source_status": "CONFIRMED_POST_POSE_TIME_JOIN",
+            "i_sign_note": "exact e_I uses vec6 and the M2DGR post pose under the host "
+                           "StatesGroup::operator- convention; if M2DGR is not the post pose of "
+                           "the same frame, the exact values are invalid. -vec6 is kept as the "
+                           "small-angle comparison column.",
             "not_done": ["no normal reference", "no independent labels", "no host run"],
         },
         "run": {
@@ -384,6 +451,7 @@ def main(argv=None):
             "duplicate_groups": sum(1 for g, n in Counter(r["grp_idx"] for r in trace["rows"]).items() if n > 1),
             "scan_first_sentinel_all": all(r["scan_first_ns"] == -1 for r in trace["rows"]),
             "m2dgr_rows": len(m2), "m2dgr_time_err_ns_max": int(np.abs(time_err).max()) if len(time_err) else None,
+            "pose_join_mode": "time_with_duplicate_order", "duplicate_time_groups": ambiguous_groups,
         },
         "join": {
             "availability_rows": len(av), "mapped": len(mapped) - len(unmapped),
@@ -420,13 +488,47 @@ def main(argv=None):
                     "max": max(i_s) if i_s else None},
             "I_by_phase": _phase_i(trace["rows"], exact_by_idx),
             "I_compare": _compare_i(joined_rows),
+            "I_quantiles": {
+                "e_norm_exact": _qs([r["i"]["e_norm"] for r in joined_rows
+                                     if r["i"].get("mode") == "exact_from_vec6_and_m2dgr_post"]),
+                "e_norm_approx": _qs([r["i"]["e_norm_approx"] for r in joined_rows
+                                      if r["i"].get("mode") == "exact_from_vec6_and_m2dgr_post"]),
+                "s_exact": _qs([r["i"]["s_i"] for r in joined_rows
+                                if r["i"].get("mode") == "exact_from_vec6_and_m2dgr_post"]),
+                "s_approx": _qs([r["i"]["s_i_approx"] for r in joined_rows
+                                 if r["i"].get("mode") == "exact_from_vec6_and_m2dgr_post"
+                                 and r["i"].get("s_i_approx") is not None]),
+                "e_trans_exact": _qs([r["i"]["e_trans_exact"] for r in joined_rows
+                                      if r["i"].get("mode") == "exact_from_vec6_and_m2dgr_post"]),
+                "e_trans_approx": _qs([r["i"]["e_trans_approx"] for r in joined_rows
+                                       if r["i"].get("mode") == "exact_from_vec6_and_m2dgr_post"]),
+            },
+            "M_T_denominators": {
+                "all": len(joined_rows),
+                "M_present": sum(1 for r in joined_rows if r["M_present"]),
+                "T_present": sum(1 for r in joined_rows if r["T_present"]),
+                "both": sum(1 for r in joined_rows if r["M_present"] and r["T_present"]),
+                "neither": sum(1 for r in joined_rows if not r["M_present"] and not r["T_present"]),
+                "M_pct": 100.0 * sum(1 for r in joined_rows if r["M_present"]) / max(len(joined_rows), 1),
+                "T_pct": 100.0 * sum(1 for r in joined_rows if r["T_present"]) / max(len(joined_rows), 1),
+            },
             "old_status_by_M_T": {str(k): v for k, v in joined_counter.items()},
         },
         "states": {
             "by_status_and_tail": {str(k): v for k, v in state_counts.items()},
             "blocks": len(block_rows), "unknown_blocks": unknown_blocks,
-            "tail_rows": tail_rows, "tail_blocks": sum(1 for b in block_rows if b["tail"]),
+            "tail_rows": tail_rows, "tail_blocks": len(tail_blocks),
             "span_s": (block_ids[-1] - block_ids[0] + 1) * (BLOCK_NS / 1e9),
+            "unknown_normal": {
+                "blocks": len(normal_blocks),
+                "duration_s": len(normal_blocks) * (BLOCK_NS / 1e9),
+                "longest_run": max((r["duration_s"] for r in normal_runs), default=0.0),
+                "runs": normal_runs},
+            "unknown_post_e2": {
+                "blocks": len(tail_blocks),
+                "duration_s": len(tail_blocks) * (BLOCK_NS / 1e9),
+                "longest_run": max((r["duration_s"] for r in tail_runs), default=0.0),
+                "runs": tail_runs},
             "not_evaluable": ["NORMAL_CONSISTENT", "SUSPECT", "false positive", "missed detection",
                               "detection delay", "wrong NORMAL"],
         },
