@@ -2529,3 +2529,20 @@ S2 提交（`exp/growth-run`，已推至 `54943bf`）：
    与 FAST-LIVO2"重放时替换扫描"不等价——这是四宿主主线的结构性结论；
 4. 天然可用：PGO 的**关键帧图 + iSAM2** 作软回滚对象、`SleepMapList` 作粗粒度回滚点、`Issleeping`/`Isbuilding` 已是现成
    停写/重建信号；未确认项（立方体深拷贝开销、iSAM2 序列化、`re_slam()` 后关键帧连续性、命令通道时序影响）单列 §7。
+
+## 168. LIO-SAM 130 s 发散定位为输入退化驱动的前端发散；四宿主共同前提成立
+
+S2 `8a08a9b`（`exp/growth-run`，已推）新增 `docs/four_host/LIOSAM_DIVERGENCE_20261113.md`（只读）。
+
+**结论**：是**前端（扫描-地图匹配）发散**，不是回环/图优化把图拉坏。直接诱因是输入点云骤降（bag 实测 4055 帧）：
+120–130 s 每帧点数中位从约 26,600 掉到 **797**、130–140 s 为 **203**，140–150 s 恢复到 26,531；轨迹首个 >1 m 相邻步长在
+**130.3 s** 且随后连续爬升（1.1→1.6→1.9→2.1 m…），是"约束不足→漂移"的形态而非单条错误回环边；同期 110 次
+`Large velocity, reset IMU-preintegration!`（约 rel 124–146 s）；断流从 148.2 s 才开始，晚于发散约 18 s。日志中无回环约束
+输出，录到的 227 条 loop 话题是 1 Hz 搜索标记，不能当回环次数。
+
+**与 MM-LINS 的关键差异**：LIO-SAM 是**单节点**（imageProjection/featureExtraction/mapOptimization/imuPreintegration/
+transformFusion 同进程），状态集中（`cloudKeyPoses3D/6D`、`isam`），**存在测量注入点**（可直接复用 relay 替换单帧测量）；
+MM-LINS 为 4 节点、无单一状态所有者、**无测量注入点**。
+
+**四宿主恢复层的共同前提（采纳）**：必须先区分"输入故障 vs 算法故障"；把降采样帧当正常输入重放会重演发散。
+这条写入恢复层设计前提，适用于全部四个宿主。
