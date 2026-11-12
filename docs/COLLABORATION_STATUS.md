@@ -673,7 +673,7 @@ S3旁支接受62f294对fixed/own与坐标/精度控制的有限纠正，A/B旧�
 | **LIO-SAM** | **已跑完一项：宿主原生 FAIL；slam_recovery NOT_IMPLEMENTED** | `docs/review_20261112_four_host/lio_sam/`：campus_1(2)-003（`1fb5d827…`）260 s 连续输入，1120 条 odometry；E1 [50,70) 正常（最大步长 0.571 m），130.1 s 起发散（>1 m 步 85 次、最大断流 3.201 s），E2 [190,210) 含 535 m 单步，尾段仍跳、终点 z=625.95 m，未恢复 |
 | MM-LINS | 运行中（S2 发起） | 巡检时 `run_mmlins.sh campus_12_fl.bag` 进程在跑，尚无新提交/归档 |
 | FAST-LIO2 | NOT_STARTED | 本机无独立工作区，只能以 `mmlins_ws/fastlio_mapping` 做 SHARED_EXECUTION（S2 负责） |
-| ORB-SLAM3 | 运行已起（S1） | `mono_inertial_euroc` 全序列 `/tmp/orb_hall01`，E1=[190,220] E2=[300,330] 尾段 [330,351] 已在分析前声明；结果待出 |
+| **ORB-SLAM3** | **已跑完一项：宿主原生 FAIL；slam_recovery NOT_IMPLEMENTED** | `docs/review_20261112_four_host/orb_slam3/`：全序列 351.65 s，80 次地图初始化（E1 窗 4、E2 窗 6、尾段 3），最终 Atlas 1 图 0 关键帧，`exit=139`；窗口计数由 `mnFirstFrameId` 精确映射 times.txt，非按墙钟估算 |
 
 LIO-SAM 运行器问题教训（已写进归档 README）：先单独起 `roscore` 会让 `roslaunch` 报
 `run_id ... does not match declared run_id`，节点起不来、录制为空；改为让 roslaunch 自己持有
