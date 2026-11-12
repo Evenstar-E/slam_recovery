@@ -810,3 +810,9 @@ S1原因/人口限定只阻相关评价结论，S1/S2合法cp/成功依赖及物
 [核验](review_20261112_d86e57d/README.md)新092251Z/23SHA/source target/v6库绑定，scripted trigger-margin及前已处理组cp，真实apply early E1 15.918433ms/E2 12.414904ms，具体晚边界断点解除。E1修23/原生794=244+550/map27805,564227/无set_state→接回→E2拒绝restore/关闭rearm/resume/尾17,1.725149s接受，受控/detection off/E2无注入非自动收益。未解128/160、59shift23修36未修保留；E2无第二reprocess，fullpatch resume只map_hold=false，消费历史/健康后缀归宿与时间连续性UNKNOWN，未来输出不充追赶。
 
 S1/S2最低复用buffer/重推明确拒绝与需追赶input/IMU视觉归宿，或不支持范围显式拒绝；不重放已拒污染/不重做时间边界旧FAIL。旧失败UNKNOWN写回/物理候选范围保不重测，S3用户ALI-H同人口真实验证继续，旧参数停。changed test及正常10s-margin4s控制PASS/no源码新review发现，laser_mapping Built/整体ABI failed保；status负延迟只字段旁支，来源人口/失败质量成本自检，A/B局部不总分/Python-I不host/private保护。用户17:53新15h连续执行与重大阻塞中文GitHub确认任务另发布，不冒本target已认领新要求。
+
+## repair-f3 / 用户15小时任务：不停普通失败，中文告知重大阻塞，先真实ALI再自动检测
+
+用户17:53直接要求持续15h至2026-11-13 08:53 UTC+8，[执行入口](OVERNIGHT_ALI_AUTODETECTION_TASK_20261112.md)优先：S1分发/集成/实际预算和运行owner，S3独立ALI-H真实资格shadow同人口评价，S2现运动trace/必要一次最小导出及原生自动检测接线验证。用户同轮明确暂时没有Codex分支会话辅助，不再给Codex分派或等待其复核，本机S4独立审阅；既有历史分工不当现可用人员。具备真实结果后有限实验接线获准继续，默认生产部署/改科学门/选新模型/超预算不自动批准，旧参数停/1研究+2集成宿主，UNKNOWN不充正常。保已验v6边界/suffix/skip，必要拒绝后输入归宿/成功依赖同期收口，不换图无穷诊断。
+
+重大阻塞立即中文文件/提交GitHub，附ID/版本命令原件/影响/最低解除/需用户确认的最小选项；只停阻塞部分、不删负结果，实际用户GitHub提交确认后恢复。S4三Cron已挂、会话存活限定，无gh/认证评论读取不冒正在看Issue或已收到；建议用户在仓库阻塞记录commit确认，S1沿现可读渠道同步出处。截止中文结果含漏检误报延迟错误NORMAL/UNKNOWN区间与成本/实际自动动作及未解决范围，自检状态而非test数。发布不等实际接收开工，下一实交回真实owner branch/HEAD/预算；不造收到周期、不承诺所有问题必然解决，review SSH中文提交/private保护不改算法历史。
