@@ -89,6 +89,17 @@ class TestSupportDetail(unittest.TestCase):
         self.assertEqual(detail["points"][0]["row"], 0)
         self.assertEqual(len(detail["points"]), 200)
 
+    def test_a_frame_below_the_threshold_names_the_fraction_branch(self):
+        node = OnlineRecoveryTransactionNode()
+        rng = np.random.default_rng(4)
+        node.scan_buffer_body[0] = rng.normal(size=(400, 3)) * 0.1
+        detail = {}
+        passed = node._frame_has_reference_support(
+            0, np.zeros((10, 3)) + 100.0, {0: np.eye(4)}, detail=detail)
+        self.assertFalse(passed)
+        self.assertEqual(detail["reason"], "fraction_below_threshold")
+        self.assertEqual(detail["supported_fraction"], 0.0)
+
     def test_a_frame_without_a_scan_says_so(self):
         node = OnlineRecoveryTransactionNode()
         detail = {}

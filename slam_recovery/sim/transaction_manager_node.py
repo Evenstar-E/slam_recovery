@@ -411,7 +411,8 @@ class OnlineRecoveryTransactionNode:
         passed = bool(fraction >= min_supported_fraction)
         if detail is not None:
             detail.update({
-                "reason": "ok", "radius_m": float(radius_m),
+                "reason": ("ok" if passed else "fraction_below_threshold"),
+                "radius_m": float(radius_m),
                 "threshold_fraction": float(min_supported_fraction),
                 "reference_points": int(len(ref_pts)),
                 "scan_points": int(len(pts_b)), "sampled_query_count": int(len(q)),
