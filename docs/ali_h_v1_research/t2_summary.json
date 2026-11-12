@@ -14,7 +14,7 @@
   "e2_deadline_rel_s": 54.0,
   "e2_basis": "legacy_54s_not_run_bound",
   "i_qualification_layers": {
-   "RAW_HEADER_CONTAINMENT": "PASS",
+   "RAW_HEADER_CONTAINMENT": "HEURISTIC_UNPROVEN",
    "SAME_UPDATE_PRE_POST": "INCOMPLETE",
    "COMPLETE_POINT_MEMBERSHIP": "ASSERTED_NOT_VERIFIED",
    "COVARIANCE_6D": "NOT_AVAILABLE"

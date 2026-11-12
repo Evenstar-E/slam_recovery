@@ -661,7 +661,8 @@ def main(argv=None):
             "e2_trigger_rel_s": e2_trigger_rel, "e2_deadline_rel_s": e2_deadline_rel,
             "e2_basis": e2_basis,
             "i_qualification_layers": {
-                "RAW_HEADER_CONTAINMENT": "PASS",
+                "RAW_HEADER_CONTAINMENT": ("PASS" if join["mode"] == "true_span_512"
+                                           else "HEURISTIC_UNPROVEN"),
                 "SAME_UPDATE_PRE_POST": ("PASS" if same_row_pre_post else "INCOMPLETE"),
                 "COMPLETE_POINT_MEMBERSHIP": "ASSERTED_NOT_VERIFIED",
                 "COVARIANCE_6D": "NOT_AVAILABLE"},

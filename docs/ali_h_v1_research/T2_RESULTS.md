@@ -173,7 +173,7 @@ replay 的 `s` 明显更大，说明 replay 的 `Ppre` 尺度与 live 不同；*
 | 原因 | `CALIBRATION_BLOCKED:no_normal_reference`；部分块另带 `I_HAS_OUT_0`/`I_NO_TRACE_ROW` |
 | 普通 UNKNOWN | **108 块 / 54.0 s**，最长连续 **54.0 s**（0–54 s，单段） |
 | `POST_E2_NO_CATCHUP` | **12 块 / 6.0 s**，最长连续 **6.0 s**（54–60 s，单段） |
-| 尾段行数 | 按 pose 时间 ≥54 s：**47**；按尾段块：**51**（边界块含 4 行 <54 s） |
+| 尾段 | **47 行**（pose≥54 s）/ **12 块** / **51 行块成员**（边界块含 4 行 <54 s） |
 | 尾段处理 | E2 后宿主发散到约 520 m、`catch_up=NOT_IMPLEMENTED`；只作分段报告，不作连续接回正常证据 |
 
 **`NORMAL_CONSISTENT` / `SUSPECT` / 误报 / 漏检 / 延迟 / 错误 NORMAL 全部 `NOT_EVALUABLE`**：
