@@ -1,0 +1,94 @@
+{
+  "target": "22d79337ba80c01ae05988d7dec3bb87db0f0e60",
+  "host_archive": "eb2630ef10f827626ee1eaad87fa7ddc39cc825c",
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261113_22d7933/run_checks.py",
+  "reader_sha256": "fa582cbc2a78a2c88f19eb0585ba39a5521f59a0e7cae064aa8b3a8e4962bb35",
+  "host_source_sha256": "0b029d0a1c40a34467cea25c1e34b065aa6133e16b9feb5445dcfe715d9b2500",
+  "actual_writer_header": "# idx rel_s abs_ns grp_idx scan_first_ns scan_last_ns n_scans has_out phase eff r_mean r_med r_abs_mean r_chi2 r_chi2w vec6 Ppre6x6 Ppost6x6 pose7",
+  "selftest_header": "# idx rel_s abs_ns grp_idx scan_first_ns scan_last_ns n_scans has_out phase eff r_mean r_med r_abs_mean r_chi2 r_chi2w vec6 Ppre6x6 Ppost6x6 pose_x pose_y pose_z pose_qx pose_qy pose_qz pose_qw",
+  "actual_tail_names_count": 1,
+  "actual_tail_block_width": 7,
+  "parser_expected_columns_for_actual_header": [
+    93,
+    94
+  ],
+  "writer_columns": 100,
+  "controls": [
+    {
+      "parser": "t2_run.py",
+      "case": "actual_v10_header_100",
+      "rows": 0,
+      "malformed": [
+        {
+          "line": 2,
+          "ncols": 100
+        }
+      ],
+      "pose_tail_values": null,
+      "status": "FAIL_REPRODUCED_actual_writer_header_not_supported"
+    },
+    {
+      "parser": "t2_run.py",
+      "case": "selftest_named_header_100",
+      "rows": 1,
+      "malformed": [],
+      "pose_tail_values": [
+        1.5,
+        -2.0,
+        0.25,
+        0.1,
+        0.2,
+        0.3,
+        0.92736185
+      ],
+      "status": "PASS_LOCAL_parser_scope"
+    },
+    {
+      "parser": "t2_run.py",
+      "case": "legacy_v8_header_93",
+      "rows": 1,
+      "malformed": [],
+      "pose_tail_values": null,
+      "status": "PASS_LOCAL_parser_scope"
+    },
+    {
+      "parser": "t2_join_upgrade.py",
+      "case": "actual_v10_header_100",
+      "rows": 0,
+      "malformed": [
+        {
+          "line": 2,
+          "ncols": 100
+        }
+      ],
+      "pose_tail_values": null,
+      "status": "FAIL_REPRODUCED_actual_writer_header_not_supported"
+    },
+    {
+      "parser": "t2_join_upgrade.py",
+      "case": "selftest_named_header_100",
+      "rows": 1,
+      "malformed": [],
+      "pose_tail_values": null,
+      "status": "PASS_LOCAL_parser_scope"
+    },
+    {
+      "parser": "t2_join_upgrade.py",
+      "case": "legacy_v8_header_93",
+      "rows": 1,
+      "malformed": [],
+      "pose_tail_values": null,
+      "status": "PASS_LOCAL_parser_scope"
+    }
+  ],
+  "inline_pose_branch": "SOURCE_PRESENT: uses parsed same-row quaternion and skips external fallback when idx is present; actual v10 header produces no parsed rows",
+  "qualification_subclaims_narrowed": true,
+  "saved_results_unchanged_sha256": {
+    "t2_join.jsonl": "496d99ab5149cbd56c70f5476eda7faaeaa049a01e4832444e28d04686472bea",
+    "t2_summary.json": "ce2efe450d9977fb0bb3947e439edb3d8562d73e675f700c0a24fc61f76087aa"
+  },
+  "new_bag_trace_or_native_recovery": "NONE_IN_DELTA",
+  "real_I_qualification": "INCOMPLETE/UNKNOWN",
+  "full_selftest_or_archived_CLI_execution": false,
+  "no_ROS_build_parameters_or_production_code_changed": true
+}

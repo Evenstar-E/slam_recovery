@@ -717,3 +717,9 @@ hist_bytes最大235760928为旧历史points*32+voxels*96估算，排除当前槽
 两个现reader仍只接受92/93或vec_start+78，普通声明100列行控制都0parsed/malformed100，最低S3/S1沿现schema接pose7及真实消费者，一个正常控制复用旧档，不只放行却继续旧外部pose；不阻旧数据/native其他工作。额外LIO文件只有rel_s且无idx/group/phase，空点早退仅pre，最低S2/S3将所用pre与trace已有key同更新绑定，可直接真实pre/post算残差、不强求final solution或反推vec。其他四源码与v9同，mixed body旋转/world平移未转换，新增body cov声明不能补Log残差Sigma；cov保持NOT_AVAILABLE/unit-only可继续，不把协方差列前置或改frame冒转换。v8 carryover单scan/post时间PASS子主张仍未实证，不靠总体资格收窄洗成独立I。
 
 唯一完整cp+IMU/capture→实际物理修复→native状态map→全部后继仍待后半，S1唯一集成/S2宿主/S3研究；v10开发准备和认领确认非新bag或效果，08:53窗不被“明天”安排延期，未阻工作继续/noCodex/旧手调停科学门不降。A1/A11/A3/B3取证准备与A2/A12档局部增加、不全表评分，reader-I exit0为有限核验及正常缺口复现非端到端PASS，四Cron单owner，中文review SSH白名单、不算法ROS/main历史/private/开发日报。
+
+## 90. 22d7933：具名尾字段parser局部接受，真实v10的pose7块header仍未接通
+
+[增量核验](review_20261113_22d7933/README.md)固定00:45 fetch主线22d7933、producer仍eb2630e。两个parser新增按header尾名读取，展开七pose字段的100列普通控制通过、旧93无tail通过；同行post优先及跳外部fallback源码存在，I资格v8 post/carryover两子PASS已收窄接受。保存join/summary逐字未变，无新bag/真实I或恢复结果，数学旧修正不重测。
+
+实际C++header由固定源码提取只Ppost6x6后一个pose7块token，writer却追加7标量；parser用len(tail_names)=1只接受93/94，两个actual header+正常100控制仍0rows/malformed100。最低S3/S1对已声明pose7块按7值顺序展开或统一已部署writer/reader版本，必须取得七值并进入同行post，不只放宽长度/默回外部；复用一个真实header控制和旧档，不扩schema矩阵或为parser重跑宿主。仅阻v10消费，S1/S2完整历史cp+IMU/capture→实际修复→native重处理→全部后继仍唯一实交，pre key同更新待S2，cov不可用unit-only不前置。S3代码/S1集成/派S2认领确认非闭合、新运行与ALI效果未交，A/B局部不总分，08:53窗不延期/noCodex/旧手调停门不降，四Cron单owner，reader-I有限源码控制exit0非完整PASS，中文review SSH白名单、不算法ROS/main历史/private/日报。
