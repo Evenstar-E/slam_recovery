@@ -2172,8 +2172,11 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
             "native_checkpoint_actions": loop.cp_actions,
             # The host has one checkpoint slot; these say whether each segment's restore or
             # replay used the checkpoint that segment was armed with, or a later one.
+            # An episode that never reached decide() has no meta at all; reading it directly
+            # raised AttributeError and the run then wrote no summary (found in the v8 run by S2).
             "checkpoint_checks": [ep.meta.get("checkpoint_check")
-                                  for ep in loop.episodes if ep.meta.get("checkpoint_check")],
+                                  for ep in loop.episodes
+                                  if (getattr(ep, "meta", {}) or {}).get("checkpoint_check")],
         },
         # The label has to describe what actually happened, not what was asked for. A run that
         # declared scripted triggers and fired none is an online run, and saying otherwise would

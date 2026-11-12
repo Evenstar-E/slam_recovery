@@ -383,6 +383,20 @@ def test_summary_counts_gate_outcomes_and_nulls():
     json.dumps(s)
 
 
+def test_summary_survives_an_episode_that_never_decided():
+    # An episode opened at the end of the bag never reaches decide(), so it has no meta at all.
+    # Reading ep.meta directly raised AttributeError inside build_summary and the run wrote no
+    # summary file (found in the v8 online run by S2).
+    node = _FakeLoopNode(trigger_at=2)
+    loop = NativeClosedLoop(node, run_id="run", confirmation_margin_ns=1_000_000_000)
+    loop._open_episode(1_000, np.eye(4),
+                       segment=types.SimpleNamespace(segment_id="s1", t_start_ns=900))
+    s = build_summary(loop, {})
+    assert s["quarantine"]["episodes"] == 1
+    assert s["lifecycle"]["checkpoint_checks"] == []
+    json.dumps(s)
+
+
 def test_detection_off_grows_the_map_and_judges_nothing():
     node = _WarmupNode()
     loop = NativeClosedLoop(node, run_id="run", detection_enabled=False)
