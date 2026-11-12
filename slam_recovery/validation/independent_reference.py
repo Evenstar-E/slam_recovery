@@ -80,6 +80,31 @@ def load_rows(path: str) -> List[Dict[str, Any]]:
         return [json.loads(line) for line in fh]
 
 
+def estimate_se3(src_xyz: np.ndarray, dst_xyz: np.ndarray) -> Dict[str, Any]:
+    """Single rigid transform between two runs' positions over a matched prefix.
+
+    The two runs share a bag but not a world gauge: each starts from its own first IMU sample and
+    drifts its own way. Comparing points across runs needs one declared transform, estimated on a
+    healthy prefix where both runs are trusted, not a per-frame fit.
+    """
+    src = np.asarray(src_xyz, dtype=np.float64)[:, :3]
+    dst = np.asarray(dst_xyz, dtype=np.float64)[:, :3]
+    if len(src) != len(dst) or len(src) < 3:
+        raise ValueError("need at least three matched positions")
+    cs, cd = src.mean(0), dst.mean(0)
+    H = (src - cs).T @ (dst - cd)
+    U, _S, Vt = np.linalg.svd(H)
+    d = np.sign(np.linalg.det(Vt.T @ U.T))
+    R = Vt.T @ np.diag([1.0, 1.0, d]) @ U.T
+    t = cd - R @ cs
+    T = np.eye(4)
+    T[:3, :3] = R
+    T[:3, 3] = t
+    resid = np.linalg.norm((src @ R.T + t) - dst, axis=1)
+    return {"T": T, "n": int(len(src)), "rms_residual_m": float(np.sqrt(np.mean(resid ** 2))),
+            "max_residual_m": float(np.max(resid))}
+
+
 def voxel_downsample(points: np.ndarray, voxel_m: float = 1.0) -> np.ndarray:
     pts = np.asarray(points, dtype=np.float64)[:, :3]
     if len(pts) == 0:
@@ -132,12 +157,14 @@ def icp_align(body: np.ndarray, reference: np.ndarray, seed: np.ndarray,
 
 
 def score_rows(rows: Iterable[Dict[str, Any]], reference_xyz: np.ndarray,
-               radius_m: float = 1.0, align: bool = False) -> List[Dict[str, Any]]:
+               radius_m: float = 1.0, align: bool = False,
+               reference_transform: Optional[np.ndarray] = None) -> List[Dict[str, Any]]:
     """Fraction of each frame's saved samples inside ``radius_m`` of the reference."""
     from slam_recovery.sim.transaction_manager_node import _RadiusIndex
 
     ref = np.asarray(reference_xyz, dtype=np.float64)[:, :3]
     index = _RadiusIndex(ref, radius_m) if len(ref) else None
+    gauge = np.eye(4) if reference_transform is None else np.asarray(reference_transform, dtype=np.float64)
     out = []
     for row in rows:
         support = row.get("support") or {}
@@ -148,7 +175,7 @@ def score_rows(rows: Iterable[Dict[str, Any]], reference_xyz: np.ndarray,
                         "reason": "no_samples_or_reference"})
             continue
         body = np.asarray([p["body"] for p in samples], dtype=np.float64)
-        T = np.asarray(row["T_wb"], dtype=np.float64).reshape(4, 4)
+        T = gauge @ np.asarray(row["T_wb"], dtype=np.float64).reshape(4, 4)
         world = (body @ T[:3, :3].T) + T[:3, 3]
         inside = index.within_radius_mask(world, radius_m)
         fraction = float(np.mean(inside))
@@ -167,26 +194,34 @@ def score_rows(rows: Iterable[Dict[str, Any]], reference_xyz: np.ndarray,
             "host_fraction": support.get("supported_fraction"),
             "host_pass": support.get("pass"),
             "status": row.get("status"),
+            "partial_sample": bool(support.get("points_total", len(samples)) > len(samples)),
             "aligned": aligned,
         })
     return out
 
 
 def summarise(scored: Iterable[Dict[str, Any]]) -> Dict[str, Any]:
+    """Joint counts on complete samples only; partially saved frames are listed separately.
+
+    A trimmed frame's fraction is over the saved subset, not over the 200-point denominator the
+    decision used, so it cannot enter the main table.
+    """
     scored = [s for s in scored if s.get("independent_pass") is not None]
-    both_low = [s for s in scored if s["host_pass"] is False and s["independent_pass"] is False]
-    host_low_indep_pass = [s for s in scored if s["host_pass"] is False and s["independent_pass"] is True]
-    host_pass_indep_low = [s for s in scored if s["host_pass"] is True and s["independent_pass"] is False]
-    both_pass = [s for s in scored if s["host_pass"] and s["independent_pass"]]
+    full = [s for s in scored if not s.get("partial_sample")]
+    partial = [s for s in scored if s.get("partial_sample")]
+    both_low = [s for s in full if s["host_pass"] is False and s["independent_pass"] is False]
+    host_low_new_pass = [s for s in full if s["host_pass"] is False and s["independent_pass"] is True]
+    host_pass_new_low = [s for s in full if s["host_pass"] is True and s["independent_pass"] is False]
+    both_pass = [s for s in full if s["host_pass"] and s["independent_pass"]]
     return {
-        "frames": len(scored),
-        "trimmed_frames": sum(1 for s in scored if s["samples_trimmed"]),
+        "frames_full_sample": len(full),
+        "partial_sample_not_evaluable": len(partial),
         "both_low": len(both_low),
-        "host_low_independent_pass": len(host_low_indep_pass),
-        "host_pass_independent_low": len(host_pass_indep_low),
+        "host_low_new_reference_pass": len(host_low_new_pass),
+        "host_pass_new_reference_low": len(host_pass_new_low),
         "both_pass": len(both_pass),
-        "reading": ("host_low_independent_pass means the scan is covered by a map this run did not "
-                    "build: the pose placement is the likely failure. both_low means the independent "
-                    "map does not cover it either; that still does not separate a wrong pose from "
-                    "missing coverage if both maps were built with the same drift."),
+        "reading": ("labels name the reference, not the cause: host_low_new_reference_pass means the "
+                    "same body points and the same T_wb fall inside the new map but not the run's own "
+                    "reference; the cause stays UNKNOWN. both_low means neither reference covers them. "
+                    "Per-frame ICP results are fitted compatibility, not an unfitted verdict."),
     }
