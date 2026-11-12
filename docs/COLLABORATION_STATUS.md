@@ -706,3 +706,9 @@ S1/S2后继有限实际修复范围给真实回执/产物/原生map接回E2或�
 S1最低native成功依赖与失败公开一致；S2按已派分批流控复用现通道、本次增量/stamp及实际应用，再保持修复测量/候选/native状态同定义。candidate尾set_state来源局部改进不等原生重估：target实际decide/producer合成反例证明旧坏云门见world0，改新云后同pose world−.5。新估计器无支持0被计入median亦本机确认，但本run26帧全n_valid≥27，不作首因；少支持标UNKNOWN，不扩防御矩阵。11cloud tests通过、无ROS/bag/算法修改；旧累计receipt/可信cp范围未关闭不重复重测。
 
 下一唯一有限实际修复→native完整state/map→接回→E2尾段或首断点；允许真实拒绝/失败，不能为保旧accepted候选绕评价新测量。逐项自检状态/命令/原件/完整人口/独立质量/失败，truth只评价、旧门不降、S3旁支参数停、不重开四宿主矩阵。A/B局部推进不全表评分，正常SSH独立review提交推送、不合main/private保护；实际接收/后继执行待开发回执。
+
+## repair-f3 / 64bfed1增量：分批/人口冻结接受，实际支持不同不报收益
+
+[核验](review_20261112_64bfed1/README.md)四run source绑定、本轮70列示SHA一致，32/32及冻结23/23received/applied、实际native重放/内部map接回接受，旧20/26首断点在这些run局部解除。freeze23个candidate pose stamp全一致，但815vs692group，起点差1.268s/终点5.334s/跨度4.066s，地图不归因；set_state ACK差4.7cm为命令pose，不独立重估质量。deferred87/81/147/148、wait关闭/ABORTED rearm及失败诊断保留，四run各一事件无E2、不报有效整链完成。
+
+本机actual publisher非零baseline/批次停止与tracking冻结PASS，None基线当0时E2旧25/新0仍sync FAIL，最低取得有效本次baseline、不默认为0。新测量/旧坏云candidate及candidate尾灌状态源码未修，S1成功公开/native依赖与同stamp集成、S2物理一致产物/有限native实际修复→接回/E2或断点优先；sham同批次不保证重放支持相同，按实际stamp核、不无限对照循环代主线。自检逐项状态/命令/原件/独立质量/失败，冻结门不降/旧参数停/S3研究、不重开四宿主矩阵。一般文档计数/区间及框架延期，A/B局部推进不全表评分。独立SSH review推送、不合main不改算法/private保护；实际接收待回执。

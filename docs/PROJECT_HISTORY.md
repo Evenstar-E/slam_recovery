@@ -493,3 +493,11 @@ S1认领矩阵/真实分工，S2复用已有宿主环境和run，逐项实际E1�
 target小控制11cloud test PASS0.399s；自写fake CP首漏enabled exit1后修辅助重跑exit0，不改production、不跑ROS/bag。实际decide/producer合成吸收pose z−.5配坏云z+.5时门world0，修复云body0再配同candidate/set_state−.5→world−.5，旧坏云候选与新测量不一致未解除；改set_state为candidate尾是来源局部改进但不是native完整重估状态。code-review low候选经actual estimator确认：一supported+.5、两非空少支持返回0被median成0，UNKNOWN误计有效0；本run全≥27不是其失败根因。最低真实修复候选/状态同定义、成功公开依赖、分批本次增量receipt/实际applied，少支持标UNKNOWN；不新RPC/阈值/异常矩阵。
 
 S1共享生命周期/失败公开一致集成，S2已有流控派工与物理一致修复、唯一有限native state/map→接回/E2交付或首断点，S3研究/旧参数停；分派记录不冒实际认领。四宿主前批不重跑，truth只评价、容差不生产门，自检逐项状态/实际命令/原件/全人口/失败/质量。A6估计组件及B7负范围局部推进，A7/A8/B2/A9/A10/B4/B11未闭合、不全表新评分。独立review SSH提交推送/private保护、不合main不改算法历史；实际接收待回执。
+
+## 60. 64bfed1：分批32/32与23/23实际应用，候选冻结接受，收益/E2未闭合
+
+[核验](review_20261112_64bfed1/README.md)四新run原件本机70/70本轮changed清单SHA一致；历史8790452/e6f7430与target7b02fa7两个冻结run各source绑定。分批成功32received/applied、676group/决定后315帧，对照0applied/529group/330帧，候选32vs23不公平；冻结修复23applied/815group/247帧、控制0/692group/248帧，23个candidate pose stamps及freeze stamp完全一致接受，不是只同kf计数。实际重放起点差1.267965555s、终点差5.333573818s、跨度差4.065608263s、123group，地图24503vs21870不归因；set_state ACK差.046982609m是主动candidate写入而非独立native重估质量。四run各一事件无E2，HEALTHY有wait关闭/ABORTED重武装，deferred87/81/147/148及native诊断失败1/2/1/4保留，不报首次有效整链完成。
+
+本机target小控制非零baseline25→期待35/45/50、第二批失败停止、deadline crossing冻结21后24帧不扩/首次wall不覆盖PASS；baseline None被当0仍E2旧累计25/本次0误sync FAIL，最低未知不发表/先有效baseline、不新RPC。成功传输首断点局部解除，不重造；旧坏云candidate与新修复云物理不一致、native失败成功依赖/同stamp状态map及尾set_state来源source未修不重测。新test modules因pytest辅助未跑、旧cloud tests不重复，无host/bag；Git Bash语法exit0，首PS bash为WSL入口exit1未安装。
+
+下一唯一有限物理一致实际修复→native完整state/map→接回→E2尾段或断点；S1共享集成成功来源，S2产物/现流控/有限run，S3研究参数停。sham仅可控制发布成本、同批次不保证实际重放支持相同，核stamp人口不要求随机逐值一致，仍不一致报断点不无限A/B；不以对照循环代E2/新测量候选准入。PLAN写26而actual32/23、deferred与时间/4.7cm更正集中旁支保历史、不为文字重跑。自检逐项状态/实际命令/原件/质量/失败；A1/A2/A5/A6/A12局部推进，A7/A8/B2/A9/A10/B4/B11未闭合、不全表新评分。独立review SSH提交推送、不合main/不改算法/private保护，开发接收待实际回执。
