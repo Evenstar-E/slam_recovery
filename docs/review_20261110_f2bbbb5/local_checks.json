@@ -1,0 +1,43 @@
+{
+  "target": "f2bbbb54faac950845e6543233cff4465e695060",
+  "command": "python -B -W ignore docs/review_20261110_f2bbbb5/run_checks.py",
+  "scope": "Local source-bound normal driver controls; no host/ROS/bag/tuning",
+  "source_pin": "PASS",
+  "selected_tests": {"status": "PASS", "count": 5, "elapsed_s": 0.214, "modules": ["test_checkpoint_client: silent/disabled only", "test_candidate_detail_record: three TestCase methods"]},
+  "controls": {
+    "one_slot_ack_misattribution": {
+      "status": "FAIL", "written_commands": ["hold", "restore"], "physical_command": "restore",
+      "single_ack": "OK restore done", "both_collects_ok": true,
+      "counted_holds": 1, "counted_restores": 1,
+      "interpretation": "Event queue does not serialize physical command/ack ownership"
+    },
+    "short_poll_late_ack": {
+      "status": "FAIL", "first_command": "hold", "collect_timeout_s": 0.05,
+      "first_error": "ack_timeout", "pending_after_poll": 0,
+      "following_command": "restore", "following_ack": "OK hold done", "following_ok": true,
+      "interpretation": "Staged delayed ack, no thread or host; command mismatch counted as success"
+    },
+    "accepted_orchestration": {
+      "status": "BLOCKED_HOST_CONTRACT", "gate_report": "simulated accepted full commit",
+      "manager_state": "HEALTHY", "lifecycle_events": [], "commands": ["hold", "reprocess"],
+      "interpretation": "Python full acceptance does not send resume; unpublished host may have an internal release but this is unverified"
+    },
+    "candidate_population": {
+      "status": "FAIL_SCORING_SET_CLAIM", "recorded_input_keys": [1, 2, 3, 4, 5, 6, 7],
+      "verified_keys": [1, 2, 3, 5, 6, 7], "actual_info_after_keys": [1, 7],
+      "actual_node_holdout_count": 2, "actual_node_committable_count": 6,
+      "unsupported_key": 4, "interpretation": "Sidecar is useful input archive, not actual scored holdout population"
+    }
+  },
+  "host_evidence": {
+    "status": "DEVELOPER_REPORTED_NOT_RAW_VERIFIED",
+    "host_patch_unchanged_from_adff0b0": true,
+    "host_patch_sha256": "f5efce7160e45933f84b23c365f08b9a51798aeb9c201c4e48a5ba026e2c2f21",
+    "reported_hold_points": 265706, "reported_restore_points": 242541,
+    "missing": ["actual hold patch", "complete host ack/log", "hold result and binary/config binding"]
+  },
+  "unchanged_source_not_rerun": ["core gate", "manager", "transaction_manager_node", "old host patch"],
+  "not_applicable": ["Full pytest-dependent discovery: pytest unavailable", "Windows fake host repeat rename", "Developer full 90-test claim", "ROS/native run", "Full A/B scoring"],
+  "exit_zero_means": "Controls reproduced defects; not production fix PASS",
+  "native_two_event": "BLOCKED: no completed run artifacts"
+}

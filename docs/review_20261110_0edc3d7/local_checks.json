@@ -1,0 +1,71 @@
+{
+  "main_target": "0edc3d76a43ddbed396eaf2dd2733f48d4ecffc4",
+  "research_target": "b2892830a768ecc0c314536352e4a39748c583b5",
+  "scope": "Local source-bound checks and archived arithmetic; no ROS, bag replay, production algorithm edits or threshold tuning",
+  "affected_unittest": {
+    "status": "PASS",
+    "tests_run": 60,
+    "elapsed_s": 1.058,
+    "execution": "Inline Python unittest loader, explicit repository import root and loaded core path check",
+    "modules": [
+      "test_a7_node_covariance_gauge", "test_empty_candidate_reason", "test_lifecycle_rearm",
+      "test_a7_tangent_frames", "test_atomic_commit", "test_checkpoint_restore",
+      "test_trusted_map_invariance", "test_transaction_normal_path", "test_a9_repair_undo",
+      "test_tau_info_criterion"
+    ],
+    "not_claimed": "Developer-reported 83-test suite was not locally rerun; no full A/B score update"
+  },
+  "old_producer_control_reused": {
+    "status": "PASS_LOCAL_SCOPE",
+    "execution": "Reuse old actual-node run_case fixture with current source; bypass old revision pin only",
+    "cases": [
+      {"world_y_m": 0, "posterior_cov_norm": 0.5136136651945151, "mode": "MODE3", "accepted": false},
+      {"world_y_m": 20, "posterior_cov_norm": 0.513539493671185, "mode": "MODE3", "accepted": false}
+    ],
+    "limit": "Old cross-0.5 mode flip removed; small inner world-ridge coordinate residual remains; not full gauge or admission certification"
+  },
+  "lifecycle_controls": {
+    "command": "python -B -W ignore docs/review_20261110_0edc3d7/lifecycle_probes.py",
+    "process_exit": 0,
+    "interpretation": "Zero means the defects reproduced, not the fixes passed",
+    "unavailable_timer": {
+      "status": "FAIL", "wait_limit_ns": 1000000000,
+      "input_times_ns": [2000000000, 4000000000, 8000000000],
+      "unavailable_frames": 3, "final_state": "WAITING_FOR_EVIDENCE", "lifecycle_events": []
+    },
+    "stale_decision": {
+      "status": "FAIL", "manager_state": "QUARANTINED", "detector_state": "HEALTHY",
+      "detector_dwell": 0, "old_segment": "quar_0_-2000000000",
+      "new_active_segment": "quar_0_-2000000000", "closed_ns": 2000000000,
+      "events": ["wait_limit_closed", "rearm"]
+    },
+    "unresolved_promotion": {
+      "status": "FAIL", "archived_unresolved_frames": ["7"],
+      "trusted_after_rearm_ingest": [7], "trusted_factors": [7]
+    }
+  },
+  "research_controls": {
+    "command": "python -B -W ignore docs/review_20261110_0edc3d7/research_controls.py",
+    "process_exit": 0,
+    "interpretation": "Research baseline differences and archived arithmetic verified, not method acceptance",
+    "constant_normalized_nis": {
+      "value": 1.6, "frames": 25, "actual_states": ["HEALTHY"],
+      "research_first_suspect_frame": 17, "research_first_quarantine_frame": 18
+    },
+    "baseline_recorded_x": 3822.5371,
+    "undo_second_sigma_normalization": 55.04453424,
+    "b1_pre_onset_judged": 111, "b1_pre_onset_total": 168,
+    "b1_oracle_control_unjudged_span_s": 25.761,
+    "input_arm": "O background-only, not original injected bag",
+    "input_sha256": "f8b26ddf54838f5314be664cf4c49e13b5f5ab476118811e135cbc89c118751d",
+    "nominal_window_s": 19.839344025, "b2_last_quarantine_rel_onset_s": 19.659,
+    "b2_scale_max": 987.3306, "b2_scale_ratio": 49.894,
+    "a_rows": 18, "a_reason_matches": 17, "a_covariance_blocked": 4,
+    "a_confirmed_changed_decisions": 0,
+    "not_claimed": "No full research replay; no independent quality or injected-fault labels certified"
+  },
+  "native_writeback_reentry_second_event": {
+    "status": "BLOCKED", "reason": "No new complete native run artifacts at these revisions"
+  },
+  "not_applicable": ["ROS and raw-bag runs", "production tuning or model implementation", "full 83-test suite", "full A/B rescoring"]
+}
