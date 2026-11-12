@@ -1,0 +1,258 @@
+{
+  "target": "4740d94a583886afc04b361aee3c6403d5072ecf",
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261112_4740d94/check_archive.py",
+  "exit": 0,
+  "scope": "Git bytes and compressed rows; no archived scripts, host or bag execution",
+  "integrity": {
+    "matched": 14,
+    "total": 14,
+    "compressed_sha": "7492097a94458fcbe9270b8fd1fe5c4036026fbd23a611d9b52932a8179fa6b1",
+    "raw_sha": "6c86be08642bb044cdf8e95c338d86ddee730fd44250b3e4ded4f5e4fa883de5",
+    "compressed_bytes": 24433349,
+    "raw_bytes": 79323160
+  },
+  "identity": {
+    "run_id": "fl_native_20261112T070801Z_197026",
+    "driver_sha_matches_target": true,
+    "driver_sha": "43c65a9d527b071c200a2c522c7fcef85a510715d54092a91ed608c0531ac048",
+    "inputs": {
+      "bag": "/tmp/fastlivo/hall01_two_event_v1.bag",
+      "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+      "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+      "host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+      "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+      "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+      "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+      "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+      "recovery_node_source": "43c65a9d527b071c200a2c522c7fcef85a510715d54092a91ed608c0531ac048",
+      "runtime_library": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+      "runtime_library_sha256": "9c0330beffa2d93564ba10d36751e938baa54768fa218b21b75fe17bb8f700db"
+    },
+    "launch": {
+      "rate": "1.0",
+      "drain_s": "20",
+      "duration_s": "0",
+      "max_pairs": "0",
+      "candidate_source": "host_poses",
+      "detection": "on",
+      "sigma_meas_m": "0.884",
+      "scripted_triggers_s": "",
+      "scripted_triggers_ns": "",
+      "confirmation_margin_sec": "2.0",
+      "relay_shift_z": "",
+      "relay_start_ns": "",
+      "relay_end_ns": "",
+      "injection": "NONE",
+      "repair_publish": "1",
+      "run_mode": "ONLINE_DETECTION",
+      "group_model": "host and recovery node are children of one setsid supervisor"
+    },
+    "actual_node_launch_args": {
+      "run_dir": "/tmp/fl_native_20261112T070801Z_197026",
+      "pose_topic": "/aft_mapped_to_init",
+      "scan_topic": "/velodyne_points",
+      "status_topic": "/slam_recovery/gate_status",
+      "candidate_source": "host_poses",
+      "confirmation_margin_sec": 2.0,
+      "pair_dt_ms": 40.0,
+      "scan_cap": 6000,
+      "sigma_meas_m": 0.884,
+      "duration_sec": 0.0,
+      "max_pairs": 0,
+      "icp_time_budget_sec": 0.0,
+      "detection": "on",
+      "scripted_triggers": "",
+      "scripted_trigger_stamps": "",
+      "checkpoint_dir": "/tmp/fl_native_20261112T070801Z_197026/host_control",
+      "checkpoint_period_sec": 2.0,
+      "wait_limit_sec": 2.0,
+      "repair_publish": false,
+      "repair_sync_timeout_sec": 5.0,
+      "repair_dry_run": false,
+      "availability_log": "/tmp/fl_native_20261112T070801Z_197026/availability_frames.jsonl",
+      "repair_sham": false
+    },
+    "runtime": {
+      "wall_sec": 92.223,
+      "pid": 198093,
+      "pgid": 198090,
+      "peak_rss_kb": 764912,
+      "pose_messages": 819,
+      "scan_messages": 598,
+      "callback_errors": [],
+      "callback_error_count": 0
+    }
+  },
+  "population": {
+    "rows": 544,
+    "pairing": {
+      "pair_window_ns": 40000000,
+      "poses_received": 819,
+      "scans_received": 598,
+      "paired": 544,
+      "poses_unpaired": 275,
+      "scans_unpaired": 54,
+      "paired_fraction_of_poses": 0.6642246642246642,
+      "paired_fraction_of_scans": 0.9096989966555183,
+      "max_abs_dt_ns": 39959192,
+      "max_backlog_messages": 37,
+      "messages_considered": 1417,
+      "pairing_rule": "nearest pose within 40 ms, no pose reused"
+    },
+    "counts": {
+      "status/UNAVAILABLE": 412,
+      "support_reason/empty_reference": 61,
+      "joint/no_prediction": 64,
+      "status/AVAILABLE": 132,
+      "support_reason/ok": 132,
+      "joint/both_pass": 82,
+      "host_pass/null_prediction": 3,
+      "support_reason/fraction_below_threshold": 351,
+      "joint/both_low": 301,
+      "joint/only_pred_low": 47,
+      "joint/only_host_low": 50
+    },
+    "condition_combinations_with_prediction": {
+      "True/True/nis=True": 82,
+      "False/False/nis=True": 301,
+      "True/False/nis=True": 47,
+      "False/True/nis=True": 50
+    },
+    "null_prediction_trusted_key_counts": {
+      "0": 64
+    },
+    "pred_points_saved_counts": {
+      "200": 480
+    },
+    "examples": {
+      "one_trusted_pose": {
+        "kf": 21,
+        "status": "AVAILABLE",
+        "manager": {
+          "state": "HEALTHY",
+          "trusted_version": 1,
+          "trusted_keyframes": 1,
+          "active_segment": null
+        },
+        "pred_reason": "ok",
+        "pred_fraction": 0.605
+      },
+      "both_pass": {
+        "kf": 21,
+        "stamp_ns": 1627785263474925518,
+        "host_fraction": 0.825,
+        "pred_fraction": 0.605,
+        "nis": 13.40979697468605,
+        "status": "AVAILABLE"
+      },
+      "only_pred_low": {
+        "kf": 88,
+        "stamp_ns": 1627785270201964378,
+        "host_fraction": 0.765,
+        "pred_fraction": 0.345,
+        "nis": 19.185926837718284,
+        "status": "AVAILABLE"
+      },
+      "only_host_low": {
+        "kf": 147,
+        "stamp_ns": 1627785276281966925,
+        "host_fraction": 0.505,
+        "pred_fraction": 0.705,
+        "nis": 353.62202581663155,
+        "status": "UNAVAILABLE"
+      }
+    },
+    "stamp_windows": {
+      "prev_53_117": {
+        "frames": 65,
+        "host_pass": 37,
+        "available": 37,
+        "pred_pass": 36
+      },
+      "prev_199_401": {
+        "frames": 203,
+        "host_pass": 37,
+        "available": 37,
+        "pred_pass": 46
+      }
+    },
+    "archived_segment_label_totals": {
+      "null_prediction": 21,
+      "both_low": 187,
+      "host_low_predicted_recovered": 147,
+      "predicted_lower": 57
+    },
+    "segment_label_rule": "exploratory median difference >=0.25 improved; <host-0.10 lower; not causal labels"
+  },
+  "actual_execution": {
+    "detection_on": true,
+    "scripted": {
+      "declared_s": [],
+      "declared_ns": [],
+      "fired": [],
+      "note": "the segment was opened by calling trigger_quarantine directly at a declared time; no detector output and no fault label was used, so this run says nothing about detection performance"
+    },
+    "gate": {
+      "accepted": 0,
+      "rejected": 8,
+      "errored": 0,
+      "modes": [
+        "MODE3_SOFT_BRIDGE_WAIT",
+        "MODE3_SOFT_BRIDGE_WAIT",
+        "MODE3_SOFT_BRIDGE_WAIT",
+        "MODE3_SOFT_BRIDGE_WAIT",
+        "MODE3_SOFT_BRIDGE_WAIT",
+        "MODE3_SOFT_BRIDGE_WAIT",
+        "MODE3_SOFT_BRIDGE_WAIT",
+        "MODE3_SOFT_BRIDGE_WAIT"
+      ],
+      "committed_key_total": 0,
+      "deferred_key_total": 87
+    },
+    "summary_final_state": "WAITING_FOR_EVIDENCE",
+    "receipt_final_state": "WAITING_FOR_EVIDENCE",
+    "lifecycle_state": "WAITING_FOR_EVIDENCE",
+    "open_at_exit": true,
+    "native_headline": {
+      "enabled": true,
+      "host_ready": true,
+      "snapshot_ack_timeouts": 0,
+      "snapshots_superseded": 2,
+      "dir": "/tmp/fl_native_20261112T070801Z_197026/host_control",
+      "snapshot_period_s": 2.0,
+      "snapshots": 10,
+      "restores": 8,
+      "reprocesses": 0,
+      "holds": 8,
+      "resumes": 7,
+      "failures": 0
+    },
+    "native_event_counts": {
+      "status/True": 1,
+      "snapshot/True": 10,
+      "hold/True": 8,
+      "restore/True": 8,
+      "resume/True": 7,
+      "snapshot/False": 2
+    },
+    "candidate_count": 8,
+    "all_candidates_refused": true,
+    "episode_trigger_stamps": [
+      1627785263607979774,
+      1627785270201964378,
+      1627785275413796663,
+      1627785284945530415,
+      1627785294025671482,
+      1627785302825878620,
+      1627785312254862785,
+      1627785317789833307
+    ]
+  },
+  "limits": [
+    "Same-frame support sensitivity to an alternative internally-derived pose is not an independent causal label of pose drift or map coverage.",
+    "Predicted pose basis keys/timestamps/horizon/matrix and actual reference coordinates/hash are not recorded in this diagnostic block.",
+    "Only predicted support pass is observed; no native correction is applied.",
+    "544 vs 402 paired frames is a different run population; load is not independently established as its sole cause.",
+    "Both_pass82 vs AVAILABLE132 differs by only_pred_low47 plus null-prediction host-pass3, not by a missing NIS gate."
+  ]
+}

@@ -531,3 +531,11 @@ v3仍skip+clear已消费后缀，本次399/372未catch-up；两run只一事件/d
 三次online触发/拒绝→native restore/resume ACK→wait close/ABORTED重武装真实接受；repair实际off/无commit/reprocess/applied，14snapshot超时保留，HEALTHY/wiring不等检测可靠或恢复成功。后两事件路径确有执行，但未发生首次测量修复，不能补用户修复后E2；22+65=87不充历史87同人口。驱动SHA与run版本及target一致，库hash匹配v3构建声明，当前无hostlog/库实体不称重新核进程加载。S3旧/tmp跨source汇总仅开发分析，不本机重跑/混同版本趋势。
 
 本机所有模块target Git bytes内存加载，12帧9不可用/3可用的base/target/log开关输出及trusted状态同；8相关test PASS.043s、runner Git Bash语法PASS，无host/bag/参数。两pytest辅助test未跑，初辅助属性错exit1只修自写控制后PASS。S1最低现取证入口保参考/cache快照身份、原row与少数全边界样本，可并行且只挡诊断强主张；S2下一已有授权run随附或明确缺项，不为文档/追同值另开矩阵。原生唯一主线仍物理一致修复→native完整state/map→保后缀追赶→接回/E2，旧v3后缀与成功依赖未解除不重测；S3研究专用/旧参数停。A3/B3取证局部推进、不全表升分；独立review SSH推送/private保护、不合main不改算法历史，开发新意见接收待回执。
+
+## 65. 4740d94：预测支持敏感性接受，漂移/覆盖强归因与终态需更正
+
+[核验](review_20261112_4740d94/README.md)新070801Z_197026原件14SHA/gz/raw一致、driver target绑定、544全paired行一致；819pose/598scan、275/54未配对。480预测块完整200mask可复算，both_low301/both_pass82/only_host_low50/only_pred_low47，null64对应trusted0；132AVAILABLE=82+47+3无预测但host通过，COLLAB称差是NIS门错误。UNAVAILABLE412=61参考空+351比例不足；预测仅日志不实际救回50。8候选全拒绝、hold/restore8/resume7/reprocess0、snapshot2superseded非超时，receipt/summary/lifecycle均WAITING_FOR_EVIDENCE/open=true，REPORT HEALTHY不成立；无实际测量修复/E2。
+
+同帧换内部历史预测pose提高support只证明敏感性，不独立证明真实漂移；两pose皆低亦不排除共源错误/外推失效，不确定覆盖唯一因果。147是段长仅50跨门，分段空预测混人口及191/54与analysis不一致集中更正，不重跑宿主。actual预测无horizon限制、一trusted返回last不是null，原件kf21确认；最低保已有基准key/戳/预测T/horizon和同次reference身份，不加新阈值/预测器。旧reference/raw row缺项source未修不重测。跨run402/544与同戳状态差接受为边界，不猜负载或地图单因。
+
+本机-I reader未执行归档脚本；target所有package Git bytes控制12帧9不可用/3可用base/target/log输出同、两pose与one/zero/nohorizon控制PASS，无host/bag/算法参数；pytest辅助新test未跑不装。仓库转述用户选分解仅DEVELOPER_REPORTED，本机无直接选择证据，不据它批准下一双参考/替代方法实验。S1/S2原生唯一交付仍物理一致修复→native state/map→保后缀catch-up→接回/E2或首断点，S1诊断最小保障可并行、S3回既定门研究/旧参数停；自检状态/实际命令/原件/失败/真实人口/未知，A3/B3局部观察不全表评分。review独立SSH推送/private保护、不合main不改历史冻结门；target早于fe56883发布不指控忽略，接收新意见另待回执。
