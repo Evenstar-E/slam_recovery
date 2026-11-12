@@ -824,3 +824,11 @@ S1/S2最低复用buffer/重推明确拒绝与需追赶input/IMU视觉归宿，�
 §116计划测量S=H Pminus H^T+R不能直接作SE3 eI协方差，H_T_H非S/6维压缩需对应映射、pre/post相关不能简单相加。S1/S2/S3最低同time frame/tangent/rank residual-Sigma定义，缺cov用单位残差/条件经验校准，保NOT_AVAILABLE不假概率/不新模型/巨大矩阵；导出phase/replay早退与绝对戳归宿同核。同新trace旧方法/shadow风险误报漏检延迟错误NORMAL/UNKNOWN时长成本才下一实交。
 
 S3上传研究/配对评价、S2一次现预算真实导出、S1共享集成与原生最小归宿并行，最新15h任务2c优先、不凭未合推忽略，旧参数停/无Codex/1研究+2集成。暂只是可解除trace依赖，不新全面重大阻塞；真缺证据/超范围立即中文GitHub选择，未阻工作继续。逐项状态命令原件/source人口/label失败质量成本，不test数/全UNKNOWN假安全；本机不算法/host，A/B局部不总分，三周期+截止单owner，review中文SSH/private保护不合main历史冻结门。
+
+## repair-f3 / 24cf24c：T0原件可验收，真实导出重复启动失败先保最小环境证据
+
+[核验](review_20261112_24cf24c/README.md)研究源码/validator/协议已上传，五产物hash+code一致，402/544 shadow逐行旧身份分数/90,119块人口来源一致，全UNKNOWN/真实I0/normal标签缺项接受，不再记未上传；T1六/T2 prep十一保存PASS本机未执行，无共享算法改动/新真实trace或自动运行，不效果或主线恢复成功。
+
+两次trace startup image_transport报错/pose paired0仅S1报告，失败日志收据/新库patch未上target，不根因实证；rospack查询成功不等宿主fork环境有效。S2先失败原件/真实进程环境最小修正，证据前不第三次盲重跑，其余15h工作继续，S3现在确认正常校准/label范围、复用实现准备同新trace对照。现可解除依赖不自动全面重大阻塞；真需用户选择/超授权或证据不可得，立即中文GitHub按模板告知，未阻工作继续。S1共享检测/native归宿单写，1研究+2集成/无Codex/参数停，四Cron单owner，完整人口风险UNKNOWN成本/命令原件逐项自检，A/B局部不总分/review SSH/private不合main改算法历史。
+
+源码主会话正常控制实际复现：SE3 Log漏平移Jacobian（.2rad/.1m输出(.1,0,0)非(.0996664,-.01,0)）；整块11缺行而10/12ALARM/NORMAL跨gap累计；left/world READY但P无frame绑定、右eI直接用P同场景score1而搬运.01。S3最低修Log/空块断dwell保last_suspect、S1/S2/S3实际cov扰动frame对应，不以阈值补偿；真实caller还未交，不指控实际host已错判/T0全UNKNOWN无效，不阻现trace环境最小解除。只读代理误fork审阅流程已披露，主会话亲核源码和三控制，无host/算法修改或新Codex角色。

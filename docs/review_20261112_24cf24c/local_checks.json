@@ -1,0 +1,211 @@
+{
+  "target": "24cf24cbea76d08011e3933b3b11c48dd7588b7b",
+  "exit": 0,
+  "command": "C:/Python315/python.exe -B -W ignore D:/REPAIR/slam_recovery_upstream/docs/review_20261112_24cf24c/run_checks.py",
+  "loading": "Only named reviewed target functions and literal constants compiled in memory; no archived module imports, CLIs, selftests, files or host execution",
+  "source_sha256": {
+    "t2_input_check.py": "cd1c2a849cfc1b76bd0e7b5e328b38992f1cf29e003330e1bfa2adb4a0105504",
+    "ali_h_v1.py": "0c165717ba7c988cc57eb39a4436889b40c74956d53ddff493af971a90418f20"
+  },
+  "se3_log_control": {
+    "status": "FAIL_REPRODUCED_NORMAL_NUMERIC",
+    "pose_rotation_rad": 0.2,
+    "translation_m": [
+      0.1,
+      0,
+      0
+    ],
+    "actual_e": [
+      0.0,
+      0.0,
+      0.2,
+      0.1,
+      0.0,
+      0.0
+    ],
+    "contract_se3_log_e": [
+      0.0,
+      0.0,
+      0.2,
+      0.0996664442325924,
+      -0.010000000000000002,
+      0.0
+    ],
+    "actual_same_cov_score": 0.05000000000000001,
+    "contract_same_cov_score": 100.04993340010601,
+    "scope": "Synthetic physically matched right-tangent covariance, not actual host covariance or observed real misclassification"
+  },
+  "empty_block_control": {
+    "status": "FAIL_REPRODUCED_NORMAL_MISSING_WINDOW",
+    "M_alarm_blocks10_12": [
+      {
+        "block_id": 10,
+        "state": "UNKNOWN",
+        "scope": "NONE",
+        "reason_codes": [
+          "INSUFFICIENT_PERSISTENCE_OR_CALIBRATION"
+        ],
+        "last_suspect_block": null,
+        "verdicts": {
+          "M": "ALARM",
+          "T": "MISSING",
+          "I": "MISSING"
+        },
+        "u": {
+          "M": null,
+          "T": null,
+          "I": null
+        }
+      },
+      {
+        "block_id": 12,
+        "state": "SUSPECT",
+        "scope": "MAP_AND_MOTION",
+        "reason_codes": [
+          "POSITIVE_CONFLICT:M"
+        ],
+        "last_suspect_block": 12,
+        "verdicts": {
+          "M": "ALARM",
+          "T": "MISSING",
+          "I": "MISSING"
+        },
+        "u": {
+          "M": null,
+          "T": null,
+          "I": null
+        }
+      }
+    ],
+    "I_T_normal_blocks10_12": [
+      {
+        "block_id": 10,
+        "state": "UNKNOWN",
+        "scope": "NONE",
+        "reason_codes": [
+          "INSUFFICIENT_PERSISTENCE_OR_CALIBRATION"
+        ],
+        "last_suspect_block": null,
+        "verdicts": {
+          "M": "MISSING",
+          "T": "NORMAL",
+          "I": "NORMAL"
+        },
+        "u": {
+          "M": null,
+          "T": null,
+          "I": null
+        }
+      },
+      {
+        "block_id": 12,
+        "state": "NORMAL_CONSISTENT",
+        "scope": "RELATIVE_MOTION_ONLY",
+        "reason_codes": [],
+        "last_suspect_block": null,
+        "verdicts": {
+          "M": "MISSING",
+          "T": "NORMAL",
+          "I": "NORMAL"
+        },
+        "u": {
+          "M": null,
+          "T": null,
+          "I": null
+        }
+      }
+    ],
+    "explicit_missing11_control": [
+      {
+        "block_id": 10,
+        "state": "UNKNOWN",
+        "scope": "NONE",
+        "reason_codes": [
+          "INSUFFICIENT_PERSISTENCE_OR_CALIBRATION"
+        ],
+        "last_suspect_block": null,
+        "verdicts": {
+          "M": "ALARM",
+          "T": "MISSING",
+          "I": "MISSING"
+        },
+        "u": {
+          "M": null,
+          "T": null,
+          "I": null
+        }
+      },
+      {
+        "block_id": 11,
+        "state": "UNKNOWN",
+        "scope": "NONE",
+        "reason_codes": [
+          "NO_QUALIFIED_EVIDENCE:M,T,I"
+        ],
+        "last_suspect_block": null,
+        "verdicts": {
+          "M": "MISSING",
+          "T": "MISSING",
+          "I": "MISSING"
+        },
+        "u": {
+          "M": null,
+          "T": null,
+          "I": null
+        }
+      },
+      {
+        "block_id": 12,
+        "state": "UNKNOWN",
+        "scope": "NONE",
+        "reason_codes": [
+          "INSUFFICIENT_PERSISTENCE_OR_CALIBRATION"
+        ],
+        "last_suspect_block": null,
+        "verdicts": {
+          "M": "ALARM",
+          "T": "MISSING",
+          "I": "MISSING"
+        },
+        "u": {
+          "M": null,
+          "T": null,
+          "I": null
+        }
+      }
+    ],
+    "scope": "Missing entire .5s block vs explicit missing, no real-trace classification claim"
+  },
+  "left_right_contract_control": {
+    "status": "FAIL_PREPARATION_READY_NOT_SUFFICIENT",
+    "manifest_ready": {
+      "status": "READY",
+      "missing": [],
+      "errors": [],
+      "warnings": []
+    },
+    "manifest_declarations": {
+      "state_order": "rot_trans",
+      "rotation_param": "rotvec",
+      "perturbation": "left",
+      "pose_frame": "world",
+      "vec_frame": "body",
+      "extrinsic": true,
+      "bias_source": "host_estimate",
+      "covariance_field": "P_minus/P_plus"
+    },
+    "actual_right_residual": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -1.0,
+      0.0
+    ],
+    "left_cov_used_directly_score": 1.0,
+    "cov_transported_to_right_score": 0.01,
+    "scope": "Helpers allow inconsistent composition; true trace caller not delivered, not evidence actual runtime omitted transport"
+  },
+  "old_T0_all_UNKNOWN_result_unchanged": true,
+  "no_native_ROS_bag_parameter_or_archived_CLI_execution": true
+}

@@ -621,3 +621,11 @@ S1实际分发单写共享接口/连续集成，S3唯一方法研究，S2真实t
 本机-I旧档raw资格复算A95/307、B132/412，支持不足285/351与空22/61（各缺NIS1包含空参考非另加）；U中fresh M28/137,T278/274,none1/1,I0/0。fresh不qualified，NORMAL须真实I故结构上限0，不调门能补；正常校准/独立label仍不足。导出规划H Pminus H^T+R是测量空间，不能直接配SE3位姿eI；H_T_H非S、6维压缩需其映射/cov、不简单Pminus+Pplus。最低声明同物理时间frame/tangent/rank/residual-Sigma来源，缺合适cov保带单位残差/经验条件校准NOT_AVAILABLE，不新矩阵/惯导/巨大S。时间还须区分replay/restore phase与早退，不能只行号/重复相对戳。
 
 S3上传/同新trace风险UNKNOWN成本，S2一次已有预算真实导出、S1共享检测接线及原生归宿并行，1研究+2集成/无Codex/旧参数停，不为字段修正停全15h；只有真实证据不可得/需新选择预算才中文重大阻塞告知用户。当前可解除trace依赖非全面重大阻塞。逐项状态命令原件/来源人口/label失败质量成本自检，A3/B3资格认识非性能/自动链/收益，本机不算法或ROS/PAT、review中文SSH/private保护不合main不改历史门。
+
+## 77. 24cf24c：ALI研究原件已上传，T0全UNKNOWN可核，真实trace仍待启动解除
+
+[核验](review_20261112_24cf24c/README.md)新研究实现/输入validator/评价协议合main，五产物bytes/SHA及code manifest一致，A402/B544逐帧身份/旧字段/raw分数和90/119块来源/上下文缺项读回同，全UNKNOWN scopeNONE/I0/缺normal校准与label确认。旧“未上传研究原件”缺口解除，T1六/T2 prep十一记录PASS仅归档读数、本机未执行，不test数当真实性能。共享算法/旧档未变，无新I trace/原生自动run，A3/B3仅实现资格组件，效果与净收益NOT_EVALUABLE。
+
+S1报100744Z/101116Z两次host image_transport启动错误/pose0 paired0，同新库691d7334，但失败receipt/host log/部署patch未上传，本机记DEVELOPER_REPORTED/root UNKNOWN。查询进程rospack成功不证明实际host进程环境/依赖，先S2保存fork环境/原件最小解除，不盲第三次重跑但其余15h工作继续。独立正常校准/label另一依赖现在确认，确需超授权/现证据不可得即中文重大阻塞用户选，尚不从二次失败造全面重大阻塞。S3复用T0实现/准备真实同人口评价、S1集成/原生归宿、S2有效导出不新矩阵/模型或手调，1研究+2集成/无Codex，四Cron含截止保持，状态命令原件/人口缺项风险成本自检，review SSH/private保护不合main算法历史冻结门。
+
+本机目标函数最小控制另复现3正常问题：eI只SO3+原translation非SE3 Log，.2rad/.1m应rho(.0996664,-.01,0)而(.1,0,0)同cov评分.05/100.0499；块10/12无11仍跨空窗SUSPECT或NORMAL，显式missing11则UNKNOWN；left/world READY无Pframe绑定但右残差直接用P，旋转pi/2例评分1/正确搬运.01。最低完整Log+已有控制、空块NO_DATA断dwell保历史、cov同扰动frame来源/实际转换或拒不支持。仅阻对应分类结论/真实计分，不否定T0全UNKNOWN或停环境导出，不增阈值/矩阵。源码只读代理误再调用skill fork已披露，主会话亲自复核/实际小控制，不冒归档自测实跑或远端Codex配置。
