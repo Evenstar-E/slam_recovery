@@ -440,6 +440,8 @@ def main(argv=None):
     for r in ho_rows:
         pre = r.get("pre_pose")
         post = pose_from_tail(r.get("pose_tail"), "pose")
+        if post is not None:
+            same_row_pose += 1
         if pre is not None and post is not None:
             exact_by_idx[r["idx"]] = e_i_from_poses(pre, post)
             same_row_pre_post += 1
@@ -449,7 +451,6 @@ def main(argv=None):
         p = pose_from_tail(r.get("pose_tail"), "pose")
         if p is not None:
             exact_by_idx[r["idx"]] = exact_e(r["vec6"], quat_to_rot(p[3:7]))
-            same_row_pose += 1
     time_err = []
     used: Dict[int, int] = defaultdict(int)
     ambiguous_groups = 0
@@ -609,6 +610,29 @@ def main(argv=None):
             if m is not None:
                 repair[key] = int(m)
 
+    if same_row_pre_post > 0:
+        i_qual = "PASS_SAME_ROW_UNIT_WEIGHTED"
+        i_reasons = [
+            f"{same_row_pre_post} rows have same-row pre_pose7+pose7; e_I is a true SE(3) Log "
+            "(V^-1 included)",
+            "vec6 remains NOT_VERIFIED and is used only as a comparison",
+            "Ppre/Ppost are mixed-convention state blocks; covariance is NOT_AVAILABLE",
+            "I primary quantity is the unit-weighted |e_I|^2; no chi-square probability"]
+    elif same_row_pose > 0:
+        i_qual = "INCOMPLETE/UNKNOWN"
+        i_reasons = [
+            f"{same_row_pose} rows have same-row post pose only; pre pose is not same-row",
+            "vec6 is captured before the final solution; covariance is NOT_AVAILABLE"]
+    else:
+        i_qual = "INCOMPLETE/UNKNOWN"
+        i_reasons = [
+            "vec6 is captured before the final solution (state_ += solution); the final "
+            "solution is not exported, so vec6 is not the final pre-post increment",
+            "pre pose is not independently exported for the LIO handler; mat_pre has "
+            "VIO/LIO double writes without a handler tag",
+            "Ppre/Ppost are mixed-convention state blocks; no verified 6D tangent covariance",
+            "numeric I rows are not qualified independent I observations"]
+
     out = {
         "_meta": {
             "run": os.path.basename(base), "run_id": summary.get("run_id"),
@@ -617,9 +641,14 @@ def main(argv=None):
             "receipt_sha256": sha256(receipt_path), "summary_sha256": sha256(summary_path),
             "protocol": "T2_PROTOCOL.md (pre-registered)", "block_ns": BLOCK_NS,
             "e2_rel_s": E2_REL_S,
-            "pose_source_status": "CONFIRMED_POST_POSE_TIME_JOIN",
-            "join_status": "HEURISTIC_UNPROVEN",
-            "results_conditional_on": "unproven group-membership mapping; not a source-membership proof",
+            "pose_source_status": ("SAME_ROW_PRE_POST" if same_row_pre_post
+                                   else ("SAME_ROW_POST" if same_row_pose
+                                         else "LEGACY_M2DGR_TIME_JOIN")),
+            "join_status": join["status"],
+            "results_conditional_on": ("true span containment with 512 ns quantization; "
+                                        "multi-to-one kept"
+                                        if join["mode"] == "true_span_512" else
+                                        "unproven group-membership mapping"),
             "e_i_convention": ("host mixed convention: rot = R*Exp(d_rot) (body right), "
                                "pos = p + d_pos (world additive); rot=-w, t_body=-R_pre^T v, "
                                "then SE(3) Log t_log = so3_left_jacobian_inv(rot) @ t_body"),
@@ -628,16 +657,11 @@ def main(argv=None):
                             "legacy 92/93-column rows as a cross-check"),
             "same_row_pre_post_rows": same_row_pre_post,
             "same_row_post_pose_rows": same_row_pose,
-            "pose_source_scope": "CONFIRMED_POST_POSE_TIME_JOIN applies to v8 124217Z only; "
-                                 "v7 115734Z remains HEURISTIC_UNPROVEN",
-            "i_qualification": "INCOMPLETE/UNKNOWN",
-            "i_qualification_reasons": [
-                "vec6 is captured before the final solution (state_ += solution); the final "
-                "solution is not exported, so vec6 is not the final pre-post increment",
-                "pre pose is not independently exported for the LIO handler; mat_pre has "
-                "VIO/LIO double writes without a handler tag",
-                "Ppre/Ppost are mixed-convention state blocks; no verified 6D tangent covariance",
-                "504 numeric I rows are not 504 qualified independent I observations"],
+            "pose_source_scope": ("SAME_ROW_PRE_POST applies to v11 165438Z; SAME_ROW_POST to "
+                                  "v10 100-col rows; LEGACY_M2DGR_TIME_JOIN to v7/v8, where v7 "
+                                  "join remains HEURISTIC_UNPROVEN"),
+            "i_qualification": i_qual,
+            "i_qualification_reasons": i_reasons,
             "covariance_status": ("NOT_AVAILABLE_FOR_E_I: Ppre/Ppost are mixed-convention state "
                                   "blocks; no verified 6x6 tangent conversion"),
             "vec6_status": ("NOT_VERIFIED: saved before the final solution; same pre/post and "
