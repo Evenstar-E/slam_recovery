@@ -2607,3 +2607,16 @@ S3 `ca384cf`（已合入 main）：
   输出到约 53 s → **E2 后 64 块 / 30 行尾段（303 行）**，明确只是宿主在回滚地图上继续输出，**不是合法 catch-up**；
   v7 保留 `e2_basis="legacy_54s_not_run_bound"`（tail 47 行/51 块不变）。
 - v11 其余数值不变：I 462、`|e|` p50 0.03424、单位权 p50 1.1726e-3、106 块/53 s 全 UNKNOWN；分类/误报/漏检 `NOT_EVALUABLE`。
+
+## 173. 审阅接受分层与本 run 尾段；发现 `RAW_HEADER_CONTAINMENT` 为常量 PASS（旧档误标）；更正 §172 的尾块笔误
+
+审阅 `29738ec`（已合入 main）独立复核：v11 分层成立、18/24 条零约束保留且与 trace idx 对得上、本 run 尾段
+trigger 17.002940433 s / deadline 21.002940433 s、**303 条尾行（179 条在 deadline 前）**，旧 v7 仍 `legacy_54s_not_run_bound`
+（47 尾行/12 尾块/51 行块成员，120 块全 UNKNOWN）。
+
+**新缺陷（FAIL_REPRODUCED，S1 已核）**：`t2_run.py:663–667` 把 `i_qualification_layers.RAW_HEADER_CONTAINMENT` 写成常量
+`"PASS"`，未引用 join 模式——旧 v7 的 `_meta` 因此同时出现 `RAW_HEADER_CONTAINMENT: PASS` 与
+`join_status: HEURISTIC_UNPROVEN`，而 v7 的 `scan_first` 全为 -1、用机械关联，**没有真实 raw 首末跨度**。已要求 S3 从
+`join.mode/status` 派生（真实跨度→PASS；机械→`HEURISTIC_UNPROVEN`），v11 不受影响。
+
+**更正 §172 笔误**：v7 尾段是 **47 行（pose≥54 s）/ 12 块 / 51 行块成员**，§172 写成"47 行/51 块"有误；51 是块成员行数不是块数。
