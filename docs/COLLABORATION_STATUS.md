@@ -776,3 +776,9 @@ E2无注入/detection off、滚动cp晚trigger1.607814s/晚隔离起点5.607814s
 实际cp晚隔离起点：两E1约4s，armed E2 3.999999942s，final E2 3.932198216s，早trigger67.8ms只解除晚trigger范围；最低实际应用历史cp不晚quarantine_start并保input归宿，或明确拒绝回溯不支持，不调margin/重新框架/无限移E2戳。旧collect未知失败写回/物理候选仍未改不重测，59shift仅23修/未解101,138保人口。总结final before20.3222非22.064/Wilson0、superseded0非1等集中更正不重跑。
 
 S1共享成功依赖/可信边界、S2下一合法历史恢复→完整接回后继尾段或能力断点；S3按新用户ALI-H v1有限shadow研究授权且旧参数停、既有研究预算顺序回执，native不等研究。availability旧state交叉不真值/唯一pose因果，论文受控限定保留。-I reader/source控制PASS，早reader断言只修辅助，无host/bag，build目标成功整体ABI失败不抹。实际automation owner无双写，16:29DNS失败不冒remote latest，A/B局部不总分、自检状态/命令/原件/人口/失败/质量成本UNKNOWN，review SSH推送/private保护不合main不改算法历史冻结门，接收新意见待回执。
+
+## repair-f3 / 26ba3a3与两小时总结：独立参考仅研究组件，真实主线部分推进
+
+[核验](review_20261112_26ba3a3/README.md)新PCD/独立支持工具5相关test target Git bytes PASS，Scipy ICP未跑不装；target无新PCD/receipt/评分运行。正常pose不变只换参考fraction0→1不证明pose错；裁20/200保存点fraction1/真全样本.1仍入主both_pass，最低完整分母/partial单列、中性解释与现prefix gauge/共同支持，不能每帧ICP自拟合冒独立评价。ASCII COUNT兼容候选不声明binary input主阻断。S1§103派S2clean pass仅开发转述认领/用户选，本机无新直接选择不扩授权；ALI-H v1用户已直接授权隔离shadow研究b7ad580优先，实际接收待回执，S3唯一研究角色不占S2整轮诊断。
+
+14:37–16:37结论部分推进：后缀真实重推/成功skip旧pose/修复后同实例E2与39尾帧原生证据接受，不日志或test数；首工程cp晚隔离起点及UNKNOWN/FAIL依赖仍未过，算法/评价物理候选/全损坏人口/独立净收益未知，参数无同版本同人口规律/上限证据可解、旧sigma/κ/floor停。目标库运行/整体ABI测试失败次要；DNS恢复fetch最新26ba3a3，不猜远端停工。S1成功依赖/共享集成、S2合法历史cp/完整input归宿→实际修复接回后继尾段或显式不支持，复用已验suffix/skip不扩框架；S3既定研究/native不等。自检状态/命令/原件/全人口/失败/质量成本UNKNOWN，A/B局部不总分，只新评价增量提交SSH不重复2h空报告/private保护不合main不改算法历史冻结门。

@@ -1,0 +1,54 @@
+{
+  "target": "26ba3a3f907c4ff6f29a32feb8e3540a7bd31de8",
+  "exit": 0,
+  "command": "C:/Python315/python.exe -B -W ignore D:/REPAIR/slam_recovery_upstream/docs/review_20261112_26ba3a3/run_checks.py",
+  "source_loading": "All slam_recovery modules from exact Git bytes",
+  "loaded_sources_sha256": {
+    "slam_recovery/__init__.py": "5138483ee7e515c0c12dc64bcfe280306a2eddedc28858d38f58a51978fd22fb",
+    "slam_recovery/core.py": "fad8630b6e242754802b480444ae9ba4dc7b42adcd559888afc1a7a363ef5f2b",
+    "slam_recovery/tests/__init__.py": "1b08d61c2ddd4f16be6990ee5b8b6a750b6dca03db8a49435e3b69faa410be3d",
+    "slam_recovery/tests/test_independent_reference.py": "d539006ad4b33c3b01fd96ade089556f70f70a2b1ddf37df8d02d483a18a7822",
+    "slam_recovery/validation/__init__.py": "eb16af0477600f44bec76839e24f2b34dc39cd8eca9b3382b4fa49076a5cdf82",
+    "slam_recovery/validation/fim_and_holdout.py": "dacd3d3a8a9f733cbc52021d8cb0b8dc2abdd053e5f98794969dd27ac223e538",
+    "slam_recovery/validation/wilson_validator.py": "42b6b2a89c8d14ae74f73157da5013bda18ee9e37ad8b65529656c0f4012df09",
+    "slam_recovery/validation/independent_reference.py": "181d1877797d3ae5092a72787c4ffa285d1268f0f58dc0514cc23f2081136dc1",
+    "slam_recovery/sim/__init__.py": "d7e6c731425fa21849d8030388453cf53e0114c8be35416e09f382451d1a3d17",
+    "slam_recovery/sim/transaction_manager_node.py": "0c781f090dec0941e65278557aa0cb43c6b5d098f5d8242e87c4e4371b566353",
+    "slam_recovery/diagnosis/__init__.py": "d2af4f4c1df3381d7af353a631c3896ffc45053a6bcdeb3ad61b5d31eea8e311",
+    "slam_recovery/diagnosis/causal_transformer.py": "6b144e975290786ab807718a0fb9531326520b918fb71784ba5948269955eae3",
+    "slam_recovery/health/__init__.py": "5d7a9d6276da1f30e0ee34d1393c284ef4bd250e0ae11c7f3fe6934bdf35aea9",
+    "slam_recovery/health/detector.py": "c381422c53482c654e0c185bbeab80929227c909d397814cb580f5d5d840694d",
+    "slam_recovery/health/spherical_cells_and_identifiability.py": "26caec3f182a459e00a67049a282892ccf24b5def60f3ebc2d92ebcd834f5017",
+    "slam_recovery/diagnosis/signature_router.py": "e207a9ece340ea22e0365e0e9ba1ec5eee698769806aca94988079741870eaee",
+    "slam_recovery/quarantine/__init__.py": "5c0317485d9ad8a094b4c683e5dc8da26bf3d86abeca45730718a054e4173523",
+    "slam_recovery/quarantine/manager.py": "6a6ddf4324065de72693e39fcca86784b455ae8f353fa4a2f4cc5c06a262d583",
+    "slam_recovery/quarantine/spatial_mutation_log.py": "04cefaad0b4d988386cc25413242f5c51d2ad9038d2da1048bbc212378b29ee6"
+  },
+  "selected_tests": 5,
+  "scipy_alignment_test": "NOT_RUN_scipy_missing_no_install",
+  "same_pose_reference_only_control": {
+    "status": "PASS_FACT_REJECT_CAUSAL_READING",
+    "pose_changed": false,
+    "old_reference_fraction": 0.0,
+    "new_reference_fraction": 1.0,
+    "producer_reading": "host_low_independent_pass means the scan is covered by a map this run did not build: the pose placement is the likely failure. both_low means the independent map does not cover it either; that still does not separate a wrong pose from missing coverage if both maps were built with the same drift.",
+    "conclusion": "Reference replacement alone explains the flip; this is not evidence that the pose is wrong."
+  },
+  "trimmed_population_control": {
+    "status": "FAIL_REPRODUCED_IF_USED_AS_FULL_POPULATION",
+    "saved_sample_fraction": 1.0,
+    "actual_full_200_fraction": 0.1,
+    "summary": {
+      "frames": 1,
+      "trimmed_frames": 1,
+      "both_low": 0,
+      "host_low_independent_pass": 0,
+      "host_pass_independent_low": 0,
+      "both_pass": 1,
+      "reading": "host_low_independent_pass means the scan is covered by a map this run did not build: the pose placement is the likely failure. both_low means the independent map does not cover it either; that still does not separate a wrong pose from missing coverage if both maps were built with the same drift."
+    },
+    "conclusion": "Trimming is flagged, but the main joint count still includes it as a full frame pass."
+  },
+  "independent_map_runtime_or_geometry_result": "NOT_EXECUTED_no_new_run_or_PCD_in_target",
+  "no_native_host_bag_or_parameter_execution": true
+}
