@@ -1,0 +1,34 @@
+{
+  "target": "f48b23f66707e9491350c1c62972fbf542f94fa3",
+  "comparison_base": "088906ae7cda17fb50b32580323a1008c542e3b1",
+  "execution": "Inline python -I target Git readback exited 0; check_records.py packages the same operations and was not separately rerun",
+  "scope": "Archive SHA256, structured summary arithmetic and limited frontend raw log; no raw bag/ROS/host/test/algorithm execution",
+  "integrity": {"matched": 15, "total": 15, "bad": [], "limit": "Listed files only, not LIO-SAM/ORB files or external output bags"},
+  "mmlins": {
+    "status": "RECORDED_NATIVE_REBUILD_AND_E2_TAIL_ARITHMETIC_VERIFIED",
+    "frontend_gaps_s": [23.699415207, 26.799198866],
+    "frontend_reset_displacements_m": [60.55691071756131, 71.11083377719183],
+    "pgo_gaps_s": [38.499598264, 41.399305344],
+    "pgo_gap_displacements_m": [0.7492366323658313, 0.4849806778967598],
+    "pgo_tail_after_E2_s": 227.017538423,
+    "pgo_messages_after_E2": 967,
+    "pgo_zero_stamp_messages_excluded": 2,
+    "raw_output_bag_recomputed_locally": false
+  },
+  "fastlio_frontend_separate_run": {
+    "status": "ACTUAL_SEPARATE_FRONTEND_RUN_SHARED_IMPLEMENTATION",
+    "frontend_gaps_s": [23.799380302, 26.899189473],
+    "frontend_reset_displacements_m": [60.562743771438555, 71.13210851438483],
+    "tail_after_E2_s": 239.317980404,
+    "messages_after_E2": 2126,
+    "raw_log_sleep_lines": [6, 312],
+    "raw_log_rebuild_lines": [309, 664],
+    "implementation": "MM-LINS modified FAST-LIO binary, same as MM-LINS run; not independently built upstream FAST-LIO2",
+    "independent_original_FAST_LIO2_validation": "NOT_EXECUTED_NO_INDEPENDENT_BUILD"
+  },
+  "common_event_offsets_ns": [115990000000, 230090000000],
+  "matrix": "Four named execution attempts reported; two distinct MM/frontend invocations sharing an implementation; LIO/ORB negative observation-window attempts retain previous limits",
+  "repair_gap": {"missing_online_publisher": "SOURCE_CONFIRMED", "no_measurement_filter_in_repository": "REFUTED_existing_point_mixture_filter_and_full_record_exporter", "pose_coordinate_identity": "VALID_LIMITED_COORDINATE_REEXPRESSION_NOT_GENERAL_REPAIR_IMPOSSIBILITY", "new_method_choice": "REPOSITORY_REPORT_NOT_DIRECT_USER_AUTHORIZATION_IN_THIS_SESSION"},
+  "actual_slam_recovery_measurement_repair_chain": "NOT_IMPLEMENTED_IN_THIS_BATCH",
+  "publication": "Existing SSH independent review branch, no main merge/private handoff"
+}

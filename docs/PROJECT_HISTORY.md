@@ -471,3 +471,9 @@ S1认领矩阵/真实分工，S2复用已有宿主环境和run，逐项实际E1�
 [核验](review_20261112_088906a/README.md)S1已运行LIO-SAM260s与ORB351.65s，不能再称未执行。LIO归档1120CSV本机复算一致，E2观察窗535m单步/尾段发散；ORB原log80次初始化、385次motion不足/43badimu reset、最终0KF/exit139负结果可核。原生运行有实证推进，但没有实际修复接线、稳定E1恢复后独立E2证据，不把观察窗等事件、失败不计成功。
 
 声明文件写运行开始后分析前，不按README称预运行冻结；LIO评价t0首输出非已核bagstart，ORB times.txt未公开/window4/6/3只开发报告，远端/tmp run.sh未归档、LIO receipt混checksum行。最低沿已有输入/log补时钟/事件和runner，或明确负尝试范围，不另重跑/扩框架挡余下宿主。MM-LINS §65开发报告在跑尚缺新原件，FAST-LIO2 NOT_STARTED/shared前端非独立执行；S1/S2下一唯一收齐这两项实际结果或命令级断点，S3旁支/参数停、不回LIVO。A2/A12局部负结果可核推进，不全表升分；本机只原件复算无host/bag/tests。前推送限制已通过smoke保留旧OUT解除，1f1527b已发布且0e23548合入main；本轮沿review提交推送/private保护，接收新意见另待回执。
+
+## 57. f48b23f：余下两项真实运行已交，改版前端能力与旧修复器不能抹去
+
+[核验](review_20261112_f48b23f/README.md)MM-LINS与共享前端单独项是两次实际运行，15/15列示原件SHA一致，summary两事件gap/位移/尾段算术核一致；MM前端两次重建、PGO尾227s/967条；单独改版前端rawlog两sleep/两build、尾239s/2126条。四命名项都有尝试，独立原版FAST-LIO2没有构建/未执行；不能叫四独立实现、公平同输入主表或共同“无原生恢复能力”。原生re_slam建图接回能力有证据，共同缺口是未接slam_recovery测量修复；LIO/ORB旧失败与观察窗边界保留不追成功重跑。
+
+接受当前driver无repair publisher、丢scan stamp/完整消息及pose候选不产云的接线定位；REPAIR_GAP“仓库无改变测量的生产者”错误，point_mixture_repairer已有keep-mask/完整点记录导出/C3原生离线重估，必须复用或给新z偏差不适用的具体原因。坐标重表达恒等式不证明一般刚性测量修复不可能。f48文档转述用户选INJECTION仅开发报告，不充本会话直接授权；下一有限实际测量→原生重估/map→接回/E2交实际选择/实现/首断点，不再空决定循环。正常累计receipt非本次stamp应用证明、旧tail set_state/FAIL依赖会破坏来源，沿已有最小解除不扩框架；注入真值只评分，标签反演标oracle、不靠applied计数充收益。原参数停、旧门不降，A/B不全表升分；本机只Git原件/源码算术无host/bag/tests，review46与main分叉未merge、增量独立提交推送/private保护。
