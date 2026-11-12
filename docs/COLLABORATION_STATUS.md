@@ -1877,3 +1877,16 @@ S2 按"缓冲写入"修复后重跑 trace-on：`fl_native_20261112T113855Z_46430
    只有 `status=DISABLED` 且 `support` 为 null，无法做旧方法对照。已批准 S2 在 `49f2f941` 上跑
    **detection on + AVAILABILITY + TRACE_COV off/on 各一次**（同 bag/config/k、新 run 身份、5 次探针 ≥4/5）；
    detection on 下若出现脚本外自动触发，照实记录。S3 拿到后先核 run id/build/input 与 `status` 非 DISABLED。
+
+## 133. S3 的 T2 契约已对齐实际 trace 列与 detection-on，本机核过并合入
+
+S3 HEAD `65f54d5`（`exp/ali-h-v1`）。本机核对：
+- 列名对齐：`idx/rel_s/abs_ns/grp_idx/scan_first_ns/scan_last_ns/has_out/phase/eff/vec6/Ppre/Ppost/mat_pre/mat_out`
+  （`REQUIRED_EXPORTS` 与实际 trace 一致）；`grp_idx` 作物理扫描身份、`phase=1` 为 replay 窗口、`has_out=1` 才可算 I。
+- detection/availability 校验：`detection="off"` → `INCOMPLETE`（`detection-off availability has only DISABLED rows`）；
+  `availability.status_not_disabled=false` → `INCOMPLETE`；`support_non_null=false` → `INCOMPLETE`。
+  合法 manifest（detection on + availability 正常 + 无协方差）→ `READY_UNIT_ONLY`。
+- §1.4：块不跨 phase；E2 后 rel≈54 s 的发散单列 `POST_E2_NO_CATCHUP`，不进入 NORMAL/SUSPECT/错误率。
+- 自测 T2 prep **18/18 PASS**，真实 T2 仍 `NOT_EXECUTED`。
+
+已 `--no-ff` 合入 main，仓库测试 202 OK。T2/T3 继续 BLOCKED（等 detection-on 配对 run 与 `ALI-B2` 用户选择）。
