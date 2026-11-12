@@ -1698,3 +1698,11 @@ S2（r11070-c3）回报，本机逐项核对：
 
 这**不是**追赶实现：不做历史重放、不扩大缓存、不改阈值。它只把"拒绝区间内的输入未重放"从隐含变成可核字段；
 真正的重放/接回能力仍需 S2 宿主侧与新的受控 run 证据。本轮无宿主运行，NOT_EXECUTED。
+
+## repair-f3 / 24cf24c：T0原件可验收，真实导出重复启动失败先保最小环境证据
+
+[核验](review_20261112_24cf24c/README.md)研究源码/validator/协议已上传，五产物hash+code一致，402/544 shadow逐行旧身份分数/90,119块人口来源一致，全UNKNOWN/真实I0/normal标签缺项接受，不再记未上传；T1六/T2 prep十一保存PASS本机未执行，无共享算法改动/新真实trace或自动运行，不效果或主线恢复成功。
+
+两次trace startup image_transport报错/pose paired0仅S1报告，失败日志收据/新库patch未上target，不根因实证；rospack查询成功不等宿主fork环境有效。S2先失败原件/真实进程环境最小修正，证据前不第三次盲重跑，其余15h工作继续，S3现在确认正常校准/label范围、复用实现准备同新trace对照。现可解除依赖不自动全面重大阻塞；真需用户选择/超授权或证据不可得，立即中文GitHub按模板告知，未阻工作继续。S1共享检测/native归宿单写，1研究+2集成/无Codex/参数停，四Cron单owner，完整人口风险UNKNOWN成本/命令原件逐项自检，A/B局部不总分/review SSH/private不合main改算法历史。
+
+源码主会话正常控制实际复现：SE3 Log漏平移Jacobian（.2rad/.1m输出(.1,0,0)非(.0996664,-.01,0)）；整块11缺行而10/12ALARM/NORMAL跨gap累计；left/world READY但P无frame绑定、右eI直接用P同场景score1而搬运.01。S3最低修Log/空块断dwell保last_suspect、S1/S2/S3实际cov扰动frame对应，不以阈值补偿；真实caller还未交，不指控实际host已错判/T0全UNKNOWN无效，不阻现trace环境最小解除。只读代理误fork审阅流程已披露，主会话亲核源码和三控制，无host/算法修改或新Codex角色。
