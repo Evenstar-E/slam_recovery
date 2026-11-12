@@ -176,3 +176,30 @@ resume 后滚动快照继续增长到 60425 voxels。重放前后 `average resid
 的运行成立。`reprocessCheckpoint` 在重放期间会临时清掉 `map_hold_` 才能写图（宿主源码如此设计），
 所以本轮同一窗口有 164 次写图，全部来自重放；停写对普通帧的约束仍由 resume ack 的
 `held_frames=171` 体现。以后引用这个指标必须写明运行里有没有 reprocess。
+
+---
+
+## 11. 第三次运行：同一份受控 run 里的第二事件：`fl_native_20261112T024337Z_4166038`
+
+同一 bag、同一宿主二进制（`0d7e23de…`）、同一驱动（`18d92a03…`）、同一 margin 4.0、
+`--detection off`。新增**第二个绝对戳** `1627785308048271418`（kf 422），选在第一次放写
+（bag 287.011）之后、bag 末帧（320.909）之前；只声明，不按门的结果挑帧。原始件在
+`run_fl_native_20261112T024337Z_4166038/`，索引见其 `INDEX.md`。
+
+**两次事件都完整走完**：
+
+| | 事件 1 | 事件 2 |
+|---|---|---|
+| 触发（bag ns） | 1627785276215170145 | 1627785308048271418 |
+| 决策 | 1627785280281185627 | 1627785312188321114 |
+| 结果 | **Mode 2 接受**（before 3.1388 / after 7.2154 / Wilson 0.8947） | **Mode 3 拒绝**（22.0638 / 17.6808 / Wilson 0.8304） |
+| 关闭 + rearm | 287.011 → rearm | 317.390 → rearm |
+| 原生 | hold → reprocess → set_state → resume（3.61 s 重放） | hold → restore → resume（0.50 s restore） |
+
+- 触发 1 → 触发 2 之间 **276 帧**；第一次关闭 → 触发 2 **210 帧**；触发 2 → bag 末 **122 帧**。
+- `candidates.jsonl` **2 行**，`lifecycle.events` 4 条（两次 close + 两次 rearm），终态 `HEALTHY`。
+- 原生计数 `holds=2 / resumes=2 / restores=1 / reprocesses=1`；两次 resume 的 `trigger` 都是 `rearm`。
+- 地图在两次事件后继续增长（末快照 `live_voxels=44633`）。
+
+第二事件是**事件**（开段、决策、关闭、放写都发生），但不是第二次接纳：门按自己的规则拒绝了它，
+没有为了让它好看改帧或改门。`commit_closed` 仍不出现（协议不变）。
