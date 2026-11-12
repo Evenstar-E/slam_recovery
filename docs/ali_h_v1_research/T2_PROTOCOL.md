@@ -21,13 +21,19 @@
 
 - 新 trace 必须带同一次运行的 **availability 日志**（S1 的 `availability_frames.jsonl`）与
   **旧检测/manager 决定**；三者同 run id、同一 build、同一输入/配置/library sha256。
-- join 键：**`last_lio_update_time` ↔ availability 的 `scan_stamp_ns` 精确相等**；不近似、不 nearest。
-  availability 的 `scan_stamp_ns` 是消息 header 戳，而宿主 `mat_pre`/`mat_out` 的第一列是
-  `last_lio_update_time`（LiDAR 帧末时刻），两者不一定逐位相等。因此要求 trace **同时导出**
-  `scan_header_stamp` 与 `last_lio_update_time` 两列；若样本内两者存在**同比偏移**，另声明映射并
-  报告偏移分布（`scan_header_stamp - last_lio_update_time` 的 min/median/max），映射后的
-  `last_lio_update_time` 仍按精确相等 join。join 不上的行照旧记 `NO_AVAILABILITY_ROW` 进分母。
-  若偏移不是常数、或只给 header 戳：该列记 `INCOMPLETE:join_key_unresolved`，**不做 nearest 近似**。
+- **导出身份**：trace 必须带原始 source scan 的**唯一身份**（`scan_source_index`，能在同 run 内
+  唯一定位该扫描；仅 header 时间戳不够），以及 native 的 `native_group_id` / `native_phase`
+  对应关系；同时给 `scan_header_stamp` 与 `last_lio_update_time`，**原 ns 与 double 量化/打印分开**。
+- **join 判定两条都要成立**：
+  1. **身份对应成立**：`scan_source_index` 在同 run 内唯一，且与 availability 行、native
+     group/phase 指向同一条扫描；
+  2. **时间对应成立**：计分两端（availability 与 trace）对应**同一物理起止时间**。
+  任一不成立 → `INCOMPLETE:join_key_unresolved`（写明缺身份还是缺时间），不静默删除、不 nearest。
+- **不要用时间差自证关联**：header 戳与 `last_lio_update_time` 不等、或 offset 非恒定，本身
+  **不证明**原始扫描无法关联；反过来，**恒定 offset 也不证明**关联到的是同一扫描。只有身份对应
+  不存在时才记 `join_key_unresolved`。
+- 不得用“把变 offset 的数据全删”制造好看人口；不得用 double 末时刻反推原始 header 整数。
+- join 不上的行照旧记 `NO_AVAILABILITY_ROW` / `NO_TRACE_ROW` 进分母。
 - join 不上的 trace 行记 `NO_AVAILABILITY_ROW`；availability 有而 trace 无的行记
   `NO_TRACE_ROW`。两者都进分母，明确列出，不静默删除。
 - 若 trace 与 availability 的 run id/build/输入 sha256 不一致：**STOP**，不作跨 run 贴接。
