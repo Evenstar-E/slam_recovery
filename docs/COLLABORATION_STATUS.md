@@ -998,3 +998,24 @@ S1 认领的部分（共享诊断，默认不改变计算与决定）：
 - 计算与决定不变（开关前后逐值一致的小控制），不新增阈值/置信层，不把相关点当独立样本做显著性。
 
 S2 的部分：在现有宿主/输入与预算内跑**一次检测 on** 的有限诊断，交每帧原件与原因计数；本次实现完成后再派。
+
+## 87. UNAVAILABLE 逐帧诊断已实现（S1，默认不改变计算/决定）
+
+`c35b162`，202 测试通过。新通道 `--availability-log <path>` → `availability_frames.jsonl`，每 paired frame
+一行、无 2000 条上限、逐行 flush：
+
+- **support**（同一次 `_frame_has_reference_support` 计算）：reason（empty_reference/missing_scan/
+  missing_pose/invalid_pose/empty_scan/ok）、radius、threshold、sampled/within/fraction/pass、
+  query_stride、每个样本的 row/body/world/within_1m；
+- **NIS**（同一次 `LiveNis.measure` 计算）：reference source（node_map/prev_scan/none）与 trusted_total、
+  3 m 内数、prev_scan 点数、选中参考点数、current/train/query 采样、sigma、attempted/computed、
+  raw_kind（finite/inf/nan/not_computed+reason）、effective NIS、source（computed/carried_forward/
+  unavailable）、沿用值来源 kf/stamp/age；holdout 的 train/holdout stride、k、coverage、all/clipped
+  分支、均值/rms/分位、每点邻居 ID/质心/法向/特征值/残差/卡方/是否 <2 m；
+- **身份**：kf、pose/scan stamp、dt、scan frame_id、T_wb、manager state/version/keys/active segment；
+  `status_from_conditions` 由两个布尔重算；检测 off 记 `DISABLED`，不沿用旧 detector 状态。
+- **采样节省**：UNAVAILABLE 帧保留全部点级样本；AVAILABLE 帧保留声明的前 20 个（记 points_total）。
+- **不改变决定**：新增测试跑同一 12 帧，开/关日志对比 diag、detection_counts、records 完全一致；
+  另有 support fraction 与布尔一致、carried_forward 的 age/kf、2500 行不截断等测试。
+
+下一步（S2）：用现有宿主/输入跑**一次检测 on** 的有限诊断，交每帧原件与按原因计数；本任务不新开参数/矩阵。
