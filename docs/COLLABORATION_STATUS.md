@@ -1237,3 +1237,23 @@ run `fl_native_20261112T080204Z_228057`：
 
 可用最晚戳：关闭 = 触发 + margin 4 + wait_offset 7.335 + wait 2 = 触发 + 13.335 s ≤ 320.909 ⇒ 触发 ≤ 307.574。
 考虑尾部余量，S1 要求 S2 用 **≤306.4 s 的戳**（关闭后至少约 10 帧尾段）再跑一次；不重制 bag、不改门/阈值。
+
+## 101. 主线整链在同一实例内完整成立（受控 + 声明注入）：写回→接回→第二事件关闭/rearm→尾段
+
+S1 复核 S2 `b201f25`（合入，209 测试）。run `two_event_final_20261112`，宿主 v5 库 `9e7d8cdf…`（本机核对）。
+
+| 项 | 实际（本机核对） |
+|---|---|
+| 声明/命中 | 两戳 `1627785276215170145`、`1627785306371636152`（kf 405，306.3716 s），`declared_ns` 与 `fired ts_ns` **逐位一致** |
+| 事件 1 | Mode 2 **accepted**（3.1388→7.3001，Wilson .8947）；`repairs applied=23`；reprocess 503 帧 [276.282..293.026]（**within 124 / suffix 379**）；地图 21578 voxels/403642 points；**无 set_state**；close 289.149 → rearm → resume |
+| 事件 2 | Mode 3 **拒绝**（22.064→19.616）；restore stamp `1627785306303834368` **早于触发 67.8 ms**；close **316.258** → rearm v232 → resume(`trigger=rearm`) |
+| 快照 | `snapshots=2`（只有两次武装快照），`superseded=0` |
+| 尾段 | 关闭→bag 末 **39 帧 / 4.65 s** |
+| 终态 | **HEALTHY、`open=false`**；`lifecycle.events` 4 条；`candidates.jsonl` 2 行；holds 4 / resumes 2 / restores 1 / reprocesses 1 |
+| 尾部预算 | 本 run 第二段 `wait_offset=1.284 s`（上一 run 7.335 s），提前的戳留出余量，"差 0.47 s"未复现 |
+
+**这是主线目标的完整受控证据**：同一实例内实际修复测量进入宿主重放（23/23）、状态与地图停在重放边界、
+接回后第二事件开段→决策→关闭→rearm→resume、尾段保留、终态 HEALTHY。
+
+**边界（不得越过）**：损坏为自注入（INJECTION），不声称真实自然故障的修复收益或恢复成功率；门/阈值/σ 未动；
+detection off（受控接口测试），不是自动检测链；可用性诊断仍暂停；`commit_closed→resume` 仍不可达（partial 接纳）。
