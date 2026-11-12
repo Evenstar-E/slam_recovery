@@ -144,3 +144,15 @@ vec6(6) Ppre6x6(36) Ppost6x6(36)
    右乘 SO(3) 增量**，pos 为世界系位置；只有在该约定下才可作为 e_I 的协方差使用，否则 `NOT_AVAILABLE`。
 
 启动探针 5/5 PASS（类布局未变：新增的全部是文件级 static）。
+
+## 12. v11：同帧 pre/post 配对（2026-11-13，回应审阅 480a038）
+
+库 `81b35f92…`；可执行文件未重链（`6dd71953…`）。
+
+- trace 行尾在 `pose7`（更新后）之后再加 **`pre_pose7`**（同一帧 `StateEstimation` 之前的 `pos_end`
+  与 `rot_end` 四元数，进入 `handleLIO` 时捕获）。行宽 **100 → 107**。这样同一行同时给出
+  pre 位姿 / post 位姿 / Ppre / Ppost，构成**一次更新的完整配对**，不需要行间 zip 或时间近邻。
+- `mat_lio_pre.txt` / `mat_lio_out.txt` 每行前面加 `idx grp_idx phase`（与 trace 同一行的 key：
+  pre 用即将写入的 `idx`，out 用刚写入的 `idx`），因此这两个文件也能与 trace 精确配对。
+- 早退帧（`has_out=0`）同样带 `pre_pose7`；`pose7` 为 0（无后验）。
+- 启动探针 5/5 PASS（改动仍只在文件写入与局部变量，类布局未变）。

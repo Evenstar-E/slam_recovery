@@ -1,0 +1,7 @@
+[rosmaster.main][INFO] 2026-11-13 00:44:40,853: initialization complete, waiting for shutdown
+[rosmaster.main][INFO] 2026-11-13 00:44:40,853: Starting ROS Master Node
+[xmlrpc][INFO] 2026-11-13 00:44:40,854: XML-RPC server binding to 0.0.0.0:59013
+[xmlrpc][ERROR] 2026-11-13 00:44:40,854: ERROR: Unable to start XML-RPC server, port 59013 is already in use
+[rosmaster.main][INFO] 2026-11-13 00:44:50,118: keyboard interrupt, will exit
+[rosmaster.main][INFO] 2026-11-13 00:44:50,118: stopping master...
+[rospy.core][INFO] 2026-11-13 00:44:50,118: signal_shutdown [atexit]
