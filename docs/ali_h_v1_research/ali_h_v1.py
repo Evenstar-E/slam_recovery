@@ -216,9 +216,14 @@ def channel_verdict(ch: Dict[str, Any], context: str, calib: Calibration) -> Dic
 def classify_blocks(blocks: List[Dict[str, Any]], calib: Calibration) -> List[Dict[str, Any]]:
     """State machine over 0.5 s blocks. Two adjacent evidence blocks are required."""
     prev_verdict: Dict[str, Optional[str]] = {"M": None, "T": None, "I": None}
+    prev_bid: Optional[int] = None
     last_suspect = None
     out = []
     for blk in blocks:
+        # Dwell only accumulates on adjacent 0.5 s blocks. A gap (including a NO_DATA block)
+        # breaks the adjacency even if the same verdict appears on both sides.
+        if prev_bid is not None and blk["block_id"] != prev_bid + 1:
+            prev_verdict = {"M": None, "T": None, "I": None}
         v = blk["verdicts"]
         alarms = {k: (v[k]["verdict"] == "ALARM" and prev_verdict[k] == "ALARM")
                   for k in ("M", "T", "I")}
@@ -242,9 +247,12 @@ def classify_blocks(blocks: List[Dict[str, Any]], calib: Calibration) -> List[Di
             if normals["T"] and not normals["I"]:
                 reasons.append("T_NORMAL_ONLY_RELATIVE")
             if not any(v[k]["verdict"] in ("ALARM", "NORMAL", "GREY") for k in ("M", "T", "I")):
-                missing = [k for k in ("M", "T", "I")
-                           if v[k]["verdict"] in ("MISSING", "STALE", "NOT_AVAILABLE")]
-                reasons.append("NO_QUALIFIED_EVIDENCE:" + (",".join(missing) or "all_unqualified"))
+                if all(v[k]["verdict"] == "NO_DATA" for k in ("M", "T", "I")):
+                    reasons.append("NO_DATA_BLOCK")
+                else:
+                    missing = [k for k in ("M", "T", "I")
+                               if v[k]["verdict"] in ("MISSING", "STALE", "NOT_AVAILABLE")]
+                    reasons.append("NO_QUALIFIED_EVIDENCE:" + (",".join(missing) or "all_unqualified"))
             if not reasons:
                 reasons.append("INSUFFICIENT_PERSISTENCE_OR_CALIBRATION")
         if state == "SUSPECT":
@@ -254,6 +262,7 @@ def classify_blocks(blocks: List[Dict[str, Any]], calib: Calibration) -> List[Di
                     "verdicts": {k: v[k]["verdict"] for k in ("M", "T", "I")},
                     "u": {k: v[k]["u"] for k in ("M", "T", "I")}})
         prev_verdict = {k: v[k]["verdict"] for k in ("M", "T", "I")}
+        prev_bid = blk["block_id"]
     return out
 
 
@@ -262,7 +271,19 @@ def block_summary(frames: List[Dict[str, Any]], calib: Calibration) -> List[Dict
     for f in frames:
         by_block.setdefault(f["block_id"], []).append(f)
     blocks = []
-    for bid in sorted(by_block):
+    lo, hi = min(by_block), max(by_block)
+    for bid in range(lo, hi + 1):
+        if bid not in by_block:
+            # A block with no rows is still part of the time population, and it breaks dwell:
+            # two alarm blocks separated by an empty block are not adjacent evidence.
+            verdicts = {ch: {"channel": ch, "present": False, "fresh": False, "score": None,
+                             "verdict": "NO_DATA", "calibration": "NOT_APPLICABLE", "u": None,
+                             "reason": "no_rows_in_block"} for ch in ("M", "T", "I")}
+            blocks.append({"block_id": bid, "n_frames": 0, "context": "NO_DATA",
+                           "old_status": {}, "median_score": {ch: None for ch in ("M", "T", "I")},
+                           "fresh_count": {ch: 0 for ch in ("M", "T", "I")},
+                           "verdicts": verdicts})
+            continue
         fs = by_block[bid]
         contexts = {f["map_support"] for f in fs}
         context = contexts.pop() if len(contexts) == 1 else "MIXED"

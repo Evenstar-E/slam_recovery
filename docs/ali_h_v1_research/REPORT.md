@@ -6,6 +6,8 @@
 > 实现：`ali_h_v1.py`（观察器）、`selftest.py`（T1）；配置/身份：`manifest.json`。
 > T2 输入契约：`T2_INPUT_CONTRACT.md`；T2 评价协议（预注册）：`T2_PROTOCOL.md`
 > （trace 结果前写死，不扫参数；S2 导出未到，T2/T3 仍 `BLOCKED`）。
+> T2 开跑前三处修正：`T2_FIX_NOTES.md`。重大阻塞：`重大阻塞记录.md` 的
+> **`ALI-B2-NORMAL-LABELS-20261112-01`**（无独立正常前缀/事件标签，等待用户确认）。
 > 15 小时任务：`docs/OVERNIGHT_ALI_AUTODETECTION_TASK_20261112.md`；本文件是其中 S3 的研究交付。
 
 ## 0. 一句话结果
@@ -20,7 +22,7 @@
 | 项 | Run A | Run B |
 |---|---|---|
 | run id | `fl_native_20261112T065500Z_187992` | `fl_native_20261112T070801Z_197026` |
-| paired 帧 / 0.5 s 块 | **402 / 90** | **544 / 119** |
+| paired 帧 / 0.5 s 块 | **402 / 90** | **544 / 120**（含 1 个 NO_DATA 块） |
 | `availability_frames.jsonl.gz` sha256 | `7a201845…36f82b` | `7492097a…79fa6b1` |
 | receipt / run_summary sha256 | 见 `t0_A.json` | 见 `t0_B.json` |
 | recovery_node 源 hash | `93f69356…` | `43c65a9d…` |
@@ -80,9 +82,9 @@ M/T 互斥（一帧的 NIS 参考只能是一个来源）。旧 UNAVAILABLE 中�
 
 | 通道 | Run A | Run B |
 |---|---|---|
-| M | 35 块有证据：**29 BLOCKED（无 normal 参照）**、6 OUT_OF_SUPPORT（块内上下文混合）；55 块无 M | 57 块有证据：**42 BLOCKED**、15 OUT_OF_SUPPORT；62 块无 M |
-| T | 58 块有证据：**56 BLOCKED**、2 OUT_OF_SUPPORT；32 块无 T | 71 块有证据：**63 BLOCKED**、8 OUT_OF_SUPPORT；48 块无 T |
-| I | 90 块全部 NOT_AVAILABLE | 119 块全部 NOT_AVAILABLE |
+| M | 35 块有证据：**29 BLOCKED（无 normal 参照）**、6 OUT_OF_SUPPORT（块内上下文混合）；55 块无 M | 57 块有证据：**42 BLOCKED**、15 OUT_OF_SUPPORT；62 块无 M + 1 块 NO_DATA |
+| T | 58 块有证据：**56 BLOCKED**、2 OUT_OF_SUPPORT；32 块无 T | 71 块有证据：**63 BLOCKED**、8 OUT_OF_SUPPORT；48 块无 T + 1 块 NO_DATA |
+| I | 90 块全部 NOT_AVAILABLE | 119 块 NOT_AVAILABLE + 1 块 NO_DATA |
 
 normal 参照状态：**`BLOCKED:no_independently_confirmed_normal_reference`**。
 两份归档都没有"由独立离线证据确认的正常前缀"；`HEALTHY`、trusted、无注入、预测支持通过
@@ -109,6 +111,7 @@ normal 参照状态：**`BLOCKED:no_independently_confirmed_normal_reference`**�
 | T1.4 | 同一分数在 M/T 各自参照下结论不同；没有 LOW 参照 → OUT_OF_SUPPORT，不借 SUPPORTED | **PASS** |
 | T1.5 | 同一物理标量在 SE(3) 重表达下不变（rel 1.7e-16）；块时间取自 pose_stamp，不发明 dt | **PASS** |
 | T1.6 | **同一 trace（Run A 402 行）** shadow 开关前后：旧 status/NIS source/参考/分数/fraction 逐条相同；旧字段与输入一致 | **PASS** |
+| T1.7 | 缺块/NO_DATA 打断 dwell：块 10、12 两个 ALARM 不跨空窗变 SUSPECT；last_suspect 保留；block_summary 补齐 NO_DATA 块 | **PASS** |
 
 T1 全部标记 `marker: SYNTHETIC_UNIT`，不称真实恢复，不产生真实 NORMAL/SUSPECT。
 
@@ -117,7 +120,7 @@ T1 全部标记 `marker: SYNTHETIC_UNIT`，不称真实恢复，不产生真实 
 | 项 | 状态 | 缺什么 / 下一动作 |
 |---|---|---|
 | 真实 I 通道 | **BLOCKED** | 两份归档无 IMU preupdate/update、区间、外参、协方差；输入 bag 只有 raw IMU/LiDAR，无 `imu_prop_odom`。需 S1/S2 在 LiDAR 更新点做**一次最小导出**（正常前缀 + 已声明退化窗 + 尾段），并先给 wall/message 预算 |
-| normal 参照 | **BLOCKED** | 无独立确认的健康前缀；不能用 HEALTHY/trusted/无注入替代。需指定正常开发输入 + 离线证据 |
+| normal 参照 | **BLOCKED** | 无独立确认的健康前缀；不能用 HEALTHY/trusted/无注入替代。已登记 `ALI-B2-NORMAL-LABELS-20261112-01`，等用户选择 A/B/C |
 | 独立事件标签 | **NOT_EVALUABLE（归档）** | 两份归档没有事件标签；自注入标签只能离线评价，不能生成训练/评价真值 |
 | T2 最小 trace | **NOT_EXECUTED** | S2 的 `fl_native_20261112T101116Z_329791` 宿主启动即 `image_transport` 插件缺失 terminate（`pose_messages: 0`、`paired: 0`），trace 未导出；不自行造 trace、不拼旧档 |
 | T3 同人口对照 | **NOT_EXECUTED** | 依赖 T2；当前只能交 T0 的证据资格与边界 |
@@ -133,14 +136,15 @@ T1 全部标记 `marker: SYNTHETIC_UNIT`，不称真实恢复，不产生真实 
 | 校准资格 OUT_OF_SUPPORT / BLOCKED 单列 | **PASS** | §2.4；`block_channel_status` | — | — |
 | NORMAL 分支可测性 | **FAIL（设计上限 0）** | §2.2：I=0；§5 要求 I+M/T | 无法验证正常相容 | 需真实 I |
 | SUSPECT 分支可测性 | **BLOCKED** | 有 M/T 证据但无 normal 参照 | 无 SUSPECT | 需正常前缀 |
-| T1 六条控制 | **PASS 6/6** | `python -I … selftest`；`t1_selftest.json` | — | — |
+| T1 七条控制 | **PASS 7/7** | `python -I … selftest`；`t1_selftest.json` | — | — |
 | shadow 开关不变性 | **PASS（限定控制）** | T1.6，Run A 402 行逐条相同 | — | — |
 | 真实 I trace | **BLOCKED/NOT_EXECUTED** | §4 | — | 等 S1/S2 |
 | 同人口误报/漏检/延迟 | **NOT_EVALUABLE** | 无标签、无 I、无 normal 参照 | — | 等 T2 |
-| T2 输入契约/校验器 | **PASS（准备，SYNTHETIC）** | `T2_INPUT_CONTRACT.md`、`t2_input_check.py`；11/11 合成测试（manifest 缺项/拒绝 S 与 H_T_H/旧 run id/e_I/s_I/单位权） | 真实 T2 仍 `NOT_EXECUTED` | 收到 trace 后按契约 §6 顺序核声明 |
+| T2 输入契约/校验器 | **PASS（准备，SYNTHETIC）** | `T2_INPUT_CONTRACT.md`、`t2_input_check.py`；14/14 合成测试（manifest 缺项/拒绝 S 与 H_T_H/旧 run id/左扰动与异切空间拒绝/V⁻¹ e_I/s_I/单位权） | 真实 T2 仍 `NOT_EXECUTED` | 收到 trace 后按契约 §6 顺序核声明 |
 | 计算成本/内存 | **PASS（T0 本地）** | T0 两份归档合计 **3.03 s**、峰值 RSS **28.4 MB**；shadow 输出 **652,502 B + 891,001 B**（`wc -c`，生成后未追加） | — | T2 时补生产侧成本 |
 | 旧归档文件改写 | **NOT_APPLICABLE** | 只读；新文件全部在本目录 | — | — |
 | 生产集成 | **NOT_APPLICABLE（未授权）** | shadow 不写 manager/native | — | 用户另行确认 |
+| 重大阻塞登记 | **PASS（已提交）** | `重大阻塞记录.md`：`ALI-B2-NORMAL-LABELS-20261112-01`；trace 依赖单列 | — | 等用户确认 |
 
 ## 6. 能推出 / 不能推出
 

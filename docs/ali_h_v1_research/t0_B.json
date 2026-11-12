@@ -8,7 +8,7 @@
  },
  "population": {
   "frames": 544,
-  "blocks": 119
+  "blocks": 120
  },
  "old_status": {
   "AVAILABLE": 132,
@@ -40,15 +40,18 @@
   "M": {
    "MISSING": 62,
    "UNQUALIFIED/OUT_OF_SUPPORT": 15,
-   "UNQUALIFIED/BLOCKED": 42
+   "UNQUALIFIED/BLOCKED": 42,
+   "NO_DATA": 1
   },
   "T": {
    "UNQUALIFIED/BLOCKED": 63,
    "UNQUALIFIED/OUT_OF_SUPPORT": 8,
-   "MISSING": 48
+   "MISSING": 48,
+   "NO_DATA": 1
   },
   "I": {
-   "NOT_AVAILABLE": 119
+   "NOT_AVAILABLE": 119,
+   "NO_DATA": 1
   }
  },
  "blocks": [
@@ -2350,6 +2353,26 @@
    "scope": "NONE",
    "reason_codes": [
     "NO_QUALIFIED_EVIDENCE:T,I"
+   ]
+  },
+  {
+   "block_id": 3255570637,
+   "n_frames": 0,
+   "context": "NO_DATA",
+   "median_score": {
+    "M": null,
+    "T": null,
+    "I": null
+   },
+   "fresh_count": {
+    "M": 0,
+    "T": 0,
+    "I": 0
+   },
+   "state": "UNKNOWN",
+   "scope": "NONE",
+   "reason_codes": [
+    "NO_DATA_BLOCK"
    ]
   },
   {

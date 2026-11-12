@@ -194,6 +194,57 @@
      "UNKNOWN": 402
     }
    }
+  },
+  {
+   "test": "T1.7 dwell does not cross a missing block",
+   "status": "PASS",
+   "detail": {
+    "gap_only_last": {
+     "block_id": 12,
+     "state": "UNKNOWN",
+     "scope": "NONE",
+     "reason_codes": [
+      "INSUFFICIENT_PERSISTENCE_OR_CALIBRATION"
+     ],
+     "last_suspect_block": 9,
+     "verdicts": {
+      "M": "ALARM",
+      "T": null,
+      "I": null
+     },
+     "u": {
+      "M": null,
+      "T": null,
+      "I": null
+     }
+    },
+    "no_data_last": {
+     "block_id": 11,
+     "state": "UNKNOWN",
+     "scope": "NONE",
+     "reason_codes": [
+      "INSUFFICIENT_PERSISTENCE_OR_CALIBRATION"
+     ],
+     "last_suspect_block": 9,
+     "verdicts": {
+      "M": "ALARM",
+      "T": null,
+      "I": null
+     },
+     "u": {
+      "M": null,
+      "T": null,
+      "I": null
+     }
+    },
+    "filled_block_ids": [
+     8,
+     9,
+     10,
+     11,
+     12
+    ]
+   }
   }
  ],
  "failed": 0

@@ -126,7 +126,8 @@
 1. trace 缺 §3 声明的任一项（state order / rotation param / perturbation / frame / extrinsic /
    bias 来源），或声明互相矛盾；
 2. `pose_pre`/`pose_post` 不是同一实际区间/同一基，或 `has_out=false` 被当作更新后状态；
-3. `P⁻/P⁺` 不是 6×6 位姿块，或把 `S`/`H_T_H` 当 6D 协方差；
+3. `P⁻/P⁺` 不是 6×6 位姿块，或把 `S`/`H_T_H` 当 6D 协方差；或协方差声明不是
+   `pre_body` + `right`（与 `e_I` 不同切空间且未声明转换）；
 4. trace 与 availability 的 run id/build/输入 sha256 不一致，或 join 键不能精确对应
    （含 `last_lio_update_time` 缺失、偏移非常数且未声明映射）；
 5. 正常前缀不可得/非独立确认，导致校准 `INCOMPLETE`：可继续报资格/UNKNOWN，但

@@ -82,8 +82,19 @@ def check_manifest(m: dict) -> dict:
     if cov.get("usable") is True:
         if cov.get("blocks") not in ("P_minus/P_plus", "P_minus", "P_plus"):
             errors.append("covariance.blocks must name the 6x6 pose blocks")
+        # e_I = Log(inv(pre) * post) is a RIGHT perturbation expressed in the pre-pose body
+        # frame. A covariance declared left, or in another frame, is a different tangent; using
+        # it here can be off by orders of magnitude. Conversion is not implemented, so refuse.
+        if decl.get("perturbation") != "right":
+            errors.append("declarations.perturbation must be right for this e_I convention")
+        if cov.get("perturbation") != "right":
+            errors.append("covariance.perturbation must be right")
+        if cov.get("frame") != "pre_body":
+            errors.append("covariance.frame must be pre_body (the tangent of inv(pre)*post)")
         status = "READY"
     elif cov.get("usable") is False and cov.get("reason"):
+        if decl.get("perturbation") != "right":
+            warnings.append("perturbation_not_right_but_unit_only")
         warnings.append(f"unit_weighted_only:{cov['reason']}")
         status = "READY_UNIT_ONLY"
     else:
@@ -108,8 +119,33 @@ def so3_log(R: np.ndarray) -> np.ndarray:
     return w * theta
 
 
+def _hat(w: np.ndarray) -> np.ndarray:
+    w = np.asarray(w, dtype=np.float64).reshape(3)
+    return np.array([[0.0, -w[2], w[1]], [w[2], 0.0, -w[0]], [-w[1], w[0], 0.0]])
+
+
+def so3_left_jacobian_inv(w: np.ndarray) -> np.ndarray:
+    """V(w)^-1 for the SE(3) Log: t = V(w) rho, so rho = V(w)^-1 t.
+
+    The small-angle series is used below 1e-4 to avoid the 1 - (theta/2)cot(theta/2)
+    cancellation; above it the closed form is
+        V^-1 = I - 0.5*hat(w) + c*hat(w)^2,  c = (1 - (theta/2)cot(theta/2)) / theta^2.
+    """
+    w = np.asarray(w, dtype=np.float64).reshape(3)
+    th = float(np.linalg.norm(w))
+    W = _hat(w)
+    if th < 1e-4:
+        return np.eye(3) - 0.5 * W + (1.0 / 12.0) * (W @ W)
+    c = (1.0 - 0.5 * th / math.tan(0.5 * th)) / (th * th)
+    return np.eye(3) - 0.5 * W + c * (W @ W)
+
+
 def e_i(pose_pre: np.ndarray, pose_post: np.ndarray, state_order: str = "rot_trans") -> np.ndarray:
     """e_I = Log(inv(DeltaT_pre) * DeltaT_post) in the declared block order.
+
+    The translation of an SE(3) Log is V(w)^-1 * t, not t: the exponential maps rho through the
+    left Jacobian V. Returning t directly understates/rotates the translation whenever the
+    relative rotation is non-zero.
 
     Both poses must already be in the same declared frame with the declared extrinsic applied;
     the caller owns that mapping. A frame mismatch is a caller error, not something this function
@@ -123,7 +159,7 @@ def e_i(pose_pre: np.ndarray, pose_post: np.ndarray, state_order: str = "rot_tra
         raise ValueError("pose_pre/pose_post must be 4x4")
     D = np.linalg.inv(A) @ B
     rot = so3_log(D[:3, :3])
-    trans = D[:3, 3]
+    trans = so3_left_jacobian_inv(rot) @ D[:3, 3]
     return np.concatenate([rot, trans]) if state_order == "rot_trans" else np.concatenate([trans, rot])
 
 
@@ -159,10 +195,11 @@ def _manifest(**over):
                              "old_decisions_identical": True},
         "exports": {k: True for k in REQUIRED_EXPORTS},
         "declarations": {"state_order": "rot_trans", "rotation_param": "rotvec",
-                         "perturbation": "left", "pose_frame": "world", "vec_frame": "body",
+                         "perturbation": "right", "pose_frame": "world", "vec_frame": "body",
                          "extrinsic": True, "bias_source": "host_estimate",
                          "covariance_field": "P_minus/P_plus"},
-        "covariance": {"usable": True, "blocks": "P_minus/P_plus"},
+        "covariance": {"usable": True, "blocks": "P_minus/P_plus",
+                       "frame": "pre_body", "perturbation": "right"},
         "not_included": ["S", "H_T_H"],
     }
     m.update(over)
@@ -200,6 +237,24 @@ def selftest() -> dict:
     r5 = check_manifest(m5)
     add("unit-only manifest is READY_UNIT_ONLY", r5["status"] == "READY_UNIT_ONLY", r5)
 
+    m6 = _manifest()
+    m6["declarations"]["perturbation"] = "left"
+    r6 = check_manifest(m6)
+    add("left perturbation is refused", r6["status"] == "INCOMPLETE"
+        and any("perturbation must be right" in e for e in r6["errors"]), r6)
+
+    m7 = _manifest()
+    m7["covariance"]["frame"] = "world"
+    r7 = check_manifest(m7)
+    add("covariance in another frame is refused", r7["status"] == "INCOMPLETE"
+        and any("pre_body" in e for e in r7["errors"]), r7)
+
+    m8 = _manifest()
+    del m8["covariance"]["frame"]
+    r8 = check_manifest(m8)
+    add("missing covariance frame is refused", r8["status"] == "INCOMPLETE"
+        and any("pre_body" in e for e in r8["errors"]), r8)
+
     # identity -> zero residual
     I = np.eye(4)
     e0 = e_i(I, I)
@@ -212,13 +267,18 @@ def selftest() -> dict:
                           [math.sin(th), math.cos(th), 0], [0, 0, 1]])
     B[:3, 3] = [0.1, 0.0, 0.0]
     e1 = e_i(I, B)
-    ok_e = abs(e1[2] - th) < 1e-12 and abs(e1[3] - 0.1) < 1e-12 and abs(e1[0]) < 1e-12
-    add("rotvec+translation recovered", ok_e, {"e": e1.tolist()})
+    expected_trans = np.array([0.099666444232592, -0.01, 0.0])   # V(w)^-1 t, not t
+    ok_e = (abs(e1[2] - th) < 1e-12 and np.allclose(e1[3:], expected_trans, atol=1e-12)
+            and abs(e1[0]) < 1e-12)
+    ok_regression = bool(abs(e1[3] - 0.1) > 1e-4)  # the old (missing V^-1) value would be 0.1
+    add("rotvec+V^-1 translation recovered", ok_e and ok_regression,
+        {"e": e1.tolist(), "expected_trans": expected_trans.tolist(),
+         "old_bug_value_rejected": ok_regression})
 
     # state order changes the block order, not the values
     e2 = e_i(I, B, state_order="trans_rot")
-    add("state order is honoured", abs(e2[0] - 0.1) < 1e-12 and abs(e2[5] - th) < 1e-12,
-        {"e": e2.tolist()})
+    add("state order is honoured", np.allclose(e2[:3], e1[3:], atol=1e-12)
+        and np.allclose(e2[3:], e1[:3], atol=1e-12), {"e": e2.tolist()})
 
     # covariance identity -> s = |e|^2
     res = s_i(e1, np.eye(6))

@@ -1,7 +1,7 @@
 {
  "method": "ALI-H v1 (research observer)",
  "contract": "docs/ADAPTIVE_LOW_INFORMATION_HEALTH_V1_20261112.md (§2-§7, §10)",
- "code_sha256": "0c165717ba7c988cc57eb39a4436889b40c74956d53ddff493af971a90418f20",
+ "code_sha256": "7da88fa97ceaf55093b9d7263a1f7d4756b30fbd1e682192860ce9a4ca4b0e08",
  "config": {
   "block_ns": 500000000,
   "alarm_u": 0.95,
@@ -35,8 +35,8 @@
   },
   "t0_B.json": {
    "path": "/tmp/wt-ali/docs/ali_h_v1_research/t0_B.json",
-   "bytes": 40475,
-   "sha256": "e9638d5f54759632aacd297082390ce8f918cc606b046929c911a46e3e6e383d"
+   "bytes": 40826,
+   "sha256": "e8194850140977db6a524a830e2effed49ef7b0f476525a2d0e9b8ca75792c7e"
   },
   "shadow_A.jsonl": {
    "path": "/tmp/wt-ali/docs/ali_h_v1_research/shadow_A.jsonl",
@@ -50,8 +50,8 @@
   },
   "t1_selftest.json": {
    "path": "/tmp/wt-ali/docs/ali_h_v1_research/t1_selftest.json",
-   "bytes": 3906,
-   "sha256": "8cb7594700faa2940cd1a0aa8348421e6d0226f4277fbcb86df3adba3f17ce51"
+   "bytes": 4797,
+   "sha256": "66aebb4be895ef404b0f15527c0407297aef80f29b795228d8c46622ab0320ae"
   }
  }
 }
