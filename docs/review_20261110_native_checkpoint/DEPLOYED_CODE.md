@@ -172,3 +172,25 @@ undefined reference to __cxa_call_terminate@CXXABI_1.3.15`（mm ROS 库的 ABI �
 - v3 完整 patch 在干净 `0d2c034` 树上 `git apply --check` 通过；
 - 两份增量在各自上一版树上 `git apply --check` 通过；
 - `strings liblaser_mapping.so | grep 'deferred apply'` 命中，v3 库确含新代码。
+
+## 9. 版本链 v1 → v5（每版解决什么、仍缺什么）
+
+同一上游 `0d2c034`，五版宿主 patch 依次叠加；可执行文件始终 `0d7e23de…`，行为在
+`liblaser_mapping.so`，run 身份看 receipt 的 `runtime_library_sha256`。
+
+| 版本 | 完整 patch（行数 / sha256） | 库 sha256 | 解决的断点 | 当时仍缺 |
+|---|---|---|---|---|
+| **v1** | `deployed_host.diff`（1501 / `b12ae153…`） | `0eacffe1…` | 宿主原生 checkpoint/restore/replay、停写图、修复扫描通道、`set_state`、地图深拷贝 | 控制轮询与 LIO 共槽（ack 饿死）；`reprocess`/`set_state` 连发被覆盖；重放无终止边界 |
+| **v2** | `../review_20261112_four_host/host_change_terminal_stamp/deployed_host_v2.diff`（1528 / `2ffc5f6e…`） | `f27d1730…` | `reprocess <end_stamp>`：重放只处理组结束 ≤ 戳的条目 | 被截断的已消费后缀不再重推；开段快照/滚动快照的时刻受宿主积压影响 |
+| **v3** | `../review_20261112_four_host/host_change_deferred_stamp/deployed_host_v3.diff`（1627 / `46648b4c…`） | `9c0330be…` | `hold`/`snapshot` 带应用戳，控制线程入队、主循环在第一个带 lio 的组处理前执行 | 后缀仍未重推；`set_state` 会把状态写回候选末端 |
+| **v4** | `../review_20261112_four_host/host_change_suffix_replay/deployed_host_v4.diff`（1625 / `f025329c…`） | `c0833d9f…` | 重放覆盖全部捕获组：终止戳只限制修复云匹配，后缀用原始测量按序重推，日志分列 `replayed_within_end / replayed_suffix` | `set_state` 在重放到达边界后仍回拨状态（实测 3.9 m / 15 s） |
+| **v5** | `../review_20261112_four_host/host_change_replay_suffix_ack/deployed_host_v5.diff`（1632 / `e444adac…`） | `9e7d8cdf…` | `checkpointStatus()` 暴露 `replay_within_end / replay_suffix`；驱动据此在后缀 >0 时跳过 `set_state` | 驱动侧另有：每戳武装 checkpoint、开段作废 pending snapshot、scripted run 关滚动快照（不在宿主 diff 里） |
+
+**驱动侧的收尾（不在这五个 patch 内）**：`_open_episode` 先 `expire_pending(0.0)` 再发 hold；
+`main()` 为每个 scripted 戳预排 `hold/snapshot`；scripted run 关闭滚动快照；`reprocess` 的终止
+戳 = `frozen_at_ns + REPLAY_END_GRACE_NS`（100 ms，声明常量）；收到 `replay_suffix>0` 时跳过
+`set_state` 并记 `native_writeback_skipped`。
+
+各版构建记录在对应的 `BUILD.md`；宿主目标每次都在 91% 处 `Built target laser_mapping`，构建
+退出码 1 只来自无关的 `test_vk_common_patch_score`（`libIlmThread` 的 `__cxa_call_terminate@
+CXXABI_1.3.15`）。

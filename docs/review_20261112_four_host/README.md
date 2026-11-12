@@ -28,6 +28,9 @@ FAST-LIO2，S1 负责 LIO-SAM 与 ORB-SLAM3。本目录只收 S2 的两项。
 | `080204Z_228057` | `a7cf030c` | `9e7d8cdf` | 第一窗口 +0.5 z，第二事件无损坏 | 每戳武装 checkpoint + 开段作废 snapshot + scripted 关滚动快照：第二段 restore 戳 308.048271360 **早于**触发 308.048271418；第一段 accepted + repairs 23 + suffix 313 + 无 set_state；第二段决策完成但 wait 关闭落在 bag 外 0.47 s，终态 open=true | 能：restore 戳修复成立；不能：该 run 第二段完整关闭（尾部不足，最晚戳 ≤307.574，kf416 307.442 留 127 帧） |
 | `080914Z_233068` | `a7cf030c` | `9e7d8cdf` | 第一窗口 +0.5 z，第二事件无损坏 | 第二戳 kf 405（306.372，留 139 帧）：restore stamp 306.3038 **早于触发 67.8 ms**；两段都完整（第一段 accepted + repairs 23 + suffix 379 + 无 set_state；第二段 Mode 3 拒绝 + restore + close/rearm/resume）；关闭 316.258，尾段 39 帧/4.65 s；终态 HEALTHY/open=false；2 行候选 | 能：修复接回+第二事件+尾段在同一 run 完整成立；不能：真实修复收益 |
 
+
+**断点链终点**：`two_event_final_20261112`（`080914Z_233068`）是本轮"宿主停写 → 恢复写图 → 命令串行化 → 终止戳 → 后缀重推 → 跳过 set_state → 每戳武装 checkpoint → 两事件 + 尾段"这条链的终点；表中更早的 run（含被拒绝、传输丢帧、跨度不一致、尾部不足的）全部保留，作为每一步断点的证据。
+
 ## 状态
 
 | 宿主 | 实际运行 | 宿主原生双事件 | slam_recovery 修复链 | 报告 |
@@ -94,3 +97,15 @@ FAST-LIO2 必须标 **SHARED_EXECUTION**：本机只有一个 `fastlio_mapping`
 | `analyze_run_bag.py` | 从输出 bag 计算 E1/E2 位姿、间隔、步长、尾段的分析脚本 |
 
 大型产物不入库，路径与 sha 写在各报告里；`analysis.json` 是可直接复核的结构化结果。
+
+## 未闭合项（照实列出，不掩盖）
+
+1. **真实自然故障下的修复**：当前所有修复证据都来自自注入的 +0.5 body-z 窗口，不是自然故障。
+2. **自动检测链**：UNAVAILABLE 的结构问题按用户决定暂停诊断；在线检测链仍 BLOCKED 在上游。
+   现有 147/191/54 帧分解只到"短时预测能否解释"，根因 UNKNOWN。
+3. **`commit_closed → resume`**：Mode 2 完整接纳路径在受控 run 中一直是 partial commit；
+   `commit_closed` 不可达，放写仍由 wait 超时 + `rearm` 完成。
+4. **第二事件的武装 checkpoint**：机制已成立，但只对**声明戳**；自然触发或在线事件仍用滚动
+   checkpoint。
+5. **没有 GT 的质量评价**：所有轨迹/地图数字都是记录值，没有真值，不构成定位精度或修复收益
+   结论。
