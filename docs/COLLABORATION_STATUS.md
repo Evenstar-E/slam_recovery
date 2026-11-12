@@ -2146,3 +2146,28 @@ K=3 run `131213Z_563253`：paired 341、accepted 0/rejected 1、终态 HEALTHY�
 即 C′ 能找到合法快照，代价可能是回滚到极早期。多段覆盖率需在宿主不发散的 run 上统计。
 
 归档：`exp/online-v2` → `f5212e5`（已由 S1 推送）。
+
+## 146. 宿主可执行文件身份已变（重链，非代码改动）；v9 补丁入 Git；ASan 推迟到明天
+
+**必须记录的溯源变更**：S2 尝试 ASan 构建时，`catkin_make` 在重链前删掉了旧的 `fastlivo_mapping`，链接因
+"unsafe runtime search path" 失败；恢复时发现默认链到系统 libstdc++（GCC 11，缺 `GLIBCXX_3.4.32`），改用
+`-L/home/R26534/mm/ros/lib` + `-L…/Sophus` 重新链接成功。本机核对当前部署：
+
+| 项 | 现值 | 先前值 |
+|---|---|---|
+| `fastlivo_mapping` | **`6dd71953…`**（重链） | `0d7e23de…`（已删、无法还原） |
+| `liblaser_mapping.so` | `18e039e1…`（v9c，未变） | 同 |
+
+后果：**从此以后所有 receipt 的 `host_binary_sha256` 都会是 `6dd71953…`**；这不是代码改动，但**可执行文件的链接环境
+（libstdc++ 来源）也与早先 run 不同**，因此今晚之后的 run 与早先 run 不能按"同一二进制"直接比较，须在报告里声明。
+启动探针恢复后 5/5 PASS。
+
+**ASan 推迟到明天**：真要做得让可执行文件与库同为 ASan 构建（或正确预加载 libasan）+ 新 libstdc++ 链接，约 20–30 min，
+超出 ≤10 min 预算；S2 建议先备份可执行文件再动链接环境，采纳。
+
+**运行期 map 膨胀的判读（S2 提出、S1 批准明天做）**：这次 K=3 run 是 frame 478 后 voxels 323k→453k，更像 LIO 匹配
+退化后大量点写入地图（数值/几何问题），未必与启动期"环境被写坏/stack smashing"同源。明天先用**只读增长率判据**
+（触发前 30 s 的 voxel/point 增速 + effective feature 数）区分"匹配退化"与"内存损坏"，再决定是否需要 ASan。
+
+**v9 补丁**：`exp/online-v2` → `86bdf86`（`trace_cov_v9_full.diff` 465 行 v6→v9 + 5 文件完整快照），已由 S1 推送。
+工作分支 `exp/online-v3` 从 `main@c915197` 建立、尚无提交。
