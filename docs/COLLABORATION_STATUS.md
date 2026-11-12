@@ -2564,3 +2564,19 @@ S2 `5c3bf54`（`exp/growth-run`，已推）新增两份只读文档：
   LIO-SAM 原生 FAIL（输入退化）；ORB-SLAM3 原生 FAIL（未稳定跟踪）。
 
 **FAST-LIO2 重跑**：新门控下通过 120 s 速率检查（0.83×），当前 bag 211.9/469.4 s（≈0.88×），未触发早停；结果待交。
+
+## 170. 审阅关闭块消费者与旧索引；要求 I 资格三层化、18 条 eff=0 单列、事件绑定本 run
+
+审阅 `2d77094`（已合入 main）用独立 reader 复核：两个消费者直接读原 **792×107** 得 0 malformed、14 个 pose/pre_pose 标量逐值一致；
+旧排序索引修正后 531 人口/504 诊断、92 分数变化、中位 `72.2938760853` 与保存值一致。它还用独立 V 求解复核了 725 行同行 Log
+（`norm p50 0.03424097551`、`energy p50 0.001172599568`），确认单位权数值成立。
+
+**但它要求把 I 资格分层，并要求两处范围收紧（已转 S3）**：
+1. `RAW_HEADER_CONTAINMENT`（数值）PASS ≠ `COMPLETE_POINT_MEMBERSHIP`：cur 先接上次 next carryover、`n_scans` 只计新 pop raw，
+   同一 scan header 出现在两个更新组是实际资料；因此完整成员应记 `ASSERTED_NOT_VERIFIED`，不得把 462 行说成"462 个合格 I 观测"。
+2. 462 条里有 **18 条 `eff=0` 且 Log 全零**（全 725 行中 37 条）：零修正不证明 IMU 与 LiDAR 物理一致，须在资格层单列原因、
+   **保留在分母**，不作 NORMAL 的 I 支持。
+3. `t2_run` 的 `E2_REL_S=54.0` 是旧 run 硬编码；本 run 第二个 episode 在 rel **17.0029 s**（deadline 21.0029 s）、输出到约 52.8 s，
+   所以"0 条 tail"只说明未进旧 54 s 窗口，**不说明没有 E2 后输出**；须从本 run 的 `episode_detail` 读取事件时刻重算。
+
+**宿主**：FAST-LIO2 独立重跑（run2）进行中——`fastlio2_ws` 二进制、`rosbag play --clock` 正在跑；本轮未干预。
