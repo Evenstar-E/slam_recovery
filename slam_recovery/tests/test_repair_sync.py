@@ -115,17 +115,23 @@ class RepairReceiptTest(unittest.TestCase):
 
 class RepairGateTest(unittest.TestCase):
     def _loop(self, wait_result):
+        from slam_recovery.tests.test_cloud_repair import _plane
+
         node = _FakeLoopNode(trigger_at=10 ** 9)
         node.evaluate_and_commit_candidate = lambda *a, **k: _Report(
             accepted=True, committed_pose_keys=[0, 1], deferred_pose_keys=[])
+        plane = _plane()
+        node.support_reference = lambda: plane
+        corrupted = _plane(z=0.5)[::4]
+        node.scan_buffer_body = {0: corrupted, 1: corrupted}
         loop = NativeClosedLoop(node, run_id="run")
         loop.repair_publish_enabled = True
         loop.published = []
         loop.publish_repair = loop.published.append
-        loop._last_icp_delta = np.eye(4)
         loop.cp = _FakeCP(wait_result)
         cloud = _Cloud()
-        cloud.set_points(ROWS)
+        cloud.set_points([(float(x), float(y), float(z), 0.0, 0.0, 0)
+                          for x, y, z in corrupted])
         for k in (0, 1):
             loop._scan_index[k] = (1000 + k, cloud)
         ep = Episode(0, 1_000, np.eye(4), 2_000)
@@ -153,26 +159,30 @@ class RepairGateTest(unittest.TestCase):
         self.assertEqual(loop.cp.set_state_calls, 1)
         self.assertTrue(ep.meta["repair_publish"]["synced"])
 
-    def test_the_bias_is_estimated_at_the_incumbent_poses(self):
-        # Host poses are rotated about x, which would project the world correction to ~0; the
-        # incumbent poses are identity, where a -0.5 world-z correction is a +0.5 body-z
-        # corruption. The test fails if the code falls back to the host poses or flips the sign.
+    def test_the_bias_is_estimated_at_the_incumbent_pose_with_a_pinned_sign(self):
+        # A synthetic plane map; the frame's cloud is that plane displaced +0.5 in body z. With the
+        # incumbent at identity the 1-D search must return +0.5 and the published cloud must carry
+        # -0.5. An inverted sign would double the corruption instead of removing it.
+        from slam_recovery.tests.test_cloud_repair import _plane
+
         loop, ep = self._loop(wait_result=True)
-        delta = np.eye(4)
-        delta[2, 3] = -0.5
-        loop._last_icp_delta = delta
-        loop._last_repair_inits = {0: np.eye(4), 1: np.eye(4)}
-        host = np.eye(4)
-        host[:3, :3] = np.array([[1.0, 0, 0], [0, 0, -1.0], [0, 1.0, 0]])
-        ep.frames = [(k, 1_000, host) for k in (0, 1)]
-        loop.decide(1_500, "test")
-        rep = ep.meta["repair_publish"]
-        self.assertAlmostEqual(rep["bias_z_m"], 0.5, places=6)
-        self.assertAlmostEqual(rep["repair_shift_z_m"], -0.5, places=6)
-        # the published cloud actually carries the -0.5 shift
+        plane = _plane()
+        loop.node.support_reference = lambda: plane
+        corrupted = _plane(z=0.5)[::4]
+        cloud = _Cloud()
+        cloud.set_points([(float(x), float(y), float(z), 0.0, 0.0, 0)
+                          for x, y, z in corrupted])
+        loop.node.scan_buffer_body = {0: corrupted, 1: corrupted}
+        loop._scan_index = {0: (1000, cloud), 1: (1001, cloud)}
+        loop._last_incumbent = {0: np.eye(4), 1: np.eye(4)}
+        ep.frames = [(k, 1_000, np.eye(4)) for k in (0, 1)]
+        rep = loop._publish_repaired_scans(ep)
+        self.assertAlmostEqual(rep["bias_z_m"], 0.5, delta=0.06)
+        self.assertAlmostEqual(rep["repair_shift_z_m"], -0.5, delta=0.06)
+        self.assertEqual(rep["published"], 2)
         raw = np.frombuffer(loop.published[0].data, dtype=np.uint8).reshape(-1, 24)
         z = raw[:, 8:12].view(np.float32).reshape(-1)
-        self.assertAlmostEqual(float(z[0]), ROWS[0][2] - 0.5, places=5)
+        self.assertAlmostEqual(float(z[0]), 0.0, delta=0.06)
 
 
 if __name__ == "__main__":

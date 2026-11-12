@@ -113,6 +113,45 @@ class CorruptRelayTest(unittest.TestCase):
         np.testing.assert_allclose(rep_z, orig_z, rtol=0, atol=1e-6)
 
 
+def _plane(n=21, side=2.0, z=0.0):
+    xs, ys = np.meshgrid(np.linspace(-side, side, n), np.linspace(-side, side, n))
+    return np.c_[xs.ravel(), ys.ravel(), np.full(xs.size, z)]
+
+
+class BiasSearchTest(unittest.TestCase):
+    """The decoupled estimator, with the sign pinned to the injected corruption."""
+
+    def test_a_plus_half_metre_corruption_is_estimated_as_plus_half(self):
+        from slam_recovery.ros.cloud_repair import ReferenceGrid, estimate_body_z_bias
+
+        grid = ReferenceGrid(_plane(), cell_m=0.5)
+        corrupted = _plane(z=0.5)[::4]          # body-frame scan displaced by +0.5 z
+        bias, _curve, n_valid = estimate_body_z_bias(corrupted, np.eye(4), grid, step=0.05)
+        self.assertGreater(n_valid, 20)
+        self.assertAlmostEqual(bias, 0.5, delta=0.06)
+
+    def test_a_minus_half_metre_corruption_keeps_the_sign(self):
+        from slam_recovery.ros.cloud_repair import ReferenceGrid, estimate_body_z_bias
+
+        grid = ReferenceGrid(_plane(), cell_m=0.5)
+        corrupted = _plane(z=-0.5)[::4]
+        bias, _curve, _n = estimate_body_z_bias(corrupted, np.eye(4), grid, step=0.05)
+        self.assertAlmostEqual(bias, -0.5, delta=0.06)
+
+    def test_the_pose_rotation_is_applied_before_the_search(self):
+        from slam_recovery.ros.cloud_repair import ReferenceGrid, estimate_body_z_bias
+
+        # A yaw rotation leaves body z along world z; the estimate must be unchanged. A code path
+        # that ignored the pose rotation would still pass, but one that applied it wrongly would
+        # shift the plane out of the reference and fail.
+        T = np.eye(4)
+        T[:3, :3] = np.array([[0, -1.0, 0], [1.0, 0, 0], [0, 0, 1.0]])
+        grid = ReferenceGrid(_plane(), cell_m=0.5)
+        corrupted = _plane(z=0.5)[::4]
+        bias, _curve, _n = estimate_body_z_bias(corrupted, T, grid, step=0.05)
+        self.assertAlmostEqual(bias, 0.5, delta=0.06)
+
+
 class BodyBiasTest(unittest.TestCase):
     def test_identity_rotation_returns_the_injected_bias_with_positive_sign(self):
         # The registration correction for a +0.5 body-z corruption is -0.5; the estimate is the

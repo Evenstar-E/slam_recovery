@@ -48,7 +48,12 @@ import numpy as np
 
 from slam_recovery.core import BackendDelta, RecoveryState, TangentFrame
 from slam_recovery.repair.pose_reregistration import ICP_CONFIG, reregister_segment
-from slam_recovery.ros.cloud_repair import body_z_bias, shift_z_cloud
+from slam_recovery.ros.cloud_repair import (
+    ReferenceGrid,
+    body_z_bias,
+    estimate_body_z_bias,
+    shift_z_cloud,
+)
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
 from slam_recovery.validation import (
     compute_6dof_point_to_plane_fim,
@@ -958,7 +963,7 @@ class NativeClosedLoop:
         self.publish_repair = None            # callable(PointCloud2), set by the ROS driver
         self.repair_sync_timeout_s = float(repair_sync_timeout_s)
         self._last_icp_delta: Optional[np.ndarray] = None
-        self._last_repair_inits: Dict[int, np.ndarray] = {}
+        self._last_incumbent: Dict[int, np.ndarray] = {}
         # 0 = no budget. A budget that is hit is recorded, because truncating the candidate
         # changes what the gate sees and must never happen silently.
         self.icp_time_budget_s = float(icp_time_budget_s)
@@ -1285,7 +1290,6 @@ class NativeClosedLoop:
         # for the frames it covers; the repair publisher projects it onto the declared body axis,
         # using the rotations of the same initial poses.
         self._last_icp_delta = delta.copy()
-        self._last_repair_inits = dict(inits)
         poses = {k: delta @ np.asarray(inits[k], dtype=np.float64) for k in inits}
         detail = {
             "mode": "single_rigid_transform_for_the_segment",
@@ -1341,32 +1345,64 @@ class NativeClosedLoop:
             return False, rep
         return True, rep
 
+    def _estimate_repair_bias(self, ep: "Episode") -> Dict[str, Any]:
+        """Per-frame body-z bias, estimated at the incumbent pose against the trusted map.
+
+        The host pose absorbed the bias, so the scan placed with it is already map-aligned and a
+        registration there reports ~0 (run 043602Z: 0.003 m). The gate's incumbent is computed from
+        the trusted keyframes and is independent of that pose; at it the corrupted scan is
+        displaced along body z and a one-dimensional search recovers the shift.
+        """
+        reference = self.node.support_reference()
+        out: Dict[str, Any] = {"reference_points": int(len(reference)), "per_frame": [],
+                               "bias_z_m": None, "mad_m": None, "frames_estimated": 0,
+                               "tolerance_m": 0.15, "expected_bias_m": 0.5}
+        if len(reference) == 0:
+            out["reason"] = "no_reference"
+            return out
+        grid = ReferenceGrid(reference)
+        vals = []
+        for kf, _ts, pose in ep.frames:
+            scan = self.node.scan_buffer_body.get(kf)
+            if scan is None or len(scan) == 0:
+                continue
+            inc = self._last_incumbent.get(kf, pose)
+            bias, _curve, n_valid = estimate_body_z_bias(scan, inc, grid)
+            out["per_frame"].append({"kf": int(kf), "bias_z_m": round(float(bias), 4),
+                                     "valid_points": int(n_valid)})
+            vals.append(float(bias))
+        if vals:
+            med = float(np.median(vals))
+            out["bias_z_m"] = round(med, 4)
+            out["mad_m"] = round(float(np.median(np.abs(np.asarray(vals) - med))), 4)
+            out["frames_estimated"] = len(vals)
+            out["within_declared_tolerance"] = bool(abs(med - 0.5) <= 0.15)
+        return out
+
     def _publish_repaired_scans(self, ep: "Episode") -> Dict[str, Any]:
         """Republish the episode's frames with the estimated body-z bias removed.
 
-        INJECTION test only. The correction is the body-frame z component of the same rigid
-        registration that produced the candidate poses: it is the part of the correction along the
-        declared corruption axis. Every frame keeps its own header stamp and full point layout;
-        only x/y/z bytes change. The clouds go out before `reprocess` and the caller waits for the
-        host to acknowledge receipt, because the command and the topic travel on different paths.
+        INJECTION test only. The bias is estimated per frame with the decoupled 1-D search at the
+        incumbent pose; the candidate poses are untouched (they come from the host-pose ICP the
+        gate accepted). Every frame keeps its own header stamp and full point layout; only x/y/z
+        bytes change. The clouds go out before `reprocess` and the caller waits for the host to
+        acknowledge receipt, because the command and the topic travel on different paths.
         """
         out: Dict[str, Any] = {"enabled": True, "published": 0, "bias_z_m": None,
-                               "frames_with_pose": 0, "missing_clouds": 0,
-                               "synced": False, "frames": []}
-        if self._last_icp_delta is None:
-            out["reason"] = "no_measurement_correction"
-            return out
+                               "missing_clouds": 0, "synced": False, "frames": []}
         if self.publish_repair is None:
             out["reason"] = "no_repair_publisher"
             return out
-        # The bias is estimated at the independent (incumbent) poses used for the registration,
-        # not at the host poses that already absorbed it.
-        frames_for_bias = [(kf, ts, self._last_repair_inits.get(kf, pose))
-                           for kf, ts, pose in ep.frames]
-        bias, n = body_z_bias(frames_for_bias, self._last_icp_delta)
-        out["bias_z_m"] = round(float(bias), 6)
-        out["frames_with_pose"] = int(n)
-        out["repair_shift_z_m"] = round(float(-bias), 6)
+        est = self._estimate_repair_bias(ep)
+        out.update({k: est[k] for k in ("bias_z_m", "mad_m", "frames_estimated",
+                                        "per_frame", "reference_points", "tolerance_m",
+                                        "expected_bias_m", "within_declared_tolerance")
+                    if k in est})
+        if est.get("bias_z_m") is None:
+            out["reason"] = est.get("reason", "no_bias_estimate")
+            return out
+        bias = float(est["bias_z_m"])
+        out["repair_shift_z_m"] = round(-bias, 4)
         for kf, _ts, _pose in ep.frames:
             rec = self._scan_index.get(kf)
             if not rec or rec[1] is None:
@@ -1374,7 +1410,7 @@ class NativeClosedLoop:
                 continue
             scan_ns, msg = rec
             # bias is the estimated injected corruption; the repair removes it.
-            self.publish_repair(shift_z_cloud(msg, float(-bias)))
+            self.publish_repair(shift_z_cloud(msg, -bias))
             out["published"] += 1
             out["frames"].append(int(scan_ns))
         if out["published"]:
@@ -1403,6 +1439,7 @@ class NativeClosedLoop:
         # when the corrupted cloud is placed with that pose.
         incumbent, anchor, extrap_basis = extrapolate_incumbent(
             self.node.tx_mgr.trusted_poses, self.node._kf_timestamps, ts_by_key)
+        self._last_incumbent = dict(incumbent)
 
         icp_detail = None
         if self.candidate_source == "icp_reregistration":
@@ -1410,7 +1447,11 @@ class NativeClosedLoop:
             # episode is already marked decided by the time we get here, so an uncaught exception
             # would drop the decision entirely and the stream would show nothing happened.
             try:
-                repaired, icp_detail = self._icp_candidate(ep, incumbent_poses=incumbent)
+                # The candidate stays at the host-pose initialisation: that is the fit the gate
+                # accepted. The measurement bias is estimated separately, at the incumbent pose,
+                # because a single rigid fit at an 0.8 m-off init does not converge inside the
+                # correspondence gate.
+                repaired, icp_detail = self._icp_candidate(ep)
                 self.icp_details.append({"candidate_id": ep.candidate_id, **icp_detail})
             except BaseException as exc:
                 self.decision_errors.append({
