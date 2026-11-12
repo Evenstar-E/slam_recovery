@@ -131,3 +131,16 @@ vec6(6) Ppre6x6(36) Ppost6x6(36)
   `8d9cd0d` + 一处本地 `getattr(ep,"meta")` 绕过（sha `7cfcccf7…`，原件见
   `../run_provenance_131213/`），**不是** `c915197`；该 run 的 LATE 结论仍有效，但不能称为
   "c915 修复后的验证"。
+
+## 11. v10：S3 的最小导出补齐（2026-11-13）
+
+库 `69dc8ac5…`（可执行文件未重链，仍 `6dd71953…`）。三项都只写文件、不改估计：
+
+1. **最终位姿**：trace 行尾新增 7 列 `pose_x pose_y pose_z qx qy qz qw`，取 `StateEstimation` 之后
+   `_state` 的 `pos_end` 与 `rot_end` 四元数（行数 93 → **100**）。`vec6` 仍是更新前的量。
+2. **handler 标签**：新增 LIO-only 的 `mat_lio_pre.txt` / `mat_lio_out.txt`，只在 `handleLIO()` 写，
+   列与 `mat_pre/mat_out` 相同（out 多一列点数）；共享文件的双写问题不再影响判读。
+3. **切空间声明**：trace 文件头明确写出——协方差是 19 维状态里 rot+pos 的 6×6 块，**body(IMU) 切空间、
+   右乘 SO(3) 增量**，pos 为世界系位置；只有在该约定下才可作为 e_I 的协方差使用，否则 `NOT_AVAILABLE`。
+
+启动探针 5/5 PASS（类布局未变：新增的全部是文件级 static）。

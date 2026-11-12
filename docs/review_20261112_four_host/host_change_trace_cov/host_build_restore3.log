@@ -1,0 +1,28 @@
+[ 43%] Built target pre
+[ 40%] Built target imu_proc
+[ 46%] Built target lio
+[ 50%] Built target laser_mapping
+[ 60%] Built target vio
+[ 86%] Built target vikit_common
+[ 93%] Built target vikit_ros
+[ 96%] Linking CXX executable /home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping
+/usr/bin/ld: /home/R26534/mm/ros/lib/libboost_program_options.so.1.86.0: undefined reference to `std::ios_base_library_init()@GLIBCXX_3.4.32'
+/usr/bin/ld: /home/R26534/mm/ros/lib/libroscpp.so: undefined reference to `__cxa_call_terminate@CXXABI_1.3.15'
+/usr/bin/ld: /home/R26534/mm/ros/lib/libboost_filesystem.so.1.86.0: undefined reference to `std::__cxx11::basic_string<wchar_t, std::char_traits<wchar_t>, std::allocator<wchar_t> >::_M_replace_cold(wchar_t*, unsigned long, wchar_t const*, unsigned long, unsigned long)@GLIBCXX_3.4.31'
+/usr/bin/ld: /home/R26534/mm/ros/lib/libboost_filesystem.so.1.86.0: undefined reference to `std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_replace_cold(char*, unsigned long, char const*, unsigned long, unsigned long)@GLIBCXX_3.4.31'
+collect2: error: ld returned 1 exit status
+make[2]: *** [FAST-LIVO2/CMakeFiles/fastlivo_mapping.dir/build.make:501: /home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping] Error 1
+make[1]: *** [CMakeFiles/Makefile2:3593: FAST-LIVO2/CMakeFiles/fastlivo_mapping.dir/all] Error 2
+make: *** [Makefile:146: all] Error 2
+Base path: /home/R26534/fast_livo2_ws
+Source space: /home/R26534/fast_livo2_ws/src
+Build space: /home/R26534/fast_livo2_ws/build
+Devel space: /home/R26534/fast_livo2_ws/devel
+Install space: /home/R26534/fast_livo2_ws/install
+####
+#### Running command: "make cmake_check_build_system" in "/home/R26534/fast_livo2_ws/build"
+####
+####
+#### Running command: "make -j8" in "/home/R26534/fast_livo2_ws/build/FAST-LIVO2"
+####
+Invoking "make -j8" failed

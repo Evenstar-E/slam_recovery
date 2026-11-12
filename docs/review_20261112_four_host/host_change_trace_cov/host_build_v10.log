@@ -1,0 +1,22 @@
+[ 43%] Built target vikit_common
+[ 66%] Building CXX object FAST-LIVO2/CMakeFiles/laser_mapping.dir/src/LIVMapper.cpp.o
+[ 73%] Built target pre
+[ 73%] Built target imu_proc
+[ 73%] Built target lio
+[ 86%] Built target vio
+[ 86%] Built target vikit_ros
+[ 90%] Linking CXX shared library /home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so
+[ 93%] Built target laser_mapping
+[ 96%] Linking CXX executable /home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping
+[100%] Built target fastlivo_mapping
+Base path: /home/R26534/fast_livo2_ws
+Source space: /home/R26534/fast_livo2_ws/src
+Build space: /home/R26534/fast_livo2_ws/build
+Devel space: /home/R26534/fast_livo2_ws/devel
+Install space: /home/R26534/fast_livo2_ws/install
+####
+#### Running command: "make cmake_check_build_system" in "/home/R26534/fast_livo2_ws/build"
+####
+####
+#### Running command: "make -j8" in "/home/R26534/fast_livo2_ws/build/FAST-LIVO2"
+####

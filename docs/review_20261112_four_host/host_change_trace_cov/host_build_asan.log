@@ -1,0 +1,243 @@
+CMake Deprecation Warning at CMakeLists.txt:4 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- Using CATKIN_DEVEL_PREFIX: /home/R26534/fast_livo2_ws/devel
+-- Using CMAKE_PREFIX_PATH: /home/R26534/mm/ros
+-- This workspace overlays: /home/R26534/mm/ros
+CMake Warning (dev) at /home/R26534/mm/ros/share/catkin/cmake/python.cmake:4 (find_package):
+  Policy CMP0148 is not set: The FindPythonInterp and FindPythonLibs modules
+  are removed.  Run "cmake --help-policy CMP0148" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+
+Call Stack (most recent call first):
+  /home/R26534/mm/ros/share/catkin/cmake/all.cmake:164 (include)
+  /home/R26534/mm/ros/share/catkin/cmake/catkinConfig.cmake:20 (include)
+  CMakeLists.txt:58 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Using PYTHON_EXECUTABLE: /home/R26534/mm/ros/bin/python3.11
+-- Using default Python package layout
+-- Using empy: /home/R26534/mm/ros/lib/python3.11/site-packages/em.py
+-- Using CATKIN_ENABLE_TESTING: ON
+-- Call enable_testing()
+-- Using CATKIN_TEST_RESULTS_DIR: /home/R26534/fast_livo2_ws/build/test_results
+-- Found gtest: gtests will be built
+-- Using Python nosetests: /home/R26534/mm/ros/bin/nosetests
+-- catkin 0.8.10
+-- BUILD_SHARED_LIBS is on
+-- BUILD_SHARED_LIBS is on
+-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- ~~  traversing 4 packages in topological order:
+-- ~~  - vikit_common
+-- ~~  - vikit_py
+-- ~~  - vikit_ros
+-- ~~  - fast_livo
+-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- +++ processing catkin package: 'vikit_common'
+-- ==> add_subdirectory(rpg_vikit/vikit_common)
+CMake Deprecation Warning at rpg_vikit/vikit_common/CMakeLists.txt:3 (CMAKE_MINIMUM_REQUIRED):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+Current CPU archtecture: x86_64
+-- Eigen found (include: /home/R26534/mm/ros/include/eigen3)
+-- +++ processing catkin package: 'vikit_py'
+-- ==> add_subdirectory(rpg_vikit/vikit_py)
+CMake Deprecation Warning at rpg_vikit/vikit_py/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- +++ processing catkin package: 'vikit_ros'
+-- ==> add_subdirectory(rpg_vikit/vikit_ros)
+CMake Deprecation Warning at rpg_vikit/vikit_ros/CMakeLists.txt:3 (CMAKE_MINIMUM_REQUIRED):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+-- +++ processing catkin package: 'fast_livo'
+-- ==> add_subdirectory(FAST-LIVO2)
+CMake Deprecation Warning at FAST-LIVO2/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- Build Type: Release
+-- Current CPU architecture: x86_64
+-- Using general x86 optimizations: -O3 -march=native -mtune=native -funroll-loops
+-- Processor count: 128
+-- TRACE_GROUP=ON: grouping trace lines are written to $TRACE_GROUP_FILE
+-- Multithreading enabled. Cores: 4
+-- OpenMP found
+-- mimalloc not found, proceeding without it
+-- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+CMake Warning (dev) at /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:121 (find_package):
+  Policy CMP0167 is not set: The FindBoost module is removed.  Run "cmake
+  --help-policy CMP0167" for policy details.  Use the cmake_policy command to
+  set the policy and suppress this warning.
+
+Call Stack (most recent call first):
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:294 (find_boost)
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:559 (find_external_library)
+  FAST-LIVO2/CMakeLists.txt:113 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found Boost: /home/R26534/mm/ros/lib/cmake/Boost-1.86.0/BoostConfig.cmake (found suitable version "1.86.0", minimum required is "1.65.0") found components: system iostreams filesystem
+CMake Warning (dev) at /home/R26534/mm/ros/share/pcl-1.14/Modules/FindFLANN.cmake:45 (find_package):
+  Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT
+  variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the
+  cmake_policy command to set the policy and suppress this warning.
+
+  CMake variable FLANN_ROOT is set to:
+
+    /home/R26534/mm/ros
+
+  For compatibility, find_package is ignoring the variable, but code in a
+  .cmake module might still use it.
+Call Stack (most recent call first):
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:253 (find_package)
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:298 (find_flann)
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:559 (find_external_library)
+  FAST-LIVO2/CMakeLists.txt:113 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found flann version 1.9.2
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Found OpenGL: /home/R26534/mm/ros/lib/libGL.so
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Could NOT find freetype (missing: freetype_DIR)
+CMake Warning (dev) at /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:121 (find_package):
+  Policy CMP0167 is not set: The FindBoost module is removed.  Run "cmake
+  --help-policy CMP0167" for policy details.  Use the cmake_policy command to
+  set the policy and suppress this warning.
+
+Call Stack (most recent call first):
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:294 (find_boost)
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:559 (find_external_library)
+  FAST-LIVO2/CMakeLists.txt:113 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found OpenGL: /home/R26534/mm/ros/lib/libGL.so  found components: OpenGL GLX
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Could NOT find freetype (missing: freetype_DIR)
+-- Found Qhull version 8.0.2
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Could NOT find freetype (missing: freetype_DIR)
+-- looking for PCL_COMMON
+-- looking for PCL_KDTREE
+-- looking for PCL_OCTREE
+-- looking for PCL_SEARCH
+-- looking for PCL_SAMPLE_CONSENSUS
+-- looking for PCL_FILTERS
+-- looking for PCL_2D
+-- looking for PCL_GEOMETRY
+-- looking for PCL_IO
+-- looking for PCL_FEATURES
+-- looking for PCL_ML
+-- looking for PCL_SEGMENTATION
+-- looking for PCL_VISUALIZATION
+-- looking for PCL_SURFACE
+-- looking for PCL_REGISTRATION
+-- looking for PCL_KEYPOINTS
+-- looking for PCL_TRACKING
+-- looking for PCL_RECOGNITION
+-- looking for PCL_STEREO
+-- looking for PCL_OUTOFCORE
+-- looking for PCL_PEOPLE
+CMake Warning (dev) at FAST-LIVO2/CMakeLists.txt:116 (find_package):
+  Policy CMP0167 is not set: The FindBoost module is removed.  Run "cmake
+  --help-policy CMP0167" for policy details.  Use the cmake_policy command to
+  set the policy and suppress this warning.
+
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found Boost: /home/R26534/mm/ros/lib/cmake/Boost-1.86.0/BoostConfig.cmake (found version "1.86.0") found components: thread
+-- Configuring done (50.8s)
+CMake Warning at FAST-LIVO2/CMakeLists.txt:144 (add_executable):
+  Cannot generate a safe runtime search path for target fastlivo_mapping
+  because files in some directories may conflict with libraries in implicit
+  directories:
+
+    runtime library [libgomp.so.1] in /usr/lib/gcc/x86_64-linux-gnu/11 may be hidden by files in:
+      /home/R26534/mm/ros/lib
+
+  Some of these libraries may not be found correctly.
+
+
+-- Generating done (10.8s)
+-- Build files have been written to: /home/R26534/fast_livo2_ws/build
+[  3%] Linking CXX shared library /home/R26534/fast_livo2_ws/devel/lib/libvikit_common.so
+[ 23%] Building CXX object FAST-LIVO2/CMakeFiles/laser_mapping.dir/src/LIVMapper.cpp.o
+[ 26%] Building CXX object FAST-LIVO2/CMakeFiles/pre.dir/src/preprocess.cpp.o
+[ 26%] Building CXX object FAST-LIVO2/CMakeFiles/lio.dir/src/voxel_map.cpp.o
+[ 26%] Building CXX object FAST-LIVO2/CMakeFiles/imu_proc.dir/src/IMU_Processing.cpp.o
+[ 26%] Building CXX object FAST-LIVO2/CMakeFiles/laser_mapping.dir/src/native_checkpoint.cpp.o
+[ 26%] Building CXX object FAST-LIVO2/CMakeFiles/vio.dir/src/frame.cpp.o
+[ 26%] Building CXX object FAST-LIVO2/CMakeFiles/vio.dir/src/vio.cpp.o
+[ 66%] Built target vikit_common
+[ 70%] Building CXX object FAST-LIVO2/CMakeFiles/vio.dir/src/visual_point.cpp.o
+In file included from /home/R26534/mm/ros/include/boost/bind.hpp:30,
+                 from /home/R26534/fast_livo2_ws/src/FAST-LIVO2/src/frame.cpp:13:
+/home/R26534/mm/ros/include/boost/config/pragma_message.hpp:24:34: note: ‘#pragma message: The practice of declaring the Bind placeholders (_1, _2, ...) in the global namespace is deprecated. Please use <boost/bind/bind.hpp> + using namespace boost::placeholders, or define BOOST_BIND_GLOBAL_PLACEHOLDERS to retain the current behavior.’
+   24 | # define BOOST_PRAGMA_MESSAGE(x) _Pragma(BOOST_STRINGIZE(message(x)))
+      |                                  ^~~~~~~
+/home/R26534/mm/ros/include/boost/bind.hpp:36:1: note: in expansion of macro ‘BOOST_PRAGMA_MESSAGE’
+   36 | BOOST_PRAGMA_MESSAGE(
+      | ^~~~~~~~~~~~~~~~~~~~
+[ 73%] Linking CXX shared library /home/R26534/fast_livo2_ws/devel/lib/libvikit_ros.so
+[ 76%] Built target vikit_ros
+[ 80%] Linking CXX shared library /home/R26534/fast_livo2_ws/devel/lib/libpre.so
+[ 80%] Built target pre
+[ 83%] Linking CXX shared library /home/R26534/fast_livo2_ws/devel/lib/libimu_proc.so
+[ 83%] Built target imu_proc
+[ 86%] Linking CXX shared library /home/R26534/fast_livo2_ws/devel/lib/libvio.so
+[ 86%] Built target vio
+[ 90%] Linking CXX shared library /home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so
+[ 90%] Built target laser_mapping
+[ 93%] Linking CXX shared library /home/R26534/fast_livo2_ws/devel/lib/liblio.so
+[ 93%] Built target lio
+[ 96%] Building CXX object FAST-LIVO2/CMakeFiles/fastlivo_mapping.dir/src/main.cpp.o
+[100%] Linking CXX executable /home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping
+/usr/bin/ld: cannot find -lSophus: No such file or directory
+collect2: error: ld returned 1 exit status
+make[2]: *** [FAST-LIVO2/CMakeFiles/fastlivo_mapping.dir/build.make:501: /home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping] Error 1
+make[1]: *** [CMakeFiles/Makefile2:3593: FAST-LIVO2/CMakeFiles/fastlivo_mapping.dir/all] Error 2
+make: *** [Makefile:146: all] Error 2
+Base path: /home/R26534/fast_livo2_ws
+Source space: /home/R26534/fast_livo2_ws/src
+Build space: /home/R26534/fast_livo2_ws/build
+Devel space: /home/R26534/fast_livo2_ws/devel
+Install space: /home/R26534/fast_livo2_ws/install
+####
+#### Running command: "cmake /home/R26534/fast_livo2_ws/src -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS=-fsanitize=address -fno-omit-frame-pointer -g -DCMAKE_SHARED_LINKER_FLAGS=-fsanitize=address -DCATKIN_DEVEL_PREFIX=/home/R26534/fast_livo2_ws/devel -DCMAKE_INSTALL_PREFIX=/home/R26534/fast_livo2_ws/install -G Unix Makefiles" in "/home/R26534/fast_livo2_ws/build"
+####
+####
+#### Running command: "make -j8" in "/home/R26534/fast_livo2_ws/build/FAST-LIVO2"
+####
+Invoking "make -j8" failed
