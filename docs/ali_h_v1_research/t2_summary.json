@@ -10,6 +10,16 @@
   "protocol": "T2_PROTOCOL.md (pre-registered)",
   "block_ns": 500000000,
   "e2_rel_s": 54.0,
+  "e2_trigger_rel_s": 54.0,
+  "e2_deadline_rel_s": 54.0,
+  "e2_basis": "legacy_54s_not_run_bound",
+  "i_qualification_layers": {
+   "RAW_HEADER_CONTAINMENT": "PASS",
+   "SAME_UPDATE_PRE_POST": "INCOMPLETE",
+   "COMPLETE_POINT_MEMBERSHIP": "ASSERTED_NOT_VERIFIED",
+   "COVARIANCE_6D": "NOT_AVAILABLE"
+  },
+  "i_qualification_caveat": "numeric rows are not qualified independent I observations; complete point membership is unverified",
   "pose_source_status": "LEGACY_M2DGR_TIME_JOIN",
   "join_status": "HEURISTIC_UNPROVEN",
   "results_conditional_on": "unproven group-membership mapping",
@@ -148,6 +158,9 @@
    "phase_0": 504
   },
   "I_rank6": 504,
+  "I_zero_eff_rows": 24,
+  "I_zero_eff_zero_log_rows": 24,
+  "has_out_eff0_rows": 35,
   "I_e_norm": {
    "min": 0.0,
    "median": 0.01826777741136127,
@@ -270,7 +283,7 @@
   "unknown_blocks": 120,
   "tail_rows": 47,
   "tail_blocks": 12,
-  "tail_rows_by_pose_rel_54": 47,
+  "tail_rows_by_pose_rel_e2": 47,
   "tail_rows_by_block": 51,
   "span_s": 60.0,
   "unknown_normal": {

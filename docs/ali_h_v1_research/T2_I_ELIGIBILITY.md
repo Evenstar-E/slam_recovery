@@ -14,11 +14,14 @@ pre 位姿没有独立的 LIO handler 导出，协方差是混合约定且无已
 
 | 量 | 源码/文件 | 采集阶段 | 状态 | 缺什么 |
 |---|---|---|---|---|
-| source scan 身份 | trace `grp_idx`、`scan_first_ns`/`scan_last_ns`、`n_scans`；availability `scan_stamp_ns` | 组建立时 | v8 **PASS（含 512 ns 量化）**；v7 **`HEURISTIC_UNPROVEN`** | v7 的 `scan_first` 为 -1；v8 的跨度是单点 + 量化 |
+| source scan：`RAW_HEADER_CONTAINMENT` | trace `scan_first/last_ns`；availability `scan_stamp_ns` | 组建立时 | v8/v11 **PASS（含 512 ns 量化）**；v7 **`HEURISTIC_UNPROVEN`** | v7 的 `scan_first` 为 -1 |
+| source scan：`SAME_UPDATE_PRE_POST` | 同行 `pre_pose7`/`pose7` | update 前后 | v11 **PASS（725）**；v7/v8 **INCOMPLETE** | v7/v8 无同行 pre |
+| source scan：`COMPLETE_POINT_MEMBERSHIP` | `grp_idx`/`n_scans`/carryover | 组建立 | **`ASSERTED_NOT_VERIFIED`** | cur 接上次 next carryover；`n_scans` 只计新 pop raw；同一 header 可出现在两个更新组 |
 | update 阶段 | `LIVMapper::handleLIO`：`has_out=0` 在 StateEstimation 前返回；`has_out=1` 在更新后写 trace | 每 LIO 帧 | **PASS（阶段标签）** | — |
 | post 位姿 | v11/v10 同行 `pose_x…qw`；v7/v8 用 `M2DGR_room_02.txt`（`pose_output_en`，StateEstimation 之后） | update 后 | v11 **`PASS_SAME_ROW`**（与 M2DGR 同时间 ≤1 mm）；v8 **`ASSERTED_NOT_VERIFIED`/`INCOMPLETE`** | v8 的 `grp_idx`/首末戳**不唯一对应**所用更新 |
 | pre 位姿 | v11（107 列）同行 `pre_pose7`；v7/v8 的 `mat_pre.txt` 由 `handleVIO`/`handleLIO` 双写、**无 handler 标签**，`state_propagat` 不单独导出 | update 前 | v11 **`PASS_SAME_ROW`**（真实 run `165438Z`，725 行；3 行抽检）；v7/v8 **INCOMPLETE** | v7/v8 无可唯一归属 LIO 的 pre 位姿 |
 | `vec6` | `voxel_map.cpp`：`vec = state_propagat - state_`（L478），`trace_cov_vec_ = vec`（L510），**之后**才 `state_ += solution`（L519） | 最终 solution **之前** | **INCOMPLETE / `NOT_VERIFIED`** | 最终 solution 未导出；v11 起 e_I 改用同行 pre/post，`vec6` **只作对照**，不再作为 e_I 来源 |
+| `eff=0` 零约束 | trace `eff`、同行 pre/post | 无有效点面约束 | **单列，保留分母** | v11：462 条 I 中 **18** 条 `eff=0` 且 Log 全零（全 725 行中 37 条）；零修正不证明 IMU/LiDAR 一致，不能作 NORMAL 支持 |
 | `Ppre` / `Ppost` | `_state.cov` 6×6 rot+pos 块；Ppre 在 StateEstimation 前取，Ppost 更新后取 | update 前/后 | **`NOT_AVAILABLE`（for e_I）** | 混合约定（rot 右 body、pos 世界加性）；无已验证 6D 切空间转换 |
 | carryover / 成员 | trace `n_scans`、`grp_idx`；v8 全为 1 | — | **`ASSERTED_NOT_VERIFIED`**（v8） / **UNKNOWN**（v7） | `n_scans` 计的是新 pop 的 raw，carryover 在 cur/next；**完整点成员未证**；v7 无 `n_scans` |
 
@@ -42,6 +45,8 @@ pre 位姿没有独立的 LIO handler 导出，协方差是混合约定且无已
   与 `abs_ns`/`Ppost` 一致（post 与 M2DGR ≤1 mm，quat 范数 1.0±1.2e-11）。因此 v11 的 pre/post
   升为 **`PASS_SAME_ROW`**；总体 I 为 **`PASS_SAME_ROW_UNIT_WEIGHTED`**（协方差仍 `NOT_AVAILABLE`）。
   详见 `T2_V11_RESULTS.md`。v7/v8 仍 `INCOMPLETE/UNKNOWN`。
+- **E2 绑定本 run**：v11 第 2 段 trigger rel 17.0029 s、deadline 21.0029 s；输出到约 53 s，
+  E2 后 64 块/32 s 只是宿主继续在回滚地图上输出，**不是 catch-up**。
 - `mat_lio_pre/out` 已加 `idx/grp_idx/phase`，只作交叉核对，不再是 e_I 的必要来源。
 
 ## 3. 解锁条件（交给 S2/S1 的实际导出）
