@@ -752,3 +752,11 @@ S1/S2唯一主线继续物理一致实际修复→native完整state/map→保后
 S1已决定派ACK suffix/driver跳旧pose但target未实施；下一最小保native完整重估边界和成功依赖→接回→修复后E2尾段或首断点，不复制pose/newRPC/阈值扩展。59shift仅23发布、36未修含最后修复后18，suffix原始测量非干净；单scripted/detection off/E2未跑，HEALTHY经waitclose/ABORTED，snapshot8超时/整体build ABI失败保留。S2后缀真实成果接受，不重复v3控制，旧物理候选与成功来源保范围。
 
 诊断选项收窄/方向更正可并行，开发声明暂停及“用户选”仅转述，本机无新直接指令不批准双参考；S3维持门研究专用/旧参数停，不无限诊断代native。-I原件reader最终exit0，初逗号解析失败仅修自写reader，无host/bag/algorithm；driver未变不重跑旧tests。A5/A6/A10局部推进不全表评分，自检逐项状态/命令/原件/人口/失败/质量/成本UNKNOWN；独立review SSH提交推送/private保护不合main不改历史冻结门，target早于d442793发布不指控忽略，接收新意见待回执。
+
+## repair-f3 / 70e3e7c增量：受控实际修复后E2已执行，可信回退/未知依赖仍FAIL
+
+[核验](review_20261112_70e3e7c/README.md)两v5新run40SHA一致、实际driver e39b2b8/0a38e952非随后诊断target c33c0094、库9e7d8cdf绑定build。074154Z真实23应用/454=124+330suffix/无set_state，ACK差实际4.225cm；074744Z E1修复23/.40→原生497=124+373suffix/map20838/379892→无旧pose灌回/resume边界XYZ同→E2拒绝restore/resume→关闭后17paired/1.725149s。首次实际修复后同实例受控E2执行已即时单报用户，不抹执行也不称全部验收成功。
+
+E2无注入/detection off、滚动cp晚trigger1.607814s/晚隔离起点5.607814s，可信完整回退未过；真实两ABORTED rearm/未解决106,143/59shift仅23修复保人口。新collect None/FAILED ack仍实际target decide发送set_state，与“缺ACK不盲写”不符；成功suffix正例skip已通过，普通未知失败依赖最低停尾命令/不公开成功，不扩防御矩阵/newRPC。S1共享成功依赖/物理一致，S2合法历史cp及input归宿→接回/E2或显式不支持，复用已验后缀/skip，不无限单事件。
+
+诊断最新补reference缓存元数据/预测基准/正常边界全样本只源码组件，未新on运行、参考坐标/raw行仍缺；用户本轮问UNAVAILABLE如何解决，已明确答：分支定位已完成，支持门/处理策略未改、物理根因未知，非已修。不自选方法/调门，S3既定研究参数停。-I archive及target Git bytes方法控制PASS/FAIL反例如实，无host/bag；pytest辅助新tests未跑不装。A/B局部进步不总分、自检状态/命令/原件/实际版本/全人口/失败未知/质量成本，review白名单SSH推送补012899f/private保护不合main不改历史，接收新意见待回执。

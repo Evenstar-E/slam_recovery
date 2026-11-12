@@ -547,3 +547,11 @@ v3仍skip+clear已消费后缀，本次399/372未catch-up；两run只一事件/d
 实际set_state紧随重放仍灌key161@1627785280281185627的candidate尾[7.050962,5.921306,-.446735]，reprocess ACK边界[3.167535,6.145446,-.110570]，相差15.0111s/两命令位置差3.904389m，地图计数不变；这是旧状态来源问题实证，不新防御推演，非瞬时GT误差。S1已决定派宿主ACK暴露suffix/driver有suffix跳set_state，但target未实施；最低保native重估边界、不从FAIL/UNKNOWN推进尾命令，不新RPC/复制pose或调门。relay59shift只23发布、36未修含末云之后18，原始后缀非clean；只一scripted事件/detection off、无E2、HEALTHY经ABORTED rearm、snapshot8超时。目标build成功但整体vikit ABI失败保留。
 
 可用性选项S3更正方向/因果范围接受，暂停/用户选择仅开发转述无本机新直接指令，不自动批准双参考实验；本机不新诊断循环。-I reader原件核exit0，首字段逗号解析exit1仅修自写reader后PASS，无host/bag/算法；未变driver不重测旧test。下一唯一S1/S2实际保native边界→接回→修复后E2/尾段或首断点，S3既定门研究/旧参数停；旧candidate新云物理一致及成功依赖保持范围不扩防御。A5/A6/A10捕获后缀局部推进、A8/A9/B4/B11整链未闭合不总分；逐项自检状态/命令/原件/人口/失败/质量成本UNKNOWN，独立SSH review推送/private保护不合main不改历史冻结门；target早于d442793发布不指控忽略，新意见接收待回执。
+
+## 67. 70e3e7c：实际修复接回后的受控E2流程已执行，晚检查点与未知ACK写回未通过
+
+[核验](review_20261112_70e3e7c/README.md)两新v5 run本轮40SHA一致，实际driver均e39b2b8/0a38e952，非随后补诊断的target c33c0094；库9e7d8cdf与构建声明绑定。单事件074154Z重放454=124+330suffix、23应用、无set_state，reprocess/resume两ACK位置差实际4.225cm非报告3.6cm；两事件074744Z E1真实23修复/.40估计应用→497=124+373suffix原生重估/map20838/379892→无set_state→resume边界XYZ同→E2脚本触发拒绝/restore/resume→尾17paired/1.725149s。首次实际测量修复后同实例受控E2执行已立即单独报用户，不再称E2完全未跑，亦不充完整恢复成功。
+
+E2无新注入/detection off；cp1627785309656085248晚trigger1.607814s、晚quarantine_start5.607814s，真实restore不等可信完整回退。close1→trigger2严格185非未说明186，两waitclose仍ABORTED rearm、未解决106/143；59shift仅23修复，36保未修人口。正常成功非零suffix跳灌旧pose局部解除；新collect None/FAIL ack实际target控制仍set_state，开发“缺ACK不盲写”与源码不符，code-review候选已复现。最低合法历史cp/实际应用边界与输入归宿，未知或失败不推进依赖/公开成功，不新RPC/阈值；旧物理候选与新云准入同定义仍未闭合。
+
+诊断最新补cache hash/key/刷新、预测基准/horizon/T、正常边界全样本为源码组件接受，未有新诊断on原件且未保存参考坐标/raw行映射；UNAVAILABLE分支已定位不是行为已修，支持门未改/实际物理根因仍UNKNOWN。本机-I原件核、所有target package Git bytes方法控制，无host/bag/算法参数；首次reader错假设targetSHA只修绑定后PASS，pytest辅助新tests未跑不装。下一S1/S2可信后继checkpoint→完整接回/E2或显式不支持，成功依赖/物理一致最小收口；S3既定研究/旧参数停，不重开诊断或单事件矩阵。A5/A6/A10受控执行局部推进、A4/A8/A9/B2/B4/B11仍未闭合不总分；独立review SSH提交推送并补旧012899f，private保护不合main不改历史冻结门，实际新意见接收待回执。
