@@ -103,3 +103,10 @@ resume 221.37→221.87。命令串行化与 receipt 屏障都按设计工作。
 | `host.log` | 宿主全文：`[NATIVE_REPAIR] received/applied`、`reprocess #1 ... repairs applied=25` |
 | `host_control/`、`launch_pair.sh`、`recovery_node.log`、`machine_load.txt` | 命令链、配方、载荷 |
 | `recovery_node_source.sha256` | 驱动源码身份 |
+
+## 8. 后续：incumbent 初值的第二次尝试
+
+`incumbent_init_refused/REPORT.md`：同声明、同窗口，只把 ICP 初值换成 incumbent。结果 ICP 修正
+从 0.027 m 放大到 **0.815 m**（偏差可见），但拟合未收敛（706 inliers，0.5 m 对应门限），候选被
+Wilson 0.2855 拒绝，**没有发布修复、没有 bias 实测**。按任务规则没有跑对照，断点与下一步写在
+该报告里。
