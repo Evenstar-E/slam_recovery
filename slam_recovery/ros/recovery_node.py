@@ -1580,6 +1580,45 @@ class NativeClosedLoop:
             # host's next processed frame, which lags the trigger under a playback backlog.
             self.cp.hold()
 
+    def _checkpoint_expectation(self, ep: "Episode") -> Optional[int]:
+        """The stamp this segment's checkpoint should carry, when the driver declared it.
+
+        A scripted segment is armed at ``trigger - confirmation margin`` (see ``main``), so the
+        expected stamp is known before the run. An online segment's checkpoint is whichever
+        rolling snapshot the host happened to hold; the driver does not know its stamp, and
+        saying otherwise would invent one.
+        """
+        declared = {int(s) for s in (self.scripted_trigger_stamps_ns or [])}
+        if int(ep.trigger_ts_ns) in declared:
+            return int(ep.trigger_ts_ns) - int(self.confirmation_margin_ns)
+        return None
+
+    def _record_checkpoint_check(self, ep: "Episode", action: dict) -> None:
+        """Record which checkpoint the host actually used, and whether it was the expected one.
+
+        The host has a single checkpoint slot, so a later snapshot can silently replace the one
+        a segment was armed with. A restore or replay that used a different checkpoint is still
+        executed -- this only makes it visible instead of letting it pass as a clean recovery.
+        """
+        import re as _re
+        ack = (action or {}).get("ack", "") or ""
+        stamp = _re.search(r"stamp_ns=(-?\d+)", ack)
+        frame = _re.search(r"frame=(\d+)", ack)
+        actual = int(stamp.group(1)) if stamp else None
+        expected = self._checkpoint_expectation(ep)
+        if actual is None or expected is None:
+            status = "EXPECTED_UNKNOWN"
+        elif actual == expected:
+            status = "MATCH"
+        else:
+            status = "MISMATCH"
+        ep.meta["checkpoint_check"] = {
+            "expected_stamp_ns": expected,
+            "actual_stamp_ns": actual,
+            "actual_frame": int(frame.group(1)) if frame else None,
+            "status": status,
+        }
+
     # -- decision -----------------------------------------------------------------------------
     def _repair_gate(self, ep: "Episode", accepted: bool) -> Tuple[bool, Optional[Dict[str, Any]]]:
         """Publish the repaired measurements and decide whether the replay may be sent.
@@ -1845,6 +1884,11 @@ class NativeClosedLoop:
             if row.get("accepted") is True:
                 action = self.cp.reprocess(ep.frozen_at_ns + REPLAY_END_GRACE_NS)
                 ep.meta["native_checkpoint"] = action
+                # The host has one checkpoint slot. When several segments are open over a run,
+                # a later snapshot can replace the one this segment was armed with, and the
+                # replay then starts from a different point without saying so. The ack carries
+                # the stamp it actually used; record it next to the stamp that was expected.
+                self._record_checkpoint_check(ep, action)
                 # Wait for the replay ack: it carries replay_suffix, i.e. whether the host's own
                 # estimate already ran past the candidate window to the captured boundary. If it
                 # did, writing the last candidate pose back would rewind the state by seconds
@@ -1868,7 +1912,9 @@ class NativeClosedLoop:
                     writeback["trigger"] = "accepted_pose"
                     ep.meta["native_writeback"] = writeback
             else:
-                ep.meta["native_checkpoint"] = self.cp.restore()
+                action = self.cp.restore()
+                ep.meta["native_checkpoint"] = action
+                self._record_checkpoint_check(ep, action)
                 # A restore rolls the host's state and map back to its own checkpoint, and the
                 # `resume` that follows only releases the map hold: nothing replays the input the
                 # host consumed between that checkpoint and this decision. Record the disposition
@@ -2071,6 +2117,10 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
             # The host side of the same lifecycle: when its map was held and when it was released.
             # A re-arm the host never heard would otherwise look like a re-arm that happened.
             "native_checkpoint_actions": loop.cp_actions,
+            # The host has one checkpoint slot; these say whether each segment's restore or
+            # replay used the checkpoint that segment was armed with, or a later one.
+            "checkpoint_checks": [ep.meta.get("checkpoint_check")
+                                  for ep in loop.episodes if ep.meta.get("checkpoint_check")],
         },
         # The label has to describe what actually happened, not what was asked for. A run that
         # declared scripted triggers and fired none is an online run, and saying otherwise would

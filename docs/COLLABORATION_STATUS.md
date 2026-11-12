@@ -1914,3 +1914,23 @@ S2 在 `49f2f941` 上完成 detection on + availability + trace 的 off/on 各�
 
 **归档**：`exp/trace-cov` 已推至 `ffd4b13`（含两次 detection-on run 的 receipt/run_summary/wiring/
 `availability_frames.jsonl.gz`/`host_logs`/SHA256SUMS），`.git/config` 无 token。
+
+## 135. 单 checkpoint 槽根因确认；S1 实现驱动侧 checkpoint 校验；下一轮走纯在线触发
+
+S2 定位（本机看 `run_summary.lifecycle.native_checkpoint_actions` 与 ack 原文一致）：宿主**只有一个 checkpoint 槽**
+（`cp_state_/cp_state_propagat_/cp_map_`，`snapshotCheckpoint()` 无条件覆盖，命令不带身份）；延迟命令队列是三个 deque、
+FIFO，没问题；**自动触发段不拍自己的快照**（`_open_episode` 只做 `expire_pending` + `hold`），所以拒绝时 restore 到槽里
+最新那份——在 scripted 混合 run 里就是 E1 的 armed 快照（frame 163）；迟到时该槽已被 E2 快照覆盖，reprocess 于是落在
+frame 552（`repair_applied=0 / dropped=42`）。这统一解释了 `115203Z` 全拒、`115734Z` 只触发第二个戳、以及修复全丢。
+
+**S1 实现（driver 侧，行为不变）**：新增
+- `_checkpoint_expectation(ep)`：scripted 段期望戳 = `trigger − confirmation_margin`；在线段返回 None（不臆造）；
+- `_record_checkpoint_check(ep, action)`：从 ack 解析 `stamp_ns=`/`frame=`，写 `ep.meta["checkpoint_check"]`
+  = `{expected_stamp_ns, actual_stamp_ns, actual_frame, status: MATCH/MISMATCH/EXPECTED_UNKNOWN}`；
+- `run_summary.lifecycle.checkpoint_checks` 汇总各段结果。
+- 测试：`test_a_restore_on_a_different_checkpoint_is_marked_as_a_mismatch`（MATCH 与 MISMATCH 两例）、
+  `test_an_online_segment_has_no_expected_checkpoint_stamp`；全量 **204 tests OK**。
+
+**决定**：暂不做 (a) 多槽身份化（host+协议 ~100 行、需重过版本链）；不采用 (c) 抑制自动段（会改变验证面）。
+下一轮验证用**纯在线触发**（无 scripted）的 detection-on run：滚动快照提供槽，每段的 `checkpoint_check` 如实记录
+回滚点与期望是否一致；混合模式下的 `115203Z`/`115734Z` 自动段结论按"回滚到非本段 checkpoint"标注，不再用于收益统计。

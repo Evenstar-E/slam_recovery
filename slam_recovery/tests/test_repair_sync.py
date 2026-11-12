@@ -66,6 +66,7 @@ class _FakeCP:
         self.set_state_calls = 0
         self.expected = None
         self.reprocess_end_stamp = None
+        self.restore_ack = "OK restore valid=1 stamp_ns=0 frame=0\n"
         self._last_snapshot_wall = 0.0
 
     def read_repair_received(self, timeout_s=1.0):
@@ -85,7 +86,7 @@ class _FakeCP:
 
     def restore(self):
         self.restore_calls += 1
-        return {"command": "restore"}
+        return {"command": "restore", "ack": self.restore_ack}
 
     def set_state(self, pose):
         self.set_state_calls += 1
@@ -189,6 +190,42 @@ class RepairGateTest(unittest.TestCase):
         self.assertEqual(d["checkpoint_stamp_ns"],
                          ep.trigger_ts_ns - loop.confirmation_margin_ns)
         self.assertEqual(d["interval_ns"], [d["checkpoint_stamp_ns"], 1_500])
+
+    def test_a_restore_on_a_different_checkpoint_is_marked_as_a_mismatch(self):
+        # The host has one checkpoint slot, so an auto-triggered segment can restore to a stamp
+        # another segment armed. The restore still runs; the run summary has to say which stamp
+        # was used, otherwise a rollback to the wrong point reads as a clean recovery.
+        loop, ep = self._loop(wait_result=True)
+        loop.node.evaluate_and_commit_candidate = lambda *a, **k: _Report(
+            accepted=False, committed_pose_keys=[], deferred_pose_keys=[])
+        loop.scripted_trigger_stamps_ns = [ep.trigger_ts_ns]
+        expected = ep.trigger_ts_ns - loop.confirmation_margin_ns
+        loop.cp.restore_ack = f"OK restore valid=1 stamp_ns={expected} frame=163\n"
+        loop.decide(1_500, "test")
+        check = ep.meta["checkpoint_check"]
+        self.assertEqual(check["status"], "MATCH")
+        self.assertEqual(check["expected_stamp_ns"], expected)
+        self.assertEqual(check["actual_frame"], 163)
+
+        loop2, ep2 = self._loop(wait_result=True)
+        loop2.node.evaluate_and_commit_candidate = lambda *a, **k: _Report(
+            accepted=False, committed_pose_keys=[], deferred_pose_keys=[])
+        loop2.scripted_trigger_stamps_ns = [ep2.trigger_ts_ns]
+        loop2.cp.restore_ack = f"OK restore valid=1 stamp_ns={expected + 999} frame=552\n"
+        loop2.decide(1_500, "test")
+        self.assertEqual(ep2.meta["checkpoint_check"]["status"], "MISMATCH")
+        self.assertEqual(ep2.meta["checkpoint_check"]["actual_frame"], 552)
+
+    def test_an_online_segment_has_no_expected_checkpoint_stamp(self):
+        loop, ep = self._loop(wait_result=True)
+        loop.node.evaluate_and_commit_candidate = lambda *a, **k: _Report(
+            accepted=False, committed_pose_keys=[], deferred_pose_keys=[])
+        loop.scripted_trigger_stamps_ns = []          # an online trigger, not a declared stamp
+        loop.decide(1_500, "test")
+        check = ep.meta["checkpoint_check"]
+        self.assertEqual(check["status"], "EXPECTED_UNKNOWN")
+        self.assertIsNone(check["expected_stamp_ns"])
+        self.assertIsNotNone(check["actual_stamp_ns"])
 
     def test_the_sham_publishes_unchanged_clouds_with_the_same_receipts(self):
         loop, ep = self._loop(wait_result=True)
