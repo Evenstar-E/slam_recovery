@@ -71,11 +71,22 @@ PLAY_EXIT=null; PAIR_EXIT=null; REC_EXIT=null; RC_EXIT=null
 cleanup() {
   if [ -n "$PAIR" ]; then
     # SIGTERM the whole supervisor group, then wait for the recovery node to flush, then KILL.
-    kill -TERM -- "-$PAIR" 2>/dev/null
+    # A reference-map pass needs the host to reach its exit path (savePCD) instead of dying on
+    # SIGTERM: SAVE_WAIT sends SIGINT first, which makes ros::ok() false and lets savePCD run.
+    if [ "${SAVE_WAIT:-0}" -gt 0 ]; then
+      kill -INT -- "-$PAIR" 2>/dev/null
+      sleep "$SAVE_WAIT"
+      kill -TERM -- "-$PAIR" 2>/dev/null
+    else
+      kill -TERM -- "-$PAIR" 2>/dev/null
+    fi
   fi
   for _ in $(seq 1 15); do
     [ -n "$REC" ] && [ -d "/proc/$REC" ] && sleep 1 || break
   done
+  # A host that saves a map on exit needs time between SIGTERM and SIGKILL; the reference-map pass
+  # sets SAVE_WAIT, every other run leaves it at 0 and keeps the old teardown.
+  if [ "${SAVE_WAIT:-0}" -gt 0 ]; then sleep "$SAVE_WAIT"; fi
   [ -n "$PAIR" ] && kill -KILL -- "-$PAIR" 2>/dev/null
   [ -n "$RC" ] && kill -KILL -- "-$RC" 2>/dev/null
 }
