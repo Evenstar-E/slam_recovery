@@ -4,6 +4,8 @@
 > 状态：**T0 EXECUTED / T1 EXECUTED / T2–T3 BLOCKED**。0 次宿主运行、0 个新参数矩阵；
 > shadow 观察器只读归档，不写 manager/recovery 共享代码，不改旧归档文件。
 > 实现：`ali_h_v1.py`（观察器）、`selftest.py`（T1）；配置/身份：`manifest.json`。
+> T2 输入契约：`T2_INPUT_CONTRACT.md`（S2 导出未到，T2/T3 仍 `BLOCKED`）。
+> 15 小时任务：`docs/OVERNIGHT_ALI_AUTODETECTION_TASK_20261112.md`；本文件是其中 S3 的研究交付。
 
 ## 0. 一句话结果
 
@@ -39,6 +41,11 @@ manifest 逐项记录代码 sha256、配置（块 0.5 s、alarm u≥.95、normal
 | `nis_unavailable`（NIS 无值，重叠计数） | **1** / 307 | **1** / 412 |
 | 全部 UNAVAILABLE | 307 / 402 | 412 / 544 |
 | 旧 AVAILABLE | 95 | 132 |
+
+**字段来源（必读）**：Run A 的 285 个比例失败帧在旧 `support.reason` 里仍写作 **`ok`**（旧字段未更新）；
+本报告的 `insufficient_support` 是**派生值**（`pass == false` 且 `reference_points > 0`），不是旧档原因字段的原值。
+Run B 的 351 个失败帧旧字段是 `fraction_below_threshold`，与本报告类别一致。`empty_reference` 在
+两 run 都是旧字段原值（22 / 61）。复核时请按派生规则复算，不要以为 Run A 的旧字段与状态自洽。
 
 ### 2.2 通道实际证据（逐帧，`shadow_{A,B}.jsonl`）
 
@@ -111,7 +118,7 @@ T1 全部标记 `marker: SYNTHETIC_UNIT`，不称真实恢复，不产生真实 
 | 真实 I 通道 | **BLOCKED** | 两份归档无 IMU preupdate/update、区间、外参、协方差；输入 bag 只有 raw IMU/LiDAR，无 `imu_prop_odom`。需 S1/S2 在 LiDAR 更新点做**一次最小导出**（正常前缀 + 已声明退化窗 + 尾段），并先给 wall/message 预算 |
 | normal 参照 | **BLOCKED** | 无独立确认的健康前缀；不能用 HEALTHY/trusted/无注入替代。需指定正常开发输入 + 离线证据 |
 | 独立事件标签 | **NOT_EVALUABLE（归档）** | 两份归档没有事件标签；自注入标签只能离线评价，不能生成训练/评价真值 |
-| T2 最小 trace | **NOT_EXECUTED** | 等 S2 回 trace 接口与 S1 预算确认；未开始 |
+| T2 最小 trace | **NOT_EXECUTED** | S2 的 `fl_native_20261112T101116Z_329791` 宿主启动即 `image_transport` 插件缺失 terminate（`pose_messages: 0`、`paired: 0`），trace 未导出；不自行造 trace、不拼旧档 |
 | T3 同人口对照 | **NOT_EXECUTED** | 依赖 T2；当前只能交 T0 的证据资格与边界 |
 
 ## 5. 逐项自检（§8/§10.3 格式）
@@ -129,6 +136,7 @@ T1 全部标记 `marker: SYNTHETIC_UNIT`，不称真实恢复，不产生真实 
 | shadow 开关不变性 | **PASS（限定控制）** | T1.6，Run A 402 行逐条相同 | — | — |
 | 真实 I trace | **BLOCKED/NOT_EXECUTED** | §4 | — | 等 S1/S2 |
 | 同人口误报/漏检/延迟 | **NOT_EVALUABLE** | 无标签、无 I、无 normal 参照 | — | 等 T2 |
+| T2 输入契约/校验器 | **PASS（准备，SYNTHETIC）** | `T2_INPUT_CONTRACT.md`、`t2_input_check.py`；11/11 合成测试（manifest 缺项/拒绝 S 与 H_T_H/旧 run id/e_I/s_I/单位权） | 真实 T2 仍 `NOT_EXECUTED` | 收到 trace 后按契约 §6 顺序核声明 |
 | 计算成本/内存 | **PASS（T0 本地）** | T0 两份归档合计 **3.03 s**、峰值 RSS **28.4 MB**；shadow 输出 **652,502 B + 891,001 B**（`wc -c`，生成后未追加） | — | T2 时补生产侧成本 |
 | 旧归档文件改写 | **NOT_APPLICABLE** | 只读；新文件全部在本目录 | — | — |
 | 生产集成 | **NOT_APPLICABLE（未授权）** | shadow 不写 manager/native | — | 用户另行确认 |
