@@ -1,0 +1,30 @@
+{
+ "bag": "/home/R26534/datasets/mmlins/campus_12_fl.bag",
+ "bag_sha256": "a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de",
+ "bag_first_imu_ns": 1711547883362267771,
+ "declaration": "absolute stamps = first IMU stamp + offset; offsets are the historical hibernation onsets in slam_recovery/experiments/manifests/e2_real_world_mmlins_campus_r1_r2_r3_benchmark.json (campus_12, sleep_trigger_sec 115.99 and 230.09). Declared observation only: these hosts have no trigger interface.",
+ "events": [
+  {
+   "name": "E1",
+   "offset_s": 115.99,
+   "stamp_ns": 1711547999352267771
+  },
+  {
+   "name": "E2",
+   "offset_s": 230.09,
+   "stamp_ns": 1711548113452267771
+  }
+ ],
+ "imu_stationary_windows_s": [
+  [
+   109,
+   143
+  ],
+  [
+   224,
+   261
+  ]
+ ],
+ "imu_method": "1 s bins from /imu_raw; low-motion = gyro-norm std < 0.002 rad/s and acc-norm std < 0.03 m/s^2, at least 3 s; the two broad clusters contain both declared stamps",
+ "label": "DECLARED_OBSERVATION (natural hibernation events, not injected)"
+}
