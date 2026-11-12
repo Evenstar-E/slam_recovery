@@ -22,6 +22,21 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 TOL_NS = 512
 
 
+POSE_LEAVES = ("x", "y", "z", "qx", "qy", "qz", "qw")
+
+
+def expand_tail_names(tail_names):
+    keys = []
+    for name in tail_names:
+        if name == "pose7":
+            keys += [f"pose_{k}" for k in POSE_LEAVES]
+        elif name == "pre_pose7":
+            keys += [f"pre_pose_{k}" for k in POSE_LEAVES]
+        else:
+            keys.append(name)
+    return keys
+
+
 def parse_trace(path):
     names = None
     rows, malformed = [], []
@@ -44,11 +59,12 @@ def parse_trace(path):
             block_end = vec_start + 78
             tail_names = (names[names.index("Ppost6x6") + 1:]
                           if "Ppost6x6" in names else [])
-            if len(f) not in (block_end, block_end + len(tail_names)):
+            tail_keys = expand_tail_names(tail_names)
+            if len(f) not in (block_end, block_end + len(tail_keys)):
                 malformed.append({"line": lineno, "ncols": len(f)})
                 continue
-            pose = ({name: float(f[block_end + i]) for i, name in enumerate(tail_names)}
-                    if len(f) == block_end + len(tail_names) and tail_names else None)
+            pose = ({tail_keys[i]: float(f[block_end + i]) for i in range(len(tail_keys))}
+                    if len(f) == block_end + len(tail_keys) and tail_keys else None)
             rows.append({
                 "idx": int(f[col["idx"]]), "rel_s": float(f[col["rel_s"]]),
                 "abs_ns": int(f[col["abs_ns"]]), "grp_idx": int(f[col["grp_idx"]]),

@@ -16,8 +16,8 @@ pre 位姿没有独立的 LIO handler 导出，协方差是混合约定且无已
 |---|---|---|---|---|
 | source scan 身份 | trace `grp_idx`、`scan_first_ns`/`scan_last_ns`、`n_scans`；availability `scan_stamp_ns` | 组建立时 | v8 **PASS（含 512 ns 量化）**；v7 **`HEURISTIC_UNPROVEN`** | v7 的 `scan_first` 为 -1；v8 的跨度是单点 + 量化 |
 | update 阶段 | `LIVMapper::handleLIO`：`has_out=0` 在 StateEstimation 前返回；`has_out=1` 在更新后写 trace | 每 LIO 帧 | **PASS（阶段标签）** | — |
-| post 位姿 | v11/v10 同行 `pose_x…qw`；v7/v8 用 `M2DGR_room_02.txt`（`pose_output_en`，StateEstimation 之后） | update 后 | v11 **`PENDING_v11_RUN`**；v8 **`ASSERTED_NOT_VERIFIED`/`INCOMPLETE`** | v11 待真实 run；v8 的 `grp_idx`/首末戳**不唯一对应**所用更新 |
-| pre 位姿 | v11（107 列）同行 `pre_pose7`；v7/v8 的 `mat_pre.txt` 由 `handleVIO`/`handleLIO` 双写、**无 handler 标签**，`state_propagat` 不单独导出 | update 前 | v11 **`PENDING_v11_RUN`**（parser 已支持，等真实 run 验证同帧配对后升 `PASS_SAME_ROW`）；v7/v8 **INCOMPLETE** | v11 还没有真实 run；v7/v8 无可唯一归属 LIO 的 pre 位姿 |
+| post 位姿 | v11/v10 同行 `pose_x…qw`；v7/v8 用 `M2DGR_room_02.txt`（`pose_output_en`，StateEstimation 之后） | update 后 | v11 **`PASS_SAME_ROW`**（与 M2DGR 同时间 ≤1 mm）；v8 **`ASSERTED_NOT_VERIFIED`/`INCOMPLETE`** | v8 的 `grp_idx`/首末戳**不唯一对应**所用更新 |
+| pre 位姿 | v11（107 列）同行 `pre_pose7`；v7/v8 的 `mat_pre.txt` 由 `handleVIO`/`handleLIO` 双写、**无 handler 标签**，`state_propagat` 不单独导出 | update 前 | v11 **`PASS_SAME_ROW`**（真实 run `165438Z`，725 行；3 行抽检）；v7/v8 **INCOMPLETE** | v7/v8 无可唯一归属 LIO 的 pre 位姿 |
 | `vec6` | `voxel_map.cpp`：`vec = state_propagat - state_`（L478），`trace_cov_vec_ = vec`（L510），**之后**才 `state_ += solution`（L519） | 最终 solution **之前** | **INCOMPLETE / `NOT_VERIFIED`** | 最终 solution 未导出；v11 起 e_I 改用同行 pre/post，`vec6` **只作对照**，不再作为 e_I 来源 |
 | `Ppre` / `Ppost` | `_state.cov` 6×6 rot+pos 块；Ppre 在 StateEstimation 前取，Ppost 更新后取 | update 前/后 | **`NOT_AVAILABLE`（for e_I）** | 混合约定（rot 右 body、pos 世界加性）；无已验证 6D 切空间转换 |
 | carryover / 成员 | trace `n_scans`、`grp_idx`；v8 全为 1 | — | **`ASSERTED_NOT_VERIFIED`**（v8） / **UNKNOWN**（v7） | `n_scans` 计的是新 pop 的 raw，carryover 在 cur/next；**完整点成员未证**；v7 无 `n_scans` |
@@ -38,8 +38,10 @@ pre 位姿没有独立的 LIO handler 导出，协方差是混合约定且无已
   `selftest100` 仍 PASS。
 - 新路径：v11 的 e_I 直接用同行 `pre_pose7`/`pose7` 做 `Log(inv(pre)·post)`（含 V⁻¹），
   **不再依赖 `vec6`**；`vec6` 只作对照。
-- 仍需真实 v11 run 才能把 pre 位姿从 `PENDING_v11_RUN` 升为 `PASS_SAME_ROW`；在同帧配对
-  验证通过前，I 总体仍 `INCOMPLETE/UNKNOWN`。
+- 真实 v11 run `165438Z_669633` 已验证：`same_row_pre_post_rows=725`；抽 3 行核对 pre/post
+  与 `abs_ns`/`Ppost` 一致（post 与 M2DGR ≤1 mm，quat 范数 1.0±1.2e-11）。因此 v11 的 pre/post
+  升为 **`PASS_SAME_ROW`**；总体 I 为 **`PASS_SAME_ROW_UNIT_WEIGHTED`**（协方差仍 `NOT_AVAILABLE`）。
+  详见 `T2_V11_RESULTS.md`。v7/v8 仍 `INCOMPLETE/UNKNOWN`。
 - `mat_lio_pre/out` 已加 `idx/grp_idx/phase`，只作交叉核对，不再是 e_I 的必要来源。
 
 ## 3. 解锁条件（交给 S2/S1 的实际导出）

@@ -10,20 +10,20 @@
   "protocol": "T2_PROTOCOL.md (pre-registered)",
   "block_ns": 500000000,
   "e2_rel_s": 54.0,
-  "pose_source_status": "CONFIRMED_POST_POSE_TIME_JOIN",
+  "pose_source_status": "LEGACY_M2DGR_TIME_JOIN",
   "join_status": "HEURISTIC_UNPROVEN",
-  "results_conditional_on": "unproven group-membership mapping; not a source-membership proof",
+  "results_conditional_on": "unproven group-membership mapping",
   "e_i_convention": "host mixed convention: rot = R*Exp(d_rot) (body right), pos = p + d_pos (world additive); rot=-w, t_body=-R_pre^T v, then SE(3) Log t_log = so3_left_jacobian_inv(rot) @ t_body",
   "pose_source": "same-row pre_pose+pose (v11, 107 cols) when both exist; same-row pose only (v10, 100 cols); M2DGR time join only for legacy 92/93-column rows as a cross-check",
   "same_row_pre_post_rows": 0,
   "same_row_post_pose_rows": 0,
-  "pose_source_scope": "CONFIRMED_POST_POSE_TIME_JOIN applies to v8 124217Z only; v7 115734Z remains HEURISTIC_UNPROVEN",
+  "pose_source_scope": "SAME_ROW_PRE_POST applies to v11 165438Z; SAME_ROW_POST to v10 100-col rows; LEGACY_M2DGR_TIME_JOIN to v7/v8, where v7 join remains HEURISTIC_UNPROVEN",
   "i_qualification": "INCOMPLETE/UNKNOWN",
   "i_qualification_reasons": [
    "vec6 is captured before the final solution (state_ += solution); the final solution is not exported, so vec6 is not the final pre-post increment",
    "pre pose is not independently exported for the LIO handler; mat_pre has VIO/LIO double writes without a handler tag",
    "Ppre/Ppost are mixed-convention state blocks; no verified 6D tangent covariance",
-   "504 numeric I rows are not 504 qualified independent I observations"
+   "numeric I rows are not qualified independent I observations"
   ],
   "covariance_status": "NOT_AVAILABLE_FOR_E_I: Ppre/Ppost are mixed-convention state blocks; no verified 6x6 tangent conversion",
   "vec6_status": "NOT_VERIFIED: saved before the final solution; same pre/post and carryover membership are unproven; do not infer physical meaning from vec6 alone",
@@ -88,10 +88,11 @@
  },
  "join": {
   "status": "HEURISTIC_UNPROVEN",
+  "mode": "mechanical_prev_last",
   "availability_rows": 531,
   "mapped": 530,
   "unmapped": 1,
-  "exact_equality": 1,
+  "exact_equality": 0,
   "trace_rows_per_group": {
    "2": 276,
    "1": 217,
@@ -105,8 +106,8 @@
   "multi_grp_idx_rows": 257,
   "shared_last_groups": 295,
   "grp_per_last_distribution": {
-   "1": 295,
-   "2": 295
+   "2": 295,
+   "1": 295
   },
   "avail_rows_per_last_distribution": {
    "1": 296,
@@ -133,7 +134,7 @@
    "(0, 1)": 24,
    "(0,)": 16
   },
-  "rule": "effective span containment: previous distinct scan_last < scan_stamp_ns <= scan_last"
+  "rule": "mechanical: previous distinct scan_last < scan_stamp_ns <= scan_last"
  },
  "channels": {
   "M_present_all": 444,
@@ -154,7 +155,7 @@
   },
   "I_s": {
    "min": 0.0,
-   "median": 70.3133963953216,
+   "median": 72.29387608528953,
    "max": 5955.053067343836
   },
   "I_by_phase": {
@@ -162,15 +163,15 @@
     "n": 818,
     "e_norm_median": 0.018507259567401707,
     "e_norm_max": 1.545105747222006,
-    "s_median": 67.05666885618308,
+    "s_median": 69.2511307796695,
     "s_max": 5955.053067343836
    },
    "1": {
     "n": 156,
-    "e_norm_median": 0.042502286619414645,
-    "e_norm_max": 0.14510704839873165,
-    "s_median": 870.6808824004141,
-    "s_max": 9697.078386141366
+    "e_norm_median": 0.042502285819066496,
+    "e_norm_max": 0.14510704834227303,
+    "s_median": 911.8655393481097,
+    "s_max": 9790.524882155898
    }
   },
   "I_compare": {
@@ -179,9 +180,9 @@
    "e_norm_median_approx": 0.018267771874565623,
    "e_norm_max_exact": 1.545105747222006,
    "e_norm_max_approx": 1.544963135028306,
-   "s_median_exact": 70.3133963953216,
+   "s_median_exact": 72.29387608528953,
    "s_median_approx": 66.86904947448734,
-   "trans_vector_diff_median": 0.00948159155297433,
+   "trans_vector_diff_median": 0.009593498127978915,
    "trans_vector_diff_max": 2.645246942694468,
    "rows_trans_diff_gt_1pct": 475
   },
@@ -190,7 +191,7 @@
    "min": 0.0,
    "p10": 3.624428061151708e-05,
    "p50": 0.0003337125699815768,
-   "p90": 0.0036901347201135043,
+   "p90": 0.003690133744413367,
    "max": 2.3873517700984737
   },
   "I_s_status": "DIAGNOSTIC_ONLY_MIXED_CONVENTION_NOT_A_CHI2",
@@ -200,7 +201,7 @@
     "min": 0.0,
     "p10": 0.006016523720252364,
     "p50": 0.01826777741136127,
-    "p90": 0.06074627283332719,
+    "p90": 0.060746264770284275,
     "max": 1.545105747222006
    },
    "e_norm_approx": {
@@ -215,8 +216,8 @@
     "n": 504,
     "min": 0.0,
     "p10": 3.987432582249829,
-    "p50": 70.3133963953216,
-    "p90": 414.2168904431597,
+    "p50": 72.29387608528953,
+    "p90": 420.8597494810994,
     "max": 5955.053067343836
    },
    "s_approx": {
@@ -232,7 +233,7 @@
     "min": 0.0,
     "p10": 0.00508281499187999,
     "p50": 0.016615794187936732,
-    "p90": 0.05365378089667688,
+    "p90": 0.0536537543259207,
     "max": 1.5443827294741674
    },
    "e_trans_approx": {
