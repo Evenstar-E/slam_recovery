@@ -1654,3 +1654,8 @@ S3 HEAD `0d929f2`（`exp/ali-h-v1`）新增 `docs/ali_h_v1_research/T2_PROTOCOL.
 本机按 runner 相同方式 source 后复现：`ROS_PACKAGE_PATH=/home/R26534/fast_livo2_ws/src:/home/R26534/mm/ros/share`，
 `rospack plugins --attrib=plugin image_transport` 正常返回，说明失败在**进程环境**而非插件缺失。已要求 S2 在宿主
 fork 前记录 `ROS_PACKAGE_PATH/ROS_HOME`，并**在拿到该证据前不进行第三次重跑**；本轮仍记 NOT_EXECUTED。
+
+**补**（S3 `98abad4`，已核并合入）：`T2_PROTOCOL.md` §1.1 与 §5 已把 join 规则改为
+`last_lio_update_time` ↔ `scan_stamp_ns` 精确相等，trace 必须同时导出 `scan_header_stamp` 与
+`last_lio_update_time`；偏移非常数或只给 header 戳 → `INCOMPLETE:join_key_unresolved`；契约与
+`t2_input_check.py` 同步，11/11 仍 PASS。
