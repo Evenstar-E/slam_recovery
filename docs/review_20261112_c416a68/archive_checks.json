@@ -1,0 +1,413 @@
+{
+  "target": "c416a68d736c3fb9eee3bc0cfecdb23d586aba34",
+  "base": "4740d94a583886afc04b361aee3c6403d5072ecf",
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261112_c416a68/check_archive.py",
+  "exit": 0,
+  "scope": "Git archive/source-bound arithmetic only; no host, bag, binary or archived script execution",
+  "integrity": {
+    "matched": 23,
+    "total": 23,
+    "checks": [
+      {
+        "path": "README.md",
+        "ok": true
+      },
+      {
+        "path": "host_change_suffix_replay/BUILD.md",
+        "ok": true
+      },
+      {
+        "path": "host_change_suffix_replay/deployed_host_v4.diff",
+        "ok": true
+      },
+      {
+        "path": "host_change_suffix_replay/host_build_v5.log",
+        "ok": true
+      },
+      {
+        "path": "host_change_suffix_replay/new_binary_sha.txt",
+        "ok": true
+      },
+      {
+        "path": "host_change_suffix_replay/suffix_increment.diff",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/REPORT.md",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/candidates.jsonl",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/candidates_detail.jsonl",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/host.log",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/host_control/ack_received",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/host_control/cmd.done",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/icp_detail.jsonl",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/launch_pair.sh",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/lifecycle_events.json",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/machine_load.txt",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/native_checkpoint_events.json",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/receipt.json",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/recovery_node.log",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/recovery_node_source.sha256",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/relay.log",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/relay_frames.jsonl",
+        "ok": true
+      },
+      {
+        "path": "suffix_replay_20261112/run_summary.json",
+        "ok": true
+      }
+    ]
+  },
+  "identity": {
+    "run_id": "fl_native_20261112T072902Z_207524",
+    "driver_sha": "43c65a9d527b071c200a2c522c7fcef85a510715d54092a91ed608c0531ac048",
+    "matches_target_driver": true,
+    "runtime_library_sha": "c0833d9ff7610ef4d1507596b4ce8c41805e8c349f385218edf9641920f4dfe0",
+    "matches_declared_build_sha": true,
+    "inputs": {
+      "bag": "/tmp/fastlivo/hall01_two_event_v1.bag",
+      "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+      "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+      "host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+      "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+      "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+      "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+      "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+      "recovery_node_source": "43c65a9d527b071c200a2c522c7fcef85a510715d54092a91ed608c0531ac048",
+      "runtime_library": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+      "runtime_library_sha256": "c0833d9ff7610ef4d1507596b4ce8c41805e8c349f385218edf9641920f4dfe0"
+    },
+    "launch": {
+      "rate": "1.0",
+      "drain_s": "30",
+      "duration_s": "0",
+      "max_pairs": "0",
+      "candidate_source": "icp_reregistration",
+      "detection": "off",
+      "sigma_meas_m": "0.884",
+      "scripted_triggers_s": "",
+      "scripted_triggers_ns": "1627785276215170145",
+      "confirmation_margin_sec": "4.0",
+      "relay_shift_z": "0.5",
+      "relay_start_ns": "1627785276215170145",
+      "relay_end_ns": "1627785282215170145",
+      "injection": "INJECTION_DECLARED_Z_BIAS",
+      "repair_publish": "1",
+      "run_mode": "CONTROLLED_INTERFACE_TEST",
+      "group_model": "host and recovery node are children of one setsid supervisor"
+    },
+    "actual_node_args": {
+      "run_dir": "/tmp/fl_native_20261112T072902Z_207524",
+      "pose_topic": "/aft_mapped_to_init",
+      "scan_topic": "/velodyne_points",
+      "status_topic": "/slam_recovery/gate_status",
+      "candidate_source": "icp_reregistration",
+      "confirmation_margin_sec": 4.0,
+      "pair_dt_ms": 40.0,
+      "scan_cap": 6000,
+      "sigma_meas_m": 0.884,
+      "duration_sec": 0.0,
+      "max_pairs": 0,
+      "icp_time_budget_sec": 0.0,
+      "detection": "off",
+      "scripted_triggers": "",
+      "scripted_trigger_stamps": "1627785276215170145",
+      "checkpoint_dir": "/tmp/fl_native_20261112T072902Z_207524/host_control",
+      "checkpoint_period_sec": 2.0,
+      "wait_limit_sec": 2.0,
+      "repair_publish": true,
+      "repair_sync_timeout_sec": 5.0,
+      "repair_dry_run": false,
+      "availability_log": "",
+      "repair_sham": false
+    },
+    "v4_patch_sha": "f025329c1e400627381b76e3ef5fc97269383154c0d211ee38ad06746bc1bc22"
+  },
+  "replay": {
+    "log": "\u001b[0m[ INFO] [1794468620.336473021]: [NATIVE_CHECKPOINT] reprocess #1: 572 frames replayed over [1627785276.281966925 .. 1627785295.292295218], repairs applied=23 queued=0, replayed_within_end=124 replayed_suffix=448 end_stamp=1627785280381185627, map now 21257 voxels/379069 points\u001b[0m",
+    "groups": 572,
+    "start_s": "1627785276.281966925",
+    "end_s": "1627785295.292295218",
+    "within_end": 124,
+    "suffix": 448,
+    "end_stamp_ns": 1627785280381185627,
+    "point_accounting_log": "\u001b[0m[ INFO] [1794468620.328140667]: [NATIVE_CHECKPOINT] replay points: with_points=226 empty=346 total_undistorted=1086941 | LIO frames=286 with_points=226 empty=60 | VIO frames=286\u001b[0m",
+    "full_group_time_list_or_complete_state_equivalence": "NOT_VERIFIED_not_archived",
+    "source_loops_all_captured_groups_through_native_imu_mapping": true
+  },
+  "repair": {
+    "published": 23,
+    "received": "23",
+    "applied": "23",
+    "dropped": "0",
+    "host_received_lines": 23,
+    "host_applied_lines": 23,
+    "leftover_lines": [
+      "\u001b[0m[ INFO] [1794468620.321349509]: [NATIVE_REPAIR] leftover 0: had_group_but_missed=0 no_group_nearby=0 (groups=572, spans=0)\u001b[0m"
+    ],
+    "bias_z_m": 0.45,
+    "actual_shift_z_m": -0.45,
+    "relay_frames": 598,
+    "relay_shifted": 59,
+    "published_stamps_all_shifted": true,
+    "shifted_stamps_not_published": 36,
+    "shifted_stamps_after_last_published": 18,
+    "full_injected_window_repaired": "NOT_VERIFIED_23_clouds_not_all_shifted_frames"
+  },
+  "boundary_conflict": {
+    "commands": {
+      "reprocess": {
+        "command": "reprocess",
+        "wall": 1794468613.877,
+        "received_wall": 1794468613.880635,
+        "received_s": 0.004,
+        "ok": true,
+        "ack": "OK reprocess valid=1 stamp_ns=1627785276215170048 frame=209 voxels=15464 nodes=31686 points=287640 restores=1 live_voxels=21257 live_points=379069 state_pos=3.167535,6.145446,-0.110570 hold=1 held_frames=226 held_points=693048 hold_commands=2 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=334 set_state=0 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+        "ack_wall": 1794468620.377
+      },
+      "set_state": {
+        "command": "set_state",
+        "wall": 1794468620.377,
+        "trigger": "accepted_pose",
+        "received_wall": 1794468620.379686,
+        "received_s": 0.003,
+        "ok": true,
+        "ack": "OK set_state valid=1 stamp_ns=1627785276215170048 frame=209 voxels=15464 nodes=31686 points=287640 restores=1 live_voxels=21257 live_points=379069 state_pos=7.050962,5.921306,-0.446735 hold=1 held_frames=227 held_points=696654 hold_commands=2 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=335 set_state=1 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+        "ack_wall": 1794468620.877
+      },
+      "resume": {
+        "command": "resume",
+        "wall": 1794468620.877,
+        "trigger": "rearm",
+        "received_wall": 1794468620.880729,
+        "received_s": 0.004,
+        "ok": true,
+        "ack": "OK resume valid=1 stamp_ns=1627785276215170048 frame=209 voxels=15464 nodes=31686 points=287640 restores=1 live_voxels=21257 live_points=379069 state_pos=7.317790,6.075148,0.200500 hold=0 held_frames=234 held_points=767200 hold_commands=3 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=340 set_state=1 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+        "ack_wall": 1794468621.377
+      }
+    },
+    "ack_fields": {
+      "reprocess": {
+        "valid": "1",
+        "stamp_ns": "1627785276215170048",
+        "frame": "209",
+        "voxels": "15464",
+        "nodes": "31686",
+        "points": "287640",
+        "restores": "1",
+        "live_voxels": "21257",
+        "live_points": "379069",
+        "state_pos": "3.167535,6.145446,-0.110570",
+        "hold": "1",
+        "held_frames": "226",
+        "held_points": "693048",
+        "hold_commands": "2",
+        "repair_received": "23",
+        "repair_applied": "23",
+        "repair_dropped": "0",
+        "repair_queued": "0",
+        "multi_scan_groups": "0",
+        "merged_scans": "334",
+        "set_state": "0",
+        "repair_merged_away": "0",
+        "control_valid": "0",
+        "control_pos": "0.000000,0.000000,0.000000",
+        "control_points": "0"
+      },
+      "set_state": {
+        "valid": "1",
+        "stamp_ns": "1627785276215170048",
+        "frame": "209",
+        "voxels": "15464",
+        "nodes": "31686",
+        "points": "287640",
+        "restores": "1",
+        "live_voxels": "21257",
+        "live_points": "379069",
+        "state_pos": "7.050962,5.921306,-0.446735",
+        "hold": "1",
+        "held_frames": "227",
+        "held_points": "696654",
+        "hold_commands": "2",
+        "repair_received": "23",
+        "repair_applied": "23",
+        "repair_dropped": "0",
+        "repair_queued": "0",
+        "multi_scan_groups": "0",
+        "merged_scans": "335",
+        "set_state": "1",
+        "repair_merged_away": "0",
+        "control_valid": "0",
+        "control_pos": "0.000000,0.000000,0.000000",
+        "control_points": "0"
+      },
+      "resume": {
+        "valid": "1",
+        "stamp_ns": "1627785276215170048",
+        "frame": "209",
+        "voxels": "15464",
+        "nodes": "31686",
+        "points": "287640",
+        "restores": "1",
+        "live_voxels": "21257",
+        "live_points": "379069",
+        "state_pos": "7.317790,6.075148,0.200500",
+        "hold": "0",
+        "held_frames": "234",
+        "held_points": "767200",
+        "hold_commands": "3",
+        "repair_received": "23",
+        "repair_applied": "23",
+        "repair_dropped": "0",
+        "repair_queued": "0",
+        "multi_scan_groups": "0",
+        "merged_scans": "340",
+        "set_state": "1",
+        "repair_merged_away": "0",
+        "control_valid": "0",
+        "control_pos": "0.000000,0.000000,0.000000",
+        "control_points": "0"
+      }
+    },
+    "candidate_tail_stamp_ns": 1627785280281185627,
+    "candidate_tail_key": 161,
+    "candidate_tail_xyz": [
+      7.050961928658987,
+      5.921305900481978,
+      -0.44673501244527175
+    ],
+    "replay_end_minus_candidate_tail_s": 15.011109590530396,
+    "reprocess_to_set_state_displacement_m": 3.9043886731669017,
+    "set_state_matches_candidate_tail_not_replay_state": true,
+    "map_counts_unchanged_at_set_state": true,
+    "scope": "ACK states at separate command boundaries; not instantaneous jump/trajectory-quality estimate"
+  },
+  "lifecycle": {
+    "frames": {
+      "paired": 531,
+      "ingested": 531,
+      "fed_to_step_frame": 1,
+      "ingested_without_detection": 0,
+      "consumed_after_first_decision": 300,
+      "first_decision_ts_ns": 1627785281280762672
+    },
+    "quarantine": {
+      "episodes": 1,
+      "trigger_ts_ns": [
+        1627785276215170145
+      ],
+      "decisions": 1,
+      "second_and_later_events": 0
+    },
+    "gate": {
+      "accepted": 1,
+      "rejected": 0,
+      "errored": 0,
+      "modes": [
+        "MODE2_ATOMIC_COMMIT"
+      ],
+      "committed_key_total": 23,
+      "deferred_key_total": 106
+    },
+    "final_state": "HEALTHY",
+    "lifecycle_state": "HEALTHY",
+    "detection_enabled": false,
+    "runtime": {
+      "wall_sec": 112.339,
+      "pid": 209120,
+      "pgid": 209116,
+      "peak_rss_kb": 982740,
+      "pose_messages": 799,
+      "scan_messages": 598,
+      "callback_errors": [],
+      "callback_error_count": 0
+    },
+    "native": {
+      "enabled": true,
+      "host_ready": true,
+      "snapshot_ack_timeouts": 8,
+      "snapshots_superseded": 0,
+      "dir": "/tmp/fl_native_20261112T072902Z_207524/host_control",
+      "snapshot_period_s": 2.0,
+      "snapshots": 26,
+      "restores": 0,
+      "reprocesses": 1,
+      "holds": 2,
+      "resumes": 1,
+      "failures": 8
+    },
+    "native_event_counts": {
+      "hold/True": 2,
+      "snapshot/True": 26,
+      "status/True": 7,
+      "reprocess/True": 1,
+      "set_state/True": 1,
+      "resume/True": 1,
+      "snapshot/False": 8
+    },
+    "lifecycle_events": [
+      {
+        "event": "wait_limit_closed",
+        "from_state": null,
+        "trusted_version": 95
+      },
+      {
+        "event": "rearm",
+        "from_state": "ABORTED",
+        "trusted_version": 95
+      }
+    ]
+  },
+  "build_signals": [
+    "/usr/bin/ld: /home/R26534/mm/ros/lib/libIlmThread.so.32: undefined reference to `__cxa_call_terminate@CXXABI_1.3.15'",
+    "make[2]: *** [rpg_vikit/vikit_common/CMakeFiles/test_vk_common_patch_score.dir/build.make:190: /home/R26534/fast_livo2_ws/devel/lib/vikit_common/test_vk_common_patch_score] Error 1",
+    "make[1]: *** [CMakeFiles/Makefile2:1027: rpg_vikit/vikit_common/CMakeFiles/test_vk_common_patch_score.dir/all] Error 2",
+    "[ 91%] Built target laser_mapping",
+    "make: *** [Makefile:146: all] Error 2",
+    "Invoking \"make -j8\" failed"
+  ]
+}

@@ -539,3 +539,11 @@ v3仍skip+clear已消费后缀，本次399/372未catch-up；两run只一事件/d
 同帧换内部历史预测pose提高support只证明敏感性，不独立证明真实漂移；两pose皆低亦不排除共源错误/外推失效，不确定覆盖唯一因果。147是段长仅50跨门，分段空预测混人口及191/54与analysis不一致集中更正，不重跑宿主。actual预测无horizon限制、一trusted返回last不是null，原件kf21确认；最低保已有基准key/戳/预测T/horizon和同次reference身份，不加新阈值/预测器。旧reference/raw row缺项source未修不重测。跨run402/544与同戳状态差接受为边界，不猜负载或地图单因。
 
 本机-I reader未执行归档脚本；target所有package Git bytes控制12帧9不可用/3可用base/target/log输出同、两pose与one/zero/nohorizon控制PASS，无host/bag/算法参数；pytest辅助新test未跑不装。仓库转述用户选分解仅DEVELOPER_REPORTED，本机无直接选择证据，不据它批准下一双参考/替代方法实验。S1/S2原生唯一交付仍物理一致修复→native state/map→保后缀catch-up→接回/E2或首断点，S1诊断最小保障可并行、S3回既定门研究/旧参数停；自检状态/实际命令/原件/失败/真实人口/未知，A3/B3局部观察不全表评分。review独立SSH推送/private保护、不合main不改历史冻结门；target早于fe56883发布不指控忽略，接收新意见另待回执。
+
+## 66. c416a68：已捕获后缀原生重推接受，实际候选尾set_state回拨尚未解除
+
+[核验](review_20261112_c416a68/README.md)072902Z_207524新run本轮23SHA一致，driver43c65a9d未变且target绑定、库c0833d9f匹配v4构建声明。真实reprocess572group=124窗口+448后缀，原生IMU/stateEstimationAndMapping全循环不再skip，重放[1627785276.281966925,1627785295.292295218]、map21257/379069；LIO286中226有点/60空、VIO286，572不是572非空scan。23received/applied/leftover0接受，旧v3捕获后缀skip+clear该范围解除，不再机械报399/372当前仍截断；全状态等价/质量未独立验证。
+
+实际set_state紧随重放仍灌key161@1627785280281185627的candidate尾[7.050962,5.921306,-.446735]，reprocess ACK边界[3.167535,6.145446,-.110570]，相差15.0111s/两命令位置差3.904389m，地图计数不变；这是旧状态来源问题实证，不新防御推演，非瞬时GT误差。S1已决定派宿主ACK暴露suffix/driver有suffix跳set_state，但target未实施；最低保native重估边界、不从FAIL/UNKNOWN推进尾命令，不新RPC/复制pose或调门。relay59shift只23发布、36未修含末云之后18，原始后缀非clean；只一scripted事件/detection off、无E2、HEALTHY经ABORTED rearm、snapshot8超时。目标build成功但整体vikit ABI失败保留。
+
+可用性选项S3更正方向/因果范围接受，暂停/用户选择仅开发转述无本机新直接指令，不自动批准双参考实验；本机不新诊断循环。-I reader原件核exit0，首字段逗号解析exit1仅修自写reader后PASS，无host/bag/算法；未变driver不重测旧test。下一唯一S1/S2实际保native边界→接回→修复后E2/尾段或首断点，S3既定门研究/旧参数停；旧candidate新云物理一致及成功依赖保持范围不扩防御。A5/A6/A10捕获后缀局部推进、A8/A9/B4/B11整链未闭合不总分；逐项自检状态/命令/原件/人口/失败/质量成本UNKNOWN，独立SSH review推送/private保护不合main不改历史冻结门；target早于d442793发布不指控忽略，新意见接收待回执。

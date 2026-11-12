@@ -744,3 +744,11 @@ S1可并行最小补当时reference/cache身份与必要坐标、原row和少数
 source预测无horizon界/一trusted返回last非null，kf21原件及actual-method控制确认；最低记录已有key/戳/预测T/horizon、同次reference/cache与原row，旧缺项未修不重测，不先加预测器/阈值。12帧9不可用/3可用base/target/log输出同，全部package Git bytes加载、-I archive reader无host/bag，pytest辅助新test未跑不安装。跨run人口不同不唯一归因负载；S3旧/tmp统计不新同版本证据。仓库“用户选中”仅开发转述无本机直接选择证据，不自动批准双参考或部署替代策略。
 
 S1/S2唯一主线继续物理一致实际修复→native完整state/map→保后缀catch-up→接回/E2或首断点，已验替换复用，v3后缀/成功依赖未改；诊断补元数据/真实分母与因果限定可并行只挡强诊断主张，不继续日志矩阵代native。S3回既定门A/B/C研究专用、旧参数停；自检逐项状态/命令/原件/失败/成本/质量UNKNOWN，A3/B3局部观察不总分。独立review SSH提交推送、不合main不改算法历史/冻结门/private保护；target早于fe56883发布不指控忽略，新意见接收待实际回执。
+
+## repair-f3 / c416a68增量：448后缀原生重推通过，set_state实际覆盖边界状态仍FAIL
+
+[核验](review_20261112_c416a68/README.md)新072902Z原件本轮23SHA一致、driver未变target绑定/库c0833d9f匹配build声明；572group=124within+448suffix通过原生IMU/mapping，map21257/379069、23received/applied/leftover0，旧skip+clear捕获后缀断点本范围解除。572含286LIO（226有点/60空）及286VIO，不冒全非空scan/全state等价。实际reprocess边界state[3.167535,6.145446,-.110570]之后仍set_state写candidate key161@280.281的[7.050962,5.921306,-.446735]，重放末295.292晚15.0111s，两ACK差3.904389m且map计数同，旧来源问题实跑确认，不瞬时GT误差。
+
+S1已决定派ACK suffix/driver跳旧pose但target未实施；下一最小保native完整重估边界和成功依赖→接回→修复后E2尾段或首断点，不复制pose/newRPC/阈值扩展。59shift仅23发布、36未修含最后修复后18，suffix原始测量非干净；单scripted/detection off/E2未跑，HEALTHY经waitclose/ABORTED，snapshot8超时/整体build ABI失败保留。S2后缀真实成果接受，不重复v3控制，旧物理候选与成功来源保范围。
+
+诊断选项收窄/方向更正可并行，开发声明暂停及“用户选”仅转述，本机无新直接指令不批准双参考；S3维持门研究专用/旧参数停，不无限诊断代native。-I原件reader最终exit0，初逗号解析失败仅修自写reader，无host/bag/algorithm；driver未变不重跑旧tests。A5/A6/A10局部推进不全表评分，自检逐项状态/命令/原件/人口/失败/质量/成本UNKNOWN；独立review SSH提交推送/private保护不合main不改历史冻结门，target早于d442793发布不指控忽略，接收新意见待回执。
