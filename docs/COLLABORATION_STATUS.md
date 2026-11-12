@@ -1527,3 +1527,31 @@ S2（r11070-c3）确认宿主已有 ①②、③需最小 instrument。本机逐
 
 状态：S2 **接口确认已完成**；导出**尚未开始**（等 S2 实施与回执），故记 NOT_EXECUTED。S3 的 T2/T3 在拿到
 同一份新 trace 前保持 BLOCKED/UNKNOWN，不把 IMU 状态贴回旧 402/544 行。
+
+## 117. S3 的 ALI-H T0/T1 已核（本机复算一致），三处修正后定稿；T2 等 trace
+
+S3 交付：branch `exp/ali-h-v1`、HEAD `8c5b082`（基于 `0eec9e1`），仅新增 `docs/ali_h_v1_research/`
+9 个文件（`ali_h_v1.py`/`selftest.py`/`manifest.json`/`shadow_A.jsonl`/`shadow_B.jsonl`/`t0_A.json`/
+`t0_B.json`/`t1_selftest.json`/`REPORT.md`），未改旧归档、未写共享代码、0 宿主。
+
+**本机独立复算（读 S3 的 JSONL，不执行其脚本）**：
+
+| 项 | Run A | Run B |
+|---|---:|---:|
+| 旧 AVAILABLE / UNAVAILABLE | 95 / 307 | 132 / 412 |
+| `insufficient_support` / `empty_reference` / `nis_unavailable` | 285 / 22 / 1 | 351 / 61 / 1 |
+| UNAVAILABLE 中 M 有证据 / 仅 T / 都无 | 28 / 278 / 1 | 137 / 274 / 1 |
+| `channels.I.present` | 0 | 0 |
+| shadow 状态 | UNKNOWN 402/402 | UNKNOWN 544/544 |
+| T1 | 6/6 PASS，`failed: 0` | — |
+
+结论（证据资格，不是分类器失败）：NORMAL 需"真实 I + M 或 T"，I 在两归档中为 0，故 **NORMAL 结构上限 0，与参数无关**；
+SUSPECT 因无独立确认的正常前缀而无法校准。能进入 M 分支的旧 UNAVAILABLE 为 9.1%（A）/33.3%（B），其余只有 T。
+
+**已要求 S3 修正（不影响上述数字，只影响定稿）**：
+1. REPORT 写"shadow 输出 550 KB + 752 KB"与实际 `652,502`/`891,001` B 不符，改实际 bytes。
+2. T1.6 的 `state_counts: {UNKNOWN: 90}` 实为块数（402 帧↔90 块），字段名需改为 `block_counts` 并写明换算。
+3. `manifest.json` 缺 shadow/t0/t1 产物 sha256，需补实际 digest。
+
+**T2/T3**：接口侧已由 S2 确认（见 §116），但**导出尚未执行**，S3 保持 BLOCKED。拿到 trace 后必须在新 trace 上同时算
+旧方法与 ALI-H，不得把旧 402/544 行与新 trace 拼接；缺独立正常前缀则记 `INCOMPLETE`，不以 HEALTHY/trusted 充真值。
