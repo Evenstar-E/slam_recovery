@@ -1,0 +1,29 @@
+{
+ "bag": "/tmp/s1_lio_sam_run/r1_20261112T120500Z/result.bag",
+ "topics": {
+  "/lio_sam/mapping/odometry": 1120,
+  "/lio_sam/mapping/trajectory": 1120,
+  "/lio_sam/mapping/path": 1120,
+  "/lio_sam/mapping/loop_closure_constraints": 227
+ },
+ "odometry": {
+  "n": 1120,
+  "t0": 1711547453.4838946,
+  "t1": 1711547713.080028,
+  "path_len_m": 44574.557,
+  "max_step_m": 535.019,
+  "max_step_at_s": 206.0,
+  "max_gap_s": 3.201,
+  "max_gap_at_s": 150.6,
+  "start": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "end": [
+   -661.75,
+   -148.72,
+   625.951
+  ]
+ }
+}

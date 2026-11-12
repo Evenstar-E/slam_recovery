@@ -1,0 +1,12 @@
+LIO-SAM 两事件声明（写于运行开始后、任何轨迹分析之前）
+
+宿主：LIO-SAM（~/catkin_ws/devel/lib/lio_sam/lio_sam_imageProjection，params_mmlins.yaml）
+输入：/home/R26534/datasets/mmlins/campus_1(2)-003.bag（405 s，/velodyne_points 10 Hz，/imu_raw 200 Hz）
+播放：--clock -r 1.0 --duration 260 秒（bag 起点起）
+E1 = bag 相对时刻 60.0 s 前后各 10 s 的窗口 [50,70]
+E2 = bag 相对时刻 200.0 s 前后各 10 s 的窗口 [190,210]
+尾段 = 210–260 s
+判据（运行前声明，不因结果调整）：在窗口内看 /lio_sam/mapping/odometry 是否持续输出、
+相邻位姿步长与时间间隔是否出现 >1 m 单步或 >0.5 s 断流；E2 后是否继续输出到 260 s。
+该宿主没有 slam_recovery 接线：原生自身行为与 slam_recovery 层（NOT_IMPLEMENTED）分开记录。
+2026-11-12T11:39:14+08:00
