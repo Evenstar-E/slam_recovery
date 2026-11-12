@@ -1,0 +1,36 @@
+{
+  "main": "18297d1d4e8bf4518e7329359a56f29beb5130f9",
+  "comparison": "cdd3bf70eb78287b102301bb5c6529185cea231d",
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261113_18297d1/run_checks.py <new-output>",
+  "scope": "two ordinary reviewed-expression controls and byte/JSON comparisons only; no CLI/native/math rerun",
+  "controls": [
+    {
+      "mode": "true_span_512",
+      "qualification": "PASS",
+      "status": "PASS_LOCAL"
+    },
+    {
+      "mode": "mechanical_prev_last",
+      "qualification": "HEURISTIC_UNPROVEN",
+      "status": "PASS_LOCAL"
+    }
+  ],
+  "legacy_only_changed_field": "_meta.i_qualification_layers.RAW_HEADER_CONTAINMENT",
+  "unchanged_files": [
+    "t2_join.jsonl",
+    "t2_v11_join.jsonl",
+    "t2_v11_summary.json"
+  ],
+  "existing_defect": "CLOSED_AT_18297d1",
+  "hashes": {
+    "18297d1d4e8bf4518e7329359a56f29beb5130f9:t2_run.py": "ff85dcc182117c6998034b976bd9183d8740afd035a5afe8331c7cd150c3a474",
+    "cdd3bf70eb78287b102301bb5c6529185cea231d:t2_summary.json": "172656a24539887ad7ef5ba4cfa38ab05a5901f7086f9b4eb457c9af8ae0f9ad",
+    "18297d1d4e8bf4518e7329359a56f29beb5130f9:t2_summary.json": "d5439bf30da3af7e0e6b552595034d07d836f2e5cc5bb16210fee2fdb62383a6",
+    "cdd3bf70eb78287b102301bb5c6529185cea231d:t2_join.jsonl": "adadb7d2261f3ef61b1d34bbb2b54ab2ebcd1dd301d79a16896a1f21af2f7926",
+    "18297d1d4e8bf4518e7329359a56f29beb5130f9:t2_join.jsonl": "adadb7d2261f3ef61b1d34bbb2b54ab2ebcd1dd301d79a16896a1f21af2f7926",
+    "cdd3bf70eb78287b102301bb5c6529185cea231d:t2_v11_join.jsonl": "f4c80ebce9309e061089d0854be904ca5fcda739af9e8c64a50e29916b0075c4",
+    "18297d1d4e8bf4518e7329359a56f29beb5130f9:t2_v11_join.jsonl": "f4c80ebce9309e061089d0854be904ca5fcda739af9e8c64a50e29916b0075c4",
+    "cdd3bf70eb78287b102301bb5c6529185cea231d:t2_v11_summary.json": "bfe335bb981012fde3af89423f9fe85761e2c97adf7ea48c1ae537985c2b6b8b",
+    "18297d1d4e8bf4518e7329359a56f29beb5130f9:t2_v11_summary.json": "bfe335bb981012fde3af89423f9fe85761e2c97adf7ea48c1ae537985c2b6b8b"
+  }
+}
