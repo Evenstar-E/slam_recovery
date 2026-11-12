@@ -1334,14 +1334,20 @@ class NativeClosedLoop:
         return self.decide(self._last_ts_ns or self._open.trigger_ts_ns, basis)
 
     def _apply_lifecycle(self) -> None:
-        """Follow the manager's bounded wait: a re-arm is when the host may write again."""
+        """Follow the manager's lifecycle: the host may write again when quarantine ends.
+
+        Two events end it, and both look the same to the host: `rearm` after a wait closed
+        unresolved (the frames are lost, the map stays at its last commit) and `commit_closed`
+        after an accepted repair left nothing pending (the frames are committed). `resume` is
+        sent on either; keying only on `rearm` left the accepted path holding the map forever.
+        """
         events = getattr(self.node.tx_mgr, "lifecycle_events", None)
         if not events:
             return
         for ev in events[self._lifecycle_seen:]:
-            if ev.get("event") == "rearm":
+            if ev.get("event") in ("rearm", "commit_closed"):
                 action = self.cp.resume()
-                action["trigger"] = "rearm"
+                action["trigger"] = ev.get("event")
         self._lifecycle_seen = len(events)
 
     def finish(self) -> None:

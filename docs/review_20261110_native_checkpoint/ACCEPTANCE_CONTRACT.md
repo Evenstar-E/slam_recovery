@@ -1,7 +1,7 @@
 # 验收契约（审阅点名的三项）
 
-本文只描述**现在代码里的实际契约**，并标出其中的缺口。行号对应当前分支
-`exp/m0-updated` / HEAD `c2b193c`。
+本文只描述**现在代码里的实际契约**，并标出其中的缺口。§1/§3 的行号对应归档 run 的代码
+`exp/m0-updated` / HEAD `c2b193c`；§2.2 的修复合入后在 main。
 
 ---
 
@@ -37,48 +37,29 @@ ack 的令牌是**命令名，不是序号**。同名命令连续出现时（`sn
 
 ---
 
-## 2. 完整接纳 → HEALTHY：谁发 `resume`（当前契约 + 缺口）
+## 2. 隔离结束 → 放写：谁发 `resume`
 
-### 2.1 现在的契约
+### 2.1 归档 run 的契约（发现缺口时的状态）
 
-`resume` 只有一个发送点：`NativeClosedLoop._apply_lifecycle()`（:1336-1345），
-它遍历 `tx_mgr.lifecycle_events`，**只对 `"rearm"` 事件**调用 `cp.resume()`。
+归档 run `fl_native_20261110T115717Z_3390402` 跑在修复合入前的代码上。当时 `resume` 只有一个发送点
+`NativeClosedLoop._apply_lifecycle()`，且**只对 `"rearm"` 事件**调用 `cp.resume()`；`rearm` 只在
+Mode 3 等待超时关闭后产生。Mode 2 完整提交在 `pending` 为空时直接置 `HEALTHY`、清
+`active_quarantine`，不 append 任何 `lifecycle_events`——**接纳路径不会发 `resume`**，宿主的
+`map_hold_` 保持 true（`LIVMapper.cpp:1145-1155`，只有 `resume` 清零），修复后的地图不会再被写入。
+本趟两段都是拒绝（`accepted=0`），所以没有暴露。
 
-而 `rearm` 只有一个产生点：`QuarantineManager.rearm()`（`slam_recovery/quarantine/manager.py:567`），
-调用者为：
-- `maybe_close_waiting_segment()` 返回非空之后（`transaction_manager_node.py:306`、
-  `recovery_node.py:1075`）——即 **Mode 3 等待超时关闭**路径；
-- 状态为 `ABORTED` 且没有 active quarantine 时的恢复（`transaction_manager_node.py:312`）。
+### 2.2 已补的（代码级，未在宿主上跑过接纳路径）
 
-### 2.2 缺口：接纳路径没有事件
+采用方案 1：manager 在"提交后 `pending` 清空、`new_segment is None`、确有旧段"时 append
+一条 `commit_closed` 事件（`manager.py`，publish 块内），字段
+`segment_id / trusted_version / n_committed / t_end_ns`；驱动侧把 `rearm` 与 `commit_closed`
+都视为"宿主可以写图"，发 `resume` 并在 action 里记 `trigger`。
 
-Mode 2 提交分支（`manager.py:324-475`）在 `pending` 为空时直接：
-
-```python
-new_state = RecoveryState.HEALTHY     # pending 为空
-...
-self.active_quarantine = new_segment  # None
-self.state = new_state
-```
-
-**它不 append 任何 `lifecycle_events`。** 因此：
-
-- 完整接纳 → `HEALTHY` → Python 侧**不会发 `resume`**；
-- 宿主的 `map_hold_` 仍为 true（`LIVMapper.cpp:1145-1155`，只有 `resume` 会清零），
-  之后的地图写入继续被停掉。
-
-也就是说，**"接纳后放写"目前没有契约**，`resume` 只覆盖"拒绝 → 等待超时 → 关闭 → rearm"这条路径。
-本趟受控整链没有暴露这一点，因为两段都是拒绝（`accepted=0`，见归档 `candidates.jsonl`）。
-
-### 2.3 需要补的（未做，等决定）
-
-二选一，都是小改动，但属于设计决定，不在本轮文档任务里动：
-
-1. 接纳成功时也 append 一个 lifecycle 事件（例如 `"commit_closed"`），驱动侧把它等同于 rearm；
-2. 驱动侧不再只看 `rearm`，而在观察到 `tx_mgr.state` 从隔离态回到 `HEALTHY` 且
-   `active_quarantine is None` 时发 `resume`。
-
-第 2 种不依赖 manager 改动，但依赖状态轮询；第 1 种把"为什么放写"写进事件流，更可核对。
+- 部分提交（`pending` 非空 → `WAITING_FOR_EVIDENCE`）不产生该事件，也不放写（见 §3）。
+- 测试：`test_lifecycle_rearm.py::TestAcceptedCommitReleasesTheHold`（接纳产生事件、拒绝不产生）、
+  `test_checkpoint_client.py::test_an_accepted_commit_writes_resume`（`commit_closed` 也写 `resume`）。
+- **边界**：这条路径只有单测覆盖，没有宿主运行证据；下一次受控整链若被接纳，`resume` 的
+  实际发出与应用要在 receipt 的 `native_checkpoint_actions` 里核对。
 
 ---
 
@@ -98,8 +79,8 @@ self.state = new_state
   不在 reference 里的帧**能进 commit（`candidate.verified_pose_keys` 覆盖检查，`manager.py:324-338`）。
 - 剩余 pending 帧组成 `:deferred` 段继续隔离；状态是 `WAITING_FOR_EVIDENCE`，不是 `HEALTHY`。
 - 该分支同样**不产生 lifecycle 事件**，所以宿主保持 hold，不会放写——这在这里是正确行为。
-- 只有 pending 真正清空（后续候选把剩余帧全部验证并提交）才转 `HEALTHY`；转 `HEALTHY` 后
-  仍会遇到第 2 节的缺口。
+- 只有 pending 真正清空（后续候选把剩余帧全部验证并提交）才转 `HEALTHY`；转 `HEALTHY` 时走
+  §2.2 的 `commit_closed`，宿主放写。
 
 ### 3.1 可核对的字段
 
