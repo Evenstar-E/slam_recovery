@@ -172,6 +172,8 @@
 7. 只有伪 I（零 bias、默认速度、另一 run 内部状态、carried NIS）可用。
 
 协方差不可用**不**停止：只走单位权 `e_I` + `NOT_AVAILABLE`，不宣称卡方概率。
+e_I 的源约定是**混合**的（rot 右 body、pos 世界加性）；SE(3) Log 的平移必须含 `V(ω)⁻¹`，
+且 `vec6` 标 `NOT_VERIFIED`（最终 solution 前保存，同次 pre/post/carryover 成员未证）。
 
 ## 6. 首版冻结配置与“不扫参数”
 

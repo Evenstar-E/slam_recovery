@@ -15,6 +15,8 @@
   "results_conditional_on": "unproven group-membership mapping; not a source-membership proof",
   "e_i_convention": "host mixed convention: rot = R*Exp(d_rot) (body right), pos = p + d_pos (world additive); e_I = [-w, -R_pre^T v] explicitly rotates the translation into pre-body",
   "covariance_status": "NOT_AVAILABLE_FOR_E_I: Ppre/Ppost are mixed-convention state blocks; no verified 6x6 tangent conversion",
+  "vec6_status": "NOT_VERIFIED: saved before the final solution; same pre/post and carryover membership are unproven; do not infer physical meaning from vec6 alone",
+  "e_i_formula": "e_I = [rot, V(rot)^-1 * t_body], rot=-w, t_body=-R_pre^T v",
   "i_sign_note": "exact e_I uses vec6 and the M2DGR post pose under the host StatesGroup::operator- convention; if M2DGR is not the post pose of the same frame, the exact values are invalid. -vec6 is kept as the small-angle comparison column.",
   "not_done": [
    "no normal reference",
@@ -136,59 +138,59 @@
   "I_rank6": 504,
   "I_e_norm": {
    "min": 0.0,
-   "median": 0.01826777187456562,
-   "max": 1.5449631350283055
+   "median": 0.01826777741136127,
+   "max": 1.545105747222006
   },
   "I_s": {
    "min": 0.0,
-   "median": 70.39192969003082,
-   "max": 5953.314894251505
+   "median": 70.3133963953216,
+   "max": 5955.053067343836
   },
   "I_by_phase": {
    "0": {
     "n": 818,
-    "e_norm_median": 0.018507255635730017,
-    "e_norm_max": 1.5449631350283055,
-    "s_median": 67.04345368361173,
-    "s_max": 5953.314894251505
+    "e_norm_median": 0.018507259567401707,
+    "e_norm_max": 1.545105747222006,
+    "s_median": 67.05666885618308,
+    "s_max": 5955.053067343836
    },
    "1": {
     "n": 156,
-    "e_norm_median": 0.04250227035716067,
-    "e_norm_max": 0.14510596872925552,
-    "s_median": 869.055870633722,
-    "s_max": 9713.966459863705
+    "e_norm_median": 0.042502286619414645,
+    "e_norm_max": 0.14510704839873165,
+    "s_median": 870.6808824004141,
+    "s_max": 9697.078386141366
    }
   },
   "I_compare": {
    "n": 504,
-   "e_norm_median_exact": 0.01826777187456562,
+   "e_norm_median_exact": 0.01826777741136127,
    "e_norm_median_approx": 0.018267771874565623,
-   "e_norm_max_exact": 1.5449631350283055,
+   "e_norm_max_exact": 1.545105747222006,
    "e_norm_max_approx": 1.544963135028306,
-   "s_median_exact": 70.39192969003082,
+   "s_median_exact": 70.3133963953216,
    "s_median_approx": 66.86904947448734,
-   "trans_vector_diff_median": 0.009368423616879843,
-   "trans_vector_diff_max": 2.637508029702121,
+   "trans_vector_diff_median": 0.00948159155297433,
+   "trans_vector_diff_max": 2.645246942694468,
    "rows_trans_diff_gt_1pct": 475
   },
   "I_unit_energy": {
    "n": 504,
    "min": 0.0,
-   "p10": 3.624427189027545e-05,
-   "p50": 0.00033371236763289066,
-   "p90": 0.0036900630867706635,
-   "max": 2.38691108859649
+   "p10": 3.624428061151708e-05,
+   "p50": 0.0003337125699815768,
+   "p90": 0.0036901347201135043,
+   "max": 2.3873517700984737
   },
   "I_s_status": "DIAGNOSTIC_ONLY_MIXED_CONVENTION_NOT_A_CHI2",
   "I_quantiles": {
    "e_norm_exact": {
     "n": 504,
     "min": 0.0,
-    "p10": 0.006016523009848154,
-    "p50": 0.01826777187456562,
-    "p90": 0.06074568402584174,
-    "max": 1.5449631350283055
+    "p10": 0.006016523720252364,
+    "p50": 0.01826777741136127,
+    "p90": 0.06074627283332719,
+    "max": 1.545105747222006
    },
    "e_norm_approx": {
     "n": 504,
@@ -201,10 +203,10 @@
    "s_exact": {
     "n": 504,
     "min": 0.0,
-    "p10": 4.046647630177653,
-    "p50": 70.39192969003082,
-    "p90": 413.76361054255705,
-    "max": 5953.314894251505
+    "p10": 3.987432582249829,
+    "p50": 70.3133963953216,
+    "p90": 414.2168904431597,
+    "max": 5955.053067343836
    },
    "s_approx": {
     "n": 504,
@@ -217,10 +219,10 @@
    "e_trans_exact": {
     "n": 504,
     "min": 0.0,
-    "p10": 0.005082814376124265,
-    "p50": 0.01661578612677014,
-    "p90": 0.053653366209573096,
-    "max": 1.5442400505090186
+    "p10": 0.00508281499187999,
+    "p50": 0.016615794187936732,
+    "p90": 0.05365378089667688,
+    "max": 1.5443827294741674
    },
    "e_trans_approx": {
     "n": 504,

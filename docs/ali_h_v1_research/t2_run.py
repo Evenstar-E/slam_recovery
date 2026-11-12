@@ -33,6 +33,17 @@ def so3_exp(w: np.ndarray) -> np.ndarray:
             + (1.0 - math.cos(th)) / (th * th) * (K @ K))
 
 
+def so3_left_jacobian_inv(w: np.ndarray) -> np.ndarray:
+    """V(w)^-1 for the SE(3) Log: V(w)^-1 = I - 0.5*hat(w) + c*hat(w)^2."""
+    w = np.asarray(w, dtype=np.float64).reshape(3)
+    th = float(np.linalg.norm(w))
+    K = np.array([[0.0, -w[2], w[1]], [w[2], 0.0, -w[0]], [-w[1], w[0], 0.0]])
+    if th < 1e-4:
+        return np.eye(3) - 0.5 * K + (1.0 / 12.0) * (K @ K)
+    c = (1.0 - 0.5 * th / math.tan(0.5 * th)) / (th * th)
+    return np.eye(3) - 0.5 * K + c * (K @ K)
+
+
 def quat_to_rot(q: np.ndarray) -> np.ndarray:
     x, y, z, w = np.asarray(q, dtype=np.float64)
     n = math.sqrt(x * x + y * y + z * z + w * w)
@@ -55,7 +66,10 @@ def exact_e(vec6: np.ndarray, R_post: np.ndarray) -> np.ndarray:
     w = np.asarray(vec6[:3], dtype=np.float64)
     v = np.asarray(vec6[3:], dtype=np.float64)
     R_pre = R_post @ so3_exp(w)
-    return np.concatenate([-w, -R_pre.T @ v])
+    rot = -w
+    t_body = -R_pre.T @ v
+    # SE(3) Log: the translation is V(rot)^-1 * t_body, not t_body itself.
+    return np.concatenate([rot, so3_left_jacobian_inv(rot) @ t_body])
 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -438,6 +452,10 @@ def main(argv=None):
                                "explicitly rotates the translation into pre-body"),
             "covariance_status": ("NOT_AVAILABLE_FOR_E_I: Ppre/Ppost are mixed-convention state "
                                   "blocks; no verified 6x6 tangent conversion"),
+            "vec6_status": ("NOT_VERIFIED: saved before the final solution; same pre/post and "
+                            "carryover membership are unproven; do not infer physical meaning "
+                            "from vec6 alone"),
+            "e_i_formula": "e_I = [rot, V(rot)^-1 * t_body], rot=-w, t_body=-R_pre^T v",
             "i_sign_note": "exact e_I uses vec6 and the M2DGR post pose under the host "
                            "StatesGroup::operator- convention; if M2DGR is not the post pose of "
                            "the same frame, the exact values are invalid. -vec6 is kept as the "
