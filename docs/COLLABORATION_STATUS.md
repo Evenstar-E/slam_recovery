@@ -1500,3 +1500,30 @@ S3（r26534-58）2026-11-12 回执认领，本机逐条核对如下（只核原�
 远端 `slam_recovery/main` 现与本地一致（`rev-list --left-right --count` = 0/0）。
 
 S3 承诺 T0 完成后先报中间 HEAD；本轮不把"已认领"写成"已执行"，T0 结果仍记 NOT_EXECUTED。
+
+## 116. S2 回 ALI-H trace 接口，S1 核实并批准一次最小导出
+
+S2（r11070-c3）确认宿主已有 ①②、③需最小 instrument。本机逐条核过源码与运行时产物：
+
+| 断言 | 本机证据 |
+|---|---|
+| `fout_pre`/`fout_out` 已落盘 | `Log/mat_pre.txt` 2515 行、`Log/mat_out.txt` 2253 行（mtime 17:24，属 `092251Z` run） |
+| 列结构 | 19 列（time, euler°, pos, vel, bias_g, bias_a, inv_expo）＋mat_out 第 20 列 feat 数 |
+| 写入点 | `LIVMapper.cpp:469–472`（`handleLIO` 开头，`StateEstimation` 前）、`:622–625`（函数尾） |
+| 两文件每次 trunc | `initializeFiles` 中 `fout_pre.open(...,std::ios::out)`/`fout_out.open(...)` 同处 |
+| 协方差仅内存 | `DIM_STATE=19`；`_state.cov` 打印在 `LIVMapper.cpp:394–396` 被注释，无落盘 |
+| 同键 | t=0.36 的第二行 pos `-0.00249287 -0.00252392 -0.00015602` 与 S2 样例一致 |
+
+**S1 批准的导出范围（一次，不追加）**：
+- 字段：`P⁻`(rot+pos 6×6)、`P⁺`(6×6)、`vec`(6)、`H_T_H`(6×6)、`effct_feat_num`、`R_inv` 摘要、
+  **测量空间 `S = H·P⁻·Hᵀ + R`**（ALI-H §3 的 `s_I` 用 innovation covariance，`H_T_H` 不是 S）；
+  另加**绝对戳**列与 `has_out` 标记（早退帧只有 pre，按时间键配对不起静默失配）。
+- 控制：同一 build 跑 trace off / trace on 两次，同 bag、同 config、同触发，各用新 run 身份；报告帧数/决定/
+  lifecycle/终态位姿一致性，有差异如实报。
+- 预算：1 次重建 + 2 次约 60 s 运行，产物 ~2–4 MB，窗口=整段 bag。
+- 归档纪律：`mat_pre/mat_out/trace_cov` 每次 run 后立即复制并算 sha256（下次运行 trunc）。
+- 边界：S 是逐点面残差在单一线性化点的 6 维聚合，不能与 VIO/NIS 阈值互比；量级随 `cov_acc/cov_gyr` 变；
+  首两行为 IMU 初始化占位需剔除。
+
+状态：S2 **接口确认已完成**；导出**尚未开始**（等 S2 实施与回执），故记 NOT_EXECUTED。S3 的 T2/T3 在拿到
+同一份新 trace 前保持 BLOCKED/UNKNOWN，不把 IMU 状态贴回旧 402/544 行。
