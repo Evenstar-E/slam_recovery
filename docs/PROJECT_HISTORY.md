@@ -453,3 +453,9 @@ actual driver/client复用模拟正常partial候选：reprocess未applied就set_
 **最新真实用户要求（2026-11-12）**：汇总所有宿主第二事件，有记录报结果、无记录报未执行原因，并强调此前要求先跑所有宿主第二事件矩阵。此直接要求优先于旧单宿主选择/不扩多宿主矩阵交接；下一唯一主线改为五宿主第二事件执行矩阵，不拿继续修LIVO或门研究代替。MM-LINS Campus12历史双sleep有记录、ORB Atlas多次原生恢复有log、LIVO受控双拒绝有原件；独立FAST-LIO2/LIO-SAM连续恢复E2未找到，前者无独立工作区只是旧范围选择、后者原因UNKNOWN。历史原生多事件与slam_recovery实际修复分别记账；不要求每宿主先造通用checkpoint，不拿E2=Experiment2或同窗多故障充第二事件。
 
 S1认领矩阵/真实分工，S2复用已有宿主环境和run，逐项实际E1→接回→E2/尾段或首文件函数BLOCKED/NOT_STARTED真实理由，状态+命令/source/input/run/原件；现有预算外安装/适配具体报告，不无限扩实验。S3门旁支/旧参数仍停、冻结门不放宽。原生修复整链首次完成仍立即单报。当前执行/接收UNCONFIRMED；本机无host/bag/算法实验，记录仅本地push拒绝未解除未绕过/private保护。
+
+## 54. 用户再次纠正执行顺序：先实际跑非FAST-LIVO2四宿主（仅本地）
+
+2026-11-12用户直接要求“先把除了fast-livo2的第二事件都跑一遍”。[明确执行任务](NON_FASTLIVO2_SECOND_EVENT_TASK_20261112.md)覆盖旧单宿主选择及§53未明确先后的五宿主矩阵：下一批先MM-LINS、FAST-LIO2、LIO-SAM、ORB-SLAM3各实际执行一次E1→继续输入→E2→尾段，然后再回FAST-LIVO2；不等其检测/门/命令/checkpoint问题解决，不先给四宿主造完整事务适配。已有启动运行沿原预算收尾保留，不擅自杀进程，随后转向；不新开LIVO轮次替代本批。
+
+复用历史环境/runner但旧归档不能充本次各跑一遍；宿主自身原生机制与slam_recovery实际修复分列，缺后者不挡前者。FAST-LIO2实际source/与MM-LINS共享前端明确身份，不把同bag前端/backend当两次独立执行。S1确认owner并分配两个主线会话，逐项实际命令/事件stamp/run/原件/状态或具体BLOCKED/NOT_STARTED原因，未知不猜不能跑；旧参数停、S3旁支不挡、本机不代跑。顺序纠正源于审阅交接未落实用户要求，不能说用户要求不清或单宿主研究天然前置。记录仅本地、推送拒绝未解除未绕过、接收/开跑UNCONFIRMED。
