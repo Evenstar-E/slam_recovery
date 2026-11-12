@@ -12,7 +12,7 @@
 | 检测 | 必须是 `--detection on`（旧 402/544 也是 on；off 只有 `DISABLED`，没有 support 可对照） |
 | availability | 同 run 产出；`status` **不再全是 DISABLED**，`support` / `support_pass` **非空** |
 | 输入 | bag/scan/imu 的 sha256；host library/executable sha256；config sha256 |
-| 时间/身份 | **绝对传感器戳**（原 ns，IMU 与 LiDAR 各自）且同时给 `scan_header_stamp`、`last_lio_update_time`、`scan_source_index`、`native_group_id/native_phase`；join 需**身份对应 + 时间对应**都成立，任一不成立 → `INCOMPLETE:join_key_unresolved`；不用 wall time、不 nearest、不用恒定 offset 自证同帧 |
+| 时间/身份 | 绝对原 ns；`grp_idx` 为身份，`abs_ns` 为时间；join 用 `scan_first_ns ≤ S ≤ scan_last_ns` 的**跨度包含**（`scan_first=-1` 时有效跨度为 `(prev last, last]`），多对一必须显式写映射；不用精确相等/±1 ms/nearest |
 | 帧配对 | 每个 LiDAR 更新一行；`has_out` 标明该行是否有更新后状态 |
 | 行为对照 | trace off/on 两次运行，旧检测决定/manager/native 命令逐条相同（最小不变性） |
 
@@ -66,6 +66,12 @@ e_I = \mathrm{Log}\left(\Delta T_{\text{IMU,preupdate}}^{-1}\,\Delta T_{\text{ho
 
 SE(3) Log 的平移是 `rho = V(w)^-1 * t`（`V` 为左 Jacobian），**不是直接取 `t`**；
 `s_i` 只能使用与 `e_I` 同一切空间（pre_body、right）的 6×6 协方差。
+本 trace 的 `vec6 = (state_propagat - state_)[0..5]`（`has_out=1` 时在 StateEstimation 之后）。
+按 host `StatesGroup::operator-`，`vec6 = [Log(R_post^T R_pre), pos_pre − pos_post]`；精确
+`e_I = [-vec6_rot, −R_pre^T vec6_pos]`，其中 `R_pre = R_post·Exp(vec6_rot)`。
+`R_post` 必须来自同帧的 post 位姿（`M2DGR_room_02.txt` 或可配对的 `mat_out`），不能只用 `−vec6`
+（仅小角近似；本数据平移方向最大差 2.64 m）。`Ppre` 为预测协方差；`s_i`/`|e_I|` 对符号不变，
+但平移方向与各向异性 `s_i` 需要精确值。
 
 - 两端必须对应**相同实际起止传感器时刻**、同一基、同一外参；
 - 平移与旋转**分开保留**，不把米与弧度无声明相加；

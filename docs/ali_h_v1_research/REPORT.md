@@ -6,7 +6,7 @@
 > 实现：`ali_h_v1.py`（观察器）、`selftest.py`（T1）；配置/身份：`manifest.json`。
 > T2 输入契约：`T2_INPUT_CONTRACT.md`；T2 评价协议（预注册）：`T2_PROTOCOL.md`
 > （trace 结果前写死，不扫参数；S2 导出未到，T2/T3 仍 `BLOCKED`）。
-> T2 开跑前三处修正：`T2_FIX_NOTES.md`。重大阻塞：`重大阻塞记录.md` 的
+> T2 开跑前三处修正：`T2_FIX_NOTES.md`；T2 结果：`T2_RESULTS.md`。重大阻塞：`重大阻塞记录.md` 的
 > **`ALI-B2-NORMAL-LABELS-20261112-01`**（无独立正常前缀/事件标签，等待用户确认）。
 > 15 小时任务：`docs/OVERNIGHT_ALI_AUTODETECTION_TASK_20261112.md`；本文件是其中 S3 的研究交付。
 
@@ -122,7 +122,7 @@ T1 全部标记 `marker: SYNTHETIC_UNIT`，不称真实恢复，不产生真实 
 | 真实 I 通道 | **BLOCKED** | 两份归档无 IMU preupdate/update、区间、外参、协方差；输入 bag 只有 raw IMU/LiDAR，无 `imu_prop_odom`。需 S1/S2 在 LiDAR 更新点做**一次最小导出**（正常前缀 + 已声明退化窗 + 尾段），并先给 wall/message 预算 |
 | normal 参照 | **BLOCKED** | 无独立确认的健康前缀；不能用 HEALTHY/trusted/无注入替代。已登记 `ALI-B2-NORMAL-LABELS-20261112-01`，等用户选择 A/B/C |
 | 独立事件标签 | **NOT_EVALUABLE（归档）** | 两份归档没有事件标签；自注入标签只能离线评价，不能生成训练/评价真值 |
-| T2 最小 trace | **NOT_EXECUTED** | S2 的 `fl_native_20261112T101116Z_329791` 宿主启动即 `image_transport` 插件缺失 terminate（`pose_messages: 0`、`paired: 0`），trace 未导出；不自行造 trace、不拼旧档。已知列序按名读取：`grp_idx`（322 值各两次、同 `abs_ns`）为物理扫描身份，`phase=1` 为 replay 窗口（第 489–810 行）；E2 后 rel≈54 s 尾段因 `catch_up=NOT_IMPLEMENTED` 发散到 520 m，只单列 `POST_E2_NO_CATCHUP`，不参与分类 |
+| T2 最小 trace | **EXECUTED（资格）** | run `fl_native_20261112T115734Z_483777`：531 availability、1042 trace 行（1 截断）、跨度包含 join 530/531、I 504 帧可算；120 块全 UNKNOWN；分类/错误率仍 `NOT_EVALUABLE`（ALI-B2）。详见 `T2_RESULTS.md`；E2 后 rel≈54 s 尾段单列 `POST_E2_NO_CATCHUP` |
 | T3 同人口对照 | **NOT_EXECUTED** | 依赖 T2；当前只能交 T0 的证据资格与边界 |
 
 ## 5. 逐项自检（§8/§10.3 格式）

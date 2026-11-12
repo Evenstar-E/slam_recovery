@@ -27,11 +27,18 @@
   两次 `abs_ns` 相同）；`scan_first_ns`/`scan_last_ns` 是该合并组的 header 跨度（原 ns）；
   `phase` 是 native 阶段（`phase=1` = replay 窗口，已知第 489–810 行）；`has_out` 只对
   “有更新后状态”的行有效。绝对原 ns 与 double 量化/打印分开记录。
-- **join 两条都要成立**：
-  1. **身份对应**：`grp_idx` 在同 run 内与 availability 行、扫描身份一一对应；
-  2. **时间对应**：计分两端（availability 与 trace）对应**同一物理起止时间**（用 `abs_ns` /
-     `scan_first_ns` / `scan_last_ns` 核对）。
-  任一不成立 → `INCOMPLETE:join_key_unresolved`（写明缺身份还是缺时间），不静默删除、不 nearest。
+- **join 用跨度包含，不用精确相等/容差**：availability 的 `scan_stamp_ns` 是**单扫描 header 戳**，
+  trace 的 `scan_last_ns` 是**合并组末时刻**，二者物理量不同；本 run 精确相等只有 1/531。
+  判定为 `scan_first_ns ≤ S ≤ scan_last_ns`（合并组包含该扫描）；若 `scan_first_ns` 为 `-1`
+  （本 trace 的哨兵），有效跨度取 `(previous distinct scan_last, scan_last]`。这是**包含关系**，
+  不是 ±1 ms 近似。
+- **多对一**：一个组可包含多条扫描；每个 availability 行必须显式写出映射到的 `grp_idx`（以及
+  phase/has_out），不得只保留一个而丢掉其余。身份用 `grp_idx`，时间用 `abs_ns`。
+- **I 端选行**：同一组有 live/replay 两行时，对 availability 行默认取 `phase=0` 行；若该组只有
+  `phase=1`，取 replay 行并标注。`has_out=0` 的行无更新后状态，只记存在、不算 I。
+- 未落入任何组跨度的 availability 行记 `NO_TRACE_ROW`（进分母）；trace 行无对应 availability 记
+  `NO_AVAILABILITY_ROW`。不静默删除、不 nearest。
+- 若 trace 与 availability 的 run id/build/输入 sha256 不一致：**STOP**，不作跨 run 贴接。
 - **不要用时间差自证关联**：header 戳与末时刻不等、或 offset 非恒定，本身**不证明**原始扫描
   无法关联；反过来，**恒定 offset 也不证明**关联到的是同一扫描。只有身份对应不存在时才记
   `join_key_unresolved`。
