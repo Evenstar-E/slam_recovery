@@ -1956,3 +1956,26 @@ sha `435fff50…`、`has_out=1` 1439、`phase=1` 682；availability 194 AVAILABL
 51 行尾段单列 `POST_E2_NO_CATCHUP`；NORMAL/SUSPECT/误报/漏检/延迟/错误 NORMAL 因缺独立正常参照与标签
 （`ALI-B2`）全部 `NOT_EVALUABLE`；该 run 的修复为 `applied=0/dropped=42`，不用于修复收益。成本 1.97 s / 218 MB。
 S1 已更正 `e_I ≈ −vec6` 只在小增量成立（本批 |e| 最大 1.545），要求以 `mat_pre/mat_out` 的 `Log(inv(pre)·post)` 为主结果。
+
+## 137. 纯在线缺陷已修（driver 跳过已关闭段）；S3 的 T2 改用精确 e_I；scan_first 确认为该模式写 0
+
+**S1 修复（driver，10 行量级）**：`Episode` 增加 `segment_id`（开段时记录），`decide()` 在评估前检查
+`tx_mgr.active_quarantine` 是否仍是该段：若已关闭（wait-limit 关闭后决策仍在队列），写
+`ep.meta["decision_skipped"]="SEGMENT_CLOSED_BEFORE_DECISION"` 并跳过，**不再抛 `RuntimeError` 计成 errored**。
+两个测试（已关闭段跳过且不调用 gate/restore；活动段仍正常评估），全量 **206 tests OK**。
+
+**S2 的只读定位（已核，接受）**：
+- `scan_first_ns` 恒 `-1` 的原因不是读错：写入点 `LIVMapper.cpp:2079` 取 `lidar_frame_beg_time`，而 m2dgr 配置下该值为 0
+  （源码注释 `:824`），trace 把非正值映射为 -1。**该列当前不可用**，join 只能按"上一个不同 `scan_last` < stamp ≤ 当前 `scan_last`"。
+  最小修法约 4 行 + 一次重建/run，暂缓（join 已有可用替代）。
+- 末行截断是 SIGTERM 杀死缓冲写、停在行中间：`113855Z` 1207×92+1×44、`115734Z` 1041×92+1×53、`121127Z` 1568×92（无截断）。
+  读取端规则：**丢弃列数 <92 的行并计入 `TRUNCATED_ROW`**；S3 已照此实现（1/1042）。
+
+**S3 的 T2 更新（`975aa5a`）**：
+- `TRUNCATED_ROW=1` 进分母，可解析 1041/1042；
+- e_I 改为按 `StatesGroup::operator-` 的精确式：`vec6=[Log(R_postᵀR_pre), pos_pre−pos_post]`，`e_I=[−w, −R_preᵀv]`，
+  用 `M2DGR_room_02.txt` 的 post 四元数（975 行，时间差 ≤512 ns）；`−vec6` 只作对照。精确 vs 近似：`|e|` 范数相同，
+  平移方向差中位 0.0096 m、最大 2.64 m，475/504 行 >1%；`s` 中位 73.0 vs 66.9。
+- 多对一结构：590 个不同 `scan_last` 中 295 个由 2 个 `grp_idx` 共享；trace 每组行数 1:217/2:276/4:37，availability 1:296/2:117。
+- 结论不变：M 444、T 86、I 504（秩 6）、120 块全 UNKNOWN、51 尾段行单列、分类/错误率 `NOT_EVALUABLE`。
+- 待 S2 确认：`M2DGR_room_02.txt` 是否为 `state_` 的 post 位姿、且与 trace `abs_ns` 同帧（S3 按顺序对齐）。

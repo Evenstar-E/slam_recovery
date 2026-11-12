@@ -648,6 +648,10 @@ class Episode:
         self.frames_after_freeze = 0
         self.decided = False
         self.candidate_id = f"cand_{index:04d}"
+        # The manager segment this episode was opened for. A wait-limit close can end that
+        # segment before the queued decision runs; without the id the driver cannot tell the
+        # difference between "still open" and "closed while this decision waited".
+        self.segment_id: Optional[str] = None
 
 
 class CheckpointClient:
@@ -1564,6 +1568,7 @@ class NativeClosedLoop:
                      estimated_onset_ns=estimated,
                      first_alarm_ts_ns=self._first_alarm_ts_ns,
                      quarantine_start_ns=q_start)
+        ep.segment_id = getattr(segment, "segment_id", None)
         self.episodes.append(ep)
         self._open = ep
         # The host keeps writing its map until told otherwise. The command is only written here --
@@ -1753,6 +1758,20 @@ class NativeClosedLoop:
         ep = self._open
         if ep is None or ep.decided:
             return None
+        # The wait limit can close a segment while its decision is still queued. The manager then
+        # has no active segment to validate, and evaluating anyway raised
+        # `RuntimeError: No active quarantine segment to validate` -- counted as an errored
+        # candidate even though nothing was wrong with the candidate. The segment is already
+        # closed and re-armed, so the honest result is a skip, not a verdict.
+        seg_id = getattr(ep, "segment_id", None)
+        if seg_id is not None:
+            active = self.node.tx_mgr.active_quarantine
+            if active is None or getattr(active, "segment_id", None) != seg_id:
+                ep.decided = True
+                if not hasattr(ep, "meta"):
+                    ep.meta = {}
+                ep.meta["decision_skipped"] = "SEGMENT_CLOSED_BEFORE_DECISION"
+                return None
         # A bag-end decision can reach here without the deadline frame having frozen the set; fix
         # it now. From this point `ep.frames` cannot grow (`_track_episode` guards on `frozen`).
         if not ep.frozen:

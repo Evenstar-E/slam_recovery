@@ -15,6 +15,7 @@ import os
 import tempfile
 import threading
 import time
+import types
 import unittest
 
 import numpy as np
@@ -226,6 +227,28 @@ class RepairGateTest(unittest.TestCase):
         self.assertEqual(check["status"], "EXPECTED_UNKNOWN")
         self.assertIsNone(check["expected_stamp_ns"])
         self.assertIsNotNone(check["actual_stamp_ns"])
+
+    def test_a_decision_queued_for_a_closed_segment_is_skipped(self):
+        # The wait limit can close a segment before its queued decision runs. Evaluating then
+        # raised `RuntimeError: No active quarantine segment to validate`, which was counted as
+        # an errored candidate although nothing was wrong with it. See the online run
+        # fl_native_20261112T121127Z_497953, cand_0004.
+        loop, ep = self._loop(wait_result=True)
+        ep.segment_id = "seg-1"
+        loop.node.tx_mgr.active_quarantine = None
+        row = loop.decide(1_500, "test")
+        self.assertIsNone(row)
+        self.assertEqual(ep.meta.get("decision_skipped"), "SEGMENT_CLOSED_BEFORE_DECISION")
+        self.assertFalse(hasattr(loop.node, "last_call"))
+        self.assertEqual(loop.cp.restore_calls, 0)
+
+    def test_a_decision_for_the_still_active_segment_runs(self):
+        loop, ep = self._loop(wait_result=True)
+        ep.segment_id = "seg-1"
+        loop.node.tx_mgr.active_quarantine = types.SimpleNamespace(segment_id="seg-1")
+        row = loop.decide(1_500, "test")
+        self.assertIsNotNone(row)
+        self.assertNotIn("decision_skipped", ep.meta)
 
     def test_the_sham_publishes_unchanged_clouds_with_the_same_receipts(self):
         loop, ep = self._loop(wait_result=True)
