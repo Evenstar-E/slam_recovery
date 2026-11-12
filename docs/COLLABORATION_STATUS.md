@@ -473,3 +473,27 @@ S3专用研究纠正这个小控制并保留缺candidate/独立质量BLOCKED；S
 | 限制 | `repairs applied=0`：重放用的是宿主自己的原始扫描，候选的“修复”只通过末尾 `set_state` 进入；不能声称“用修复测量重建了地图” |
 | 用户决定 | 2026-11-12：**保持现协议**（候选总体不扩到隔离总体）；`commit_closed` 仍不可达，按接受限制记录 |
 | double free | 本轮未出现；上轮那行保持原记录，未推测 |
+
+## 44. 主线达成（受控）：同一 run 内写回→接回→第二事件两段走完
+
+以下为 S1 复核 S2 原始件 `docs/review_20261112_accepted_chain/run_fl_native_20261112T024337Z_4166038/`
+（`cf948be`，合入后 main）。
+
+| 项 | 事件 1 | 事件 2 |
+|---|---|---|
+| trigger | kf 146 `1627785276215170145` | kf 422 `1627785308048271418` |
+| 决策 | `1627785280281185627` | `1627785312188321114` |
+| 门 | before 3.1388 → after 7.2145，Wilson .8947，holdout .3906，**Mode 2 accepted**，committed 23 / deferred 62 | before 22.0641 → after 17.6810，Wilson .8304，holdout .5588，**Mode 3 refused** |
+| 关闭 | `wait_limit_closed`(80 帧) → `rearm` | `wait_limit_closed`(132 帧) → `rearm` |
+| 原生 | hold → reprocess(applied 3.611 s) → set_state → resume(`trigger=rearm`) | hold → restore(applied 0.496 s) → resume(`trigger=rearm`) |
+
+- 触发 1→2 **276 帧**；第一段关闭→触发 2 **210 帧**；触发 2→bag 末 **122 帧**；`candidates.jsonl` **2 行**；
+  `lifecycle.events` 4 条；终态 **HEALTHY**、`quarantine_open_at_exit=false`；本轮无 `double free`。
+- 宿主日志：`reprocess #1`（316 帧重放，map 17876 voxels）与 `restore #2`（37335→36511）均在；
+  `restore #1` 是 reprocess 内部那次，与驱动 `restores=1` 一致。
+- INDEX 初版三处数值与自身 JSON 不符（after 7.2154、holdout 0.4369 / 0.4677），S2 已按
+  `candidates.jsonl` 改正并留修订注脚；其中 0.4369 追到 `fl_native_20261110T113447Z_3372448` 的
+  `cand_0000.holdout_nis = 0.4368596204571292`（本机 `/tmp` 原件核对存在）。
+- **限制**：第二事件是事件、不是第二次接纳；`commit_closed` 仍不可达（用户已定保持现协议）；
+  `repairs applied=0` 表示重放用宿主原始扫描，修复仅经 `set_state` 进入；该 run 的 hold 窗口不能用
+  `Update Voxel Map` 计数判断停写（reprocess/restore 都会写图），普通帧看 `held_frames` 126 / 248。
