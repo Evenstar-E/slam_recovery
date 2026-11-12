@@ -2269,3 +2269,19 @@ S3 `932c07f`（已合入 main），本机核对：
 
 结论：`I_present=504` 是数值行数，**不是 504 个合格独立 I 证据**；解锁需 S2 提供最终 solution 位姿、带 handler 标签的
 pre/post，以及声明切空间的协方差。
+
+## 154. 真实 I 的三条导出已实现（v10，未跑 bag）；本机核对并推送
+
+S2 实现（库 **`69dc8ac5…`**，可执行文件仍 `6dd71953…` 未重链；`host_build_v10.log` 两个 target 均 Built；启动探针
+**5/5 PASS**），本机核对：
+
+1. trace 行尾新增 7 列 `pose_x/y/z qx/qy/qz/qw`（`StateEstimation` 后、`_state` 定稿处），与同行 `abs_ns`、`Ppost6x6` 同帧；
+   行宽 93→100；`vec6` 仍是更新前量、语义不变。
+2. 新增 `mat_lio_pre.txt` / `mat_lio_out.txt`，只在 `handleLIO()` 写（源文件 `LIVMapper.cpp:359–360` 已核），
+   共享的 `mat_pre/mat_out` 保持原样。
+3. trace 文件头声明：协方差为 19 维状态中 rot+pos 的 6×6 块、**body(IMU) 切空间、右乘 SO(3) 增量**、pos 世界系；
+   只有该约定下可作 `e_I` 协方差，否则 `NOT_AVAILABLE`。
+
+归档：`exp/online-v2` → **`eb2630e`**（`*.v10` 五个源码快照 + `trace_cov_v10_full.diff` 493 行 + BUILD.md §11），已由 S1 推送。
+**今晚未跑 bag**；明天第一个 run 会带出这些字段。跨今天的 run 与早先 run **不可按同一二进制比较**
+（库 `69dc8ac5…`、可执行文件 `6dd71953…`、链接环境已变）。
