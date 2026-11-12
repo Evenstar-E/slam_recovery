@@ -548,6 +548,15 @@ class Episode:
         self.quarantine_start_ns = quarantine_start_ns
         self.pose = np.asarray(pose, dtype=np.float64).copy()
         self.frames: List[Tuple[int, int, np.ndarray]] = []   # (kf_id, ts_ns, pose)
+        # The candidate population is frozen the moment a frame crosses the decision deadline.
+        # Frames that arrive afterwards belong to the segment (and, if the commit is partial, to
+        # the deferred set) but not to this candidate. Without the freeze, a decision delayed by a
+        # pending command or the service tick silently scores a larger population than the other
+        # arm of an A/B, which made the repair/control map comparison non-comparable.
+        self.frozen = False
+        self.frozen_frames: List[Tuple[int, int, np.ndarray]] = []
+        self.frozen_at_ns: Optional[int] = None
+        self.frames_after_freeze = 0
         self.decided = False
         self.candidate_id = f"cand_{index:04d}"
 
@@ -1100,9 +1109,18 @@ class NativeClosedLoop:
         This was a tail block of ``on_pair``, which the diagnosis branch returns before -- so with
         detection off a forced segment got no frames at all and could only be decided at bag end.
         """
-        if self._open is not None and not self._open.decided:
+        if self._open is not None:
+            if self._open.frozen:
+                # The candidate is already fixed; this frame is still part of the segment.
+                self._open.frames_after_freeze += 1
+                return
+            if self._open.decided:
+                return
             self._open.frames.append((kf_id, ts_ns, np.asarray(pose, dtype=np.float64).copy()))
             if ts_ns >= self._open.deadline_ns:
+                self._open.frozen = True
+                self._open.frozen_frames = list(self._open.frames)
+                self._open.frozen_at_ns = int(ts_ns)
                 self.pending_decision = "confirmation_margin"
                 self._pending_decision_wall = time.time()
 
@@ -1470,6 +1488,12 @@ class NativeClosedLoop:
         ep = self._open
         if ep is None or ep.decided:
             return None
+        # A bag-end decision can reach here without the deadline frame having frozen the set; fix
+        # it now. From this point `ep.frames` cannot grow (`_track_episode` guards on `frozen`).
+        if not ep.frozen:
+            ep.frozen = True
+            ep.frozen_frames = list(ep.frames)
+            ep.frozen_at_ns = int(ep.frames[-1][1]) if ep.frames else None
         # Three timestamps, so the interval that the five stage timers do not cover can be split
         # into "the main loop took this long to get to the decision" and "decide() spent this long
         # before handing over to evaluate_and_commit_candidate". Recorded, not optimised.
@@ -1736,6 +1760,12 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
                  "estimated_onset_ns": ep.estimated_onset_ns,
                  "quarantine_start_ns": ep.quarantine_start_ns,
                  "first_alarm_ts_ns": ep.first_alarm_ts_ns,
+                 "frame_freeze": {
+                     "frozen": bool(ep.frozen),
+                     "frozen_at_ns": ep.frozen_at_ns,
+                     "frozen_frames": len(ep.frozen_frames),
+                     "frames_after_freeze": int(ep.frames_after_freeze),
+                 },
                  "frames_registered": len(ep.frames), **(getattr(ep, "meta", {}) or {})}
                 for ep in loop.episodes
             ],
