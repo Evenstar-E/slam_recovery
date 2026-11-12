@@ -424,6 +424,13 @@ def main(argv=None):
             "protocol": "T2_PROTOCOL.md (pre-registered)", "block_ns": BLOCK_NS,
             "e2_rel_s": E2_REL_S,
             "pose_source_status": "CONFIRMED_POST_POSE_TIME_JOIN",
+            "join_status": "HEURISTIC_UNPROVEN",
+            "results_conditional_on": "unproven group-membership mapping; not a source-membership proof",
+            "e_i_convention": ("host mixed convention: rot = R*Exp(d_rot) (body right), "
+                               "pos = p + d_pos (world additive); e_I = [-w, -R_pre^T v] "
+                               "explicitly rotates the translation into pre-body"),
+            "covariance_status": ("NOT_AVAILABLE_FOR_E_I: Ppre/Ppost are mixed-convention state "
+                                  "blocks; no verified 6x6 tangent conversion"),
             "i_sign_note": "exact e_I uses vec6 and the M2DGR post pose under the host "
                            "StatesGroup::operator- convention; if M2DGR is not the post pose of "
                            "the same frame, the exact values are invalid. -vec6 is kept as the "
@@ -488,6 +495,9 @@ def main(argv=None):
                     "max": max(i_s) if i_s else None},
             "I_by_phase": _phase_i(trace["rows"], exact_by_idx),
             "I_compare": _compare_i(joined_rows),
+            "I_unit_energy": _qs([float(r["i"]["e_norm"] ** 2) for r in joined_rows
+                                  if r["i"].get("mode") == "exact_from_vec6_and_m2dgr_post"]),
+            "I_s_status": "DIAGNOSTIC_ONLY_MIXED_CONVENTION_NOT_A_CHI2",
             "I_quantiles": {
                 "e_norm_exact": _qs([r["i"]["e_norm"] for r in joined_rows
                                      if r["i"].get("mode") == "exact_from_vec6_and_m2dgr_post"]),

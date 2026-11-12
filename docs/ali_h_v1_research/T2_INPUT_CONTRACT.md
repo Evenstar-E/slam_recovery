@@ -12,7 +12,7 @@
 | 检测 | 必须是 `--detection on`（旧 402/544 也是 on；off 只有 `DISABLED`，没有 support 可对照） |
 | availability | 同 run 产出；`status` **不再全是 DISABLED**，`support` / `support_pass` **非空** |
 | 输入 | bag/scan/imu 的 sha256；host library/executable sha256；config sha256 |
-| 时间/身份 | 绝对原 ns；`grp_idx` 为身份，`abs_ns` 为时间；join 用 `scan_first_ns ≤ S ≤ scan_last_ns` 的**跨度包含**（`scan_first=-1` 时有效跨度为 `(prev last, last]`），多对一必须显式写映射；不用精确相等/±1 ms/nearest |
+| 时间/身份 | 绝对原 ns；`grp_idx` **不被当作已证身份**；join 为 **`HEURISTIC_UNPROVEN` 的机械跨度映射**（`scan_first=-1` 时用 `(prev last, last]`），每行结果条件于该映射；多义/`NO_TRACE_ROW` 单列，531 全保留；S2 补实际首戳与成员后才升级 |
 | 帧配对 | 每个 LiDAR 更新一行；`has_out` 标明该行是否有更新后状态 |
 | 行为对照 | trace off/on 两次运行，旧检测决定/manager/native 命令逐条相同（最小不变性） |
 
@@ -67,6 +67,10 @@ e_I = \mathrm{Log}\left(\Delta T_{\text{IMU,preupdate}}^{-1}\,\Delta T_{\text{ho
 SE(3) Log 的平移是 `rho = V(w)^-1 * t`（`V` 为左 Jacobian），**不是直接取 `t`**；
 `s_i` 只能使用与 `e_I` 同一切空间（pre_body、right）的 6×6 协方差。
 本 trace 的 `vec6 = (state_propagat - state_)[0..5]`（`has_out=1` 时在 StateEstimation 之后）。
+**源约定是混合的**：`rot = R*Exp(d_rot)`（body 右增量）、`pos = p + d_pos`（world 加性）；
+精确 e_I 显式把平移转回 pre-body（`-R_pre^T v`），不能写成"统一 body SE(3)"。
+`Ppre/Ppost` 为混合约定下的 rot+pos 块，**不能**当 e_I 的已验证协方差；协方差只允许
+`READY_UNIT_ONLY` / `NOT_AVAILABLE`，不得把 `P⁻+P⁺` 或字符串改 frame 当转换。
 按 host `StatesGroup::operator-`，`vec6 = [Log(R_post^T R_pre), pos_pre − pos_post]`；精确
 `e_I = [-vec6_rot, −R_pre^T vec6_pos]`，其中 `R_pre = R_post·Exp(vec6_rot)`。
 `R_post` 必须来自同帧的 post 位姿（`M2DGR_room_02.txt` 或可配对的 `mat_out`），不能只用 `−vec6`

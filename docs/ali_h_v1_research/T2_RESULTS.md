@@ -5,6 +5,11 @@
 > `NORMAL_CONSISTENT` / `SUSPECT` / 误报 / 漏检 / 延迟 / 错误 NORMAL 全部 **`NOT_EVALUABLE`**
 > （`ALI-B2-NORMAL-LABELS-20261112-01`）。本文件只交资格、UNKNOWN 区间、M/T/I 证据分布。
 > 未跑宿主、未改共享代码、未改旧归档。
+> **join_status: `HEURISTIC_UNPROVEN`**：`scan_first_ns` 全 -1，`grp_idx` 不是已证身份；下列每一行/
+> 每个统计都**条件于该未证明映射**，不是 source membership 证明。
+> **e_I 源约定是混合的**：`rot=R*Exp(d_rot)`（body 右增量）、`pos=p+d_pos`（world 加性）；
+> 精确 e_I 显式把平移转回 pre-body。**协方差 `Ppre/Ppost` 为混合约定块，不能当 e_I 已验证协方差**，
+> 因此 `s_I` 只作诊断，不作卡方/概率；主量是单位权 `|e_I|²`。
 
 ## 0. 一句话
 
@@ -39,6 +44,13 @@
 | `grp_idx` | 885 个组；156 个组出现两次（live/replay） |
 | `scan_first_ns` | 全为 **-1 哨兵**；有效跨度用 `(previous distinct scan_last, scan_last]` |
 
+**e_I 的源约定是混合的**（`include_common_lib.h` 的 `operator+`/`operator-`）：
+`rot = R*Exp(d_rot)`（body 右增量）、`pos = p + d_pos`（world 加性）。因此
+`vec6 = [Log(R_post^T R_pre), pos_pre − pos_post]`，`e_I = [−w, −R_pre^T v]` **显式把世界平移
+转回 pre-body**；这与 `Log(T_pre⁻¹T_post)` 一致，但不能表述为"统一 body SE(3)"。
+`Ppre/Ppost` 是同一混合约定下的 rot+pos 块，**不能**当 e_I 的已验证 6×6 协方差；
+`READY_UNIT_ONLY` / `NOT_AVAILABLE` 是唯一允许的状态，`P⁻+P⁺` 或字符串改 frame 不算转换。
+
 `vec6 = state_propagat - state_ [0..5]`（has_out=1 且在 StateEstimation 之后）；按 host 的
 `StatesGroup::operator-`，`vec6 = [Log(R_post^T R_pre), pos_pre - pos_post]`。因此
 `R_pre = R_post · Exp(vec6_rot)`，`e_I = [-vec6_rot, -R_pre^T vec6_pos]`；
@@ -51,8 +63,10 @@
 
 ## 3. join（跨度包含，多对一）
 
-规则：`previous distinct scan_last < scan_stamp_ns ≤ scan_last`（等价于 `scan_first..scan_last`
-包含，`scan_first=-1` 哨兵已按有效跨度解释）；不用精确相等/±1 ms/nearest。
+规则：`previous distinct scan_last < scan_stamp_ns ≤ scan_last`（`scan_first=-1` 哨兵下的**机械跨度
+映射**）；**不是 source membership 证明**，`join_status=HEURISTIC_UNPROVEN`。字面 `last ≥ stamp` 的
+机械规模：审阅复算 **296,310** 条候选边、**530/531** 多义、**1035** 个 trace 行涵盖多条 availability；
+本机复算 **295,779 / 529/531 / 1037**（边界规则差几个）。分母保留 531，多义/`NO_TRACE_ROW` 单列。
 
 | 项 | 值 |
 |---|---|
@@ -64,10 +78,11 @@
 | phase 覆盖 | 437 行只对应 live 组；93 行对应含 replay 的组（仍取 phase0） |
 | 未映射的 1 行 | 最后一个 availability 扫描超出最后一个**可解析**组的 `scan_last`；截断行无法提供跨度 → 记 `NO_TRACE_ROW` 进分母，不删除 |
 
-**多对一的真实结构**：`scan_last` 共 **590** 个不同值，其中 **295 个值由 2 个 `grp_idx` 共享**
-（另 295 个只有 1 个），这就是 257 行 availability 出现两个 `grp_idx` 的原因——**合并组/同末时刻的
-capture 组**；每个 availability 行映射到的全部 `grp_idx`、`trace idx`、phase、has_out 都写在
-`t2_join.jsonl`。每组扫描数分布：trace 行/组 1:217、2:276、4:37；availability 行/组 1:296、2:117。
+**多对一的机械结构（不是身份证明）**：`scan_last` 共 **590** 个不同值，其中 **295 个值由 2 个
+`grp_idx` 共享**（另 295 个只有 1 个）；257 行 availability 因此出现两个 `grp_idx`。每个 availability
+行映射到的全部 `grp_idx`、`trace idx`、phase、has_out 都写在 `t2_join.jsonl`，但 `grp_idx` 不被当作
+已证扫描身份。每组扫描数分布：trace 行/组 1:217、2:276、4:37；availability 行/组 1:296、2:117。
+S2 补出实际首戳与成员前，这些只作机械描述。
 
 ## 4. 通道证据（531 个 availability 行）
 
@@ -79,7 +94,8 @@ capture 组**；每个 availability 行映射到的全部 `grp_idx`、`trace idx
 | I 的 `Ppre` 秩 | 504/504 秩 **6** |
 | pose join | **CONFIRMED_POST_POSE_TIME_JOIN**；重复时间组 156 个，phase 分开 |
 | I 的 `|e_I|`（与符号无关） | min 0 / median **0.0183** / max **1.545** |
-| I 的 `s_I`（精确 e_I，Ppre 可观测子空间） | min 0 / median **70.39** / max **5953** |
+| I 的 `s_I`（**诊断，不作卡方**；混合约定协方差未验证） | min 0 / median **70.39** / max **5953** |
+| I 的主量：单位权 `|e_I|²` | min 0 / p50 **0.000334** / p90 **0.00369** / max **2.387** |
 
 旧 status × M/T：
 
@@ -95,7 +111,7 @@ capture 组**；每个 availability 行映射到的全部 `grp_idx`、`trace idx
 | M（node_map） | **444** | 83.6% | 0 | — |
 | T（prev_scan） | **86** | 16.2% | 0 | 1 |
 
-**I 的分位表**（精确 e_I，n=504；`−vec6` 近似作对照）：
+**I 的分位表**（精确 e_I，n=504；`−vec6` 近似作对照；**`s` 列仅诊断，不作卡方/概率**）：
 
 | 量 | min | p10 | p50 | p90 | max |
 |---|---:|---:|---:|---:|---:|
@@ -114,7 +130,7 @@ capture 组**；每个 availability 行映射到的全部 `grp_idx`、`trace idx
 
 replay 的 `s` 明显更大，说明 replay 的 `Ppre` 尺度与 live 不同；**不能**据此判异常，只作上下文。
 
-**精确 vs 小角近似**（504 行）：`|e_I|` 的范数相同（旋转不改变范数），但平移**方向**不同——
+**精确 vs 小角近似**（504 行；`s` 仅诊断）：`|e_I|` 的范数相同（旋转不改变范数），但平移**方向**不同——
 `‖e_trans_exact − e_trans_approx‖` 中位 **0.0096 m**、最大 **2.64 m**，**475/504 行**差异超过 1%；
 `s_I` 中位 70.39（精确） vs 66.87（近似）。所以**精确值为主结果**，`−vec6` 只作对照；大旋转
 （最大 |e| 1.545 由平移主导）时近似会明显失真。
@@ -142,9 +158,9 @@ replay 的 `s` 明显更大，说明 replay 的 `Ppre` 尺度与 live 不同；*
 | 输入/run/build/身份 | **PASS** | receipt + sha256（`t2_summary.json._meta`） | — |
 | detection on / status / support 非空 | **PASS** | 351 AVAILABLE、180 UNAVAILABLE；support 531/531 非空 | — |
 | trace 形状（按名） | **PASS（1 行截断已记录）** | 1041/1042 可解析；第 1048 行 53 列 | 需 S2 补最后一行或声明截断 |
-| join 跨度包含、多对一显式 | **PASS（1 行 NO_TRACE_ROW）** | `t2_join.jsonl` 531 行，含 grp/phases/has_out | — |
+| join 机械映射、多对一显式 | **PASS（`HEURISTIC_UNPROVEN`；1 行 NO_TRACE_ROW）** | `t2_join.jsonl` 531 行，含 grp/phases/has_out；所有结果条件于该映射 | 等 S2 实际首戳/成员后升级 |
 | M/T 证据 | **PASS** | 444 / 86 | — |
-| I 证据存在与可算 | **PASS（504，秩 6）** | 精确 e_I（vec6 + M2DGR P⁺，时间 join、phase 分开）；s/|e| 分位表 | — |
+| I 证据存在与可算 | **PASS（504）** | 精确 e_I（vec6 + M2DGR P⁺，时间 join、phase 分开）；|e|/|e|² 分位表；`s_I` 仅诊断 | 等 S2 补协方差切空间后才可谈 s_I |
 | NORMAL/SUSPECT 分类 | **BLOCKED / NOT_EVALUABLE** | 无独立正常参照/标签（ALI-B2） | 等用户选 A/B/C |
 | 误报/漏检/延迟/错误 NORMAL | **NOT_EVALUABLE** | 同上；受控注入标签只可离线评价 | — |
 | UNKNOWN 区间 | **PASS** | 120 块/60 s，尾段 12 块 | — |
