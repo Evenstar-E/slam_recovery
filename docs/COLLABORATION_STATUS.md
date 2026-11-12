@@ -2245,3 +2245,14 @@ S3 `be8b955`（已合入 main）：`t2_run.exact_e` 改为先取 `rot=-w`、`t_b
 0.00948 m、max 2.645 m、475/504 行 >1%。文档已在 `T2_RESULTS`/`T2_INPUT_CONTRACT`/`T2_PROTOCOL` 补 `V(ω)⁻¹` 与修正日期；
 `vec6` 标 `NOT_VERIFIED`（最终 solution 前保存、同次 pre/post 与 carryover 未证）。
 人口与状态不变：M 444 / T 86 / I 504、120 块全 UNKNOWN、分类与错误率 `NOT_EVALUABLE`。
+
+## 152. 审阅关闭 SE(3) 数学缺陷；仅剩 meta 文案待收口
+
+审阅 `220c617`（已合入 main）独立执行了三个已读函数，复现 `rho=(0.09966644423259238, −0.01, 0)`，确认旧 `(.1,0,0)`
+反例关闭；修正后保存值（`|e|` 中位 0.01826777741136127、max 1.545105747222006；`s` 中位 70.3133963953216、max 5955.053067343836）
+与归档一致。其保留的限定与本记录一致：`vec6` 在最终 solution 前保存 → `NOT_VERIFIED`；协方差 `NOT_AVAILABLE`；
+504 不是 504 个合格独立 I 证据；120 块全 UNKNOWN；无正常校准/标签 → 分类 `NOT_EVALUABLE`。
+
+**剩余小项（S3，非阻塞）**：`t2_summary.json` 的旧 meta 字符串仍写 `e_i_convention`（漏 `V⁻¹`）与
+`pose_source_status=CONFIRMED_POST_POSE_TIME_JOIN`；应随下次实质提交更新为与当前实现一致，避免机器读取时与正文冲突。
+审阅也指出 RESULTS 里夹有旧"精确 I/跨度可用/尾 51"陈述，随同一提交收口，不为文案重跑数据。
