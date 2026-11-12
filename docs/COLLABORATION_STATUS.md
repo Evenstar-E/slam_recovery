@@ -2217,3 +2217,20 @@ S2 工作树当前基于 `8d9cd0d`，`recovery_node.py` 无未提交改动，`ru
 明天第一个 run 前会切到 `main@05fd0a2` 并重记执行文件 sha。
 
 C′ 限制与"布局敏感"表述已按 S1 要求收窄（不推广成"任何布局变化必崩"），并写进 BUILD.md §10。
+
+## 150. 日报合入；`exact_e` 漏 SE(3) 平移 Jacobian（S1 复现，退回 S3）
+
+审阅侧日报 `231de75`（`docs/daily_reports/2026-11-12-review.md`）已合入 main。其核心分层与我们的记录一致。
+其中一条技术指摘经本机复现成立：**`t2_run.exact_e` 漏了 SE(3) Log 的平移 Jacobian**。
+
+```
+Tpre=I, Tpost=Rz(0.2)+t(0.1,0,0)
+t2_run.exact_e     → [-0, -0, 0.2, 0.1, -0, 0]
+t2_input_check.e_i → [0, 0, 0.2, 0.09966644, -0.01, 0]
+diff               → [0, 0, 0, -0.00033356, -0.01, 0]
+```
+
+`exact_e` 返回的是"相对变换的旋转 + body 平移"，缺 `ρ = V(ω)⁻¹ t_body`；而 `t2_input_check.e_i` 是对的——
+两模块不一致。已要求 S3 二选一（加 `V⁻¹` 并统一，或改名为 `relative_tangent` 并同时给真 Log），重跑 T2（1.97 s），
+并把现有 `s` 中位 70.39 / `|e|` 中位 0.01827 标为"修正前"。另：`vec6` 在最终 solution 前保存、同次 pre/post 与
+carryover 成员未证，记为 `NOT_VERIFIED`，不据它推 `e_I` 的物理意义。
