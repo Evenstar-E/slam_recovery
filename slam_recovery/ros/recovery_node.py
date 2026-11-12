@@ -71,6 +71,10 @@ NIS_RADIUS_M = 3.0               # "trusted map points near the current pose"
 NIS_MIN_TRAIN = 30               # below this the estimator itself has no reference
 NIS_MIN_HOLDOUT = 10             # below this the estimator itself has no holdout
 EXTRAP_FRAMES = 5                # tail length for the incumbent's constant-velocity extrapolation
+# The frozen stamp is the deadline frame's pose stamp; its group ends ~35-70 ms later, and a
+# terminal stamp equal to the pose stamp would truncate that frame's group and leave its repaired
+# cloud unmatched. The grace is declared here, not tuned per run.
+REPLAY_END_GRACE_NS = 100_000_000
 RSS_POLL_SEC = 1.0
 # How often the spatially sampled reference is rebuilt. Not a point budget: the voxel size still
 # fixes the point spacing; this only bounds how far the reference can lag the map.
@@ -835,9 +839,14 @@ class CheckpointClient:
             _time.sleep(0.05)
         return False
 
-    def hold(self) -> Optional[Dict[str, Any]]:
-        """Stop the host writing its map, without waiting: this is called from a callback."""
-        return self._write("hold", preempt_snapshot=True)
+    def hold(self, apply_stamp_ns: Optional[int] = None) -> Optional[Dict[str, Any]]:
+        """Stop the host writing its map, without waiting: this is called from a callback.
+
+        With `apply_stamp_ns` the host queues the command and executes it just before the first
+        group whose lio_time reaches the stamp; without one it applies at the next frame boundary.
+        """
+        payload = "" if apply_stamp_ns is None else str(int(apply_stamp_ns))
+        return self._write("hold", payload=payload, preempt_snapshot=True)
 
     def tick(self, now_wall: float, quiescent: bool) -> Optional[Dict[str, Any]]:
         """Rolling snapshot while nothing is being judged; nothing at all once stopped.
@@ -862,9 +871,10 @@ class CheckpointClient:
     def restore(self) -> Dict[str, Any]:
         return self._send("restore")
 
-    def snapshot_now(self) -> Dict[str, Any]:
-        """Immediate snapshot; queued behind any command in flight (single-in-flight client)."""
-        event = self._send("snapshot")
+    def snapshot_now(self, apply_stamp_ns: Optional[int] = None) -> Dict[str, Any]:
+        """Snapshot; queued behind any command in flight. A stamp defers it in the host."""
+        payload = "" if apply_stamp_ns is None else str(int(apply_stamp_ns))
+        event = self._send("snapshot", payload)
         event["sent_wall"] = round(time.time(), 3)
         return event
 
@@ -1370,13 +1380,10 @@ class NativeClosedLoop:
         # The host keeps writing its map until told otherwise. The command is only written here --
         # waiting for the ack inside a subscriber callback would stall the pairing.
         if self.cp is not None:
+            # Idempotent fallback. The checkpoint and capture start are declared at the trigger
+            # stamp ahead of time (see main()), because a command sent here is applied at the
+            # host's next processed frame, which lags the trigger under a playback backlog.
             self.cp.hold()
-            # Take the checkpoint at the segment open, on the held map. The rolling snapshots can
-            # be up to one period old, and the replay would then start from before the trigger
-            # with a map that does not correspond to it. This snapshot also starts the capture
-            # window at the trigger rather than up to 2 s earlier. It queues behind the hold in the
-            # single-in-flight client, so the map is already held when the copy is taken.
-            self.cp.snapshot_now()
 
     # -- decision -----------------------------------------------------------------------------
     def _repair_gate(self, ep: "Episode", accepted: bool) -> Tuple[bool, Optional[Dict[str, Any]]]:
@@ -1640,7 +1647,7 @@ class NativeClosedLoop:
             # list the same command twice.
             # The terminal stamp bounds the host's replay to the frozen candidate's frames, so
             # wall-clock work done after the decision cannot extend the replay window.
-            action = (self.cp.reprocess(ep.frozen_at_ns) if row.get("accepted") is True
+            action = (self.cp.reprocess(ep.frozen_at_ns + REPLAY_END_GRACE_NS) if row.get("accepted") is True
                       else self.cp.restore())
             ep.meta["native_checkpoint"] = action
             if row.get("accepted") is True and ep.frames:
@@ -2224,6 +2231,15 @@ def main(argv: Optional[List[str]] = None) -> int:
         loop.scripted_trigger_stamps_ns = [int(x) for x in args.scripted_trigger_stamps.split(",")
                                            if x.strip()]
         loop._scripted_done_ns = [False] * len(loop.scripted_trigger_stamps_ns)
+    # Declare the checkpoint and capture start at the first scripted trigger stamp, ahead of time.
+    # A command sent when the trigger fires is applied at the host's next processed frame, which
+    # lags the trigger under a playback backlog; a stamped command is queued now and executed by
+    # the host just before the first group whose lio_time reaches the trigger. Only scripted runs
+    # get this; the online path keeps the immediate behaviour.
+    if loop.cp is not None and loop.scripted_trigger_stamps_ns:
+        first_trigger = int(min(loop.scripted_trigger_stamps_ns))
+        loop.cp.hold(first_trigger)
+        loop.cp.snapshot_now(first_trigger)
     driver = RosDriver(loop, args.pose_topic, args.scan_topic, args.status_topic)
 
     started = time.time()
