@@ -1,0 +1,21 @@
+CMake Error at CMakeLists.txt:4 (cmake_minimum_required):
+  Compatibility with CMake < 3.5 has been removed from CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+  Or, add -DCMAKE_POLICY_VERSION_MINIMUM=3.5 to try configuring anyway.
+
+
+-- Configuring incomplete, errors occurred!
+Base path: /home/R26534/fastlio2_ws
+Source space: /home/R26534/fastlio2_ws/src
+Build space: /home/R26534/fastlio2_ws/build
+Devel space: /home/R26534/fastlio2_ws/devel
+Install space: /home/R26534/fastlio2_ws/install
+Creating symlink "/home/R26534/fastlio2_ws/src/CMakeLists.txt" pointing to "/home/R26534/mm/ros/share/catkin/cmake/toplevel.cmake"
+####
+#### Running command: "cmake /home/R26534/fastlio2_ws/src -DCATKIN_DEVEL_PREFIX=/home/R26534/fastlio2_ws/devel -DCMAKE_INSTALL_PREFIX=/home/R26534/fastlio2_ws/install -G Unix Makefiles" in "/home/R26534/fastlio2_ws/build"
+####
+Invoking "cmake" failed

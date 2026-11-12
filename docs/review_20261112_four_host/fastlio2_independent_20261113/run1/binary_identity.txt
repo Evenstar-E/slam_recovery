@@ -1,0 +1,5 @@
+rosrun_path=
+bash_source_ws=/home/R26534/fastlio2_ws/devel/setup.bash
+bag=/home/R26534/datasets/mmlins/campus_12_fl.bag
+a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de  /home/R26534/datasets/mmlins/campus_12_fl.bag
+node_pid=692359 exe=/home/R26534/fastlio2_ws/devel/lib/fast_lio/fastlio_mapping
