@@ -49,3 +49,10 @@
 `all_downsampled_points.pcd`、`lidar_poses.txt`、`refmap_m2dgr.yaml`、`pcd_sha256.txt`、
 `receipt.json`、`run_summary.json`、`host.log`、`recovery_node.log`、`machine_load.txt`、
 `recovery_node_source.sha256`。
+
+## 6. 后续（2026-11-12）：本 pass 被取代
+
+本 pass 的 `paired=396`、`lidar_poses` 只到 315.5（宿主在 drain 结束时仍落后于 bag），且与诊断
+run 的轨迹在约 15 s 后分叉。重做版见 `../reference_map_20261112_redo/`：full bag、paired 544、
+pose log 到 320.909；但**轨迹分叉的断点仍在**（clean 轨迹 0–9 m，诊断 run 后期在 −20/−25 m），
+独立参考需要同轨迹地图或 GT。不要把本目录当作可用参考。
