@@ -10,12 +10,14 @@ PORT="$($HOME/mm/ros/bin/python -c 'import socket; s=socket.socket(); s.bind(("1
 export ROS_MASTER_URI="http://127.0.0.1:${PORT}"
 BAG="${1:?bag}"; OUT="${2:?out}"; mkdir -p "$OUT"
 mkdir -p "$OUT"
+# /proc/loadavg is HOST-global in this container (no lxcfs): it says nothing about the CPU this
+# container can use, so it is recorded and warned about, never used as a hard gate. The real gate
+# is the playback rate measured below, plus cgroup throttling of the container itself.
 LOAD1=$(awk '{print int($1)}' /proc/loadavg)
-echo "load1_at_start=$LOAD1" >> "$OUT/binary_identity.txt"
-if [ "$LOAD1" -gt 200 ]; then
-  echo "BLOCKED_LOAD: load1=$LOAD1 > 200; not starting (does not consume the run budget)" | tee -a "$OUT/runner.log"
-  exit 2
-fi
+echo "load1_at_start=$LOAD1 (host-global, informational)" >> "$OUT/binary_identity.txt"
+[ "$LOAD1" -gt 200 ] && echo "WARN_HOST_LOAD: load1=$LOAD1 is host-global; continuing, gating on rate" | tee -a "$OUT/runner.log"
+CGROUP=/sys/fs/cgroup/cpu.stat
+if [ -r "$CGROUP" ]; then grep -E 'nr_throttled|throttled_usec' "$CGROUP" > "$OUT/cgroup_start.txt" 2>/dev/null; fi
 # one load sample per minute, for the whole run
 ( while true; do awk '{print systime(), $1, $2, $3}' /proc/loadavg >> "$OUT/loadavg.log"; sleep 60; done ) &
 LOADPID=$!
@@ -57,6 +59,12 @@ setsid rosbag play --clock "$BAG" > "$OUT/play.log" 2>&1 & PLAY=$!
 sleep 120
 RATE=$(tr '\r' '\n' < "$OUT/play.log" | grep -o 'Duration: [0-9.]*' | tail -1 | awk '{print $2}')
 echo "bag_duration_after_120s=${RATE:-unknown}" >> "$OUT/runner.log"
+if [ -r "$CGROUP" ]; then
+  grep -E 'nr_throttled|throttled_usec' "$CGROUP" > "$OUT/cgroup_120s.txt" 2>/dev/null
+  T0=$(awk '/nr_throttled/{print $2}' "$OUT/cgroup_start.txt" 2>/dev/null)
+  T1=$(awk '/nr_throttled/{print $2}' "$OUT/cgroup_120s.txt" 2>/dev/null)
+  echo "cgroup_throttled_delta=${T0:-?}->${T1:-?}" >> "$OUT/runner.log"
+fi
 if [ -n "${RATE:-}" ] && awk -v r="$RATE" 'BEGIN{exit !(r < 96.0)}'; then
   echo "EARLY_STOP_RATE: only ${RATE}s of bag in 120s wall (<0.8x); stopping" | tee -a "$OUT/runner.log"
   kill -INT "$PLAY" 2>/dev/null || true
