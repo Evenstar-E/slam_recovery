@@ -2234,3 +2234,14 @@ diff               → [0, 0, 0, -0.00033356, -0.01, 0]
 两模块不一致。已要求 S3 二选一（加 `V⁻¹` 并统一，或改名为 `relative_tangent` 并同时给真 Log），重跑 T2（1.97 s），
 并把现有 `s` 中位 70.39 / `|e|` 中位 0.01827 标为"修正前"。另：`vec6` 在最终 solution 前保存、同次 pre/post 与
 carryover 成员未证，记为 `NOT_VERIFIED`，不据它推 `e_I` 的物理意义。
+
+## 151. `exact_e` 的 SE(3) Jacobian 已补，T2 重跑；本机复核一致
+
+S3 `be8b955`（已合入 main）：`t2_run.exact_e` 改为先取 `rot=-w`、`t_body=-R_preᵀv`，再乘 `so3_left_jacobian_inv(rot)`，
+与 `t2_input_check.e_i` 统一。本机复现同一例子：两者现在都给 `[0, 0, 0.2, 0.09966644, −0.01, 0]`。
+
+重跑 T2（1.97 s）本机核对：`|e|` p50 **0.01826778**、p90 0.0607463、max **1.54511**；`s`（诊断量）中位 **70.31**
+（旧无 `V⁻¹` 的 70.39 已标"修正前"）、p90 414.2、max 5955.1；phase0/1 中位 67.06/870.68；精确 vs 近似平移差中位
+0.00948 m、max 2.645 m、475/504 行 >1%。文档已在 `T2_RESULTS`/`T2_INPUT_CONTRACT`/`T2_PROTOCOL` 补 `V(ω)⁻¹` 与修正日期；
+`vec6` 标 `NOT_VERIFIED`（最终 solution 前保存、同次 pre/post 与 carryover 未证）。
+人口与状态不变：M 444 / T 86 / I 504、120 块全 UNKNOWN、分类与错误率 `NOT_EVALUABLE`。
