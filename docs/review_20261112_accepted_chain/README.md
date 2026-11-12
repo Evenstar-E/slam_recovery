@@ -192,7 +192,7 @@ resume 后滚动快照继续增长到 60425 voxels。重放前后 `average resid
 |---|---|---|
 | 触发（bag ns） | 1627785276215170145 | 1627785308048271418 |
 | 决策 | 1627785280281185627 | 1627785312188321114 |
-| 结果 | **Mode 2 接受**（before 3.1388 / after 7.2154 / Wilson 0.8947） | **Mode 3 拒绝**（22.0638 / 17.6808 / Wilson 0.8304） |
+| 结果 | **Mode 2 接受**（before 3.1388 / after 7.2145 / Wilson 0.8947 / holdout 0.3906） | **Mode 3 拒绝**（22.0641 / 17.6810 / Wilson 0.8304 / holdout 0.5588） |
 | 关闭 + rearm | 287.011 → rearm | 317.390 → rearm |
 | 原生 | hold → reprocess → set_state → resume（3.61 s 重放） | hold → restore → resume（0.50 s restore） |
 
