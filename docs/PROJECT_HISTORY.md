@@ -477,3 +477,11 @@ S1认领矩阵/真实分工，S2复用已有宿主环境和run，逐项实际E1�
 [核验](review_20261112_f48b23f/README.md)MM-LINS与共享前端单独项是两次实际运行，15/15列示原件SHA一致，summary两事件gap/位移/尾段算术核一致；MM前端两次重建、PGO尾227s/967条；单独改版前端rawlog两sleep/两build、尾239s/2126条。四命名项都有尝试，独立原版FAST-LIO2没有构建/未执行；不能叫四独立实现、公平同输入主表或共同“无原生恢复能力”。原生re_slam建图接回能力有证据，共同缺口是未接slam_recovery测量修复；LIO/ORB旧失败与观察窗边界保留不追成功重跑。
 
 接受当前driver无repair publisher、丢scan stamp/完整消息及pose候选不产云的接线定位；REPAIR_GAP“仓库无改变测量的生产者”错误，point_mixture_repairer已有keep-mask/完整点记录导出/C3原生离线重估，必须复用或给新z偏差不适用的具体原因。坐标重表达恒等式不证明一般刚性测量修复不可能。f48文档转述用户选INJECTION仅开发报告，不充本会话直接授权；下一有限实际测量→原生重估/map→接回/E2交实际选择/实现/首断点，不再空决定循环。正常累计receipt非本次stamp应用证明、旧tail set_state/FAIL依赖会破坏来源，沿已有最小解除不扩框架；注入真值只评分，标签反演标oracle、不靠applied计数充收益。原参数停、旧门不降，A/B不全表升分；本机只Git原件/源码算术无host/bag/tests，review46与main分叉未merge、增量独立提交推送/private保护。
+
+## 58. 18baefd：在线测量替换已有实跑，偏差修复失败，第二事件未执行
+
+[增量核验](review_20261112_18baefd/README.md)接受run043602Z_79001真实relay598帧/60移位/538原样，25修复stamp均在损坏集，发布→received/queued25→reprocess382group/applied25/leftover0→内部map18032vox→resume及决定后328帧；新16原件+README共17/17SHA一致，driver记录SHA匹配目标18及报告run版本cd90e127。旧在线repair=0缺口在这次运行已解除，不抹传输成果。但+0.5m注入只施加+0.0029m，ICP未收敛，未证明有效去偏/独立收益；只一触发、detection off，无E2，HEALTHY来自wait关闭/重武装，不报首次有效整链完成。规范自由度/位姿吸收为开发解释，唯一因果及incumbent初值收益UNKNOWN，常速外推非独立GT。
+
+本机目标cloud8test PASS0.147s及有限实际driver/client控制、无ROS/bag；首-I因numpy不可用exit1保留，无安装，源码控制改既有依赖环境，原件reader另-I exit0。identity精确反例：坏点z1.5配delta_z=-.5时门看世界z1，再施加同-.5到测量且保同候选pose会变世界z.5，证明原坏云门通过不可搬给发布新云，非本次run因果推断。E2旧累计received25/本次0仍sync true，full接纳后sync false仍commit_closed→resume，以及零云仍reprocess三控制FAIL；归档成功传输未声称发生这些失败。最低一致物理修复/候选/符号、实际产物准入和applied成功依赖、本次receipt人口，不扩RPC/阈值/异常矩阵。旧尾set_state/晚cp source未修不重测。
+
+下一单一主线在已声明有限范围交实际去偏→原生完整状态/map→接回→E2尾段或真实首断点；S1集成成功生命周期与E2receipt，S2修复物理定义/有限宿主交付，S3门研究/旧参数停。四宿主前批尝试边界保留，不重开矩阵追成功。纠正window实际触发前7.17ms非0.7s、kf134非132、599记录非599帧、旧protocol仅旁支，不为文字重跑。自检逐项状态/命令/原件/失败/独立质量，A1/A2/A6局部推进、B7负范围保留，A7/A8/A9/A10及B4/B11未闭合、不全表评分。独立review正常SSH提交推送，不合分叉main/private保护，本机不改算法，开发接收待实际回执。

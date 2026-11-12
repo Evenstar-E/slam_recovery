@@ -1,0 +1,156 @@
+{
+  "target": "18baefd89e70a65b1a493b0c1e532558b6bff6e0",
+  "comparison_base": "f48b23f66707e9491350c1c62972fbf542f94fa3",
+  "worktree_head": "4201dbde5d713bcbcf74916e213e12875f220cd9",
+  "loaded_sources": {
+    "slam_recovery/ros/cloud_repair.py": {
+      "git_blob": "ce6dd7f45d9144f2eefc69e7d06d97f42dc8507c",
+      "sha256": "04d2c3ba6e0c9d5ca6504af8a2a8a79b7ba8d2f5bb0f12f25f0fa2e5462bcb7a"
+    },
+    "slam_recovery/ros/recovery_node.py": {
+      "git_blob": "f7d9641037d03b4fb4fcc4c7f1716479ac73d480",
+      "sha256": "90acfca99d8a21504b4960fc5fb21f8a5b40ad9c0553709f4011ce8d493ed29f"
+    },
+    "slam_recovery/tests/test_cloud_repair.py": {
+      "git_blob": "f856c60466f6b300a8e4850cb3199b3179d4c90c",
+      "sha256": "071609b31bda674fb1265b2d2639bb2386631328235a95bde5073664aed55881"
+    }
+  },
+  "source_loading": "Target Git blobs in memory, unchanged package dependencies from worktree",
+  "command": "C:/Python315/python.exe -B -W ignore D:/REPAIR/slam_recovery_upstream/docs/review_20261112_18baefd/run_checks.py",
+  "initial_attempt": "python -I exit1: numpy unavailable on isolated sys.path; no dependency installation. This authored source-control script uses the existing repository Python environment; archives are read as bytes only.",
+  "exit": 0,
+  "cloud_tests": {
+    "status": "PASS_LOCAL",
+    "count": 8,
+    "seconds": 0.15985019993968308,
+    "scope": "Target cloud helpers on declared little-endian packed Velodyne layout"
+  },
+  "positive_publish": {
+    "status": "PASS_LOCAL",
+    "published": 2,
+    "physical_first_command": "reprocess",
+    "scope": "Actual target driver/client, synthetic gate and successful receipt; not native execution"
+  },
+  "zero_publish_replay": {
+    "status": "FAIL_REPRODUCED_LOCAL",
+    "published": 0,
+    "missing_clouds": 2,
+    "synced": false,
+    "physical_command": "reprocess",
+    "scope": "Missing cached clouds on an otherwise accepted candidate; not observed in archived run"
+  },
+  "sync_failure_release": {
+    "status": "FAIL_REPRODUCED_LOCAL",
+    "published": 2,
+    "replay_sent": false,
+    "trusted_version": 1,
+    "manager_state": "HEALTHY",
+    "after_commit_closed_command": "resume",
+    "scope": "Synthetic legal full commit + no receipt; actual target lifecycle sends resume; not archived failure"
+  },
+  "cumulative_receipt": {
+    "status": "FAIL_REPRODUCED_LOCAL",
+    "old_received": 25,
+    "current_event_received": 0,
+    "current_event_expected": 25,
+    "method_returned_synced": true,
+    "scope": "Actual target file-client; simulated second event with only previous cumulative receipt"
+  },
+  "pose_measurement_consistency": {
+    "status": "FAIL_REPRODUCED_LOCAL",
+    "clean_world_z": 1.0,
+    "corrupted_body_z": 1.5,
+    "delta_z": -0.5,
+    "producer_bias_z": -0.5,
+    "repaired_body_z": 1.0,
+    "gate_candidate_on_raw_scan_world_z": 1.0,
+    "same_candidate_on_published_repair_world_z": 0.5,
+    "scope": "Exact arithmetic with target producer; illustrates pose/measurement consistency, not observed causal diagnosis"
+  },
+  "new_archive_integrity": {
+    "matched": 17,
+    "total": 17,
+    "checks": [
+      {
+        "path": "README.md",
+        "ok": true
+      },
+      {
+        "path": "injection_repair_20261112/REPORT.md",
+        "ok": true
+      },
+      {
+        "path": "injection_repair_20261112/candidates.jsonl",
+        "ok": true
+      },
+      {
+        "path": "injection_repair_20261112/candidates_detail.jsonl",
+        "ok": true
+      },
+      {
+        "path": "injection_repair_20261112/host.log",
+        "ok": true
+      },
+      {
+        "path": "injection_repair_20261112/host_control/ack",
+        "ok": true
+      },
+      {
+        "path": "injection_repair_20261112/host_control/ack_received",
+        "ok": true
+      },
+      {
+        "path": "injection_repair_20261112/host_control/cmd.done",
+        "ok": true
+      },
+      {
+        "path": "injection_repair_20261112/icp_detail.jsonl",
+        "ok": true
+      },
+      {
+        "path": "injection_repair_20261112/launch_pair.sh",
+        "ok": true
+      },
+      {
+        "path": "injection_repair_20261112/machine_load.txt",
+        "ok": true
+      },
+      {
+        "path": "injection_repair_20261112/receipt.json",
+        "ok": true
+      },
+      {
+        "path": "injection_repair_20261112/recovery_node.log",
+        "ok": true
+      },
+      {
+        "path": "injection_repair_20261112/recovery_node_source.sha256",
+        "ok": true
+      },
+      {
+        "path": "injection_repair_20261112/relay.log",
+        "ok": true
+      },
+      {
+        "path": "injection_repair_20261112/relay_frames.jsonl",
+        "ok": true
+      },
+      {
+        "path": "injection_repair_20261112/run_summary.json",
+        "ok": true
+      }
+    ],
+    "scope": "16 injection records + updated README only; not external bag/binary"
+  },
+  "archive_source_binding": {
+    "reported_run_version": "cd90e127f276922e59f8c402d377f561c4b68c67",
+    "recorded_driver_sha256": "90acfca99d8a21504b4960fc5fb21f8a5b40ad9c0553709f4011ce8d493ed29f",
+    "target_driver_sha256": "90acfca99d8a21504b4960fc5fb21f8a5b40ad9c0553709f4011ce8d493ed29f",
+    "run_version_driver_sha256": "90acfca99d8a21504b4960fc5fb21f8a5b40ad9c0553709f4011ce8d493ed29f",
+    "matches_target_driver": true,
+    "matches_run_version_driver": true
+  },
+  "repair_sync_test_module": "NOT_RUN: imports pytest-dependent test_recovery_node; no install/shim; small actual-target controls used",
+  "no_native_host_or_bag_execution": true
+}

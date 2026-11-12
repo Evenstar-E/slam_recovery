@@ -690,3 +690,11 @@ S2下一交MM-LINS（开发报告运行中）与FAST-LIO2（NOT_STARTED/shared�
 [核验](review_20261112_f48b23f/README.md)余下MM/backend与改版frontend各另跑一次、原件15SHA和gap/tail算术一致，单独frontend rawlog两睡眠/两建图；共享实现非共享同一次运行、不是独立原版FAST-LIO2验证。原生re_slam/继续输入存在，不接受开发§66“所有宿主无恢复能力”；四项共同缺的是slam_recovery测量修复接线，LIO/ORB负结果/观察窗限保留，不重跑追成功，matrix不是公平修复收益表。
 
 S1/S2后继有限实际修复范围给真实回执/产物/原生map接回E2或首断点，不机械重回修LIVO全部问题；文档转述选INJECTION不充本会话授权。缺publisher/scan原件身份属已核接口事实，但现有point_mixture_filter和完整记录导出/C3可复用，不能说仓库没有测量修复器或让用户从零选以挡开工。沿旧正常来源/FAIL依赖最低修，累计received不等本次应用stamp；注入标签/原云不得作为部署生产者反演，oracle明确、真实质量缺证据UNAVAILABLE。自检状态/命令/source/input/点人口/applied/native同stamp/E2尾段，S3门旁支参数停不变、不全表评分。本机未跑host/bag/tests/算法，未merge分叉main，只review增量提交推送/private保护，收到新意见待回执。
+
+## repair-f3 / 18baefd增量：测量替换接受，修复失败与E2缺口保留
+
+[核验与最低交接](review_20261112_18baefd/README.md)接受run043602Z_79001的60帧声明损坏、25条修复云received/applied、382group原生重放及内部map/接回，17新列示SHA一致、实际driver SHA匹配目标；在线修复接线不再NOT_IMPLEMENTED。但+0.0029m未消除+0.5m，ICP未收敛、质量/因果未确认；只一触发，无E2，不报首次有效整链完成。常速incumbent是初值不是独立GT，开发“吸收偏差”解释与初值改善预期不当已证定论。
+
+本机8cloud test及有限actual driver/client控制，未代跑host：原坏云+delta pose通过的候选若再施加同delta到测量会重复补偿（identity z1.5→门z1→新云配同pose z.5）；E2累计旧received25、本次0仍synced；full提交后同步失败仍commit_closed→resume；零发布仍reprocess。正成功入口通过，反例不冒充本次归档已发生。S1最低本次人口receipt/成功依赖与共享生命周期集成，S2唯一物理修复/符号/候选一致及native真实完整状态，不灌旧尾；无需新RPC/阈值或全防御矩阵。
+
+下一唯一有限主线：实际去偏→原生状态/map→接回→第二事件/尾段或首断点；自检逐项PASS/FAIL/BLOCKED/NOT_APPLICABLE+实际命令/原件/完整人口/失败/质量。四宿主前批尝试不重开，S3门旁支与旧参数暂停不变。7.17ms窗口/kf134/598帧/stale protocol集中旁支更正，不重跑迎合文字；A/B局部推进不全表升分。独立review正常SSH提交推送、分叉main未merge、不改算法/private保护；实际接收及后继运行待开发回执。
