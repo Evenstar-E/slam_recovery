@@ -1800,3 +1800,19 @@ S2 的 B1 结果（本机核归档）：`probe_b1b_1` 在启动期 `No plugins f
 （所有通过探针在 teardown 仍 smash）。已批准 S2 按 R 开始 off/on 两次：同一 build `007c3bdc…`、同 bag/config/触发、
 同 k、每次 run 前 5 次探针 ≥4/5、结束后立即复制 `mat_pre/mat_out/trace_cov` 并算 sha256、报告两次帧数/决定/lifecycle
 一致性；run 中途 smash 则该次数据无效；任何一次启动失败即停下先做 ASan（≤10 min）。
+
+## 129. trace-off 对照 run 成功落地（布局修复后）；等 trace-on
+
+`fl_native_20261112T111325Z_435333`（19:13–19:15，S2 按 R 执行）：`status OK / all wiring checks passed`，
+库 `007c3bdc…`（布局修复后的 build），driver `a4aaa58b…`，detection off，scripted 两事件。
+
+| 项 | 实测 |
+|---|---|
+| paired | 536 |
+| E1 | 23 帧候选；`replay_suffix=651`，`native_writeback_skipped`（正确，宿主已越过候选窗口） |
+| E2 | 拒绝 + 1 次 restore；生命周期 2×`wait_limit_closed` + 2×`rearm` |
+| 终态 | `HEALTHY`、`open=false`、trusted kf 260、cp failures 0 |
+| 归档 | `host_logs/mat_pre.txt` 与 `mat_out.txt` 已复制，sha 与 `Log/` 一致（`3e03ffb6…`） |
+
+`episode_detail` 中无 `restore_disposition` 属预期（该字段在 main 后续提交，S2 的 driver 仍是 `a4aaa58b…`），
+不影响 trace run。此 run 记为 trace 开关的 **off 基线**；trace-on 尚未开始，T2 仍 BLOCKED。
