@@ -1,0 +1,15 @@
+[0m[ INFO] [1794488719.617256482]: Found parameter: laserMapping/cam_model, value: Pinhole[0m
+[0m[ INFO] [1794488719.618474812]: Found parameter: laserMapping/cam_width, value: 640[0m
+[0m[ INFO] [1794488719.618921600]: Found parameter: laserMapping/cam_height, value: 480[0m
+[0m[ INFO] [1794488719.619303618]: Found parameter: laserMapping/scale, value: 1[0m
+[0m[ INFO] [1794488719.619555013]: Found parameter: laserMapping/cam_fx, value: 617.971[0m
+[0m[ INFO] [1794488719.619958226]: Found parameter: laserMapping/cam_fy, value: 616.445[0m
+[0m[ INFO] [1794488719.620192004]: Found parameter: laserMapping/cam_cx, value: 327.71[0m
+[0m[ INFO] [1794488719.620389139]: Found parameter: laserMapping/cam_cy, value: 253.977[0m
+[0m[ INFO] [1794488719.620606980]: Found parameter: laserMapping/cam_d0, value: 0.148001[0m
+[0m[ INFO] [1794488719.620820919]: Found parameter: laserMapping/cam_d1, value: -0.217835[0m
+[0m[ INFO] [1794488719.621067009]: Found parameter: laserMapping/cam_d2, value: 0[0m
+[0m[ INFO] [1794488719.621275531]: Found parameter: laserMapping/cam_d3, value: 0[0m
+scale: 1
+[rospack] Error: package 'image_transport' not found
+[librospack]: error while executing command

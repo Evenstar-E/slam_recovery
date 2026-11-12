@@ -1,0 +1,42 @@
+[roslaunch][INFO] 2026-11-12 20:51:06,204: Checking log directory for disk usage. This may take a while.
+Press Ctrl-C to interrupt
+[roslaunch][INFO] 2026-11-12 20:51:06,205: Done checking log file disk usage. Usage is <1GB.
+[roslaunch][INFO] 2026-11-12 20:51:06,205: roslaunch starting with args ['roscore', '--core', '-p', '59033']
+[roslaunch][INFO] 2026-11-12 20:51:06,205: roslaunch env is environ({'SHELL': '/bin/bash', 'ROS_VERSION': '1', 'COREPACK_ENABLE_AUTO_PIN': '0', 'CLAUDE_CODE_CHILD_SESSION': '1', 'NVM_INC': '/usr/local/nvm/versions/node/v18.20.4/include/node', 'PKG_CONFIG_PATH': '/home/R26534/fast_livo2_ws/devel/lib/pkgconfig:/home/R26534/mm/ros/lib/pkgconfig', 'AI_AGENT': 'claude-code_2-1-319_agent', 'ROS_PYTHON_VERSION': '3.11', 'CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING': 'true', 'CLAUDE_CODE_SESSION_ID': '9e692b29-cda7-40e6-8093-d1166fbaa01b', 'CLAUDE_PID': '1966950', 'CLAUDE_CODE_QUESTION_PREVIEW_FORMAT': 'markdown', 'CLAUDE_EFFORT': 'high', 'COPILOT_CLI_ENABLED_FEATURE_FLAGS': 'SHELL_SPAWN_BACKEND', 'CLAUDE_CODE_MAX_CONTEXT_TOKENS': '1000000', 'ELECTRON_RUN_AS_NODE': '1', 'CLAUDE_CODE_ENABLE_TASKS': '0', 'ROS_PACKAGE_PATH': '/home/R26534/fast_livo2_ws/src:/home/R26534/mm/ros/share', 'PWD': '/home/R26534/R11070', 'LOGNAME': 'R26534', 'COPILOT_OTEL_FILE_EXPORTER_PATH': '/dev/null', 'VSCODE_ESM_ENTRYPOINT': 'vs/workbench/api/node/extensionHostProcess', 'CLAUDE_CODE_MESSAGING_SOCKET': '/tmp/cc-socks/1966950.sock', 'NoDefaultCurrentDirectoryInExePath': '1', 'CLAUDECODE': '1', 'HOME': '/home/R26534', 'CLAUDE_AGENT_SDK_VERSION': '0.3.319', 'ROS_ETC_DIR': '/home/R26534/mm/ros/etc/ros', 'CLAUDE_CODE_SESSION_ATTENDED': '1', 'CMAKE_PREFIX_PATH': '/home/R26534/fast_livo2_ws/devel:/home/R26534/mm/ros', 'VSCODE_AGENT_FOLDER': '/home/R26534/.vscode-server', 'ANTHROPIC_BASE_URL': 'https://pool.autelrobotics.com', 'SSH_CONNECTION': '10.132.16.123 47932 172.17.0.58 22', 'NVM_DIR': '/usr/local/nvm', 'VSCODE_HANDLES_SIGPIPE': 'true', 'PYTHONPATH': '/home/R26534/fast_livo2_ws/devel/lib/python3.11/site-packages:/home/R26534/mm/ros/lib/python3.11/site-packages', 'USER': 'R26534', 'ROS_HOME': '/tmp/wt-sim/docs/review_20261112_four_host/host_change_trace_cov/probe_v2_pre_1/ros_home', 'SHLVL': '1', 'NVM_CD_FLAGS': '', 'CLAUDE_CODE_EMIT_STARTUP_TIMING': '1', 'GIT_EDITOR': 'true', 'CLAUDE_CODE_STARTUP_FAILURE_RESULTS': '1', 'ROS_MASTER_URI': 'http://localhost:59033', 'VSCODE_CWD': '/home/R26534', 'VSCODE_RECONNECTION_GRACE_TIME': '10800000', 'CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS': '1', 'ANTHROPIC_AUTH_TOKEN': 'sk-pKARG6uNXEZxWPDUmU4P5g', 'SSH_CLIENT': '10.132.16.123 47932 22', 'CLAUDE_CODE_ENTRYPOINT': 'claude-vscode', 'VSCODE_CLI_REQUIRE_TOKEN': '661fe407-13ad-475a-a760-7756569e0ffd', 'MCP_CONNECTION_NONBLOCKING': 'true', '_CUDA_COMPAT_PATH': '/usr/local/cuda/compat', 'CLAUDE_CODE_EXECPATH': '/home/R26534/.vscode-server/extensions/anthropic.claude-code-2.1.319/resources/native-binary/claude', 'BROWSER': '/home/R26534/.vscode-server/cli/servers/Stable-2d0b7506a36c1d6db9a466440131a8e01eab2289/server/bin/helpers/browser.sh', 'PATH': '/home/R26534/mm/ros/bin:/home/R26534/.vscode-server/cli/servers/Stable-2d0b7506a36c1d6db9a466440131a8e01eab2289/server/bin/remote-cli:/usr/local/nvm/versions/node/v18.20.4/bin:/home/R26534/.npm-global/bin:/usr/local/lib/python3.10/dist-packages/torch_tensorrt/bin:/usr/local/mpi/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ucx/bin:/opt/tensorrt/bin:/opt/openssh/bin:/opt/openssh/bin:/opt/openssh/bin', 'APPLICATION_INSIGHTS_NO_STATSBEAT': 'true', 'VSCODE_NLS_CONFIG': '{"userLocale":"zh-cn","osLocale":"zh-cn","resolvedLanguage":"zh-cn","defaultMessagesFile":"/home/R26534/.vscode-server/cli/servers/Stable-2d0b7506a36c1d6db9a466440131a8e01eab2289/server/out/nls.messages.json","languagePack":{"translationsConfigFile":"/home/R26534/.vscode-server/data/clp/b576c2d4e866b55874c9d3722d2140e7.zh-cn/tcf.json","messagesFile":"/home/R26534/.vscode-server/data/clp/b576c2d4e866b55874c9d3722d2140e7.zh-cn/e1b35ffc1a6ba5ebdf31adf50dcb9b43728b31087fb9180493a2bab295a5a63b/nls.messages.json","corruptMarkerFile":"/home/R26534/.vscode-server/data/clp/b576c2d4e866b55874c9d3722d2140e7.zh-cn/corrupted.info"},"locale":"zh-cn","availableLanguages":{"*":"zh-cn"},"_languagePackId":"b576c2d4e866b55874c9d3722d2140e7.zh-cn","_languagePackSupport":true,"_translationsConfigFile":"/home/R26534/.vscode-server/data/clp/b576c2d4e866b55874c9d3722d2140e7.zh-cn/tcf.json","_cacheRoot":"/home/R26534/.vscode-server/data/clp/b576c2d4e866b55874c9d3722d2140e7.zh-cn","_resolvedLanguagePackCoreLocation":"/home/R26534/.vscode-server/data/clp/b576c2d4e866b55874c9d3722d2140e7.zh-cn/e1b35ffc1a6ba5ebdf31adf50dcb9b43728b31087fb9180493a2bab295a5a63b","_corruptedFile":"/home/R26534/.vscode-server/data/clp/b576c2d4e866b55874c9d3722d2140e7.zh-cn/corrupted.info"}', 'MAIL': '/var/mail/R26534', 'NVM_BIN': '/usr/local/nvm/versions/node/v18.20.4/bin', 'ROS_ROOT': '/home/R26534/mm/ros/share/ros', 'ROS_DISTRO': 'noetic', 'VSCODE_HANDLES_UNCAUGHT_ERRORS': 'true', 'CLAUDE_CODE_MESSAGING_TOKEN': 'f6a8d6fe63d9275795b0946dbabe6905', 'VSCODE_IPC_HOOK_CLI': '/tmp/vscode-ipc-44ad4eb3-5a3f-4790-a22a-300e4bc0114a.sock', '_': '/usr/bin/setsid', 'LC_CTYPE': 'C.UTF-8', 'ROS_LOG_FILENAME': '/tmp/wt-sim/docs/review_20261112_four_host/host_change_trace_cov/probe_v2_pre_1/ros_home/log/65a7f6a2-de87-11f1-8033-0242ac11003a/roslaunch-DEV-99bef9-527344.log'})
+[roslaunch][INFO] 2026-11-12 20:51:06,205: starting in server mode
+[roslaunch.parent][INFO] 2026-11-12 20:51:06,205: starting roslaunch parent run
+[roslaunch][INFO] 2026-11-12 20:51:06,206: loading roscore config file /home/R26534/mm/ros/etc/ros/roscore.xml
+[roslaunch][INFO] 2026-11-12 20:51:07,810: Added core node of type [rosout/rosout] in namespace [/]
+[roslaunch.pmon][INFO] 2026-11-12 20:51:07,811: start_process_monitor: creating ProcessMonitor
+[roslaunch.pmon][INFO] 2026-11-12 20:51:07,811: created process monitor <ProcessMonitor(ProcessMonitor-1, initial daemon)>
+[roslaunch.pmon][INFO] 2026-11-12 20:51:07,811: start_process_monitor: ProcessMonitor started
+[roslaunch.parent][INFO] 2026-11-12 20:51:07,811: starting parent XML-RPC server
+[roslaunch.server][INFO] 2026-11-12 20:51:07,811: starting roslaunch XML-RPC server
+[roslaunch.server][INFO] 2026-11-12 20:51:07,811: waiting for roslaunch XML-RPC server to initialize
+[xmlrpc][INFO] 2026-11-12 20:51:07,811: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2026-11-12 20:51:07,811: Started XML-RPC server [http://DEV-99bef9:36179/]
+[xmlrpc][INFO] 2026-11-12 20:51:07,811: xml rpc node: starting XML-RPC server
+[roslaunch][INFO] 2026-11-12 20:51:07,823: started roslaunch server http://DEV-99bef9:36179/
+[roslaunch.parent][INFO] 2026-11-12 20:51:07,823: ... parent XML-RPC server started
+[roslaunch][INFO] 2026-11-12 20:51:07,823: master.is_running[http://DEV-99bef9:59033/]
+[roslaunch][ERROR] 2026-11-12 20:51:07,824: RLException: roscore cannot run as another roscore/master is already running. 
+Please kill other roscore/master processes before relaunching.
+The ROS_MASTER_URI is http://DEV-99bef9:59033/
+[roslaunch][ERROR] 2026-11-12 20:51:07,824: The traceback for the exception was written to the log file
+[roslaunch][ERROR] 2026-11-12 20:51:07,826: Traceback (most recent call last):
+  File "/home/R26534/mm/ros/lib/python3.11/site-packages/roslaunch/__init__.py", line 347, in main
+    p.start()
+  File "/home/R26534/mm/ros/lib/python3.11/site-packages/roslaunch/parent.py", line 316, in start
+    self.runner.launch()
+  File "/home/R26534/mm/ros/lib/python3.11/site-packages/roslaunch/launch.py", line 676, in launch
+    self._setup()
+  File "/home/R26534/mm/ros/lib/python3.11/site-packages/roslaunch/launch.py", line 651, in _setup
+    launched = self._launch_master()
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/R26534/mm/ros/lib/python3.11/site-packages/roslaunch/launch.py", line 410, in _launch_master
+    raise RLException("roscore cannot run as another roscore/master is already running. \nPlease kill other roscore/master processes before relaunching.\nThe ROS_MASTER_URI is %s"%(m.uri))
+roslaunch.core.RLException: roscore cannot run as another roscore/master is already running. 
+Please kill other roscore/master processes before relaunching.
+The ROS_MASTER_URI is http://DEV-99bef9:59033/
+
+[rospy.core][INFO] 2026-11-12 20:51:07,826: signal_shutdown [atexit]

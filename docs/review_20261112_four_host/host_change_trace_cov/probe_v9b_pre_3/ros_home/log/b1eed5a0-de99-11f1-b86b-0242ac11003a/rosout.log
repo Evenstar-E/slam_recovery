@@ -1,0 +1,15 @@
+
+
+1794488716.995336110  Node Startup
+1794488719.617279362 INFO /laserMapping [/home/R26534/fast_livo2_ws/src/rpg_vikit/vikit_ros/include/vikit/params_helper.h:49(getParam)] [topics: /rosout] Found parameter: laserMapping/cam_model, value: Pinhole
+1794488719.618480805 INFO /laserMapping [/home/R26534/fast_livo2_ws/src/rpg_vikit/vikit_ros/include/vikit/params_helper.h:49(getParam)] [topics: /rosout] Found parameter: laserMapping/cam_width, value: 640
+1794488719.618927018 INFO /laserMapping [/home/R26534/fast_livo2_ws/src/rpg_vikit/vikit_ros/include/vikit/params_helper.h:49(getParam)] [topics: /rosout] Found parameter: laserMapping/cam_height, value: 480
+1794488719.619307224 INFO /laserMapping [/home/R26534/fast_livo2_ws/src/rpg_vikit/vikit_ros/include/vikit/params_helper.h:30(getParam)] [topics: /rosout] Found parameter: laserMapping/scale, value: 1
+1794488719.619558162 INFO /laserMapping [/home/R26534/fast_livo2_ws/src/rpg_vikit/vikit_ros/include/vikit/params_helper.h:49(getParam)] [topics: /rosout] Found parameter: laserMapping/cam_fx, value: 617.971
+1794488719.619961815 INFO /laserMapping [/home/R26534/fast_livo2_ws/src/rpg_vikit/vikit_ros/include/vikit/params_helper.h:49(getParam)] [topics: /rosout] Found parameter: laserMapping/cam_fy, value: 616.445
+1794488719.620194642 INFO /laserMapping [/home/R26534/fast_livo2_ws/src/rpg_vikit/vikit_ros/include/vikit/params_helper.h:49(getParam)] [topics: /rosout] Found parameter: laserMapping/cam_cx, value: 327.71
+1794488719.620390741 INFO /laserMapping [/home/R26534/fast_livo2_ws/src/rpg_vikit/vikit_ros/include/vikit/params_helper.h:49(getParam)] [topics: /rosout] Found parameter: laserMapping/cam_cy, value: 253.977
+1794488719.620614606 INFO /laserMapping [/home/R26534/fast_livo2_ws/src/rpg_vikit/vikit_ros/include/vikit/params_helper.h:30(getParam)] [topics: /rosout] Found parameter: laserMapping/cam_d0, value: 0.148001
+1794488719.620824311 INFO /laserMapping [/home/R26534/fast_livo2_ws/src/rpg_vikit/vikit_ros/include/vikit/params_helper.h:30(getParam)] [topics: /rosout] Found parameter: laserMapping/cam_d1, value: -0.217835
+1794488719.621069963 INFO /laserMapping [/home/R26534/fast_livo2_ws/src/rpg_vikit/vikit_ros/include/vikit/params_helper.h:30(getParam)] [topics: /rosout] Found parameter: laserMapping/cam_d2, value: 0
+1794488719.621278545 INFO /laserMapping [/home/R26534/fast_livo2_ws/src/rpg_vikit/vikit_ros/include/vikit/params_helper.h:30(getParam)] [topics: /rosout] Found parameter: laserMapping/cam_d3, value: 0

@@ -1,0 +1,160 @@
+[roslaunch][INFO] 2026-11-12 21:02:24,106: Checking log directory for disk usage. This may take a while.
+Press Ctrl-C to interrupt
+[roslaunch][INFO] 2026-11-12 21:02:24,108: Done checking log file disk usage. Usage is <1GB.
+[roslaunch][INFO] 2026-11-12 21:02:24,108: roslaunch starting with args ['roscore', '--core', '-p', '59021']
+[roslaunch][INFO] 2026-11-12 21:02:24,108: roslaunch env is environ({'SHELL': '/bin/bash', 'ROS_VERSION': '1', 'COREPACK_ENABLE_AUTO_PIN': '0', 'CLAUDE_CODE_CHILD_SESSION': '1', 'NVM_INC': '/usr/local/nvm/versions/node/v18.20.4/include/node', 'PKG_CONFIG_PATH': '/home/R26534/fast_livo2_ws/devel/lib/pkgconfig:/home/R26534/mm/ros/lib/pkgconfig', 'AI_AGENT': 'claude-code_2-1-319_agent', 'ROS_PYTHON_VERSION': '3.11', 'CLAUDE_CODE_ENABLE_SDK_FILE_CHECKPOINTING': 'true', 'CLAUDE_CODE_SESSION_ID': '9e692b29-cda7-40e6-8093-d1166fbaa01b', 'CLAUDE_PID': '1966950', 'CLAUDE_CODE_QUESTION_PREVIEW_FORMAT': 'markdown', 'CLAUDE_EFFORT': 'high', 'COPILOT_CLI_ENABLED_FEATURE_FLAGS': 'SHELL_SPAWN_BACKEND', 'CLAUDE_CODE_MAX_CONTEXT_TOKENS': '1000000', 'ELECTRON_RUN_AS_NODE': '1', 'CLAUDE_CODE_ENABLE_TASKS': '0', 'ROS_PACKAGE_PATH': '/home/R26534/fast_livo2_ws/src:/home/R26534/mm/ros/share', 'PWD': '/tmp/wt-sim', 'LOGNAME': 'R26534', 'COPILOT_OTEL_FILE_EXPORTER_PATH': '/dev/null', 'VSCODE_ESM_ENTRYPOINT': 'vs/workbench/api/node/extensionHostProcess', 'CLAUDE_CODE_MESSAGING_SOCKET': '/tmp/cc-socks/1966950.sock', 'NoDefaultCurrentDirectoryInExePath': '1', 'CLAUDECODE': '1', 'HOME': '/home/R26534', 'CLAUDE_AGENT_SDK_VERSION': '0.3.319', 'ROS_ETC_DIR': '/home/R26534/mm/ros/etc/ros', 'CLAUDE_CODE_SESSION_ATTENDED': '1', 'CMAKE_PREFIX_PATH': '/home/R26534/fast_livo2_ws/devel:/home/R26534/mm/ros', 'VSCODE_AGENT_FOLDER': '/home/R26534/.vscode-server', 'ANTHROPIC_BASE_URL': 'https://pool.autelrobotics.com', 'SSH_CONNECTION': '10.132.16.123 47932 172.17.0.58 22', 'NVM_DIR': '/usr/local/nvm', 'VSCODE_HANDLES_SIGPIPE': 'true', 'PYTHONPATH': '/home/R26534/fast_livo2_ws/devel/lib/python3.11/site-packages:/home/R26534/mm/ros/lib/python3.11/site-packages', 'USER': 'R26534', 'ROS_HOME': '/tmp/wt-sim/docs/review_20261112_four_host/host_change_trace_cov/probe_v9_pre_5/ros_home', 'SHLVL': '1', 'NVM_CD_FLAGS': '', 'CLAUDE_CODE_EMIT_STARTUP_TIMING': '1', 'GIT_EDITOR': 'true', 'CLAUDE_CODE_STARTUP_FAILURE_RESULTS': '1', 'ROS_MASTER_URI': 'http://localhost:59021', 'VSCODE_CWD': '/home/R26534', 'VSCODE_RECONNECTION_GRACE_TIME': '10800000', 'CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS': '1', 'ANTHROPIC_AUTH_TOKEN': 'sk-pKARG6uNXEZxWPDUmU4P5g', 'SSH_CLIENT': '10.132.16.123 47932 22', 'CLAUDE_CODE_ENTRYPOINT': 'claude-vscode', 'VSCODE_CLI_REQUIRE_TOKEN': '661fe407-13ad-475a-a760-7756569e0ffd', 'MCP_CONNECTION_NONBLOCKING': 'true', '_CUDA_COMPAT_PATH': '/usr/local/cuda/compat', 'CLAUDE_CODE_EXECPATH': '/home/R26534/.vscode-server/extensions/anthropic.claude-code-2.1.319/resources/native-binary/claude', 'BROWSER': '/home/R26534/.vscode-server/cli/servers/Stable-2d0b7506a36c1d6db9a466440131a8e01eab2289/server/bin/helpers/browser.sh', 'PATH': '/home/R26534/mm/ros/bin:/home/R26534/.vscode-server/cli/servers/Stable-2d0b7506a36c1d6db9a466440131a8e01eab2289/server/bin/remote-cli:/usr/local/nvm/versions/node/v18.20.4/bin:/home/R26534/.npm-global/bin:/usr/local/lib/python3.10/dist-packages/torch_tensorrt/bin:/usr/local/mpi/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/ucx/bin:/opt/tensorrt/bin:/opt/openssh/bin:/opt/openssh/bin:/opt/openssh/bin', 'APPLICATION_INSIGHTS_NO_STATSBEAT': 'true', 'VSCODE_NLS_CONFIG': '{"userLocale":"zh-cn","osLocale":"zh-cn","resolvedLanguage":"zh-cn","defaultMessagesFile":"/home/R26534/.vscode-server/cli/servers/Stable-2d0b7506a36c1d6db9a466440131a8e01eab2289/server/out/nls.messages.json","languagePack":{"translationsConfigFile":"/home/R26534/.vscode-server/data/clp/b576c2d4e866b55874c9d3722d2140e7.zh-cn/tcf.json","messagesFile":"/home/R26534/.vscode-server/data/clp/b576c2d4e866b55874c9d3722d2140e7.zh-cn/e1b35ffc1a6ba5ebdf31adf50dcb9b43728b31087fb9180493a2bab295a5a63b/nls.messages.json","corruptMarkerFile":"/home/R26534/.vscode-server/data/clp/b576c2d4e866b55874c9d3722d2140e7.zh-cn/corrupted.info"},"locale":"zh-cn","availableLanguages":{"*":"zh-cn"},"_languagePackId":"b576c2d4e866b55874c9d3722d2140e7.zh-cn","_languagePackSupport":true,"_translationsConfigFile":"/home/R26534/.vscode-server/data/clp/b576c2d4e866b55874c9d3722d2140e7.zh-cn/tcf.json","_cacheRoot":"/home/R26534/.vscode-server/data/clp/b576c2d4e866b55874c9d3722d2140e7.zh-cn","_resolvedLanguagePackCoreLocation":"/home/R26534/.vscode-server/data/clp/b576c2d4e866b55874c9d3722d2140e7.zh-cn/e1b35ffc1a6ba5ebdf31adf50dcb9b43728b31087fb9180493a2bab295a5a63b","_corruptedFile":"/home/R26534/.vscode-server/data/clp/b576c2d4e866b55874c9d3722d2140e7.zh-cn/corrupted.info"}', 'MAIL': '/var/mail/R26534', 'NVM_BIN': '/usr/local/nvm/versions/node/v18.20.4/bin', 'ROS_ROOT': '/home/R26534/mm/ros/share/ros', 'ROS_DISTRO': 'noetic', 'VSCODE_HANDLES_UNCAUGHT_ERRORS': 'true', 'OLDPWD': '/home/R26534/R11070', 'CLAUDE_CODE_MESSAGING_TOKEN': 'f6a8d6fe63d9275795b0946dbabe6905', 'VSCODE_IPC_HOOK_CLI': '/tmp/vscode-ipc-44ad4eb3-5a3f-4790-a22a-300e4bc0114a.sock', '_': '/usr/bin/setsid', 'LC_CTYPE': 'C.UTF-8', 'ROS_LOG_FILENAME': '/tmp/wt-sim/docs/review_20261112_four_host/host_change_trace_cov/probe_v9_pre_5/ros_home/log/4d33e574-de99-11f1-ab80-0242ac11003a/roslaunch-DEV-99bef9-541646.log'})
+[roslaunch][INFO] 2026-11-12 21:02:24,108: starting in server mode
+[roslaunch.parent][INFO] 2026-11-12 21:02:24,108: starting roslaunch parent run
+[roslaunch][INFO] 2026-11-12 21:02:24,108: loading roscore config file /home/R26534/mm/ros/etc/ros/roscore.xml
+[roslaunch][INFO] 2026-11-12 21:02:26,003: Added core node of type [rosout/rosout] in namespace [/]
+[roslaunch.pmon][INFO] 2026-11-12 21:02:26,003: start_process_monitor: creating ProcessMonitor
+[roslaunch.pmon][INFO] 2026-11-12 21:02:26,004: created process monitor <ProcessMonitor(ProcessMonitor-1, initial daemon)>
+[roslaunch.pmon][INFO] 2026-11-12 21:02:26,004: start_process_monitor: ProcessMonitor started
+[roslaunch.parent][INFO] 2026-11-12 21:02:26,004: starting parent XML-RPC server
+[roslaunch.server][INFO] 2026-11-12 21:02:26,004: starting roslaunch XML-RPC server
+[roslaunch.server][INFO] 2026-11-12 21:02:26,004: waiting for roslaunch XML-RPC server to initialize
+[xmlrpc][INFO] 2026-11-12 21:02:26,004: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2026-11-12 21:02:26,004: Started XML-RPC server [http://DEV-99bef9:44341/]
+[xmlrpc][INFO] 2026-11-12 21:02:26,005: xml rpc node: starting XML-RPC server
+[roslaunch][INFO] 2026-11-12 21:02:26,016: started roslaunch server http://DEV-99bef9:44341/
+[roslaunch.parent][INFO] 2026-11-12 21:02:26,016: ... parent XML-RPC server started
+[roslaunch][INFO] 2026-11-12 21:02:26,016: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:26,017: auto-starting new master
+[roslaunch][INFO] 2026-11-12 21:02:26,017: create_master_process: rosmaster, /home/R26534/mm/ros/share/ros, 59021, 3, None, False
+[roslaunch][INFO] 2026-11-12 21:02:26,017: process[master]: launching with args [['rosmaster', '--core', '-p', '59021', '-w', '3']]
+[roslaunch.pmon][INFO] 2026-11-12 21:02:26,017: ProcessMonitor.register[master]
+[roslaunch.pmon][INFO] 2026-11-12 21:02:26,018: ProcessMonitor.register[master] complete
+[roslaunch][INFO] 2026-11-12 21:02:26,018: process[master]: starting os process
+[roslaunch][INFO] 2026-11-12 21:02:26,018: process[master]: start w/ args [['rosmaster', '--core', '-p', '59021', '-w', '3', '__log:=/tmp/wt-sim/docs/review_20261112_four_host/host_change_trace_cov/probe_v9_pre_5/ros_home/log/4d33e574-de99-11f1-ab80-0242ac11003a/master.log']]
+[roslaunch][INFO] 2026-11-12 21:02:26,018: process[master]: cwd will be [/tmp/wt-sim/docs/review_20261112_four_host/host_change_trace_cov/probe_v9_pre_5/ros_home]
+[roslaunch][INFO] 2026-11-12 21:02:26,023: process[master]: started with pid [542168]
+[roslaunch][INFO] 2026-11-12 21:02:26,023: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:26,124: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:26,224: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:26,325: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:26,426: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:26,526: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:26,627: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:26,727: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:26,828: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:26,928: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:27,029: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:27,129: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:27,230: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:27,330: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:27,431: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:27,532: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:27,632: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:27,733: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:27,833: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:27,934: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:28,034: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:28,135: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:28,235: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:28,336: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:28,436: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:28,537: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:28,638: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:28,738: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:28,839: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:28,939: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:29,040: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:29,140: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:29,241: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:29,341: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:29,442: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:29,542: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:29,643: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:29,743: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:29,844: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:29,944: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:30,045: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:30,145: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:30,246: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:30,346: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:30,447: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:30,547: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:30,648: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:30,748: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:30,849: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:30,949: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:31,050: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:31,150: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:31,251: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:31,351: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:31,452: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:31,552: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:31,653: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:31,753: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:31,854: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:31,954: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:32,054: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:32,155: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:32,255: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:32,356: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:32,456: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:32,557: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:32,657: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:32,758: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:32,858: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:32,959: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:33,059: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:33,160: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:33,260: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:33,361: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:33,461: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:33,562: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:33,662: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:33,762: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:33,863: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:33,963: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:34,064: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:34,164: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:34,265: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:34,365: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:34,466: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:34,566: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:34,667: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:34,767: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:34,868: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:34,968: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:35,069: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:35,169: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:35,270: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:35,370: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:35,470: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:35,571: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:35,671: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:35,772: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:35,872: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:35,973: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:36,073: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][INFO] 2026-11-12 21:02:36,074: master.is_running[http://DEV-99bef9:59021/]
+[roslaunch][ERROR] 2026-11-12 21:02:36,074: RLException: ERROR: could not contact master [http://DEV-99bef9:59021/]
+[roslaunch][ERROR] 2026-11-12 21:02:36,074: The traceback for the exception was written to the log file
+[roslaunch][ERROR] 2026-11-12 21:02:36,078: Traceback (most recent call last):
+  File "/home/R26534/mm/ros/lib/python3.11/site-packages/roslaunch/__init__.py", line 347, in main
+    p.start()
+  File "/home/R26534/mm/ros/lib/python3.11/site-packages/roslaunch/parent.py", line 316, in start
+    self.runner.launch()
+  File "/home/R26534/mm/ros/lib/python3.11/site-packages/roslaunch/launch.py", line 676, in launch
+    self._setup()
+  File "/home/R26534/mm/ros/lib/python3.11/site-packages/roslaunch/launch.py", line 651, in _setup
+    launched = self._launch_master()
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/R26534/mm/ros/lib/python3.11/site-packages/roslaunch/launch.py", line 429, in _launch_master
+    raise RLException("ERROR: could not contact master [%s]"%m.uri)
+roslaunch.core.RLException: ERROR: could not contact master [http://DEV-99bef9:59021/]
+
+[roslaunch.pmon][INFO] 2026-11-12 21:02:36,078: ProcessMonitor.shutdown <ProcessMonitor(ProcessMonitor-1, started daemon 140328166356544)>
+[roslaunch.pmon][INFO] 2026-11-12 21:02:36,117: ProcessMonitor._post_run <ProcessMonitor(ProcessMonitor-1, started daemon 140328166356544)>
+[roslaunch.pmon][INFO] 2026-11-12 21:02:36,117: ProcessMonitor._post_run <ProcessMonitor(ProcessMonitor-1, started daemon 140328166356544)>: remaining procs are [<roslaunch.nodeprocess.LocalProcess object at 0x7fa0b2fc9350>]
+[roslaunch.pmon][INFO] 2026-11-12 21:02:36,121: ProcessMonitor exit: killing master
+[roslaunch][INFO] 2026-11-12 21:02:36,121: [master] killing on exit
+[roslaunch][INFO] 2026-11-12 21:02:36,121: process[master]: killing os process with pid[542168] pgid[542168]
+[roslaunch][INFO] 2026-11-12 21:02:36,121: [master] sending SIGINT to pgid [542168]
+[roslaunch][INFO] 2026-11-12 21:02:36,121: [master] sent SIGINT to pgid [542168]
+[roslaunch][INFO] 2026-11-12 21:02:36,322: process[master]: SIGINT killed with return value 0
+[roslaunch.pmon][INFO] 2026-11-12 21:02:36,322: ProcessMonitor exit: cleaning up data structures and signals
+[roslaunch.pmon][INFO] 2026-11-12 21:02:36,322: ProcessMonitor exit: pmon has shutdown
+[rospy.core][INFO] 2026-11-12 21:02:36,322: signal_shutdown [atexit]
