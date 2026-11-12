@@ -218,6 +218,8 @@ class RepairGateTest(unittest.TestCase):
         loop2._finalize_checkpoint_checks()
         self.assertEqual(ep2.meta["checkpoint_check"]["status"], "LATE_AFTER_BOUNDARY")
         self.assertEqual(ep2.meta["checkpoint_check"]["actual_frame"], 552)
+        self.assertEqual(ep2.meta["checkpoint_check"]["rollback_support"],
+                         "UNSUPPORTED_AT_OR_BEFORE_QSTART")
 
     def test_an_online_segment_uses_the_quarantine_start_as_boundary(self):
         # An online segment has no requested stamp; the boundary it must not roll forward past is

@@ -1642,10 +1642,17 @@ class NativeClosedLoop:
                 status = "AT_OR_BEFORE_BOUNDARY"
             else:
                 status = "LATE_AFTER_BOUNDARY"
+            if status == "LATE_AFTER_BOUNDARY":
+                support = "UNSUPPORTED_AT_OR_BEFORE_QSTART"
+            elif status == "AT_OR_BEFORE_BOUNDARY":
+                support = "WITHIN_DECLARED_BOUNDARY"
+            else:
+                support = "UNKNOWN"
             entry.update({
                 "actual_stamp_ns": actual,
                 "actual_frame": int(frame.group(1)) if frame else None,
                 "status": status,
+                "rollback_support": support,
             })
 
     # -- decision -----------------------------------------------------------------------------
