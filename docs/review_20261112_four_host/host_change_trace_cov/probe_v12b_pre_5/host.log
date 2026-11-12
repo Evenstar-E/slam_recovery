@@ -1,0 +1,16 @@
+[0m[ INFO] [1794502965.358445366]: Found parameter: laserMapping/cam_model, value: Pinhole[0m
+[0m[ INFO] [1794502965.359179550]: Found parameter: laserMapping/cam_width, value: 640[0m
+[0m[ INFO] [1794502965.359297605]: Found parameter: laserMapping/cam_height, value: 480[0m
+[0m[ INFO] [1794502965.359435332]: Found parameter: laserMapping/scale, value: 1[0m
+[0m[ INFO] [1794502965.359570543]: Found parameter: laserMapping/cam_fx, value: 617.971[0m
+[0m[ INFO] [1794502965.359709991]: Found parameter: laserMapping/cam_fy, value: 616.445[0m
+[0m[ INFO] [1794502965.359907523]: Found parameter: laserMapping/cam_cx, value: 327.71[0m
+[0m[ INFO] [1794502965.360047284]: Found parameter: laserMapping/cam_cy, value: 253.977[0m
+[0m[ INFO] [1794502965.360170686]: Found parameter: laserMapping/cam_d0, value: 0.148001[0m
+[0m[ INFO] [1794502965.360298986]: Found parameter: laserMapping/cam_d1, value: -0.217835[0m
+[0m[ INFO] [1794502965.360420970]: Found parameter: laserMapping/cam_d2, value: 0[0m
+[0m[ INFO] [1794502965.360527523]: Found parameter: laserMapping/cam_d3, value: 0[0m
+scale: 1
+intrinsic: 617.971051, 616.445132, 327.710279, 253.976984
+width: 640, height: 480, scale: 1.000000
+[0m[ INFO] [1794502965.394173993]: [DETERMINISM] build: MP_EN with MP_PROC_NUM=4, omp_get_max_threads()=128[0m

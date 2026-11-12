@@ -1,0 +1,22 @@
+[31mRLException: roscore cannot run as another roscore/master is already running. 
+Please kill other roscore/master processes before relaunching.
+The ROS_MASTER_URI is http://DEV-99bef9:59045/[0m
+[31mThe traceback for the exception was written to the log file[0m
+... logging to /tmp/wt-sim/docs/review_20261112_four_host/host_change_trace_cov/probe_growth_pre_2/ros_home/log/ff95e8d4-de8a-11f1-9a0e-0242ac11003a/roslaunch-DEV-99bef9-662424.log
+Checking log directory for disk usage. This may take a while.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+]2;roscore
+[1mstarted roslaunch server http://DEV-99bef9:45471/[0m
+ros_comm version 1.17.0
+
+
+SUMMARY
+========
+
+PARAMETERS
+ * /rosdistro: noetic
+ * /rosversion: 1.17.0
+
+NODES
+
