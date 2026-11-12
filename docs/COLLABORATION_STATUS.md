@@ -2285,3 +2285,20 @@ S2 实现（库 **`69dc8ac5…`**，可执行文件仍 `6dd71953…` 未重链�
 归档：`exp/online-v2` → **`eb2630e`**（`*.v10` 五个源码快照 + `trace_cov_v10_full.diff` 493 行 + BUILD.md §11），已由 S1 推送。
 **今晚未跑 bag**；明天第一个 run 会带出这些字段。跨今天的 run 与早先 run **不可按同一二进制比较**
 （库 `69dc8ac5…`、可执行文件 `6dd71953…`、链接环境已变）。
+
+## 155. 审阅复现 v10 消费缺口（100 列被两个 parser 判 malformed）；已退回 S3/S2
+
+审阅 `480a038`（已合入 main `b3540f0`）本机复现：`t2_run.py:107` 要求 `len(f)==vec_start+78`（v8 的 93 列）、
+`t2_join_upgrade.py:38` 只接受 92/93；v10 在 93 列后追加 7 个 post pose 标量 → 合法行 100 列，**现在会被判
+malformed、0 rows**。这是本轮实证的最小接线断点（失败发生在值解析前，不是格式恶意）。
+
+已要求：
+- **S3**：两个 parser 接受 92/93/100、100 时按名解析尾部 `pose_x…qw`；新路径优先用同行 post pose，不再回落外部
+  `M2DGR_room_02.txt`；加一个 100 列正常控制；并把 `T2_I_ELIGIBILITY.md` 中两处子 PASS 收窄——v8 carryover 的
+  "PASS 单扫描"（`n_scans` 计新 pop 的 raw、carryover 在 cur/next，完整点成员未证）与 post 的"PASS 时间 join"
+  （grp/首末戳不唯一对应所用更新）改为 `INCOMPLETE/ASSERTED_NOT_VERIFIED`。
+- **S2**：`mat_lio_pre/out` 只有 `rel_s`，无法唯一配对 live/replay、重戳、空点早退与两个更新组；最小修法是每行加
+  `idx/grp_idx/phase` key，或把 pre pose 直接写进 trace 同行。
+
+审阅同时确认：v10 的 inline post pose 源码正确（`StateEstimation` 后写 `_state`）、构建与 5/5 探针档案限定通过、
+协方差仍 `NOT_AVAILABLE_FOR_E_I`（声明文字不产生转换/相关性模型）。
