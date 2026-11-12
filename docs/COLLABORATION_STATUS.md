@@ -1861,3 +1861,19 @@ S2 按"缓冲写入"修复后重跑 trace-on：`fl_native_20261112T113855Z_46430
    **off/on 且都开 availability**（同 bag/config/触发/k、新 run 身份、5 次探针 ≥4/5）。
 4. **原件未入 Git**：审阅 `8676ad7` 将上述全部记为 DEVELOPER_REPORTED，要求上传布局 diff、探针输出、off/on receipt 与
    `host_logs`+SHA。已要求 S2 推到远端分支（非 main）。
+
+## 132. 更正 §131 的 phase 误读；归档已推送；availability 采用 detection-on
+
+1. **phase 列更正（S1 读数错误）**：trace 列序为 `idx(0) rel_s(1) abs_ns(2) grp_idx(3) scan_first(4) scan_last(5)
+   has_out(6) phase(7) eff(8) …`。§131 中"431/489 行 phase=1"实为 `has_out`；正确统计：**`phase=1` 共 322 行，
+   恰为第 489–810 行（replay 窗口）**，`has_out=1` 1087 行。`phase` 与 `grp_idx` 均可靠，S3 可按名取列。
+2. **归档已推送**：S2 在 `/tmp/wt-sim` 分支 `exp/trace-cov`（提交 `70732b9`，253 文件/~2.3 MB）包含 v6/v7/v7u 快照、
+   `trace_cov_v7u.diff`、构建日志、全部 probe 目录、off/on/无效 on 三个 run 的 receipt 与 `host_logs`+SHA。
+   已由 S1 用内联认证推到 `Evenstar-E/slam_recovery`（远端新建分支 `exp/trace-cov`，`.git/config` 无 token）。
+3. **尾段发散解释接受**：replay 窗口 489–810（rel 11.19–32.61）→ E2 为 restore 无 replay → live 在回滚地图继续，
+   `catch_up=NOT_IMPLEMENTED`；`mat_out` 于 rel≈54 s 起发散到 519.9 m 与该机制一致。结论限定：该 run 支持
+   trace/修复/replay 段证据，**不支持"连续接回正常"**。
+4. **availability 决策：采用 `--detection on`**。旧 402/544 归档本身为 `detection=on`；detection off 的 availability
+   只有 `status=DISABLED` 且 `support` 为 null，无法做旧方法对照。已批准 S2 在 `49f2f941` 上跑
+   **detection on + AVAILABILITY + TRACE_COV off/on 各一次**（同 bag/config/k、新 run 身份、5 次探针 ≥4/5）；
+   detection on 下若出现脚本外自动触发，照实记录。S3 拿到后先核 run id/build/input 与 `status` 非 DISABLED。
