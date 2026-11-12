@@ -1,0 +1,203 @@
+--- a/include/LIVMapper.h
++++ b/include/LIVMapper.h
+@@ -16,6 +16,7 @@
+ #include "IMU_Processing.h"
+ #include "vio.h"
+ #include "preprocess.h"
++#include <deque>
+ #include <cv_bridge/cv_bridge.h>
+ #include <image_transport/image_transport.h>
+ #include <nav_msgs/Path.h>
+@@ -267,6 +268,16 @@
+   std::mutex cp_pending_mtx_;
+   std::string cp_pending_cmd_, cp_pending_payload_;
+   std::atomic<bool> cp_has_pending_{false};
++  // Commands with an apply stamp are queued and executed in the main loop just before the first
++  // group whose lio_time reaches the stamp. The control thread only receives and acknowledges
++  // them; it never touches the map.
++  std::mutex cp_deferred_mtx_;
++  std::deque<std::string> cp_deferred_cmd_, cp_deferred_payload_;
++  std::deque<int64_t> cp_deferred_stamp_;
++  double cp_last_lio_time_ = -1.0;
++  bool executeControlCommand(const std::string &cmd, const std::string &payload,
++                             std::string &detail);
++  void applyDeferredControlCommands(double now_lio_s);
+   size_t cp_received_ = 0, cp_applied_commands_ = 0;
+   double cp_last_poll_wall_ = -1.0;
+ 
+--- a/src/LIVMapper.cpp
++++ b/src/LIVMapper.cpp
+@@ -13,6 +13,7 @@
+ #include "LIVMapper.h"
+ #include "native_checkpoint.h"
+ #include <chrono>
++#include <cmath>
+ #include <cstdio>
+ #include <fstream>
+ #include <omp.h>
+@@ -1106,18 +1107,45 @@
+       if (!cmd.empty())
+       {
+         std::rename(cmd_path.c_str(), (cp_ctrl_dir_ + "/cmd.done").c_str());
++        // hold/snapshot may carry an apply stamp (ns): the main loop executes them just before the
++        // first group whose lio_time reaches it. Queue them here; the thread never touches the map.
++        int64_t apply_stamp_ns = 0;
++        if ((cmd == "hold" || cmd == "snapshot") && !payload.empty())
+         {
+-          std::lock_guard<std::mutex> lk(cp_pending_mtx_);
+-          cp_pending_cmd_ = cmd;
+-          cp_pending_payload_ = payload;
+-          cp_has_pending_.store(true);
+-          cp_received_++;
++          try { apply_stamp_ns = std::stoll(payload); }
++          catch (...) { apply_stamp_ns = 0; }
++        }
++        if (apply_stamp_ns > 0)
++        {
++          {
++            std::lock_guard<std::mutex> lk(cp_deferred_mtx_);
++            cp_deferred_cmd_.push_back(cmd);
++            cp_deferred_payload_.push_back(payload);
++            cp_deferred_stamp_.push_back(apply_stamp_ns);
++            cp_received_++;
++          }
++          const double recv_s =
++              std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
++          std::ofstream out(ack_path, std::ios::trunc);
++          out << "RECEIVED " << cmd << " wall=" << std::fixed << std::setprecision(6) << recv_s << "\n";
++          std::ofstream ack(cp_ctrl_dir_ + "/ack", std::ios::trunc);
++          ack << "OK " << cmd << " deferred stamp=" << (long long)apply_stamp_ns << "\n";
++        }
++        else
++        {
++          {
++            std::lock_guard<std::mutex> lk(cp_pending_mtx_);
++            cp_pending_cmd_ = cmd;
++            cp_pending_payload_ = payload;
++            cp_has_pending_.store(true);
++            cp_received_++;
++          }
++          // system_clock, not a monotonic clock: the driver compares this with its own time.time().
++          const double recv_s =
++              std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
++          std::ofstream out(ack_path, std::ios::trunc);
++          out << "RECEIVED " << cmd << " wall=" << std::fixed << std::setprecision(6) << recv_s << "\n";
+         }
+-        // system_clock, not a monotonic clock: the driver compares this with its own time.time().
+-        const double recv_s =
+-            std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
+-        std::ofstream out(ack_path, std::ios::trunc);
+-        out << "RECEIVED " << cmd << " wall=" << std::fixed << std::setprecision(6) << recv_s << "\n";
+       }
+     }
+     std::this_thread::sleep_for(std::chrono::milliseconds(5));
+@@ -1126,20 +1154,10 @@
+ 
+ // Called at the top of each frame in the main loop. Everything here runs on the estimator's thread,
+ // at a frame boundary, exactly as the synchronous path did.
+-bool LIVMapper::applyPendingControlCommand()
++bool LIVMapper::executeControlCommand(const std::string &cmd, const std::string &payload,
++                                      std::string &detail)
+ {
+-  if (!cp_has_pending_.load()) return false;
+-  std::string cmd, payload;
+-  {
+-    std::lock_guard<std::mutex> lk(cp_pending_mtx_);
+-    cmd = cp_pending_cmd_;
+-    payload = cp_pending_payload_;
+-    cp_has_pending_.store(false);
+-  }
+-  if (cmd.empty()) return false;
+-  cp_applied_commands_++;
+   bool ok = false;
+-  std::string detail;
+   if (cmd == "snapshot")
+   {
+     ok = snapshotCheckpoint();
+@@ -1211,6 +1229,23 @@
+   {
+     detail = "unknown_command";
+   }
++  return ok;
++}
++
++bool LIVMapper::applyPendingControlCommand()
++{
++  if (!cp_has_pending_.load()) return false;
++  std::string cmd, payload;
++  {
++    std::lock_guard<std::mutex> lk(cp_pending_mtx_);
++    cmd = cp_pending_cmd_;
++    payload = cp_pending_payload_;
++    cp_has_pending_.store(false);
++  }
++  if (cmd.empty()) return false;
++  cp_applied_commands_++;
++  std::string detail;
++  const bool ok = executeControlCommand(cmd, payload, detail);
+   {
+     std::ofstream out(cp_ctrl_dir_ + "/ack", std::ios::trunc);
+     out << (ok ? "OK " : "FAIL ") << cmd << " " << detail << "\n";
+@@ -1218,6 +1253,38 @@
+   return true;
+ }
+ 
++void LIVMapper::applyDeferredControlCommands(double now_lio_s)
++{
++  std::vector<std::pair<std::string, std::string>> due;
++  std::vector<int64_t> stamps;
++  {
++    std::lock_guard<std::mutex> lk(cp_deferred_mtx_);
++    const int64_t now_ns = (now_lio_s > 0.0) ? (int64_t)std::llround(now_lio_s * 1e9) : 0;
++    while (!cp_deferred_cmd_.empty() && now_ns > 0)
++    {
++      const int64_t stamp_ns = cp_deferred_stamp_.front();
++      if (now_ns < stamp_ns) break;
++      due.emplace_back(cp_deferred_cmd_.front(), cp_deferred_payload_.front());
++      stamps.push_back(stamp_ns);
++      cp_deferred_cmd_.pop_front();
++      cp_deferred_payload_.pop_front();
++      cp_deferred_stamp_.pop_front();
++    }
++  }
++  for (size_t i = 0; i < due.size(); ++i)
++  {
++    std::string detail;
++    const bool ok = executeControlCommand(due[i].first, due[i].second, detail);
++    cp_applied_commands_++;
++    const double late_ms =
++        (double)((int64_t)std::llround(now_lio_s * 1e9) - stamps[i]) / 1e6;
++    ROS_INFO("[NATIVE_CHECKPOINT] deferred apply cmd=%s at_lio=%.9f stamp_ns=%lld "
++             "late_ms=%.3f ok=%d %s",
++             due[i].first.c_str(), now_lio_s, (long long)stamps[i], late_ms,
++             (int)ok, detail.c_str());
++  }
++}
++
+ void LIVMapper::pollCheckpointControl()
+ {
+   if (cp_ctrl_dir_.empty()) return;
+@@ -1254,6 +1321,23 @@
+ #endif
+       continue;
+     }
++    // A command with an apply stamp (hold/snapshot) runs here: after the next package is known,
++    // before it is processed, so the checkpoint and the capture window start exactly at that
++    // package's lio_time.
++    {
++      // Only a group that actually carries a lidar measurement has a lio_time to compare. An
++      // image-only group does not, and applying on the last known time would fire one measured
++      // group late -- the checkpoint would then miss the trigger group and the first candidate
++      // frames would never enter the replay.
++      double now_lio = -1.0;
++      if (!LidarMeasures.measures.empty())
++        now_lio = LidarMeasures.measures.back().lio_time;
++      if (now_lio > 0.0)
++      {
++        cp_last_lio_time_ = now_lio;
++        applyDeferredControlCommands(now_lio);
++      }
++    }
+     // The trace must describe the same packages in every build shape, so the emission cannot live
+     // inside DET_SYNC: that guard is a build flag, and the default build would then write only the
+     // IMUINIT lines (which is exactly what happened on 2026-11-10).

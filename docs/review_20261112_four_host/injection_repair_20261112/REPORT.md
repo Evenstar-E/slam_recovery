@@ -150,3 +150,12 @@ synced、set_state 与 repair 差 3 mm、逐帧 z 差 0.40 m。重放跨度 686 
 触发后 2.9 s / 1.9 s（两次差 1 s），重放窗口起点随之不同，34 vs 64 帧、7 vs 12 条修复被消费。
 按"不一致就停"没有再跑；报告给出回退滚动快照、触发前定时快照、宿主按戳 checkpoint 三个选项。
 宿主改动与构建见 `host_change_terminal_stamp/BUILD.md`（新库 sha `f27d1730…`，executable 未变）。
+
+## 14. 干净 A/B：声明戳 hold/snapshot + 终止戳
+
+`freeze_ab/deferred_pair/REPORT.md`：宿主按声明戳执行 hold/snapshot（控制线程入队、主循环在
+第一个带 lio_time 的组处理前执行），`reprocess <frozen+100 ms>` 固定终点。两次 **snapshot
+stamp/frame 相同、重放区间逐位相同 [276.281966925 .. 280.347787857]、replayed=124 相同、
+repairs applied=23/23、leftover 0**；唯一差别是 repair 的 shift −0.40 vs sham 0。同窗口下地图
+17811/335054 vs 17316/328516，set_state 差 1.1 cm；这组可以归因于测量是否被修正，但仍不声称
+真实修复收益（损坏为注入）。宿主改动见 `host_change_deferred_stamp/BUILD.md`。
