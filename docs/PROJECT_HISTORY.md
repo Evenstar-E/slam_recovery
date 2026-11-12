@@ -515,3 +515,11 @@ S1共享生命周期/失败公开一致集成，S2已有流控派工与物理一
 2026-11-12用户明确“需要搞清楚为什么会出现unavailable”，要求逐次输出两个指标及相关计算指标。[有限诊断交接](UNAVAILABLE_DIAGNOSTIC_TASK_20261112.md)要求复用现_record_diag/LiveNis/support索引，不改检测算法/冻结门：逐帧support比例与分母/1m mask/失败分支，raw/effective NIS与computed/carried来源/年龄、3m参考数/采样/邻居面残差/2m覆盖分支、当时pose/scan/参考版本身份及缺项。全paired JSONL不被diag_cap2000静默截断，每UNAVAILABLE保存实际200/300样本/参考，非全云刷屏；不把事后map重算当当时证据。覆盖<70%底层用全残差计算而非返回None，必须按实际分支归因。
 
 本机fetch最新e82d900，只核该版诊断入口及未变support/NIS底层，发现现输出缺support/raw失败/点样本；尚未完整审v3/clean A-B新运行，不继承d193680缺陷当其仍失败、不凭提交标题验收。S1诊断共享改动与开关前后原值/决定不变，S2现预算/宿主/输入检测on有限归因或原件无法回推的具体缺项，S3参数停/研究；native恢复/E2仍可并行，不把新日志循环代主线。交真正分支计数/连续段/正常边界及不可用复算、UNKNOWN，不从unsupported猜漂移；逐项状态/实际命令/原件/成本/非oracle自检。A3/B3取证任务而非已通过或新总分。独立review提交SSH推送、private保护、不合main不改算法旧历史；开发接收/实现/执行待实际回执。
+
+## 63. e82d900：受控预置检查点与23全量应用通过，后缀/E2及因果限定保留
+
+[核验](review_20261112_e82d900/README.md)新两run41列示SHA一致，driver匹配target、实际库匹配9c0330be；snapshot时刻/frame及实际replay两端/124group一致，23candidate pose和published scan stamp列表一致、各23received/applied/leftover0，解除前轮该受控范围晚快照及7/12部分应用。不抹真实成果，但snapshot修复前地图15905/308821 vs15902/308223、state亦不同，不能说唯一差别/全部495vox和6538点唯一由修正造成；这是单对受控组件观察，不强求随机逐值一致或无限重跑。set_state为主动candidate写入非独立native质量，独立收益UNKNOWN。
+
+v3仍skip+clear已消费后缀，本次399/372未catch-up；两run只一事件/detection off，尾317/300帧、HEALTHY经wait关闭/ABORTED rearm不等有效恢复/E2，sham21诊断失败保留。预置仅min脚本戳，deferred OK是receipt非应用，在线/后继保证未验。target1新receipt测试PASS0.040s与actual file payload/仅hold开段控制，未代host；旧多命令Windows/pytest辅助测试未跑不安装，构建目标成功但整体ABI失败保留。
+
+下一唯一有限物理一致修复→native state/map→保后缀追赶→接回/E2或实际不支持范围，S1成功公开/共享集成、S2实际产物/native追赶，S3参数停/研究。用户UNAVAILABLE诊断ddd0fb7比target晚发布，target尚未实现不指控无视，S1认领/S2检测on有限取证与native并行、不改门；自检逐项状态/命令/原件/质量/全人口/未知。A2/A4/A6/A12局部推进、自动检测与A5/A8/A9/A10/B4/B11未闭合，不全表升分。独立review SSH提交推送、不合main/private保护、不改算法历史；接收执行待真实回执。

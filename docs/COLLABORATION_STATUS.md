@@ -722,3 +722,9 @@ S1最低native成功依赖与失败公开一致；S2按已派分批流控复用�
 ## repair-f3 / 用户UNAVAILABLE取证要求：不能再只打印标签
 
 [任务](UNAVAILABLE_DIAGNOSTIC_TASK_20261112.md)由用户2026-11-12直接提出。核最新e82d900现_record_diag仅nis/source/map点数且2000条截断，要求S1复用计算入口：逐帧support比例/分母/失败reason及mask，当前raw与最终effective NIS/旧值来源年龄/参考3m点数/局部面残差/coverage分支，scan/pose/当时参考版本身份；每UNAVAILABLE保存实际采样点/参考及原row mapping，summary全paired流式、不刷全图、不事后用新map造原因。S2现输入/宿主预算检测on有限归因，交代码分支计数/连续段/正常边界与不可用复算或具体BLOCKED；native恢复/E2并行、S3参数停/研究。诊断不得变计算/门值、truth只评分，原件缺项UNKNOWN，自检逐项状态/命令/原件/成本。不升A/B总分，不说任务发布即已执行。新main的v3/A-B运行尚未完整审，不继承旧缺陷为已确认当前失败；本机不改算法/代host，独立review SSH推送/private保护，实际认领待开发回执。
+
+## repair-f3 / e82d900增量：受控完整替换通过，连续接回及诊断待交
+
+[核验](review_20261112_e82d900/README.md)两run41SHA一致/target driver/新库绑定，按戳snapshot时刻frame同、replay两端124group同、23stamp人口及23全应用接受，旧晚cp/部分应用该范围解除。修复前snapshot地图及state不同，不要求随机逐值一致，但单对不能宣称唯一因素/全部map和resume差归因；质量UNKNOWN。v3仍skip+clear后缀399/372、无catch-up，单事件/detection off、尾帧不是E2，deferred ACK非应用且预置仅首脚本戳。S1成功依赖/真实人口、S2物理一致产物及后缀追赶→接回E2或能力断点优先，S3研究/参数停，非无限单事件A/B。
+
+用户诊断任务ddd0fb7晚于target发布，现main无实现不说开发已无视；S1实际认领共享逐帧取证、S2检测on有限分支/样本复算，native并行不调门。逐项自检状态/实际命令/原件/失败/质量/未知，A/B局部推进不总分。本机1receipt test/control无host/bag，独立review SSH推送、不合main不改算法/private保护，实际接收待回执。
