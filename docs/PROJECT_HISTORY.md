@@ -509,3 +509,9 @@ S1共享生命周期/失败公开一致集成，S2已有流控派工与物理一
 新C++分支跳过end之后group，随后现clear删除已消费后缀/capture=false，本次truncated451/509；source-bound算术[1,2,3,4]重放到2/clear3,4/下一live5说明归宿缺口，非执行C++动态轨迹。最低可信同stamp完整checkpoint、不以晚held map/state覆唯一可信历史；保留后缀按序native catch-up再接回或显式拒绝，不为A/B端点齐牺牲持续输入。7应用/23准入仍set_state/resume的实际原件要求成功公开依赖核真实人口，旧candidate物理不一致/source未修不重测。按脚本戳arm只是开发受控方案/派工，未验收且不等自动迟检测。
 
 本机actual driver/client hold→snapshot串行/end payload/default空及sham点data不变控制PASS、Git Bash语法exit0；新测试Windows fake-host/pytest依赖未跑不安装，未代host/bag。reader首取receipt顶层null导致假library mismatch，改嵌套inputs重跑最终一致，不报真实身份失败。S1共享成功依赖集成、S2可信checkpoint/真实产物/保后缀，下一唯一有限修复→native state/map→追赶→接回/E2或首断点；S3研究参数停、四宿主不重开，逐项状态/实际命令/原件/未知/独立质量自检。A2/A6/A12局部推进，A4/A5/A8/A10新正常FAIL、A9/B4/B11未闭合、不全表评分。独立review SSH提交推送、不合main不改算法旧历史/private保护，实际接收待回执。
+
+## 62. 用户直接要求UNAVAILABLE实证归因：逐帧两条件与实际计算样本
+
+2026-11-12用户明确“需要搞清楚为什么会出现unavailable”，要求逐次输出两个指标及相关计算指标。[有限诊断交接](UNAVAILABLE_DIAGNOSTIC_TASK_20261112.md)要求复用现_record_diag/LiveNis/support索引，不改检测算法/冻结门：逐帧support比例与分母/1m mask/失败分支，raw/effective NIS与computed/carried来源/年龄、3m参考数/采样/邻居面残差/2m覆盖分支、当时pose/scan/参考版本身份及缺项。全paired JSONL不被diag_cap2000静默截断，每UNAVAILABLE保存实际200/300样本/参考，非全云刷屏；不把事后map重算当当时证据。覆盖<70%底层用全残差计算而非返回None，必须按实际分支归因。
+
+本机fetch最新e82d900，只核该版诊断入口及未变support/NIS底层，发现现输出缺support/raw失败/点样本；尚未完整审v3/clean A-B新运行，不继承d193680缺陷当其仍失败、不凭提交标题验收。S1诊断共享改动与开关前后原值/决定不变，S2现预算/宿主/输入检测on有限归因或原件无法回推的具体缺项，S3参数停/研究；native恢复/E2仍可并行，不把新日志循环代主线。交真正分支计数/连续段/正常边界及不可用复算、UNKNOWN，不从unsupported猜漂移；逐项状态/实际命令/原件/成本/非oracle自检。A3/B3取证任务而非已通过或新总分。独立review提交SSH推送、private保护、不合main不改算法旧历史；开发接收/实现/执行待实际回执。

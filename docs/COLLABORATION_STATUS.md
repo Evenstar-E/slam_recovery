@@ -718,3 +718,7 @@ S1最低native成功依赖与失败公开一致；S2按已派分批流控复用�
 [核验](review_20261112_d193680/README.md)三run59列示SHA一致，旧sham23应用、新terminal两driver绑定target/实际库匹配f27d构建hash；整体build ABI失败不隐去。新两臂candidate pose stamps同、实际终点与payload同，起点差约1s/开段snapshot晚trigger2.933及1.934s；23received但applied7/12、dropped16/11，不能写23/23应用或可信trigger checkpoint。三run无E2，HEALTHY/尾段输入非恢复完成，map差不归因。
 
 新host skip451/509已消费group后仍clear整个replay buffer，source与原件支持接回人口缺口；需保后缀native按序追赶到input边界或显式拒绝，不单为A/B端点对齐删除连续状态输入。S1最低实际应用人口/native成功公开依赖、S2可信完整checkpoint/产物/后缀与接回，按戳arm只是受控开发方案不等自动迟检测。旧物理候选/source来源问题未修不重测，不新RPC/阈值/防御矩阵。下一唯一有限真实修复→native state/map→catch-up→E2尾段或第一接口断点，自检逐项状态/命令/原件/失败未知/质量，S3参数停/研究、不重开四宿主。A/B局部复核不总分，独立review SSH推送、不合main不改算法历史/private保护；实际接收待回执。
+
+## repair-f3 / 用户UNAVAILABLE取证要求：不能再只打印标签
+
+[任务](UNAVAILABLE_DIAGNOSTIC_TASK_20261112.md)由用户2026-11-12直接提出。核最新e82d900现_record_diag仅nis/source/map点数且2000条截断，要求S1复用计算入口：逐帧support比例/分母/失败reason及mask，当前raw与最终effective NIS/旧值来源年龄/参考3m点数/局部面残差/coverage分支，scan/pose/当时参考版本身份；每UNAVAILABLE保存实际采样点/参考及原row mapping，summary全paired流式、不刷全图、不事后用新map造原因。S2现输入/宿主预算检测on有限归因，交代码分支计数/连续段/正常边界与不可用复算或具体BLOCKED；native恢复/E2并行、S3参数停/研究。诊断不得变计算/门值、truth只评分，原件缺项UNKNOWN，自检逐项状态/命令/原件/成本。不升A/B总分，不说任务发布即已执行。新main的v3/A-B运行尚未完整审，不继承旧缺陷为已确认当前失败；本机不改算法/代host，独立review SSH推送/private保护，实际认领待开发回执。
