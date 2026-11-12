@@ -163,6 +163,19 @@ class RepairGateTest(unittest.TestCase):
         self.assertEqual(loop.cp.set_state_calls, 1)
         self.assertTrue(ep.meta["repair_publish"]["synced"])
 
+    def test_the_sham_publishes_unchanged_clouds_with_the_same_receipts(self):
+        loop, ep = self._loop(wait_result=True)
+        loop.repair_sham = True
+        rep = loop._publish_repaired_scans(ep)
+        self.assertEqual(rep["published"], 2)
+        self.assertTrue(rep["sham"])
+        self.assertEqual(rep["repair_shift_z_m"], 0.0)
+        self.assertTrue(rep["synced"])
+        raw = np.frombuffer(loop.published[0].data, dtype=np.uint8).reshape(-1, 24)
+        z = raw[:, 8:12].view(np.float32).reshape(-1)
+        # the corrupted +0.5 cloud is forwarded unchanged
+        self.assertAlmostEqual(float(z[0]), 0.5, delta=0.06)
+
     def test_the_dry_run_estimates_but_publishes_nothing(self):
         loop, ep = self._loop(wait_result=True)
         loop.repair_dry_run = True

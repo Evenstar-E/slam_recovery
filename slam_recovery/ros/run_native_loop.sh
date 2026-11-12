@@ -224,9 +224,11 @@ RELAY_ON=0
 # REPAIR_PUBLISH=0 keeps the identical pipeline and corruption but stops the repair clouds, which
 # is the control that isolates the repair's effect from the corruption itself.
 REPAIR_PUBLISH="${REPAIR_PUBLISH:-1}"
-[ "$RELAY_ON" -eq 1 ] && [ "$REPAIR_PUBLISH" -eq 1 ] && REC_ARGS+=(--repair-publish)
-# Control: same relay, same estimation cost, no publication and no sync.
-[ "$RELAY_ON" -eq 1 ] && [ "$REPAIR_PUBLISH" -eq 0 ] && REC_ARGS+=(--repair-dry-run)
+case "$REPAIR_PUBLISH" in
+  1) [ "$RELAY_ON" -eq 1 ] && REC_ARGS+=(--repair-publish) ;;
+  sham) [ "$RELAY_ON" -eq 1 ] && REC_ARGS+=(--repair-sham) ;;
+  0) [ "$RELAY_ON" -eq 1 ] && REC_ARGS+=(--repair-dry-run) ;;
+esac
 
 cat > "$RUN_DIR/launch_pair.sh" <<EOF
 #!/bin/bash
