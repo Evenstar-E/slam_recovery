@@ -1,0 +1,7 @@
+[0m[ INFO] [1794455494.101947932]: Subscribing to /Isbuilding[0m
+[0m[ INFO] [1794455494.106443632]: Subscribing to /Issleeping[0m
+[0m[ INFO] [1794455494.108574941]: Subscribing to /Odometry[0m
+[0m[ INFO] [1794455494.110947497]: Subscribing to /cloud_registered[0m
+[0m[ INFO] [1794455494.113083222]: Subscribing to /cloud_registered_body[0m
+[0m[ INFO] [1794455494.115743876]: Subscribing to /path[0m
+[0m[ INFO] [1794455494.129196872]: Recording to '/home/R26534/mmlins_ws/output/fastlio2_shared_campus12_20261112/frontend.bag'.[0m

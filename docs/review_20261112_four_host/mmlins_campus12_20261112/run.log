@@ -1,0 +1,11 @@
+[run_mmlins] ROS master: http://127.0.0.1:50999
+/alaserPGO
+/laserMapping
+/rosout
+[run_mmlins] playing bag: /home/R26534/datasets/mmlins/campus_12_fl.bag
+[run_mmlins] bag finished, waiting 15s for PGO to settle...
+[run_mmlins] stopping recorder and finalizing: /home/R26534/mmlins_ws/output/result_campus12_twosleep_20261112.bag
+[postprocess] light: 7947 msgs -> /home/R26534/mmlins_ws/output/result_campus12_twosleep_20261112_light.bag (79 MB)
+[postprocess] mid:   8822 msgs -> /home/R26534/mmlins_ws/output/result_campus12_twosleep_20261112_mid.bag (1589 MB)
+[run_mmlins] done
+[run_mmlins] stopping only process groups started by this run...
