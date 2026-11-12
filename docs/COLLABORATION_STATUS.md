@@ -2396,3 +2396,27 @@ S3 停止依赖新 FAST-LIVO2 trace 的工作，只用既有原件（允许只�
 
 同时，Codex 参考审阅指出 `t2_run` 的一个真实缺陷：**时间排序索引读回原数组**，现有归档中 92/504 条诊断分数受影响
 （正确位姿行下中位数 70.3134→72.2939）；该修正可用既有归档完成，**不需要**新 FAST-LIVO2 运行。
+
+## 161. FAST-LIVO2 已按指令停止并归档负结果；转入四宿主，先做 FAST-LIO2 独立构建
+
+S2 停止确认：**在途无**（无 build/rosbag play/宿主进程）；最后动作是只读分析并提交 `ab2fd2a`，随后即停。
+其探针遗留的 5 个 roscore（端口 58571–58575）已按 PID 确认后终止；**48271/32895 两个非其进程，未触碰**。
+归档原样保留（`host_change_trace_cov/` v6–v12、`growth_*`、`cphist_*`、`trace_*`、`run_provenance_131213/`、
+`ONLINE_ROLLBACK_NEGATIVE_20261112.md`；源码在 `fast_livo2_ws` 当前 v12，库 `b6c1f3a4…`；run 原件在 `/tmp/fl_native_*`）。
+`ab2fd2a`（growth 报告）已由 S1 推到 `exp/growth-run`。
+
+**FAST-LIVO2 负结果（归档，不再追）**：`eff` 在 rel 25–35 s 塌陷、地图增速峰值 rel≈40.5 s，与隔离窗口（rel 0.43/12.7）
+不同步 → 指向 LIO 匹配退化后的持续写入，而非隔离触发的越界写；K=3/K=1 对照与 ASan 一并暂停。
+
+**四宿主现状（S2 据 `review_20261112_four_host/README.md`，非实时）**：
+
+| 宿主 | 已有证据 | 主要缺口 |
+|---|---|---|
+| MM-LINS / SC-PGO | Campus-12 原生两事件（E1/E2 发生、PGO 保持全局图、尾段 227–239 s） | slam_recovery 修复/事务层 **NOT_IMPLEMENTED** |
+| FAST-LIO2 | 同一 bag/时间线前端单独运行、原生双事件 PASS | **SHARED_EXECUTION**：只有 `mmlins_ws` 的 `fastlio_mapping`（`59674a8f…`），无独立构建；恢复接线 NOT_IMPLEMENTED |
+| LIO-SAM | 已运行，约 130.1 s 起发散，E2/尾段未恢复，原生 FAIL | 恢复接线 NOT_IMPLEMENTED；发散未解释 |
+| ORB-SLAM3 | 已运行，未稳定跟踪（80 次初始化、末 0 关键帧、退出 139），原生 FAIL | 跟踪稳定性未解决；恢复接线 NOT_IMPLEMENTED |
+
+**S1 已批准下一任务**：FAST-LIO2 **独立构建** + 同一 bag（`campus_12_fl.bag`，sha `a924b5f9…`）/同 E1-E2 声明戳/同 `/Odometry`
+口径复跑；验收含新二进制 sha、构建日志、源码身份、双事件证据、与 SHARED_EXECUTION 的逐项差异；标签升级为
+`NATIVE_INDEPENDENT` 或如实 FAIL。预算 1 次构建 + ≤2 次 run，不扩参数矩阵；恢复接线仍 NOT_IMPLEMENTED，不混为已实现。
