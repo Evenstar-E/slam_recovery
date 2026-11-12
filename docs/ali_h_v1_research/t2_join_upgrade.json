@@ -1,0 +1,77 @@
+{
+ "_meta": {
+  "run": "fl_native_20261112T124217Z_521833",
+  "run_id": "fl_native_20261112T124217Z_521833",
+  "trace_sha256": "3728c94c19dffcac3134ffc98a1bf28c700cc79e47665c9f6a7e1081e2f9a416",
+  "availability_sha256": "f3e7bf44474be4432bbf9a65086750d042bb1125e7e2553cd07d33f62abf7db0",
+  "receipt_sha256": "9c80b64e9d7ef57420b3c1405273c814f4a9584143bdc25b6aba0b51ffdb34e1",
+  "summary_sha256": "981381bc5d1477c1164727576266908f867f2cfea60701f31b95499ebc697be7",
+  "join_status": "TRUE_SPAN_CONTAINMENT_WITH_512NS_QUANTIZATION",
+  "tolerance_ns": 512,
+  "tolerance_basis": "double-second print quantization (ulp), not a nearest search",
+  "rule": "S in every group with first-512 <= S <= last+512; multi-to-one kept"
+ },
+ "run": {
+  "run_mode": "ONLINE_DETECTION",
+  "detection_enabled": true,
+  "final_state": "HEALTHY",
+  "paired": 444,
+  "injection": "INJECTION_DECLARED_Z_BIAS",
+  "candidate_source": "icp_reregistration",
+  "runtime_library": "1239f35ffa910018c69621c38f5e08bf20c428b3cec100e0f863d212db5aef14",
+  "recovery_node_source": "62c165d13a2fe39c3b029ef8b6f21556b31fa440aac25484b5ed03920acc670a",
+  "availability_rows": 444,
+  "status_counts": {
+   "UNAVAILABLE": 356,
+   "AVAILABLE": 88
+  },
+  "support_non_null": 444
+ },
+ "trace": {
+  "rows": 736,
+  "malformed": [],
+  "has_n_scans": true,
+  "groups": 736,
+  "n_scans_distribution": {
+   "1": 736
+  },
+  "first_equals_last": 736,
+  "phase_distribution": {
+   "0": 736
+  },
+  "has_out_distribution": {
+   "0": 67,
+   "1": 669
+  },
+  "rel_s_max": 49.11162591,
+  "shared_scan_stamp_groups": {
+   "1": 246,
+   "2": 245
+  }
+ },
+ "join": {
+  "denominator": 444,
+  "true_groups_per_availability": {
+   "2": 227,
+   "1": 217
+  },
+  "unmatched": 0,
+  "matched_n_scans": {
+   "1": 671
+  },
+  "old_mechanical_vs_new": {
+   "old_group_in_new_set": 222,
+   "old_group_not_in_new_set": 221,
+   "old_unmapped": 1
+  },
+  "multi_to_one_rows": 227,
+  "one_to_one_rows": 217,
+  "rule": "span containment with 512 ns quantization; multi-to-one kept, no group split"
+ },
+ "population_limits": {
+  "rel_s_max": 49.11162591,
+  "bag_duration_s": 60.0,
+  "full_60s_coverage": false,
+  "note": "this run stops at rel≈49.1 s; 736 trace rows / 444 paired, not a full 60 s population"
+ }
+}
