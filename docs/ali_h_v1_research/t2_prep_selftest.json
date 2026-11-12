@@ -13,12 +13,12 @@
    }
   },
   {
-   "test": "missing P_minus is INCOMPLETE",
+   "test": "missing Ppre is INCOMPLETE",
    "status": "PASS",
    "detail": {
     "status": "INCOMPLETE",
     "missing": [
-     "exports.P_minus"
+     "exports.Ppre"
     ],
     "errors": [],
     "warnings": []
@@ -116,6 +116,30 @@
     "missing": [],
     "errors": [
      "join_time_unresolved: the two ends are not the same physical interval"
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "test": "detection off is refused",
+   "status": "PASS",
+   "detail": {
+    "status": "INCOMPLETE",
+    "missing": [],
+    "errors": [
+     "detection must be on: detection-off availability has only DISABLED rows"
+    ],
+    "warnings": []
+   }
+  },
+  {
+   "test": "DISABLED availability is refused",
+   "status": "PASS",
+   "detail": {
+    "status": "INCOMPLETE",
+    "missing": [],
+    "errors": [
+     "availability.status_not_disabled must be true"
     ],
     "warnings": []
    }

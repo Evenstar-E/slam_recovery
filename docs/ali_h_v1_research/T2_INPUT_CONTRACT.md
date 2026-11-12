@@ -9,6 +9,8 @@
 | 项 | 要求 |
 |---|---|
 | run 身份 | **新的 run id**，不能复用 402/544；off/on 两次为**同一 build**、同一输入/config/library |
+| 检测 | 必须是 `--detection on`（旧 402/544 也是 on；off 只有 `DISABLED`，没有 support 可对照） |
+| availability | 同 run 产出；`status` **不再全是 DISABLED**，`support` / `support_pass` **非空** |
 | 输入 | bag/scan/imu 的 sha256；host library/executable sha256；config sha256 |
 | 时间/身份 | **绝对传感器戳**（原 ns，IMU 与 LiDAR 各自）且同时给 `scan_header_stamp`、`last_lio_update_time`、`scan_source_index`、`native_group_id/native_phase`；join 需**身份对应 + 时间对应**都成立，任一不成立 → `INCOMPLETE:join_key_unresolved`；不用 wall time、不 nearest、不用恒定 offset 自证同帧 |
 | 帧配对 | 每个 LiDAR 更新一行；`has_out` 标明该行是否有更新后状态 |
@@ -18,19 +20,25 @@
 
 每个 LiDAR 更新：
 
+**trace 按列名读取，不按位置**。已知列序（仅供核对，不用于解析）：
+
+`idx(0) rel_s(1) abs_ns(2) grp_idx(3) scan_first_ns(4) scan_last_ns(5) has_out(6)
+phase(7) eff(8) r_mean(9) r_med(10) r_abs_mean(11) r_chi2(12) r_chi2w(13)
+vec6(14..19) Ppre6x6(20..55) Ppost6x6(56..91)`
+
 | 字段 | 形状/含义 | 用途 |
 |---|---|---|
-| `P_minus` | 6×6，**更新前**位姿块 | 仅当声明为 **pre_body 的 right perturbation** 时才是 `e_I` 的协方差 |
-| `P_plus` | 6×6，**更新后**位姿块 | 同上 |
-| `vec` | 6，状态修正/扰动向量 | 与 `P` 同一状态顺序/参数化才可组合 |
-| `effct_feat_num` | 有效特征数 | 资格/可观测性上下文，不作概率 |
-| `pose_pre` | 更新前 IMU 传播位姿（SE(3)） | `e_I` 的一端 |
-| `pose_post` | 更新后 LiDAR 位姿（SE(3)） | `e_I` 的另一端 |
-| `stamp_pre` / `stamp_post` | 对应实际传感器时刻（ns） | 同一区间/同基检查 |
-| `scan_header_stamp` | LiDAR 消息 header 戳（原 ns） | 与 availability 的 `scan_stamp_ns` 对照 |
-| `last_lio_update_time` | LiDAR 帧**末时刻**（宿主首列，原 ns） | 时间对应的一端，不单独作身份 |
-| `scan_source_index` | 原始 source scan 的**唯一身份**（bag index/序号等价物） | **身份对应**的必需列 |
-| `native_group_id` / `native_phase` | native 分组/更新阶段 | 与 source scan 一一对应的必需列 |
+| `idx` / `rel_s` | 行号 / 相对秒 | 追溯，不作时间真值 |
+| `abs_ns` | 绝对传感器时刻（原 ns） | 时间对应的一端 |
+| `grp_idx` | native 合并组身份；322 个值各出现两次、两次 `abs_ns` 相同 | **物理扫描身份**（join 必需） |
+| `scan_first_ns` / `scan_last_ns` | 该合并组的 header 戳跨度（原 ns） | 时间对应/跨度核对 |
+| `has_out` | 该行是否有更新后状态 | 只用于 `has_out=1` 的行 |
+| `phase` | native 阶段；`phase=1` 为 replay 窗口（已知第 489–810 行） | live/replay 分段，不跨段分块 |
+| `eff` | 有效特征数 | 资格/可观测性上下文，不作概率 |
+| `vec6` | 6，状态修正/扰动 | 与 `Ppre/Ppost` 同一状态顺序/参数化才可组合 |
+| `Ppre` / `Ppost` | 6×6，更新前/后位姿块 | 仅当声明为 **pre_body 的 right perturbation** 时才是 `e_I` 协方差 |
+| `r_*` | 更新残差及其统计（mean/median/abs/chi2） | 仅作上下文，不另造新 confidence |
+| `mat_pre.txt` / `mat_out.txt` | 更新前 IMU 传播位姿 / 更新后 LiDAR 位姿，SE(3) | `e_I` 的两端；与 trace 同键（`grp_idx`/`abs_ns`） |
 
 **明确不接收**：
 - `S`（m×m 测量空间量，`S = H P⁻ Hᵀ + R`）——不是 6 维切空间协方差；
@@ -44,7 +52,7 @@
 3. 扰动方向：left 或 right（`T ⊞ δ` 的定义）；
 4. `P`、`vec`、位姿各自的 frame：body 或 world，及外参；
 5. bias 来源（真实估计值/常量及来源），不得用零 bias 假冒；
-6. `P_minus/P_plus` 是否可直接作 6D 协方差；若可用，必须声明 `covariance.frame = pre_body`
+6. `Ppre/Ppost` 是否可直接作 6D 协方差；若可用，必须声明 `covariance.frame = pre_body`
    且 `covariance.perturbation = right`（`e_I` 的切空间）；left 或其它 frame 不转换，直接
    `INCOMPLETE`；不可用则写 `NOT_AVAILABLE`。
 
@@ -81,8 +89,8 @@ SE(3) Log 的平移是 `rho = V(w)^-1 * t`（`V` 为左 Jacobian），**不是�
 
 ## 6. 到达后的最小验收顺序
 
-1. 校验 run 身份、输入/库/config sha256、off/on 同 build；
-2. 校验 §3 的六项声明，缺项 → `INCOMPLETE`（列出）；
+1. 校验 run 身份、detection=on、availability 非全 DISABLED 且 support 非空、输入/库/config sha256、off/on 同 build；
+2. 校验 §3 的六项声明与 §1 的按列名导出（`grp_idx`/`abs_ns`/`phase`/`scan_first_ns`/`scan_last_ns`/`Ppre`/`Ppost`/`vec6`/`mat_pre`/`mat_out`），缺项 → `INCOMPLETE`（列出）；
 3. 抽 1–2 帧做 `e_I` 手算复核对（同区间、同基、同外参）；
 4. 在全部新 trace 上跑 ALI-H shadow 与旧方法同人口对照；
 5. 若 trace 仍不可得至 2026-11-13 08:53（UTC+8），按 15 小时任务提交

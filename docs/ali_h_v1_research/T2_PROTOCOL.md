@@ -20,29 +20,32 @@
 ### 1.1 输入与 join
 
 - 新 trace 必须带同一次运行的 **availability 日志**（S1 的 `availability_frames.jsonl`）与
-  **旧检测/manager 决定**；三者同 run id、同一 build、同一输入/配置/library sha256。
-- **导出身份**：trace 必须带原始 source scan 的**唯一身份**（`scan_source_index`，能在同 run 内
-  唯一定位该扫描；仅 header 时间戳不够），以及 native 的 `native_group_id` / `native_phase`
-  对应关系；同时给 `scan_header_stamp` 与 `last_lio_update_time`，**原 ns 与 double 量化/打印分开**。
-- **join 判定两条都要成立**：
-  1. **身份对应成立**：`scan_source_index` 在同 run 内唯一，且与 availability 行、native
-     group/phase 指向同一条扫描；
-  2. **时间对应成立**：计分两端（availability 与 trace）对应**同一物理起止时间**。
+  **旧检测/manager 决定**；三者同 run id、同一 build、同一输入/配置/library sha256；
+  **detection=on**（旧 402/544 也是 on），availability 的 `status` 不能全是 DISABLED，
+  `support`/`support_pass` 必须非空。
+- **按列名读取，不按位置**。导出身份：`grp_idx` 是物理扫描身份（已知 322 个值各出现两次、
+  两次 `abs_ns` 相同）；`scan_first_ns`/`scan_last_ns` 是该合并组的 header 跨度（原 ns）；
+  `phase` 是 native 阶段（`phase=1` = replay 窗口，已知第 489–810 行）；`has_out` 只对
+  “有更新后状态”的行有效。绝对原 ns 与 double 量化/打印分开记录。
+- **join 两条都要成立**：
+  1. **身份对应**：`grp_idx` 在同 run 内与 availability 行、扫描身份一一对应；
+  2. **时间对应**：计分两端（availability 与 trace）对应**同一物理起止时间**（用 `abs_ns` /
+     `scan_first_ns` / `scan_last_ns` 核对）。
   任一不成立 → `INCOMPLETE:join_key_unresolved`（写明缺身份还是缺时间），不静默删除、不 nearest。
-- **不要用时间差自证关联**：header 戳与 `last_lio_update_time` 不等、或 offset 非恒定，本身
-  **不证明**原始扫描无法关联；反过来，**恒定 offset 也不证明**关联到的是同一扫描。只有身份对应
-  不存在时才记 `join_key_unresolved`。
+- **不要用时间差自证关联**：header 戳与末时刻不等、或 offset 非恒定，本身**不证明**原始扫描
+  无法关联；反过来，**恒定 offset 也不证明**关联到的是同一扫描。只有身份对应不存在时才记
+  `join_key_unresolved`。
 - 不得用“把变 offset 的数据全删”制造好看人口；不得用 double 末时刻反推原始 header 整数。
-- join 不上的行照旧记 `NO_AVAILABILITY_ROW` / `NO_TRACE_ROW` 进分母。
-- join 不上的 trace 行记 `NO_AVAILABILITY_ROW`；availability 有而 trace 无的行记
-  `NO_TRACE_ROW`。两者都进分母，明确列出，不静默删除。
+- join 不上的 trace 行记 `NO_AVAILABILITY_ROW`；availability 有而 trace 无的行记 `NO_TRACE_ROW`。
+  两者都进分母，明确列出。
 - 若 trace 与 availability 的 run id/build/输入 sha256 不一致：**STOP**，不作跨 run 贴接。
 
 ### 1.2 帧级分母
 
 | 人口 | 定义 |
 |---|---|
-| `all_trace_rows` | trace 的全部 LiDAR 更新行（含 `has_out=false`） |
+| `all_trace_rows` | trace 的全部行（含 `has_out=0`、各 `phase`） |
+| `has_out=1` | 有更新后状态的行；只有这些行能算 I |
 | `paired` | join 上 availability 的行 |
 | `unpaired` | `NO_AVAILABILITY_ROW` + `NO_TRACE_ROW`（分开报） |
 | 每通道分母 | `M_present` / `T_present` / `I_present`；再分 `fresh` 与 `carried`；`missing` 单列 |
@@ -60,6 +63,16 @@
 - 块内每通道取**fresh 样本分数的中位数**；`carried` 不算 fresh；无 fresh → 该通道该块 `MISSING`。
 - 尾段、隔离/恢复段、`has_out=false` 段**全部包含**在主分母；另按段（正常前缀 / 声明退化窗 /
   尾段 / 恢复段）分层报告，但不从主分母删除。
+
+### 1.4 分段与尾段（本次已知限制）
+
+- 块在**单个 phase 内**形成，不跨 phase；跨界块按 phase 边界拆开或记 `MIXED_PHASE → OUT_OF_SUPPORT`。
+- 本次 trace-on 在 **E2 之后（rel≈54 s 起）宿主位姿发散到 520 m**，原因是 restore 后没有
+  catch-up（`catch_up=NOT_IMPLEMENTED`，属既有机制，不是宿主新缺陷）。
+- 因此分类结论只在 **replay 窗口（`phase=1`，已知第 489–810 行）与其之前/声明的有效段**；
+  E2 之后尾段**不进入** NORMAL/SUSPECT/错误率的分母，单列 `POST_E2_NO_CATCHUP`：
+  报行数/时长，注明“宿主继续在回滚地图上运行、无追赶”，**不得**当作连续接回正常证据。
+- 若 trace 的 phase/时间边界与上述已知值不同，以 manifest 声明为准并记录差异；差异无法解释 → `INCOMPLETE`。
 
 ## 2. 三状态的最小证据条件与 scope
 
@@ -129,8 +142,9 @@
 
 出现以下任一，T2 该部分 `STOP/BLOCKED`，不换参数、不扫 `.95/.80/0.5/20`：
 
-1. trace 缺 §3 声明的任一项（state order / rotation param / perturbation / frame / extrinsic /
-   bias 来源），或声明互相矛盾；
+0. trace 不是 detection on，或 availability 的 status 全为 DISABLED / support 为空；
+1. trace 缺声明（state order / rotation param / perturbation / frame / extrinsic / bias 来源），
+   或声明互相矛盾；
 2. `pose_pre`/`pose_post` 不是同一实际区间/同一基，或 `has_out=false` 被当作更新后状态；
 3. `P⁻/P⁺` 不是 6×6 位姿块，或把 `S`/`H_T_H` 当 6D 协方差；或协方差声明不是
    `pre_body` + `right`（与 `e_I` 不同切空间且未声明转换）；

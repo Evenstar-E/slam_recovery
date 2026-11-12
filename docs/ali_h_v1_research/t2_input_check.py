@@ -24,13 +24,13 @@ OUT = os.path.join(HERE, "t2_prep_selftest.json")
 
 OLD_RUN_IDS = {"fl_native_20261112T065500Z_187992", "fl_native_20261112T070801Z_197026"}
 
-REQUIRED_TOP = ("run_id", "same_build_off_on", "inputs", "behavior_control", "exports",
-                "declarations", "covariance", "join")
+REQUIRED_TOP = ("run_id", "same_build_off_on", "detection", "availability", "inputs",
+                "behavior_control", "exports", "declarations", "covariance", "join")
 REQUIRED_INPUTS = ("bag_sha256", "library_sha256", "config_sha256")
-REQUIRED_EXPORTS = ("P_minus", "P_plus", "vec", "effct_feat_num",
-                    "pose_pre", "pose_post", "stamps", "has_out",
-                    "scan_header_stamp", "last_lio_update_time",
-                    "scan_source_index", "native_group_id", "native_phase")
+# Actual trace columns, read by name (the known order is only a cross-check).
+REQUIRED_EXPORTS = ("idx", "rel_s", "abs_ns", "grp_idx", "scan_first_ns", "scan_last_ns",
+                    "has_out", "phase", "eff", "vec6", "Ppre", "Ppost",
+                    "mat_pre", "mat_out")
 REQUIRED_DECL = ("state_order", "rotation_param", "perturbation", "pose_frame",
                  "vec_frame", "extrinsic", "bias_source")
 VALID_STATE_ORDER = {"rot_trans", "trans_rot"}
@@ -50,6 +50,13 @@ def check_manifest(m: dict) -> dict:
         errors.append("run_id_is_an_old_archive_run")
     if m.get("same_build_off_on") is not True:
         errors.append("off/on runs are not the same build")
+    if m.get("detection") != "on":
+        errors.append("detection must be on: detection-off availability has only DISABLED rows")
+    avail = m.get("availability") or {}
+    if avail.get("status_not_disabled") is not True:
+        errors.append("availability.status_not_disabled must be true")
+    if avail.get("support_non_null") is not True:
+        errors.append("availability.support_non_null must be true")
     inputs = m.get("inputs") or {}
     for key in REQUIRED_INPUTS:
         if not inputs.get(key):
@@ -89,7 +96,7 @@ def check_manifest(m: dict) -> dict:
         if name in (decl.get("covariance_field") or ""):
             errors.append(f"covariance must not be {name} (measurement-space/information matrix)")
     if cov.get("usable") is True:
-        if cov.get("blocks") not in ("P_minus/P_plus", "P_minus", "P_plus"):
+        if cov.get("blocks") not in ("Ppre/Ppost", "Ppre", "Ppost"):
             errors.append("covariance.blocks must name the 6x6 pose blocks")
         # e_I = Log(inv(pre) * post) is a RIGHT perturbation expressed in the pre-pose body
         # frame. A covariance declared left, or in another frame, is a different tangent; using
@@ -199,6 +206,8 @@ def _manifest(**over):
     m = {
         "run_id": "fl_native_SYNTHETIC_TRACE_000",
         "same_build_off_on": True,
+        "detection": "on",
+        "availability": {"status_not_disabled": True, "support_non_null": True},
         "inputs": {"bag_sha256": "a" * 64, "library_sha256": "b" * 64, "config_sha256": "c" * 64},
         "behavior_control": {"trace_off_run": "off", "trace_on_run": "on",
                              "old_decisions_identical": True},
@@ -207,7 +216,7 @@ def _manifest(**over):
                          "perturbation": "right", "pose_frame": "world", "vec_frame": "body",
                          "extrinsic": True, "bias_source": "host_estimate",
                          "covariance_field": "P_minus/P_plus"},
-        "covariance": {"usable": True, "blocks": "P_minus/P_plus",
+        "covariance": {"usable": True, "blocks": "Ppre/Ppost",
                        "frame": "pre_body", "perturbation": "right"},
         "not_included": ["S", "H_T_H"],
         "join": {"identity_correspondence": True, "time_correspondence": True,
@@ -230,10 +239,10 @@ def selftest() -> dict:
     add("valid manifest is READY", r["status"] == "READY", r)
 
     m2 = _manifest()
-    del m2["exports"]["P_minus"]
+    del m2["exports"]["Ppre"]
     r2 = check_manifest(m2)
-    add("missing P_minus is INCOMPLETE", r2["status"] == "INCOMPLETE"
-        and "exports.P_minus" in r2["missing"], r2)
+    add("missing Ppre is INCOMPLETE", r2["status"] == "INCOMPLETE"
+        and "exports.Ppre" in r2["missing"], r2)
 
     m3 = _manifest()
     m3["declarations"]["covariance_field"] = "S"
@@ -281,6 +290,16 @@ def selftest() -> dict:
     r10 = check_manifest(m10)
     add("missing time correspondence is refused", r10["status"] == "INCOMPLETE"
         and any("join_time_unresolved" in e for e in r10["errors"]), r10)
+
+    m11 = _manifest(detection="off")
+    r11 = check_manifest(m11)
+    add("detection off is refused", r11["status"] == "INCOMPLETE"
+        and any("detection must be on" in e for e in r11["errors"]), r11)
+
+    m12 = _manifest(availability={"status_not_disabled": False, "support_non_null": True})
+    r12 = check_manifest(m12)
+    add("DISABLED availability is refused", r12["status"] == "INCOMPLETE"
+        and any("status_not_disabled" in e for e in r12["errors"]), r12)
 
     # identity -> zero residual
     I = np.eye(4)
