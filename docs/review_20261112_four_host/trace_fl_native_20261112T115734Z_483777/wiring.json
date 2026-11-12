@@ -1,0 +1,66 @@
+{
+ "checks": {
+  "both_topics_received": {
+   "pose_messages": 819,
+   "scan_messages": 586,
+   "ok": true
+  },
+  "pairing": {
+   "paired": 532,
+   "fraction_of_poses": 0.6495726495726496,
+   "fraction_of_scans": 0.9078498293515358,
+   "max_abs_dt_ns": 39959192,
+   "ok": true
+  },
+  "nis_provenance": {
+   "computed": 531,
+   "carried_forward": 0,
+   "unavailable": 1,
+   "reference_node_map": 445,
+   "reference_prev_scan": 86,
+   "fed_to_step_frame": 352,
+   "ingested_without_detection": 180,
+   "detection_status": {
+    "AVAILABLE": 351,
+    "UNAVAILABLE": 180,
+    "DISABLED_FOR_DIAGNOSIS": 0
+   },
+   "ok": true
+  },
+  "gate_reachable": {
+   "episodes": 7,
+   "decisions": 6,
+   "accepted": 1,
+   "rejected": 5,
+   "errored": 0,
+   "incumbent_basis": [
+    "CONSTANT_VELOCITY",
+    "CONSTANT_VELOCITY",
+    "CONSTANT_VELOCITY",
+    "CONSTANT_VELOCITY",
+    null,
+    "CONSTANT_VELOCITY",
+    "CONSTANT_VELOCITY"
+   ],
+   "evidence_reasons": [
+    "passed_wilson_sequential_benefit_and_boundary_continuity",
+    "passed_wilson_sequential_benefit_and_boundary_continuity",
+    "wilson_sequential_benefit_lower_bound_failed",
+    "passed_wilson_sequential_benefit_and_boundary_continuity",
+    null,
+    "passed_wilson_sequential_benefit_and_boundary_continuity",
+    "passed_wilson_sequential_benefit_and_boundary_continuity"
+   ],
+   "status": "APPLICABLE",
+   "ok": true
+  },
+  "same_process_group": {
+   "recovery_pid": 484770,
+   "host_pid": 484769,
+   "recovery_pgid": 484766,
+   "host_pgid": 484766,
+   "ok": true
+  }
+ },
+ "all_ok": true
+}

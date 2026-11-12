@@ -1,0 +1,54 @@
+{
+ "status": "OK",
+ "reason": "all wiring checks passed",
+ "termination": "PLANNED_KILL_AFTER_DRAIN",
+ "run_id": "fl_native_20261112T115203Z_476840",
+ "inputs": {
+  "bag": "/tmp/fastlivo/hall01_two_event_v1.bag",
+  "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+  "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+  "host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+  "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+  "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+  "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+  "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+  "recovery_node_source": "a4aaa58b05503749b420f164ac93a942b4d137b69c65362128904a6d27428a69",
+  "runtime_library": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+  "runtime_library_sha256": "49f2f941cc0a90357e088d2271f21e60fdeb18c88b5b89a1c6acce5f55e48eda"
+ },
+ "machine_load_at_launch": "60.93 114.98 157.73 10/74373 476891\nnproc=128",
+ "launch": {
+  "rate": "1.0",
+  "drain_s": "40",
+  "duration_s": "0",
+  "max_pairs": "0",
+  "candidate_source": "icp_reregistration",
+  "detection": "on",
+  "sigma_meas_m": "0.884",
+  "scripted_triggers_s": "",
+  "scripted_triggers_ns": "1627785276215170145,1627785306371636152",
+  "confirmation_margin_sec": "4.0",
+  "relay_shift_z": "0.5",
+  "relay_start_ns": "1627785276215170145",
+  "relay_end_ns": "1627785282215170145",
+  "injection": "INJECTION_DECLARED_Z_BIAS",
+  "repair_publish": "1",
+  "run_mode": "CONTROLLED_INTERFACE_TEST",
+  "group_model": "host and recovery node are children of one setsid supervisor"
+ },
+ "exit_codes": {
+  "play": "0",
+  "supervisor": "null",
+  "recovery_node": "0",
+  "roscore": "null"
+ },
+ "recovery_summary_present": true,
+ "recovery_summary_headline": {
+  "paired": 544,
+  "fed_to_step_frame": 202,
+  "episodes": 5,
+  "decisions": 5,
+  "accepted": 0,
+  "final_state": "HEALTHY"
+ }
+}
