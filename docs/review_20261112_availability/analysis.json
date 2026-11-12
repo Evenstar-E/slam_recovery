@@ -1,0 +1,201 @@
+{
+ "rows": 402,
+ "support_classes": {
+  "empty_reference": 22,
+  "ok": 95,
+  "insufficient_support": 285
+ },
+ "support_pass": {
+  "false": 307,
+  "true": 95
+ },
+ "nis_classes": {
+  "not_computed:no_reference": 1,
+  "computed_finite": 401
+ },
+ "status": {
+  "UNAVAILABLE": 307,
+  "AVAILABLE": 95
+ },
+ "status_from_conditions_mismatches": [],
+ "runs": [
+  {
+   "status": "UNAVAILABLE",
+   "first_row": 0,
+   "last_row": 21,
+   "frames": 22,
+   "start_pose_stamp_ns": 1627785262008174419,
+   "end_pose_stamp_ns": 1627785264073572397
+  },
+  {
+   "status": "AVAILABLE",
+   "first_row": 22,
+   "last_row": 52,
+   "frames": 31,
+   "start_pose_stamp_ns": 1627785264206571102,
+   "end_pose_stamp_ns": 1627785267205767155
+  },
+  {
+   "status": "UNAVAILABLE",
+   "first_row": 53,
+   "last_row": 117,
+   "frames": 65,
+   "start_pose_stamp_ns": 1627785267272356749,
+   "end_pose_stamp_ns": 1627785273678019524
+  },
+  {
+   "status": "AVAILABLE",
+   "first_row": 118,
+   "last_row": 156,
+   "frames": 39,
+   "start_pose_stamp_ns": 1627785273812009573,
+   "end_pose_stamp_ns": 1627785279081910849
+  },
+  {
+   "status": "UNAVAILABLE",
+   "first_row": 157,
+   "last_row": 170,
+   "frames": 14,
+   "start_pose_stamp_ns": 1627785279281777620,
+   "end_pose_stamp_ns": 1627785281680577278
+  },
+  {
+   "status": "AVAILABLE",
+   "first_row": 171,
+   "last_row": 179,
+   "frames": 9,
+   "start_pose_stamp_ns": 1627785281880469561,
+   "end_pose_stamp_ns": 1627785283346364737
+  },
+  {
+   "status": "UNAVAILABLE",
+   "first_row": 180,
+   "last_row": 182,
+   "frames": 3,
+   "start_pose_stamp_ns": 1627785283546281815,
+   "end_pose_stamp_ns": 1627785283946079731
+  },
+  {
+   "status": "AVAILABLE",
+   "first_row": 183,
+   "last_row": 198,
+   "frames": 16,
+   "start_pose_stamp_ns": 1627785284145961285,
+   "end_pose_stamp_ns": 1627785286211474180
+  },
+  {
+   "status": "UNAVAILABLE",
+   "first_row": 199,
+   "last_row": 401,
+   "frames": 203,
+   "start_pose_stamp_ns": 1627785286344705820,
+   "end_pose_stamp_ns": 1627785306575157404
+  }
+ ],
+ "recompute": [
+  {
+   "row": 22,
+   "kf_id": 22,
+   "status": "AVAILABLE",
+   "support_pass": true,
+   "nis_present": true,
+   "status_from_conditions": "AVAILABLE",
+   "support": {
+    "reported_reason": "ok",
+    "reported_supported_fraction": 0.88,
+    "reported_within": 176,
+    "reported_sampled": 200,
+    "saved_points": 20,
+    "saved_within": 15,
+    "saved_fraction": 0.75
+   },
+   "nis": {
+    "reported_nis": 18.280525337810758,
+    "reported_mean_residual": 2.3224142871936224,
+    "reported_branch": "all_residuals",
+    "reported_valid_total": [
+     202,
+     300
+    ],
+    "saved_residuals": 20,
+    "saved_chi2_mean": 0.889422,
+    "saved_residual_mean": 0.664675,
+    "saved_within_2m": [
+     19,
+     20
+    ]
+   }
+  },
+  {
+   "row": 53,
+   "kf_id": 53,
+   "status": "UNAVAILABLE",
+   "support_pass": false,
+   "nis_present": true,
+   "status_from_conditions": "UNAVAILABLE",
+   "support": {
+    "reported_reason": "ok",
+    "reported_supported_fraction": 0.195,
+    "reported_within": 39,
+    "reported_sampled": 200,
+    "saved_points": 200,
+    "saved_within": 39,
+    "saved_fraction": 0.195
+   },
+   "nis": {
+    "reported_nis": 10.156722370991561,
+    "reported_mean_residual": 2.289657832613871,
+    "reported_branch": "all_residuals",
+    "reported_valid_total": [
+     181,
+     300
+    ],
+    "saved_residuals": 300,
+    "saved_chi2_mean": 10.156722,
+    "saved_residual_mean": 2.289658,
+    "saved_within_2m": [
+     181,
+     300
+    ]
+   }
+  },
+  {
+   "row": 157,
+   "kf_id": 157,
+   "status": "UNAVAILABLE",
+   "support_pass": false,
+   "nis_present": true,
+   "status_from_conditions": "UNAVAILABLE",
+   "support": {
+    "reported_reason": "ok",
+    "reported_supported_fraction": 0.315,
+    "reported_within": 63,
+    "reported_sampled": 200,
+    "saved_points": 200,
+    "saved_within": 63,
+    "saved_fraction": 0.315
+   },
+   "nis": {
+    "reported_nis": 403.6426057098469,
+    "reported_mean_residual": 14.603380588785058,
+    "reported_branch": "all_residuals",
+    "reported_valid_total": [
+     23,
+     300
+    ],
+    "saved_residuals": 300,
+    "saved_chi2_mean": 403.642606,
+    "saved_residual_mean": 14.603381,
+    "saved_within_2m": [
+     23,
+     300
+    ]
+   }
+  }
+ ],
+ "status_condition_combos": {
+  "False/False": 1,
+  "False/True": 306,
+  "True/True": 95
+ }
+}
