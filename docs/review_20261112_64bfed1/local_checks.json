@@ -1,0 +1,66 @@
+{
+  "target": "64bfed115f7d2058bbfe076caf103491036560c1",
+  "base": "2f1f59bfdab1203a7ef6eb3eb2e72eb345a7b8cb",
+  "loaded_sources_sha256": {
+    "slam_recovery/ros/cloud_repair.py": "4b5b6f8a5428f0527fe0002acdb8f80af2b708195846a412a11fb7b5c3588dd2",
+    "slam_recovery/ros/recovery_node.py": "6f90ad9e98833208ea50f4011b7dcdf0f18cf29d621063359813eaaa92b2d069",
+    "slam_recovery/tests/test_cloud_repair.py": "69bda1d3ed6229dc2391e465d70e41a7c926cfb42b4b4d89d60c8dc4e6e6c559"
+  },
+  "source_loading": "Target Git blobs in memory; remaining package source unchanged",
+  "command": "C:/Python315/python.exe -B -W ignore D:/REPAIR/slam_recovery_upstream/docs/review_20261112_64bfed1/run_checks.py",
+  "exit": 0,
+  "batch_nonzero_baseline": {
+    "status": "PASS_LOCAL",
+    "baseline": 25,
+    "final": 50,
+    "expected_per_batch": [
+      35,
+      45,
+      50
+    ],
+    "batch_sizes": [
+      10,
+      10,
+      5
+    ],
+    "header_order_preserved": true,
+    "scope": "Actual target batch/gate with synthetic valid bias and receipt results; not host execution"
+  },
+  "batch_partial_receipt": {
+    "status": "PASS_LOCAL",
+    "published_before_stop": 20,
+    "expected_per_batch": [
+      35,
+      45
+    ],
+    "reason": "batch_receipt_timeout",
+    "scope": "Synthetic receipt failure stops remaining batch; no native state/lifecycle claim"
+  },
+  "missing_baseline_skill_finding": {
+    "status": "FAIL_REPRODUCED_LOCAL",
+    "baseline": null,
+    "old_host_received": 25,
+    "current_event_received": 0,
+    "published": 25,
+    "expected_per_batch": [
+      10,
+      20,
+      25
+    ],
+    "final_received": 25,
+    "synced": true,
+    "gate_proceed": true,
+    "scope": "Actual target publisher/gate, simulated delayed status baseline and old receipts; not observed in four archives"
+  },
+  "candidate_freeze": {
+    "status": "PASS_LOCAL",
+    "frozen_at_ns": 3000000000,
+    "candidate_frames": 21,
+    "later_frames_not_added": 24,
+    "first_pending_wall_not_overwritten": true,
+    "scope": "Actual target tracking with identical synthetic timestamps; does not prove native replay extent or all pending ownership"
+  },
+  "target_test_modules": "NOT_RUN: frame_freeze and repair_sync import pytest-dependent helpers; no install/shim; direct target controls used",
+  "unchanged_cloud_tests": "Previously accepted; not rerun",
+  "native_host_or_bag_execution": false
+}

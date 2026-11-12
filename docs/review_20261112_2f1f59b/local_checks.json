@@ -1,0 +1,59 @@
+{
+  "target": "2f1f59bfdab1203a7ef6eb3eb2e72eb345a7b8cb",
+  "base": "18baefd89e70a65b1a493b0c1e532558b6bff6e0",
+  "loaded_source_sha256": {
+    "slam_recovery/ros/cloud_repair.py": "4b5b6f8a5428f0527fe0002acdb8f80af2b708195846a412a11fb7b5c3588dd2",
+    "slam_recovery/ros/recovery_node.py": "c144deb388037b82aac7462a545149130b7715b43faf5bf99dd4a4840c219f23",
+    "slam_recovery/tests/test_cloud_repair.py": "69bda1d3ed6229dc2391e465d70e41a7c926cfb42b4b4d89d60c8dc4e6e6c559"
+  },
+  "source_loading": "Target Git blobs, unchanged worktree dependencies",
+  "command": "C:/Python315/python.exe -B -W ignore D:/REPAIR/slam_recovery_upstream/docs/review_20261112_2f1f59b/run_checks.py",
+  "exit": 0,
+  "cloud_tests": {
+    "status": "PASS_LOCAL",
+    "count": 11,
+    "seconds": 0.4125588000752032
+  },
+  "skill_finding_verification": {
+    "status": "FAIL_REPRODUCED_LOCAL",
+    "estimate": {
+      "reference_points": 441,
+      "per_frame": [
+        {
+          "kf": 1,
+          "bias_z_m": 0.5,
+          "valid_points": 80
+        },
+        {
+          "kf": 2,
+          "bias_z_m": 0.0,
+          "valid_points": 0
+        },
+        {
+          "kf": 3,
+          "bias_z_m": 0.0,
+          "valid_points": 0
+        }
+      ],
+      "bias_z_m": 0.0,
+      "mad_m": 0.0,
+      "frames_estimated": 3,
+      "tolerance_m": 0.15,
+      "expected_bias_m": 0.5,
+      "within_declared_tolerance": false
+    },
+    "scope": "Actual target estimator: one supported +0.5 estimate, two nonempty low-support scans; invalid zero results become the median. Not the archived run, whose all n_valid>=27."
+  },
+  "candidate_measurement_mismatch": {
+    "status": "FAIL_REPRODUCED_LOCAL",
+    "gate_world_z": 0.0,
+    "set_state_z": -0.5,
+    "published_body_z": 0.0,
+    "candidate_pose_plus_repaired_cloud_world_z": -0.5,
+    "bias_m": 0.5,
+    "repair_shift_m": -0.5,
+    "scope": "Actual target decide and producer; gate and host-absorbed ICP pose simulated, no host estimator execution. Accepted raw geometry differs from published repaired geometry; not an observed 0.5m error in archived run."
+  },
+  "repair_sync_tests": "NOT_RUN: pytest-dependent helper and existing Windows fake-host rename issue; no install/shim",
+  "no_native_host_or_bag_execution": true
+}

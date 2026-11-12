@@ -1,0 +1,53 @@
+{
+  "target": "d193680aa6f3bb7945e8bf01fdd2d8932819c49c",
+  "base": "64bfed115f7d2058bbfe076caf103491036560c1",
+  "loaded_sources_sha256": {
+    "slam_recovery/ros/cloud_repair.py": "4b5b6f8a5428f0527fe0002acdb8f80af2b708195846a412a11fb7b5c3588dd2",
+    "slam_recovery/ros/recovery_node.py": "cae046ecfb8740d42ec28e26b41908da3a08bcb215e6e993e7e72c29a5443070",
+    "slam_recovery/tests/test_cloud_repair.py": "69bda1d3ed6229dc2391e465d70e41a7c926cfb42b4b4d89d60c8dc4e6e6c559",
+    "docs/review_20261112_four_host/host_change_terminal_stamp/deployed_host_v2.diff": "2ffc5f6e6f8792ec35594a8772bfd85bd3b16be65dfc765637573e33c4fb59a0"
+  },
+  "command": "C:/Python315/python.exe -B -W ignore D:/REPAIR/slam_recovery_upstream/docs/review_20261112_d193680/run_checks.py",
+  "exit": 0,
+  "client_endpoint": {
+    "status": "PASS_LOCAL",
+    "physical_order": [
+      "hold",
+      "snapshot",
+      "reprocess"
+    ],
+    "end_payload": "1627785280281185627",
+    "default_payload": "",
+    "scope": "Actual target client/episode open with file ACKs; no native timestamp-equivalence claim"
+  },
+  "sham_publisher": {
+    "status": "PASS_LOCAL",
+    "shift_m": 0,
+    "entire_point_data_unchanged": true,
+    "scope": "Actual target publisher with synthetic estimate/receipt; not proof identical runtime timing"
+  },
+  "truncated_suffix": {
+    "status": "SOURCE_CONFIRMED_WITH_BOOKKEEPING_ILLUSTRATION",
+    "captured_ns": [
+      1000000000,
+      2000000000,
+      3000000000,
+      4000000000
+    ],
+    "bounded_replayed_ns": [
+      1000000000,
+      2000000000
+    ],
+    "already_consumed_skipped_ns": [
+      3000000000,
+      4000000000
+    ],
+    "retained_after_clear": [],
+    "next_live_ns": 5000000000,
+    "scope": "New C++ truncation skips consumed suffix, then existing clear discards it. Does not compute actual dynamics/trajectory; archived truncated451/509 separately corroborate affected population."
+  },
+  "new_checkpoint_multicommand_test": "NOT_RUN: Windows fake host renames over existing cmd.done; manual file protocol control avoids modifying target test/production",
+  "repair_sync_tests": "NOT_RUN: imports pytest-dependent helper; no installation/shim",
+  "unchanged_tests": "Prior accepted components not rerun",
+  "no_native_host_or_bag_execution": true
+}

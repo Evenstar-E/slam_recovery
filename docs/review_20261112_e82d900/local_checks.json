@@ -1,0 +1,36 @@
+{
+  "target": "e82d90041c090dcb8a9df6402ebfdb98f465a0b8",
+  "base": "d193680aa6f3bb7945e8bf01fdd2d8932819c49c",
+  "source_loading": "Target Git blobs with unchanged package dependencies",
+  "loaded_sources_sha256": {
+    "slam_recovery/ros/cloud_repair.py": "4b5b6f8a5428f0527fe0002acdb8f80af2b708195846a412a11fb7b5c3588dd2",
+    "slam_recovery/ros/recovery_node.py": "5877388c9d651a8963e3a989146c411764b9fb276058ec1cea7f9a9b83c686d5",
+    "slam_recovery/tests/test_checkpoint_client.py": "e26cf33d08327efdf58c283a83fbb81521a2f35d5860fdd8c0fdcf42f78821ca"
+  },
+  "command": "C:/Python315/python.exe -B -W ignore D:/REPAIR/slam_recovery_upstream/docs/review_20261112_e82d900/run_checks.py",
+  "exit": 0,
+  "selected_tests": {
+    "status": "PASS_LOCAL",
+    "count": 1
+  },
+  "deferred_receipt": {
+    "status": "PASS_LOCAL_RECEIPT_ONLY",
+    "stamp_ns": 1627785276215170145,
+    "hold_then_snapshot_payloads": true,
+    "client_pending_after_deferred_receipts": false,
+    "host_application_proven_by_this_control": false
+  },
+  "episode_open_fallback": {
+    "status": "PASS_LOCAL_DECLARED_FALLBACK",
+    "command": "hold",
+    "snapshot_sent": false,
+    "scope": "Actual target opening, no prearming simulated. Online/next event does not obtain the first scripted timestamp guarantee."
+  },
+  "first_scripted_trigger_only_prearmed": true,
+  "replay_end_grace_ns": 100000000,
+  "consumed_suffix_skip_and_clear_still_in_v3": true,
+  "v3_patch_sha256": "46648b4c082fd52ee74ea1e8677d2ad756de66473a73c936912d01d669d1ab28",
+  "multicommand_checkpoint_tests": "NOT_RUN_existing_Windows_fake_host_rename_over_cmd.done",
+  "repair_sync_tests": "NOT_RUN_pytest_helper_dependency_no_install_or_shim",
+  "no_native_host_or_bag_execution": true
+}

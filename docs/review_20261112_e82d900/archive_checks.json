@@ -1,0 +1,604 @@
+{
+  "target": "e82d90041c090dcb8a9df6402ebfdb98f465a0b8",
+  "base": "d193680aa6f3bb7945e8bf01fdd2d8932819c49c",
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261112_e82d900/check_archive.py",
+  "exit": 0,
+  "scope": "Archive Git bytes/hash and execution counters; no bag/native execution, no causal quality claim",
+  "integrity": {
+    "matched": 41,
+    "total": 41,
+    "bad": []
+  },
+  "runs": [
+    {
+      "arm": "repair",
+      "run_id": "fl_native_20261112T055727Z_148998",
+      "driver_sha": "5877388c9d651a8963e3a989146c411764b9fb276058ec1cea7f9a9b83c686d5",
+      "matches_target_driver": true,
+      "runtime_library_sha": "9c0330beffa2d93564ba10d36751e938baa54768fa218b21b75fe17bb8f700db",
+      "matches_recorded_build_sha": true,
+      "input_hashes": {
+        "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+        "host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+        "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+        "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7"
+      },
+      "launch": {
+        "rate": "1.0",
+        "drain_s": "30",
+        "duration_s": "0",
+        "max_pairs": "0",
+        "candidate_source": "icp_reregistration",
+        "detection": "off",
+        "sigma_meas_m": "0.884",
+        "scripted_triggers_s": "",
+        "scripted_triggers_ns": "1627785276215170145",
+        "confirmation_margin_sec": "4.0",
+        "relay_shift_z": "0.5",
+        "relay_start_ns": "1627785276215170145",
+        "relay_end_ns": "1627785282215170145",
+        "injection": "INJECTION_DECLARED_Z_BIAS",
+        "repair_publish": "1",
+        "run_mode": "CONTROLLED_INTERFACE_TEST",
+        "group_model": "host and recovery node are children of one setsid supervisor"
+      },
+      "machine_load": "43.74 60.84 108.65 6/61963 149040\nnproc=128",
+      "candidate": {
+        "accepted": true,
+        "count": 23,
+        "pose_stamps_ns": [
+          1627785276281966925,
+          1627785276482108831,
+          1627785276681957006,
+          1627785276815181017,
+          1627785276881790638,
+          1627785277081609249,
+          1627785277281412840,
+          1627785277481386900,
+          1627785277681567430,
+          1627785277881757259,
+          1627785278081956625,
+          1627785278282165527,
+          1627785278482237816,
+          1627785278682140827,
+          1627785278882031918,
+          1627785279081910849,
+          1627785279281777620,
+          1627785279481660843,
+          1627785279681560755,
+          1627785279814820290,
+          1627785279881448030,
+          1627785280081322908,
+          1627785280281185627
+        ],
+        "committed": 23,
+        "deferred": 93,
+        "weak_before": 3.138785109598945,
+        "weak_after": 7.296022129067538,
+        "wilson": 0.8947318770599499,
+        "holdout": 0.41368003614033666
+      },
+      "freeze": {
+        "frozen": true,
+        "frozen_at_ns": 1627785280281185627,
+        "frozen_frames": 23,
+        "frames_after_freeze": 373
+      },
+      "repair": {
+        "enabled": true,
+        "published": 23,
+        "bias_z_m": 0.4,
+        "missing_clouds": 0,
+        "synced": true,
+        "mad_m": 0.05,
+        "frames_estimated": 23,
+        "reference_points": 24281,
+        "tolerance_m": 0.15,
+        "expected_bias_m": 0.5,
+        "within_declared_tolerance": true,
+        "sham": false,
+        "repair_shift_z_m": -0.4,
+        "repair_received_baseline": 0,
+        "batches": [
+          {
+            "batch": 1,
+            "in_batch": 10,
+            "published_total": 10,
+            "received_ok": true
+          },
+          {
+            "batch": 2,
+            "in_batch": 10,
+            "published_total": 20,
+            "received_ok": true
+          },
+          {
+            "batch": 3,
+            "in_batch": 3,
+            "published_total": 23,
+            "received_ok": true
+          }
+        ],
+        "final_received": 23
+      },
+      "published_scan_stamps_ns": [
+        1627785276310700417,
+        1627785276509166718,
+        1627785276709579945,
+        1627785276809773207,
+        1627785276910036325,
+        1627785277110370636,
+        1627785277310790539,
+        1627785277511139870,
+        1627785277711539745,
+        1627785277911912918,
+        1627785278112646341,
+        1627785278313846827,
+        1627785278514312744,
+        1627785278713484526,
+        1627785278914969444,
+        1627785279114402533,
+        1627785279314662933,
+        1627785279515062809,
+        1627785279715475559,
+        1627785279815762043,
+        1627785279915841579,
+        1627785280116224766,
+        1627785280317023993
+      ],
+      "published_stamps_all_corrupted": true,
+      "relay": {
+        "frames": 598,
+        "shifted": 59,
+        "unshifted": 539,
+        "window": {
+          "event": "window",
+          "in_topic": "/velodyne_points_raw",
+          "out_topic": "/velodyne_points",
+          "start_ns": 1627785276215170145,
+          "end_ns": 1627785282215170145,
+          "shift_z": 0.5,
+          "wall_start": 1794463056.3959296
+        }
+      },
+      "deferred_apply": [
+        {
+          "line": 9163,
+          "text": "\u001b[0m[ INFO] [1794463090.171665530]: [NATIVE_CHECKPOINT] deferred apply cmd=hold at_lio=1627785276.281966925 stamp_ns=1627785276215170145 late_ms=66.797 ok=1 valid=1 stamp_ns=1627785276081583616 frame=219 voxels=15890 nodes=33596 points=308512 restores=0 live_voxels=15905 live_points=308821 state_pos=6.192556,3.582319,0.107959 hold=1 held_frames=0 held_points=0 hold_commands=1 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=152 set_state=0 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0\u001b[0m"
+        },
+        {
+          "line": 9165,
+          "text": "\u001b[0m[ INFO] [1794463090.251364044]: [NATIVE_CHECKPOINT] deferred apply cmd=snapshot at_lio=1627785276.281966925 stamp_ns=1627785276215170145 late_ms=66.797 ok=1 valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15905 nodes=33641 points=308821 restores=0 live_voxels=15905 live_points=308821 state_pos=6.192556,3.582319,0.107959 hold=1 held_frames=0 held_points=0 hold_commands=1 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=152 set_state=0 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0\u001b[0m"
+        }
+      ],
+      "snapshot_fields": {
+        "cmd": "snapshot",
+        "at_lio": "1627785276.281966925",
+        "stamp_ns": "1627785276215170048",
+        "late_ms": "66.797",
+        "ok": "1",
+        "valid": "1",
+        "frame": "221",
+        "voxels": "15905",
+        "nodes": "33641",
+        "points": "308821",
+        "restores": "0",
+        "live_voxels": "15905",
+        "live_points": "308821",
+        "state_pos": "6.192556,3.582319,0.107959",
+        "hold": "1",
+        "held_frames": "0",
+        "held_points": "0",
+        "hold_commands": "1",
+        "repair_received": "0",
+        "repair_applied": "0",
+        "repair_dropped": "0",
+        "repair_queued": "0",
+        "multi_scan_groups": "0",
+        "merged_scans": "152",
+        "set_state": "0",
+        "repair_merged_away": "0",
+        "control_valid": "0",
+        "control_pos": "0.000000,0.000000,0.000000",
+        "control_points": "0\u001b[0m"
+      },
+      "replay": {
+        "frames": 124,
+        "start_ns": 1627785276281966925,
+        "end_ns": 1627785280347787857,
+        "applied": 23,
+        "queued": 0,
+        "replayed": 124,
+        "truncated": 399,
+        "end_stamp": 1627785280381185627
+      },
+      "replay_log": "\u001b[0m[ INFO] [1794463101.225172562]: [NATIVE_CHECKPOINT] reprocess #1: 124 frames replayed over [1627785276.281966925 .. 1627785280.347787857], repairs applied=23 queued=0, replayed=124 truncated=399 end_stamp=1627785280381185627, map now 17811 voxels/335054 points\u001b[0m",
+      "host_received_log_count": 23,
+      "host_applied_log_count": 23,
+      "leftover_lines": [
+        "\u001b[0m[ INFO] [1794463101.212071362]: [NATIVE_REPAIR] leftover 0: had_group_but_missed=0 no_group_nearby=0 (groups=124, spans=0)\u001b[0m"
+      ],
+      "actions": [
+        {
+          "command": "hold",
+          "wall": 1794463056.396,
+          "ack_wall": 1794463067.459,
+          "ok": true,
+          "error": null,
+          "ack": "OK hold deferred stamp=1627785276215170145"
+        },
+        {
+          "command": "hold",
+          "wall": 1794463090.644,
+          "ack_wall": 1794463090.959,
+          "ok": true,
+          "error": null,
+          "ack": "OK hold valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15905 nodes=33641 points=308821 restores=0 live_voxels=15905 live_points=308821 state_pos=6.703862,4.379517,-0.333489 hold=1 held_frames=17 held_points=72244 hold_commands=2 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=167 set_state=0 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0"
+        },
+        {
+          "command": "reprocess",
+          "wall": 1794463099.835,
+          "ack_wall": 1794463101.34,
+          "ok": true,
+          "error": null,
+          "ack": "OK reprocess valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15905 nodes=33641 points=308821 restores=1 live_voxels=17811 live_points=335054 state_pos=7.697883,5.720576,-0.029850 hold=1 held_frames=210 held_points=636880 hold_commands=2 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=326 set_state=0 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0"
+        },
+        {
+          "command": "set_state",
+          "wall": 1794463101.34,
+          "ack_wall": 1794463101.836,
+          "ok": true,
+          "error": null,
+          "ack": "OK set_state valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15905 nodes=33641 points=308821 restores=1 live_voxels=17811 live_points=335054 state_pos=7.696037,5.637564,-0.359403 hold=1 held_frames=215 held_points=655496 hold_commands=2 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=331 set_state=1 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0"
+        },
+        {
+          "command": "resume",
+          "wall": 1794463101.836,
+          "ack_wall": 1794463102.341,
+          "ok": true,
+          "error": null,
+          "ack": "OK resume valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15905 nodes=33641 points=308821 restores=1 live_voxels=17811 live_points=335054 state_pos=9.506266,4.749488,0.068121 hold=0 held_frames=230 held_points=718895 hold_commands=3 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=346 set_state=1 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0"
+        }
+      ],
+      "frames": {
+        "paired": 543,
+        "ingested": 543,
+        "fed_to_step_frame": 1,
+        "ingested_without_detection": 0,
+        "consumed_after_first_decision": 317,
+        "first_decision_ts_ns": 1627785280880943775
+      },
+      "episodes": 1,
+      "second_and_later_events": 0,
+      "detection_enabled": false,
+      "lifecycle": {
+        "state": "HEALTHY",
+        "wait_limit_ns": 2000000000,
+        "unresolved_segments": 1
+      },
+      "lifecycle_events": [
+        {
+          "event": "wait_limit_closed",
+          "from_state": null,
+          "trusted_version": 102
+        },
+        {
+          "event": "rearm",
+          "from_state": "ABORTED",
+          "trusted_version": 102
+        }
+      ],
+      "native_failures": 0,
+      "termination": "PLANNED_KILL_AFTER_DRAIN"
+    },
+    {
+      "arm": "sham",
+      "run_id": "fl_native_20261112T055931Z_151459",
+      "driver_sha": "5877388c9d651a8963e3a989146c411764b9fb276058ec1cea7f9a9b83c686d5",
+      "matches_target_driver": true,
+      "runtime_library_sha": "9c0330beffa2d93564ba10d36751e938baa54768fa218b21b75fe17bb8f700db",
+      "matches_recorded_build_sha": true,
+      "input_hashes": {
+        "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+        "host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+        "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+        "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7"
+      },
+      "launch": {
+        "rate": "1.0",
+        "drain_s": "30",
+        "duration_s": "0",
+        "max_pairs": "0",
+        "candidate_source": "icp_reregistration",
+        "detection": "off",
+        "sigma_meas_m": "0.884",
+        "scripted_triggers_s": "",
+        "scripted_triggers_ns": "1627785276215170145",
+        "confirmation_margin_sec": "4.0",
+        "relay_shift_z": "0.5",
+        "relay_start_ns": "1627785276215170145",
+        "relay_end_ns": "1627785282215170145",
+        "injection": "INJECTION_DECLARED_Z_BIAS",
+        "repair_publish": "sham",
+        "run_mode": "CONTROLLED_INTERFACE_TEST",
+        "group_model": "host and recovery node are children of one setsid supervisor"
+      },
+      "machine_load": "45.76 56.42 101.02 10/62211 151494\nnproc=128",
+      "candidate": {
+        "accepted": true,
+        "count": 23,
+        "pose_stamps_ns": [
+          1627785276281966925,
+          1627785276482108831,
+          1627785276681957006,
+          1627785276815181017,
+          1627785276881790638,
+          1627785277081609249,
+          1627785277281412840,
+          1627785277481386900,
+          1627785277681567430,
+          1627785277881757259,
+          1627785278081956625,
+          1627785278282165527,
+          1627785278482237816,
+          1627785278682140827,
+          1627785278882031918,
+          1627785279081910849,
+          1627785279281777620,
+          1627785279481660843,
+          1627785279681560755,
+          1627785279814820290,
+          1627785279881448030,
+          1627785280081322908,
+          1627785280281185627
+        ],
+        "committed": 23,
+        "deferred": 85,
+        "weak_before": 3.138785109598945,
+        "weak_after": 7.298630859542505,
+        "wilson": 0.8947318770599499,
+        "holdout": 0.41934151024940525
+      },
+      "freeze": {
+        "frozen": true,
+        "frozen_at_ns": 1627785280281185627,
+        "frozen_frames": 23,
+        "frames_after_freeze": 348
+      },
+      "repair": {
+        "enabled": true,
+        "published": 23,
+        "bias_z_m": 0.4,
+        "missing_clouds": 0,
+        "synced": true,
+        "mad_m": 0.05,
+        "frames_estimated": 23,
+        "reference_points": 24284,
+        "tolerance_m": 0.15,
+        "expected_bias_m": 0.5,
+        "within_declared_tolerance": true,
+        "sham": true,
+        "repair_shift_z_m": 0.0,
+        "repair_received_baseline": 0,
+        "batches": [
+          {
+            "batch": 1,
+            "in_batch": 10,
+            "published_total": 10,
+            "received_ok": true
+          },
+          {
+            "batch": 2,
+            "in_batch": 10,
+            "published_total": 20,
+            "received_ok": true
+          },
+          {
+            "batch": 3,
+            "in_batch": 3,
+            "published_total": 23,
+            "received_ok": true
+          }
+        ],
+        "final_received": 23
+      },
+      "published_scan_stamps_ns": [
+        1627785276310700417,
+        1627785276509166718,
+        1627785276709579945,
+        1627785276809773207,
+        1627785276910036325,
+        1627785277110370636,
+        1627785277310790539,
+        1627785277511139870,
+        1627785277711539745,
+        1627785277911912918,
+        1627785278112646341,
+        1627785278313846827,
+        1627785278514312744,
+        1627785278713484526,
+        1627785278914969444,
+        1627785279114402533,
+        1627785279314662933,
+        1627785279515062809,
+        1627785279715475559,
+        1627785279815762043,
+        1627785279915841579,
+        1627785280116224766,
+        1627785280317023993
+      ],
+      "published_stamps_all_corrupted": true,
+      "relay": {
+        "frames": 598,
+        "shifted": 59,
+        "unshifted": 539,
+        "window": {
+          "event": "window",
+          "in_topic": "/velodyne_points_raw",
+          "out_topic": "/velodyne_points",
+          "start_ns": 1627785276215170145,
+          "end_ns": 1627785282215170145,
+          "shift_z": 0.5,
+          "wall_start": 1794463180.4413776
+        }
+      },
+      "deferred_apply": [
+        {
+          "line": 9152,
+          "text": "\u001b[0m[ INFO] [1794463215.378052235]: [NATIVE_CHECKPOINT] deferred apply cmd=hold at_lio=1627785276.281966925 stamp_ns=1627785276215170145 late_ms=66.797 ok=1 valid=1 stamp_ns=1627785274481725696 frame=197 voxels=15134 nodes=31721 points=293253 restores=0 live_voxels=15902 live_points=308223 state_pos=6.192642,3.580536,0.103953 hold=1 held_frames=0 held_points=0 hold_commands=1 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=152 set_state=0 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0\u001b[0m"
+        },
+        {
+          "line": 9154,
+          "text": "\u001b[0m[ INFO] [1794463215.448221378]: [NATIVE_CHECKPOINT] deferred apply cmd=snapshot at_lio=1627785276.281966925 stamp_ns=1627785276215170145 late_ms=66.797 ok=1 valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15902 nodes=33624 points=308223 restores=0 live_voxels=15902 live_points=308223 state_pos=6.192642,3.580536,0.103953 hold=1 held_frames=0 held_points=0 hold_commands=1 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=152 set_state=0 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0\u001b[0m"
+        }
+      ],
+      "snapshot_fields": {
+        "cmd": "snapshot",
+        "at_lio": "1627785276.281966925",
+        "stamp_ns": "1627785276215170048",
+        "late_ms": "66.797",
+        "ok": "1",
+        "valid": "1",
+        "frame": "221",
+        "voxels": "15902",
+        "nodes": "33624",
+        "points": "308223",
+        "restores": "0",
+        "live_voxels": "15902",
+        "live_points": "308223",
+        "state_pos": "6.192642,3.580536,0.103953",
+        "hold": "1",
+        "held_frames": "0",
+        "held_points": "0",
+        "hold_commands": "1",
+        "repair_received": "0",
+        "repair_applied": "0",
+        "repair_dropped": "0",
+        "repair_queued": "0",
+        "multi_scan_groups": "0",
+        "merged_scans": "152",
+        "set_state": "0",
+        "repair_merged_away": "0",
+        "control_valid": "0",
+        "control_pos": "0.000000,0.000000,0.000000",
+        "control_points": "0\u001b[0m"
+      },
+      "replay": {
+        "frames": 124,
+        "start_ns": 1627785276281966925,
+        "end_ns": 1627785280347787857,
+        "applied": 23,
+        "queued": 0,
+        "replayed": 124,
+        "truncated": 372,
+        "end_stamp": 1627785280381185627
+      },
+      "replay_log": "\u001b[0m[ INFO] [1794463226.142666399]: [NATIVE_CHECKPOINT] reprocess #1: 124 frames replayed over [1627785276.281966925 .. 1627785280.347787857], repairs applied=23 queued=0, replayed=124 truncated=372 end_stamp=1627785280381185627, map now 17316 voxels/328516 points\u001b[0m",
+      "host_received_log_count": 23,
+      "host_applied_log_count": 23,
+      "leftover_lines": [
+        "\u001b[0m[ INFO] [1794463226.130589560]: [NATIVE_REPAIR] leftover 0: had_group_but_missed=0 no_group_nearby=0 (groups=124, spans=0)\u001b[0m"
+      ],
+      "actions": [
+        {
+          "command": "hold",
+          "wall": 1794463180.441,
+          "ack_wall": 1794463193.52,
+          "ok": true,
+          "error": null,
+          "ack": "OK hold deferred stamp=1627785276215170145"
+        },
+        {
+          "command": "hold",
+          "wall": 1794463215.938,
+          "ack_wall": 1794463216.072,
+          "ok": true,
+          "error": null,
+          "ack": "OK hold valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15902 nodes=33624 points=308223 restores=0 live_voxels=15902 live_points=308223 state_pos=6.867068,4.691887,-0.304904 hold=1 held_frames=22 held_points=95041 hold_commands=2 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=172 set_state=0 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0"
+        },
+        {
+          "command": "reprocess",
+          "wall": 1794463224.82,
+          "ack_wall": 1794463226.32,
+          "ok": true,
+          "error": null,
+          "ack": "OK reprocess valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15902 nodes=33624 points=308223 restores=1 live_voxels=17316 live_points=328516 state_pos=7.704330,5.728760,-0.307808 hold=1 held_frames=201 held_points=601646 hold_commands=2 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=317 set_state=0 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0"
+        },
+        {
+          "command": "set_state",
+          "wall": 1794463226.32,
+          "ack_wall": 1794463226.82,
+          "ok": true,
+          "error": null,
+          "ack": "OK set_state valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15902 nodes=33624 points=308223 restores=1 live_voxels=17316 live_points=328516 state_pos=7.700662,5.627412,-0.359489 hold=1 held_frames=210 held_points=634368 hold_commands=2 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=327 set_state=1 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0"
+        },
+        {
+          "command": "resume",
+          "wall": 1794463226.82,
+          "ack_wall": 1794463227.32,
+          "ok": true,
+          "error": null,
+          "ack": "OK resume valid=1 stamp_ns=1627785276215170048 frame=221 voxels=15902 nodes=33624 points=308223 restores=1 live_voxels=17316 live_points=328516 state_pos=7.753919,-0.175096,-0.379777 hold=0 held_frames=220 held_points=671271 hold_commands=3 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=337 set_state=1 repair_merged_away=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0"
+        }
+      ],
+      "frames": {
+        "paired": 518,
+        "ingested": 518,
+        "fed_to_step_frame": 1,
+        "ingested_without_detection": 0,
+        "consumed_after_first_decision": 300,
+        "first_decision_ts_ns": 1627785280681018829
+      },
+      "episodes": 1,
+      "second_and_later_events": 0,
+      "detection_enabled": false,
+      "lifecycle": {
+        "state": "HEALTHY",
+        "wait_limit_ns": 2000000000,
+        "unresolved_segments": 1
+      },
+      "lifecycle_events": [
+        {
+          "event": "wait_limit_closed",
+          "from_state": null,
+          "trusted_version": 102
+        },
+        {
+          "event": "rearm",
+          "from_state": "ABORTED",
+          "trusted_version": 102
+        }
+      ],
+      "native_failures": 21,
+      "termination": "PLANNED_KILL_AFTER_DRAIN"
+    }
+  ],
+  "comparison": {
+    "same_candidate_pose_stamps": true,
+    "same_published_scan_stamps": true,
+    "same_replay_bounds_and_count": true,
+    "snapshot_fields_equal": {
+      "frame": true,
+      "voxels": false,
+      "nodes": false,
+      "points": false,
+      "state_pos": false,
+      "stamp_ns": true
+    },
+    "native_complete_state_or_map_bytes_equal": "NOT_VERIFIED_no_full_checkpoint_state_or_map_bytes",
+    "same_input_and_config_hashes": true,
+    "different_actual_consumed_suffix": [
+      399,
+      372
+    ]
+  },
+  "build_signals": [
+    "/usr/bin/ld: /home/R26534/mm/ros/lib/libIlmThread.so.32: undefined reference to `__cxa_call_terminate@CXXABI_1.3.15'",
+    "make[2]: *** [rpg_vikit/vikit_common/CMakeFiles/test_vk_common_patch_score.dir/build.make:190: /home/R26534/fast_livo2_ws/devel/lib/vikit_common/test_vk_common_patch_score] Error 1",
+    "make[1]: *** [CMakeFiles/Makefile2:1027: rpg_vikit/vikit_common/CMakeFiles/test_vk_common_patch_score.dir/all] Error 2",
+    "[ 91%] Built target laser_mapping",
+    "make: *** [Makefile:146: all] Error 2",
+    "Invoking \"make -j8\" failed"
+  ],
+  "unavailable_task_in_target": false
+}

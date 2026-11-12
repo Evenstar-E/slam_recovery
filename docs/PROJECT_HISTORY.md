@@ -465,3 +465,61 @@ S1认领矩阵/真实分工，S2复用已有宿主环境和run，逐项实际E1�
 [核验](review_20261112_751a226/README.md)run024337Z原件25/25哈希一致，同run E1部分接纳后真实reprocess316group/set_state/resume、E2拒绝后restore/resume均OK，终态HEALTHY，E2关闭后28帧；接受受控原生组件→接回→第二事件事实，不抹去。host_poses/detection off/修复apply0，未完成actual修复整链；E1/E2 cp比隔离起点晚2.866/4.542s，可信边界及旧FAIL依赖/旧尾/段release未修不重测。276/122计数含触发端点，严格close1→trigger2为209非不明210；ack观察非精确apply，不全表升分。
 
 此为10:50–10:52已提交LIVO结果归档，早于§54顺序纠正记录；不当非LIVO四项交付，不建议新LIVO运行/修复阻挡它们。下一主线仍MM-LINS/FAST-LIO2/LIO-SAM/ORB各实际E1→输入继续→E2尾段一次，S1/S2回实际状态/命令/source/input/run/原件或具体未执行原因；本批回执未出现、实际开跑UNCONFIRMED。S3旁支/参数停，本机只原件核验无host/bag/新tests，记录仅本地push拒绝未解除未绕过/private保护。
+
+## 56. 088906a：非LIVO两宿主真实负尝试已交，余下矩阵继续（审阅）
+
+[核验](review_20261112_088906a/README.md)S1已运行LIO-SAM260s与ORB351.65s，不能再称未执行。LIO归档1120CSV本机复算一致，E2观察窗535m单步/尾段发散；ORB原log80次初始化、385次motion不足/43badimu reset、最终0KF/exit139负结果可核。原生运行有实证推进，但没有实际修复接线、稳定E1恢复后独立E2证据，不把观察窗等事件、失败不计成功。
+
+声明文件写运行开始后分析前，不按README称预运行冻结；LIO评价t0首输出非已核bagstart，ORB times.txt未公开/window4/6/3只开发报告，远端/tmp run.sh未归档、LIO receipt混checksum行。最低沿已有输入/log补时钟/事件和runner，或明确负尝试范围，不另重跑/扩框架挡余下宿主。MM-LINS §65开发报告在跑尚缺新原件，FAST-LIO2 NOT_STARTED/shared前端非独立执行；S1/S2下一唯一收齐这两项实际结果或命令级断点，S3旁支/参数停、不回LIVO。A2/A12局部负结果可核推进，不全表升分；本机只原件复算无host/bag/tests。前推送限制已通过smoke保留旧OUT解除，1f1527b已发布且0e23548合入main；本轮沿review提交推送/private保护，接收新意见另待回执。
+
+## 57. f48b23f：余下两项真实运行已交，改版前端能力与旧修复器不能抹去
+
+[核验](review_20261112_f48b23f/README.md)MM-LINS与共享前端单独项是两次实际运行，15/15列示原件SHA一致，summary两事件gap/位移/尾段算术核一致；MM前端两次重建、PGO尾227s/967条；单独改版前端rawlog两sleep/两build、尾239s/2126条。四命名项都有尝试，独立原版FAST-LIO2没有构建/未执行；不能叫四独立实现、公平同输入主表或共同“无原生恢复能力”。原生re_slam建图接回能力有证据，共同缺口是未接slam_recovery测量修复；LIO/ORB旧失败与观察窗边界保留不追成功重跑。
+
+接受当前driver无repair publisher、丢scan stamp/完整消息及pose候选不产云的接线定位；REPAIR_GAP“仓库无改变测量的生产者”错误，point_mixture_repairer已有keep-mask/完整点记录导出/C3原生离线重估，必须复用或给新z偏差不适用的具体原因。坐标重表达恒等式不证明一般刚性测量修复不可能。f48文档转述用户选INJECTION仅开发报告，不充本会话直接授权；下一有限实际测量→原生重估/map→接回/E2交实际选择/实现/首断点，不再空决定循环。正常累计receipt非本次stamp应用证明、旧tail set_state/FAIL依赖会破坏来源，沿已有最小解除不扩框架；注入真值只评分，标签反演标oracle、不靠applied计数充收益。原参数停、旧门不降，A/B不全表升分；本机只Git原件/源码算术无host/bag/tests，review46与main分叉未merge、增量独立提交推送/private保护。
+
+## 58. 18baefd：在线测量替换已有实跑，偏差修复失败，第二事件未执行
+
+[增量核验](review_20261112_18baefd/README.md)接受run043602Z_79001真实relay598帧/60移位/538原样，25修复stamp均在损坏集，发布→received/queued25→reprocess382group/applied25/leftover0→内部map18032vox→resume及决定后328帧；新16原件+README共17/17SHA一致，driver记录SHA匹配目标18及报告run版本cd90e127。旧在线repair=0缺口在这次运行已解除，不抹传输成果。但+0.5m注入只施加+0.0029m，ICP未收敛，未证明有效去偏/独立收益；只一触发、detection off，无E2，HEALTHY来自wait关闭/重武装，不报首次有效整链完成。规范自由度/位姿吸收为开发解释，唯一因果及incumbent初值收益UNKNOWN，常速外推非独立GT。
+
+本机目标cloud8test PASS0.147s及有限实际driver/client控制、无ROS/bag；首-I因numpy不可用exit1保留，无安装，源码控制改既有依赖环境，原件reader另-I exit0。identity精确反例：坏点z1.5配delta_z=-.5时门看世界z1，再施加同-.5到测量且保同候选pose会变世界z.5，证明原坏云门通过不可搬给发布新云，非本次run因果推断。E2旧累计received25/本次0仍sync true，full接纳后sync false仍commit_closed→resume，以及零云仍reprocess三控制FAIL；归档成功传输未声称发生这些失败。最低一致物理修复/候选/符号、实际产物准入和applied成功依赖、本次receipt人口，不扩RPC/阈值/异常矩阵。旧尾set_state/晚cp source未修不重测。
+
+下一单一主线在已声明有限范围交实际去偏→原生完整状态/map→接回→E2尾段或真实首断点；S1集成成功生命周期与E2receipt，S2修复物理定义/有限宿主交付，S3门研究/旧参数停。四宿主前批尝试边界保留，不重开矩阵追成功。纠正window实际触发前7.17ms非0.7s、kf134非132、599记录非599帧、旧protocol仅旁支，不为文字重跑。自检逐项状态/命令/原件/失败/独立质量，A1/A2/A6局部推进、B7负范围保留，A7/A8/A9/A10及B4/B11未闭合、不全表评分。独立review正常SSH提交推送，不合分叉main/private保护，本机不改算法，开发接收待实际回执。
+
+## 59. 2f1f59b：解耦偏差+0.40合理，20/26接收未应用；候选与测量仍不同
+
+[核验](review_20261112_2f1f59b/README.md)两新run原件37/37SHA一致，driver各绑定e472410/bfe2939，后者匹配target。incumbent初值0.815m/未收敛/门拒绝、未发布，hold→restore→resume及214后继帧；不能由范数证明测得0.5bias或初值距真值0.8m。解耦26帧median+0.40/MAD0.05、n_valid全≥27，声明容差内且施加−0.40方向正确，估计组件接受；host received20/queued20/applied0、无reprocess，sync失败后wait关闭/rearm→resume仍发散，263后继帧，两run各一事件无E2。队列20与burst丢6吻合但确切drop层未独立证，旧25/25同队列成功保留，不能说超过20必丢/回调5–10ms已测。
+
+target小控制11cloud test PASS0.399s；自写fake CP首漏enabled exit1后修辅助重跑exit0，不改production、不跑ROS/bag。实际decide/producer合成吸收pose z−.5配坏云z+.5时门world0，修复云body0再配同candidate/set_state−.5→world−.5，旧坏云候选与新测量不一致未解除；改set_state为candidate尾是来源局部改进但不是native完整重估状态。code-review low候选经actual estimator确认：一supported+.5、两非空少支持返回0被median成0，UNKNOWN误计有效0；本run全≥27不是其失败根因。最低真实修复候选/状态同定义、成功公开依赖、分批本次增量receipt/实际applied，少支持标UNKNOWN；不新RPC/阈值/异常矩阵。
+
+S1共享生命周期/失败公开一致集成，S2已有流控派工与物理一致修复、唯一有限native state/map→接回/E2交付或首断点，S3研究/旧参数停；分派记录不冒实际认领。四宿主前批不重跑，truth只评价、容差不生产门，自检逐项状态/实际命令/原件/全人口/失败/质量。A6估计组件及B7负范围局部推进，A7/A8/B2/A9/A10/B4/B11未闭合、不全表新评分。独立review SSH提交推送/private保护、不合main不改算法历史；实际接收待回执。
+
+## 60. 64bfed1：分批32/32与23/23实际应用，候选冻结接受，收益/E2未闭合
+
+[核验](review_20261112_64bfed1/README.md)四新run原件本机70/70本轮changed清单SHA一致；历史8790452/e6f7430与target7b02fa7两个冻结run各source绑定。分批成功32received/applied、676group/决定后315帧，对照0applied/529group/330帧，候选32vs23不公平；冻结修复23applied/815group/247帧、控制0/692group/248帧，23个candidate pose stamps及freeze stamp完全一致接受，不是只同kf计数。实际重放起点差1.267965555s、终点差5.333573818s、跨度差4.065608263s、123group，地图24503vs21870不归因；set_state ACK差.046982609m是主动candidate写入而非独立native重估质量。四run各一事件无E2，HEALTHY有wait关闭/ABORTED重武装，deferred87/81/147/148及native诊断失败1/2/1/4保留，不报首次有效整链完成。
+
+本机target小控制非零baseline25→期待35/45/50、第二批失败停止、deadline crossing冻结21后24帧不扩/首次wall不覆盖PASS；baseline None被当0仍E2旧累计25/本次0误sync FAIL，最低未知不发表/先有效baseline、不新RPC。成功传输首断点局部解除，不重造；旧坏云candidate与新修复云物理不一致、native失败成功依赖/同stamp状态map及尾set_state来源source未修不重测。新test modules因pytest辅助未跑、旧cloud tests不重复，无host/bag；Git Bash语法exit0，首PS bash为WSL入口exit1未安装。
+
+下一唯一有限物理一致实际修复→native完整state/map→接回→E2尾段或断点；S1共享集成成功来源，S2产物/现流控/有限run，S3研究参数停。sham仅可控制发布成本、同批次不保证实际重放支持相同，核stamp人口不要求随机逐值一致，仍不一致报断点不无限A/B；不以对照循环代E2/新测量候选准入。PLAN写26而actual32/23、deferred与时间/4.7cm更正集中旁支保历史、不为文字重跑。自检逐项状态/实际命令/原件/质量/失败；A1/A2/A5/A6/A12局部推进，A7/A8/B2/A9/A10/B4/B11未闭合、不全表新评分。独立review SSH提交推送、不合main/不改算法/private保护，开发接收待实际回执。
+
+## 61. d193680：终点限制通过，晚开段快照与截断后缀清空不支持完整接回
+
+[核验](review_20261112_d193680/README.md)三新run原件59/59本轮清单SHA一致，各driver版本绑定，新terminal两run实际加载库hash与f27d1730构建记录一致；build laser_mapping目标成功、整体vikit ABI链接失败保留，不称全构建PASS/本机复现。旧sham23应用/686group，新terminal两臂23received但仅7/12applied、16/11leftover并dropped，34/64group重放；payload和真实终点均1627785280281185627、候选23个pose stamp同，起点差.999728918s、snapshot晚trigger2.933/1.934s，前段候选无group。只endpoint组件局部通过，received23不改称applied23；三run各一事件无E2，尾段263/300/286配对帧非有效恢复。
+
+新C++分支跳过end之后group，随后现clear删除已消费后缀/capture=false，本次truncated451/509；source-bound算术[1,2,3,4]重放到2/clear3,4/下一live5说明归宿缺口，非执行C++动态轨迹。最低可信同stamp完整checkpoint、不以晚held map/state覆唯一可信历史；保留后缀按序native catch-up再接回或显式拒绝，不为A/B端点齐牺牲持续输入。7应用/23准入仍set_state/resume的实际原件要求成功公开依赖核真实人口，旧candidate物理不一致/source未修不重测。按脚本戳arm只是开发受控方案/派工，未验收且不等自动迟检测。
+
+本机actual driver/client hold→snapshot串行/end payload/default空及sham点data不变控制PASS、Git Bash语法exit0；新测试Windows fake-host/pytest依赖未跑不安装，未代host/bag。reader首取receipt顶层null导致假library mismatch，改嵌套inputs重跑最终一致，不报真实身份失败。S1共享成功依赖集成、S2可信checkpoint/真实产物/保后缀，下一唯一有限修复→native state/map→追赶→接回/E2或首断点；S3研究参数停、四宿主不重开，逐项状态/实际命令/原件/未知/独立质量自检。A2/A6/A12局部推进，A4/A5/A8/A10新正常FAIL、A9/B4/B11未闭合、不全表评分。独立review SSH提交推送、不合main不改算法旧历史/private保护，实际接收待回执。
+
+## 62. 用户直接要求UNAVAILABLE实证归因：逐帧两条件与实际计算样本
+
+2026-11-12用户明确“需要搞清楚为什么会出现unavailable”，要求逐次输出两个指标及相关计算指标。[有限诊断交接](UNAVAILABLE_DIAGNOSTIC_TASK_20261112.md)要求复用现_record_diag/LiveNis/support索引，不改检测算法/冻结门：逐帧support比例与分母/1m mask/失败分支，raw/effective NIS与computed/carried来源/年龄、3m参考数/采样/邻居面残差/2m覆盖分支、当时pose/scan/参考版本身份及缺项。全paired JSONL不被diag_cap2000静默截断，每UNAVAILABLE保存实际200/300样本/参考，非全云刷屏；不把事后map重算当当时证据。覆盖<70%底层用全残差计算而非返回None，必须按实际分支归因。
+
+本机fetch最新e82d900，只核该版诊断入口及未变support/NIS底层，发现现输出缺support/raw失败/点样本；尚未完整审v3/clean A-B新运行，不继承d193680缺陷当其仍失败、不凭提交标题验收。S1诊断共享改动与开关前后原值/决定不变，S2现预算/宿主/输入检测on有限归因或原件无法回推的具体缺项，S3参数停/研究；native恢复/E2仍可并行，不把新日志循环代主线。交真正分支计数/连续段/正常边界及不可用复算、UNKNOWN，不从unsupported猜漂移；逐项状态/实际命令/原件/成本/非oracle自检。A3/B3取证任务而非已通过或新总分。独立review提交SSH推送、private保护、不合main不改算法旧历史；开发接收/实现/执行待实际回执。
+
+## 63. e82d900：受控预置检查点与23全量应用通过，后缀/E2及因果限定保留
+
+[核验](review_20261112_e82d900/README.md)新两run41列示SHA一致，driver匹配target、实际库匹配9c0330be；snapshot时刻/frame及实际replay两端/124group一致，23candidate pose和published scan stamp列表一致、各23received/applied/leftover0，解除前轮该受控范围晚快照及7/12部分应用。不抹真实成果，但snapshot修复前地图15905/308821 vs15902/308223、state亦不同，不能说唯一差别/全部495vox和6538点唯一由修正造成；这是单对受控组件观察，不强求随机逐值一致或无限重跑。set_state为主动candidate写入非独立native质量，独立收益UNKNOWN。
+
+v3仍skip+clear已消费后缀，本次399/372未catch-up；两run只一事件/detection off，尾317/300帧、HEALTHY经wait关闭/ABORTED rearm不等有效恢复/E2，sham21诊断失败保留。预置仅min脚本戳，deferred OK是receipt非应用，在线/后继保证未验。target1新receipt测试PASS0.040s与actual file payload/仅hold开段控制，未代host；旧多命令Windows/pytest辅助测试未跑不安装，构建目标成功但整体ABI失败保留。
+
+下一唯一有限物理一致修复→native state/map→保后缀追赶→接回/E2或实际不支持范围，S1成功公开/共享集成、S2实际产物/native追赶，S3参数停/研究。用户UNAVAILABLE诊断ddd0fb7比target晚发布，target尚未实现不指控无视，S1认领/S2检测on有限取证与native并行、不改门；自检逐项状态/命令/原件/质量/全人口/未知。A2/A4/A6/A12局部推进、自动检测与A5/A8/A9/A10/B4/B11未闭合，不全表升分。独立review SSH提交推送、不合main/private保护、不改算法历史；接收执行待真实回执。
