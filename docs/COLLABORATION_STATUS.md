@@ -908,3 +908,22 @@ S1 复核 S2 `bec959a`（合入，192 测试；测试已按新语义更新）。
 
 **声明常量溯源（如实）**：`REPLAY_END_GRACE_NS = 100 ms` 是在观察到"无 grace 时最后一组修复云匹配
 不上（22/23）"之后加的；它只加在重放终点、两臂一致，不接触门/阈值。
+
+## 77. 归档收口：v3 部署记录 + 证据链 + SHA 校验；本阶段完成项
+
+S1 复核 S2 `5a86af9`（合入，193 测试）。无新运行。
+
+| 项 | 实际状态 |
+|---|---|
+| v3 部署记录 | `DEPLOYED_CODE.md` §8：完整 patch `deployed_host_v3.diff` 1627 行 / `46648b4c…ab28`，库 sha `9c0330be…00db`；增量 v1→v2 87 行、v2→v3 203 行，均在各自上一版树上可 apply，v3 完整 patch 在干净 `0d2c034` 上可 apply；明确"可执行文件 `0d7e23de…` 未变、行为在库" |
+| 证据链 | `docs/review_20261112_four_host/README.md` §0：11 行 run（含拒绝/丢帧/跨度不一致的几组），每行 run id / 驱动 sha / 库 sha / 损坏声明 / 关键证据 / 能-不能声称 |
+| SHA 校验 | 5 个 SHA256SUMS 全部 `sha256sum -c` 通过，0 FAILED（four_host 230 项 + accepted_chain 3 run + native chain_run） |
+| 测试 | 客户端测试按新语义统一（开段只发幂等 hold、带戳 payload、`OK … deferred` 作为 receipt），193 通过 |
+
+**本阶段可交付结论**（全部有原件，限制如实）：
+1. 受控两事件整链：接受+写回与拒绝+放写各一次，同一 run，终态 HEALTHY（`024337Z`）。
+2. 四宿主矩阵：MM-LINS/FAST-LIO2 原生 PASS（前端休眠重建、PGO 保持全局图），LIO-SAM/ORB-SLAM3 原生 FAIL；
+   四项 slam_recovery 均 `NOT_IMPLEMENTED`。
+3. 实际修复测量进入原生重估：声明注入 0.5 m body-z 损坏 → 偏差估计 +0.40（容差内）→ 分批回执
+   23/23 送达并应用 → 重放区间两端逐位一致的 repair/sham 干净 A/B；地图 17811/335054 vs 17316/328516。
+4. 边界：损坏自注入，不声称真实修复收益；`commit_closed→resume` 仍不可达；在线自动链仍 BLOCKED 在上游检测。
