@@ -1,0 +1,42 @@
+Exception ignored in thread started by: <bound method XmlRpcNode.run of <rosgraph.xmlrpc.XmlRpcNode object at 0x7f998ad35b10>>
+Traceback (most recent call last):
+  File "/home/R26534/mm/ros/lib/python3.11/site-packages/rosgraph/xmlrpc.py", line 252, in run
+    self._run()
+  File "/home/R26534/mm/ros/lib/python3.11/site-packages/rosgraph/xmlrpc.py", line 321, in _run
+    self._run_init()
+  File "/home/R26534/mm/ros/lib/python3.11/site-packages/rosgraph/xmlrpc.py", line 271, in _run_init
+    self.server = ThreadingXMLRPCServer((bind_address, port), log_requests)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/R26534/mm/ros/lib/python3.11/site-packages/rosgraph/xmlrpc.py", line 149, in __init__
+    SimpleXMLRPCServer.__init__(self, addr, SilenceableXMLRPCRequestHandler, log_requests)
+  File "/home/R26534/mm/ros/lib/python3.11/xmlrpc/server.py", line 594, in __init__
+    socketserver.TCPServer.__init__(self, addr, requestHandler, bind_and_activate)
+  File "/home/R26534/mm/ros/lib/python3.11/socketserver.py", line 456, in __init__
+    self.server_bind()
+  File "/home/R26534/mm/ros/lib/python3.11/socketserver.py", line 472, in server_bind
+    self.socket.bind(self.server_address)
+OSError: [Errno 98] Address already in use
+[31mRLException: ERROR: could not contact master [http://DEV-99bef9:59060/][0m
+[31mThe traceback for the exception was written to the log file[0m
+... logging to /tmp/wt-sim/docs/review_20261112_four_host/host_change_trace_cov/probe_online_pre_2/ros_home/log/c9e34392-de91-11f1-957f-0242ac11003a/roslaunch-DEV-99bef9-490482.log
+Checking log directory for disk usage. This may take a while.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+]2;roscore
+[1mstarted roslaunch server http://DEV-99bef9:32797/[0m
+ros_comm version 1.17.0
+
+
+SUMMARY
+========
+
+PARAMETERS
+ * /rosdistro: noetic
+ * /rosversion: 1.17.0
+
+NODES
+
+auto-starting new master
+[1mprocess[master]: started with pid [491025][0m
+ERROR: Unable to start XML-RPC server, port 59060 is already in use
+[master] killing on exit

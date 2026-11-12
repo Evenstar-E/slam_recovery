@@ -1,0 +1,14 @@
+[0m[ INFO] [1794484555.691011147]: Found parameter: laserMapping/cam_model, value: Pinhole[0m
+[0m[ INFO] [1794484555.691573819]: Found parameter: laserMapping/cam_width, value: 640[0m
+[0m[ INFO] [1794484555.691703334]: Found parameter: laserMapping/cam_height, value: 480[0m
+[0m[ INFO] [1794484555.691829768]: Found parameter: laserMapping/scale, value: 1[0m
+[0m[ INFO] [1794484555.691944552]: Found parameter: laserMapping/cam_fx, value: 617.971[0m
+[0m[ INFO] [1794484555.692053797]: Found parameter: laserMapping/cam_fy, value: 616.445[0m
+[0m[ INFO] [1794484555.692160102]: Found parameter: laserMapping/cam_cx, value: 327.71[0m
+[0m[ INFO] [1794484555.692266508]: Found parameter: laserMapping/cam_cy, value: 253.977[0m
+[0m[ INFO] [1794484555.692377394]: Found parameter: laserMapping/cam_d0, value: 0.148001[0m
+[0m[ INFO] [1794484555.692483418]: Found parameter: laserMapping/cam_d1, value: -0.217835[0m
+[0m[ INFO] [1794484555.692588058]: Found parameter: laserMapping/cam_d2, value: 0[0m
+[0m[ INFO] [1794484555.692697405]: Found parameter: laserMapping/cam_d3, value: 0[0m
+scale: 1
+*** stack smashing detected ***: terminated

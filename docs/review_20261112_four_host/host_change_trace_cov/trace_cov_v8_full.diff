@@ -1,0 +1,366 @@
+--- /tmp/v6_src_LIVMapper.cpp	2026-11-12 20:42:01.061900953 +0800
++++ docs/review_20261112_four_host/host_change_trace_cov/src_LIVMapper.cpp.v8	2026-11-12 20:38:15.145231749 +0800
+@@ -11,11 +11,15 @@
+ */
+ 
+ #include "LIVMapper.h"
++
++// ALI-H v1 trace stream. Deliberately not a LIVMapper member: see LIVMapper.h.
++static std::ofstream g_trace_cov;
+ #include "native_checkpoint.h"
+ #include <chrono>
+ #include <cmath>
+ #include <cstdio>
+ #include <fstream>
++#include <sstream>
+ #include <omp.h>
+ #ifdef TRACE_GROUP
+ #include <atomic>
+@@ -151,6 +155,7 @@
+   pcl_wait_save.reset(new PointCloudXYZRGB());
+   pcl_wait_save_intensity.reset(new PointCloudXYZI());
+   voxelmap_manager.reset(new VoxelMapManager(voxel_config, voxel_map));
++  voxelmap_manager->trace_cov_en_ = trace_cov_en;
+   vio_manager.reset(new VIOManager());
+   root_dir = ROOT_DIR;
+   initializeFiles();
+@@ -221,6 +226,12 @@
+ 
+   nh.param<bool>("pcd_save/colmap_output_en", colmap_output_en, false);
+   nh.param<double>("pcd_save/filter_size_pcd", filter_size_pcd, 0.5);
++  // ALI-H v1 trace switch. Private so a run can set it ("_trace_cov:=true") without touching
++  // the shared config; default false keeps every existing behaviour unchanged.
++  {
++    ros::NodeHandle pnh("~");
++    pnh.param<bool>("trace_cov", trace_cov_en, false);
++  }
+   nh.param<vector<double>>("extrin_calib/extrinsic_T", extrinT, vector<double>());
+   nh.param<vector<double>>("extrin_calib/extrinsic_R", extrinR, vector<double>());
+   nh.param<vector<double>>("extrin_calib/Pcl", cameraextrinT, vector<double>());
+@@ -307,6 +318,30 @@
+   if(img_save_en) fout_visual_pos.open(std::string(ROOT_DIR) + "Log/image/image_poses.txt", std::ios::out);
+   fout_pre.open(DEBUG_FILE_DIR("mat_pre.txt"), std::ios::out);
+   fout_out.open(DEBUG_FILE_DIR("mat_out.txt"), std::ios::out);
++  // ALI-H v1 trace. Off unless ~trace_cov is set; truncated per run like mat_pre/mat_out,
++  // so the caller must archive it right after the run.
++  if (trace_cov_en)
++  {
++    g_trace_cov.open(DEBUG_FILE_DIR("trace_cov.txt"), std::ios::out);
++    g_trace_cov << "# ALI-H v1 trace, one row per LIO frame (live and replay). Fields:\n"
++             << "# idx rel_s abs_ns grp_idx scan_first_ns scan_last_ns n_scans has_out phase eff"
++             << " r_mean r_med r_abs_mean r_chi2 r_chi2w vec6 Ppre6x6 Ppost6x6\n"
++             << "#   abs_ns = last_lio_update_time (lidar scan end, ns); grp_idx = capture-time group"
++             << " index, copied with the group, so it is unique across replay; n_scans = raw scans merged"
++             << " into this group; scan_first/last_ns bound them (start falls back to the first merged"
++             << " scan when lidar_frame_beg_time is 0); join to the bag by scan_last_ns. has_out=0: returned before"
++             << " StateEstimation (Ppre only, update fields 0). phase=1: row produced by a replay"
++             << " pass (timestamps repeat; pair by idx, never by time or row count).\n"
++             << "#   vec6 = (state_propagat - state_)[0..5]; Ppre = propagated cov rot+pos block,"
++             << " Ppost = updated cov rot+pos block; both row-major 6x6.\n"
++             << "#   r_* are summaries of meas_vec in metres (not a pose covariance); S = H P- H^T + R"
++             << " is m x m and is NOT exported.\n"
++             << "#   state order [rot(0..2) so3 tangent, pos(3..5), inv_expo(6), vel(7..9), bg(10..12),"
++             << " ba(13..15), gravity(16..18)]; body frame = IMU/body, cov in body tangent;"
++             << " perturbation: right-multiplied rotation increment (state_ += solution uses the"
++             << " existing StatesGroup::operator+).\n";
++    g_trace_cov << std::setprecision(10);
++  }
+ }
+ 
+ void LIVMapper::initializeSubscribersAndPublishers(ros::NodeHandle &nh, image_transport::ImageTransport &it) 
+@@ -464,16 +499,77 @@
+             << _state.bias_a.transpose() << " " << V3D(_state.inv_expo_time, 0, 0).transpose() << " " << feats_undistort->points.size() << std::endl;
+ }
+ 
+-void LIVMapper::handleLIO() 
+-{    
++void LIVMapper::writeTraceCovRow(double rel_time, int has_out,
++                                 const Eigen::Matrix<double, 6, 6> &P_pre)
++{
++  if (!trace_cov_en || !g_trace_cov.is_open()) return;
++
++  const double abs_time = LidarMeasures.last_lio_update_time;
++  const long long abs_ns = (long long)llround(abs_time * 1e9);
++  const int phase = replay_mode_ ? 1 : 0;   // 1 = this row was produced by a replay pass
++  Eigen::Matrix<double, 6, 6> P_post = Eigen::Matrix<double, 6, 6>::Zero();
++  Eigen::Matrix<double, 6, 1> vec6 = Eigen::Matrix<double, 6, 1>::Zero();
++  int eff = 0;
++  double r_mean = 0.0, r_med = 0.0, r_abs_mean = 0.0, r_chi2 = 0.0, r_chi2w = 0.0;
++
++  if (has_out && voxelmap_manager->trace_cov_valid_)
++  {
++    P_post = _state.cov.block<6, 6>(0, 0);
++    vec6 = voxelmap_manager->trace_cov_vec_;
++    eff = voxelmap_manager->trace_cov_eff_;
++    r_mean = voxelmap_manager->trace_cov_r_mean_;
++    r_med = voxelmap_manager->trace_cov_r_med_;
++    r_abs_mean = voxelmap_manager->trace_cov_r_abs_mean_;
++    r_chi2 = voxelmap_manager->trace_cov_r_chi2_;
++    r_chi2w = voxelmap_manager->trace_cov_r_chi2w_;
++  }
++  else
++  {
++    has_out = 0;
++  }
++
++  const long long grp_idx = (long long)LidarMeasures.native_group_index;
++  const int n_scans = LidarMeasures.native_scan_count;
++  const long long scan_first_ns = (LidarMeasures.native_scan_first > 0)
++                                      ? (long long)llround(LidarMeasures.native_scan_first * 1e9) : -1;
++  const long long scan_last_ns = (LidarMeasures.native_scan_last > 0)
++                                     ? (long long)llround(LidarMeasures.native_scan_last * 1e9) : -1;
++  // One row is built in full and written with a single insertion: a SIGTERM between per-field
++  // insertions left short rows in the first runs (44/53 columns instead of 92).
++  std::ostringstream row;
++  row.precision(10);
++  row << trace_cov_rows++ << ' ' << rel_time << ' ' << abs_ns << ' ' << grp_idx << ' '
++      << scan_first_ns << ' ' << scan_last_ns << ' ' << n_scans << ' ' << has_out << ' '
++      << phase << ' ' << eff << ' ' << r_mean << ' ' << r_med << ' ' << r_abs_mean << ' '
++      << r_chi2 << ' ' << r_chi2w;
++  for (int i = 0; i < 6; ++i) row << ' ' << vec6(i);
++  for (int i = 0; i < 6; ++i)
++    for (int j = 0; j < 6; ++j) row << ' ' << P_pre(i, j);
++  for (int i = 0; i < 6; ++i)
++    for (int j = 0; j < 6; ++j) row << ' ' << P_post(i, j);
++  row << '\n';
++  g_trace_cov << row.str();
++  // Buffered on purpose: a flush per row stalls the host on this filesystem (Log/ is on a
++  // nearly-full network mount) and the stall was measured to change scan-group timing.
++  if ((trace_cov_rows & 31) == 0) g_trace_cov.flush();
++}
++
++void LIVMapper::handleLIO()
++{
+   euler_cur = RotMtoEuler(_state.rot_end);
+   fout_pre << setw(20) << LidarMeasures.last_lio_update_time - _first_lidar_time << " " << euler_cur.transpose() * 57.3 << " "
+            << _state.pos_end.transpose() << " " << _state.vel_end.transpose() << " " << _state.bias_g.transpose() << " "
+            << _state.bias_a.transpose() << " " << V3D(_state.inv_expo_time, 0, 0).transpose() << endl;
+-           
+-  if (feats_undistort->empty() || (feats_undistort == nullptr)) 
++
++  // The propagated covariance, before StateEstimation overwrites it. Only touched when the
++  // trace is on; with the switch off this is never evaluated into anything.
++  Eigen::Matrix<double, 6, 6> trace_P_pre = Eigen::Matrix<double, 6, 6>::Zero();
++  if (trace_cov_en) trace_P_pre = _state.cov.block<6, 6>(0, 0);
++
++  if (feats_undistort->empty() || (feats_undistort == nullptr))
+   {
+     std::cout << "[ LIO ]: No point!!!" << std::endl;
++    writeTraceCovRow(LidarMeasures.last_lio_update_time - _first_lidar_time, 0, trace_P_pre);
+     return;
+   }
+ 
+@@ -622,9 +718,11 @@
+   fout_out << std::setw(20) << LidarMeasures.last_lio_update_time - _first_lidar_time << " " << euler_cur.transpose() * 57.3 << " "
+             << _state.pos_end.transpose() << " " << _state.vel_end.transpose() << " " << _state.bias_g.transpose() << " "
+             << _state.bias_a.transpose() << " " << V3D(_state.inv_expo_time, 0, 0).transpose() << " " << feats_undistort->points.size() << std::endl;
++
++  writeTraceCovRow(LidarMeasures.last_lio_update_time - _first_lidar_time, 1, trace_P_pre);
+ }
+ 
+-void LIVMapper::savePCD() 
++void LIVMapper::savePCD()
+ {
+   if (pcd_save_en && (pcl_wait_save->points.size() > 0 || pcl_wait_save_intensity->points.size() > 0) && pcd_save_interval < 0) 
+   {
+@@ -1869,6 +1967,10 @@
+     sig_buffer.notify_all();
+ 
+     meas.lio_vio_flg = LIO; // process lidar topic, so timestamp should be lidar scan end.
++    meas.native_scan_first = meas.lidar_frame_beg_time;
++    meas.native_scan_last = meas.lidar_frame_beg_time;
++    meas.native_scan_count = 1;
++    meas.native_group_index = scan_group_counter_++;
+     meas.measures.push_back(m);
+     // ROS_INFO("ONlY HAS LiDAR and IMU, NO IMAGE!");
+     lidar_pushed = false; // sync one whole lidar scan.
+@@ -1948,12 +2050,14 @@
+       // deque<PointCloudXYZI::Ptr> lidar_buffer_tmp;
+ 
+       double last_merged_time = -1.0;
++      double first_merged_time = -1.0;
+       int merged_scans = 0;
+       while (!lid_raw_data_buffer.empty())
+       {
+         if (lid_header_time_buffer.front() > img_capture_time) break;
+         auto pcl(lid_raw_data_buffer.front()->points);
+         double frame_header_time(lid_header_time_buffer.front());
++        if (merged_scans == 0) first_merged_time = frame_header_time;
+         last_merged_time = frame_header_time;
+         merged_scans++;
+         float max_offs_time_ms = (m.lio_time - frame_header_time) * 1000.0f;
+@@ -1985,12 +2089,17 @@
+         // Deliberately NOT stamping the cloud: measured, a stamped header turns the derived-begin
+         // match into a 1 ms exact match and loses every frame, because the group's begin and the
+         // scan's own header differ by a few ms here. The span is what the matching uses.
+-        meas.native_scan_first = meas.lidar_frame_beg_time;
++        // lidar_frame_beg_time is 0 in this mode (see the note at L824), so the start falls back
++        // to the first scan actually merged into the group. The count proves membership.
++        meas.native_scan_first =
++            (meas.lidar_frame_beg_time > 0.0) ? meas.lidar_frame_beg_time : first_merged_time;
+         meas.native_scan_last = last_merged_time;
++        meas.native_scan_count = merged_scans;
+       }
+       if (merged_scans > 1) native_multi_scan_groups_++;
+       native_merged_scans_ += merged_scans;
+ 
++      meas.native_group_index = scan_group_counter_++;
+       meas.measures.push_back(m);
+       meas.lio_vio_flg = LIO;
+       // meas.last_lio_update_time = m.lio_time;
+@@ -2027,6 +2136,7 @@
+       img_time_buffer.pop_front();
+       mtx_buffer.unlock();
+       sig_buffer.notify_all();
++      meas.native_group_index = scan_group_counter_++;
+       meas.measures.push_back(m);
+       lidar_pushed = false; // after VIO update, the _lidar_frame_end_time will be refresh.
+       // printf("[ Data Cut ] VIO process time: %lf \n", omp_get_wtime() - t0);
+@@ -2063,6 +2173,10 @@
+     sig_buffer.notify_all();
+     lidar_pushed = false; // sync one whole lidar scan.
+     meas.lio_vio_flg = LO; // process lidar topic, so timestamp should be lidar scan end.
++    meas.native_scan_first = meas.lidar_frame_beg_time;
++    meas.native_scan_last = meas.lidar_frame_beg_time;
++    meas.native_scan_count = 1;
++    meas.native_group_index = scan_group_counter_++;
+     meas.measures.push_back(m);
+     return true;
+     break;
+--- /tmp/v6_include_LIVMapper.h	2026-11-12 20:42:01.081901013 +0800
++++ docs/review_20261112_four_host/host_change_trace_cov/include_LIVMapper.h.v8	2026-11-12 20:38:15.148231758 +0800
+@@ -71,6 +71,9 @@
+   void handleLIO();
+   void savePCD();
+   void processImu();
++  // Writes one ALI-H trace row. Called at the end of handleLIO() when a posterior exists
++  // (has_out=1) or on the early-return path before StateEstimation ran (has_out=0).
++  void writeTraceCovRow(double rel_time, int has_out, const Eigen::Matrix<double, 6, 6> &P_pre);
+   
+   bool sync_packages(LidarMeasureGroup &meas);
+   void prop_imu_once(StatesGroup &imu_prop_state, const double dt, V3D acc_avr, V3D angvel_avr);
+@@ -175,6 +178,14 @@
+ 
+   ofstream fout_pre, fout_out, fout_visual_pos, fout_lidar_pos, fout_points;
+ 
++  // ALI-H v1 diagnostic trace (opt-in, default off; private param "~trace_cov").
++  // The stream is a file-local static in LIVMapper.cpp on purpose: adding it as a member
++  // changes the LIVMapper layout and makes a pre-existing startup memory fault in this
++  // build hit ~4/5 of launches (B1b2, 2026-11-12). Scalars only here.
++  bool trace_cov_en = false;
++  long trace_cov_rows = 0;
++  long long scan_group_counter_ = 0;   // ALI-H: capture-time group identity
++
+   pcl::VoxelGrid<PointType> downSizeFilterSurf;
+ 
+   V3D euler_cur;
+--- /tmp/v6_src_voxel_map.cpp	2026-11-12 20:42:01.105901084 +0800
++++ docs/review_20261112_four_host/host_change_trace_cov/src_voxel_map.cpp.v8	2026-11-12 20:38:15.150231764 +0800
+@@ -337,6 +337,14 @@
+ 
+ void VoxelMapManager::StateEstimation(StatesGroup &state_propagat)
+ {
++  // ALI-H v1 trace: the propagated covariance is the prediction P-. It is overwritten by the
++  // update below, so copy the rot+pos block now. Pure read; nothing depends on it.
++  if (trace_cov_en_)
++  {
++    trace_cov_Ppre_ = state_.cov.block<6, 6>(0, 0);
++    trace_cov_valid_ = false;
++  }
++
+   cross_mat_list_.clear();
+   cross_mat_list_.reserve(feats_down_size_);
+   body_cov_list_.clear();
+@@ -470,6 +478,45 @@
+     auto vec = state_propagat - state_;
+     VD(DIM_STATE)
+     solution = K_1.block<DIM_STATE, 6>(0, 0) * HTz + vec.block<DIM_STATE, 1>(0, 0) - G.block<DIM_STATE, 6>(0, 0) * vec.block<6, 1>(0, 0);
++
++    if (trace_cov_en_)
++    {
++      // ALI-H v1: measurement-space statistics of the point-to-plane update, reported under
++      // their own names. S = H P- H^T + R is m x m (m = effct_feat_num_) and is NOT exported:
++      // it is not the covariance of any 6-dim pose residual. r_mean/r_med/r_abs_mean/r_chi2/
++      // r_chi2w are summaries of r = meas_vec (metres of point-to-plane residual), with
++      // r_chi2w = r^T R^-1 r using this update's own R. Re-run each iteration; the final
++      // iteration's values are the ones the update used.
++      const int m = (int)R_inv.size();
++      std::vector<double> r_abs(m);
++      double r_sum = 0.0, r_abs_sum = 0.0, r_chi2 = 0.0, r_chi2w = 0.0;
++      for (int i = 0; i < m; i++)
++      {
++        const double ri = meas_vec(i);
++        r_abs[i] = std::fabs(ri);
++        r_sum += ri;
++        r_abs_sum += r_abs[i];
++        r_chi2 += ri * ri;
++        r_chi2w += ri * ri * R_inv(i);
++      }
++      double r_med = 0.0;
++      if (m > 0)
++      {
++        std::vector<double> sorted(r_abs);
++        const size_t mid = (size_t)(m / 2);
++        std::nth_element(sorted.begin(), sorted.begin() + mid, sorted.end());
++        r_med = sorted[mid];
++      }
++      trace_cov_vec_ = vec.block<6, 1>(0, 0);
++      trace_cov_eff_ = m;
++      trace_cov_r_mean_ = (m > 0) ? r_sum / m : 0.0;
++      trace_cov_r_med_ = r_med;
++      trace_cov_r_abs_mean_ = (m > 0) ? r_abs_sum / m : 0.0;
++      trace_cov_r_chi2_ = r_chi2;
++      trace_cov_r_chi2w_ = r_chi2w;
++      trace_cov_valid_ = true;
++    }
++
+     int minRow, minCol;
+     state_ += solution;
+     auto rot_add = solution.block<3, 1>(0, 0);
+--- /tmp/v6_include_voxel_map.h	2026-11-12 20:42:01.130901158 +0800
++++ docs/review_20261112_four_host/host_change_trace_cov/include_voxel_map.h.v8	2026-11-12 20:38:15.153231773 +0800
+@@ -15,6 +15,8 @@
+ 
+ #include "common_lib.h"
+ #include <Eigen/Dense>
++#include <algorithm>
++#include <cmath>
+ #include <fstream>
+ #include <math.h>
+ #include <mutex>
+@@ -217,6 +219,22 @@
+   std::vector<pointWithVar> pv_list_;
+   std::vector<PointToPlane> ptpl_list_;
+ 
++  // ALI-H v1 diagnostic trace. Filled by StateEstimation() only when trace_cov_en_ is true;
++  // the values are written out by LIVMapper::writeTraceCovRow() and never read back here.
++  // P- is the propagated (pre-update) rot+pos block, P+ the updated one, vec the pose part of
++  // (state_propagat - state_). The r_* fields are measurement-space summaries of meas_vec; the
++  // m x m S = H P- H^T + R is deliberately not formed and not exported.
++  bool trace_cov_en_ = false;
++  bool trace_cov_valid_ = false;
++  int trace_cov_eff_ = 0;
++  MD(6, 6) trace_cov_Ppre_ = MD(6, 6)::Zero();
++  VD(6) trace_cov_vec_ = VD(6)::Zero();
++  double trace_cov_r_mean_ = 0.0;
++  double trace_cov_r_med_ = 0.0;
++  double trace_cov_r_abs_mean_ = 0.0;
++  double trace_cov_r_chi2_ = 0.0;
++  double trace_cov_r_chi2w_ = 0.0;
++
+   VoxelMapManager(VoxelMapConfig &config_setting, std::unordered_map<VOXEL_LOCATION, VoxelOctoTree *> &voxel_map)
+       : config_setting_(config_setting), voxel_map_(voxel_map)
+   {
+--- /tmp/v6_include_common_lib.h	2026-11-12 20:42:01.152901223 +0800
++++ docs/review_20261112_four_host/host_change_trace_cov/include_common_lib.h.v8	2026-11-12 20:38:15.157231785 +0800
+@@ -87,6 +87,10 @@
+   // this group iff its own stamp lies inside it -- exact, and no tolerance window.
+   double native_scan_first = -1.0;
+   double native_scan_last = -1.0;
++  // Monotonic capture-time identity of this group (survives replay: it is copied with the group).
++  int64_t native_group_index = -1;
++  // How many raw scans this group was merged from; with the span it proves membership.
++  int native_scan_count = 0;
+ 
+   LidarMeasureGroup()
+   {

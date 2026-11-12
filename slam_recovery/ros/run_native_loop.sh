@@ -80,6 +80,10 @@ cleanup() {
       sleep "$SAVE_WAIT"
       kill -TERM -- "-$PAIR" 2>/dev/null
     else
+      # Let the host leave through its own exit path first: a SIGTERM in the middle of a buffered
+      # trace row left short rows (44/53 columns instead of 92). SIGINT makes ros::ok() false and
+      # the static trace stream is flushed by its destructor.
+      [ -n "$HOST" ] && kill -INT "$HOST" 2>/dev/null && sleep 1
       kill -TERM -- "-$PAIR" 2>/dev/null
     fi
   fi
