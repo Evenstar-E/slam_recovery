@@ -755,3 +755,21 @@ S1 复核 S2 `6fc0fc2`（合入，176 测试通过）。run `fl_native_20261112T
 
 **下一步（已派 S2）**：配准初值改用门已有的 incumbent（trusted 外推）位姿，`bias≈+0.5` 才可见；
 约 15 行 + 单测，再跑一次同声明受控 run；若效应出现，再补一次"同管线关掉修复发布"的对照以隔离效应。
+
+## 70. incumbent 初值让偏差可见（0.027 → 0.815 m），但拟合不收敛、候选被拒
+
+S1 复核 S2 `bc7bd98`（合入，177 测试）。run `fl_native_20261112T044445Z_85628`，同 bag/戳/窗/margin，
+只改 ICP 初值为 incumbent：
+
+| 项 | 实际值 |
+|---|---|
+| ICP | 修正 **0.815 m / 0.357°**（宿主位姿那次 0.027 m），`ITERATION_LIMIT`，inliers 706（上次 1352），残差 0.0535 |
+| 候选 | before 3.1341 → after 6.3645（信息量过线 6.2682），但 Wilson **0.2855** → `MODE3_SOFT_BRIDGE_WAIT` **拒绝** |
+| 修复 | 未发布（只有 accepted 才发），无 `bias_z`、无 `repair_received/applied`；原生命令 hold→restore→resume，终态 HEALTHY |
+
+断点判定：**不是"仍无效应"，而是"效应可见但 0.8 m 初值超出 ICP 0.5 m 对应门限"**，拟合停在半路，
+候选位姿既不等于宿主位姿也不等于真值。
+
+**S1 决定采用 S2 的方案 2（解耦）**：候选继续用宿主位姿初值（已 accepted、Wilson 0.90），
+偏差另用 incumbent 位姿下的一维 body-z 搜索估计（点面残差最小），按该 bias 发布修复云；
+**不改 `IcpConfig`、不改门/阈值/σ/宿主**。约 15 行 + 单测，再跑一次同声明受控 run。
