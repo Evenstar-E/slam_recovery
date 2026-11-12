@@ -1,0 +1,119 @@
+{
+  "target": "be35af983639cf97354c13b09fad79845754b491",
+  "exit": 0,
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261112_be35af9/check_evidence.py",
+  "scope": "Existing availability raw-source qualification only; no ALI-H implementation, selftests, host/bag or archived script execution",
+  "runs": [
+    {
+      "run": "A",
+      "run_id": "fl_native_20261112T065500Z_187992",
+      "frames": 402,
+      "input_trace_sha256": "7a2018456be69ff2e17a918d971b59161918b119d7b3cc9f9dda02937a36f82b",
+      "receipt_inputs": {
+        "bag": "/tmp/fastlivo/hall01_two_event_v1.bag",
+        "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+        "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+        "host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+        "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+        "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+        "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+        "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+        "recovery_node_source": "93f693566111cca38f1dfa28e77347babc5b140c3b8f315603fc0679ce5a077c",
+        "runtime_library": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+        "runtime_library_sha256": "9c0330beffa2d93564ba10d36751e938baa54768fa218b21b75fe17bb8f700db"
+      },
+      "status_counts": {
+        "UNAVAILABLE": 307,
+        "AVAILABLE": 95
+      },
+      "unavailable_support_reason_counts": {
+        "empty_reference": 22,
+        "ok": 285
+      },
+      "unavailable_support_reasons_from_numeric_fields": {
+        "empty_reference": 22,
+        "insufficient_support": 285
+      },
+      "nis_missing_all_frames": 1,
+      "unavailable_fresh_raw_channel_counts": {
+        "NONE": 1,
+        "T_raw": 278,
+        "M_raw": 28
+      },
+      "all_fresh_raw_channel_counts": {
+        "NONE": 1,
+        "T_raw": 278,
+        "M_raw": 123
+      },
+      "I_observation_keys": [],
+      "I_in_old_trace": "NOT_AVAILABLE",
+      "M_or_T_raw_is_qualified_health_evidence": false,
+      "NORMAL_design_ceiling_without_real_I": 0,
+      "calibration_and_label_validity": "NOT_EVALUABLE_no_new_independent_calibration_or_labels_checked",
+      "reported_all_UNKNOWN_shadow": "DEVELOPER_REPORTED_not_independently_read_no_research_artifacts_in_target"
+    },
+    {
+      "run": "B",
+      "run_id": "fl_native_20261112T070801Z_197026",
+      "frames": 544,
+      "input_trace_sha256": "7492097a94458fcbe9270b8fd1fe5c4036026fbd23a611d9b52932a8179fa6b1",
+      "receipt_inputs": {
+        "bag": "/tmp/fastlivo/hall01_two_event_v1.bag",
+        "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+        "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+        "host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+        "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+        "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+        "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+        "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+        "recovery_node_source": "43c65a9d527b071c200a2c522c7fcef85a510715d54092a91ed608c0531ac048",
+        "runtime_library": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+        "runtime_library_sha256": "9c0330beffa2d93564ba10d36751e938baa54768fa218b21b75fe17bb8f700db"
+      },
+      "status_counts": {
+        "UNAVAILABLE": 412,
+        "AVAILABLE": 132
+      },
+      "unavailable_support_reason_counts": {
+        "empty_reference": 61,
+        "fraction_below_threshold": 351
+      },
+      "unavailable_support_reasons_from_numeric_fields": {
+        "empty_reference": 61,
+        "insufficient_support": 351
+      },
+      "nis_missing_all_frames": 1,
+      "unavailable_fresh_raw_channel_counts": {
+        "NONE": 1,
+        "T_raw": 274,
+        "M_raw": 137
+      },
+      "all_fresh_raw_channel_counts": {
+        "NONE": 1,
+        "T_raw": 304,
+        "M_raw": 239
+      },
+      "I_observation_keys": [],
+      "I_in_old_trace": "NOT_AVAILABLE",
+      "M_or_T_raw_is_qualified_health_evidence": false,
+      "NORMAL_design_ceiling_without_real_I": 0,
+      "calibration_and_label_validity": "NOT_EVALUABLE_no_new_independent_calibration_or_labels_checked",
+      "reported_all_UNKNOWN_shadow": "DEVELOPER_REPORTED_not_independently_read_no_research_artifacts_in_target"
+    }
+  ],
+  "research_artifacts_in_main": [],
+  "remote_exp_branch": "NOT_LISTED_ls_remote_heads_exp_ali_h_v1_exit0_empty",
+  "reported_research_commit_8c5b082": "NOT_AVAILABLE_in_local_fetched_objects",
+  "reported_T1_6_tests": "NOT_EXECUTED_NOT_VERIFIED",
+  "reported_existing_host_pre_post_logs": "DEVELOPER_REPORTED_NOT_READ_remote_files_not_in_target",
+  "proposed_motion_export": {
+    "real_export": "NOT_EXECUTED_in_target",
+    "measurement_S": "H_Pminus_Htranspose_plus_R_lives_in_measurement_space",
+    "pose_eI": "SE3_tangent_6D_covariance_must_live_in_same_tangent_not_direct_measurement_S",
+    "pre_post_covariance": "Pminus_and_Pplus_share_history_not_independent; not_naive_sum_for_eI",
+    "missing_covariance": "Preserve_unit_residual_and_UNKNOWN_qualification_no_identity_or_fake_probability"
+  },
+  "no_new_main_algorithm_changes": true,
+  "new_15h_task_merged_in_target": false,
+  "no_native_or_parameter_execution": true
+}

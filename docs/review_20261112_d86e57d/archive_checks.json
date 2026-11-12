@@ -1,0 +1,1536 @@
+{
+  "target": "d86e57df09c076e531cb2e4edabdc70daac6b668",
+  "baseline": "fafbaf173b873502d248164adff8cd185dfa0dfc",
+  "exit": 0,
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261112_d86e57d/check_archive.py",
+  "scope": "New archive and changed four_host paths only; no algorithm/host execution or old-run replay",
+  "integrity": {
+    "matched": 23,
+    "total": 23,
+    "checks": [
+      {
+        "path": "docs/review_20261112_four_host/README.md",
+        "expected": "59ab88887a0d2bbbddfbb430a8be218f9e2bb8ce38ddb57202277300824cb2ce",
+        "actual": "59ab88887a0d2bbbddfbb430a8be218f9e2bb8ce38ddb57202277300824cb2ce",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/REPORT.md",
+        "expected": "ada116f42c8d46dc70494cc798f9c6d9aa24626c3cefff430c5d89a7794d023a",
+        "actual": "ada116f42c8d46dc70494cc798f9c6d9aa24626c3cefff430c5d89a7794d023a",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/candidates.jsonl",
+        "expected": "30efead49655844de4017bc36792ed8fe8a1341fc1bf5e1527764a9c7a79d14d",
+        "actual": "30efead49655844de4017bc36792ed8fe8a1341fc1bf5e1527764a9c7a79d14d",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/candidates_detail.jsonl",
+        "expected": "e7ccc63a3f291ea6aa0dd1d9a8c6f40b4eaa16c0789efccd57ff530e817f88ed",
+        "actual": "e7ccc63a3f291ea6aa0dd1d9a8c6f40b4eaa16c0789efccd57ff530e817f88ed",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/host.log",
+        "expected": "56539606d9a50de2738bde70f5f9d7616327c59affcc3ed61fc7b5d85f53c547",
+        "actual": "56539606d9a50de2738bde70f5f9d7616327c59affcc3ed61fc7b5d85f53c547",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/host_control/ack_received",
+        "expected": "7008c43ca51d8b8f7c2992ccd03377921239258f44ae2e552f4741e6061aff20",
+        "actual": "7008c43ca51d8b8f7c2992ccd03377921239258f44ae2e552f4741e6061aff20",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/host_control/cmd.done",
+        "expected": "903415749bce35aae019f8997c53401bb67ba5680f454058b8fc4355b597ea69",
+        "actual": "903415749bce35aae019f8997c53401bb67ba5680f454058b8fc4355b597ea69",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/icp_detail.jsonl",
+        "expected": "0a9a35bcb3b0bc5482eb5a8c678eedbdb8b00e286de44f05c948747831f84bb5",
+        "actual": "0a9a35bcb3b0bc5482eb5a8c678eedbdb8b00e286de44f05c948747831f84bb5",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/launch_pair.sh",
+        "expected": "2dd9da46707ead21e1f9313de92e9227100b6070dbc4f36e56c6eb446d3c0bb4",
+        "actual": "2dd9da46707ead21e1f9313de92e9227100b6070dbc4f36e56c6eb446d3c0bb4",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/lifecycle_events.json",
+        "expected": "e8adb777225d8818840ae2931a537ef23e0238340b71e700329f4fec315eee00",
+        "actual": "e8adb777225d8818840ae2931a537ef23e0238340b71e700329f4fec315eee00",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/machine_load.txt",
+        "expected": "79988ecd4c6690e727f8c3e8bed87827ed51d06c66a5a21ab7e80021583025ae",
+        "actual": "79988ecd4c6690e727f8c3e8bed87827ed51d06c66a5a21ab7e80021583025ae",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/native_checkpoint_events.json",
+        "expected": "1ae4e5410f81e4dcfa1dd1e2af57be519905f956476feed1400f3012646a9e81",
+        "actual": "1ae4e5410f81e4dcfa1dd1e2af57be519905f956476feed1400f3012646a9e81",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/receipt.json",
+        "expected": "c625dbb60f5e2e5b6a08fe68e476ee9e90761763b80f757b5321dfa49d80ed0a",
+        "actual": "c625dbb60f5e2e5b6a08fe68e476ee9e90761763b80f757b5321dfa49d80ed0a",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/recovery_node.log",
+        "expected": "f7ac36207817476a4a36126eea88c42c4940326fc4cd1bf1b7279d1b55e2d4b5",
+        "actual": "f7ac36207817476a4a36126eea88c42c4940326fc4cd1bf1b7279d1b55e2d4b5",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/recovery_node_source.sha256",
+        "expected": "b049c1227c85f100dfa08513b117fe106a5ed85431a8df5eaed5aefdd03f886e",
+        "actual": "b049c1227c85f100dfa08513b117fe106a5ed85431a8df5eaed5aefdd03f886e",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/relay.log",
+        "expected": "bd68ee7cde78d968e1d3402921607606e9a6e19ea45d3603787a5d495e05e494",
+        "actual": "bd68ee7cde78d968e1d3402921607606e9a6e19ea45d3603787a5d495e05e494",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/relay_frames.jsonl",
+        "expected": "ab3a500b0b6ebe36db9c2792ca016e475c10fa9da102769b5ac3012dc8e017a0",
+        "actual": "ab3a500b0b6ebe36db9c2792ca016e475c10fa9da102769b5ac3012dc8e017a0",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/boundary_checkpoint_final_20261112/run_summary.json",
+        "expected": "89f83e1c5b8df9fa5de5edc1d5701cbae47ee6ee71cb8b0a9710a54080773614",
+        "actual": "89f83e1c5b8df9fa5de5edc1d5701cbae47ee6ee71cb8b0a9710a54080773614",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/host_change_boundary_checkpoint/BUILD.md",
+        "expected": "472d773eb62ca3e52092329e75fa8250c0963fcbe46b22936f1b9e6366f6c126",
+        "actual": "472d773eb62ca3e52092329e75fa8250c0963fcbe46b22936f1b9e6366f6c126",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/host_change_boundary_checkpoint/boundary_increment.diff",
+        "expected": "1b8ef29b324ec1d913e502018ef56c8e4f980a57ea1d170a173119f40c7b1740",
+        "actual": "1b8ef29b324ec1d913e502018ef56c8e4f980a57ea1d170a173119f40c7b1740",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/host_change_boundary_checkpoint/deployed_host_v6.diff",
+        "expected": "faf5e156071b0634f099d3790df8ed32b7dc1e7ba914a4c615f33868774066e8",
+        "actual": "faf5e156071b0634f099d3790df8ed32b7dc1e7ba914a4c615f33868774066e8",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/host_change_boundary_checkpoint/host_build_v7.log",
+        "expected": "e1b30a7eebf766741a4bc7b90bfab362ddf3c8e15c02a0f0e8521fbb0eef863c",
+        "actual": "e1b30a7eebf766741a4bc7b90bfab362ddf3c8e15c02a0f0e8521fbb0eef863c",
+        "ok": true
+      },
+      {
+        "path": "docs/review_20261112_four_host/host_change_boundary_checkpoint/new_binary_sha.txt",
+        "expected": "e8e1dc137833a6f3494ffbabc2fb1f6936491aa55c096cc9c6e9d674021c3a50",
+        "actual": "e8e1dc137833a6f3494ffbabc2fb1f6936491aa55c096cc9c6e9d674021c3a50",
+        "ok": true
+      }
+    ],
+    "new_run_files": 17,
+    "excluded_manifest_self": "docs/review_20261112_four_host/SHA256SUMS"
+  },
+  "identity": {
+    "receipt": {
+      "status": "OK",
+      "reason": "all wiring checks passed",
+      "termination": "PLANNED_KILL_AFTER_DRAIN",
+      "run_id": "fl_native_20261112T092251Z_291996",
+      "inputs": {
+        "bag": "/tmp/fastlivo/hall01_two_event_v1.bag",
+        "bag_sha256": "c3e905da6600d86c1ecc5dde5ff3cfceb33938b18960fe62bf2f06f43c059dec",
+        "host_binary": "/home/R26534/fast_livo2_ws/devel/lib/fast_livo/fastlivo_mapping",
+        "host_binary_sha256": "0d7e23de537fcaa9ae0a4feb86afd8f9bc867c064f30bbfc9d0fa6bc9a2af6c1",
+        "config_m2dgr": "/home/R26534/FAST-LIVO2/config/m2dgr.yaml",
+        "config_m2dgr_sha256": "47a1bfd9b6f453298a0aafb2bc0651a48647f0ff1cba2c0ddd6dc6459217fe93",
+        "config_camera": "/home/R26534/FAST-LIVO2/config/camera_m2dgr.yaml",
+        "config_camera_sha256": "96867cf92efc6ebbcaf224de4d3d2a82baf03e5834bc4197dddaf964f7ad75d7",
+        "recovery_node_source": "a4aaa58b05503749b420f164ac93a942b4d137b69c65362128904a6d27428a69",
+        "runtime_library": "/home/R26534/fast_livo2_ws/devel/lib/liblaser_mapping.so",
+        "runtime_library_sha256": "ca9126c4395e87da4232b3d0bf18fb2a3873788fa12ed03f6a54bec83e8b44ef"
+      },
+      "machine_load_at_launch": "396.64 439.14 338.56 158/65160 292031\nnproc=128",
+      "launch": {
+        "rate": "1.0",
+        "drain_s": "30",
+        "duration_s": "0",
+        "max_pairs": "0",
+        "candidate_source": "icp_reregistration",
+        "detection": "off",
+        "sigma_meas_m": "0.884",
+        "scripted_triggers_s": "",
+        "scripted_triggers_ns": "1627785276215170145,1627785306371636152",
+        "confirmation_margin_sec": "4.0",
+        "relay_shift_z": "0.5",
+        "relay_start_ns": "1627785276215170145",
+        "relay_end_ns": "1627785282215170145",
+        "injection": "INJECTION_DECLARED_Z_BIAS",
+        "repair_publish": "1",
+        "run_mode": "CONTROLLED_INTERFACE_TEST",
+        "group_model": "host and recovery node are children of one setsid supervisor"
+      },
+      "exit_codes": {
+        "play": "0",
+        "supervisor": "null",
+        "recovery_node": "0",
+        "roscore": "null"
+      },
+      "recovery_summary_present": true,
+      "recovery_summary_headline": {
+        "paired": 526,
+        "fed_to_step_frame": 2,
+        "episodes": 2,
+        "decisions": 2,
+        "accepted": 1,
+        "final_state": "HEALTHY"
+      }
+    },
+    "driver_matches_exact_target": true,
+    "library_and_binary_match_v6_build_declaration": true,
+    "raw_bag_library_binary_runtime_files": "NOT_READ_remote_hash_declaration_only"
+  },
+  "boundaries": [
+    {
+      "episode": 1,
+      "trigger_ns": 1627785276215170145,
+      "quarantine_start_ns": 1627785272215170145,
+      "checkpoint_ack_ns": 1627785272199251712,
+      "checkpoint_minus_qstart_ns": -15918433,
+      "checkpoint_minus_trigger_ns": -4015918433,
+      "checkpoint_printed_seconds": "1627785272.199251652",
+      "printed_decimal_ns": 1627785272199251652,
+      "ack_minus_printed_decimal_ns": 60,
+      "application_group_printed_seconds": "1627785272.265811205",
+      "application_group_minus_requested_ns": 50641060,
+      "result": "PASS_THIS_RUN_checkpoint_label_before_boundary_and_later_actual_apply_confirmed",
+      "snapshot_evidence": {
+        "line": 5716,
+        "text": "[ INFO] [1794475433.620182401]: [NATIVE_CHECKPOINT] snapshot stamp=1627785272.199251652 frame=137 voxels=13105 nodes=26873 points=252336"
+      },
+      "apply_evidence": {
+        "line": 5717,
+        "text": "[ INFO] [1794475433.623533898]: [NATIVE_CHECKPOINT] deferred apply cmd=snapshot at_lio=1627785272.265811205 stamp_ns=1627785272215170145 late_ms=50.641 ok=1 valid=1 stamp_ns=1627785272199251712 frame=137 voxels=13105 nodes=26873 points=252336 restores=0 live_voxels=13105 live_points=252336 state_pos=3.444055,2.783129,0.047238 hold=1 held_frames=0 held_points=0 hold_commands=1 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=95 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0"
+      },
+      "scope": "Actual apply plus cp label/anchor/map counts checked; full native state/cache time equivalence requires source/state validation."
+    },
+    {
+      "episode": 2,
+      "trigger_ns": 1627785306371636152,
+      "quarantine_start_ns": 1627785302371636152,
+      "checkpoint_ack_ns": 1627785302359221248,
+      "checkpoint_minus_qstart_ns": -12414904,
+      "checkpoint_minus_trigger_ns": -4012414904,
+      "checkpoint_printed_seconds": "1627785302.359221220",
+      "printed_decimal_ns": 1627785302359221220,
+      "ack_minus_printed_decimal_ns": 28,
+      "application_group_printed_seconds": "1627785302.425881863",
+      "application_group_minus_requested_ns": 54245711,
+      "result": "PASS_THIS_RUN_checkpoint_label_before_boundary_and_later_actual_apply_confirmed",
+      "snapshot_evidence": {
+        "line": 34444,
+        "text": "[ INFO] [1794475482.063216670]: [NATIVE_CHECKPOINT] snapshot stamp=1627785302.359221220 frame=860 voxels=29869 nodes=67008 points=628655"
+      },
+      "apply_evidence": {
+        "line": 34445,
+        "text": "[ INFO] [1794475482.069453402]: [NATIVE_CHECKPOINT] deferred apply cmd=snapshot at_lio=1627785302.425881863 stamp_ns=1627785302371636152 late_ms=54.246 ok=1 valid=1 stamp_ns=1627785302359221248 frame=860 voxels=29869 nodes=67008 points=628655 restores=1 live_voxels=29869 live_points=628655 state_pos=1.880189,1.248682,1.056206 hold=1 held_frames=335 held_points=2301928 hold_commands=4 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=396 set_state=0 repair_merged_away=0 replay_within_end=244 replay_suffix=550 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0"
+      },
+      "scope": "Actual apply plus cp label/anchor/map counts checked; full native state/cache time equivalence requires source/state validation."
+    }
+  ],
+  "receipt_application_separation": {
+    "deferred_arrangement_events": [
+      {
+        "command": "hold",
+        "wall": 1794475390.62,
+        "received_wall": 1794475417.550585,
+        "received_s": 26.931,
+        "ok": true,
+        "ack": "OK hold deferred stamp=1627785272215170145",
+        "ack_wall": 1794475417.85
+      },
+      {
+        "command": "snapshot",
+        "wall": 1794475417.85,
+        "sent_wall": 1794475390.62,
+        "received_wall": 1794475417.855027,
+        "received_s": 0.005,
+        "ok": true,
+        "ack": "OK snapshot deferred stamp=1627785272215170145",
+        "ack_wall": 1794475418.351
+      },
+      {
+        "command": "hold",
+        "wall": 1794475418.351,
+        "received_wall": 1794475418.355365,
+        "received_s": 0.004,
+        "ok": true,
+        "ack": "OK hold deferred stamp=1627785302371636152",
+        "ack_wall": 1794475418.85
+      },
+      {
+        "command": "snapshot",
+        "wall": 1794475418.85,
+        "sent_wall": 1794475390.62,
+        "received_wall": 1794475418.851109,
+        "received_s": 0.001,
+        "ok": true,
+        "ack": "OK snapshot deferred stamp=1627785302371636152",
+        "ack_wall": 1794475419.35
+      }
+    ],
+    "actual_apply_host_lines": [
+      {
+        "line": 5715,
+        "text": "[ INFO] [1794475433.547526308]: [NATIVE_CHECKPOINT] deferred apply cmd=hold at_lio=1627785272.265811205 stamp_ns=1627785272215170145 late_ms=50.641 ok=1 valid=0 stamp_ns=-1000000000 frame=0 voxels=0 nodes=0 points=0 restores=0 live_voxels=13105 live_points=252336 state_pos=3.444055,2.783129,0.047238 hold=1 held_frames=0 held_points=0 hold_commands=1 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=95 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0"
+      },
+      {
+        "line": 5717,
+        "text": "[ INFO] [1794475433.623533898]: [NATIVE_CHECKPOINT] deferred apply cmd=snapshot at_lio=1627785272.265811205 stamp_ns=1627785272215170145 late_ms=50.641 ok=1 valid=1 stamp_ns=1627785272199251712 frame=137 voxels=13105 nodes=26873 points=252336 restores=0 live_voxels=13105 live_points=252336 state_pos=3.444055,2.783129,0.047238 hold=1 held_frames=0 held_points=0 hold_commands=1 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=95 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0"
+      },
+      {
+        "line": 34443,
+        "text": "[ INFO] [1794475481.809901448]: [NATIVE_CHECKPOINT] deferred apply cmd=hold at_lio=1627785302.425881863 stamp_ns=1627785302371636152 late_ms=54.246 ok=1 valid=1 stamp_ns=1627785272199251712 frame=137 voxels=13105 nodes=26873 points=252336 restores=1 live_voxels=29869 live_points=628655 state_pos=1.880189,1.248682,1.056206 hold=1 held_frames=335 held_points=2301928 hold_commands=4 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=396 set_state=0 repair_merged_away=0 replay_within_end=244 replay_suffix=550 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0"
+      },
+      {
+        "line": 34445,
+        "text": "[ INFO] [1794475482.069453402]: [NATIVE_CHECKPOINT] deferred apply cmd=snapshot at_lio=1627785302.425881863 stamp_ns=1627785302371636152 late_ms=54.246 ok=1 valid=1 stamp_ns=1627785302359221248 frame=860 voxels=29869 nodes=67008 points=628655 restores=1 live_voxels=29869 live_points=628655 state_pos=1.880189,1.248682,1.056206 hold=1 held_frames=335 held_points=2301928 hold_commands=4 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=396 set_state=0 repair_merged_away=0 replay_within_end=244 replay_suffix=550 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0"
+      }
+    ],
+    "non_status_action_count": 10,
+    "all_exported_events_count": 18,
+    "summary_copies_consistent_after_status_filter": true
+  },
+  "repair": {
+    "published": 23,
+    "received": 23,
+    "applied": 23,
+    "leftover_evidence": [
+      {
+        "line": 31936,
+        "text": "[ INFO] [1794475472.862354526]: [NATIVE_REPAIR] leftover 0: had_group_but_missed=0 no_group_nearby=0 (groups=794, spans=0)"
+      }
+    ],
+    "received_identity_matches": [
+      {
+        "source_scan_ns": 1627785276310700417,
+        "printed_seconds": "1627785276.310700417",
+        "print_minus_exact_ns": 0,
+        "points": 5821,
+        "line": 18435
+      },
+      {
+        "source_scan_ns": 1627785276509166718,
+        "printed_seconds": "1627785276.509166718",
+        "print_minus_exact_ns": 0,
+        "points": 5826,
+        "line": 18436
+      },
+      {
+        "source_scan_ns": 1627785276709579945,
+        "printed_seconds": "1627785276.709579945",
+        "print_minus_exact_ns": 0,
+        "points": 5890,
+        "line": 18437
+      },
+      {
+        "source_scan_ns": 1627785276809773207,
+        "printed_seconds": "1627785276.809773207",
+        "print_minus_exact_ns": 0,
+        "points": 7944,
+        "line": 18438
+      },
+      {
+        "source_scan_ns": 1627785276910036325,
+        "printed_seconds": "1627785276.910036325",
+        "print_minus_exact_ns": 0,
+        "points": 5734,
+        "line": 18439
+      },
+      {
+        "source_scan_ns": 1627785277110370636,
+        "printed_seconds": "1627785277.110370636",
+        "print_minus_exact_ns": 0,
+        "points": 5704,
+        "line": 18440
+      },
+      {
+        "source_scan_ns": 1627785277310790539,
+        "printed_seconds": "1627785277.310790539",
+        "print_minus_exact_ns": 0,
+        "points": 5741,
+        "line": 18441
+      },
+      {
+        "source_scan_ns": 1627785277511139870,
+        "printed_seconds": "1627785277.511139870",
+        "print_minus_exact_ns": 0,
+        "points": 5806,
+        "line": 18442
+      },
+      {
+        "source_scan_ns": 1627785277711539745,
+        "printed_seconds": "1627785277.711539745",
+        "print_minus_exact_ns": 0,
+        "points": 5839,
+        "line": 18443
+      },
+      {
+        "source_scan_ns": 1627785277911912918,
+        "printed_seconds": "1627785277.911912918",
+        "print_minus_exact_ns": 0,
+        "points": 5825,
+        "line": 18444
+      },
+      {
+        "source_scan_ns": 1627785278112646341,
+        "printed_seconds": "1627785278.112646341",
+        "print_minus_exact_ns": 0,
+        "points": 5852,
+        "line": 18517
+      },
+      {
+        "source_scan_ns": 1627785278313846827,
+        "printed_seconds": "1627785278.313846827",
+        "print_minus_exact_ns": 0,
+        "points": 5821,
+        "line": 18518
+      },
+      {
+        "source_scan_ns": 1627785278514312744,
+        "printed_seconds": "1627785278.514312744",
+        "print_minus_exact_ns": 0,
+        "points": 5836,
+        "line": 18519
+      },
+      {
+        "source_scan_ns": 1627785278713484526,
+        "printed_seconds": "1627785278.713484526",
+        "print_minus_exact_ns": 0,
+        "points": 5797,
+        "line": 18520
+      },
+      {
+        "source_scan_ns": 1627785278914969444,
+        "printed_seconds": "1627785278.914969444",
+        "print_minus_exact_ns": 0,
+        "points": 5734,
+        "line": 18521
+      },
+      {
+        "source_scan_ns": 1627785279114402533,
+        "printed_seconds": "1627785279.114402533",
+        "print_minus_exact_ns": 0,
+        "points": 5739,
+        "line": 18522
+      },
+      {
+        "source_scan_ns": 1627785279314662933,
+        "printed_seconds": "1627785279.314662933",
+        "print_minus_exact_ns": 0,
+        "points": 5732,
+        "line": 18523
+      },
+      {
+        "source_scan_ns": 1627785279515062809,
+        "printed_seconds": "1627785279.515062809",
+        "print_minus_exact_ns": 0,
+        "points": 5768,
+        "line": 18524
+      },
+      {
+        "source_scan_ns": 1627785279715475559,
+        "printed_seconds": "1627785279.715475559",
+        "print_minus_exact_ns": 0,
+        "points": 5820,
+        "line": 18525
+      },
+      {
+        "source_scan_ns": 1627785279815762043,
+        "printed_seconds": "1627785279.815762043",
+        "print_minus_exact_ns": 0,
+        "points": 5820,
+        "line": 18526
+      },
+      {
+        "source_scan_ns": 1627785279915841579,
+        "printed_seconds": "1627785279.915841579",
+        "print_minus_exact_ns": 0,
+        "points": 5840,
+        "line": 18599
+      },
+      {
+        "source_scan_ns": 1627785280116224766,
+        "printed_seconds": "1627785280.116224766",
+        "print_minus_exact_ns": 0,
+        "points": 5854,
+        "line": 18600
+      },
+      {
+        "source_scan_ns": 1627785280317023993,
+        "printed_seconds": "1627785280.317023993",
+        "print_minus_exact_ns": 0,
+        "points": 5895,
+        "line": 18601
+      }
+    ],
+    "applied_identity_matches": [
+      {
+        "source_scan_ns": 1627785276310700417,
+        "printed_seconds": "1627785276.310700655",
+        "print_minus_exact_ns": 238,
+        "points": 5821,
+        "line": 21035
+      },
+      {
+        "source_scan_ns": 1627785276509166718,
+        "printed_seconds": "1627785276.509166718",
+        "print_minus_exact_ns": 0,
+        "points": 5826,
+        "line": 21116
+      },
+      {
+        "source_scan_ns": 1627785276709579945,
+        "printed_seconds": "1627785276.709580183",
+        "print_minus_exact_ns": 238,
+        "points": 5890,
+        "line": 21197
+      },
+      {
+        "source_scan_ns": 1627785276809773207,
+        "printed_seconds": "1627785276.809773445",
+        "print_minus_exact_ns": 238,
+        "points": 7944,
+        "line": 21237
+      },
+      {
+        "source_scan_ns": 1627785276910036325,
+        "printed_seconds": "1627785276.910036325",
+        "print_minus_exact_ns": 0,
+        "points": 5734,
+        "line": 21316
+      },
+      {
+        "source_scan_ns": 1627785277110370636,
+        "printed_seconds": "1627785277.110370636",
+        "print_minus_exact_ns": 0,
+        "points": 5704,
+        "line": 21397
+      },
+      {
+        "source_scan_ns": 1627785277310790539,
+        "printed_seconds": "1627785277.310790777",
+        "print_minus_exact_ns": 238,
+        "points": 5741,
+        "line": 21478
+      },
+      {
+        "source_scan_ns": 1627785277511139870,
+        "printed_seconds": "1627785277.511139870",
+        "print_minus_exact_ns": 0,
+        "points": 5806,
+        "line": 21559
+      },
+      {
+        "source_scan_ns": 1627785277711539745,
+        "printed_seconds": "1627785277.711539745",
+        "print_minus_exact_ns": 0,
+        "points": 5839,
+        "line": 21640
+      },
+      {
+        "source_scan_ns": 1627785277911912918,
+        "printed_seconds": "1627785277.911913157",
+        "print_minus_exact_ns": 239,
+        "points": 5825,
+        "line": 21721
+      },
+      {
+        "source_scan_ns": 1627785278112646341,
+        "printed_seconds": "1627785278.112646580",
+        "print_minus_exact_ns": 239,
+        "points": 5852,
+        "line": 21802
+      },
+      {
+        "source_scan_ns": 1627785278313846827,
+        "printed_seconds": "1627785278.313846827",
+        "print_minus_exact_ns": 0,
+        "points": 5821,
+        "line": 21883
+      },
+      {
+        "source_scan_ns": 1627785278514312744,
+        "printed_seconds": "1627785278.514312744",
+        "print_minus_exact_ns": 0,
+        "points": 5836,
+        "line": 21964
+      },
+      {
+        "source_scan_ns": 1627785278713484526,
+        "printed_seconds": "1627785278.713484764",
+        "print_minus_exact_ns": 238,
+        "points": 5797,
+        "line": 22045
+      },
+      {
+        "source_scan_ns": 1627785278914969444,
+        "printed_seconds": "1627785278.914969444",
+        "print_minus_exact_ns": 0,
+        "points": 5734,
+        "line": 22126
+      },
+      {
+        "source_scan_ns": 1627785279114402533,
+        "printed_seconds": "1627785279.114402771",
+        "print_minus_exact_ns": 238,
+        "points": 5739,
+        "line": 22207
+      },
+      {
+        "source_scan_ns": 1627785279314662933,
+        "printed_seconds": "1627785279.314662933",
+        "print_minus_exact_ns": 0,
+        "points": 5732,
+        "line": 22288
+      },
+      {
+        "source_scan_ns": 1627785279515062809,
+        "printed_seconds": "1627785279.515062809",
+        "print_minus_exact_ns": 0,
+        "points": 5768,
+        "line": 22369
+      },
+      {
+        "source_scan_ns": 1627785279715475559,
+        "printed_seconds": "1627785279.715475559",
+        "print_minus_exact_ns": 0,
+        "points": 5820,
+        "line": 22450
+      },
+      {
+        "source_scan_ns": 1627785279815762043,
+        "printed_seconds": "1627785279.815762043",
+        "print_minus_exact_ns": 0,
+        "points": 5820,
+        "line": 22525
+      },
+      {
+        "source_scan_ns": 1627785279915841579,
+        "printed_seconds": "1627785279.915841579",
+        "print_minus_exact_ns": 0,
+        "points": 5840,
+        "line": 22565
+      },
+      {
+        "source_scan_ns": 1627785280116224766,
+        "printed_seconds": "1627785280.116224766",
+        "print_minus_exact_ns": 0,
+        "points": 5854,
+        "line": 22646
+      },
+      {
+        "source_scan_ns": 1627785280317023993,
+        "printed_seconds": "1627785280.317023993",
+        "print_minus_exact_ns": 0,
+        "points": 5895,
+        "line": 22727
+      }
+    ],
+    "stamp_precision": "Printed double has <=one ULP plus one-ns decimal-rounding difference from exact scan_ns; no false exact-ns identity assertion",
+    "repair_publish": {
+      "enabled": true,
+      "published": 23,
+      "bias_z_m": 0.55,
+      "missing_clouds": 0,
+      "synced": true,
+      "frames": [
+        1627785276310700417,
+        1627785276509166718,
+        1627785276709579945,
+        1627785276809773207,
+        1627785276910036325,
+        1627785277110370636,
+        1627785277310790539,
+        1627785277511139870,
+        1627785277711539745,
+        1627785277911912918,
+        1627785278112646341,
+        1627785278313846827,
+        1627785278514312744,
+        1627785278713484526,
+        1627785278914969444,
+        1627785279114402533,
+        1627785279314662933,
+        1627785279515062809,
+        1627785279715475559,
+        1627785279815762043,
+        1627785279915841579,
+        1627785280116224766,
+        1627785280317023993
+      ],
+      "mad_m": 0.05,
+      "frames_estimated": 23,
+      "per_frame": [
+        {
+          "kf": 129,
+          "bias_z_m": 0.75,
+          "valid_points": 48
+        },
+        {
+          "kf": 130,
+          "bias_z_m": 0.55,
+          "valid_points": 52
+        },
+        {
+          "kf": 131,
+          "bias_z_m": 0.4,
+          "valid_points": 47
+        },
+        {
+          "kf": 132,
+          "bias_z_m": 0.55,
+          "valid_points": 40
+        },
+        {
+          "kf": 133,
+          "bias_z_m": 0.55,
+          "valid_points": 48
+        },
+        {
+          "kf": 134,
+          "bias_z_m": 0.45,
+          "valid_points": 42
+        },
+        {
+          "kf": 135,
+          "bias_z_m": 0.4,
+          "valid_points": 42
+        },
+        {
+          "kf": 136,
+          "bias_z_m": 0.55,
+          "valid_points": 43
+        },
+        {
+          "kf": 137,
+          "bias_z_m": 0.55,
+          "valid_points": 41
+        },
+        {
+          "kf": 138,
+          "bias_z_m": 0.65,
+          "valid_points": 41
+        },
+        {
+          "kf": 139,
+          "bias_z_m": 0.65,
+          "valid_points": 40
+        },
+        {
+          "kf": 140,
+          "bias_z_m": 0.55,
+          "valid_points": 27
+        },
+        {
+          "kf": 141,
+          "bias_z_m": 0.5,
+          "valid_points": 37
+        },
+        {
+          "kf": 142,
+          "bias_z_m": 0.6,
+          "valid_points": 40
+        },
+        {
+          "kf": 143,
+          "bias_z_m": 0.5,
+          "valid_points": 40
+        },
+        {
+          "kf": 144,
+          "bias_z_m": 0.55,
+          "valid_points": 43
+        },
+        {
+          "kf": 145,
+          "bias_z_m": 0.6,
+          "valid_points": 44
+        },
+        {
+          "kf": 146,
+          "bias_z_m": 0.45,
+          "valid_points": 43
+        },
+        {
+          "kf": 147,
+          "bias_z_m": 0.7,
+          "valid_points": 57
+        },
+        {
+          "kf": 148,
+          "bias_z_m": 0.6,
+          "valid_points": 57
+        },
+        {
+          "kf": 149,
+          "bias_z_m": 0.45,
+          "valid_points": 69
+        },
+        {
+          "kf": 150,
+          "bias_z_m": 0.8,
+          "valid_points": 69
+        },
+        {
+          "kf": 151,
+          "bias_z_m": 0.7,
+          "valid_points": 78
+        }
+      ],
+      "reference_points": 22080,
+      "tolerance_m": 0.15,
+      "expected_bias_m": 0.5,
+      "within_declared_tolerance": true,
+      "sham": false,
+      "repair_shift_z_m": -0.55,
+      "repair_received_baseline": 0,
+      "batches": [
+        {
+          "batch": 1,
+          "in_batch": 10,
+          "published_total": 10,
+          "received_ok": true
+        },
+        {
+          "batch": 2,
+          "in_batch": 10,
+          "published_total": 20,
+          "received_ok": true
+        },
+        {
+          "batch": 3,
+          "in_batch": 3,
+          "published_total": 23,
+          "received_ok": true
+        }
+      ],
+      "final_received": 23
+    },
+    "actual_pointcloud_bytes_or_full_record_layout": "NOT_READ_no_wire_cloud_archive_in_this_run"
+  },
+  "replay": {
+    "total_groups": 794,
+    "within_end": 244,
+    "suffix": 550,
+    "start_printed_seconds": "1627785272.265811205",
+    "end_printed_seconds": "1627785298.692232847",
+    "end_stamp_ns": 1627785280381185627,
+    "map_voxels": 27805,
+    "map_points": 564227,
+    "replay_evidence": {
+      "line": 31938,
+      "text": "[ INFO] [1794475472.878678119]: [NATIVE_CHECKPOINT] reprocess #1: 794 frames replayed over [1627785272.265811205 .. 1627785298.692232847], repairs applied=23 queued=0, replayed_within_end=244 replayed_suffix=550 end_stamp=1627785280381185627, map now 27805 voxels/564227 points"
+    },
+    "point_population_evidence": [
+      {
+        "line": 31937,
+        "text": "[ INFO] [1794475472.869852197]: [NATIVE_CHECKPOINT] replay points: with_points=334 empty=460 total_undistorted=4395939 | LIO frames=397 with_points=334 empty=63 | VIO frames=397"
+      }
+    ],
+    "set_state_command_count": 0,
+    "writeback_skip": {
+      "reason": "replay_suffix",
+      "replay_suffix": 550
+    },
+    "aggregate_population": "PASS_244_plus550_equals794_reported_loop_processed",
+    "all_input_identity_fate": "UNKNOWN_no_per_group_identity_manifest_or_all_native_consumed_input_list",
+    "reprocess_wall_duration_s": 19.397000074386597,
+    "reprocess_resume_xyz_distance_m": 0.05332219895128115,
+    "reprocess_xyz": [
+      3.268756,
+      3.177345,
+      0.867906
+    ],
+    "resume_xyz": [
+      3.228974,
+      3.142296,
+      0.873582
+    ],
+    "ack_delta_scope": "Different command times; not instantaneous GT jump or full state equivalence"
+  },
+  "events": [
+    {
+      "episode": 1,
+      "mode": "MODE2_ATOMIC_COMMIT",
+      "accepted": true,
+      "decision_ns": 1627785281080858469,
+      "candidate_frames": 23,
+      "committed_keys": [
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136,
+        137,
+        138,
+        139,
+        140,
+        141,
+        142,
+        143,
+        144,
+        145,
+        146,
+        147,
+        148,
+        149,
+        150,
+        151
+      ],
+      "paired_benefit": {
+        "num_paired_frames": 23,
+        "required_paired_frames": 8,
+        "candidate_keyframes": 23,
+        "pairable_frames": 23,
+        "frames_without_independent_reference": 0,
+        "reference_frames_from_candidate": 90,
+        "num_improved_frames": 23,
+        "improved_fraction": 1.0,
+        "wilson_lower_bound": 0.8947318770599499,
+        "approved": true,
+        "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+        "incumbent_mean_residual": 10.964056612878263,
+        "candidate_mean_residual": 0.46485749204564547,
+        "reentry_pos_jump_m": 1.9682033795356049
+      },
+      "icp": {
+        "candidate_id": "cand_0000",
+        "mode": "single_rigid_transform_for_the_segment",
+        "init_poses": "host_poses",
+        "seconds": 1.639900367707014,
+        "frames_with_scan": 23,
+        "frames_candidate": 23,
+        "reference_points_total": 135000,
+        "segment_points_before_sampling": 133694,
+        "status": "CONVERGED",
+        "icp_iterations": 9,
+        "icp_residual": 0.07278643130091786,
+        "icp_converged": true,
+        "icp_inliers": 1587,
+        "reference_points_used": 18337,
+        "scan_points_used": 1996,
+        "correction_translation_m": 0.05082586922001141,
+        "correction_rotation_deg": 0.5952595856898787
+      },
+      "wait_closed_ns": 1627785291825775146,
+      "t_start_ns": 1627785272215170145,
+      "t_end_ns": 1627785291759108543,
+      "unresolved_count": 128,
+      "unresolved_keys": [
+        "91",
+        "92",
+        "93",
+        "94",
+        "95",
+        "96",
+        "97",
+        "98",
+        "99",
+        "100",
+        "101",
+        "102",
+        "103",
+        "104",
+        "105",
+        "106",
+        "107",
+        "108",
+        "109",
+        "110",
+        "111",
+        "112",
+        "113",
+        "114",
+        "115",
+        "116",
+        "117",
+        "118",
+        "119",
+        "120",
+        "121",
+        "122",
+        "123",
+        "124",
+        "125",
+        "126",
+        "127",
+        "128",
+        "152",
+        "153",
+        "154",
+        "155",
+        "156",
+        "157",
+        "158",
+        "159",
+        "160",
+        "161",
+        "162",
+        "163",
+        "164",
+        "165",
+        "166",
+        "167",
+        "168",
+        "169",
+        "170",
+        "171",
+        "172",
+        "173",
+        "174",
+        "175",
+        "176",
+        "177",
+        "178",
+        "179",
+        "180",
+        "181",
+        "182",
+        "183",
+        "184",
+        "185",
+        "186",
+        "187",
+        "188",
+        "189",
+        "190",
+        "191",
+        "192",
+        "193",
+        "194",
+        "195",
+        "196",
+        "197",
+        "198",
+        "199",
+        "200",
+        "201",
+        "202",
+        "203",
+        "204",
+        "205",
+        "206",
+        "207",
+        "208",
+        "209",
+        "210",
+        "211",
+        "212",
+        "213",
+        "214",
+        "215",
+        "216",
+        "217",
+        "218",
+        "219",
+        "220",
+        "221",
+        "222",
+        "223",
+        "224",
+        "225",
+        "226",
+        "227",
+        "228",
+        "229",
+        "230",
+        "231",
+        "232",
+        "233",
+        "234",
+        "235",
+        "236",
+        "237",
+        "238",
+        "239",
+        "240",
+        "241"
+      ],
+      "strictly_after_close_paired": 283,
+      "first_pair_after_close_ns": 1627785291959105730,
+      "last_pair_ns": 1627785320909073830,
+      "close_to_last_pair_s": 29.083298684,
+      "trigger_to_end_inclusive_paired": 398,
+      "close_path": "wait_limit_closed then rearm from ABORTED, not fully resolved commit_closed",
+      "native_command": {
+        "command": "reprocess",
+        "wall": 1794475453.503,
+        "ok": true,
+        "ack": "OK reprocess valid=1 stamp_ns=1627785272199251712 frame=137 voxels=13105 nodes=26873 points=252336 restores=1 live_voxels=27805 live_points=564227 state_pos=3.268756,3.177345,0.867906 hold=1 held_frames=334 held_points=2287246 hold_commands=2 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=359 set_state=0 repair_merged_away=0 replay_within_end=244 replay_suffix=550 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+        "ack_wall": 1794475472.9
+      }
+    },
+    {
+      "episode": 2,
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "accepted": false,
+      "decision_ns": 1627785311190698147,
+      "candidate_frames": 40,
+      "committed_keys": [],
+      "paired_benefit": {
+        "num_paired_frames": 29,
+        "required_paired_frames": 8,
+        "candidate_keyframes": 29,
+        "pairable_frames": 29,
+        "frames_without_independent_reference": 0,
+        "reference_frames_from_candidate": 219,
+        "num_improved_frames": 20,
+        "improved_fraction": 0.6896551724137931,
+        "wilson_lower_bound": 0.5373474299831861,
+        "approved": false,
+        "reason": "wilson_sequential_benefit_lower_bound_failed",
+        "incumbent_mean_residual": 4.828950207398153,
+        "candidate_mean_residual": 3.483062851867703,
+        "reentry_pos_jump_m": 2.562486470540727
+      },
+      "icp": {
+        "candidate_id": "cand_0001",
+        "mode": "single_rigid_transform_for_the_segment",
+        "init_poses": "host_poses",
+        "seconds": 0.7504055239260197,
+        "frames_with_scan": 40,
+        "frames_candidate": 40,
+        "reference_points_total": 323178,
+        "segment_points_before_sampling": 240000,
+        "status": "ITERATION_LIMIT",
+        "icp_iterations": 20,
+        "icp_residual": 0.08074431045588207,
+        "icp_converged": false,
+        "icp_inliers": 198,
+        "reference_points_used": 19580,
+        "scan_points_used": 2000,
+        "correction_translation_m": 0.4291003507061708,
+        "correction_rotation_deg": 3.9634548963719483
+      },
+      "wait_closed_ns": 1627785319183924675,
+      "t_start_ns": 1627785302371636152,
+      "t_end_ns": 1627785318387740374,
+      "unresolved_count": 160,
+      "unresolved_keys": [
+        "348",
+        "349",
+        "350",
+        "351",
+        "352",
+        "353",
+        "354",
+        "355",
+        "356",
+        "357",
+        "358",
+        "359",
+        "360",
+        "361",
+        "362",
+        "363",
+        "364",
+        "365",
+        "366",
+        "367",
+        "368",
+        "369",
+        "370",
+        "371",
+        "372",
+        "373",
+        "374",
+        "375",
+        "376",
+        "377",
+        "378",
+        "379",
+        "380",
+        "381",
+        "382",
+        "383",
+        "384",
+        "385",
+        "386",
+        "387",
+        "388",
+        "389",
+        "390",
+        "391",
+        "392",
+        "393",
+        "394",
+        "395",
+        "396",
+        "397",
+        "398",
+        "399",
+        "400",
+        "401",
+        "402",
+        "403",
+        "404",
+        "405",
+        "406",
+        "407",
+        "408",
+        "409",
+        "410",
+        "411",
+        "412",
+        "413",
+        "414",
+        "415",
+        "416",
+        "417",
+        "418",
+        "419",
+        "420",
+        "421",
+        "422",
+        "423",
+        "424",
+        "425",
+        "426",
+        "427",
+        "428",
+        "429",
+        "430",
+        "431",
+        "432",
+        "433",
+        "434",
+        "435",
+        "436",
+        "437",
+        "438",
+        "439",
+        "440",
+        "441",
+        "442",
+        "443",
+        "444",
+        "445",
+        "446",
+        "447",
+        "448",
+        "449",
+        "450",
+        "451",
+        "452",
+        "453",
+        "454",
+        "455",
+        "456",
+        "457",
+        "458",
+        "459",
+        "460",
+        "461",
+        "462",
+        "463",
+        "464",
+        "465",
+        "466",
+        "467",
+        "468",
+        "469",
+        "470",
+        "471",
+        "472",
+        "473",
+        "474",
+        "475",
+        "476",
+        "477",
+        "478",
+        "479",
+        "480",
+        "481",
+        "482",
+        "483",
+        "484",
+        "485",
+        "486",
+        "487",
+        "488",
+        "489",
+        "490",
+        "491",
+        "492",
+        "493",
+        "494",
+        "495",
+        "496",
+        "497",
+        "498",
+        "499",
+        "500",
+        "501",
+        "502",
+        "503",
+        "504",
+        "505",
+        "506",
+        "507"
+      ],
+      "strictly_after_close_paired": 17,
+      "first_pair_after_close_ns": 1627785319316660404,
+      "last_pair_ns": 1627785320909073830,
+      "close_to_last_pair_s": 1.725149155,
+      "trigger_to_end_inclusive_paired": 139,
+      "close_path": "wait_limit_closed then rearm from ABORTED, not fully resolved commit_closed",
+      "native_command": {
+        "command": "restore",
+        "wall": 1794475493.759,
+        "received_wall": 1794475493.759165,
+        "received_s": 0.0,
+        "ok": true,
+        "ack": "OK restore valid=1 stamp_ns=1627785302359221248 frame=860 voxels=29869 nodes=67008 points=628655 restores=2 live_voxels=29869 live_points=628655 state_pos=1.880189,1.248682,1.056206 hold=1 held_frames=551 held_points=5266930 hold_commands=5 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=540 set_state=0 repair_merged_away=0 replay_within_end=244 replay_suffix=550 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+        "ack_wall": 1794475494.259
+      }
+    }
+  ],
+  "tail": {
+    "strict_close1_to_trigger2_paired": 144,
+    "after_e2_close_paired": 17,
+    "after_e2_close_span_to_last_s": 1.725149155,
+    "e2_resume_event": {
+      "command": "resume",
+      "wall": 1794475496.766,
+      "trigger": "rearm",
+      "received_wall": 1794475496.772605,
+      "received_s": 0.007,
+      "ok": true,
+      "ack": "OK resume valid=1 stamp_ns=1627785302359221248 frame=860 voxels=29869 nodes=67008 points=628655 restores=2 live_voxels=29869 live_points=628655 state_pos=4.144184,8.201294,0.377827 hold=0 held_frames=577 held_points=5875807 hold_commands=6 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=1 merged_scans=564 set_state=0 repair_merged_away=0 replay_within_end=244 replay_suffix=550 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+      "ack_wall": 1794475497.365
+    },
+    "e2_restore_replay_or_held_history_identity": "UNKNOWN_no_second_reprocess_or_explicit_suffix_replay_population_in_archive",
+    "post_restore_future_output_is_not_full_rollback_catchup": true
+  },
+  "damage": {
+    "relay_frames": 598,
+    "shifted_actual": 59,
+    "repair_scan_subset": 23,
+    "unrepaired_shifted": 36,
+    "unrepaired_scan_stamps": [
+      1627785276409005165,
+      1627785276610954046,
+      1627785277010176420,
+      1627785277210542202,
+      1627785277411109447,
+      1627785277611365318,
+      1627785277811749458,
+      1627785278012118816,
+      1627785278212527990,
+      1627785278412906408,
+      1627785278613305807,
+      1627785278813706160,
+      1627785279014089108,
+      1627785279214470625,
+      1627785279414889097,
+      1627785279615255356,
+      1627785280016039848,
+      1627785280216433525,
+      1627785280416828156,
+      1627785280517013788,
+      1627785280617594957,
+      1627785280717405796,
+      1627785280817767620,
+      1627785280917798042,
+      1627785281018114090,
+      1627785281118199587,
+      1627785281218379974,
+      1627785281318648338,
+      1627785281418802738,
+      1627785281519118786,
+      1627785281619167566,
+      1627785281719384909,
+      1627785281819571495,
+      1627785281919771433,
+      1627785282019945621,
+      1627785282120156765
+    ],
+    "unrepaired_after_last_published": 18,
+    "shifted_in_e2_quarantine_or_later": 0,
+    "injection_window": {
+      "event": "window",
+      "in_topic": "/velodyne_points_raw",
+      "out_topic": "/velodyne_points",
+      "start_ns": 1627785276215170145,
+      "end_ns": 1627785282215170145,
+      "shift_z": 0.5,
+      "wall_start": 1794475390.6213105
+    },
+    "scope": "Controlled E1 injection only; E2 is lifecycle exercise without new injected fault"
+  },
+  "run": {
+    "frames": {
+      "paired": 526,
+      "ingested": 526,
+      "fed_to_step_frame": 2,
+      "ingested_without_detection": 0,
+      "consumed_after_first_decision": 301,
+      "first_decision_ts_ns": 1627785281080858469
+    },
+    "pairing": {
+      "pair_window_ns": 40000000,
+      "poses_received": 793,
+      "scans_received": 598,
+      "paired": 526,
+      "poses_unpaired": 267,
+      "scans_unpaired": 72,
+      "paired_fraction_of_poses": 0.6633039092055486,
+      "paired_fraction_of_scans": 0.8795986622073578,
+      "max_abs_dt_ns": 39806843,
+      "max_backlog_messages": 214,
+      "messages_considered": 1391,
+      "pairing_rule": "nearest pose within 40 ms, no pose reused"
+    },
+    "runtime": {
+      "wall_sec": 115.808,
+      "pid": 293626,
+      "pgid": 293622,
+      "peak_rss_kb": 1028060,
+      "pose_messages": 793,
+      "scan_messages": 598,
+      "callback_errors": [],
+      "callback_error_count": 0
+    },
+    "first_pair_ns": 1627785263208830595,
+    "last_pair_ns": 1627785320909073830,
+    "final_state": "HEALTHY",
+    "quarantine_open_at_exit": false,
+    "native_counters": {
+      "enabled": true,
+      "host_ready": true,
+      "snapshot_ack_timeouts": 0,
+      "snapshots_superseded": 0,
+      "dir": "/tmp/fl_native_20261112T092251Z_291996/host_control",
+      "snapshot_period_s": 2.0,
+      "snapshots": 2,
+      "restores": 1,
+      "reprocesses": 1,
+      "holds": 4,
+      "resumes": 2,
+      "failures": 0,
+      "note": "the checkpoint is the host's own _state and voxel map plus the IMU pre-integrator's cross-frame values; a snapshot taken while healthy is the trusted checkpoint, and its age at the trigger is the snapshot period"
+    },
+    "status_received_negative_s_events": [
+      {
+        "command": "status",
+        "wall": 1794475453.075,
+        "received_wall": 1794475453.030116,
+        "received_s": -0.045,
+        "ok": true,
+        "ack": "OK status valid=1 stamp_ns=1627785272199251712 frame=137 voxels=13105 nodes=26873 points=252336 restores=0 live_voxels=13105 live_points=252336 state_pos=55.365907,-33.507045,-1.830779 hold=1 held_frames=328 held_points=2187242 hold_commands=2 repair_received=0 repair_applied=0 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=355 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+        "ack_wall": 1794475453.095
+      },
+      {
+        "command": "status",
+        "wall": 1794475453.156,
+        "received_wall": 1794475453.079302,
+        "received_s": -0.077,
+        "ok": true,
+        "ack": "OK status valid=1 stamp_ns=1627785272199251712 frame=137 voxels=13105 nodes=26873 points=252336 restores=0 live_voxels=13105 live_points=252336 state_pos=56.096043,-34.932974,-2.062978 hold=1 held_frames=329 held_points=2204635 hold_commands=2 repair_received=10 repair_applied=0 repair_dropped=0 repair_queued=10 multi_scan_groups=0 merged_scans=356 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+        "ack_wall": 1794475453.173
+      },
+      {
+        "command": "status",
+        "wall": 1794475453.187,
+        "received_wall": 1794475453.158953,
+        "received_s": -0.028,
+        "ok": true,
+        "ack": "OK status valid=1 stamp_ns=1627785272199251712 frame=137 voxels=13105 nodes=26873 points=252336 restores=0 live_voxels=13105 live_points=252336 state_pos=56.831951,-36.377742,-2.299428 hold=1 held_frames=330 held_points=2227015 hold_commands=2 repair_received=10 repair_applied=0 repair_dropped=0 repair_queued=10 multi_scan_groups=0 merged_scans=356 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+        "ack_wall": 1794475453.241
+      },
+      {
+        "command": "status",
+        "wall": 1794475453.301,
+        "received_wall": 1794475453.188003,
+        "received_s": -0.113,
+        "ok": true,
+        "ack": "OK status valid=1 stamp_ns=1627785272199251712 frame=137 voxels=13105 nodes=26873 points=252336 restores=0 live_voxels=13105 live_points=252336 state_pos=57.573704,-37.841176,-2.540583 hold=1 held_frames=331 held_points=2237877 hold_commands=2 repair_received=20 repair_applied=0 repair_dropped=0 repair_queued=20 multi_scan_groups=0 merged_scans=357 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+        "ack_wall": 1794475453.311
+      },
+      {
+        "command": "status",
+        "wall": 1794475453.322,
+        "received_wall": 1794475453.302957,
+        "received_s": -0.019,
+        "ok": true,
+        "ack": "OK status valid=1 stamp_ns=1627785272199251712 frame=137 voxels=13105 nodes=26873 points=252336 restores=0 live_voxels=13105 live_points=252336 state_pos=58.321833,-39.323358,-2.785992 hold=1 held_frames=332 held_points=2253202 hold_commands=2 repair_received=20 repair_applied=0 repair_dropped=0 repair_queued=20 multi_scan_groups=0 merged_scans=358 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+        "ack_wall": 1794475453.374
+      },
+      {
+        "command": "status",
+        "wall": 1794475453.44,
+        "received_wall": 1794475453.323479,
+        "received_s": -0.117,
+        "ok": true,
+        "ack": "OK status valid=1 stamp_ns=1627785272199251712 frame=137 voxels=13105 nodes=26873 points=252336 restores=0 live_voxels=13105 live_points=252336 state_pos=59.076435,-40.823608,-3.036167 hold=1 held_frames=333 held_points=2276231 hold_commands=2 repair_received=23 repair_applied=0 repair_dropped=0 repair_queued=23 multi_scan_groups=0 merged_scans=358 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+        "ack_wall": 1794475453.45
+      },
+      {
+        "command": "status",
+        "wall": 1794475453.461,
+        "received_wall": 1794475453.442801,
+        "received_s": -0.018,
+        "ok": true,
+        "ack": "OK status valid=1 stamp_ns=1627785272199251712 frame=137 voxels=13105 nodes=26873 points=252336 restores=0 live_voxels=13105 live_points=252336 state_pos=59.837248,-42.341706,-3.291278 hold=1 held_frames=334 held_points=2287246 hold_commands=2 repair_received=23 repair_applied=0 repair_dropped=0 repair_queued=23 multi_scan_groups=0 merged_scans=359 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=0 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+        "ack_wall": 1794475453.492
+      }
+    ],
+    "status_latency_scope": "received_s reused stale receipt metadata for status entries; not usable measured RPC latency",
+    "host_log_lines": 44416,
+    "host_log_footer": [
+      "[ LIO ] Raw feature num: 32833, downsampled feature num:14988 effective feature num: 12590 average residual: 0.0474687",
+      "[ LIO ] Raw feature num: 32833, downsampled feature num:14988 effective feature num: 12592 average residual: 0.0475427",
+      "[ LIO ] Raw feature num: 32833, downsampled feature num:14988 effective feature num: 12591 average residual: 0.0475873",
+      "[ LIO ] Raw feature num: 32833, downsampled feature num:14988 effective feature num: 12588 average residual: 0.0475486",
+      "[ LIO ] Update Voxel Map"
+    ],
+    "graceful_host_exit": "UNKNOWN_planned_group_kill_host_exit_null_no_clean_exit_marker",
+    "build": {
+      "library_declared_built": true,
+      "overall_exit": "1_DEVELOPER_REPORTED_vikit_test_ABI",
+      "evidence_path": "docs/review_20261112_four_host/host_change_boundary_checkpoint/BUILD.md"
+    },
+    "decision_errors": []
+  },
+  "scientific_boundary": {
+    "automatic_detection": "NOT_EXECUTED_detection_off_scripted",
+    "natural_fault_or_true_second_fault": "NOT_EXECUTED",
+    "whole_native_state_map_equivalence": "UNKNOWN_requires_source_and_state_evidence",
+    "independent_trajectory_map_net_quality": "UNKNOWN_NOT_EVALUATED",
+    "held_group_or_unresolved_population_cannot_count_recovery_success": true
+  },
+  "no_native_ros_bag_parameter_or_archive_script_execution": true
+}

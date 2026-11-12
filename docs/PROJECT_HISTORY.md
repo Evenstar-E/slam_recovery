@@ -599,3 +599,25 @@ S1实际分发/共享接口单写，S3唯一research shadow执行，S2提供已�
 544同pose戳有限复算：kf22裁20/200命中20/20不能证整段gauge或正常；kf157/228全200均0命中、未注册位置差39.903/32.923m；全对应最大kf173 80.002m、首>1m kf46约1.761m，不GT/ATE。diag库v3 9c0330be/driver43c65a9d/config47a1bfd9 vs新v5 9e7d8cdf/4742dbc1/94ffa5db，虽bag与binary同，不只改on/off。diag8hold/8restore/7resume是干预候选解释，唯一因果UNKNOWN，不新矩阵。独立参考需同场景/合法注册/可见支持而非复制被评轨迹；灌诊断pose造图不是独立位姿评价，当前图有效性仍UNKNOWN，不第三次cleanpass。
 
 本轮支持旁支真实尾段/差异核，原生恢复主线无新增实现或run；S1/S2仍合法隔离cp/成功依赖→物理一致native完整重估→全部input接回后继尾段或显式不支持，复用suffix/skip/受控E2。S3按用户105b5be ALI-H真实数据单一交付先旧402/544资格/缺项与真实I，同人口漏检误报延迟错误NORMAL/UNKNOWN时长/成本，不继续换图；target早于任务合入，不指控忽略/不冒认领开工。旧参数停/1研究+2native，逐项自检状态命令原件/source人口/失败质量成本，A/B局部不总分，三Cron单owner/Python-I无host或参数，review白名单SSH推送/private保护不合main不改算法历史。
+
+## 74. d86e57d：受控隔离边界cp实际解除，拒绝回退后的历史归宿待闭合
+
+[核验](review_20261112_d86e57d/README.md)新092251Z/host v6 ca9126c4，driver a4aaa58b=target、23changed SHA一致。scripted提前trigger-margin与snapshot取前已处理组，最小changed test/10s-margin4s→6s正常控制PASS；actual host snapshot/apply核cp早E1/E2隔离起点15,918,433/12,414,904ns，旧晚qstart具体FAIL本次解除，不自动推广rolling/onset迟到与全state-cache等价。laser_mapping Built/整体vikit ABI exit1保留。
+
+E1实际23修复收到应用/leftover0/no set_state，原生794=244within+550suffix（397LIO334有点/63空+397VIO）map27805/564227，reprocess约19.397s，接回ACKXYZ差.0533222m非GT跳变；E1关闭至E2 trigger144paired，E2拒绝restore/wait-close/ABORTED rearm/resume→17paired/1.725149s尾段。两段未解128/160、59shift仅23修/36未修18晚最后，E2无注入/detection off/净收益未知；完整成功不冒HEALTHY。E2无第二reprocess，源码resume仅释放hold，回退后已消费历史/健康后缀的归宿及同一时间边界连续性未证明，未来输出不等完整追赶。最低复用buffer/重处理明确拒绝测量与需追赶input/IMU视觉归宿，或显式不支持，不无条件重放拒绝污染或扩框架；旧UNKNOWN/FAIL写回分支未改不重测。
+
+原生S1/S2下一收口拒绝后归宿/成功依赖与物理一致，S3用户ALI-H真实资格/运动证据与同人口风险成本并行，旧参数停。target未合105b任务不指控忽略/开工，审阅中用户17:53新15h连续执行/重大阻塞中文GitHub告知授权另任务发布。source/archive本机control无host/算法，状态命令原件人口/失败质量成本自检，A4局部时间边界与A2/A6/A10实证推进不全表评分，review SSH/private保护不合main不改历史冻结门。
+
+## 75. 用户15小时执行授权：ALI-H真实验证→有限自动检测接线，重大阻塞中文GitHub确认
+
+2026-11-12 17:53用户明确下班后继续挂自动化，给15小时到2026-11-13 08:53 UTC+8，希望完成自适应ALI和自动检测问题；无重大阻塞不停，重大阻塞GitHub中文告知由用户确认。[执行任务](OVERNIGHT_ALI_AUTODETECTION_TASK_20261112.md)已写明有限范围：先真实资格/运动证据与同人口shadow，再有结果后继续有限实验检测接线/原生自动链，不需要仅阶段推进等待确认；生产默认、未选模型/科学门改变及超预算不自动批准，旧手调仍暂停。完整系统/所有故障不预承诺15h通过，不靠UNKNOWN正常化或降门追deadline。
+
+S1实际分发单写共享接口/连续集成，S3唯一方法研究，S2真实trace/最小已有预算导出及原生自动验证；用户同轮明确暂时没有Codex分支会话辅助，本窗口不安排/等待Codex或设其复核前置，本机S4独立审阅，历史分工不当现配置。不clean-map矩阵、不占整轮虚假字段/单测。本机现20min/2h/日报继续且只会话存活7天，不能保证机器休眠后执行；远端保持任务由S1现执行渠道确认。重大阻塞保存中文ID/命令原件/影响/最低解除/用户最小选项，停被阻部分其余继续，用户GitHub仓库提交确认可由fetch核；本机无gh/认证评论连接，不冒监控Issues/评论。每阶段提交推送、截止中文完整人口风险UNKNOWN成本与实际自动动作结果，自检逐项状态不test数，未解决和负结果如实保留。任务发布/自动化存活不等远端已认领，15h结果另独立核，不新起算法/ROS或改历史/private。
+
+## 76. be35af9：ALI-H已有认领/T0T1回报，旧档缺I复算通过，导出必须残差/cov同空间
+
+[核验](review_20261112_be35af9/README.md)S1§115–117明确S3 exp/ali-h-v1/T0T1认领及8c5b082九文件回报，S2现pre/post接口与一次导出方案确认；不再笼统说没人认领。目标main无九文件/研究分支ls-remote空/本机fetch无commit对象，自测6PASS与shadow402/544全UNKNOWN仍DEVELOPER_REPORTED未独立读执行，最低上传现产物/原件SHA即可不重做研究。main无算法/新host/trace，15h2c任务还没合，不据此推停工/忽略。
+
+本机-I旧档raw资格复算A95/307、B132/412，支持不足285/351与空22/61（各缺NIS1包含空参考非另加）；U中fresh M28/137,T278/274,none1/1,I0/0。fresh不qualified，NORMAL须真实I故结构上限0，不调门能补；正常校准/独立label仍不足。导出规划H Pminus H^T+R是测量空间，不能直接配SE3位姿eI；H_T_H非S、6维压缩需其映射/cov、不简单Pminus+Pplus。最低声明同物理时间frame/tangent/rank/residual-Sigma来源，缺合适cov保带单位残差/经验条件校准NOT_AVAILABLE，不新矩阵/惯导/巨大S。时间还须区分replay/restore phase与早退，不能只行号/重复相对戳。
+
+S3上传/同新trace风险UNKNOWN成本，S2一次已有预算真实导出、S1共享检测接线及原生归宿并行，1研究+2集成/无Codex/旧参数停，不为字段修正停全15h；只有真实证据不可得/需新选择预算才中文重大阻塞告知用户。当前可解除trace依赖非全面重大阻塞。逐项状态命令原件/来源人口/label失败质量成本自检，A3/B3资格认识非性能/自动链/收益，本机不算法或ROS/PAT、review中文SSH/private保护不合main不改历史门。
