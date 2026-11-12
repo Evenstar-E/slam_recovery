@@ -862,8 +862,16 @@ class CheckpointClient:
     def restore(self) -> Dict[str, Any]:
         return self._send("restore")
 
-    def reprocess(self) -> Dict[str, Any]:
-        return self._send("reprocess")
+    def snapshot_now(self) -> Dict[str, Any]:
+        """Immediate snapshot; queued behind any command in flight (single-in-flight client)."""
+        event = self._send("snapshot")
+        event["sent_wall"] = round(time.time(), 3)
+        return event
+
+    def reprocess(self, end_stamp_ns: Optional[int] = None) -> Dict[str, Any]:
+        """Replay the host's captured frames, optionally only up to `end_stamp_ns`."""
+        payload = "" if end_stamp_ns is None else str(int(end_stamp_ns))
+        return self._send("reprocess", payload)
 
     def resume(self) -> Dict[str, Any]:
         """Let the host write its map again; the host side of the recovery loop's re-arm."""
@@ -1363,6 +1371,12 @@ class NativeClosedLoop:
         # waiting for the ack inside a subscriber callback would stall the pairing.
         if self.cp is not None:
             self.cp.hold()
+            # Take the checkpoint at the segment open, on the held map. The rolling snapshots can
+            # be up to one period old, and the replay would then start from before the trigger
+            # with a map that does not correspond to it. This snapshot also starts the capture
+            # window at the trigger rather than up to 2 s earlier. It queues behind the hold in the
+            # single-in-flight client, so the map is already held when the copy is taken.
+            self.cp.snapshot_now()
 
     # -- decision -----------------------------------------------------------------------------
     def _repair_gate(self, ep: "Episode", accepted: bool) -> Tuple[bool, Optional[Dict[str, Any]]]:
@@ -1624,7 +1638,10 @@ class NativeClosedLoop:
                 return row
             # The event object is the one poll() will account for; appending it here as well would
             # list the same command twice.
-            action = self.cp.reprocess() if row.get("accepted") is True else self.cp.restore()
+            # The terminal stamp bounds the host's replay to the frozen candidate's frames, so
+            # wall-clock work done after the decision cannot extend the replay window.
+            action = (self.cp.reprocess(ep.frozen_at_ns) if row.get("accepted") is True
+                      else self.cp.restore())
             ep.meta["native_checkpoint"] = action
             if row.get("accepted") is True and ep.frames:
                 # An accepted repair is only accepted if the host continues from it: the last

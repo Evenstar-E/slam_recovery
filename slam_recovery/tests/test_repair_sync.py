@@ -64,6 +64,7 @@ class _FakeCP:
         self.restore_calls = 0
         self.set_state_calls = 0
         self.expected = None
+        self.reprocess_end_stamp = None
         self._last_snapshot_wall = 0.0
 
     def read_repair_received(self, timeout_s=1.0):
@@ -73,8 +74,9 @@ class _FakeCP:
         self.expected = n
         return self.wait_result
 
-    def reprocess(self):
+    def reprocess(self, end_stamp_ns=None):
         self.reprocess_calls += 1
+        self.reprocess_end_stamp = end_stamp_ns
         return {"command": "reprocess"}
 
     def restore(self):
@@ -162,6 +164,8 @@ class RepairGateTest(unittest.TestCase):
         self.assertEqual(loop.cp.reprocess_calls, 1)
         self.assertEqual(loop.cp.set_state_calls, 1)
         self.assertTrue(ep.meta["repair_publish"]["synced"])
+        # the replay is bounded by the frozen decision stamp
+        self.assertEqual(loop.cp.reprocess_end_stamp, ep.frozen_at_ns)
 
     def test_the_sham_publishes_unchanged_clouds_with_the_same_receipts(self):
         loop, ep = self._loop(wait_result=True)

@@ -139,6 +139,30 @@ class CheckpointClientTest(unittest.TestCase):
         client.expire_pending(0.01)
         self.assertEqual(client.snapshot_ack_timeouts, 1)
 
+    def test_reprocess_carries_the_terminal_stamp(self):
+        host = self._host()
+        client = CheckpointClient(self.dir, ack_timeout_s=5.0)
+        event = client.reprocess(123456789)
+        deadline = time.time() + 3.0
+        while time.time() < deadline and not event.get("ok"):
+            client.poll()
+            time.sleep(0.005)
+        self.assertTrue(event["ok"])
+        with open(os.path.join(self.dir, "cmd.done"), encoding="utf-8") as fh:
+            lines = [ln.rstrip("\n") for ln in fh]
+        self.assertEqual(lines[0], "reprocess")
+        self.assertEqual(lines[1], "123456789")
+        # an empty payload keeps the historical replay-everything behaviour
+        event2 = client.reprocess()
+        deadline = time.time() + 3.0
+        while time.time() < deadline and not event2.get("ok"):
+            client.poll()
+            time.sleep(0.005)
+        with open(os.path.join(self.dir, "cmd.done"), encoding="utf-8") as fh:
+            lines = [ln.rstrip("\n") for ln in fh]
+        self.assertEqual(lines[0], "reprocess")
+        self.assertEqual(lines[1], "")
+
     def test_a_disabled_client_sends_nothing(self):
         client = CheckpointClient("")
         self.assertFalse(client.enabled)
@@ -233,20 +257,30 @@ class CheckpointWiringTest(unittest.TestCase):
         loop._open_episode(1_000_000_000, np.eye(4))
         return loop, node
 
-    def test_opening_a_segment_holds_the_host_map(self):
+    def _open_and_snapshot(self, client):
+        """Account for the two commands an episode open queues: hold, then an immediate snapshot."""
+        client.collect(timeout_s=5.0)
+        deadline = time.time() + 3.0
+        while time.time() < deadline and len(client.events) < 2:
+            client.poll()
+            time.sleep(0.005)
+
+    def test_opening_a_segment_holds_the_map_and_takes_a_snapshot(self):
         client = CheckpointClient(self.dir, ack_timeout_s=5.0)
         self._loop(client)
         # The host consumes the command on its own thread; the assertion waits for it rather than
         # racing it.
         self.assertEqual(self._wait_seen(1), ["hold"])
+        self._open_and_snapshot(client)
+        self.assertEqual(self._wait_seen(2), ["hold", "snapshot"])
 
     def test_a_re_arm_writes_resume(self):
         client = CheckpointClient(self.dir, ack_timeout_s=5.0)
         loop, node = self._loop(client)
-        client.collect(timeout_s=5.0)                 # account for the hold before the next command
+        self._open_and_snapshot(client)               # account for hold and snapshot
         node.tx_mgr.lifecycle_events.append({"event": "rearm"})
         loop._apply_lifecycle()
-        self.assertEqual(self._wait_seen(2), ["hold", "resume"])
+        self.assertEqual(self._wait_seen(3), ["hold", "snapshot", "resume"])
         # resume is now async too: the count follows when poll() sees the applied ack.
         deadline = time.time() + 3.0
         while time.time() < deadline and client.resumes == 0:
@@ -259,11 +293,11 @@ class CheckpointWiringTest(unittest.TestCase):
         # releases its map hold on the same command either way.
         client = CheckpointClient(self.dir, ack_timeout_s=5.0)
         loop, node = self._loop(client)
-        client.collect(timeout_s=5.0)
+        self._open_and_snapshot(client)
         node.tx_mgr.lifecycle_events.append(
             {"event": "commit_closed", "segment_id": "s", "n_committed": 1})
         loop._apply_lifecycle()
-        self.assertEqual(self._wait_seen(2), ["hold", "resume"])
+        self.assertEqual(self._wait_seen(3), ["hold", "snapshot", "resume"])
         deadline = time.time() + 3.0
         while time.time() < deadline and client.resumes == 0:
             client.poll()
@@ -273,13 +307,13 @@ class CheckpointWiringTest(unittest.TestCase):
     def test_lifecycle_events_are_only_acted_on_once(self):
         client = CheckpointClient(self.dir, ack_timeout_s=5.0)
         loop, node = self._loop(client)
-        client.collect(timeout_s=5.0)
+        self._open_and_snapshot(client)
         node.tx_mgr.lifecycle_events.append({"event": "rearm"})
         loop._apply_lifecycle()
         loop._apply_lifecycle()
-        self.assertEqual(self._wait_seen(2), ["hold", "resume"])
+        self.assertEqual(self._wait_seen(3), ["hold", "snapshot", "resume"])
         time.sleep(0.05)
-        self.assertEqual(self.host.seen, ["hold", "resume"])
+        self.assertEqual(self.host.seen, ["hold", "snapshot", "resume"])
 
 
 if __name__ == "__main__":
