@@ -2204,3 +2204,16 @@ S2 更正并给出解析脚本 `docs/review_20261112_four_host/analyze_cp_candid
 
 另：审阅指出 `restore_disposition.checkpoint_stamp_ns` 仍用 `trigger−margin` 而非实际 ACK，属已知口径问题（§85 已记）。
 探针记录：v9=4 FAIL/1 PASS、v9b=5 FAIL、v9c=5 PASS——不能笼统说"任何布局变化必崩"，但 v9c 的稳定性仍只是启动探针层面。
+
+## 149. K=3 run 的 driver 来源已查明并归档（8d9cd0d + 本地 getattr 绕过 = 7cfcccf7）
+
+S2 `1fde521`（`exp/online-v2`，已推）归档 `docs/review_20261112_four_host/run_provenance_131213/`：
+`recovery_node.executed.py`（本机实测 sha `7cfcccf7…`，与 receipt 逐字节一致）、`driver_patch.diff`（8d9cd0d→执行版，
+21 行，仅 `checkpoint_checks` 的 getattr 绕过）、`run_native_loop.diff`（未提交的 `CP_HISTORY_K` 传递，31 行）、SHA256SUMS。
+
+结论：该 run 执行的是 **`8d9cd0d` 的 driver + 本地绕过**，不是 `c915197`；S2 上一条"已切到 main@c915197"指的是之后的状态。
+因此 `LATE_AFTER_BOUNDARY` 的计时结论仍有效（绕过只影响 summary 里 `ep.meta` 读取），但**该 run 不能标为"c915 修复后的验证"**。
+S2 工作树当前基于 `8d9cd0d`，`recovery_node.py` 无未提交改动，`run_native_loop.sh` 有 `CP_HISTORY_K` 未提交改动；
+明天第一个 run 前会切到 `main@05fd0a2` 并重记执行文件 sha。
+
+C′ 限制与"布局敏感"表述已按 S1 要求收窄（不推广成"任何布局变化必崩"），并写进 BUILD.md §10。
