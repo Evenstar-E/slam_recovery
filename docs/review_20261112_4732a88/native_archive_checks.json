@@ -1,0 +1,168 @@
+{
+  "archive_target": "ffd4b13ce86d03556e389e42236e913d4701cf8d",
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/review_20261112_4732a88/native_archive_reader.py",
+  "runs": [
+    {
+      "run_id": "fl_native_20261112T112254Z_445825",
+      "receipt_sha256": "1eb6bed4fb6a2adaf057da3f5385abb445866d79f659ed54718a5908466c3b99",
+      "summary_sha256": "0fc253ec91de19dfe07db9fa90d099660a95bb8f0f0b121f59e760d06f1f0da9",
+      "library": "3b26365fa0541a612cb81babd751c0997acb6cffc5dd88337a69c43bc140737b",
+      "source": "a4aaa58b05503749b420f164ac93a942b4d137b69c65362128904a6d27428a69",
+      "status": "OK",
+      "paired": 544,
+      "episodes": [
+        {
+          "index": 0,
+          "quarantine_start_ns": 1627785272215170145,
+          "command": "reprocess",
+          "ok": true,
+          "ack": "OK reprocess valid=1 stamp_ns=1627785272199251712 frame=163 voxels=14138 nodes=29197 points=273311 restores=1 live_voxels=21081 live_points=390528 state_pos=3.990739,6.217598,0.215453 hold=1 held_frames=282 held_points=1525188 hold_commands=2 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=339 set_state=0 repair_merged_away=0 replay_within_end=244 replay_suffix=439 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+          "ack_fields": {
+            "stamp_ns": 1627785272199251712,
+            "frame": 163,
+            "repair_received": 23,
+            "repair_applied": 23,
+            "repair_dropped": 0,
+            "set_state": 0,
+            "replay_within_end": 244,
+            "replay_suffix": 439
+          },
+          "replay_suffix": 439,
+          "published": 23
+        },
+        {
+          "index": 1,
+          "quarantine_start_ns": 1627785302371636152,
+          "command": "restore",
+          "ok": true,
+          "ack": "OK restore valid=1 stamp_ns=1627785302359221248 frame=834 voxels=23180 nodes=50903 points=459371 restores=2 live_voxels=23180 live_points=459371 state_pos=0.982662,2.461503,0.028583 hold=1 held_frames=470 held_points=4013047 hold_commands=5 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=538 set_state=0 repair_merged_away=0 replay_within_end=244 replay_suffix=439 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+          "ack_fields": {
+            "stamp_ns": 1627785302359221248,
+            "frame": 834,
+            "repair_received": 23,
+            "repair_applied": 23,
+            "repair_dropped": 0,
+            "set_state": 0,
+            "replay_within_end": 244,
+            "replay_suffix": 439
+          },
+          "replay_suffix": null,
+          "published": null
+        }
+      ]
+    },
+    {
+      "run_id": "fl_native_20261112T112753Z_454009",
+      "receipt_sha256": "b9ab96001e47d1a49e1cd9f2a403c96ef3df6bf42ccbc5fad38a85cf83e6a180",
+      "summary_sha256": "4d2a7c55ead7efe77d3e53e0ace5103f3178cdf87af09f7a94645875a9b5b1b2",
+      "library": "3b26365fa0541a612cb81babd751c0997acb6cffc5dd88337a69c43bc140737b",
+      "source": "a4aaa58b05503749b420f164ac93a942b4d137b69c65362128904a6d27428a69",
+      "status": "OK",
+      "paired": 544,
+      "episodes": [
+        {
+          "index": 0,
+          "quarantine_start_ns": 1627785272215170145,
+          "command": "reprocess",
+          "ok": true,
+          "ack": "OK reprocess valid=1 stamp_ns=1627785302359221248 frame=552 voxels=14133 nodes=29193 points=273382 restores=1 live_voxels=172494 live_points=1371612 state_pos=-803.417522,-592.162083,-236.686781 hold=1 held_frames=465 held_points=4328830 hold_commands=3 repair_received=23 repair_applied=0 repair_dropped=23 repair_queued=0 multi_scan_groups=0 merged_scans=463 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=151 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+          "ack_fields": {
+            "stamp_ns": 1627785302359221248,
+            "frame": 552,
+            "repair_received": 23,
+            "repair_applied": 0,
+            "repair_dropped": 23,
+            "set_state": 0,
+            "replay_within_end": 0,
+            "replay_suffix": 151
+          },
+          "replay_suffix": 151,
+          "published": 23
+        },
+        {
+          "index": 1,
+          "quarantine_start_ns": 1627785302371636152,
+          "command": "restore",
+          "ok": true,
+          "ack": "OK restore valid=1 stamp_ns=1627785302359221248 frame=552 voxels=14133 nodes=29193 points=273382 restores=2 live_voxels=14133 live_points=273382 state_pos=-431.448677,-344.436826,-117.199625 hold=1 held_frames=496 held_points=4885781 hold_commands=5 repair_received=23 repair_applied=0 repair_dropped=23 repair_queued=0 multi_scan_groups=0 merged_scans=565 set_state=0 repair_merged_away=0 replay_within_end=0 replay_suffix=151 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+          "ack_fields": {
+            "stamp_ns": 1627785302359221248,
+            "frame": 552,
+            "repair_received": 23,
+            "repair_applied": 0,
+            "repair_dropped": 23,
+            "set_state": 0,
+            "replay_within_end": 0,
+            "replay_suffix": 151
+          },
+          "replay_suffix": null,
+          "published": null
+        }
+      ]
+    },
+    {
+      "run_id": "fl_native_20261112T113855Z_464306",
+      "receipt_sha256": "27b696585f4e38c7b708a4a20c8bcc0860224e4d6d6e6c2b80f3ae81fb834644",
+      "summary_sha256": "8331c5a775f61112565a300eff7852922073b2b408d31f94e5329ef2f827ddb4",
+      "library": "49f2f941cc0a90357e088d2271f21e60fdeb18c88b5b89a1c6acce5f55e48eda",
+      "source": "a4aaa58b05503749b420f164ac93a942b4d137b69c65362128904a6d27428a69",
+      "status": "OK",
+      "paired": 544,
+      "episodes": [
+        {
+          "index": 0,
+          "quarantine_start_ns": 1627785272215170145,
+          "command": "reprocess",
+          "ok": true,
+          "ack": "OK reprocess valid=1 stamp_ns=1627785272199251712 frame=163 voxels=14134 nodes=29194 points=273176 restores=1 live_voxels=21198 live_points=388897 state_pos=4.719288,6.577257,0.218538 hold=1 held_frames=268 held_points=1472328 hold_commands=2 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=326 set_state=0 repair_merged_away=0 replay_within_end=244 replay_suffix=400 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+          "ack_fields": {
+            "stamp_ns": 1627785272199251712,
+            "frame": 163,
+            "repair_received": 23,
+            "repair_applied": 23,
+            "repair_dropped": 0,
+            "set_state": 0,
+            "replay_within_end": 244,
+            "replay_suffix": 400
+          },
+          "replay_suffix": 400,
+          "published": 23
+        },
+        {
+          "index": 1,
+          "quarantine_start_ns": 1627785302371636152,
+          "command": "restore",
+          "ok": true,
+          "ack": "OK restore valid=1 stamp_ns=1627785302359221248 frame=820 voxels=23389 nodes=51419 points=460076 restores=2 live_voxels=23389 live_points=460076 state_pos=0.984799,2.464271,0.025071 hold=1 held_frames=460 held_points=4010985 hold_commands=5 repair_received=23 repair_applied=23 repair_dropped=0 repair_queued=0 multi_scan_groups=0 merged_scans=540 set_state=0 repair_merged_away=0 replay_within_end=244 replay_suffix=400 control_valid=0 control_pos=0.000000,0.000000,0.000000 control_points=0",
+          "ack_fields": {
+            "stamp_ns": 1627785302359221248,
+            "frame": 820,
+            "repair_received": 23,
+            "repair_applied": 23,
+            "repair_dropped": 0,
+            "set_state": 0,
+            "replay_within_end": 244,
+            "replay_suffix": 400
+          },
+          "replay_suffix": null,
+          "published": null
+        }
+      ]
+    }
+  ],
+  "buffered_mat_out": {
+    "sha256": "21c022a2f239cf57a888285dd85ca92dd441193f131a3f4f754b31453e6b1c48",
+    "rows": 2173,
+    "last_relative_seconds": 59.8301,
+    "last_xyz": [
+      -482.656,
+      -185.283,
+      54.3946
+    ],
+    "last_recorded_position_norm_m": 519.8513027146897,
+    "scope": "Recorded world-coordinate position norm, not GT error or ATE"
+  },
+  "bad_on_reprocess_used_second_event_checkpoint": true,
+  "unique_cause_flush_or_slot_overwrite": "UNKNOWN; actual cp differs, final deployed source binding incomplete",
+  "no_host_ROS_parameters_or_archived_code_execution": true
+}
