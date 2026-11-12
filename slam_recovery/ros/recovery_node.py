@@ -1836,18 +1836,33 @@ class NativeClosedLoop:
             # list the same command twice.
             # The terminal stamp bounds the host's replay to the frozen candidate's frames, so
             # wall-clock work done after the decision cannot extend the replay window.
-            action = (self.cp.reprocess(ep.frozen_at_ns + REPLAY_END_GRACE_NS) if row.get("accepted") is True
-                      else self.cp.restore())
-            ep.meta["native_checkpoint"] = action
-            if row.get("accepted") is True and ep.frames:
-                # An accepted repair is only accepted if the host continues from it: the last
-                # candidate pose becomes the host's state, and the next frames propagate from
-                # there. Use the same (bias-corrected) pose the candidate and the repairs used,
-                # not the host pose the corrected measurements were meant to replace.
-                last_key = ep.frames[-1][0]
-                writeback = self.cp.set_state(repaired.get(last_key, ep.frames[-1][2]))
-                writeback["trigger"] = "accepted_pose"
-                ep.meta["native_writeback"] = writeback
+            if row.get("accepted") is True:
+                action = self.cp.reprocess(ep.frozen_at_ns + REPLAY_END_GRACE_NS)
+                ep.meta["native_checkpoint"] = action
+                # Wait for the replay ack: it carries replay_suffix, i.e. whether the host's own
+                # estimate already ran past the candidate window to the captured boundary. If it
+                # did, writing the last candidate pose back would rewind the state by seconds
+                # while the map stays at the boundary (the run before this one: 3.9 m / 15 s).
+                ack_event = self.cp.collect(timeout_s=90.0)
+                if ack_event is not None and ack_event.get("command") != "status":
+                    self.cp_actions.append(ack_event)
+                import re as _re
+                m = _re.search(r"replay_suffix=(\d+)", (ack_event or {}).get("ack", "") or "")
+                suffix = int(m.group(1)) if m else None
+                ep.meta["replay_suffix"] = suffix
+                if suffix is not None and suffix > 0:
+                    ep.meta["native_writeback_skipped"] = {"reason": "replay_suffix",
+                                                          "replay_suffix": suffix}
+                elif ep.frames:
+                    # An accepted repair is only accepted if the host continues from it: the last
+                    # candidate pose becomes the host's state. Use the same (bias-corrected) pose
+                    # the candidate and the repairs used, not the host pose they replace.
+                    last_key = ep.frames[-1][0]
+                    writeback = self.cp.set_state(repaired.get(last_key, ep.frames[-1][2]))
+                    writeback["trigger"] = "accepted_pose"
+                    ep.meta["native_writeback"] = writeback
+            else:
+                ep.meta["native_checkpoint"] = self.cp.restore()
             # The decision is made; the next event needs its own trusted checkpoint.
             self.cp._last_snapshot_wall = time.time()
         return row

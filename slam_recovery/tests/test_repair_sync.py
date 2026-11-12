@@ -57,9 +57,10 @@ class _CountingHost(threading.Thread):
 
 
 class _FakeCP:
-    def __init__(self, wait_result, counts=None):
+    def __init__(self, wait_result, counts=None, reprocess_ack="OK reprocess replay_suffix=0"):
         self.wait_result = wait_result
         self.counts = list(counts or [0, 2])
+        self.reprocess_ack = reprocess_ack
         self.reprocess_calls = 0
         self.restore_calls = 0
         self.set_state_calls = 0
@@ -78,6 +79,9 @@ class _FakeCP:
         self.reprocess_calls += 1
         self.reprocess_end_stamp = end_stamp_ns
         return {"command": "reprocess"}
+
+    def collect(self, timeout_s=None):
+        return {"command": "reprocess", "ack": self.reprocess_ack}
 
     def restore(self):
         self.restore_calls += 1
@@ -179,6 +183,18 @@ class RepairGateTest(unittest.TestCase):
         z = raw[:, 8:12].view(np.float32).reshape(-1)
         # the corrupted +0.5 cloud is forwarded unchanged
         self.assertAlmostEqual(float(z[0]), 0.5, delta=0.06)
+
+    def test_a_replayed_suffix_skips_the_pose_writeback(self):
+        # The host's own estimate already ran to the captured boundary; writing the last candidate
+        # pose would rewind the state while the map stays at the boundary.
+        loop, ep = self._loop(wait_result=True)
+        loop.cp.reprocess_ack = "OK reprocess replay_suffix=448 replay_within_end=124"
+        loop.decide(1_500, "test")
+        self.assertEqual(loop.cp.reprocess_calls, 1)
+        self.assertEqual(loop.cp.set_state_calls, 0)
+        self.assertEqual(ep.meta["native_writeback_skipped"]["reason"], "replay_suffix")
+        self.assertEqual(ep.meta["native_writeback_skipped"]["replay_suffix"], 448)
+        self.assertEqual(ep.meta["replay_suffix"], 448)
 
     def test_the_dry_run_estimates_but_publishes_nothing(self):
         loop, ep = self._loop(wait_result=True)
