@@ -63,6 +63,15 @@ check("publish clears the reset flag", "g_nr_host_reset = false;" in pub_body)
 check("capabilities declares the snapshot refusal",
       '\\"snapshot_refused_after_host_reset\\"' in s)
 
+# 6c. capabilities carries the contract block the driver's --require-contract validates
+check("capabilities declares semantics.apply_stamp", '\\"apply_stamp\\": \\"YES\\"' in s)
+check("capabilities declares both ack levels",
+      '\\"ack_levels\\": [\\"deferred\\", \\"applied\\"]' in s)
+check("capabilities declares checkpoint validity",
+      '\\"checkpoint_validity\\": \\"until_re_slam\\"' in s)
+check("capabilities declares publish gating", '\\"publish_gating\\": \\"isPublish\\"' in s)
+check("capabilities declares the profile", '\\"profile\\": \\"native_recovery\\"' in s)
+
 # 6. the deferred queue is FIFO and executes every due entry (two commands can share one stamp)
 check("deferred queue is a deque", "std::deque<NrDeferred> g_nr_deferred;" in s)
 check("deferred enqueue is push_back", "g_nr_deferred.push_back(std::move(d));" in s)
