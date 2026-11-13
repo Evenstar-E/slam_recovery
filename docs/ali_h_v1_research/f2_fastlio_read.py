@@ -280,6 +280,7 @@ def summarize(q: Dict[str, Any], bl: Dict[str, Any]) -> Dict[str, Any]:
     e = [r["e_norm2"] for r in rows if r.get("e_norm2") is not None]
     return {
         "run_ids": q["run_ids"],
+        "mixed_run_ids": len(q["run_ids"]) > 1,
         "rows": len(rows),
         "bad_lines": q["bad_lines"],
         "duplicates": q["duplicates"],
@@ -296,9 +297,10 @@ def summarize(q: Dict[str, Any], bl: Dict[str, Any]) -> Dict[str, Any]:
         "qualification": {
             # The file can prove unique update ids and complete pairs; only the C++ producer can
             # prove the two states came from the same update call. Keep the two claims separate.
-            "SAME_UPDATE_ID_PAIRING": ("PASS" if q["counts"].get("OK", 0) and not q["duplicates"]
-                                       and all(r.get("update_id") is not None for r in rows)
-                                       else "NOT_AVAILABLE"),
+            "SAME_UPDATE_ID_PAIRING": ("INVALID_MIXED_RUN_IDS" if len(q["run_ids"]) > 1 else
+                                       ("PASS" if q["counts"].get("OK", 0) and not q["duplicates"]
+                                        and all(r.get("update_id") is not None for r in rows)
+                                        else "NOT_AVAILABLE")),
             "SAME_UPDATE_CALL_BINDING": "ASSERTED_BY_PRODUCER_NOT_VERIFIED_FROM_FILE",
             "PRE_POST_POSE_SANITY": ("PASS" if e else "NOT_AVAILABLE"),
             "PRE_POST_POSE_IDENTITY": "ASSERTED_NOT_VERIFIED",
@@ -386,6 +388,15 @@ def selftest() -> int:
     q7 = qualify([mk(9, 0, ident, tr + ident[3:], support={"pass": True})])
     out["support_guard"] = {"class": q7["rows"][0]["support"],
                             "pass": q7["rows"][0]["support"] == "UNKNOWN_CONTEXT"}
+    # Two run ids in one export must not be glued.
+    q8 = qualify([mk(10, 0, ident, tr + ident[3:]),
+                  {**mk(11, 1, ident, tr + ident[3:]), "run_id": "OTHER"}])
+    s8 = summarize(q8, blocks(q8["rows"]))
+    out["mixed_run_ids"] = {"flag": s8["mixed_run_ids"],
+                            "pairing": s8["qualification"]["SAME_UPDATE_ID_PAIRING"],
+                            "pass": bool(s8["mixed_run_ids"]
+                                         and s8["qualification"]["SAME_UPDATE_ID_PAIRING"]
+                                         == "INVALID_MIXED_RUN_IDS")}
     ok = all(v["pass"] for v in out.values())
     print(json.dumps({"pass": ok, "cases": out}, indent=1, ensure_ascii=False))
     return 0 if ok else 1
