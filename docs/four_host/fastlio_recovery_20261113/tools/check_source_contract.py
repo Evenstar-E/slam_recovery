@@ -43,6 +43,15 @@ check("replay flag reset when drained", "g_nr_replay.store(false);" in s and "g_
 # 5. snapshot uses the previous completed frame's time base
 check("snapshot stamp from last completed frame", "g_nr_cp.stamp = g_nr_lidar_end;" in s)
 
+# 6. the deferred queue is FIFO and executes every due entry (two commands can share one stamp)
+check("deferred queue is a deque", "std::deque<NrDeferred> g_nr_deferred;" in s)
+check("deferred enqueue is push_back", "g_nr_deferred.push_back(std::move(d));" in s)
+check("deferred apply pops the front", "g_nr_deferred.pop_front();" in s)
+check("deferred loop drains all due (<= now)",
+      "while (!g_nr_deferred.empty() && g_nr_deferred.front().stamp_ns <= now_ns)" in s)
+check("deferred executes in queue order",
+      "for (auto& d : due) nr_execute(d.cmd, d.payload);" in s)
+
 bad = [c for c in checks if not c[1]]
 for name, ok, detail in checks:
     print(("PASS " if ok else "FAIL ") + name + (f"  [{detail}]" if detail else ""))
