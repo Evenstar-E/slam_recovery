@@ -3393,3 +3393,11 @@ sleep/build 信号，则后续静默按 `HOST_HIBERNATING`（受 `--host-hiberna
 预期：E1 后静默按 `HIBERNATING` 等待（`hibernation_inferred=true`），最多 90 s；宿主在 E2 前恢复则 E2 可触发，
 否则记 `HOST_HIBERNATION_TIMEOUT`。失败保原件、不重试、不再构建。
 当前状态：授权已下达，run 尚未开始（以 S2 实交为准）。
+
+## 223. 修正恢复时刻：v7 宿主在 driver 退出后 1.3 s 就恢复发布；90 s 上限足够
+
+从 v7 `frontend.bag` 取投稿墙钟：`/Odometry` 仅两个缺口——**116.0→139.7 s（23.7 s）**、229.9→256.7 s（26.8 s）；
+第一条 stamp≥139 s 的 `/Odometry` 录于墙钟 **1794560118.92**，driver 的 STALE 退出在 **1794560117.62**——**只差 1.3 s**。
+最后宿主信号墙钟 1794560095.4，距静默 22.2 s，在 `--host-signal-window-sec 30` 窗内；因此推断休眠后 driver 只需等约 1.3 s 即可收到恢复消息，
+`--host-hibernation-max-sec` **保持 90 即可**（无需 130–150）。第二缺口起于 stamp 229.9，E2=229.7 已被覆盖，只要 driver 活到那时 E2 可触发。
+已回复 S2 按原授权参数执行。
