@@ -2697,3 +2697,21 @@ mapping_velodyne_m2dgr.launch` `/laserMapping` + `aloam_velodyne fastlio_ouster6
 remap；`FAST-LIO/src/laserMapping.cpp:91,673–698,758–759`（ikdtree / `re_slam` / 订阅面）；`exp/growth-run` 与 remote 同为 `a4c652f`。
 
 状态：四宿主恢复层仍 **NOT_IMPLEMENTED（0/4）**；本轮未开宿主运行、未重跑、未改阈值。
+
+## 178. S1 接收 `1b28fe3` 的 18:00 任务并分发 F1/F2
+
+10:12 本机核实：`review/repair-f3-handoff-20261110` 远端 HEAD = `1b28fe3`（09:39 +0800，作者 Evenstar-E），新增
+`docs/FASTLIO_ALI_AUTODETECTION_E2_TASK_20261113.md`（93 行）与 `PROJECT_HISTORY` §98。任务目标：2026-11-13 18:00 前在 FAST-LIO 上贯通
+**真实测量修复→合法完整原生状态/地图起点→历史重估与地图重建→后继接回→重武装→第二事件及尾段**，ALI-H 真实通道/资格/校准/自动动作并行集成；
+保持 1 研究（S3）+ 2 原生集成/宿主（S1/S2），S4 独立审阅。
+
+S1 动作（10:15）：按原件把 F1（S2，`r11070-c3`，消息 `0f56951c…`）与 F2（S3，`r26534-58`，消息 `c9c1df88…`）原文分发，要求回执随
+**首个实质交付**给出实际会话名/owner/branch/HEAD/工作树保护/正在改的接口/run-source-config-input/预定窗口/停止预算，不另发"收到"提交。
+任务文档已取入 main，并在 §2 原句后追加 S1 注：原文"S4 无 S1/S2/S3 直接通道"只是 S4 自身可达性结论，不适用于 S1。
+
+S1 自身（F3）立即接手：共享 driver/manager/relay 与宿主接口的合法 cp 选择、隔离/pending 归宿、拒绝/超时回退与追赶、原子状态/地图发布、
+重武装。节点：12:00 前隔离/合法 cp 与消息归宿实现；14:00 前有界受控两事件接口验证；16:00 前在证据支持范围内整合 ALI-H 显式实验模式；
+17:30 冻结并推送；18:00 交完整结果（已解决/未解决/证据不足逐项）。
+
+状态口径：任务已分发，**开工回执未到，S2/S3 进程状态 UNCONFIRMED**；不把分发写成正在执行。冻结门、预算、禁杀未知进程、四宿主保留、
+FAST-LIVO2 后置均不变。
