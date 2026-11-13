@@ -206,3 +206,59 @@ class MessageDispositionTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PartialCapabilityTest(unittest.TestCase):
+    """PARTIAL is usable but must travel with its limitation; NO is not usable."""
+
+    def _loop(self, caps):
+        from slam_recovery.tests.test_repair_sync import _FakeCP
+        from slam_recovery.tests.test_cloud_repair import _Cloud, _plane
+        from slam_recovery.tests.test_recovery_node import _FakeLoopNode, _Report
+
+        node = _FakeLoopNode(trigger_at=10 ** 9)
+        node.evaluate_and_commit_candidate = lambda *a, **k: _Report(
+            accepted=True, committed_pose_keys=[0, 1], deferred_pose_keys=[])
+        node.support_reference = lambda: _plane()
+        corrupted = _plane(z=0.5)[::4]
+        node.scan_buffer_body = {0: corrupted, 1: corrupted}
+        loop = NativeClosedLoop(node, run_id="run")
+        loop.repair_publish_enabled = True
+        loop.published = []
+        loop.publish_repair = loop.published.append
+        cp = _FakeCP(True)
+        cp.capabilities = lambda: caps
+        loop.cp = cp
+        cloud = _Cloud()
+        cloud.set_points([(float(x), float(y), float(z), 0.0, 0.0, 0)
+                          for x, y, z in corrupted])
+        for k in (0, 1):
+            loop._scan_index[k] = (1000 + k, cloud)
+        loop._last_incumbent = {0: np.eye(4), 1: np.eye(4)}
+        ep = Episode(0, 1_000, np.eye(4), 2_000)
+        ep.frames = [(k, 1_000, np.eye(4)) for k in (0, 1)]
+        loop._open = ep
+        loop.episodes = [ep]
+        return loop, ep
+
+    def test_partial_reprocess_is_used_and_its_limitation_recorded(self):
+        caps = HostCapabilities({"commands": dict(
+            {k: "YES" for k in HostCapabilities.KEYS}, reprocess="PARTIAL"),
+            "partial_notes": {"reprocess": "buffer replay, no IMU cache in checkpoint"}})
+        loop, ep = self._loop(caps)
+        loop.decide(1_500, "test")
+        self.assertEqual(loop.cp.reprocess_calls, 1)
+        d = ep.meta["replay_disposition"]
+        self.assertEqual(d["status"], "PARTIAL")
+        self.assertIn("buffer replay", d["limitation"])
+
+    def test_a_host_without_set_state_gets_no_pose_writeback(self):
+        caps = HostCapabilities({"commands": dict(
+            {k: "YES" for k in HostCapabilities.KEYS}, set_state="NO")})
+        loop, ep = self._loop(caps)
+        loop.cp.reprocess_ack = "OK reprocess replay_suffix=0 replay_within_end=2 repaired_fed=2"
+        loop.decide(1_500, "test")
+        self.assertEqual(loop.cp.set_state_calls, 0)
+        self.assertEqual(ep.meta["native_writeback_skipped"]["reason"], "set_state_unsupported")
+        self.assertTrue(ep.meta["repair_entered_estimator"])
+        self.assertEqual(ep.meta["repaired_fed"], 2)

@@ -680,6 +680,14 @@ class HostCapabilities:
     def supports(self, name: str) -> bool:
         return self.commands.get(name) == "YES"
 
+    def partial(self, name: str) -> bool:
+        """Declared usable with a stated limitation (e.g. buffer replay, not the FAST-LIVO2
+        measurement-level replay). The driver may issue the command but must record the limit."""
+        return self.commands.get(name) == "PARTIAL"
+
+    def usable(self, name: str) -> bool:
+        return self.supports(name) or self.partial(name)
+
     def as_dict(self) -> Dict[str, Any]:
         return {"status": "DECLARED", "commands": dict(self.commands),
                 "checkpoint": self.checkpoint, "source": self.source}
@@ -1988,7 +1996,7 @@ class NativeClosedLoop:
             caps = caps_fn() if callable(caps_fn) else None
             if caps is not None:
                 ep.meta["host_capabilities"] = caps.as_dict()
-            if row.get("accepted") is True and caps is not None and not caps.supports("reprocess"):
+            if row.get("accepted") is True and caps is not None and not caps.usable("reprocess"):
                 # Publishing repairs that cannot be replayed would leave the record looking like
                 # a repair whose only missing step was the host's; it is not published at all.
                 ep.meta["native_checkpoint_skipped"] = "reprocess_unsupported"
@@ -2000,6 +2008,16 @@ class NativeClosedLoop:
                     "catch_up": "NOT_IMPLEMENTED",
                 }
                 return row
+            if caps is not None and caps.partial("reprocess"):
+                # The host can replay, but it has declared the replay is not the FAST-LIVO2
+                # measurement-level one (e.g. FAST-LIO's buffer replay with stamp substitution).
+                # It is used, because it is the only real replay this host has; the limitation
+                # travels with the decision so the run cannot be quoted as a complete catch-up.
+                ep.meta["replay_disposition"] = {
+                    "status": "PARTIAL",
+                    "declared": caps.commands.get("reprocess"),
+                    "limitation": (caps.raw.get("partial_notes") or {}).get("reprocess"),
+                }
             # INJECTION measurement repair: publish the corrected clouds before the replay command
             # and wait until the host has queued them. The host applies the command at a frame
             # boundary; the clouds arrive on a ROS topic. Without the receipt check, `reprocess`
@@ -2035,9 +2053,21 @@ class NativeClosedLoop:
                 m = _re.search(r"replay_suffix=(\d+)", (ack_event or {}).get("ack", "") or "")
                 suffix = int(m.group(1)) if m else None
                 ep.meta["replay_suffix"] = suffix
+                # What the host says it actually fed into its estimator. A replay ack that says
+                # the repaired clouds never reached the estimate is recorded as such: the repair
+                # was published, but it did not enter the state, and those are different claims.
+                m_fed = _re.search(r"repaired_fed=(\d+)", (ack_event or {}).get("ack", "") or "")
+                if m_fed:
+                    fed = int(m_fed.group(1))
+                    ep.meta["repaired_fed"] = fed
+                    ep.meta["repair_entered_estimator"] = bool(fed > 0)
                 if suffix is not None and suffix > 0:
                     ep.meta["native_writeback_skipped"] = {"reason": "replay_suffix",
                                                           "replay_suffix": suffix}
+                elif ep.frames and caps is not None and not caps.supports("set_state"):
+                    # The host declared no write-back command. The replay already ran its own
+                    # estimate; claiming a pose write-back would describe a step that never ran.
+                    ep.meta["native_writeback_skipped"] = {"reason": "set_state_unsupported"}
                 elif ep.frames:
                     # An accepted repair is only accepted if the host continues from it: the last
                     # candidate pose becomes the host's state. Use the same (bias-corrected) pose

@@ -2766,3 +2766,21 @@ S3 `r26534-58` 交 `exp/ali-h-v1@8ad46fc`（工作树 `/tmp/wt-ali` 干净，无
 2. 推送由 S1 执行（S3 无凭据，SSH 22 被重置）；S3 交付按原件核实后入库，不改其内容。
 3. §4 导出契约转 F1：S1 已把字段表要点随 ack 契约发给 S2（`9f868671…`），本条再点名 `update_id` 同行绑定、`eff`/support 样本、
    `repaired_fed` 与 `capabilities.json` 声明。
+
+## 181. F3 按 F1 实际声明调整：PARTIAL 可用、set_state gating、repaired_fed 记账
+
+S2 交 F1 12:00 交付（bin `08dc83cb…`，diff +290 行）：命令通道、hold/resume（真停 `map_incremental`）、snapshot（`kf.get_x/get_P`
++ ikd-Tree flatten + 时间游标）、restore（change_x/change_P + clear/Build，valid=0 reason=no_checkpoint）、reprocess（restore 后按时间
+把快照后消费组 push_front 回缓冲）、relay `/native_recovery/repaired_scan` 按 header stamp 替换、`input_fates.jsonl`。声明
+`snapshot/restore/hold=YES`、`reprocess=PARTIAL`、`set_state=NO`、`measurement_relay=YES`；**快照不含 `p_imu` 预积分/去畸变缓存**。
+
+S1 据此调整共享 driver（`539c00f` 之后新提交）：
+- `PARTIAL` 视为**可用但受限**：照发 reprocess，episode meta 记 `replay_disposition={status:PARTIAL, declared, limitation}`；limitation
+  取 `capabilities.json:partial_notes.reprocess`（已要求 S2 补）。
+- ack 新增解析 `repaired_fed=<n>`：记 `repaired_fed` 与 `repair_entered_estimator`；0 不当作已进入估计。
+- `set_state=NO` 时 `replay_suffix=0` 不再发写回，记 `native_writeback_skipped=set_state_unsupported`。
+- 测试 14 项（新增 PARTIAL 可用、replay_suffix=0 不回写），全套 **238 项通过**。
+
+已向 S2 指出未解风险：restore 后 `p_imu.last_timestamp_imu`/init 标志若不复位，replay 的 IMU 传播起点错误，只能记 PARTIAL/UNKNOWN，
+不能称完整重估；要求 14:00 run 前回答并做最小修。受控 run 的 driver 命令已给（`/Odometry`、`--checkpoint-dir`、
+`--scripted-trigger-stamps`、`--repair-publish`、`--detection off`、120 s）。
