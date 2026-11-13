@@ -17,16 +17,16 @@
 | 回滚对象 | PGO 关键帧+iSAM2（`Mapmanager.ActiveMap`）+ 前端 `re_slam` 重建 | `re_slam()` 重置 ESKF 并清 `ikdtree`（`laserMapping.cpp:673-693`） | `cloudKeyPoses3D/6D` + iSAM2 | **`SaveAtlas/LoadAtlas`（官方 API）** |
 | 输入缓冲/重放 | 无（需新增；前端 `re_slam` 只是重置） | **无 replay/reprocess**（那套是 FAST-LIVO2 的，本树没有） | 无（需新增） | 无（文件重读可模拟） |
 | 输入退化风险 | 中（前端 FAST-LIO，退化表现为休眠重建；实际 run 中 E1/E2 各一次） | 高（曾出现运行期地图暴涨） | **极高**（120–140 s 点云 26k→200，130.3 s 起发散） | **高**（低视差，80 次初始化失败） |
-| 既有闭环证据 | 原生双事件 PASS；恢复层 NOT_IMPLEMENTED | 原生双事件 PASS（共享版）；独立版 BLOCKED_LOAD；恢复层未接 | 原生 FAIL（输入退化）；恢复层未接 | 原生 FAIL（未稳定跟踪）；恢复层未接 |
+| 既有闭环证据 | 原生双事件 PASS；恢复层 NOT_IMPLEMENTED | **独立构建 NATIVE_INDEPENDENT + PASS**（与共享版逐项一致）；恢复层未接 | 原生 FAIL（输入退化）；恢复层未接 | 原生 FAIL（未稳定跟踪）；恢复层未接 |
 
 ## 2. 按 A1–A12 的接线含义
 
 | 需求 | 结论 |
 |---|---|
-| A1 输入与身份 | LIO-SAM/FAST-LIO2 可直接在话题层取证；ORB-SLAM3 需 runner 级身份；MM-LINS 需 4 节点联合身份 |
+| A1 输入与身份 | LIO-SAM/FAST-LIO2 可直接在话题层取证；ORB-SLAM3 需 runner 级身份；MM-LINS 为 FAST-LIO + PGO **两节点**，需两节点联合身份 |
 | A4 完整可信检查点 | ORB-SLAM3 有官方 Atlas 存取；LIO-SAM/FAST-LIO2 单进程可快照；MM-LINS 为两进程（FAST-LIO 状态 + PGO 图），需联合快照 |
-| A5 隔离与帧归宿 | 四者都需要"停止写入地图"的钩子；LIO-SAM/FAST-LIO2 有天然停写点，MM-LINS 需三处同步 |
-| A6 历史重处理 | 只有 FAST-LIO2 已有 `reprocess`；LIO-SAM/MM-LINS 需输入缓冲；ORB-SLAM3 可重读文件 |
+| A5 隔离与帧归宿 | 四者都需要"停止写入地图"的钩子；LIO-SAM/FAST-LIO2 单点停写，MM-LINS 需在 FAST-LIO 与 PGO **两处**同步 |
+| A6 历史重处理 | 四个宿主**都没有** replay/reprocess（FAST-LIVO2 的那套不能平移）；LIO-SAM/FAST-LIO2/MM-LINS 需输入缓冲，ORB-SLAM3 可重读文件 |
 | A8 原子提交 | 单进程宿主风险低；MM-LINS 必须定义"联合提交点" |
 | 论文轴测量修复 | **FAST-LIO2、LIO-SAM、MM-LINS 都具备话题级测量输入面**（按实际订阅判断）；ORB-SLAM3 离线读盘不具备 |
 
