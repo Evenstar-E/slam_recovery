@@ -3100,3 +3100,22 @@ NIS holdout（`compute_disjoint_holdout_point_to_plane_nis`，300×600 向量化
 同时记入 `runtime.pose_callback/scan_callback` 的 p50/p95/max 作为下一定量诊断依据。计数口径同步（2 次休眠触发 vs 4 行含 disappear）。
 
 状态不变：不构建、不运行、不改码；二进制 `86f85025…`；原件与 LEDGER 不动；三个建议等用户决定。
+
+## 202. 诊断结论：停发是原生 isPublish 门；C 不恢复与 hold 阻断重建一致
+
+**已证（原件）**：
+- 直接机制：FAST-LIO 在位置协方差越界时置 `isPublish=false`，连续两次后 `re_slam()` 清空 ikdtree 并 `continue`；
+  `/Odometry` 与 `map_incremental()` 都在 `if(isPublish)` 内（`laserMapping.cpp:890–948`）。
+- A/B/C：A 2095 条、首停 115.8 s（23.8 s 后恢复）；B 2091 条、115.7 s；C 的 driver 位姿止于 94.7–96.4 s；旧基线 115.8 s。
+  通道开/关无差别 → 不是恢复通道。
+- C 的时间线：首次 `quarantined` 在 **113.697 s**（hold 生效）；E1 快照（113.9 s）`map_points=221815`；
+  E2 快照（228.9 s）`map_points=**1347**` → 这期间宿主执行过 `re_slam()` 清图且**地图未重建**；
+  同期 163 次 `IMU Initial Done`、8 行 over-degeneracy，`/Odometry` 未恢复。
+
+**推断（证据一致，未独立证）**：C 不恢复的直接原因是**我们的 hold 在宿主 `re_slam()` 后冻结了地图写入**，协方差无法回落，
+宿主锁在"重初始化→再判退化→再 `re_slam`"循环；A/B 无 hold，同样休眠在 ~139 s 能恢复。
+**仍未定**：C 的首次退化为何从 115.8 s 提前到 ~95 s（A/B 只排除通道；driver 负载/时序是候选，需用 `runtime.pose_callback/scan_callback`
+在授权 run 中定量）。
+
+**设计含义**：隔离期冻结地图在宿主**自身休眠/重建**时会帮倒忙。下一步 F3 应让 hold 在宿主发出 `Issleeping`/重建时释放（或重建期不冻结），
+验证需一次新授权 run；在此之前不改代码、不跑宿主。
