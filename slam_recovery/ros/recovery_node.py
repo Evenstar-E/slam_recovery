@@ -2973,7 +2973,8 @@ def duration_stats(values) -> Dict[str, Any]:
 def pose_stream_health(pose_count: int, last_pose_wall: Optional[float],
                        started_wall: float, now_wall: float,
                        limit_s: float, host_state: Optional[str] = None,
-                       hibernation_max_s: float = 0.0) -> Dict[str, Any]:
+                       hibernation_max_s: float = 0.0,
+                       first_pose_grace_s: Optional[float] = None) -> Dict[str, Any]:
     """Whether the host is still producing the pose stream this run depends on.
 
     A host that stops publishing (FAST-LIO does exactly that while it hibernates: isPublish is
@@ -2987,9 +2988,15 @@ def pose_stream_health(pose_count: int, last_pose_wall: Optional[float],
         out["status"] = "DISABLED"
         return out
     if pose_count <= 0 or last_pose_wall is None:
+        # The first pose arrives only after the host has initialised its IMU: FAST-LIO needed
+        # ~17-19 s on this bag, longer than the stale limit, and a 15 s startup grace aborted
+        # the authorised v5 run before any pose could arrive. The startup wait is therefore a
+        # separate, longer grace; the ordinary limit applies only after a pose has been seen.
+        grace = float(first_pose_grace_s) if first_pose_grace_s is not None else float(limit_s)
         waited = now_wall - started_wall
         out["silence_s"] = round(waited, 3)
-        out["status"] = "STALE" if waited >= limit_s else "WAITING_FOR_FIRST_POSE"
+        out["first_pose_grace_s"] = grace
+        out["status"] = "STALE" if waited >= grace else "WAITING_FOR_FIRST_POSE"
         return out
     silence = now_wall - last_pose_wall
     out["silence_s"] = round(silence, 3)
@@ -3040,6 +3047,10 @@ def main(argv: Optional[List[str]] = None) -> int:
                          "long (0 = wait forever); a host that stops publishing cannot deliver "
                          "the second event, and this is a host-local condition to surface, not "
                          "to hide by running out the clock")
+    ap.add_argument("--first-pose-grace-sec", type=float, default=60.0,
+                    help="how long to wait for the first pose before calling the stream stale; "
+                         "the host must initialise its IMU first (~17-19 s on this bag), which "
+                         "is longer than the steady-state stale limit")
     ap.add_argument("--host-hibernation-max-sec", type=float, default=90.0,
                     help="while the host is in its own hibernation, allow this long without a "
                          "pose before ending with HOST_HIBERNATION_TIMEOUT; the ordinary stale "
@@ -3150,7 +3161,8 @@ def main(argv: Optional[List[str]] = None) -> int:
             health = pose_stream_health(driver.pose_count, driver.last_pose_wall,
                                         started, time.time(), args.pose_stale_sec,
                                         host_state=loop.host_native_state,
-                                        hibernation_max_s=args.host_hibernation_max_sec)
+                                        hibernation_max_s=args.host_hibernation_max_sec,
+                                        first_pose_grace_s=args.first_pose_grace_sec)
             driver.input_health = health
             if health.get("status") in ("STALE", "HOST_HIBERNATION_TIMEOUT"):
                 terminal_reason = ("INPUT_STALE" if health.get("status") == "STALE"

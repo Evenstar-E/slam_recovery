@@ -3171,3 +3171,18 @@ run 会在宿主即将恢复前被看门狗中止。修正（`pose_stream_health
 
 **用户授权（14:5x）**：1 次 v5 构建 + 1 次有界 run。条件已转 S2：同 bag/事件戳、260 s、外层 1800 s、`--wait-limit-sec 20`、
 `--pose-stale-sec 15`、`--host-hibernation-max-sec 90`、宿主信号话题、`-u` + ROS 图门控；失败保原件、不重试、不再构建。
+
+## 207. v5 复验 FAIL：看门狗启动口径在宿主首个位姿前误杀（driver 侧）；已修启动宽限
+
+授权的 1 次 v5 构建 + 1 次有界 run 已执行（S2 `286bb69`，原件 `two_event_v5_authorized/`）。S1 核实：
+- **构建 PASS**：`86f85025…` → **`785c0f20ed…`**，退出码 0；二进制现为 v5；
+- **运行 FAIL（driver 启动期，非 host）**：driver 在进程启动后 **15.0 s** 判 `INPUT_STALE` 并退出（`pose_messages=0`、`scan_callback.n=0`、wall 15.0 s）；
+  host 正常：`[NATIVE_RECOVERY] channel on`、首个 `IMU Initial Done` 在 driver 启动后 **18.4 s**（bag 打开后 14.0 s）、
+  `input_fates` 2250 组（ingested 1137 / quarantined 1113）、bag 播到 Done——**driver 比 host 首次发布早 3.4 s 自杀**。
+- 根因：`--pose-stale-sec` 从**进程启动**计时；FAST-LIO 需先完成 IMU 初始化才发第一个 `/Odometry`，15 s 必然误杀。
+
+**修复（main）**：新增 `--first-pose-grace-sec`（默认 **60 s**），仅在"尚未收到任何位姿"时使用；steady-state 仍用 `--pose-stale-sec`（15 s），
+休眠期仍用 `HOST_HIBERNATING`/`--host-hibernation-max-sec`。测试 10 项，全套 **263 项通过**。
+
+**口径**：本次 run 已消费，未重试、未再构建；v5 二进制保留、不回退。下一步需要用户新授权一次 run（无需再构建），
+建议 runner 同时记录 `/Odometry`（本次未录，无法从原件重建发布时刻）。

@@ -25,6 +25,15 @@ class PoseStreamHealthTest(unittest.TestCase):
         h = pose_stream_health(0, None, 100.0, 120.0, 15.0)
         self.assertEqual(h["status"], "STALE")
 
+    def test_the_first_pose_grace_is_separate_from_the_stale_limit(self):
+        # FAST-LIO needs ~17-19 s to initialise its IMU; a 15 s startup grace killed the
+        # authorised v5 run before the first pose.
+        h = pose_stream_health(0, None, 100.0, 120.0, 15.0, first_pose_grace_s=60.0)
+        self.assertEqual(h["status"], "WAITING_FOR_FIRST_POSE")
+        self.assertEqual(h["first_pose_grace_s"], 60.0)
+        h2 = pose_stream_health(0, None, 100.0, 170.0, 15.0, first_pose_grace_s=60.0)
+        self.assertEqual(h2["status"], "STALE")
+
     def test_recent_pose_is_ok(self):
         h = pose_stream_health(10, 190.0, 100.0, 200.0, 15.0)
         self.assertEqual(h["status"], "OK")
