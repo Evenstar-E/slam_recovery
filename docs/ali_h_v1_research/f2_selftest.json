@@ -29,6 +29,8 @@
     "NO_PAIR": 1
    },
    "rows": 2,
+   "pairing": "INCOMPLETE_MISSING_PAIR",
+   "I_rows": 1,
    "pass": true
   },
   "eff_zero": {
@@ -56,6 +58,21 @@
   },
   "support_guard": {
    "class": "UNKNOWN_CONTEXT",
+   "pass": true
+  },
+  "support_fraction_only": {
+   "class": "UNKNOWN_CONTEXT",
+   "pass": true
+  },
+  "missing_run_id": {
+   "statuses": {
+    "OK": 1,
+    "INVALID_ROW": 1
+   },
+   "rows": 2,
+   "missing_run_id_rows": 1,
+   "I_rows": 1,
+   "pairing": "INCOMPLETE_MISSING_RUN_ID",
    "pass": true
   },
   "mixed_run_ids": {
