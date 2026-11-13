@@ -780,7 +780,7 @@ class CheckpointClient:
         other command keeps its place. The event is returned immediately either way; its ``wall``
         is filled in when it is actually written, and the ack is collected by poll()/collect().
         """
-        event: Dict[str, Any] = {"command": cmd, "wall": None}
+        event: Dict[str, Any] = {"command": cmd, "wall": None, "payload": payload}
         with self._io_lock:
             self._start_or_queue(event, cmd, payload, preempt_snapshot)
         return event
@@ -802,11 +802,12 @@ class CheckpointClient:
             self._pending.append(event)
         self._write_file(event, cmd, payload)
 
-    def _write_file(self, event: Dict[str, Any], cmd: str, payload: str) -> None:
+    def _write_file(self, event: Dict[str, Any], cmd: str, payload: str,
+                    skip_unlink: bool = False) -> None:
         path = os.path.join(self.dir, "cmd")
         ack = os.path.join(self.dir, "ack")
         try:
-            if os.path.exists(ack):
+            if os.path.exists(ack) and not skip_unlink:
                 os.unlink(ack)
             tmp = path + ".tmp"
             with open(tmp, "w", encoding="utf-8") as fh:
@@ -820,6 +821,35 @@ class CheckpointClient:
                 self.failures += 1
                 self.events.append(event)
             self._flush_outbox()
+
+    def _pipeline_armed_pair(self, event: Dict[str, Any]) -> None:
+        """Send the snapshot armed at the same stamp as an in-flight, already-received hold.
+
+        The outbox serialises commands so one is never overwritten unread. That is right for
+        state commands, but a boundary needs its hold and its snapshot in the host queue *before*
+        the target group is estimated; waiting for the hold's applied ack postpones the snapshot
+        past that group (review 4cacc31 section 2). Once the host has taken the hold, the command
+        file is free, so the paired snapshot may be written while the hold is still pending.
+        """
+        if event.get("command") != "hold" or not event.get("received_wall"):
+            return
+        with self._lock:
+            if not self._outbox:
+                return
+            nxt, cmd, payload = self._outbox[0]
+            if cmd != "snapshot" or payload != event.get("payload"):
+                return
+            self._outbox.pop(0)
+            nxt["wall"] = round(time.time(), 3)
+            # The shared ack file may still hold any earlier reply; remember it so the next
+            # read cannot mistake it for this command's answer.
+            try:
+                with open(os.path.join(self.dir, "ack"), "r", encoding="utf-8") as fh:
+                    nxt["stale_ack"] = fh.read().strip()
+            except OSError:
+                nxt["stale_ack"] = ""
+            self._pending.append(nxt)
+        self._write_file(nxt, cmd, payload, skip_unlink=True)
 
     def _flush_outbox(self) -> None:
         """Send the next queued command once nothing is in flight. Called after every pop."""
@@ -879,6 +909,8 @@ class CheckpointClient:
         """
         if not line:
             return False, line
+        if event.get("stale_ack") == line:
+            return False, ""          # a reply that predates this command
         parts = line.split()
         if len(parts) < 2 or parts[1] != cmd:
             return False, ""
@@ -904,7 +936,9 @@ class CheckpointClient:
         if not line:
             return ""
         parts = line.split()
-        return line if len(parts) >= 2 and parts[1] == cmd else ""
+        if len(parts) < 2 or parts[1] != cmd:
+            return ""
+        return line
 
     def _read_received_for(self, cmd: str) -> Optional[float]:
         try:
@@ -933,6 +967,7 @@ class CheckpointClient:
             if rec:
                 event["received_wall"] = rec
                 event["received_s"] = round(rec - float(event.get("wall", rec)), 3)
+                self._pipeline_armed_pair(event)
         line = self._read_ack_for(event["command"])
         if not line:
             return None
@@ -1763,6 +1798,39 @@ class NativeClosedLoop:
             })
 
     # -- decision -----------------------------------------------------------------------------
+    def _read_update_receipt(self, ep: "Episode", ack_text: str) -> Optional[int]:
+        """How many repaired clouds a native update actually consumed, or None.
+
+        Newer hosts report ``repaired_in_update`` (and the last update stamp) on the replay ack or
+        in ``status``. Older ones report only the enqueue count; for those the honest value is
+        absent, because "queued" and "consumed by an update" are different claims.
+        """
+        import re as _re
+        m = _re.search(r"repaired_in_update=(\d+)", ack_text or "")
+        if m is not None:
+            ep.meta["update_receipt_source"] = "ack"
+            return int(m.group(1))
+        value = self._read_status_update_receipt()
+        if value is None:
+            return None
+        ep.meta["update_receipt_source"] = "status"
+        return value
+
+    def _read_status_update_receipt(self) -> Optional[int]:
+        status = getattr(self.cp, "status", None)
+        if not callable(status):
+            return None
+        try:
+            event = status()
+            got = self.cp.collect(timeout_s=5.0)
+        except Exception:
+            return None
+        if got is not None and got.get("command") != "status":
+            self.cp_actions.append(got)
+        ack = (got or {}).get("ack", "") or ""
+        m = __import__("re").search(r"repaired_in_update=(\d+)", ack)
+        return int(m.group(1)) if m else None
+
     def _repair_gate(self, ep: "Episode", accepted: bool) -> Tuple[bool, Optional[Dict[str, Any]]]:
         """Publish the repaired measurements and decide whether the replay may be sent.
 
@@ -2092,9 +2160,21 @@ class NativeClosedLoop:
                 # was published, but it did not enter the state, and those are different claims.
                 m_fed = _re.search(r"repaired_fed=(\d+)", (ack_event or {}).get("ack", "") or "")
                 if m_fed:
-                    fed = int(m_fed.group(1))
-                    ep.meta["repaired_fed"] = fed
-                    ep.meta["repair_entered_estimator"] = bool(fed > 0)
+                    # Enqueue evidence only. `repaired_fed` counts the clouds the host selected
+                    # and pushed back into its buffer; it does not prove any of them was consumed
+                    # by a native update, so it is not allowed to fill `repair_entered_estimator`.
+                    ep.meta["repaired_fed"] = int(m_fed.group(1))
+                    ep.meta["repair_enqueued"] = bool(int(m_fed.group(1)) > 0)
+                # The update-linked receipt is a separate field on hosts that implement it. Read
+                # it from the replay ack, or ask for a status after the replay has advanced; when
+                # the host reports neither, the answer is NOT_REPORTED, not True.
+                receipt = self._read_update_receipt(ep, (ack_event or {}).get("ack", "") or "")
+                ep.meta["repaired_in_update"] = receipt
+                if receipt is None:
+                    ep.meta["repair_entered_estimator"] = None
+                    ep.meta["repair_entered_estimator_reason"] = "NO_UPDATE_RECEIPT"
+                else:
+                    ep.meta["repair_entered_estimator"] = bool(receipt > 0)
                 if suffix is not None and suffix > 0:
                     ep.meta["native_writeback_skipped"] = {"reason": "replay_suffix",
                                                           "replay_suffix": suffix}

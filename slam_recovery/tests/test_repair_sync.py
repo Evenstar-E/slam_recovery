@@ -68,6 +68,8 @@ class _FakeCP:
         self.expected = None
         self.reprocess_end_stamp = None
         self.restore_ack = "OK restore valid=1 stamp_ns=0 frame=0\n"
+        self.status_ack = "OK status valid=1 repair_received=0 repair_applied=0\n"
+        self._issued = None
         self._last_snapshot_wall = 0.0
 
     def read_repair_received(self, timeout_s=1.0):
@@ -80,13 +82,21 @@ class _FakeCP:
     def reprocess(self, end_stamp_ns=None):
         self.reprocess_calls += 1
         self.reprocess_end_stamp = end_stamp_ns
+        self._issued = "reprocess"
         return {"command": "reprocess"}
 
     def collect(self, timeout_s=None):
+        if self._issued == "status":
+            return {"command": "status", "ack": self.status_ack}
         return {"command": "reprocess", "ack": self.reprocess_ack}
+
+    def status(self):
+        self._issued = "status"
+        return {"command": "status"}
 
     def restore(self):
         self.restore_calls += 1
+        self._issued = "restore"
         return {"command": "restore", "ack": self.restore_ack}
 
     def set_state(self, pose):

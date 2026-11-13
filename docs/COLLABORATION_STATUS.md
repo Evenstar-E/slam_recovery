@@ -2898,3 +2898,23 @@ S2 `442bd2c` 新增 `tools/check_source_contract.py`（50 行，只读源码，�
 
 授权前的离线控制现共两项且均可重复：`check_replay_regression.py`（ctrl2 原件，83/899 PASS）、`check_source_contract.py`（14/14 PASS）。
 状态不变：**不构建、不运行、不改码**；二进制仍 `df27a24c…`，等用户或审阅侧授权"1 次修复构建 + 1 次最小整链复验"。
+
+## 189. 执行 `ddd65d0` 审阅：同边界双命令预武装 + 驱动消费 update 回执
+
+用户指令"查看并执行提交 ddd65d0 中的内容"。审阅已合入 main（`79c0605`，`docs/review_20261113_4cacc31/`）。S1 按其 §2/§3 修共享层：
+
+**§2 同边界 hold+snapshot 的跨组件时序**（原问题：hold 的 `applied` 才释放 outbox，snapshot 晚于目标组）：
+- `CheckpointClient` 新增 `_pipeline_armed_pair`：当带 stamp 的 hold 已被 host **RECEIVED**（`ack_received`）且 outbox 头部是同 stamp 的 snapshot 时，
+  立即写出 snapshot（不等 applied），两条命令都在目标帧前进入 host 的 deferred 队列；写入时跳过 ack 删除并记录 `stale_ack`，
+  避免把上一条命令的回复当成自己的。
+- 保留两级 ACK：`deferred` 仅 armed、`applied` 才完成；未 applied 超时记 `deferred_not_applied`。
+- 测试：新增"hold 未完成时 snapshot 已写入 cmd"用例（4 项 deferred/armed 测试仍过）。
+
+**§3 驱动不再用 `repaired_fed` 冒充"进入估计器"**：
+- `repaired_fed` 只记 `repair_enqueued`；新增 `_read_update_receipt`：从 replay ack 读 `repaired_in_update`，缺失则发一次 `status` 读取；
+  两者都没有时 `repaired_in_update=None`、`repair_entered_estimator=None`、`reason=NO_UPDATE_RECEIPT`，不再默认 True。
+- 新增用例：status 带回执 → True 且 `update_receipt_source=status`；无回执 → None/NOT_REPORTED。
+- 全套 **246 项通过**。
+
+**未做**：未构建、未运行；二进制仍 `df27a24c…`。审阅 §2 的"双命令控制"属运行级验收，等授权；
+S2 侧需确认 v4 deferred 队列对同 stamp 两条命令按 FIFO 全部执行（源码形态已支持），并可在 `check_source_contract.py` 增一条断言。

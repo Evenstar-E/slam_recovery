@@ -207,6 +207,36 @@ class CheckpointClientTest(unittest.TestCase):
         self.assertTrue(event["ok"])
         self.assertIn("applied", event["ack"])
 
+    def test_a_paired_snapshot_is_sent_once_the_hold_is_received(self):
+        # The boundary pair must both be in the host queue before the target group is estimated.
+        # Waiting for the hold's *applied* ack to release the outbox sends the snapshot after the
+        # crossing group has already been processed (review 4cacc31 section 2).
+        host = self._host(delay=0.3)
+        client = CheckpointClient(self.dir, ack_timeout_s=5.0)
+        hold = client.hold(123)
+        snap = client.snapshot_now(123)
+        def cmd_text():
+            try:
+                with open(os.path.join(self.dir, "cmd"), encoding="utf-8") as fh:
+                    return fh.readline().strip()
+            except OSError:
+                return ""
+
+        deadline = time.time() + 2.0
+        while time.time() < deadline and cmd_text() != "snapshot" and not hold.get("ok"):
+            client.poll()
+            time.sleep(0.005)
+        self.assertEqual(cmd_text(), "snapshot",
+                         "the paired snapshot was not written while the hold was pending")
+        self.assertFalse(hold.get("ok"), "the hold completed before the pair was sent")
+        deadline = time.time() + 5.0
+        while time.time() < deadline and not (hold.get("ok") and snap.get("ok")):
+            client.poll()
+            time.sleep(0.005)
+        self.assertTrue(hold["ok"])
+        self.assertTrue(snap["ok"])
+        self.assertEqual(host.seen, ["hold", "snapshot"])
+
     def test_a_disabled_client_sends_nothing(self):
         client = CheckpointClient("")
         self.assertFalse(client.enabled)

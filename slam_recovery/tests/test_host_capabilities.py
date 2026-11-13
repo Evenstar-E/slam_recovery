@@ -281,11 +281,27 @@ class PartialCapabilityTest(unittest.TestCase):
             {k: "YES" for k in HostCapabilities.KEYS}, set_state="NO")})
         loop, ep = self._loop(caps)
         loop.cp.reprocess_ack = "OK reprocess replay_suffix=0 replay_within_end=2 repaired_fed=2"
+        loop.cp.status_ack = "OK status valid=1 repair_received=2 repair_applied=2 repaired_in_update=2"
         loop.decide(1_500, "test")
         self.assertEqual(loop.cp.set_state_calls, 0)
         self.assertEqual(ep.meta["native_writeback_skipped"]["reason"], "set_state_unsupported")
-        self.assertTrue(ep.meta["repair_entered_estimator"])
+        # enqueue is not the update receipt; the status read supplies the latter
         self.assertEqual(ep.meta["repaired_fed"], 2)
+        self.assertEqual(ep.meta["repaired_in_update"], 2)
+        self.assertTrue(ep.meta["repair_entered_estimator"])
+        self.assertEqual(ep.meta["update_receipt_source"], "status")
+
+    def test_without_an_update_receipt_the_driver_does_not_claim_entry(self):
+        caps = HostCapabilities({"commands": dict(
+            {k: "YES" for k in HostCapabilities.KEYS}, set_state="NO")})
+        loop, ep = self._loop(caps)
+        loop.cp.reprocess_ack = "OK reprocess replay_suffix=0 replay_within_end=2 repaired_fed=2"
+        loop.cp.status_ack = "OK status valid=1 repair_received=2 repair_applied=2"
+        loop.decide(1_500, "test")
+        self.assertEqual(ep.meta["repaired_fed"], 2)
+        self.assertIsNone(ep.meta["repaired_in_update"])
+        self.assertIsNone(ep.meta["repair_entered_estimator"])
+        self.assertEqual(ep.meta["repair_entered_estimator_reason"], "NO_UPDATE_RECEIPT")
 
 if __name__ == "__main__":
     unittest.main()
