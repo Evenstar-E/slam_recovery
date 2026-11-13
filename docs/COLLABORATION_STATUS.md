@@ -2663,3 +2663,19 @@ replay/OctoMap 不能直接搬"的正确结论。
 
 **下一交付（已下派）**：在现有非 FAST-LIVO2 宿主实现一个**可运行的恢复切片**（真实测量修复→前端状态/地图重估→后端一致接回→
 后继/第二事件），卡住就指出具体函数、缺失状态与最小改动；15h 窗口内来不及，明天从"最小切片设计"开始（FAST-LIO2 或 LIO-SAM）。
+
+## 176. P2 更正完成（对比表按实际拓扑）；下一交付定为 FAST-LIO2 最小恢复切片设计
+
+S2 `a4c652f`（`exp/growth-run`，已推）按 Codex P2 更正：本机抽查 `run_mmlins.sh:49–56`（两个 roslaunch：`fast_lio
+mapping_velodyne_m2dgr.launch` `/laserMapping` + `aloam_velodyne fastlio_ouster64.launch` `/alaserPGO`，就绪同时等两节点）与
+`SC-PGO/launch/fastlio_ouster64.launch:28–30,36`（remap `/aft_mapped_to_init→/Odometry` 等，`alaserPGO` 节点）——与更正一致。
+
+- MM-LINS 行改为"**FAST-LIO 前端 + alaserPGO 两节点**"，测量注入点改为**有**（按订阅面判断，不按进程数）；
+- FAST-LIO2 行：`ikdtree`、回滚只有 `re_slam` 重置、**明确无 replay/reprocess**；
+- 结论改为：**FAST-LIO2、LIO-SAM、MM-LINS 都有话题级测量输入面**；ORB-SLAM3 离线读盘不具备；
+- `MMLINS_RECOVERY_INTERFACE_20261113.md` 加 §0 更正：4 节点链是 SC-PGO 独立运行的 A-LOAM 流水线，不是 `run_mmlins.sh` 的拓扑；
+- "FAST-LIVO2 的 replay/OctoMap 不能直接搬"保留；FAST-LIO2 行更新为 `NATIVE_INDEPENDENT + PASS`。
+
+**下一交付（明天第一件事）**：FAST-LIO2 最小可运行恢复切片——relay 替换声明窗口内的测量 → hold + 检查点后重放 → 前端重估 →
+接回与后续帧继续（FAST-LIO2 无后端，后端一致性用 MM-LINS 的 FAST-LIO+PGO 作第二步）。先交一页设计（接口点/状态/改动行数/风险/
+验收判据），经 S1 确认后再动手。
