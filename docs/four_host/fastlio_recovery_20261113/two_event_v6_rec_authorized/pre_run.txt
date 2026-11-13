@@ -1,0 +1,7 @@
+run_id=two_event_v6_rec_20261113T081920Z
+binary=f167bf5ec3739c956176adfb9bc51db6aba9827e1bee28b4bbbcde1dc7b65b74 (v6)
+bag=a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de
+E1=1711547999352267771 E2=1711548113452267771
+rate=1.0 duration=260s timeout=1200s RECORD=1 (/Odometry /Issleeping /Isbuilding)
+driver_args=--first-pose-grace-sec 60 --pose-stale-sec 15 --host-hibernation-max-sec 90 --host-sleep-topic /Issleeping --host-build-topic /Isbuilding --wait-limit-sec 20 --repair-sync-timeout-sec 5
+stop: bag end + 20 s drain; failure kept, no retry, no rebuild

@@ -49,8 +49,11 @@ if [ "$NODE_OK" -ne 1 ]; then
   echo "BLOCKED: driver did not register (see recovery_node.log)" | tee "$OUT/result.txt"
   exit 2
 fi
-setsid rosbag record --lz4 -O "$OUT/frontend.bag" /Odometry /Issleeping /Isbuilding > "$OUT/record.log" 2>&1 & REC=$!
-sleep 2
+RECORD="${RECORD:-1}"
+if [ "$RECORD" = "1" ]; then
+  setsid rosbag record --lz4 -O "$OUT/frontend.bag" /Odometry /Issleeping /Isbuilding > "$OUT/record.log" 2>&1 & REC=$!
+  sleep 2
+fi
 setsid rosbag play --clock -r 1.0 --duration "$DUR" "$BAG" > "$OUT/play.log" 2>&1 & PLAY=$!
 wait "$PLAY"; sleep 20
 kill -INT "$NODE" 2>/dev/null

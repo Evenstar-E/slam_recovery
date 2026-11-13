@@ -1,0 +1,1 @@
+ERROR reading /tmp/wt-sim/docs/four_host/fastlio_recovery_20261113/two_event_v6_norec_authorized/frontend.bag: [Errno 2] No such file or directory: '/tmp/wt-sim/docs/four_host/fastlio_recovery_20261113/two_event_v6_norec_authorized/frontend.bag'
