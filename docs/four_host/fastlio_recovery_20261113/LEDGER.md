@@ -81,7 +81,9 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
 | C（授权整链，有 driver） | 开 | 949（driver 侧） | **94.7–96.4 s** | — | — | 8 / 163 |
 | 旧独立 run（`4c31fada…`，469 s） | 关 | 4186 | 115.80 s | 23.8 s；229.70 s / 26.9 s | — | — |
 
-判读：**A ≈ B ≈ 基线**（115.7–115.8 s），**通道开销可忽略**；C 的 19–21 s 提前来自 **driver 竞争**
-（driver 每帧对 `/velodyne_points` 做 `cloud_to_xyz` 与 NIS 最近邻搜索，随地图增长而变重），
-不是恢复通道本身。原件：`diag_A/`、`diag_B/`（各含 `pre_run.txt`、`host.log`、`play.log`、
+判读：**A ≈ B ≈ 基线**（115.7–115.8 s），**通道开销可忽略**；C 的 19–21 s 提前来自 **driver 竞争**，
+不是恢复通道本身。性能口径（2026-11-13 更正）：NIS 走 `compute_disjoint_holdout_point_to_plane_nis`
+（300×600 向量化），**不是** `ReferenceGrid` 最近邻；`ReferenceGrid` 只在修复偏置搜索里。逐帧成本应表述为
+"扫描回调的 `cloud_to_xyz` + `subsample` 与 NIS holdout 计算"；driver 已加逐回调耗时统计
+（`runtime.pose_callback/scan_callback` 的 p50/p95/max），供下一定量诊断。原件：`diag_A/`、`diag_B/`（各含 `pre_run.txt`、`host.log`、`play.log`、
 `frontend.bag`、`bag_info.txt`、`analysis.json`；B 另有 `ctl/capabilities.json` 与 `ctl/input_fates.jsonl`）。
