@@ -1,0 +1,12 @@
+run_id=two_event_authorized_20261113T052331Z
+source_sha=de55eeeb5c35426703f4dccc3c979b75cdd44688797af70dd32bb0c9d31a09b6
+binary_sha=86f850256cb8da2516740c88098e981168528aa582cfeffb563eac54c7f10279
+config=velodyne_m2dgr.yaml 13086d7de1e91bed1d59cd4b80d2a99ccfd188b2b0bfb79bf1e6c6079d6a39d0
+launch=mapping_velodyne_m2dgr.launch 23a912569341f2968616246317fecfb38434aeed4a81ff1e61fd168976e2cb68
+bag=/home/R26534/datasets/mmlins/campus_12_fl.bag a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de
+E1=1711547999352267771 E2=1711548113452267771
+rate=1.0 play_duration=260s outer_timeout=1200s wait_limit=20s
+driver=/home/R26534/MM-LINS (runpy -u -I); node=/slam_recovery_native_loop
+PID note: only our own group is signalled; PM 3980781 (Nov 5 roslaunch) untouched
+estimated_space=<100MB logs
+stop_conditions: driver gate (node registered) before bag; bag end + 20 s drain; no retry
