@@ -48,3 +48,11 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
   之前；无旧的前置调用；两级 ack 文本；`reprocess` 释放 hold；按组 replay 标记与消费；`repaired_in_update`
   暴露；排空后复位；快照戳取上一完成帧）→ **RESULT PASS**。
 - `tools/check_replay_regression.py`（只读 ctrl2 原件）→ **PASS**（replay=83 / live=899）。
+
+## §2 同边界双命令（v4 复核，2026-11-13）
+
+- `nr_apply_deferred` 对同一 stamp 的 hold + snapshot：入队 `push_back`、应用时 `while (front.stamp_ns <= now)`
+  逐项 `pop_front` 到 `due`，再按队列顺序 `nr_execute`——**FIFO、全部 due 项、都在 `nr_capture_group`/估计之前**。
+  同一组内 hold 先执行、snapshot 后执行（快照取上一完成帧，与 hold 无关）。
+- `check_source_contract.py` 增加 5 条断言（deque 类型、push_back、pop_front、`<= now` 全量排空、按序执行），
+  现共 **19 项，全部 PASS**；`check_replay_regression.py` 仍 PASS（83/899）。
