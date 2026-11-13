@@ -2918,3 +2918,16 @@ S2 `442bd2c` 新增 `tools/check_source_contract.py`（50 行，只读源码，�
 
 **未做**：未构建、未运行；二进制仍 `df27a24c…`。审阅 §2 的"双命令控制"属运行级验收，等授权；
 S2 侧需确认 v4 deferred 队列对同 stamp 两条命令按 FIFO 全部执行（源码形态已支持），并可在 `check_source_contract.py` 增一条断言。
+
+## 190. 同边界双命令的 host 侧语义与 19 项源码契约核实入库
+
+S2 `a800dce` + `6bf6981`（`exp/growth-run`，纯源码，未构建/未运行）。S1 本机运行两项离线控制：
+- `check_source_contract.py`：**19/19 PASS**（新增 5 条：deferred 队列为 `std::deque`、`push_back` 入队、`pop_front` 应用、
+  `front().stamp_ns <= now_ns` 全量排空、`for (auto& d : due) nr_execute(...)` 按序执行）；
+- `check_replay_regression.py`：**PASS**（ctrl2 原件，`replay=83 / live=899`）。
+
+语义核对：同 stamp 的两条 deferred 都会被 `<=` 弹出并按 FIFO 执行；调用点在 `sync_packages` 后、`nr_capture_group`/估计前，
+因此 hold 先执行（`map_writes=held`）、snapshot 随后取**上一完成帧**的 `kf/ikdtree`，快照戳 `< target`；与 client 侧
+"hold RECEIVED 即写 snapshot" 的配对路径一致。两提交已 cherry-pick 入 main（`46e775d`、`6313bdd`），`exp/growth-run` 已推 `6bf6981`。
+
+授权前离线控制：`check_replay_regression.py`、`check_source_contract.py`（19 项）均 PASS。**仍不构建、不运行**；二进制 `df27a24c…`。
