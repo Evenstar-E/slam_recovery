@@ -3147,3 +3147,15 @@ S1 已要求 S2 做最小改动（**只改代码、不构建**，随下次授权
 
 由此共存规则有三层：①driver 在宿主休眠/重建期间不发 hold；②driver 对跨越宿主重置的隔离段不 restore/reprocess（记 takeover）；
 ③host 在 checkpoint 被 `re_slam` 失效后拒绝 restore——即使前两层漏掉也不会用旧图重建。待 S2 提交后核实入库；状态仍不构建、不运行。
+
+## 205. 第三层落地（v5）：`re_slam` 使 checkpoint 失效，restore 具名拒绝
+
+S2 `e8eb7df`（`exp/growth-run`，v5 diff 459 行，仅 `-fsyntax-only`）已入 main（`7f24576`）。S1 本机核实：
+- `re_slam()` 内置 `g_nr_cp.valid=false` 并记 `invalidated_by_reslam`；`nr_restore_locked()` 无效时回
+  `valid=0 reason=checkpoint_invalidated_by_re_slam`，不执行 `change_x/change_P/Build`；新 `snapshot` 清除标志；
+- `capabilities.json` 声明 `checkpoint_invalidated_by = "re_slam (host-native reset); a new snapshot is required afterwards"`；
+- `check_source_contract.py` **22/22 PASS**（新增三条分别覆盖 re_slam 体内失效、restore 原因字符串、capabilities 声明）；
+  `check_replay_regression.py` 仍 PASS（83/899）。
+
+三层共存规则至此齐备：①driver 休眠期不发 hold；②driver 对跨越宿主重置的隔离段不 restore/reprocess；③host 在 `re_slam` 后拒绝 restore。
+二进制仍 **v4 `86f85025…`**；v5 随下次授权构建生效。状态不变：不构建、不运行。
