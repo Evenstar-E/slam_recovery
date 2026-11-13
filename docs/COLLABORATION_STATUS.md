@@ -3186,3 +3186,16 @@ run 会在宿主即将恢复前被看门狗中止。修正（`pose_stream_health
 
 **口径**：本次 run 已消费，未重试、未再构建；v5 二进制保留、不回退。下一步需要用户新授权一次 run（无需再构建），
 建议 runner 同时记录 `/Odometry`（本次未录，无法从原件重建发布时刻）。
+
+## 208. 用户授权第 2 次有界 run（v5 已构建，不再构建）
+
+用户于 15:0x 授权 1 次有界 run、**不构建**。条件已转 S2（消息 `a68af044…`）：
+- 二进制 `785c0f20…`（v5）；同 bag `campus_12_fl.bag`、E1/E2 戳、260 s、外层 1800 s、`-u` + ROS 图门控、新目录；
+- driver 参数：`--first-pose-grace-sec 60 --pose-stale-sec 15 --host-hibernation-max-sec 90 --host-sleep-topic /Issleeping
+  --host-build-topic /Isbuilding --wait-limit-sec 20 --repair-sync-timeout-sec 5`；
+- **新增录制** `/Odometry /Issleeping /Isbuilding` 到 `frontend.bag`（与 A/B 同口径），`pre_run` 记全参数；
+- 验点：首帧 ~20–25 s、E1 自然休眠 23.8 s → `host_native` 事件与 `HOST_NATIVE_RECOVERY_TAKEOVER`（不 restore/reprocess）、恢复后
+  `PUBLISHING` 与 `ingested`、E2/尾段、`input_health` 不再误报；
+- 失败保原件、记 FAIL/BLOCKED、不重试、不再构建。
+
+当前状态：授权已下达，run 尚未开始（以 S2 实交为准）。
