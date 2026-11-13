@@ -23,3 +23,21 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
 2. **no_timebase**：未初始化时间基时不再输出 `stamp_ns=-1000000000`——`hold/snapshot` 返回
    `valid=0 reason=no_timebase`，`status` 返回 `stamp_ns=NA no_timebase=1`。
 3. 语法检查（`g++ -fsyntax-only`，同一组 include/defines）通过；**未构建**，二进制仍为 `df27a24c…`。
+
+## v4（2026-11-13，只写代码，未构建/未运行）
+
+按审阅 §3.1–3.3 修正（`native_recovery_v4.diff`，441 行）：
+
+1. **§3.1 延期边界与 ACK**：`nr_apply_deferred(this_group_end)` 现在在 `sync_packages` 之后、
+   **该组被捕获/估计之前**执行——目标戳落在两帧之间时，hold/snapshot 在跨界组进入估计前生效，
+   快照用**前一完成帧**的状态（`g_nr_lidar_end` < target）。ACK 分两级：入队 `OK <cmd> deferred
+   stamp=<ns>`；执行后 `OK <cmd> applied valid=1 stamp_ns=<ns> frame=<n> [map_points=...]`。
+2. **§3.2 replay 期间的写图与输入顺序**：`reprocess` 时显式释放 hold（`map_writes` 随之为 released），
+   重放组按时间顺序回到缓冲区前方、先于后继实时输入被消费；新增与 update 关联的回执
+   `repaired_in_update` / `last_repaired_update_ns`（`repaired_fed` 只证明入队）。
+3. **§3.3 replay 标志复位**：改为**按组身份**——重放入队时写 `g_nr_replay_marks[group_end]`，
+   消费时取走并决定该组的 replay/live 身份（`input_fates` 随之精确）；最后一条重放组处理完时
+   复位全局标志，不再按命令发出复位。
+4. 语法检查（同一 include/defines，`-fsyntax-only`）rc=0、0 errors；**未构建**，二进制仍 `df27a24c…`。
+5. 回归断言 `tools/check_replay_regression.py`（只读 ctrl2 原件）：`rows=1255 replayed_label=982
+   declared_replay=83 corrected_split: replay=83 live=899` → **PASS**。
