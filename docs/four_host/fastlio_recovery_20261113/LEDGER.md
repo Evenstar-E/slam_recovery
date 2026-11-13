@@ -41,3 +41,10 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
 4. 语法检查（同一 include/defines，`-fsyntax-only`）rc=0、0 errors；**未构建**，二进制仍 `df27a24c…`。
 5. 回归断言 `tools/check_replay_regression.py`（只读 ctrl2 原件）：`rows=1255 replayed_label=982
    declared_replay=83 corrected_split: replay=83 live=899` → **PASS**。
+
+## 离线确定性检查（v4，未构建/未运行）
+
+- `tools/check_source_contract.py`：14 条源码级断言（延期调用点在 `sync_packages` 之后、`nr_capture_group`
+  之前；无旧的前置调用；两级 ack 文本；`reprocess` 释放 hold；按组 replay 标记与消费；`repaired_in_update`
+  暴露；排空后复位；快照戳取上一完成帧）→ **RESULT PASS**。
+- `tools/check_replay_regression.py`（只读 ctrl2 原件）→ **PASS**（replay=83 / live=899）。
