@@ -1,0 +1,32 @@
+{
+  "main": "73c97643b08a3e4efc91f6a14b1093fdf79779ce",
+  "scope": "exact current driver classes/method under deterministic file controls; no ROS/host/build",
+  "paired_ack": {
+    "status": "CONFIRMED_OLDEST_COMMAND_BLOCKED_BY_LAST_WRITE_ACK",
+    "host_command_file_after_receive": "snapshot",
+    "pending_after_coalesced_applied_writes": 2,
+    "remaining_ack": "OK snapshot applied valid=1 stamp_ns=100 frame=9 map_points=42",
+    "hold_completed": null,
+    "snapshot_completed": null,
+    "poll_returned": null
+  },
+  "update_receipt_fallback": {
+    "status": "CONFIRMED_FALLBACK_CALLS_SUMMARY_NOT_HOST_COMMAND",
+    "receipt": null,
+    "status_command_file_created": false,
+    "real_status_method_keys": [
+      "dir",
+      "enabled",
+      "events",
+      "failures",
+      "holds",
+      "host_ready",
+      "note",
+      "reprocesses"
+    ],
+    "impact": "v4 repaired_in_update cannot be obtained through this fallback"
+  },
+  "reprocess_ack_contains_update_receipt": false,
+  "minimum_fix": "unique per-command applied receipts or atomic pair; issue a real status command and wait for the relevant replay/update boundary",
+  "authorized_native_build_run_evidence": "NOT_DELIVERED_IN_THIS_REVIEWED_MAIN"
+}

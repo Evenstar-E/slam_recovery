@@ -1,0 +1,65 @@
+{
+  "main": "f1bd803dbcbb60419d50dd70491768c54c4f22dc",
+  "scope": "authorized archived run and fixed driver receipt parser; no ROS/host/build",
+  "build": {
+    "exit": "build_exit=0",
+    "pre_sha": "df27a24ce941fe036eb8e30a134653cc96776de440195936dca2305fc0a891e9  devel/lib/fast_lio/fastlio_mapping",
+    "post_sha": "86f850256cb8da2516740c88098e981168528aa582cfeffb563eac54c7f10279  devel/lib/fast_lio/fastlio_mapping",
+    "binary_entity_independently_rebuilt_here": false
+  },
+  "checkpoint_pairs": [
+    {
+      "target_ns": 1711547997352267771,
+      "hold_stamp_ns": 1711547997274449664,
+      "hold_delta_ms": -77.818107,
+      "snapshot_stamp_ns": 1711547997774402048,
+      "snapshot_delta_ms": 422.134277,
+      "snapshot_written_at_hold_applied_ack_wall": true,
+      "snapshot_wall": 1794547590.331,
+      "hold_applied_ack_wall": 1794547590.331,
+      "map_points": 221815
+    },
+    {
+      "target_ns": 1711548111452267771,
+      "hold_stamp_ns": 1711548111373400064,
+      "hold_delta_ms": -78.867707,
+      "snapshot_stamp_ns": 1711548111973349120,
+      "snapshot_delta_ms": 521.081349,
+      "snapshot_written_at_hold_applied_ack_wall": true,
+      "snapshot_wall": 1794547704.57,
+      "hold_applied_ack_wall": 1794547704.57,
+      "map_points": 1347
+    }
+  ],
+  "checkpoint_boundary": "FAIL_BOTH_SNAPSHOTS_LATE; v4 deferred PASS claim not accepted",
+  "received_receipt_from_real_host": "RECEIVED snapshot",
+  "received_parser_requires_wall_for_pipeline": true,
+  "host_fates": {
+    "ingested": 1137,
+    "quarantined": 1113
+  },
+  "last_frame_diagnostic_relative_first_host_s": 94.699095638,
+  "host_log_counts": {
+    "Over-degeneracy": 8,
+    "IMU Initial Done": 163
+  },
+  "scripted_fired": [],
+  "episodes": 0,
+  "driver_fully_accounted_but_driver_scope_only": {
+    "fully_accounted": true,
+    "driver_never_quarantined": 949,
+    "host_quarantined": 1113
+  },
+  "runtime_driver_pid_scope": {
+    "wall_sec": 260.588,
+    "pid": 1023611,
+    "pgid": 1020723,
+    "peak_rss_kb": 2174264,
+    "pose_messages": 949,
+    "scan_messages": 2397,
+    "callback_errors": [],
+    "callback_error_count": 0
+  },
+  "native_hibernation_root_cause": "UNKNOWN; direct observation precedes armed hold and is not attributed to a unique algorithm/load cause",
+  "reprocess_E1_E2": "NOT_EXECUTED"
+}

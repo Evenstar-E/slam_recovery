@@ -793,3 +793,11 @@ growth只新38行文字无map序列/原脚本，report0.43/12.7是回溯边界�
 [增量复核](review_20261113_4cacc31/README.md)固定12:07 main4cacc31/growth442bd2c/ALI121f7ef，暂停中仅源码与离线控制，无v4构建/run。F2缺run_id、NO_PAIR、无n support三反例经实际11个selftest关闭；F3 skipped单列和重叠unresolved两driver反例关闭，deferred不再直接当applied。均只限组件控制，不提升检测/整链分数，不重开旧数学。
 
 当前arm_scripted_checkpoints仍hold(at)后snapshot(at)，客户端deferred保持hold pending并把snapshot留outbox，hold applied后才发snapshot；本机AST隔离当前CheckpointClient实测deferred后host cmd=hold/outbox1，applied后才cmd=snapshot。v4虽在sync后估计前defer，snapshot却只能在后续组执行并取先前完成帧戳，仍可晚于边界。最低S1/S2把同边界hold+snapshot作为一次预武装/applied事务或等价保两条目标前均已到host，双命令控制同时验cp前一帧/跨界组未写，不恢复deferred即完成。v4新增repaired_in_update未被driver消费，2097仍fed>0写entered，S1接实际update回执；83/899是旧档算术非v4运行。下一仍合法cp→E1真实update/map→live→E2，构建/run等实际恢复；仅新缺口阻复验，其余不退回。独立-I控制exit0，不ROS/build/算法/main历史/门/private，中文SSH review增量，四Cron及18:00继续。
+
+## 101. 授权v4 run：构建成功但双snapshot晚边界，原生停发使E1/E2未发生
+
+[授权run审阅](review_20261113_73c9764/README.md)固定13:49 main f1bd803/growth163cd1d及前段73c9764，发布前补核13:54 main4f7567e离线诊断/看门狗。唯一授权构建/run已执行不重试：build exit0、SHA df27→86f85025为归档非本机复建；hold两组均早目标约78ms、host1137 ingested/1113 quarantined，启动即hold问题未复现。driver末帧诊断相对首host帧94.699s，host 8 Over-degeneracy/163 IMU Initial Done，E1约116s未到、fired空/0 episode/reprocess与E1接回E2未执行；停发早于armed hold，唯一算法/负载/时序根因UNKNOWN，不从缺交付猜因。独立run与授权run停发位置不同，深拷贝候选已撤回，内存/循环/driver竞争仅候选；新pose-stale看门狗只报错停止不属恢复/ALI-H，A/B/C诊断未授权未执行。
+
+独立原actions复算E1/E2 snapshot分别晚目标422.134/521.081ms，hold虽提前但cp不合法，v4 deferred PASS不接受。真实ack_received为RECEIVED snapshot无wall，client只有wall才触发_pipeline_armed_pair，且两snapshot wall均等于hold applied ack_wall，格式错配与实测一致；另有共享ack最后写值使最前hold永久pending的确定性控制。最低S1/S2统一生产RECEIVED、目标前双命令真实入队及唯一applied回执，不只看19项文本断言。
+
+update fallback调真实cp.status摘要而非status命令，实测receipt None/cmd未创建，fake接口不一致；reprocess ACK无repaired_in_update，须真实status并等相关replay/update边界，不只改字段。driver 949 never/full true而host1113Q，full accounted仅driver非全宿主。下一交生产格式双命令控制与update读取，用户另授权后方再验cp≤target→E1→update/map→live→E2；前移事件须预声明新受控协议不冒原事件/自动检测。A4/A6/A10/B11未闭合，A3/B3/B4不可评价，不调参。两-I控制exit0，不ROS/build/算法/main历史/门/private，中文SSH review，四Cron与18:00继续。
