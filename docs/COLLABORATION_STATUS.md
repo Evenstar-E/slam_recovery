@@ -3419,3 +3419,11 @@ S2 报告"宿主在 E1 后多轮休眠、位姿流止于 211.1 s"。S1 从 `two_
 （`--require-contract --first-pose-grace-sec 60 --pose-stale-sec 15 --host-signal-window-sec 30 --host-hibernation-max-sec 90 ...`）；
 同 bag/E1/E2、260 s、录三轻量话题。driver 已扩队列（2000/200，main `0b4dc78`），预期不再丢 E1 后的 233 帧、`scripted.fired` 出现 E2。
 失败保原件、不重试、不构建。当前状态：授权已下达，run 尚未开始（以 S2 实交为准）。
+
+## 226. 用户决定：先排空 run 验证逻辑链（标注非实时），再定位最长耗时阶段（只标注不改）
+
+用户指示：**"先做排空 run 验证逻辑链（并如实标注非实时）然后分析这个过程中哪个部分占用计算时长最长，然后标注出来但是暂不修改"**。
+- 排空 run 授权：1 次、不构建、v7 `a40e20d5…`、`DUR=360` + `POST_PLAY_DRAIN=60`（S2 `ca6834c` 已入 main），其余参数不变；
+  报告必须标注"排空期处理、墙钟晚于 bag 结束、非实时"，E2 的 `actual_s` 按 stamp 记。
+- 成本归因（只读）：driver 新增 `frame_cost_breakdown`（`nis_measure`、`ingest` 的 n/p50/p95/max/mean），与既有
+  `pose_callback/scan_callback` 并列；用于标注最长阶段，**不修改**算法/阈值/采样。273 项测试通过。

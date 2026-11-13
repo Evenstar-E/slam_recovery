@@ -1328,10 +1328,19 @@ class NativeClosedLoop:
         self.host_native_state = "UNKNOWN"
         self.host_native_events: List[Dict[str, Any]] = []
         self.last_host_signal_wall: Optional[float] = None
+        # Per-frame cost attribution. Diagnostics only: nothing here changes a decision. The
+        # question it answers is *which* stage dominates, because the driver currently runs at
+        # ~7 Hz against an 8-10 Hz host and the backlog is what hides E2.
+        self.cost_samples: Dict[str, List[float]] = {}
 
     # -- ingest -------------------------------------------------------------------------------
     def _fed(self, ts_ns: int) -> bool:
         return self._first_decision_ts_ns is None or ts_ns <= self._first_decision_ts_ns
+
+    def _note_cost(self, name: str, seconds: float) -> None:
+        bucket = self.cost_samples.setdefault(name, [])
+        if len(bucket) < 5000:
+            bucket.append(float(seconds))
 
     def on_pair(self, pose_stamp_ns: int, pose: np.ndarray, scan_body: np.ndarray,
                 scan_ns: Optional[int] = None) -> None:
@@ -1357,9 +1366,11 @@ class NativeClosedLoop:
                     self._scan_index.pop(stale, None)
 
         nis_detail: Dict[str, Any] = {}
+        t_nis = time.perf_counter()
         value, source, reference = self.nis.measure(
             pose, scan_body, now_ts_ns=ts_ns, kf_id=kf_id,
             detail=(nis_detail if self.availability.enabled else None))
+        self._note_cost("nis_measure", time.perf_counter() - t_nis)
         support_ref = self.nis.support_reference(ts_ns)
         # Map size as it stood when this frame's NIS was computed -- not after this frame has been
         # ingested. The diagnostic bins NIS by reference size, so the two must be the same instant.
@@ -1383,7 +1394,9 @@ class NativeClosedLoop:
             self.detection_counts[status] += 1
             self._record_availability(kf_id, ts_ns, scan_ns, pose, scan_body, {},
                                       nis_detail, None, value is not None, "DISABLED")
+            t_ing = time.perf_counter()
             self._ingest_without_detection(kf_id, ts_ns, pose, scan_body, value)
+            self._note_cost("ingest", time.perf_counter() - t_ing)
             self._record_diag(kf_id, ts_ns, value, source, reference, status,
                               kfs_before, pts_before)
             self._track_episode(kf_id, ts_ns, pose)
@@ -1425,7 +1438,9 @@ class NativeClosedLoop:
                 self._first_alarm_ts_ns = int(ts_ns)
         else:
             self.ingested_undetected += 1
+            t_ing = time.perf_counter()
             self._ingest_without_detection(kf_id, ts_ns, pose, scan_body, value)
+            self._note_cost("ingest", time.perf_counter() - t_ing)
         self._record_diag(kf_id, ts_ns, value, source, reference, status,
                           kfs_before, pts_before)
 
@@ -2691,6 +2706,8 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
         "host_capabilities": host_capabilities_record(loop),
         "host_native": {"state": loop.host_native_state, "events": loop.host_native_events},
         "host_contract": getattr(loop, "host_contract", {"status": "NOT_EVALUATED"}),
+        "frame_cost_breakdown": {name: duration_stats(vals)
+                                  for name, vals in (loop.cost_samples or {}).items()},
         "arming_mode": getattr(loop, "arming_mode", "PREARMED" if loop.scripted_trigger_stamps_ns
                                else "NONE"),
         "message_disposition": message_disposition(loop),
