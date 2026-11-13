@@ -1033,6 +1033,16 @@ class CheckpointClient:
         self.expire_pending(0.0)
         return self._write(cmd, payload=payload, preempt_snapshot=True)
 
+    def pending_active(self) -> bool:
+        """True only while a command is in flight but not merely armed for a later stamp.
+
+        Scheduled hold/snapshot commands for the *second* declared event stay armed for most of
+        the run. Treating them as in-flight blocked the first decision until the second event's
+        stamp arrived (v5c: the episode was decided only after the host build at 211 s).
+        """
+        with self._lock:
+            return any(not e.get("armed") for e in self._pending)
+
     def pending(self) -> bool:
         with self._lock:
             return bool(self._pending or self._outbox)
@@ -2020,9 +2030,24 @@ class NativeClosedLoop:
         if (getattr(ep, "meta", {}) or {}).get("host_reset_during_quarantine"):
             # The host hibernated and cleared its map inside this quarantine. There is no
             # checkpoint to roll back to and no candidate to score; claiming a recovery here
-            # would describe a rollback of a map the host itself discarded.
+            # would describe a rollback of a map the host itself discarded. The segment is
+            # closed and re-armed, or the next declared event can never open one.
             ep.decided = True
             ep.meta["decision_skipped"] = "HOST_NATIVE_RECOVERY_TAKEOVER"
+            abandoned = False
+            tx = self.node.tx_mgr
+            seg_id = getattr(ep, "segment_id", None)
+            if seg_id is not None and hasattr(tx, "abandon_segment"):
+                abandoned = bool(tx.abandon_segment(seg_id, "HOST_NATIVE_RECOVERY_TAKEOVER",
+                                                    int(now_ts_ns)))
+                if abandoned:
+                    tx.rearm()
+            ep.meta["segment_abandoned"] = abandoned
+            if self.cp is not None:
+                try:
+                    self.cp.resume()
+                except Exception:
+                    pass
             return None
         seg_id = getattr(ep, "segment_id", None)
         if seg_id is not None:
@@ -2308,8 +2333,9 @@ class NativeClosedLoop:
             # after it under backlog and overwrite the armed checkpoint, so the restore then rolls
             # back only part of the segment. Online runs keep the rolling snapshot.
             self.cp.tick(time.time(), quiescent=True)
-        if self.cp is not None and self.cp.pending():
+        if self.cp is not None and self.cp.pending_active():
             # A command is in flight: no new candidate is built until the host has applied it.
+            # Armed commands for a later declared stamp are not in flight.
             return None
         if self.pending_decision is None or self._open is None or self._open.decided:
             return None

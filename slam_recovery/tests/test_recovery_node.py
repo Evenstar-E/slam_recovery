@@ -261,6 +261,7 @@ class _FakeTxMgr:
         self.state = RecoveryState.HEALTHY
         self.promoted = []
         self.registered = []
+        self.abandoned = []
 
     def register_quarantined_frame(self, keyframe_id, timestamp_ns=0):
         self.registered.append(int(keyframe_id))
@@ -274,6 +275,22 @@ class _FakeTxMgr:
         self.promoted.append(delta.keyframe_id)
         self.trusted_poses[delta.keyframe_id] = np.asarray(delta.pose_se3).copy()
         return 1
+
+    def abandon_segment(self, segment_id, reason, now_ns=0):
+        if self.active_quarantine is None or getattr(
+                self.active_quarantine, "segment_id", None) != segment_id:
+            return False
+        self.abandoned.append((segment_id, reason))
+        self.active_quarantine = None
+        self.state = RecoveryState.ABORTED
+        return True
+
+    def rearm(self):
+        if self.active_quarantine is not None or self.state != RecoveryState.ABORTED:
+            return False
+        self.state = RecoveryState.HEALTHY
+        self.lifecycle_events.append({"event": "rearm"})
+        return True
 
 
 class _FakeLoopNode:

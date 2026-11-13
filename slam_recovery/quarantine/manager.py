@@ -563,6 +563,34 @@ class TrustedMapTransactionManager:
         self.state = RecoveryState.ABORTED
         return seg
 
+    def abandon_segment(self, segment_id: Optional[str], reason: str,
+                        now_ns: int = 0) -> bool:
+        """Close a segment whose recovery the host itself has taken over.
+
+        A host reset (re_slam) destroys the map the segment was going to be rolled back to and
+        the next event can only fire once the manager is HEALTHY again. The frames are recorded
+        as unresolved -- lost, not committed -- and the state passes through ABORTED so the
+        caller can rearm exactly as the wait-limit path does.
+        """
+        seg = self.active_quarantine
+        if seg is None or getattr(seg, "segment_id", None) != segment_id:
+            return False
+        self.unresolved_segments.append(seg)
+        self.lifecycle_events.append({
+            "event": "segment_abandoned",
+            "segment_id": segment_id,
+            "reason": reason,
+            "closed_ns": int(now_ns),
+            "t_start_ns": int(getattr(seg, "t_start_ns", 0)),
+            "t_end_ns": int(getattr(seg, "t_end_ns", 0)),
+            "frames_unresolved": list(getattr(seg, "raw_frame_refs", []) or []),
+            "trusted_version": int(self.trusted_version),
+        })
+        self.active_quarantine = None
+        self.wait_started_ns = None
+        self.state = RecoveryState.ABORTED
+        return True
+
     def rearm(self) -> bool:
         """Return to HEALTHY after a segment closed without evidence.
 

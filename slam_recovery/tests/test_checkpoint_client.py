@@ -434,6 +434,9 @@ class ScriptedCheckpointTest(unittest.TestCase):
             def pending(self):
                 return False
 
+            def pending_active(self):
+                return False
+
             def tick(self, *_a, **_k):
                 self.ticks += 1
 

@@ -3227,3 +3227,25 @@ run 会在宿主即将恢复前被看门狗中止。修正（`pose_stream_health
 硬指标：**宿主首次休眠是否回到 ≈115.8 s、位姿流是否到达 E1 117.4 s**；失败保原件、记 FAIL/BLOCKED、不重试。
 补充观察：若 callback 下降但仍提前，记 `input_fates` ingested/quarantined 比例与首个 quarantined 时刻，判断 hold 是否参与。
 当前状态：授权已下达，run 尚未开始（以 S2 实交为准）。
+
+## 211. v5c：E1 首次到达、takeover 按设计；修段生命周期与决策门控
+
+**v5c run（授权 1 次，不构建，v5 `785c0f20…`，driver main `16c4f71`）**，S2 `444c826`，原件 `two_event_v5c_authorized/`。S1 核实：
+- **E1 首次到达**：`scripted.fired` 一条，declared `1711547999352267771`，actual **115.599 s**，kf 1092；位姿流覆盖 E2（diag max 230.9 s）；
+- 宿主首次休眠 **105.4 s**（v5b 66.2 s，无 driver 基线 115.8 s）→ 降载后改善 39 s，仍早约 10 s；
+- **回调成本**：pose p50/p95/max/mean = **20 / 92 / 393 / 28 ms**（v5b 102/1255/1957/244，约 8.7× 改善）；scan = 1.6 / 224 / 607 / 36.8 ms；
+- episode 0：4 帧、`hold_skipped_host_state=HIBERNATING`、`host_reset_during_quarantine={build, 1711548094.37}` →
+  `decision_skipped=HOST_NATIVE_RECOVERY_TAKEOVER`，**未 restore、未 reprocess**（共存按设计）；
+- **两个新问题**：①宿主休眠期 `snapshot applied frame=1140 map_points=2`（E2 组 1）——`re_slam` 清树后仍接受空图快照；
+  ②收尾 `final_state=QUARANTINED`、`quarantine_open_at_exit=true`，E2 未触发。
+
+**S1 修复（driver，main）**：
+1. **决策不再被"已武装的后续事件命令"阻塞**：新增 `CheckpointClient.pending_active()`（只把**未 armed** 的在途命令视为阻塞），
+   `service()` 改用它。v5c 中 E2 的 armed hold/snapshot 从启动起 pending，导致 episode 直到 211 s 才被裁决（真因）。
+2. **takeover 后关闭并重武装段**：新增 `QuarantineManager.abandon_segment(segment_id, reason)`——记 `unresolved_segments` 与
+   `segment_abandoned` 事件、清 `active_quarantine`、置 ABORTED；driver 在 takeover 路径调用并 `rearm()`，episode meta 记
+   `segment_abandoned=True`。这样第二声明事件才能在 HEALTHY 状态下触发。
+测试 3 项（armed 不阻塞、takeover 放弃+重武装、fake 补齐）；全套 **266 项通过**。
+
+**待 S2（只改代码，不构建）**：`re_slam` 后到下一次正常发布前，`snapshot` 回 `valid=0 reason=host_reset_no_map`（或 capabilities 声明），
+避免休眠期空图快照；并说明 scan p95 升高（3.3→224 ms）是否与录制/调度有关。

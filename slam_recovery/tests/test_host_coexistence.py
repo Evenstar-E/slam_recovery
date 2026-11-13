@@ -53,15 +53,22 @@ class HostCoexistenceTest(unittest.TestCase):
         self.assertEqual(loop.cp.holds, 1)
 
     def test_a_segment_the_host_reset_is_taken_over_not_decided(self):
+        import types
         loop = self._loop()
         loop.on_host_signal("sleep", 1_000)
         loop._open_episode(1_100, np.eye(4), None)
         ep = loop._open
+        ep.segment_id = "seg-1"
+        loop.node.tx_mgr.active_quarantine = types.SimpleNamespace(segment_id="seg-1")
         ep.meta["host_reset_during_quarantine"] = {"signal": "sleep", "ts_ns": 1_000}
         self.assertIsNone(loop.decide(1_500, "test"))
         self.assertEqual(ep.meta["decision_skipped"], "HOST_NATIVE_RECOVERY_TAKEOVER")
         self.assertEqual(loop.cp.restore_calls, 0)
         self.assertEqual(loop.cp.reprocess_calls, 0)
+        # the segment must be closed and re-armed, or the second declared event cannot fire
+        self.assertTrue(ep.meta["segment_abandoned"])
+        self.assertEqual(loop.node.tx_mgr.abandoned, [("seg-1", "HOST_NATIVE_RECOVERY_TAKEOVER")])
+        self.assertEqual(loop.node.tx_mgr.state.value, "HEALTHY")
 
     def test_publishing_after_a_sleep_is_recorded_as_a_transition(self):
         loop = self._loop()

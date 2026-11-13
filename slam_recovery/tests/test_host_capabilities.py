@@ -358,3 +358,18 @@ class DeferredAckTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PendingActiveTest(unittest.TestCase):
+    def test_armed_commands_do_not_block_a_decision(self):
+        import tempfile
+        from slam_recovery.ros.recovery_node import CheckpointClient
+        with tempfile.TemporaryDirectory() as d:
+            client = CheckpointClient(d)
+            ev = {"command": "hold", "wall": 1.0, "armed": True}
+            client._pending.append(ev)
+            self.assertFalse(client.pending_active())
+            self.assertTrue(client.pending())
+            ev2 = {"command": "restore", "wall": 1.0}
+            client._pending.append(ev2)
+            self.assertTrue(client.pending_active())
