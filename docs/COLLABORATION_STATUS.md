@@ -3365,3 +3365,21 @@ S2 指出七步冒烟与 driver 共用 `cmd`/`ack` 单槽；S1 判定**并发冒
 - **只跑整链 run**（`--require-contract` 放 bag 前校验），七步冒烟的 hold/snapshot/restore/replay 证据沿用 ctrl2
   （v2 二进制；v7 仅新增 semantics 块，未改这些行为）；
 - `tools/smoke7.py` 已入库（main `8e4543a`），留给将来**单独的 host-only 冒烟 run**（需另授权，不与 driver 同 run）。
+
+## 221. v7 run：契约校验通过；E1 后宿主静默无信号，看门狗终止；新增"近期信号推断休眠"
+
+**v7 run（授权 1 次构建 + 1 次 run）**，S2 `9b286d3`，原件 `two_event_v7_authorized/`。S1 核实：
+- **构建/契约 PASS**：v6 `f167bf5e…` → **v7 `a40e20d5…`**；`--require-contract` 放 bag 前通过，`host_contract.status=DECLARED`，
+  `semantics` 五项与声明一致；预算诊断 47.5 ms/对（0.475 核，仅记录）。
+- 运行：E1 115.7 s 触发；armed ack `hold applied frame=1137`、`snapshot applied frame=1140 map_points=221815`；
+  宿主在 117.7 s 后停止发布；driver 在 15.2 s 后按常规 STALE 结束（wall 156 s），`terminal_reason=INPUT_STALE`；
+  决策 `MODE4_HARD_SLEEP_SPLIT`、3 帧、`accepted=false`、`final_state=ABORTED`；E2 未到。
+- **关键新证据**：录制的 `frontend.bag` 里 `/Issleeping` **共 4 条**，但 driver 只看到 1 条（111.4→111.5 s 的 0.1 s 瞬断）——
+  其余 3 条的时间在 driver 退出**之后**（如 1794560209 墙钟 vs driver 1794560117 退出）。即宿主在长静默期没有再发休眠信号。
+
+**S1 修复（driver）**：`pose_stream_health` 新增"近期宿主信号推断"——若最近 `--host-signal-window-sec`（默认 30 s）内收到过
+sleep/build 信号，则后续静默按 `HOST_HIBERNATING`（受 `--host-hibernation-max-sec` 约束）而不是 15 s 常规 STALE，并记
+`hibernation_inferred=true` 与 `last_host_signal_wall`。测试 3 项（近期信号、过期信号、推断超时），全套 **273 项通过**。
+
+口径：这是**有证据的推断**（近期原生信号），不是无条件放宽；若宿主始终不发信号，仍按 15 s 停止。
+下一步：如需验证"静默期等到宿主恢复并覆盖 E2"，需要一次新的 run 授权（v7 二进制已就位，无需构建）。

@@ -57,6 +57,27 @@ class PoseStreamHealthTest(unittest.TestCase):
                                host_state="HIBERNATING", hibernation_max_s=90.0)
         self.assertEqual(h["status"], "HOST_HIBERNATION_TIMEOUT")
 
+    def test_a_recent_host_signal_makes_silence_a_hibernation(self):
+        # v7: a 0.1 s sleep/publish glitch at 111 s, then silence from 117.7 s with no further
+        # Issleeping until the driver had already stopped. The recent native signal is evidence.
+        h = pose_stream_health(1100, 195.0, 100.0, 216.0, 15.0,
+                               host_state="PUBLISHING", hibernation_max_s=90.0,
+                               last_host_signal_wall=200.0, recent_signal_window_s=30.0)
+        self.assertEqual(h["status"], "HOST_HIBERNATING")
+        self.assertTrue(h["hibernation_inferred"])
+
+    def test_an_old_signal_does_not_change_the_stale_verdict(self):
+        h = pose_stream_health(1100, 195.0, 100.0, 216.0, 15.0,
+                               host_state="PUBLISHING", hibernation_max_s=90.0,
+                               last_host_signal_wall=150.0, recent_signal_window_s=30.0)
+        self.assertEqual(h["status"], "STALE")
+
+    def test_inferred_hibernation_still_times_out(self):
+        h = pose_stream_health(1100, 100.0, 100.0, 216.0, 15.0,
+                               host_state="PUBLISHING", hibernation_max_s=90.0,
+                               last_host_signal_wall=200.0, recent_signal_window_s=30.0)
+        self.assertEqual(h["status"], "HOST_HIBERNATION_TIMEOUT")
+
     def test_publishing_uses_the_ordinary_limit(self):
         h = pose_stream_health(949, 195.0, 100.0, 216.0, 15.0,
                                host_state="PUBLISHING", hibernation_max_s=90.0)

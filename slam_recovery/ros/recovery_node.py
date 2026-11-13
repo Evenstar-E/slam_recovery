@@ -703,7 +703,9 @@ class HostCapabilities:
         for cmd in required:
             if not self.usable(cmd):
                 problems.append(f"command_not_usable:{cmd}={self.commands.get(cmd)}")
-        if not self.apply_stamp_supported():
+        if "apply_stamp" not in self.sem:
+            problems.append("semantics.apply_stamp missing")
+        elif not self.apply_stamp_supported():
             problems.append("semantics.apply_stamp=NO (no boundary pre-arming)")
         levels = self.sem.get("ack_levels")
         if not isinstance(levels, list) or "applied" not in [str(x).lower() for x in levels]:
@@ -1325,6 +1327,7 @@ class NativeClosedLoop:
         # publishes again (authorised run: map 221815 -> 1347 points while held).
         self.host_native_state = "UNKNOWN"
         self.host_native_events: List[Dict[str, Any]] = []
+        self.last_host_signal_wall: Optional[float] = None
 
     # -- ingest -------------------------------------------------------------------------------
     def _fed(self, ts_ns: int) -> bool:
@@ -1771,6 +1774,8 @@ class NativeClosedLoop:
             self.host_native_state = "PUBLISHING"
         else:
             return
+        if kind in ("sleep", "build"):
+            self.last_host_signal_wall = now
         self.host_native_events.append({"event": f"host_{kind}", "ts_ns": stamp_ns,
                                         "wall": now, "previous": previous,
                                         "state": self.host_native_state})
@@ -3041,7 +3046,9 @@ def pose_stream_health(pose_count: int, last_pose_wall: Optional[float],
                        started_wall: float, now_wall: float,
                        limit_s: float, host_state: Optional[str] = None,
                        hibernation_max_s: float = 0.0,
-                       first_pose_grace_s: Optional[float] = None) -> Dict[str, Any]:
+                       first_pose_grace_s: Optional[float] = None,
+                       last_host_signal_wall: Optional[float] = None,
+                       recent_signal_window_s: float = 0.0) -> Dict[str, Any]:
     """Whether the host is still producing the pose stream this run depends on.
 
     A host that stops publishing (FAST-LIO does exactly that while it hibernates: isPublish is
@@ -3067,6 +3074,22 @@ def pose_stream_health(pose_count: int, last_pose_wall: Optional[float],
         return out
     silence = now_wall - last_pose_wall
     out["silence_s"] = round(silence, 3)
+    inferred = (host_state not in ("HIBERNATING", "REBUILDING")
+                and recent_signal_window_s > 0 and last_host_signal_wall is not None
+                and (now_wall - last_host_signal_wall) <= recent_signal_window_s
+                and silence >= limit_s)
+    if inferred:
+        # A host can emit a 0.1 s sleep/publish glitch and then go silent without another
+        # Issleeping for a long time (v7 run: signal at 111 s, silence from 117.7 s, the next
+        # Issleeping only after the driver had already stopped). A recent native signal is
+        # evidence that the silence is the host's own recovery, not a dead publisher.
+        out["hibernation_inferred"] = True
+        out["last_host_signal_wall"] = last_host_signal_wall
+        if hibernation_max_s and silence >= hibernation_max_s:
+            out["status"] = "HOST_HIBERNATION_TIMEOUT"
+        else:
+            out["status"] = "HOST_HIBERNATING"
+        return out
     if host_state in ("HIBERNATING", "REBUILDING"):
         # A silent stream during the host's own hibernation is expected: FAST-LIO stops
         # publishing while isPublish is false and resumes after the rebuild. The ordinary
@@ -3122,6 +3145,10 @@ def main(argv: Optional[List[str]] = None) -> int:
                     help="how long to wait for the first pose before calling the stream stale; "
                          "the host must initialise its IMU first (~17-19 s on this bag), which "
                          "is longer than the steady-state stale limit")
+    ap.add_argument("--host-signal-window-sec", type=float, default=30.0,
+                    help="a host sleep/build signal this recent is treated as evidence that a "
+                         "subsequent pose silence is the host's own recovery, so the hibernation "
+                         "limit applies instead of the steady-state stale limit (0 = off)")
     ap.add_argument("--host-hibernation-max-sec", type=float, default=90.0,
                     help="while the host is in its own hibernation, allow this long without a "
                          "pose before ending with HOST_HIBERNATION_TIMEOUT; the ordinary stale "
@@ -3254,7 +3281,9 @@ def main(argv: Optional[List[str]] = None) -> int:
                                         started, time.time(), args.pose_stale_sec,
                                         host_state=loop.host_native_state,
                                         hibernation_max_s=args.host_hibernation_max_sec,
-                                        first_pose_grace_s=args.first_pose_grace_sec)
+                                        first_pose_grace_s=args.first_pose_grace_sec,
+                                        last_host_signal_wall=loop.last_host_signal_wall,
+                                        recent_signal_window_s=args.host_signal_window_sec)
             driver.input_health = health
             if health.get("status") in ("STALE", "HOST_HIBERNATION_TIMEOUT"):
                 terminal_reason = ("INPUT_STALE" if health.get("status") == "STALE"
