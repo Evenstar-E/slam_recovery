@@ -156,3 +156,27 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
 - `capabilities.json` 增加 `"snapshot_refused_after_host_reset": "until the host publishes odometry again"`；
 - 契约断言增至 **26 项 PASS**（re_slam 置位、snapshot 拒绝、publish 清除、capabilities 声明）；
 - 语法检查 rc=0；**未构建**，二进制仍 v5 `785c0f20…`（v6 需随下次授权构建生效）。
+
+## ⑫ v6 授权 A/B（2026-11-13）：takeover 关段修复成立；E2 仍不可达
+
+- 构建 1 次：v5 `785c0f20…` → **v6 `f167bf5e…`**（休眠期拒快照），退出码 0（`build_v6.log`）。
+
+| run | 录制 | 首次休眠 | 位姿覆盖 | E1 触发 | E2 触发 | takeover/关段 | 收尾 |
+|---|---|---|---|---|---|---|---|
+| **A** `two_event_v6_norec` | 否 | 105.8 s | 1.7–226.5 s | ✔ 115.7 s | ✘（差 3.2 s） | `segment_abandoned=True` | HEALTHY / open=false |
+| **B** `two_event_v6_rec` | 是 | 111.2 s | 1.7–199.8 s | ✔ 115.7 s | ✘（差 29.9 s） | `segment_abandoned=True` | HEALTHY / open=false |
+
+- **driver 的 takeover 后关段修复成立**：两 run 都 `host_reset_during_quarantine(build)` → `segment_abandoned=True` → 终态 HEALTHY、`open=false`。
+- **v6 的 `host_reset_no_map` 未被触发**：两 run 的 E1 armed snapshot 都拿到 `map_points=221815`（当时尚未 `re_slam`），
+  E2 armed snapshot 分别为 1347 点——条件保护未满足即不拒绝，符合设计。
+- **callback A/B 对比**（说明录制不是主因）：
+
+| 回调 | A（不录制） | B（录制） |
+|---|---|---|
+| pose p50 / p95 / mean | 0.07 / 85 / 18 ms | 51 / 393 / 87 ms |
+| scan p50 / p95 / mean | 62.7 / 430 / 94 ms | 1.1 / 171 / 26 ms |
+
+  两 run 方向相反、量级都远高于算法本身，**主导因素是宿主休眠/积压下的突发处理与调度**，不是 `rosbag record`。
+- E2 不可达的量化原因：E2 在 bag 229.7 s，而 driver 的位姿流在 A 止于 226.5 s、B 止于 199.8 s；宿主在 E1 后继续
+  多次 sleep/rebuild，未能在 E2 前恢复稳定发布。
+- `input_fates`：A ingested 1268 / quarantined 982；B 1270 / 980。
