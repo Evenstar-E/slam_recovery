@@ -3275,3 +3275,22 @@ S2 `0802dd2`（`exp/growth-run`，v6 diff 472 行，仅 `-fsyntax-only`）已入
 - 失败保原件、记 FAIL/BLOCKED、不重试、不再构建。
 
 当前状态：授权已下达，构建与两次 run 尚未开始（以 S2 实交为准）。
+
+## 214. v6 两次 run 结果：E1+takeover+rearm 成立、final HEALTHY；E2 仍因宿主提前停发未到；v6 拒快照路径未被触发
+
+授权的 1 次 v6 构建 + 2 次 run（不录制/录制）已完成。S1 核实两份 `run_summary.json` 与 `ctl/ack`：
+
+| run | 回调（n/p50/p95/max/mean, ms） | E1 | E2 | 收尾 |
+|---|---|---|---|---|
+| A 不录制 | pose 2057 / **0.07** / 85 / 289 / **18.3**；scan 1834 / **62.7** / 430 / 1151 / **93.9** | 触发 115.7 s | **未到**（diag max 225.1 s） | HEALTHY，episode 已 abandon+rearm |
+| B 录制 | pose 1742 / **51.0** / 393 / 1024 / **87.5**；scan 2497 / **1.1** / 171 / 472 / **26.0** | 触发 115.7 s | **未到**（diag max 198.4 s） | HEALTHY，episode 已 abandon+rearm |
+
+- **回调成本归属随调度转移，总量不变**：A 的 pose+scan 均值 = 18.3+93.9 = **112.2 ms/对**；B = 87.5+26.0 = **113.5 ms/对**。
+  因此"scan p95 因录制升高"应更正为**同一份成对处理工作被记到不同回调**，不是录制增加成本。
+- **takeover 修复生效**：两 run 的 lifecycle 均为 `segment_abandoned` → `rearm`，`final_state=HEALTHY`、`quarantine_open_at_exit=false`；
+  `frames_unresolved` 保留（A 20 帧、B 24 帧）。
+- **E2 仍未到**：两 run 的帧时间线分别止于 bag 225.1 s / 198.4 s，E2=230.0 s 未被覆盖——宿主在 driver 共存下仍提前进入休眠并停在休眠态。
+- **v6 拒快照路径未被触发**：两次 run 的 snapshot ack 都是 `valid=1`（E1 快照 221815 点、E2 快照 1347 点），
+  没有出现 `host_reset_no_map`。E2 时地图 1347 点是重建后的小图，不是空图；v6 新分支仍需一次能命中的 run 才能验证。
+
+结论：共存四层中前三层已在真实 run 生效；E2 的阻塞是宿主原生发布提前停止（driver 共存下的负载/时序），不是接口或段生命周期。
