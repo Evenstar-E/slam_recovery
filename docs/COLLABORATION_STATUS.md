@@ -2679,3 +2679,21 @@ mapping_velodyne_m2dgr.launch` `/laserMapping` + `aloam_velodyne fastlio_ouster6
 **下一交付（明天第一件事）**：FAST-LIO2 最小可运行恢复切片——relay 替换声明窗口内的测量 → hold + 检查点后重放 → 前端重估 →
 接回与后续帧继续（FAST-LIO2 无后端，后端一致性用 MM-LINS 的 FAST-LIO+PGO 作第二步）。先交一页设计（接口点/状态/改动行数/风险/
 验收判据），经 S1 确认后再动手。
+
+## 177. S1 集成：`docs/four_host/` 分析交付进入 main，并补两处内部一致性限定
+
+本机（S1）在巡检中把 S2 `a4c652f` 的 `docs/four_host/` 四份分析**取入 main**（此前只在 `exp/growth-run`，
+该分支落后 main 46 个提交，且 main 上无此目录）。取入前逐份核对，并就地补了两处限定：
+
+1. `MMLINS_RECOVERY_INTERFACE_20261113.md` §1 与 §0 自相矛盾（§0 已作废"4 节点主拓扑、无测量注入点"，§1 仍原样写
+   "MM-LINS 是 4 节点松耦合流水线 / SC-PGO 上没有注入点"）。按 §0 改为：本 run 实际为 **FAST-LIO 前端 + `alaserPGO` 两节点**，
+   注入面在前端话题订阅（`FAST-LIO/src/laserMapping.cpp:758-759`，与 FAST-LIO2 同构）；4 节点链只适用于 SC-PGO 独立运行模式。
+   §7 未确认项同步改为"两节点时序（SC-PGO 独立模式下为 4 节点）"。
+2. `FOUR_HOST_RECOVERY_COMPARISON_20261113.md` 的 "FAST-LIO2 与共享版逐项一致" 收窄为 **REPORT 表列出的 8 个对比项一致**，
+   并补：不覆盖全轨迹逐条相同；485.08/353.43 m 差异按重建跳变是否计入解释；config/output hash 仍缺；
+   `NATIVE_INDEPENDENT` 是"独立工作区构建的 MM-LINS 派生前端"，不等于宿主源码级独立实现（同 §3 与审阅 `330e594` 口径）。
+
+本机复核证据（未重跑任何宿主）：`run_mmlins.sh:49–56` 两个 roslaunch；`SC-PGO/launch/fastlio_ouster64.launch:28–30,36`
+remap；`FAST-LIO/src/laserMapping.cpp:91,673–698,758–759`（ikdtree / `re_slam` / 订阅面）；`exp/growth-run` 与 remote 同为 `a4c652f`。
+
+状态：四宿主恢复层仍 **NOT_IMPLEMENTED（0/4）**；本轮未开宿主运行、未重跑、未改阈值。
