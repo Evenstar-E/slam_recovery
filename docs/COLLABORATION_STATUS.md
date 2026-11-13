@@ -3005,3 +3005,20 @@ S2 `163cd1d` 撤回"93.0 s"（误把首个配对帧当首帧），按同一首�
 口径：这是**宿主本地**的输入中断，不写成"所有宿主通用故障"；看门狗只负责停止与报错，不重连、不重跑。
 
 **4. 暂停维持**：不构建、不运行、不改宿主；`--pose-stale-sec` 建议在下次授权的 run 里用 15–20 s（由 S2 加入 runner）。
+
+## 195. 更正 §194 的候选原因：通道无逐组点云深拷贝；记录 A/B/C 诊断设计
+
+S2 更正并附源码：`nr_capture_group()` 只做 `g.lidar = Measures.lidar`（shared_ptr）与 `g.imu = Measures.imu`（deque<ConstPtr>），
+**没有点云逐组深拷贝**；`input_fates.jsonl` 是文本缓冲。S1 已在 v4 diff 核对，§194 中"逐组点云/IMU 深拷贝"候选**作废**。
+实际可能的通道开销：①主循环每帧 `nr_apply_pending()`+`nr_apply_deferred()` 各一次互斥（5000 Hz 循环下 ~10k 次/s）；
+②控制线程 5 ms 轮询 `stat(cmd)`；③新增 `/native_recovery/repaired_scan` 订阅（无发布时近零）。
+补充（S1）：环形 4000 组持有 shared_ptr 会**延长点云与 IMU 消息寿命**（本次峰值 RSS 2.17 GB 与量级相符），这是内存压力，不是复制开销。
+
+**A/B/C 诊断设计（S2 提，待授权，不自行执行）**：同一 v4 host、同 bag/260 s：
+- A) 通道关 + 无 driver → 基线，应复现独立 run 的 E1 116 s 停发；
+- B) 通道开 + 无 driver → 判定通道自身开销；
+- C) 通道开 + driver（已做，94.7–96.4 s 停发）。
+A/B/C 的 `/Odometry` 断点位置即可二分"通道开销 vs driver 竞争"。预算：**仅 B 需一次 260 s run**（A 已有独立 run 可作基线，需确认同二进制 v4；
+若严格同二进制，A 也需一次）。
+
+状态不变：不构建、不运行、不改码；二进制 `86f85025…`；原件与 LEDGER 不动；等用户决定。
