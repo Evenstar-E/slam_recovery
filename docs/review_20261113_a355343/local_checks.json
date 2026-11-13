@@ -1,0 +1,75 @@
+{
+  "reviewed_main": "a355343711cf8e8daf71eadbd68677ab4bf7bddb",
+  "comparison": "6b3c7f2610e4dd601a7a2cbca9efa45b527943c0",
+  "command": "C:/Python315/python.exe -I -B docs/review_20261113_a355343/run_checks.py <new-json>",
+  "scope": "fixed source, actual F2 selftest and ordinary counterexamples; no ROS/host/algorithm run",
+  "changed_paths": [
+    "docs/COLLABORATION_STATUS.md",
+    "docs/FASTLIO_ALI_AUTODETECTION_E2_TASK_20261113.md",
+    "docs/ali_h_v1_research/F2_FASTLIO_CHANNEL_ELIGIBILITY.md",
+    "docs/ali_h_v1_research/f2_fastlio_read.py",
+    "docs/ali_h_v1_research/f2_selftest.json",
+    "slam_recovery/ros/recovery_node.py",
+    "slam_recovery/tests/test_host_capabilities.py"
+  ],
+  "task_acceptance": "CONFIRMED_FROM_MAIN_COLLABORATION_STATUS_178",
+  "f2_selftest": {
+    "exit": 0,
+    "pass": true,
+    "cases": 8
+  },
+  "f1_growth_branch_at_fetch": "a4c652fcda5131988dbbcd9feb82743b4e69fe80",
+  "f1_growth_branch_observed_now": "a4c652fcda5131988dbbcd9feb82743b4e69fe80",
+  "f1_native_source_available_in_fetched_growth_branch": false,
+  "findings": {
+    "F2_MISSING_RUN_ID_ACCEPTED": {
+      "status": "CONFIRMED",
+      "actual": {
+        "mixed_run_ids": false,
+        "pairing": "PASS",
+        "I_rows": 2,
+        "row_status": {
+          "OK": 2
+        }
+      },
+      "expected": "missing required run_id must invalidate identity and exclude pairing PASS"
+    },
+    "F2_NO_PAIR_COEXISTS_WITH_PAIRING_PASS": {
+      "status": "CONFIRMED",
+      "actual": {
+        "pairing": "PASS",
+        "row_status": {
+          "OK": 1,
+          "NO_PAIR": 1
+        }
+      },
+      "expected": "complete-pair qualification cannot PASS with a required post missing"
+    },
+    "F2_SUPPORT_WITHOUT_SAMPLE_COUNT_SUPPORTED": {
+      "status": "CONFIRMED",
+      "actual": "SUPPORTED",
+      "input_support": {
+        "pass_fraction": 1.0
+      },
+      "expected": "UNKNOWN_CONTEXT without the declared 200-sample support"
+    },
+    "F3_SKIPPED_EPISODE_NOT_UNRESOLVED": {
+      "status": "CONFIRMED",
+      "ingested": 1,
+      "sum_of_four_declared_categories": 0,
+      "unresolved": [],
+      "segments_decision_skipped": 1
+    },
+    "F3_OVERLAP_DOUBLE_COUNT_NOT_UNRESOLVED": {
+      "status": "CONFIRMED",
+      "ingested": 1,
+      "sum_of_four_declared_categories": 2,
+      "unresolved": []
+    }
+  },
+  "hashes": {
+    "docs/ali_h_v1_research/f2_fastlio_read.py": "a2ce84f3369b5248ae4982e718b64546c1aca9293e7331c356154b6a3d80fd6e",
+    "docs/ali_h_v1_research/t2_run.py": "ff85dcc182117c6998034b976bd9183d8740afd035a5afe8331c7cd150c3a474",
+    "slam_recovery/ros/recovery_node.py": "82e0785ba0c0f848828bb07254b15c7a6d2c2e3c2ffa6ea2c1aaab03a9bafdf9"
+  }
+}
