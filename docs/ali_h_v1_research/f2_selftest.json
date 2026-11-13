@@ -62,6 +62,19 @@
    "flag": true,
    "pairing": "INVALID_MIXED_RUN_IDS",
    "pass": true
+  },
+  "text_block_header": {
+   "bad": [],
+   "e_I": [
+    0.0,
+    0.0,
+    0.0,
+    0.1,
+    0.0,
+    0.0
+   ],
+   "support": "SUPPORTED",
+   "pass": true
   }
  }
 }

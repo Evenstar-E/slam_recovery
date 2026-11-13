@@ -6,7 +6,8 @@ computes e_I from same-update pre/post poses with the validated T2 SE(3) Log (mi
 V^-1), keeps every row in the denominator, and reports per-row/per-block eligibility. With no
 calibration segment every block is UNKNOWN; that is the intended honest output, not a failure.
 
-Canonical input: JSONL, one object per update. Required keys:
+Canonical input: JSONL, one object per update, or a '# name ...' whitespace table with the same
+numbers (the FAST-LIVO2 trace style, including pose7/pre_pose7 block names). Required keys:
   run_id, update_id, lidar_beg_ns, has_out
   pre, post  = {"x","y","z","qx","qy","qz","qw"}   (required when has_out == 1)
 Optional keys: lidar_end_ns, rel_s, phase, grp_idx, eff, feats_down_size, feats_in,
@@ -107,7 +108,116 @@ def _support_class(sup: Any) -> str:
     return "SUPPORTED" if frac >= SUPPORT_MIN_FRAC else "LOW"
 
 
-def read_export(path: str) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+def _expand_header(names: List[str]) -> List[str]:
+    """Expand a block token (pose7/pre_pose7) into seven leaves, in place."""
+    out: List[str] = []
+    for name in names:
+        if name == "pose7":
+            out += [f"pose_{k}" for k in ("x", "y", "z", "qx", "qy", "qz", "qw")]
+        elif name == "pre_pose7":
+            out += [f"pre_pose_{k}" for k in ("x", "y", "z", "qx", "qy", "qz", "qw")]
+        else:
+            out.append(name)
+    return out
+
+
+def _find(names: List[str], aliases: Tuple[str, ...]) -> Optional[int]:
+    for a in aliases:
+        if a in names:
+            return names.index(a)
+    return None
+
+
+def _pose_idx(names: List[str], aliases: Tuple[str, ...]) -> Optional[List[int]]:
+    """Find seven consecutive named leaves for one pose."""
+    for a in aliases:
+        idx = [names.index(f"{a}_{k}") if f"{a}_{k}" in names else -1
+               for k in ("x", "y", "z", "qx", "qy", "qz", "qw")]
+        if all(i >= 0 for i in idx):
+            return idx
+    return None
+
+
+def read_text(path: str, run_id: str = "TEXT") -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """Read a header-named whitespace table (the FAST-LIVO2 trace style). No guessing: an
+    unrecognized or incomplete header is an error, not a partial parse."""
+    rows, bad, names = [], [], None
+    with open(path, encoding="utf-8") as fh:
+        for lineno, line in enumerate(fh, 1):
+            s = line.strip()
+            if not s:
+                continue
+            if s.startswith("#"):
+                p = s.lstrip("#").strip().split()
+                if p and p[0] not in ("idx",) and names is None and len(p) > 2:
+                    names = _expand_header(p)
+                elif p and p[0] == "idx" and names is None:
+                    names = _expand_header(p)
+                continue
+            if names is None:
+                bad.append({"line": lineno, "reason": "data_before_header"})
+                continue
+            f = s.split()
+            if len(f) != len(names):
+                bad.append({"line": lineno, "reason": f"ncols:{len(f)}!={len(names)}"})
+                continue
+            rows.append({names[i]: float(f[i]) for i in range(len(names))})
+    if names is None:
+        raise SystemExit(f"{path}: no '#' header line found; cannot read as text table")
+    post = _pose_idx(names, ("post", "pose", "cur", "out"))
+    pre = _pose_idx(names, ("pre", "pre_pose", "prior", "prop"))
+    i_uid = _find(names, ("update_id", "upd_id", "uid", "idx"))
+    i_ns = _find(names, ("lidar_beg_ns", "scan_stamp_ns", "abs_ns", "stamp_ns", "lidar_ns"))
+    i_out = _find(names, ("has_out",))
+    i_rel = _find(names, ("rel_s",))
+    i_phase = _find(names, ("phase",))
+    i_eff = _find(names, ("eff", "effct_feat_num"))
+    missing = [n for n, i in (("update_id", i_uid), ("lidar_beg_ns", i_ns),
+                              ("has_out", i_out), ("post pose", post), ("pre pose", pre)) if i is None]
+    if missing:
+        raise SystemExit(f"{path}: header lacks required fields: {', '.join(missing)}; "
+                         f"header={names}")
+    i_nis = _find(names, ("nis", "r_chi2w", "chi2w"))
+    i_sup_n = _find(names, ("support_n", "sup_n"))
+    i_sup_k = _find(names, ("support_pass", "sup_k", "support_valid"))
+    out = []
+    for r in rows:
+        obj: Dict[str, Any] = {
+            "run_id": run_id,
+            "update_id": int(r[names[i_uid]]),
+            "lidar_beg_ns": int(r[names[i_ns]]),
+            "has_out": int(r[names[i_out]]),
+        }
+        if i_rel is not None:
+            obj["rel_s"] = r[names[i_rel]]
+        if i_phase is not None:
+            obj["phase"] = int(r[names[i_phase]])
+        if i_eff is not None:
+            obj["eff"] = int(r[names[i_eff]])
+        if i_nis is not None:
+            obj["nis"] = r[names[i_nis]]
+        if i_sup_n is not None and i_sup_k is not None:
+            obj["support"] = {"n": int(r[names[i_sup_n]]), "pass": int(r[names[i_sup_k]])}
+        if obj["has_out"] == 1:
+            obj["post"] = {k: r[names[j]] for k, j in zip(POSE_KEYS, post)}
+            obj["pre"] = {k: r[names[j]] for k, j in zip(POSE_KEYS, pre)}
+        out.append(obj)
+    return out, bad
+
+
+def read_export(path: str, fmt: str = "auto", run_id: str = "TEXT") -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    if fmt == "auto":
+        with open(path, encoding="utf-8") as fh:
+            for line in fh:
+                s = line.strip()
+                if not s:
+                    continue
+                fmt = "jsonl" if s.startswith("{") else ("text" if s.startswith("#") else "")
+                break
+    if fmt == "text":
+        return read_text(path, run_id=run_id)
+    if fmt != "jsonl":
+        raise SystemExit(f"{path}: unrecognized format; expected JSONL or a '# name ...' header")
     rows, bad = [], []
     with open(path, encoding="utf-8") as fh:
         for lineno, line in enumerate(fh, 1):
@@ -318,8 +428,8 @@ def summarize(q: Dict[str, Any], bl: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def run(export: str, out_prefix: str) -> int:
-    rows, bad = read_export(export)
+def run(export: str, out_prefix: str, fmt: str = "auto", run_id: str = "TEXT") -> int:
+    rows, bad = read_export(export, fmt=fmt, run_id=run_id)
     q = qualify(rows)
     q["bad_lines"].extend(bad)
     bl = blocks(q["rows"])
@@ -397,6 +507,24 @@ def selftest() -> int:
                             "pass": bool(s8["mixed_run_ids"]
                                          and s8["qualification"]["SAME_UPDATE_ID_PAIRING"]
                                          == "INVALID_MIXED_RUN_IDS")}
+    # Text table with block names (pose7/pre_pose7) must parse to the same e_I.
+    import tempfile
+    hdr = ("# update_id lidar_beg_ns has_out eff support_n support_pass "
+           "pre_pose7 pose7")
+    line = "1 0 1 100 200 130 0 0 0 0 0 0 1 0.1 0 0 0 0 0 1"
+    tmp = tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False)
+    try:
+        tmp.write(hdr + "\n" + line + "\n")
+        tmp.close()
+        trows, tbad = read_text(tmp.name, run_id="SYN")
+        q9 = qualify(trows)
+        e9 = np.array(q9["rows"][0]["e_I"])
+        out["text_block_header"] = {
+            "bad": tbad, "e_I": e9.tolist(), "support": q9["rows"][0]["support"],
+            "pass": bool(not tbad and np.allclose(e9, [0, 0, 0, 0.1, 0, 0], atol=1e-12)
+                         and q9["rows"][0]["support"] == "SUPPORTED")}
+    finally:
+        os.unlink(tmp.name)
     ok = all(v["pass"] for v in out.values())
     print(json.dumps({"pass": ok, "cases": out}, indent=1, ensure_ascii=False))
     return 0 if ok else 1
@@ -409,8 +537,11 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--export", required=True)
     ap.add_argument("--out-prefix", default=os.path.join(HERE, "f2_fastlio"))
+    ap.add_argument("--format", choices=("auto", "jsonl", "text"), default="auto")
+    ap.add_argument("--run-id", default="TEXT",
+                    help="run id for a text table that has no run_id column")
     args = ap.parse_args(argv)
-    return run(args.export, args.out_prefix)
+    return run(args.export, args.out_prefix, fmt=args.format, run_id=args.run_id)
 
 
 if __name__ == "__main__":
