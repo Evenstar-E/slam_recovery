@@ -1,0 +1,3 @@
+[INFO] [1794559961.621104]: [slam_recovery] listening on /Odometry and /velodyne_points (repair publisher: on)
+[ERROR] [1794560117.624621]: [slam_recovery] pose stream stale for 15.2 s (last pose 1711547999675624847); host stopped publishing, stopping the run
+[INFO] [1794560118.064600]: [slam_recovery] wrote 1 candidate rows to /tmp/wt-sim/docs/four_host/fastlio_recovery_20261113/two_event_v7_authorized

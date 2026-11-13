@@ -1,0 +1,15 @@
+path:         /tmp/wt-sim/docs/four_host/fastlio_recovery_20261113/two_event_v7_authorized/frontend.bag
+version:      2.0
+duration:     4:19s (259s)
+start:        Nov 13 2026 16:52:59.24 (1794559979.24)
+end:          Nov 13 2026 16:57:18.82 (1794560238.82)
+size:         799.9 KB
+messages:     2096
+compression:  lz4 [3/3 chunks; 49.28%]
+uncompressed:   1.5 MB @ 6.0 KB/s
+compressed:   766.8 KB @ 3.0 KB/s (49.28%)
+types:        nav_msgs/Odometry [cd5e73d190d741a2f92e81eda573aca7]
+              std_msgs/Bool     [8b94c1b53db61fb6aed406028ad6332a]
+topics:       /Isbuilding      4 msgs    : std_msgs/Bool    
+              /Issleeping      4 msgs    : std_msgs/Bool    
+              /Odometry     2088 msgs    : nav_msgs/Odometry

@@ -1,0 +1,10 @@
+fim_ms: 35.833
+nis_ms: 11.703
+grid_build_ms_reference: 668.614
+grid_query1500_ms: 93.708
+total_ms: 47.536
+rate_hz: 10.0
+core_fraction: 0.475
+max_core_fraction: 0.25
+status: FAIL
+bench_exit=1

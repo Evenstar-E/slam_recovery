@@ -30,7 +30,8 @@ rosnode list | grep -q '^/laserMapping$' || { echo "BLOCKED: host did not start"
 $PY -u -I -c "import sys; sys.path.insert(0,'/home/R26534/MM-LINS'); import runpy; runpy.run_module('slam_recovery.ros.recovery_node', run_name='__main__')" \
   --run-dir "$OUT" --pose-topic /Odometry --scan-topic /velodyne_points --checkpoint-dir "$CTL" \
   --scripted-trigger-stamps "${E1},${E2}" --detection off --repair-publish \
-  --repair-sync-timeout-sec 5 --wait-limit-sec 20 --pose-stale-sec 15 --first-pose-grace-sec 60 \
+  --require-contract --repair-sync-timeout-sec 5 --wait-limit-sec 20 --pose-stale-sec 15 \
+  --first-pose-grace-sec 60 \
   --host-hibernation-max-sec 90 --host-sleep-topic /Issleeping --host-build-topic /Isbuilding \
   --duration-sec "$DUR" \
   > "$OUT/recovery_node.log" 2>&1 & NODE=$!

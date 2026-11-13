@@ -1,0 +1,715 @@
+Multi thread started 
+p_pre->lidar_type 2
+[0m[ INFO] [1794559955.358371286]: [NATIVE_RECOVERY] channel on /tmp/wt-sim/docs/four_host/fastlio_recovery_20261113/two_event_v7_authorized/ctl[0m
+[0m[ INFO] [1794559979.017607009]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Over-degeneracy has happened, publish hibernating map operation!!!!!!!!!!!!!
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560095.511208407]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560095.810958718]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560096.112012052]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560096.410996198]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560096.710503320]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560097.111498685]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560097.712544211]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560098.610814047]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560098.911032195]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560099.213600118]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560099.510526459]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560100.410578906]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560100.710994949]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560101.110778971]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560101.410504758]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560101.710559940]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560102.010168428]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560102.310357813]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560102.610280475]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560102.910089802]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560103.211119337]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560103.512048387]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560103.811035604]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560104.110447864]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560104.410798830]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560104.710451620]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560105.012385367]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560105.310246656]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560105.610330808]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560105.912629827]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560106.212738306]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560106.510732401]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560106.812385999]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560107.110534270]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560107.410440907]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560107.710391700]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560108.010503640]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560108.310754168]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560108.610482398]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560108.911899636]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560109.210714942]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560109.510648212]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560109.810512442]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560110.110575060]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560110.411074861]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560110.710759201]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560111.010551117]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560111.310920182]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560111.613482108]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560111.910626291]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560112.214168547]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560112.511374764]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560112.810618540]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560113.111255394]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560113.412585746]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560113.710712735]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560114.012753328]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560114.311147694]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560114.612249032]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560114.914295594]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560115.210862514]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560115.511007241]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560115.811771789]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560116.113598641]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560116.413802809]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560116.711262779]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560117.012761786]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560117.311891503]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560117.610934876]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560117.911012051]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560118.210832081]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560118.510757853]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560118.811794502]: IMU Initial Done[0m
+Over-degeneracy has disappear, construct a new map.....................
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Over-degeneracy has happened, publish hibernating map operation!!!!!!!!!!!!!
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560144.112657755]: IMU Initial Done[0m
+Over-degeneracy has disappear, construct a new map.....................
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Over-degeneracy has happened, publish hibernating map operation!!!!!!!!!!!!!
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560193.811470729]: IMU Initial Done[0m
+Over-degeneracy has disappear, construct a new map.....................
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Over-degeneracy has happened, publish hibernating map operation!!!!!!!!!!!!!
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560209.410273204]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560209.710300074]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560210.010301323]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560210.310109368]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560210.610177433]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560210.910185633]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560211.210200827]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560211.510334066]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560211.810171906]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560212.110327486]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560212.512632463]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560212.810249277]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560213.210307847]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560213.510596286]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560213.810214493]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560214.108508954]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560214.408328842]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560214.707696468]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560215.008190168]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560215.308074780]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560215.607711717]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560215.908192545]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560216.208340976]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560216.508010603]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560216.808688334]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560217.108248872]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560217.407470309]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560217.707733865]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560218.007435200]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560218.310488368]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560218.610390638]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560218.910514565]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560219.307622011]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560219.510574294]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560219.810618567]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560220.110876333]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560220.410585988]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560220.710692936]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560221.010690513]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560221.310736556]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560221.610708282]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560221.910702065]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560222.210692614]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560222.510892535]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560222.810815712]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560223.110886481]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560223.410854195]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560223.710872676]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560224.010775189]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560224.310798645]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560224.610842137]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560224.908735293]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560225.209745117]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560225.508076289]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560225.809726304]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560226.108966227]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560226.408251597]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560226.709209517]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560227.007948337]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560227.308196498]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560227.608923500]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560227.909743472]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560228.208100447]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560228.508151396]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560228.809529459]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560229.109739796]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560229.408450873]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560229.708021160]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560230.007723832]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560230.308133579]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560230.612588270]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560230.908859817]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560231.208238684]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560231.508348631]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560231.808785358]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560232.207913048]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560232.507723467]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560232.807542762]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560233.107794594]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560233.408163976]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560233.708189580]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560234.007813687]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560234.508929953]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560234.808688952]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560235.107805686]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560235.407580450]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794560235.707934979]: IMU Initial Done[0m
+Over-degeneracy has disappear, construct a new map.....................
+[33m[ WARN] [1794560262.092018810]: catch sig 2[0m
+Rebuild thread terminated normally
+... logging to /home/R26534/.ros/log/838bdd1a-df3f-11f1-ad73-0242ac11003a/roslaunch-DEV-99bef9-1120333.log
+Checking log directory for disk usage. This may take a while.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+]2;/home/R26534/fastlio2_ws/src/FAST-LIO/launch/mapping_velodyne_m2dgr.launch
+[1mstarted roslaunch server http://127.0.0.1:42825/[0m
+
+SUMMARY
+========
+
+PARAMETERS
+ * /common/imu_topic: /imu_raw
+ * /common/lid_topic: /velodyne_points
+ * /common/time_sync_en: False
+ * /cube_side_length: 1000.0
+ * /dense_publish_enable: True
+ * /feature_extract_enable: False
+ * /filter_size_map: 0.5
+ * /filter_size_surf: 0.5
+ * /mapping/acc_cov: 0.1
+ * /mapping/b_acc_cov: 0.0001
+ * /mapping/b_gyr_cov: 0.0001
+ * /mapping/det_range: 100.0
+ * /mapping/extrinsic_R: [1, -0.011619, -0...
+ * /mapping/extrinsic_T: [0, 0, 0]
+ * /mapping/fov_degree: 180
+ * /mapping/gyr_cov: 0.1
+ * /max_iteration: 3
+ * /pcd_save_enable: False
+ * /point_filter_num: 4
+ * /preprocess/blind: 4
+ * /preprocess/lidar_type: 2
+ * /preprocess/scan_line: 64
+ * /publish/dense_publish_en: ture
+ * /publish/scan_bodyframe_pub_en: True
+ * /publish/scan_publish_en: True
+ * /rosdistro: noetic
+ * /rosversion: 1.17.0
+ * /runtime_pos_log_enable: False
+ * /scan_publish_enable: True
+
+NODES
+  /
+    laserMapping (fast_lio/fastlio_mapping)
+
+[1mROS_MASTER_URI=http://127.0.0.1:45017[0m
+]2;/home/R26534/fastlio2_ws/src/FAST-LIO/launch/mapping_velodyne_m2dgr.launch http://127.0.0.1:45017
+[1mprocess[laserMapping-1]: started with pid [1121282][0m
+[laserMapping-1] killing on exit
+shutting down processing monitor...
+... shutting down processing monitor complete
+[1mdone[0m
