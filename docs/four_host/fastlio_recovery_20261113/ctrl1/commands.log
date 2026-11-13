@@ -1,0 +1,19 @@
+== status before
+OK status valid=0 repair_received=0 repair_applied=0 frame=42 stamp_ns=1711547887876570368 map_writes=released
+== capabilities
+OK capabilities written
+== hold
+OK hold valid=1 stamp_ns=1711547888076553984 frame=44 map_writes=held
+== snapshot A
+OK snapshot valid=1 stamp_ns=1711547889076467712 frame=54 map_points=10648
+== resume
+OK resume valid=1 stamp_ns=1711547889476450304 frame=58 map_writes=released
+== publish repaired cloud
+== restore
+OK restore valid=1 stamp_ns=1711547889076467712 frame=54
+== reprocess
+OK reprocess queued
+== snapshot B
+TIMEOUT waiting for ack of snapshot
+== status after
+TIMEOUT waiting for ack of status
