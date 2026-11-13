@@ -1,0 +1,19 @@
+== status before
+OK status valid=0 repair_received=0 repair_applied=0 frame=177 stamp_ns=1711547901276837120 map_writes=released
+== capabilities
+OK capabilities written
+== hold
+OK hold valid=1 stamp_ns=1711547901476817920 frame=179 map_writes=held
+== snapshot A
+OK snapshot valid=1 stamp_ns=1711547902576681472 frame=190 map_points=27513
+== resume
+OK resume valid=1 stamp_ns=1711547902676749568 frame=191 map_writes=released
+== publish repaired cloud
+== restore
+OK restore valid=1 stamp_ns=1711547902576681472 frame=190
+== reprocess
+OK reprocess replay_suffix=0 replay_within_end=83 repaired_fed=1 source=buffer
+== snapshot B
+OK snapshot valid=1 stamp_ns=1711547918976743168 frame=354 map_points=71690
+== status after
+OK status valid=1 repair_received=1 repair_applied=1 frame=355 stamp_ns=1711547919076691200 map_writes=released

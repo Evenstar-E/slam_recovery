@@ -1,0 +1,60 @@
+Multi thread started 
+p_pre->lidar_type 2
+Failed to find match for field 'normal_x'.
+Failed to find match for field 'normal_y'.
+Failed to find match for field 'normal_z'.
+Failed to find match for field 'curvature'.
+[33m[ WARN] [1794536539.131286490]: catch sig 2[0m
+[31m[laserMapping-1] escalating to SIGTERM[0m
+... logging to /home/R26534/.ros/log/a769614e-df08-11f1-839c-0242ac11003a/roslaunch-DEV-99bef9-895274.log
+Checking log directory for disk usage. This may take a while.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+]2;/home/R26534/fastlio2_ws/src/FAST-LIO/launch/mapping_velodyne_m2dgr.launch
+[1mstarted roslaunch server http://127.0.0.1:41189/[0m
+
+SUMMARY
+========
+
+PARAMETERS
+ * /common/imu_topic: /imu_raw
+ * /common/lid_topic: /velodyne_points
+ * /common/time_sync_en: False
+ * /cube_side_length: 1000.0
+ * /dense_publish_enable: True
+ * /feature_extract_enable: False
+ * /filter_size_map: 0.5
+ * /filter_size_surf: 0.5
+ * /mapping/acc_cov: 0.1
+ * /mapping/b_acc_cov: 0.0001
+ * /mapping/b_gyr_cov: 0.0001
+ * /mapping/det_range: 100.0
+ * /mapping/extrinsic_R: [1, -0.011619, -0...
+ * /mapping/extrinsic_T: [0, 0, 0]
+ * /mapping/fov_degree: 180
+ * /mapping/gyr_cov: 0.1
+ * /max_iteration: 3
+ * /pcd_save_enable: False
+ * /point_filter_num: 4
+ * /preprocess/blind: 4
+ * /preprocess/lidar_type: 2
+ * /preprocess/scan_line: 64
+ * /publish/dense_publish_en: ture
+ * /publish/scan_bodyframe_pub_en: True
+ * /publish/scan_publish_en: True
+ * /rosdistro: noetic
+ * /rosversion: 1.17.0
+ * /runtime_pos_log_enable: False
+ * /scan_publish_enable: True
+
+NODES
+  /
+    laserMapping (fast_lio/fastlio_mapping)
+
+[1mROS_MASTER_URI=http://127.0.0.1:42113[0m
+]2;/home/R26534/fastlio2_ws/src/FAST-LIO/launch/mapping_velodyne_m2dgr.launch http://127.0.0.1:42113
+[1mprocess[laserMapping-1]: started with pid [896212][0m
+[laserMapping-1] killing on exit
+shutting down processing monitor...
+... shutting down processing monitor complete
+[1mdone[0m
