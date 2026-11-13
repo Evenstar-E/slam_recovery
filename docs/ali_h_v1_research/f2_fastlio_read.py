@@ -92,7 +92,11 @@ def _quat_norm(p: np.ndarray) -> float:
 
 
 def _support_class(sup: Any) -> str:
-    """Map a support record to the ALI-H context. Never guess: absent -> UNKNOWN_CONTEXT."""
+    """Map a support record to the ALI-H context. Never guess: absent -> UNKNOWN_CONTEXT.
+
+    A pass fraction without the 200-sample count is not a support estimate: the predicate is
+    defined over 200 deterministic samples, so n must be present and >= 200.
+    """
     if not isinstance(sup, dict):
         return "UNKNOWN_CONTEXT"
     n = _int(sup, "n")
@@ -100,10 +104,9 @@ def _support_class(sup: Any) -> str:
     frac = _float(sup, "pass_fraction")
     if frac is None and n and k is not None:
         frac = k / float(n)
-    if frac is None:
-        # A bare boolean is a single sample, not a 200-sample support estimate.
+    if frac is None or n is None or n < SUPPORT_SAMPLES:
         return "UNKNOWN_CONTEXT"
-    if n is not None and n < SUPPORT_SAMPLES:
+    if not (0.0 <= frac <= 1.0):
         return "UNKNOWN_CONTEXT"
     return "SUPPORTED" if frac >= SUPPORT_MIN_FRAC else "LOW"
 
@@ -241,14 +244,23 @@ def qualify(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
     dup: List[Dict[str, Any]] = []
     out_rows: List[Dict[str, Any]] = []
     counts = Counter()
+    run_ids = set()
+    missing_run_id = 0
 
-    run_ids = {r.get("run_id") for r in rows if r.get("run_id")}
     for r in rows:
+        run_id = r.get("run_id")
+        run_ok = isinstance(run_id, str) and bool(run_id.strip())
+        if run_ok:
+            run_ids.add(run_id.strip())
+        elif run_id is not None:
+            # A non-string run id is malformed, not a valid identity.
+            run_ok = False
         uid = _int(r, "update_id")
         lidar_ns = _int(r, "lidar_beg_ns")
         has_out = _int(r, "has_out")
         rec: Dict[str, Any] = {
-            "line": r.get("__line__"), "update_id": uid, "lidar_beg_ns": lidar_ns,
+            "line": r.get("__line__"), "run_id": run_id, "update_id": uid,
+            "lidar_beg_ns": lidar_ns,
             "lidar_end_ns": _int(r, "lidar_end_ns"), "rel_s": _float(r, "rel_s"),
             "phase": _int(r, "phase"), "has_out": has_out,
             "eff": _int(r, "eff"), "feats_down_size": _int(r, "feats_down_size"),
@@ -256,25 +268,36 @@ def qualify(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
             "dof_M": _int(r, "dof_M"), "support": _support_class(r.get("support")),
             "status": "OK", "reasons": [],
         }
+        identity_ok = True
+        if not run_ok:
+            identity_ok = False
+            rec["status"] = "INVALID_ROW"
+            rec["reasons"].append("missing_run_id")
+            missing_run_id += 1
         if uid is None:
+            identity_ok = False
             rec["status"] = "INVALID_ROW"
             rec["reasons"].append("missing_update_id")
         elif uid in seen:
+            identity_ok = False
             rec["status"] = "INVALID_ROW"
             rec["reasons"].append(f"duplicate_update_id:{seen[uid]}")
             dup.append({"update_id": uid, "lines": [seen[uid], r.get("__line__")]})
         else:
             seen[uid] = r.get("__line__")
         if lidar_ns is None:
+            identity_ok = False
             rec["status"] = "INVALID_ROW"
             rec["reasons"].append("missing_lidar_beg_ns")
         if has_out not in (0, 1):
+            identity_ok = False
             rec["status"] = "INVALID_ROW"
             rec["reasons"].append("missing_or_invalid_has_out")
 
-        pre = _p7(r.get("pre"), "pre") if has_out == 1 else None
-        post = _p7(r.get("post"), "post") if has_out == 1 else None
-        if has_out == 1:
+        # Only an identity-valid row may contribute a pose pair or an e_I sample.
+        if identity_ok and has_out == 1:
+            pre = _p7(r.get("pre"), "pre")
+            post = _p7(r.get("post"), "post")
             if pre is None or post is None:
                 rec["status"] = "NO_PAIR"
                 rec["reasons"].append("missing_pre_or_post")
@@ -313,7 +336,8 @@ def qualify(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
         rec["verdict_reason"] = "NO_CALIBRATION_REFERENCE"
 
     return {"rows": out_rows, "bad_lines": [], "duplicates": dup,
-            "run_ids": sorted(x for x in run_ids if x), "counts": dict(counts)}
+            "run_ids": sorted(run_ids), "missing_run_id_rows": missing_run_id,
+            "counts": dict(counts)}
 
 
 def blocks(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -385,12 +409,33 @@ def _quantiles(vals: List[float]) -> Dict[str, Any]:
             "max": float(a.max())}
 
 
+def _pairing_status(q: Dict[str, Any]) -> str:
+    """Full-pair qualification. A partial population is not PASS: identity failures, missing
+    pairs, duplicates and malformed lines all block it while their rows stay in the denominator."""
+    if len(q["run_ids"]) > 1:
+        return "INVALID_MIXED_RUN_IDS"
+    if q["missing_run_id_rows"] > 0:
+        return "INCOMPLETE_MISSING_RUN_ID"
+    if q["bad_lines"]:
+        return "INCOMPLETE_BAD_LINES"
+    if q["duplicates"]:
+        return "INVALID_DUPLICATE_UPDATE_ID"
+    if q["counts"].get("NO_PAIR", 0) > 0:
+        return "INCOMPLETE_MISSING_PAIR"
+    if q["counts"].get("INVALID_ROW", 0) > 0:
+        return "INVALID_ROWS_PRESENT"
+    if q["counts"].get("OK", 0) == 0:
+        return "NOT_AVAILABLE"
+    return "PASS"
+
+
 def summarize(q: Dict[str, Any], bl: Dict[str, Any]) -> Dict[str, Any]:
     rows = q["rows"]
     e = [r["e_norm2"] for r in rows if r.get("e_norm2") is not None]
     return {
         "run_ids": q["run_ids"],
         "mixed_run_ids": len(q["run_ids"]) > 1,
+        "missing_run_id_rows": q["missing_run_id_rows"],
         "rows": len(rows),
         "bad_lines": q["bad_lines"],
         "duplicates": q["duplicates"],
@@ -407,10 +452,7 @@ def summarize(q: Dict[str, Any], bl: Dict[str, Any]) -> Dict[str, Any]:
         "qualification": {
             # The file can prove unique update ids and complete pairs; only the C++ producer can
             # prove the two states came from the same update call. Keep the two claims separate.
-            "SAME_UPDATE_ID_PAIRING": ("INVALID_MIXED_RUN_IDS" if len(q["run_ids"]) > 1 else
-                                       ("PASS" if q["counts"].get("OK", 0) and not q["duplicates"]
-                                        and all(r.get("update_id") is not None for r in rows)
-                                        else "NOT_AVAILABLE")),
+            "SAME_UPDATE_ID_PAIRING": _pairing_status(q),
             "SAME_UPDATE_CALL_BINDING": "ASSERTED_BY_PRODUCER_NOT_VERIFIED_FROM_FILE",
             "PRE_POST_POSE_SANITY": ("PASS" if e else "NOT_AVAILABLE"),
             "PRE_POST_POSE_IDENTITY": "ASSERTED_NOT_VERIFIED",
@@ -473,11 +515,20 @@ def selftest() -> int:
     out["pure_rotation"] = {"e_I": e2.tolist(),
                             "pass": bool(np.allclose(e2[:3], rot, atol=1e-9)
                                          and np.allclose(e2[3:], 0, atol=1e-9))}
-    # Missing post with has_out=1 must stay in the denominator as NO_PAIR.
-    q3 = qualify([mk(3, 0, ident, tr + ident[3:]), {"update_id": 4, "lidar_beg_ns": 1,
-                                                    "has_out": 1, "pre": dict(zip(POSE_KEYS, ident))}])
+    # Missing post with has_out=1 must stay in the denominator as NO_PAIR; the complete-pair
+    # qualification must not be PASS when a pair is missing.
+    q3 = qualify([mk(3, 0, ident, tr + ident[3:]),
+                  {"run_id": "SYNTH", "update_id": 4, "lidar_beg_ns": 1, "has_out": 1,
+                   "pre": dict(zip(POSE_KEYS, ident))}])
+    s3 = summarize(q3, blocks(q3["rows"]))
     out["missing_post"] = {"statuses": q3["counts"], "rows": len(q3["rows"]),
-                           "pass": q3["counts"].get("NO_PAIR") == 1 and len(q3["rows"]) == 2}
+                           "pairing": s3["qualification"]["SAME_UPDATE_ID_PAIRING"],
+                           "I_rows": s3["I_rows"],
+                           "pass": bool(q3["counts"].get("NO_PAIR") == 1
+                                        and q3["counts"].get("OK") == 1
+                                        and len(q3["rows"]) == 2 and s3["I_rows"] == 1
+                                        and s3["qualification"]["SAME_UPDATE_ID_PAIRING"]
+                                        == "INCOMPLETE_MISSING_PAIR")}
     # eff=0 with zero Log is flagged, not dropped.
     q4 = qualify([mk(5, 0, ident, ident, eff=0)])
     r4 = q4["rows"][0]
@@ -498,6 +549,24 @@ def selftest() -> int:
     q7 = qualify([mk(9, 0, ident, tr + ident[3:], support={"pass": True})])
     out["support_guard"] = {"class": q7["rows"][0]["support"],
                             "pass": q7["rows"][0]["support"] == "UNKNOWN_CONTEXT"}
+    # A pass fraction without the 200-sample count is not a support estimate either.
+    q7b = qualify([mk(9, 0, ident, tr + ident[3:], support={"pass_fraction": 1.0})])
+    out["support_fraction_only"] = {"class": q7b["rows"][0]["support"],
+                                    "pass": q7b["rows"][0]["support"] == "UNKNOWN_CONTEXT"}
+    # A row without run_id is INVALID and cannot contribute e_I or make pairing PASS.
+    r_no_id = mk(12, 0, ident, tr + ident[3:])
+    r_no_id.pop("run_id")
+    q10 = qualify([mk(13, 1, ident, tr + ident[3:]), r_no_id])
+    s10 = summarize(q10, blocks(q10["rows"]))
+    out["missing_run_id"] = {
+        "statuses": q10["counts"], "rows": len(q10["rows"]),
+        "missing_run_id_rows": s10["missing_run_id_rows"], "I_rows": s10["I_rows"],
+        "pairing": s10["qualification"]["SAME_UPDATE_ID_PAIRING"],
+        "pass": bool(q10["counts"].get("INVALID_ROW") == 1
+                     and q10["counts"].get("OK") == 1
+                     and s10["missing_run_id_rows"] == 1 and s10["I_rows"] == 1
+                     and s10["qualification"]["SAME_UPDATE_ID_PAIRING"]
+                     == "INCOMPLETE_MISSING_RUN_ID")}
     # Two run ids in one export must not be glued.
     q8 = qualify([mk(10, 0, ident, tr + ident[3:]),
                   {**mk(11, 1, ident, tr + ident[3:]), "run_id": "OTHER"}])

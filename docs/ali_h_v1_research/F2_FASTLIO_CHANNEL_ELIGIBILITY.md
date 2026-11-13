@@ -144,7 +144,7 @@ B2/B3 未解除前，本 host 只能交“资格/UNKNOWN/单位权 shadow”，�
 1. 本契约与读取器 `f2_fastlio_read.py`（接受 §4 的 JSONL，或 `# name ...` 空白表；按名读取，
    `pose7`/`pre_pose7` 块名可展开；复用 T2 的 SE(3) Log/`V⁻¹`）。逐行 `eff=0`/缺 pair/重复
    `update_id`/混合 run_id 均保留并标注；带合成自检 `python -I f2_fastlio_read.py selftest`，
-   9 个用例通过。
+   11 个用例通过（含审阅 §5 的三条回归）。
 2. 导出到达后：同 update 绑定核对、`eff=0` 单列、support/context、逐帧/块三态与 scope、
    UNKNOWN 区间（数量/总时长/最长区间）。
 3. 同人口旧检测 vs ALI-H 的**观测对比**（不是检测率）：M/T/I present、UNKNOWN 占比、单位权分位。
@@ -160,3 +160,18 @@ B2/B3 未解除前，本 host 只能交“资格/UNKNOWN/单位权 shadow”，�
 - 规则：`docs/ADAPTIVE_LOW_INFORMATION_HEALTH_V1_20261112.md` §4.2；`ali_h_v1_research/T2_PROTOCOL.md`；
   `ali_h_v1_research/T2_INPUT_CONTRACT.md`。
 - 本文件未跑宿主、未改阈值、未写生产代码。
+
+## 11. 审阅 §5 回归已补（2026-11-13）
+
+审阅 `24a7833` §5 的三条最小收紧已在 `f2_fastlio_read.py` 落地并带回归用例：
+
+1. **缺 `run_id` 的行 → `INVALID_ROW`**，不再贡献 `e_I`；整体 pairing 记
+   `INCOMPLETE_MISSING_RUN_ID`，不得 PASS。
+2. **`NO_PAIR` 与 `OK` 并存**：缺 pair 的行保留在人口里，pairing 记
+   `INCOMPLETE_MISSING_PAIR`，不得 PASS。
+3. **只有 `pass_fraction`、没有样本数 `n`**：判 `UNKNOWN_CONTEXT`；support 必须由 200 个
+   确定性样本证明（`n>=200`）。
+
+完整 pair 资格的其余非 PASS 原因单列：`INVALID_MIXED_RUN_IDS`、`INCOMPLETE_BAD_LINES`、
+`INVALID_DUPLICATE_UPDATE_ID`、`INVALID_ROWS_PRESENT`。B2/B3 仍未解除；检测指标
+`NOT_EVALUABLE`，不填 0。
