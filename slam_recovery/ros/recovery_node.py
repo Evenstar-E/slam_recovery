@@ -2906,8 +2906,11 @@ class RosDriver:
         self._scan_durations = []
         self.input_health: Dict[str, Any] = {"status": "NOT_EVALUATED"}
         self._pub = rospy.Publisher(status_topic, String, queue_size=20)
-        self._sub_pose = rospy.Subscriber(pose_topic, Odometry, self._on_pose, queue_size=200)
-        self._sub_scan = rospy.Subscriber(scan_topic, PointCloud2, self._on_scan, queue_size=20)
+        # A host that wakes from hibernation publishes a backlog of frames in a burst; with a
+        # 200-deep pose queue the driver dropped the frames around the second declared event
+        # (v7 signal-window run: 2090 published, 1857 delivered, the E2 stamp among the loss).
+        self._sub_pose = rospy.Subscriber(pose_topic, Odometry, self._on_pose, queue_size=2000)
+        self._sub_scan = rospy.Subscriber(scan_topic, PointCloud2, self._on_scan, queue_size=200)
         # The host's own recovery signals. Subscribing is harmless when the host has no such
         # topic; an empty name disables the subscription entirely.
         self._sub_sleep = (rospy.Subscriber(sleep_topic, Bool, self._on_host_sleep, queue_size=10)

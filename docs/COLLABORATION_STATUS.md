@@ -3401,3 +3401,14 @@ sleep/build 信号，则后续静默按 `HOST_HIBERNATING`（受 `--host-hiberna
 最后宿主信号墙钟 1794560095.4，距静默 22.2 s，在 `--host-signal-window-sec 30` 窗内；因此推断休眠后 driver 只需等约 1.3 s 即可收到恢复消息，
 `--host-hibernation-max-sec` **保持 90 即可**（无需 130–150）。第二缺口起于 stamp 229.9，E2=229.7 已被覆盖，只要 driver 活到那时 E2 可触发。
 已回复 S2 按原授权参数执行。
+
+## 224. 更正 E2 断点：宿主发布到了 230.1 s，是 driver 队列丢弃了 E1 后的突发
+
+S2 报告"宿主在 E1 后多轮休眠、位姿流止于 211.1 s"。S1 从 `two_event_sigwin_authorized/frontend.bag` 取投稿墙钟复核：
+- 宿主在 stamp **209.1–230.1 s** 之间发布了 **208 条** `/Odometry`，全部录于墙钟 **1794561052–1794561073**，**早于 driver 退出（1794561093）**；
+- driver 自报 `poses_received=1857`，而带内共 **2090** 条 → 约 **233 条被丢弃**；`max_backlog_messages=406` 超过当时的
+  `queue_size=200`，即 E1 后宿主恢复时的突发把 E2 前的帧挤出了队列；
+- 因此"宿主没维持到 229.7 s"不成立；断点是 **driver 订阅队列深度**。
+
+**修复（driver，main）**：位姿订阅 `queue_size 200→2000`、扫描 `20→200`（注释记录本次证据）；全套 **273 项测试通过**。
+下一步：若授权，用同一 v7 二进制（无需构建）再跑一次，E2 的帧应在队列内被处理；预期 `scripted.fired` 出现 E2。
