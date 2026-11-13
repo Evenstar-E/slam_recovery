@@ -817,3 +817,11 @@ update fallback调真实cp.status摘要而非status命令，实测receipt None/c
 最新录制原件纠正“宿主未发布到E2”：宿主实际发布至230.1s，driver却少收约233条，max_backlog406超过当时pose queue200，E1恢复突发挤掉E2前消息。故最近已证断点是driver订阅队列/消费接线，宿主原生休眠保留为背景，不能继续单独归因宿主或猜算法根因。S1已把pose/scan队列改2000/200，S2下一次同v7 run已授权，17:32尚无运行结果；这只是待验修正，不提前记E2通过。
 
 算法/科学证据：真实ALI-H校准标签仍不足，性能/净收益不可评价；参数无同版本同人口规律，不调参。成本只诊断不设门。下一唯一交付是queue修正run的E1→处理→接回→重武装→E2→尾段实际结果，失败直接报，不增工程前置。S1 driver/S2 host责任实确认，S4不代跑、不修改算法/科学门/private；仅历史增量中文SSH，四Cron和18:00如实截止继续。
+
+## 104. drain run首次E1/E2均触发并形成E2判决；失败restore不得写成已回滚
+
+固定17:53 main5494cdb/growthd265903，授权`two_event_drain_authorized`原run_summary独立核对：E1 actual115.599s、E2 actual229.696s均真实fired，run_mode CONTROLLED_INTERFACE_TEST；E1 takeover+abandon，E2触发并产生cand_0001、MODE3_SOFT_BRIDGE_WAIT、accepted=false。这是**两事件逻辑链的实质进展**，不是自动检测（scripted）或恢复成功。E2仅1帧而要求4个paired frames，reentry_pos_jump9.3956905m，paired benefit MISSING；final WAITING_FOR_EVIDENCE、quarantine_open_at_exit=true，排空结束STALE，非实时（wall334.505s），段/尾段未闭合。
+
+E2 native restore原件为`OK restore valid=0 reason=checkpoint_invalidated_by_re_slam`，但driver `native_checkpoint.ok=true`且restore_disposition仍写STATE_AND_MAP_ROLLBACK_ONLY、CONTINUES_FROM_RESTORED_STATE；checkpoint_check实际NO_ACK/UNKNOWN，无reprocess。这是会直接误述功能结果的缺陷，不属于性能/内存/实时性门。最低S1先按valid判真实成败，失败restore写NO_ROLLBACK/CONTINUES_FROM_UNRESTORED_STATE，关闭该错误归宿，不用ACK字符串OK冒成功；S2保宿主reset/cp失效原件。无需为CPU、内存或接口完备性另设放行门。
+
+下一唯一功能交付为E2判决后**真实结果与归宿一致、段关闭/重武装及尾段完成**：成功动作按实际update/map验收，拒绝则明确NO_ROLLBACK并继续后继，不能停在开放WAITING冒完整链。算法检测校准标签与净收益仍不可评价，参数不调，成本只后置诊断。S1 driver/S2 host责任确认，S4不代跑、不修改算法/科学门/private；仅历史增量中文SSH，四Cron及18:00截止如实报告。
