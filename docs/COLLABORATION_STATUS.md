@@ -3383,3 +3383,13 @@ sleep/build 信号，则后续静默按 `HOST_HIBERNATING`（受 `--host-hiberna
 
 口径：这是**有证据的推断**（近期原生信号），不是无条件放宽；若宿主始终不发信号，仍按 15 s 停止。
 下一步：如需验证"静默期等到宿主恢复并覆盖 E2"，需要一次新的 run 授权（v7 二进制已就位，无需构建）。
+
+## 222. 用户授权：1 次 run（推断休眠等待，不构建）
+
+用户于 17:4x 授权。条件已转 S2（消息 `23fd0e21…`）：v7 二进制 `a40e20d5…`；参数在 v7 run 基础上加
+`--host-signal-window-sec 30`（其余：`--require-contract --first-pose-grace-sec 60 --pose-stale-sec 15
+--host-hibernation-max-sec 90 --host-sleep-topic /Issleeping --host-build-topic /Isbuilding --wait-limit-sec 20`）；
+同 bag/E1/E2、260 s、录三轻量话题、预算只记录。
+预期：E1 后静默按 `HIBERNATING` 等待（`hibernation_inferred=true`），最多 90 s；宿主在 E2 前恢复则 E2 可触发，
+否则记 `HOST_HIBERNATION_TIMEOUT`。失败保原件、不重试、不再构建。
+当前状态：授权已下达，run 尚未开始（以 S2 实交为准）。
