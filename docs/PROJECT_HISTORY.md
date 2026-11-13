@@ -778,3 +778,19 @@ growth只新38行文字无map序列/原脚本，report0.43/12.7是回溯边界�
 截止人口分别核T0A402/90全UNKNOWN45块秒、B544/120全UNKNOWN60块秒含空块；T2v7 531/504含24eff0、120块60秒/47尾行12块51成员；v11 482/462含18eff0、106块53秒/303精确尾行64块304成员，块暴露非连续恢复/正常真值，数字不跨run拼样本。成本仅旧研究报告与指定recovery PID范围，整个15h资源/host峰/吞吐费用UNAVAILABLE；中文ALI-B2科学数据未解，Codex建议不实际用户无条件批准，远端进程状态UNKNOWN，不猜Git静默根因。
 
 最新S1§176指定FAST-LIO2派生前端最小恢复切片、PGO一致性第二步，尊重实际新安排而不硬绑旧MM建议；仍plan-only/明天设计，未交actual认领/实现run、不用户延期。下一现host真实测量修复→合法完整状态ikdtree→native重处理→后继/E2或具体函数首断点/最低解除及实认领，S1唯一集成/S2host/S3校准标签并行，四host要求保留/FAST-LIVO2后置/门不降。标准库-I截止固定清单exit0仅新时间/人口库存不旧数学/host重跑；正式中文SSH S4报告不覆盖S1日报/private/main历史算法。一次性截止任务触发自然消失，三持续20min/2h/日报仍repair-f3单owner未停止/重建，本会话存活有效7天界限保持。
+
+## 98. 今日18:00：FAST-LIO的ALI-H、自动检测与二事件，计划后直接下派
+
+[今日任务计划](FASTLIO_ALI_AUTODETECTION_E2_TASK_20261113.md)目标为2026-11-13 18:00（UTC+8）FAST-LIO的自适应ALI、自动检测与二事件。安排S1共享driver/manager集成唯一责任、S2单宿主原生完整状态/ikdtree及真实重处理/运行、S3唯一ALI-H资格/正常校准标签/同人口研究，保持1研究+2原生集成。给出今天的具体实施与验收节点，但文档不授予执行权限、不解除待批准操作；执行侧须沿其已确认授权与预算工作。设计可随首次代码交，独立校准/协方差缺项与未阻工程分别报告，无Codex分配或等待。
+
+09:33固定main75181ce/本review e588203，未新增原生实现或检测效果。默认复用MM-LINS派生FAST-LIO独立工作区，实际source/config/input及能力由S2核，不冒原版上游或照搬FAST-LIVO2 checkpoint。完整合法cp、实际测量修复→原生状态map→全部输入归宿/拒绝追赶→接回→E2与ALI-H证据整合是唯一整链目标；受控接口/自动动作/独立性能/净收益分别验收，不用HEALTHY/全UNKNOWN/计数或两个sleep当成功。四宿主最终需求仍保留、FAST-LIVO2后置，手调停门不降，不擅扩大安装/数据/模型/预算/权限。
+
+任务经既有SSH review分支中文交接，实际开发接收、开工和远端进程UNCONFIRMED：无可寻址S1/S2/S3通道，两个本机peer属其它项目，不误派或代理绕权限。本机S4不写生产算法/代跑ROS，三持续自动审阅不重建；另设18:00一次性结果核验，截止如实报告已解决/未解决/证据不足。此条是新目标/分工，不是新实现验收或A/B重评分，保私人文件及旧失败/报告不变。
+
+## 99. FAST-LIO受控原生接口局部推进；v3边界/ACK、replay后继与归宿须最小修正
+
+[固定版本审阅](review_20261113_a355343/README.md)以11:03 main119f5d7、growth ce3aaac及前段main a355343为准。main c80f50b已接收1b28fe3并实际分发，S2原生v1/v2/真实ctrl2、S3通道reader、S1能力门均有实交，旧“未收到/未开工”关闭。ctrl2真实hold/snapshot/restore/replay、83组声明重放及地图27513→71690接受为PARTIAL_CONTROLLED_INTERFACE；cp缺p_imu预积分/deskew，不称完整恢复、自动检测或净收益。第5次260.027s仅启动即hold、host2248全quarantined、driver1004但0 episode/E1E2未达，是有效负结果而非算法恢复失败或HEALTHY正常；v3仅语法检查未构建运行，暂停不自行解除。
+
+独立原件/源码核关闭下一次复验前的具体缺口：v3在达到target的帧完成后才hold/snapshot且入队OK被客户端当applied，须目标组前执行/前一完成态cp/真实applied ACK；自动accepted路径hold释放未被手工先resume的ctrl2覆盖，repaired_fed仅替换入队非native update；g_nr_replay无false复位，ctrl2 982 replayed中83为声明重放、899为后继实时帧错标。第5次host全quarantined而driver1004 never/unresolved空，另闭段跳过四类合计0及重叠合计2均空unresolved；F2缺run_id仍pairing PASS、NO_PAIR与PASS并存、无n的fraction变SUPPORTED。最低S1/S2修边界/hold/真实update回执/replay结束/跨层fate，S3三资格回归并行，不扩防御矩阵或重开SE3数学。
+
+下一单一主线为修正后合法边界cp→accepted E1真实update/map→实时ingested→E2尾段与归宿一致，实际构建/run等用户恢复授权；普通失败保原件不无限重试。A2/A6局部推进，A4/A5/A9/A10/B2/B11未闭合，A3/B3/B4无本host性能/净收益，不全表重评。两独立-I脚本最终exit0，初NumPy隔离路径及检查脚本ACK定位失败均如实记录；不ROS/build/install/算法/main历史/门/private，中文SSH review增量，四Cron单owner及18:00报告继续。

@@ -1,0 +1,97 @@
+{
+  "main": "119f5d7b4561039f3de91e6e709d76dcae021615",
+  "growth": "ce3aaacdf9e31a13e00ba293829ee0eeae50c21d",
+  "command": "C:/Python315/python.exe -I -B docs/review_20261113_a355343/native_checks.py <new-json>",
+  "scope": "fixed native source/diffs and archived receipts; no archived code execution, ROS, build or algorithm edit",
+  "controlled_interface": {
+    "status": "PARTIAL_CONTROLLED_INTERFACE_ONLY",
+    "map_points_snapshots": [
+      27513,
+      71690
+    ],
+    "replay_suffix": 0,
+    "replay_within_end": 83,
+    "repaired_fed_declared": 1,
+    "full_checkpoint": false,
+    "automatic_detection": "NOT_EXECUTED",
+    "net_benefit": "NOT_EVALUABLE"
+  },
+  "replay_fate": {
+    "status": "CONFIRMED_POST_REPLAY_LIVE_INPUT_MISLABELED",
+    "rows": 1255,
+    "counts": {
+      "ingested": 261,
+      "quarantined": 12,
+      "replayed": 982
+    },
+    "pre_replay_max_stamp_ns": 1711547910876055808,
+    "declared_replay_rows_at_or_before_pre_max": 83,
+    "later_live_rows_marked_replayed": 899,
+    "replay_reset_present_v2_or_v3": false
+  },
+  "repair_fed_semantics": {
+    "status": "CONFIRMED_QUEUE_SUBSTITUTION_NOT_NATIVE_UPDATE_PROOF",
+    "order": [
+      "nr_take_repair/++g_nr_repaired_fed",
+      "lidar_buffer.push_front",
+      "ACK"
+    ],
+    "native_update_or_map_call_in_reprocess_command": false,
+    "driver_field_overclaim": "repair_entered_estimator=bool(repaired_fed>0)"
+  },
+  "automatic_hold_sequence": {
+    "status": "SOURCE_CONFIRMED_UNCOVERED_SEQUENCE_NOT_OBSERVED_E1_FAILURE",
+    "controlled_resume_before_reprocess": true,
+    "native_reprocess_clears_hold": false,
+    "driver_lifecycle_resume_after_commit_waits_for_later_service": true,
+    "minimum_acceptance": "accepted E1 replay must release map writes for replay while controlling live input; show actual map/update evidence"
+  },
+  "v3_deferred": {
+    "status": "NOT_READY_BOUNDARY_AND_APPLIED_ACK_SEMANTICS",
+    "arm_emits_OK_deferred": true,
+    "apply_uses_previous_completed_frame_end": true,
+    "apply_call_before_next_sync": true,
+    "boundary_risk": "snapshot/hold occurs after the first frame reaching the target, not before it",
+    "built_or_run": false
+  },
+  "run5_actual_failure": {
+    "run_mode": "CONTROLLED_TRIGGERS_NOT_FIRED",
+    "host_fates": {
+      "quarantined": 2248
+    },
+    "driver_keyframes": {
+      "ingested": 1004,
+      "quarantine_memberships": 0,
+      "quarantine_distinct": 0,
+      "never_quarantined": 1004,
+      "committed_distinct": 0,
+      "deferred_distinct": 0,
+      "pending_at_exit_memberships": 0,
+      "segments_decision_skipped": 0
+    },
+    "driver_unresolved": [],
+    "exact_timestamp_matches": 2,
+    "host_fate_on_exact_matches": [
+      "quarantined"
+    ],
+    "episodes": 0,
+    "fired": [],
+    "wall_sec": 260.027,
+    "peak_rss_kb_driver_pid_scope": 2185368,
+    "final_state_not_health_evidence": "HEALTHY"
+  },
+  "previous_f2_f3_findings_still_apply": true,
+  "hashes": {
+    "119f5d7b4561039f3de91e6e709d76dcae021615:docs/four_host/fastlio_recovery_20261113/laserMapping.v2.cpp": "6bd9b3cb0949d07352d2db1ff47f8ba1bba8cdcfa0dd2d90a3a3badfa1adfb41",
+    "ce3aaacdf9e31a13e00ba293829ee0eeae50c21d:docs/four_host/fastlio_recovery_20261113/native_recovery_v3_deferred.diff": "bf9d4b55e147a417beed0fb726204dc79cd756c4727c8714aa139a08f1acba90",
+    "119f5d7b4561039f3de91e6e709d76dcae021615:slam_recovery/ros/recovery_node.py": "82e0785ba0c0f848828bb07254b15c7a6d2c2e3c2ffa6ea2c1aaab03a9bafdf9",
+    "ce3aaacdf9e31a13e00ba293829ee0eeae50c21d:docs/four_host/fastlio_recovery_20261113/tools/run_controlled.sh": "990e13a4ae1961809a1622736aa47cb9e09e8fe0e47b89303ab1e024c07e1bd8",
+    "a355343711cf8e8daf71eadbd68677ab4bf7bddb:slam_recovery/ros/recovery_node.py": "82e0785ba0c0f848828bb07254b15c7a6d2c2e3c2ffa6ea2c1aaab03a9bafdf9",
+    "a355343711cf8e8daf71eadbd68677ab4bf7bddb:docs/ali_h_v1_research/f2_fastlio_read.py": "a2ce84f3369b5248ae4982e718b64546c1aca9293e7331c356154b6a3d80fd6e",
+    "119f5d7b4561039f3de91e6e709d76dcae021615:docs/ali_h_v1_research/f2_fastlio_read.py": "a2ce84f3369b5248ae4982e718b64546c1aca9293e7331c356154b6a3d80fd6e",
+    "119f5d7b4561039f3de91e6e709d76dcae021615:docs/four_host/fastlio_recovery_20261113/ctrl2/commands.log": "d7df7f5e6501c99c297489000b226051d6501f3717bb7fa604dd85c658d18476",
+    "119f5d7b4561039f3de91e6e709d76dcae021615:docs/four_host/fastlio_recovery_20261113/ctrl2/ctl/input_fates.jsonl": "90ec1c83bb1e64a5d281e1a8930ffc100f283225981b2848fe2b8733d8540131",
+    "ce3aaacdf9e31a13e00ba293829ee0eeae50c21d:docs/four_host/fastlio_recovery_20261113/two_event5_hold_ignored_stamp/ctl/input_fates.jsonl": "43e7fe0956d835d51cd7eac692134c7e75f33174d0bb865abc14ae1f70975301",
+    "ce3aaacdf9e31a13e00ba293829ee0eeae50c21d:docs/four_host/fastlio_recovery_20261113/two_event5_hold_ignored_stamp/run_summary.json": "91f954ffdea971ab952a5cd6906c816c7f20c0adee2c10ec738dfd3ec004f122"
+  }
+}
