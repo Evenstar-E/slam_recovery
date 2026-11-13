@@ -3326,3 +3326,14 @@ callback 判读统一为：**总量不变、归属随调度转移**，主导因�
 checkpoint_validity="until_re_slam"、publish_gating="isPublish"、profile="native_recovery"），并在 `check_source_contract.py` 加断言。
 **预算结论待用户决定**：0.94 核 → 0.25 核需要声明式降采样（`max_eval_points` 600 或 `scan_cap` 减半），会改变 FIM/NIS 人口，
 需离线等价证据与用户认可；或者接受预算例外。
+
+## 217. v7：capabilities 语义块落地（31/31 断言）；预算决定仍待用户
+
+S2 `16bced5`（`exp/growth-run`，v7 diff 476 行，仅 `-fsyntax-only`）已入 main：`capabilities.json` 增加
+`semantics{apply_stamp:YES, ack_levels:[deferred,applied], checkpoint_validity:until_re_slam, publish_gating:isPublish,
+profile:native_recovery}`，与 driver `--require-contract` 的校验项完全对应；`check_source_contract.py` **31/31 PASS**
+（新增 apply_stamp/ack_levels/checkpoint_validity/publish_gating/profile 五条）。S2 另用 C++ 字面量重建整份 JSON 并 `json.loads` 通过。
+二进制仍 v6 `f167bf5e…`；v7 随下次授权构建生效。
+
+预算门槛：host 侧不参与；`bench_frame_cost.py` 实测 0.94 核 / 阈值 0.25 核 = FAIL，**是否做声明式降采样（含离线等价证据）
+或接受例外仍待用户决定**；在此之前的任何长链 run 都不满足"预算前置"要求。
