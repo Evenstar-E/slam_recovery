@@ -146,3 +146,13 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
   pose 路径改善 ~8.7×；scan 路径的 p95 反而升高（与录制/调度相关，需下次单独观察）。
 - `input_fates`：ingested 1277 / quarantined 982；首个 quarantined **115.4 s**（= E1−2 s，armed hold 正确）。
 - `input_health` OK（silence 0.06 s）；`message_disposition` 2063 位姿 / 2245 扫描、64 未配对位姿、246 未配对扫描。
+
+## v6（2026-11-13，只写代码，未构建/未运行）：休眠期拒绝空图快照
+
+针对 v5c 观察到的 `snapshot ... map_points=2`（宿主休眠/`re_slam` 后拍空图）：
+
+- `re_slam()` 置 `g_nr_host_reset = true`；`publish_odometry()` 首次正常发布时清除；
+- 该标志为真期间，`snapshot` 回 `OK snapshot valid=0 reason=host_reset_no_map`，不覆盖已有 checkpoint；
+- `capabilities.json` 增加 `"snapshot_refused_after_host_reset": "until the host publishes odometry again"`；
+- 契约断言增至 **26 项 PASS**（re_slam 置位、snapshot 拒绝、publish 清除、capabilities 声明）；
+- 语法检查 rc=0；**未构建**，二进制仍 v5 `785c0f20…`（v6 需随下次授权构建生效）。
