@@ -3218,3 +3218,12 @@ run 会在宿主即将恢复前被看门狗中止。修正（`pose_stream_health
 两项均有回归测试（FIM 对比旧实现、选点对比行式 unique）；全套 **265 项通过**。
 
 **口径**：两项都是等价优化，不改门阈值/NIS 定义；仍需一次新授权 run 才能确认回调成本下降、宿主能撑到 E1。
+
+## 210. 用户授权降载后的第 3 次有界 run（不构建）
+
+用户于 15:2x 授权 1 次有界 run、不构建。条件已转 S2（消息 `bf201fb7…`）：二进制 v5 `785c0f20…`；同 bag/E1/E2、260 s；
+`--first-pose-grace-sec 60 --pose-stale-sec 15 --host-hibernation-max-sec 90 --wait-limit-sec 20` + 宿主信号 + `-u` + ROS 图门控；
+录 `/Odometry /Issleeping /Isbuilding`；报告并列新旧 `pose_callback/scan_callback`（n/p50/p95/max/mean）。
+硬指标：**宿主首次休眠是否回到 ≈115.8 s、位姿流是否到达 E1 117.4 s**；失败保原件、记 FAIL/BLOCKED、不重试。
+补充观察：若 callback 下降但仍提前，记 `input_fates` ingested/quarantined 比例与首个 quarantined 时刻，判断 hold 是否参与。
+当前状态：授权已下达，run 尚未开始（以 S2 实交为准）。
