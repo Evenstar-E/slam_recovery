@@ -787,3 +787,9 @@ growth只新38行文字无map序列/原脚本，report0.43/12.7是回溯边界�
 独立原件/源码核关闭下一次复验前的具体缺口：v3在达到target的帧完成后才hold/snapshot且入队OK被客户端当applied，须目标组前执行/前一完成态cp/真实applied ACK；自动accepted路径hold释放未被手工先resume的ctrl2覆盖，repaired_fed仅替换入队非native update；g_nr_replay无false复位，ctrl2 982 replayed中83为声明重放、899为后继实时帧错标。第5次host全quarantined而driver1004 never/unresolved空，另闭段跳过四类合计0及重叠合计2均空unresolved；F2缺run_id仍pairing PASS、NO_PAIR与PASS并存、无n的fraction变SUPPORTED。最低S1/S2修边界/hold/真实update回执/replay结束/跨层fate，S3三资格回归并行，不扩防御矩阵或重开SE3数学。
 
 下一单一主线为修正后合法边界cp→accepted E1真实update/map→实时ingested→E2尾段与归宿一致，实际构建/run等用户恢复授权；普通失败保原件不无限重试。A2/A6局部推进，A4/A5/A9/A10/B2/B11未闭合，A3/B3/B4无本host性能/净收益，不全表重评。两独立-I脚本最终exit0，初NumPy隔离路径及检查脚本ACK定位失败均如实记录；不ROS/build/install/算法/main历史/门/private，中文SSH review增量，四Cron单owner及18:00报告继续。
+
+## 100. 4cacc31：旧资格反例关闭，同边界双命令预武装和update回执仍有集成缺口
+
+[增量复核](review_20261113_4cacc31/README.md)固定12:07 main4cacc31/growth442bd2c/ALI121f7ef，暂停中仅源码与离线控制，无v4构建/run。F2缺run_id、NO_PAIR、无n support三反例经实际11个selftest关闭；F3 skipped单列和重叠unresolved两driver反例关闭，deferred不再直接当applied。均只限组件控制，不提升检测/整链分数，不重开旧数学。
+
+当前arm_scripted_checkpoints仍hold(at)后snapshot(at)，客户端deferred保持hold pending并把snapshot留outbox，hold applied后才发snapshot；本机AST隔离当前CheckpointClient实测deferred后host cmd=hold/outbox1，applied后才cmd=snapshot。v4虽在sync后估计前defer，snapshot却只能在后续组执行并取先前完成帧戳，仍可晚于边界。最低S1/S2把同边界hold+snapshot作为一次预武装/applied事务或等价保两条目标前均已到host，双命令控制同时验cp前一帧/跨界组未写，不恢复deferred即完成。v4新增repaired_in_update未被driver消费，2097仍fed>0写entered，S1接实际update回执；83/899是旧档算术非v4运行。下一仍合法cp→E1真实update/map→live→E2，构建/run等实际恢复；仅新缺口阻复验，其余不退回。独立-I控制exit0，不ROS/build/算法/main历史/门/private，中文SSH review增量，四Cron及18:00继续。

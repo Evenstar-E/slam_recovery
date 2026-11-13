@@ -1,0 +1,136 @@
+{
+  "main": "4cacc31d8d904102eeceabb812c3e5d81959a01a",
+  "scope": "fixed source and local controls; no host/build/algorithm edit",
+  "f2_previous_three_counterexamples": {
+    "status": "CLOSED_AT_SOURCE_AND_SYNTHETIC_CONTROL",
+    "selftest_cases": 11,
+    "missing_run_id": {
+      "statuses": {
+        "OK": 1,
+        "INVALID_ROW": 1
+      },
+      "rows": 2,
+      "missing_run_id_rows": 1,
+      "I_rows": 1,
+      "pairing": "INCOMPLETE_MISSING_RUN_ID",
+      "pass": true
+    },
+    "missing_post": {
+      "statuses": {
+        "OK": 1,
+        "NO_PAIR": 1
+      },
+      "rows": 2,
+      "pairing": "INCOMPLETE_MISSING_PAIR",
+      "I_rows": 1,
+      "pass": true
+    },
+    "support_fraction_only": {
+      "class": "UNKNOWN_CONTEXT",
+      "pass": true
+    }
+  },
+  "f3_driver_disposition_counterexamples": {
+    "status": "CLOSED_FOR_DRIVER_SIDE_CONTROLS",
+    "skipped": {
+      "input": {
+        "poses_received": 1,
+        "scans_received": 1,
+        "paired": 1,
+        "poses_unpaired": 0,
+        "scans_unpaired": 0,
+        "stamp_log_truncated": false
+      },
+      "keyframes": {
+        "ingested": 1,
+        "quarantine_memberships": 1,
+        "quarantine_distinct": 1,
+        "never_quarantined": 0,
+        "committed": 0,
+        "deferred": 0,
+        "pending": 0,
+        "skipped": 1,
+        "decided_without_record": 0
+      },
+      "fully_decided": false,
+      "fully_accounted": true,
+      "repair": {
+        "clouds_published": 0,
+        "replay_suffix_frames_reported_by_host": 0
+      },
+      "unresolved": [],
+      "rule": "each distinct keyframe has at most one outcome (never_quarantined, committed, deferred, pending, skipped, decided_without_record); a key with two outcomes is unresolved. skipped is its own class and never counts as decided. fully_accounted requires the classes plus never_quarantined to equal ingested with no unresolved entry; fully_decided additionally requires no pending or skipped segment. Counts come from the loop's own events, not a re-read of the bag, and overlapping episodes no longer double-count a key."
+    },
+    "overlap": {
+      "input": {
+        "poses_received": 1,
+        "scans_received": 1,
+        "paired": 1,
+        "poses_unpaired": 0,
+        "scans_unpaired": 0,
+        "stamp_log_truncated": false
+      },
+      "keyframes": {
+        "ingested": 1,
+        "quarantine_memberships": 2,
+        "quarantine_distinct": 1,
+        "never_quarantined": 0,
+        "committed": 0,
+        "deferred": 0,
+        "pending": 0,
+        "skipped": 0,
+        "decided_without_record": 0
+      },
+      "fully_decided": true,
+      "fully_accounted": false,
+      "repair": {
+        "clouds_published": 0,
+        "replay_suffix_frames_reported_by_host": 0
+      },
+      "unresolved": [
+        {
+          "kind": "key_with_more_than_one_outcome",
+          "count": 1,
+          "sample": [
+            {
+              "kf": 0,
+              "outcomes": [
+                "committed",
+                "pending"
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "accounting_mismatch",
+          "classified": 0,
+          "never_quarantined": 0,
+          "ingested": 1
+        }
+      ],
+      "rule": "each distinct keyframe has at most one outcome (never_quarantined, committed, deferred, pending, skipped, decided_without_record); a key with two outcomes is unresolved. skipped is its own class and never counts as decided. fully_accounted requires the classes plus never_quarantined to equal ingested with no unresolved entry; fully_decided additionally requires no pending or skipped segment. Counts come from the loop's own events, not a re-read of the bag, and overlapping episodes no longer double-count a key."
+    },
+    "cross_layer_host_fate_join": "NOT_IMPLEMENTED_IN_DRIVER; next run still needs host/driver reconciliation"
+  },
+  "same_boundary_hold_snapshot_sequence": {
+    "status": "CONFIRMED_SNAPSHOT_NOT_SENT_UNTIL_HOLD_APPLIED",
+    "after_deferred": {
+      "hold_armed": true,
+      "hold_completed": false,
+      "outbox": 1,
+      "host_command_file": "hold"
+    },
+    "after_applied": {
+      "hold_completed": true,
+      "host_command_file": "snapshot"
+    },
+    "impact": "same-target snapshot is not pre-armed with hold; v4 can snapshot a later completed frame"
+  },
+  "repair_update_receipt_integration": {
+    "status": "NOT_CLOSED_DRIVER_STILL_USES_QUEUE_COUNT",
+    "host_v4_exposes_repaired_in_update": true,
+    "driver_consumes_repaired_in_update": false,
+    "driver_sets_repair_entered_estimator_from": "repaired_fed"
+  },
+  "v4_execution": "NOT_BUILT_NOT_RUN; offline source contracts are not native behavior evidence"
+}
