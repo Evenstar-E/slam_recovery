@@ -2866,3 +2866,22 @@ S2 `326413b`（`exp/growth-run`）交 ctrl1/ctrl2 原件与 v1/v2 源码。S1 �
 - S2（`1a9b0e82…`）：§3.1 延期命令须在目标组进入估计前执行 + applied ACK + 确定性跨界验收；§3.2 accepted 路径 hold/replay 顺序与
   "入队 vs 原生 update 消费"分开回执；§3.3 replay 标志按队列耗尽复位 + ctrl2 回归。
 - S3（`c33d75b6…`）：§5 三个 reader 回归，保持 8 个 selftest。
+
+## 187. 审阅 §3/§5 修正到位：S2 v4 与 S3 reader 回归经本机核实入库
+
+**S2 `ca88c47`（`exp/growth-run`，v4 diff 441 行，仅 `g++ -fsyntax-only`）**，本机核对：
+- §3.1 `nr_apply_deferred(lidar_end_time)` 已移到 `sync_packages` 之后、`nr_capture_group()`/估计之前（diff :409），快照描述**前一完成帧**、
+  戳 `< target`；ACK 两级 `deferred`→`applied valid=1 stamp_ns=… frame=…`，与 client `_classify_ack` 一致；
+- §3.2 `reprocess` 显式 `g_nr_hold.store(false)`（:286），重放组按时间 `push_front` 先于实时输入；新增 `repaired_in_update/last_repaired_update_ns`
+  只在帧尾 update 后计数（:428），`status` 可见；
+- §3.3 按组 `g_nr_replay_marks[group_end]` 标记与消费（:152/:271），不再用全局标志；`check_replay_regression.py` 本机运行
+  `rows=1255 replayed_label=982 declared_replay=83 corrected_split: replay=83 live=899` **PASS**，与 S1 独立复算一致。
+- **未构建、未运行**；部署二进制仍 `df27a24c…`。
+
+**S3 `121f7ef`（`exp/ali-h-v1`，含 `5ea77c5` 文本块头支持）**，本机运行 `f2_fastlio_read.py selftest`：**11 用例全过**，三条回归实际结果：
+- 缺 `run_id`：`{OK:1, INVALID_ROW:1}`、`missing_run_id_rows=1`、`I_rows=1`、`pairing=INCOMPLETE_MISSING_RUN_ID`；
+- 缺 post：`{OK:1, NO_PAIR:1}`、`pairing=INCOMPLETE_MISSING_PAIR`、`I_rows=1`（NO_PAIR 保留人口）；
+- support 仅 `pass_fraction=1.0`：`UNKNOWN_CONTEXT`。
+说明：审阅自带的 `run_checks.py` 固定读取被审版本 `a355343` 的 blob，重跑仍显示 CONFIRMED 是**归档检查**，不代表当前树未修。
+
+两提交已 cherry-pick 入 main（`ca8c2cc`、`4279bb6`；v3/v4 为 `a49f919`、`b7db2fe`），分支推送后与本机一致。仍无构建/运行；等用户或审阅侧的新授权。
