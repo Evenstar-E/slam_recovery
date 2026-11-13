@@ -2798,3 +2798,21 @@ S3 追加 `exp/ali-h-v1` 三提交（`8ad46fc..f85de73`），S1 逐项核后 che
 `/velodyne_points` 4695，**无 GT/参考 topic**——S3 的 B2 收紧成立：独立正常参照必须来自本数据集之外，或经用户接受的独立认证段。
 
 据此把"bag 无 GT"同步给 S2（影响其 B2/B3 方案表述）；B2/B3 仍 `BLOCKED`，检测指标 `NOT_EVALUABLE`，不填 0。`exp/ali-h-v1` 已推到 `f85de73`。
+
+## 183. F1 受控接口验证核实通过；用户授权追加 1 次整链 run
+
+S2 `326413b`（`exp/growth-run`）交 ctrl1/ctrl2 原件与 v1/v2 源码。S1 本机核对：
+
+- `ctrl2/commands.log`：`hold`（frame 179，held）→ `snapshot A`（stamp `1711547902576681472` frame 190 map_points **27513**）→ `resume`
+  → `restore`（**同 stamp/frame**）→ `reprocess`（`replay_suffix=0 replay_within_end=83 repaired_fed=1 source=buffer`）→
+  `snapshot B`（frame 354 map_points **71690**）→ `status`（`repair_received=1 repair_applied=1`）。修复云 relay 记录
+  `stamp=1711547908.776 points=25155`；`input_fates.jsonl` 982 replayed / 261 ingested / 12 quarantined。
+- `capabilities.json` 为扁平格式（driver 兼容），含 `partial_notes.reprocess` 与 `checkpoint_excludes`；`reprocess=PARTIAL`、`set_state=NO`。
+- v2 diff 核对：`nr_take_repair` 注明"Caller must hold g_nr_mtx"且内部**不再加锁**（`:115` 注释、`:234` 调用方持锁）；
+  快照存 `last_imu_time/last_lidar_time`（`:210-211`），restore 复位（`:157-158`）并置 `flg_EKF_inited`（`:153`）。自锁修复与游标复位成立。
+- 结论：**受控接口 PASS**（CONTROLLED_INTERFACE_TEST，120 s），修复消息确实进入 estimator 与地图（map 重建 27513→71690，不是旧轨迹复制）；
+  p_imu 预积分/去畸变缓存仍未入 cp，重估记 **PARTIAL**，不称完整重估。
+
+**用户授权（2026-11-13 10:2x，本次会话确认）**：追加 **1 次**两事件整链 run（同一二进制 `df27a24c…`、同 bag、约 250 s 播放、1800 s 超时、
+不新增构建/安装/参数扫描）；失败保原件、只有具体可修原因才回报，不自行重试。授权已转 S2（消息 `9f2d1bb3…`）。预算台账：构建 2 次
+（第 2 次为自锁修复）、run 2 次（ctrl1 失败/ctrl2 通过）+ 授权 1 次。
