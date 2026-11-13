@@ -667,6 +667,9 @@ class HostCapabilities:
 
     KEYS = ("snapshot", "restore", "hold", "reprocess", "set_state", "measurement_relay")
 
+    SEMANTICS = ("apply_stamp", "ack_levels", "checkpoint_validity", "publish_gating",
+                 "profile")
+
     def __init__(self, raw: Optional[Dict[str, Any]] = None) -> None:
         self.raw = dict(raw or {})
         commands = self.raw.get("commands")
@@ -675,7 +678,41 @@ class HostCapabilities:
         self.commands = {k: str(commands.get(k, "NO")).strip().upper() for k in self.KEYS}
         self.checkpoint = self.raw.get("checkpoint") if isinstance(
             self.raw.get("checkpoint"), dict) else None
+        self.sem = self.raw.get("semantics") if isinstance(
+            self.raw.get("semantics"), dict) else {}
         self.source = self.raw.get("source")
+
+    def apply_stamp_supported(self) -> bool:
+        """Whether hold/snapshot can be queued for a future stamp.
+
+        Without it the driver must not pre-arm a boundary pair: it can only send an immediate
+        command and record that the checkpoint may be later than the declared boundary.
+        """
+        return str(self.sem.get("apply_stamp", "YES")).strip().upper() != "NO"
+
+    def contract_problems(self,
+                          required: Tuple[str, ...] = ("hold", "snapshot", "restore",
+                                                       "reprocess")) -> List[str]:
+        """What this declaration lacks for a native recovery run.
+
+        A host that cannot declare what its commands mean cannot be driven as if it could: the
+        driver would be back to assuming FAST-LIVO2 semantics. Missing pieces are returned so
+        the run can refuse before the bag starts.
+        """
+        problems = []
+        for cmd in required:
+            if not self.usable(cmd):
+                problems.append(f"command_not_usable:{cmd}={self.commands.get(cmd)}")
+        if not self.apply_stamp_supported():
+            problems.append("semantics.apply_stamp=NO (no boundary pre-arming)")
+        levels = self.sem.get("ack_levels")
+        if not isinstance(levels, list) or "applied" not in [str(x).lower() for x in levels]:
+            problems.append("semantics.ack_levels missing 'applied'")
+        if not self.sem.get("checkpoint_validity"):
+            problems.append("semantics.checkpoint_validity missing")
+        if not self.sem.get("publish_gating"):
+            problems.append("semantics.publish_gating missing")
+        return problems
 
     def supports(self, name: str) -> bool:
         return self.commands.get(name) == "YES"
@@ -690,7 +727,8 @@ class HostCapabilities:
 
     def as_dict(self) -> Dict[str, Any]:
         return {"status": "DECLARED", "commands": dict(self.commands),
-                "checkpoint": self.checkpoint, "source": self.source}
+                "checkpoint": self.checkpoint, "semantics": dict(self.sem),
+                "source": self.source}
 
 
 class CheckpointClient:
@@ -2647,6 +2685,9 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
         # record must not claim it did.
         "host_capabilities": host_capabilities_record(loop),
         "host_native": {"state": loop.host_native_state, "events": loop.host_native_events},
+        "host_contract": getattr(loop, "host_contract", {"status": "NOT_EVALUATED"}),
+        "arming_mode": getattr(loop, "arming_mode", "PREARMED" if loop.scripted_trigger_stamps_ns
+                               else "NONE"),
         "message_disposition": message_disposition(loop),
         "native_checkpoint_actions": loop.cp_actions,
         "null_field_counts": null_counts,
@@ -3055,6 +3096,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--pose-topic", default="/aft_mapped_to_init")
     ap.add_argument("--scan-topic", default="/velodyne_points")
     ap.add_argument("--status-topic", default="/slam_recovery/gate_status")
+    ap.add_argument("--require-contract", action="store_true", default=False,
+                    help="refuse to run unless the host declares capabilities.json with usable "
+                         "commands and the semantics (apply stamp, applied ack, checkpoint "
+                         "validity, publish gating) this run depends on")
     ap.add_argument("--host-sleep-topic", default="/Issleeping",
                     help="the host's hibernation flag (FAST-LIO publishes Issleeping); an empty "
                          "name disables it")
@@ -3168,12 +3213,33 @@ def main(argv: Optional[List[str]] = None) -> int:
     # lags the trigger under a playback backlog; a stamped command is queued now and executed by
     # the host just before the first group whose lio_time reaches the trigger. Only scripted runs
     # get this; the online path keeps the immediate behaviour.
+    caps = loop.cp.capabilities() if loop.cp is not None else None
+    contract = caps.as_dict() if caps is not None else {"status": "UNDECLARED"}
+    contract_problems = caps.contract_problems() if caps is not None else [
+        "no capabilities.json in the checkpoint directory"]
+    loop.host_contract = {"contract": contract, "problems": contract_problems,
+                          "required": bool(args.require_contract)}
+    if args.require_contract:
+        # The point of the contract is to refuse before the bag rather than discover the
+        # semantics through a failed chain run.
+        if caps is None:
+            rospy.logerr("[slam_recovery] --require-contract: host declared no capabilities")
+            return 2
+        if contract_problems:
+            rospy.logerr("[slam_recovery] --require-contract: %s", "; ".join(contract_problems))
+            return 2
     if loop.cp is not None and loop.scripted_trigger_stamps_ns:
         # Every scripted stamp gets its own armed hold/snapshot. The first one was enough while
         # the run had a single event; a second event otherwise falls back to a rolling checkpoint
         # that can be applied after its trigger and roll back only part of the segment.
-        arm_scripted_checkpoints(loop.cp, loop.scripted_trigger_stamps_ns,
-                                 loop.confirmation_margin_ns)
+        if caps is not None and not caps.apply_stamp_supported():
+            # Without apply-stamp the host cannot queue a command for the boundary. Sending one
+            # now would execute it immediately and move the checkpoint away from the declaration.
+            loop.arming_mode = "NOT_SUPPORTED_IMMEDIATE_ONLY"
+            rospy.logwarn("[slam_recovery] host declares apply_stamp=NO; boundary pre-arming skipped")
+        else:
+            arm_scripted_checkpoints(loop.cp, loop.scripted_trigger_stamps_ns,
+                                     loop.confirmation_margin_ns)
     driver = RosDriver(loop, args.pose_topic, args.scan_topic, args.status_topic,
                        sleep_topic=args.host_sleep_topic, build_topic=args.host_build_topic)
 

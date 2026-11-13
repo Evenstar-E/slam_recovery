@@ -3306,3 +3306,23 @@ callback 判读统一为：**总量不变、归属随调度转移**，主导因�
 
 下一步候选（需用户决定）：①把受控 E2 前移到宿主可发布区间（另立事件身份）；②换更短/更稳的输入窗口；
 ③接受"该输入 + driver 共存下无法覆盖第二声明事件"为 BLOCKED。三者都不改冻结科学门。
+
+## 216. 按用户指示落地五项：契约前置、信号优先、冒烟协议、预算前置、原生优先
+
+1. **能力契约前置**：`docs/HOST_INTERFACE_CONTRACT.md` 定义 `capabilities.json` 的 `semantics`（apply_stamp、ack_levels、
+   checkpoint_validity、publish_gating、profile）与拒绝规则；driver 新增 `HostCapabilities.contract_problems()` 与
+   `--require-contract`（无声明或缺语义时**启动前退出码 2**，不跑 bag）；summary 记 `host_contract{contract, problems, required}`。
+2. **apply_stamp=NO**：不预武装边界命令，记 `arming_mode=NOT_SUPPORTED_IMMEDIATE_ONLY`（不把立即执行的 cp 称为合法边界）。
+3. **宿主信号优先**：`/Issleeping`、`/Isbuilding` 已在 driver 侧订阅；休眠/重建时释放 hold、不 restore/reprocess、takeover 后
+   `abandon_segment`+`rearm`（前几轮已实现并验证）。
+4. **有界冒烟协议**：契约文档第 3 节固定 7 步（status/capabilities → hold → snapshot → restore → relay+reprocess → 休眠信号 → HEALTHY）；
+   ctrl2 与 A/B 作为实例；未过冒烟不进入整链。
+5. **预算前置**：新增 `slam_recovery/tools/bench_frame_cost.py`，量化 FIM/NIS（含预热与参考网格构建分列），按计划帧率折算核占比，
+   超过阈值返回非 0。**当前实测：FIM ≈ 82 ms、NIS ≈ 12 ms、合计 ≈ 94 ms/对 → 10 Hz 下 0.94 核，FAIL（阈值 0.25 核）**。
+6. **原生优先**：契约文档明确不模拟 FAST-LIVO2 的 `replay_buffer_`/八叉树；`reprocess=PARTIAL` 只称有限原生缓冲重放。
+测试 4 项（契约完整/缺语义/apply_stamp=NO/命令不可用）；全套 **270 项通过**。
+
+**待 S2（只改代码）**：在 `capabilities.json` 补 `semantics` 块（apply_stamp=YES、ack_levels=["deferred","applied"]、
+checkpoint_validity="until_re_slam"、publish_gating="isPublish"、profile="native_recovery"），并在 `check_source_contract.py` 加断言。
+**预算结论待用户决定**：0.94 核 → 0.25 核需要声明式降采样（`max_eval_points` 600 或 `scan_cap` 减半），会改变 FIM/NIS 人口，
+需离线等价证据与用户认可；或者接受预算例外。
