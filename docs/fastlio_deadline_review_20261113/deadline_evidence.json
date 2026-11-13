@@ -1,0 +1,208 @@
+{
+  "deadline_utc8": "2026-11-13T18:00:00+08:00",
+  "deadline_main": "5494cdbd324377de9cfcfa1392f4bd56cf3a28f8",
+  "post_deadline_main_checked": "d9e4f34c251a526f3c0aa2cd4beb5a4dc074f6ea",
+  "post_deadline_changes": [
+    "docs/COLLABORATION_STATUS.md",
+    "docs/TODO_PRIORITIES_20261113.md"
+  ],
+  "post_deadline_has_new_code_or_run": false,
+  "run_identity": {
+    "pre_run": "run_id=two_event_drain_20261113T093527Z\nbinary=a40e20d516b14914728c98baf6b8807868bd6eb9b6f47523818c4caf1d7f0852 (v7)\ndriver_main=0b4dc78+ (queues 2000/200, frame_cost_breakdown)\nbag=a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de\nE1=1711547999352267771 E2=1711548113452267771\nplay_duration=260s driver_duration=360s POST_PLAY_DRAIN=60s timeout=1200s RECORD=1\nNON_REALTIME_DRAIN: bag ends at 260s; E2 frames are processed during the drain; E2 actual_s still by stamp (~229.7)\ndriver_args=--require-contract --first-pose-grace-sec 60 --pose-stale-sec 15 --host-signal-window-sec 30 --host-hibernation-max-sec 90 --host-sleep-topic /Issleeping --host-build-topic /Isbuilding --wait-limit-sec 20 --repair-sync-timeout-sec 5\nbudget_diagnostic=total_ms: 47.536 core_fraction: 0.475 max_core_fraction: 0.25 status: FAIL  (NOT a gate)\nstop: bag end + 60 s drain; contract failure => exit before bag\n",
+    "host": "MM-LINS-derived FAST-LIO frontend, not independently verified upstream FAST-LIO2",
+    "binary_sha_v7": "a40e20d516b14914728c98baf6b8807868bd6eb9b6f47523818c4caf1d7f0852",
+    "bag_sha": "a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de",
+    "driver_identity": "0b4dc78+ (short-plus declaration, not a full immutable SHA)",
+    "config_source_identity": "INCOMPLETE_IN_PRE_RUN"
+  },
+  "events": {
+    "fired": [
+      {
+        "declared_ns": 1711547999352267771,
+        "actual_s": 115.599,
+        "kf_id": 1156,
+        "ts_ns": 1711547999375663519,
+        "basis": "CONTROLLED_INTERFACE_TEST (trigger_quarantine called directly, absolute pose stamp)"
+      },
+      {
+        "declared_ns": 1711548113452267771,
+        "actual_s": 229.696,
+        "kf_id": 2054,
+        "ts_ns": 1711548113473230600,
+        "basis": "CONTROLLED_INTERFACE_TEST (trigger_quarantine called directly, absolute pose stamp)"
+      }
+    ],
+    "mode": "CONTROLLED_INTERFACE_TEST",
+    "episodes": 2,
+    "decisions": 1,
+    "second_and_later_events": 1,
+    "E1": "HOST_NATIVE_RECOVERY_TAKEOVER; segment_abandoned",
+    "E2": {
+      "candidate_id": "cand_0001",
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "accepted": false,
+      "refusal": "Refused Mode 2 atomic commit: paired-benefit evidence MISSING (candidate did not report paired_benefit_approved / wilson_lower_bound / reentry_pos_jump_m)",
+      "paired_evidence": {
+        "num_paired_frames": 1,
+        "reason": "insufficient_paired_frames",
+        "required_paired_frames": 4,
+        "candidate_keyframes": 1,
+        "pairable_frames": 1,
+        "frames_without_independent_reference": 0,
+        "reference_frames_from_candidate": 2024,
+        "reentry_pos_jump_m": 9.395690510758627
+      }
+    },
+    "automatic_detection": "NOT_EXECUTED; both triggers are scripted"
+  },
+  "native": {
+    "capabilities": {
+      "snapshot": "YES",
+      "restore": "YES",
+      "hold": "YES",
+      "reprocess": "PARTIAL",
+      "set_state": "NO",
+      "measurement_relay": "YES",
+      "checkpoint_contents": [
+        "eskf_state",
+        "eskf_cov",
+        "ikdtree_points",
+        "time_cursor"
+      ],
+      "checkpoint_excludes": [
+        "imu_preintegration_cache",
+        "deskew_cache",
+        "external_poses_graph"
+      ],
+      "partial_notes": {
+        "reprocess": "replays buffered lidar/imu groups through the normal loop; repaired clouds are substituted by header stamp within 1 ms of the group end; p_imu internal preintegration/deskew state is not checkpointed"
+      },
+      "notes": "time cursors are part of the checkpoint; imu/deskew caches are not",
+      "checkpoint_invalidated_by": "re_slam (host-native reset); a new snapshot is required afterwards",
+      "snapshot_refused_after_host_reset": "until the host publishes odometry again",
+      "semantics": {
+        "apply_stamp": "YES",
+        "ack_levels": [
+          "deferred",
+          "applied"
+        ],
+        "checkpoint_validity": "until_re_slam",
+        "publish_gating": "isPublish",
+        "profile": "native_recovery"
+      }
+    },
+    "restore_ack": "OK restore valid=0 reason=checkpoint_invalidated_by_re_slam",
+    "restore_disposition_in_driver": {
+      "scope": "STATE_AND_MAP_ROLLBACK_ONLY",
+      "checkpoint_stamp_ns": 1711548111473230600,
+      "decision_ts_ns": 1711548141172342539,
+      "interval_ns": [
+        1711548111473230600,
+        1711548141172342539
+      ],
+      "consumed_input_in_interval": "NOT_REPLAYED",
+      "subsequent_input": "CONTINUES_FROM_RESTORED_STATE",
+      "catch_up": "NOT_IMPLEMENTED"
+    },
+    "reprocess_count": 0,
+    "repair_clouds_published": 0,
+    "actual_repair_native_update_map": "NOT_EXECUTED_IN_THIS_RUN",
+    "controlled_ctrl2_partial_replay_is_separate_evidence": true
+  },
+  "input_and_tail": {
+    "driver": {
+      "input": {
+        "poses_received": 2085,
+        "scans_received": 2600,
+        "paired": 2085,
+        "poses_unpaired": 0,
+        "scans_unpaired": 515,
+        "stamp_log_truncated": false
+      },
+      "keyframes": {
+        "ingested": 2085,
+        "quarantine_memberships": 4,
+        "quarantine_distinct": 4,
+        "never_quarantined": 2081,
+        "committed": 0,
+        "deferred": 1,
+        "pending": 0,
+        "skipped": 3,
+        "decided_without_record": 0
+      },
+      "fully_decided": false,
+      "fully_accounted": true,
+      "repair": {
+        "clouds_published": 0,
+        "replay_suffix_frames_reported_by_host": 0
+      },
+      "unresolved": [],
+      "rule": "each distinct keyframe has at most one outcome (never_quarantined, committed, deferred, pending, skipped, decided_without_record); a key with two outcomes is unresolved. skipped is its own class and never counts as decided. fully_accounted requires the classes plus never_quarantined to equal ingested with no unresolved entry; fully_decided additionally requires no pending or skipped segment. Counts come from the loop's own events, not a re-read of the bag, and overlapping episodes no longer double-count a key."
+    },
+    "host_fates": {
+      "ingested": 1269,
+      "quarantined": 982
+    },
+    "final_state": "WAITING_FOR_EVIDENCE",
+    "quarantine_open_at_exit": true,
+    "tail_closed": false,
+    "non_realtime": true
+  },
+  "ali_h": {
+    "reader_synthetic_cases": 11,
+    "reader_synthetic_pass": true,
+    "real_FAST_LIO_M_I_export": "NOT_DELIVERED",
+    "T": "NOT_APPLICABLE_BY_F2_HOST_STRUCTURE_ASSESSMENT",
+    "independent_normal_prefix": "NOT_AVAILABLE",
+    "independent_fault_labels": "NOT_AVAILABLE",
+    "same_population_old_vs_ALI_H": "NOT_EXECUTED",
+    "recall_false_alarm_latency_error_NORMAL": "NOT_EVALUABLE",
+    "UNKNOWN_intervals_from_real_FAST_LIO": "NOT_EVALUABLE"
+  },
+  "cost": {
+    "runtime_driver_pid_scope": {
+      "wall_sec": 334.505,
+      "pid": 1147795,
+      "pgid": 1145052,
+      "peak_rss_kb": 2446880,
+      "pose_messages": 2085,
+      "scan_messages": 2600,
+      "pose_callback": {
+        "n": 2085,
+        "p50_ms": 61.893,
+        "p95_ms": 450.581,
+        "max_ms": 1028.117,
+        "mean_ms": 98.4
+      },
+      "scan_callback": {
+        "n": 2600,
+        "p50_ms": 1.086,
+        "p95_ms": 158.884,
+        "max_ms": 393.003,
+        "mean_ms": 24.266
+      },
+      "callback_errors": [],
+      "callback_error_count": 0
+    },
+    "frame_cost_breakdown": {
+      "nis_measure": {
+        "n": 2085,
+        "p50_ms": 15.608,
+        "p95_ms": 372.857,
+        "max_ms": 636.945,
+        "mean_ms": 54.735
+      },
+      "ingest": {
+        "n": 2083,
+        "p50_ms": 51.379,
+        "p95_ms": 216.754,
+        "max_ms": 522.405,
+        "mean_ms": 69.943
+      }
+    },
+    "non_realtime_drain": true,
+    "whole_chain_peak_and_monetary_cost": "UNAVAILABLE",
+    "resource_metrics_are_diagnostic_not_gates": true
+  },
+  "overall": "PARTIAL_FUNCTIONAL_PROGRESS; FULL_ALI_AUTODETECTION_AND_RECOVERY_GOAL_NOT_COMPLETE"
+}

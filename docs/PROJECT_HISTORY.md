@@ -825,3 +825,11 @@ update fallback调真实cp.status摘要而非status命令，实测receipt None/c
 E2 native restore原件为`OK restore valid=0 reason=checkpoint_invalidated_by_re_slam`，但driver `native_checkpoint.ok=true`且restore_disposition仍写STATE_AND_MAP_ROLLBACK_ONLY、CONTINUES_FROM_RESTORED_STATE；checkpoint_check实际NO_ACK/UNKNOWN，无reprocess。这是会直接误述功能结果的缺陷，不属于性能/内存/实时性门。最低S1先按valid判真实成败，失败restore写NO_ROLLBACK/CONTINUES_FROM_UNRESTORED_STATE，关闭该错误归宿，不用ACK字符串OK冒成功；S2保宿主reset/cp失效原件。无需为CPU、内存或接口完备性另设放行门。
 
 下一唯一功能交付为E2判决后**真实结果与归宿一致、段关闭/重武装及尾段完成**：成功动作按实际update/map验收，拒绝则明确NO_ROLLBACK并继续后继，不能停在开放WAITING冒完整链。算法检测校准标签与净收益仍不可评价，参数不调，成本只后置诊断。S1 driver/S2 host责任确认，S4不代跑、不修改算法/科学门/private；仅历史增量中文SSH，四Cron及18:00截止如实报告。
+
+## 105. 18:00正式截止：双事件逻辑链实质突破，完整恢复与ALI-H自动检测未完成
+
+[18:00独立报告](fastlio_deadline_review_20261113/README.md)及[固定清单](fastlio_deadline_review_20261113/deadline_evidence.json)以main5494cdb/growthd265903为截止证据，18:34复核d9e4f34仅截止后TODO无新实现/run。总判定**部分推进、目标未完成**：drain run首次E1/E2均实际fired且E2有真实decision，是功能突破；E1 takeover非测量修复，E2 Mode3 accepted=false，restore valid=0/checkpoint_invalidated_by_re_slam、reprocess0，final WAITING/open、尾段未闭合，非实时。
+
+截止run binary/bag SHA固定，driver仅0b4dc78+且config/source身份不全；cp含ESKF/cov/ikdtree/time cursor但不含IMU preintegration/deskew。repair clouds0，真实修复→update/map本run NOT_EXECUTED；driver2085 paired/host1269+982、无replayed，fully_accounted仅driver且fully_decided false，catchup未实现。F2 reader 11合成通过但真实M/I未交、T NOT_APPLICABLE、独立正常/故障标签缺，同人口比较/自动检测NOT_EXECUTED，召回误报延迟错误NORMAL/UNKNOWN区间及净收益NOT_EVALUABLE。
+
+成本仅driver wall334.505s、峰RSS2446880KB及回调/ingest/nis诊断，整链峰值费用UNAVAILABLE、drain非实时，不设资源门。主要功能缺口为E2 paired evidence 1<4/reentry9.3957m、cp失效和失败restore误写已回滚，算法有效性/信息可恢复性证据不足，不调参。下一单一主线先闭合E2段/尾段并保持NO_ROLLBACK等真实归宿，再进入accepted修复→native update/map→E2；S1/S2/S3责任确认，S4不增工程前置。TODO固定require-contract建议与用户链条优先冲突不采用。一次性18:00任务自然消失，三持续Cron不停；标准库-I清单exit0，不ROS/build/install/算法/main历史/科学门/private，中文SSH正式截止。
