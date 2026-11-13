@@ -2715,3 +2715,28 @@ S1 自身（F3）立即接手：共享 driver/manager/relay 与宿主接口的�
 
 状态口径：任务已分发，**开工回执未到，S2/S3 进程状态 UNCONFIRMED**；不把分发写成正在执行。冻结门、预算、禁杀未知进程、四宿主保留、
 FAST-LIVO2 后置均不变。
+
+## 179. F3 首个实现：宿主能力声明与全消息归宿（S1 共享层）
+
+F3 在本机落了两处共享层代码（`slam_recovery/ros/recovery_node.py`，`tests/test_host_capabilities.py` 12 项，全套 236 项通过）：
+
+1. **宿主能力声明**：`CheckpointClient.capabilities()` 读命令目录的 `capabilities.json`（按 mtime/size 缓存），解析
+   `snapshot/restore/hold/reprocess/set_state/measurement_relay` 六项，**只有字面 `YES` 视为支持**；`PARTIAL`/`NO` 不支持，
+   缺失或解析失败为 `UNDECLARED`（保持既有 FAST-LIVO2 行为，但 summary 明写未声明）。
+   - accepted 且 `reprocess != YES`：**不发 reprocess、不发布修复云**，记 `native_checkpoint_skipped=reprocess_unsupported`、
+     `recovery_disposition={replay:NOT_SUPPORTED, subsequent_input:CONTINUES_FROM_UNCORRECTED_STATE, catch_up:NOT_IMPLEMENTED}`；
+   - refused 且 `restore != YES`：**不发 restore**，记 `restore_unsupported`、`scope=NONE`、`CONTINUES_FROM_UNROLLED_STATE`；
+   - 声明 `YES` 的宿主路径与既有行为一致（回归测试）。
+2. **全消息归宿**：summary 新增 `message_disposition`——输入计数（poses/scans/paired/unpaired/日志截断）、关键帧
+   `ingested / quarantine_memberships / quarantine_distinct / never_quarantined / committed_distinct / deferred_distinct /
+   pending_at_exit / segments_decision_skipped`、修复发布与 replay_suffix，以及 `unresolved`（如 committed key 不在
+   episode frames、distinct > ingested）。成员数与去重数分列，规则写明重叠段会重复计数；**未归类项进 unresolved，不默认 healthy**。
+   summary 同时新增 `host_capabilities`（DECLARED / UNDECLARED / NO_CHECKPOINT_DIRECTORY）。
+
+已向 S2（`r11070-c3`）确认为其 F1 ack 契约（消息 `9f868671…`）：`status` 保留 `repair_received/repair_applied`；`snapshot/hold/restore`
+带 `stamp_ns/frame` 且 `valid=0` 必须给原因；`reprocess` 带 `replay_suffix/replay_within_end/repaired_fed/source`；
+启动写 `capabilities.json` 并列出 checkpoint 实际含项；每被消费组给 `ingested/quarantined/replayed/dropped/pending|UNRESOLVED` 归宿。
+
+S2 已交 F1 开工回执（10:12）：宿主 `/home/R26534/fastlio2_ws/src/FAST-LIO`（内容 sha `da889ce0…`）、config `13086d7d…`、
+launch `23a91256…`、bin `4c31fada…`、输入 `campus_12_fl.bag` `a924b5f9…`、E1 `1711547999352267771`/E2 `1711548113452267771`，
+分支 `/tmp/wt-sim exp/growth-run@a4c652f`，预算 1 次增量构建 + ≤2 次 1800 s 有界 run。**S3 尚未回执**。

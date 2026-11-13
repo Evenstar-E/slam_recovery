@@ -654,6 +654,37 @@ class Episode:
         self.segment_id: Optional[str] = None
 
 
+class HostCapabilities:
+    """The host's declared command surface, read from ``capabilities.json`` in the control dir.
+
+    Only a literal ``YES`` is treated as supported. ``PARTIAL`` and ``NO`` both mean the driver
+    must not assume the command happened -- a partial snapshot that omits the IMU integration
+    cache is not a checkpoint, and a reprocess that the host answers with ``OK`` but does not
+    feed the repaired clouds is exactly the failure the receipt check exists for. A missing file
+    is ``UNDECLARED``: the driver keeps its previous behaviour so existing hosts are unaffected,
+    but the summary says so, so an unconfirmed command is never reported as an executed step.
+    """
+
+    KEYS = ("snapshot", "restore", "hold", "reprocess", "set_state", "measurement_relay")
+
+    def __init__(self, raw: Optional[Dict[str, Any]] = None) -> None:
+        self.raw = dict(raw or {})
+        commands = self.raw.get("commands")
+        if not isinstance(commands, dict):
+            commands = {k: v for k, v in self.raw.items() if k in self.KEYS}
+        self.commands = {k: str(commands.get(k, "NO")).strip().upper() for k in self.KEYS}
+        self.checkpoint = self.raw.get("checkpoint") if isinstance(
+            self.raw.get("checkpoint"), dict) else None
+        self.source = self.raw.get("source")
+
+    def supports(self, name: str) -> bool:
+        return self.commands.get(name) == "YES"
+
+    def as_dict(self) -> Dict[str, Any]:
+        return {"status": "DECLARED", "commands": dict(self.commands),
+                "checkpoint": self.checkpoint, "source": self.source}
+
+
 class CheckpointClient:
     """Drive the host's native checkpoint over a directory of command files.
 
@@ -696,8 +727,42 @@ class CheckpointClient:
         self.snapshot_ack_s: List[float] = []
         self._last_snapshot_wall = 0.0
         self._stopped = False
+        # Capabilities are read on demand: the host writes the file after it has started, which
+        # can be later than the driver. Cached by (mtime_ns, size) so the decision path never
+        # re-reads or re-parses it per episode.
+        self._caps: Optional[HostCapabilities] = None
+        self._caps_key: Optional[Tuple[int, int]] = None
+        self._caps_checked: Optional[Tuple[int, int]] = None
         if self.enabled:
             os.makedirs(self.dir, exist_ok=True)
+
+    def capabilities(self) -> Optional[HostCapabilities]:
+        """The host's declared capabilities, or None when it has declared none.
+
+        The file is re-stat'ed on every call (cheap); it is parsed only when it changed. A file
+        that exists but cannot be parsed is treated as undeclared, not as support: a malformed
+        declaration must not be read as permission to assume.
+        """
+        if not self.enabled:
+            return None
+        path = os.path.join(self.dir, "capabilities.json")
+        try:
+            st = os.stat(path)
+        except OSError:
+            return None
+        key = (int(st.st_mtime_ns), int(st.st_size))
+        if key == self._caps_key and self._caps is not None:
+            return self._caps
+        try:
+            with open(path, encoding="utf-8") as fh:
+                raw = json.load(fh)
+        except (OSError, ValueError):
+            return None
+        if not isinstance(raw, dict):
+            return None
+        self._caps = HostCapabilities(raw)
+        self._caps_key = key
+        return self._caps
 
     def _write(self, cmd: str, payload: str = "",
                preempt_snapshot: bool = False) -> Dict[str, Any]:
@@ -1915,6 +1980,26 @@ class NativeClosedLoop:
         # re-derived from that checkpoint through the host's own estimator. Both are recorded with
         # the host's ack, because "the command was sent" and "the host did it" are different facts.
         if self.cp is not None:
+            # The host declares what it can actually do. Only a declared YES allows the driver to
+            # issue a command and then describe its effect; an undeclared host keeps the previous
+            # behaviour (recorded as UNDECLARED), and a declared NO/PARTIAL stops the command so
+            # the run cannot claim a replay or rollback the host never performed.
+            caps_fn = getattr(self.cp, "capabilities", None)
+            caps = caps_fn() if callable(caps_fn) else None
+            if caps is not None:
+                ep.meta["host_capabilities"] = caps.as_dict()
+            if row.get("accepted") is True and caps is not None and not caps.supports("reprocess"):
+                # Publishing repairs that cannot be replayed would leave the record looking like
+                # a repair whose only missing step was the host's; it is not published at all.
+                ep.meta["native_checkpoint_skipped"] = "reprocess_unsupported"
+                ep.meta["recovery_disposition"] = {
+                    "replay": "NOT_SUPPORTED",
+                    "repair_published": False,
+                    "consumed_input_in_interval": "NOT_REPLAYED",
+                    "subsequent_input": "CONTINUES_FROM_UNCORRECTED_STATE",
+                    "catch_up": "NOT_IMPLEMENTED",
+                }
+                return row
             # INJECTION measurement repair: publish the corrected clouds before the replay command
             # and wait until the host has queued them. The host applies the command at a frame
             # boundary; the clouds arrive on a ROS topic. Without the receipt check, `reprocess`
@@ -1962,6 +2047,22 @@ class NativeClosedLoop:
                     writeback["trigger"] = "accepted_pose"
                     ep.meta["native_writeback"] = writeback
             else:
+                if caps is not None and not caps.supports("restore"):
+                    # A host that cannot restore keeps the frames it just judged in its map.
+                    # Saying "refused" without saying the rollback did not happen would read as
+                    # a clean refusal; the map and the state are left as the host wrote them.
+                    ep.meta["native_checkpoint_skipped"] = "restore_unsupported"
+                    ep.meta["restore_disposition"] = {
+                        "scope": "NONE",
+                        "rollback": "NOT_SUPPORTED",
+                        "checkpoint_stamp_ns": None,
+                        "decision_ts_ns": int(now_ts_ns),
+                        "interval_ns": None,
+                        "consumed_input_in_interval": "NOT_REPLAYED",
+                        "subsequent_input": "CONTINUES_FROM_UNROLLED_STATE",
+                        "catch_up": "NOT_IMPLEMENTED",
+                    }
+                    return row
                 action = self.cp.restore()
                 ep.meta["native_checkpoint"] = action
                 self._record_checkpoint_check(ep, action)
@@ -2052,6 +2153,87 @@ class NativeClosedLoop:
 # ---------------------------------------------------------------------------------------------
 # summaries
 # ---------------------------------------------------------------------------------------------
+def host_capabilities_record(loop: NativeClosedLoop) -> Dict[str, Any]:
+    """The host's declaration, or an explicit statement that it made none."""
+    if loop.cp is None:
+        return {"status": "NO_CHECKPOINT_DIRECTORY"}
+    caps_fn = getattr(loop.cp, "capabilities", None)
+    caps = caps_fn() if callable(caps_fn) else None
+    if caps is None:
+        return {"status": "UNDECLARED",
+                "note": "no capabilities.json in the control directory; commands were issued "
+                        "as in previous runs and their effect is not confirmed by declaration"}
+    return caps.as_dict()
+
+
+def message_disposition(loop: NativeClosedLoop) -> Dict[str, Any]:
+    """Where every consumed message ended up, from counters the loop already keeps.
+
+    The point is to make "the run continued" checkable: a keyframe is either on the healthy path,
+    in a quarantine that committed it, in one that deferred it, in a segment still open at exit,
+    or unresolved. Episode membership is counted both as memberships and as distinct keys,
+    because segments can overlap; the two numbers are not interchangeable and the rule says so.
+    Nothing here re-reads a bag or a host log -- these are the same events the decisions used.
+    """
+    ingested = int(loop.next_kf_id)
+    members = [(ep, int(kf)) for ep in loop.episodes for kf, _ts, _p in ep.frames]
+    distinct = {kf for _ep, kf in members}
+    committed, deferred = set(), set()
+    for r in loop.records:
+        committed.update(int(k) for k in (r.get("committed_pose_keys") or []))
+        deferred.update(int(k) for k in (r.get("deferred_pose_keys") or []))
+    pending_frames = sum(len(ep.frames) for ep in loop.episodes if not ep.decided)
+    skipped = sum(1 for ep in loop.episodes
+                  if (getattr(ep, "meta", {}) or {}).get("decision_skipped"))
+    repair_published = sum(int((getattr(ep, "meta", {}) or {})
+                               .get("repair_publish", {}).get("published", 0) or 0)
+                           for ep in loop.episodes)
+    replay_suffix = sum(int((getattr(ep, "meta", {}) or {}).get("replay_suffix") or 0)
+                        for ep in loop.episodes)
+    unresolved = []
+    outside = committed - distinct
+    if outside:
+        unresolved.append({"kind": "committed_key_not_in_episode_frames",
+                           "keys": sorted(outside)[:20], "count": len(outside)})
+    outside_deferred = deferred - distinct
+    if outside_deferred:
+        unresolved.append({"kind": "deferred_key_not_in_episode_frames",
+                           "keys": sorted(outside_deferred)[:20],
+                           "count": len(outside_deferred)})
+    if len(distinct) > ingested:
+        unresolved.append({"kind": "more_distinct_quarantined_than_ingested",
+                           "distinct": len(distinct), "ingested": ingested})
+    never_quarantined = ingested - len(distinct)
+    if never_quarantined < 0:
+        never_quarantined = 0
+    return {
+        "input": {"poses_received": int(loop.pairer.poses_received),
+                  "scans_received": int(loop.pairer.scans_received),
+                  "paired": int(loop.pairer.paired),
+                  "poses_unpaired": int(loop.pairer.poses_unpaired),
+                  "scans_unpaired": int(loop.pairer.scans_unpaired),
+                  "stamp_log_truncated": bool(loop.pairer.poses_received > loop.pairer.stamp_log_cap
+                                              or loop.pairer.scans_received
+                                              > loop.pairer.stamp_log_cap)},
+        "keyframes": {"ingested": ingested,
+                      "quarantine_memberships": len(members),
+                      "quarantine_distinct": len(distinct),
+                      "never_quarantined": never_quarantined,
+                      "committed_distinct": len(committed),
+                      "deferred_distinct": len(deferred),
+                      "pending_at_exit_memberships": int(pending_frames),
+                      "segments_decision_skipped": int(skipped)},
+        "repair": {"clouds_published": int(repair_published),
+                   "replay_suffix_frames_reported_by_host": int(replay_suffix)},
+        "unresolved": unresolved,
+        "rule": "episode membership is counted as memberships and as distinct keys; overlapping "
+                "segments can double-count memberships. A keyframe is accounted for only if it "
+                "appears in exactly one of never_quarantined / committed / deferred / pending; "
+                "anything outside those sets is listed under unresolved rather than assumed "
+                "healthy. Counts come from the loop's own events, not from a re-read of the bag.",
+    }
+
+
 def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, Any]:
     rows = loop.records
     # The ack for the last restore/replay may have arrived after the decision copied its
@@ -2199,6 +2381,11 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
         },
         "native_checkpoint": (loop.cp.status() if loop.cp is not None
                               else {"enabled": False, "note": "no checkpoint directory was given"}),
+        # What the host said it can do, and where every message ended up. Neither is inferred
+        # from the commands that were sent: an UNDECLARED host may have executed them, but the
+        # record must not claim it did.
+        "host_capabilities": host_capabilities_record(loop),
+        "message_disposition": message_disposition(loop),
         "native_checkpoint_actions": loop.cp_actions,
         "null_field_counts": null_counts,
         "holdout_nis_nonfinite": sum(1 for r in rows if r["holdout_nis"] is None)
