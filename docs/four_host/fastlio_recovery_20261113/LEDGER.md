@@ -99,3 +99,14 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
 - `capabilities.json` 增加 `"checkpoint_invalidated_by": "re_slam (host-native reset); a new snapshot is required afterwards"`；
 - `check_source_contract.py` 增加 3 条断言（re_slam 体内失效、restore 原因字符串、capabilities 声明），现共 **22 项 PASS**；
 - 语法检查 `-fsyntax-only` rc=0、0 errors；**未构建**，二进制仍 `86f85025…`（v5 随下次授权构建一起生效）。
+
+## ⑨ v5 授权复验（2026-11-13）：FAIL（driver 启动期看门狗误杀）
+
+- 构建 1 次：`86f85025…` → **`785c0f20…`**（v5，`re_slam` 使 cp 失效），退出码 0（`build_v5.log`）。
+- 运行 1 次：**driver 在启动后 15.0 s 判 `INPUT_STALE` 并退出**（`pose_messages=0, last_pose_wall=null`），
+  此时 host 的首个 `IMU Initial Done` 在 driver 启动后 **18.4 s**（host 启动后 22.2 s，bag 打开后 14.0 s）。
+  即 `--pose-stale-sec 15` 从**进程启动**计时，比 host 首次发布 `/Odometry` 早 3.4 s。
+- 主机侧正常：通道 `channel on`、首条 ack `OK hold deferred stamp=1711547997352267771`、`input_fates` 2250 组
+  （ingested 1137 / quarantined 1113）、bag 播到 `Done`；只是 driver 已退出，未收到任何位姿/扫描。
+- 判读：**driver 启动期看门狗口径问题**（应在首个位姿后再计时，或加启动宽限 ≥30 s），不是 host 或恢复通道缺陷。
+- 未重试、未再构建；原件 `two_event_v5_authorized/`。
