@@ -58,15 +58,16 @@
 
 FAST-LIO 的 ctrl2（120 s）与 A/B（260 s×2）是本协议的实例；未过冒烟的宿主不得进入整链。
 
-## 4. 资源预算（跑长链前必须过）
+## 4. 资源成本（诊断项，不是门槛）
 
-`python3 -I slam_recovery/tools/bench_frame_cost.py --rate 10 --max-core-fraction 0.25`
+`python3 -I slam_recovery/tools/bench_frame_cost.py --rate 10`
 
-- 预算：**每对帧的 driver 成本在计划帧率下 ≤ 0.25 核**；超过则先降载，不跑长链。
-- 依据：FAST-LIO 的退化判据是数据+时序相关的；driver 成本约 1 核时，宿主首次休眠从 115.8 s 提前到 66 s。
-- 当前（FIM matmul 恒等式 + support_reference 打包去重后）：FIM ≈ 82 ms、NIS ≈ 12 ms、合计 ≈ 94 ms/对
-  → 10 Hz 下 **0.94 核，FAIL**（脚本返回非 0）。要降到 0.25 核需要声明式改动（如 `max_eval_points` 600 或 `scan_cap` 减半），
-  这会改变 FIM/NIS 的人口，必须先有离线等价证据并经用户认可，不得静默调参。
+- **定位：诊断，不阻塞。** 用户 2026-11-13 决定：优先把整链跑通，不以硬件算力预算卡正常流程；
+  该测量只作为每次 run 的成本记录，默认 `status=REPORT_ONLY`、退出码 0。
+- 只有显式给出 `--max-core-fraction` 时才作为可选的硬门槛（用于以后需要封顶时）。
+- 背景数据（保留作判读依据，不作放行条件）：FIM ≈ 63–82 ms、NIS ≈ 11–12 ms，合计约 0.6–0.9 核 @10 Hz；
+  v5b（~1 核）时宿主首次休眠 66 s，v6（~0.5–1 核）时 105–111 s，无 driver 基线 115.8 s。成本会影响宿主时序，
+  但不能因此停住主线；需要时再降载。
 
 ## 5. 以宿主原生机制为主
 

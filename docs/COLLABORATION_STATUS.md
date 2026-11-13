@@ -3337,3 +3337,13 @@ profile:native_recovery}`，与 driver `--require-contract` 的校验项完全�
 
 预算门槛：host 侧不参与；`bench_frame_cost.py` 实测 0.94 核 / 阈值 0.25 核 = FAIL，**是否做声明式降采样（含离线等价证据）
 或接受例外仍待用户决定**；在此之前的任何长链 run 都不满足"预算前置"要求。
+
+## 218. 用户决定：硬件算力预算改为诊断项，不再阻塞流程
+
+用户明确指示：**"为什么我们要考虑预算问题，这不是工程问题吗，先能跑通再说……放宽或取消这种硬件算力预算的阈值"**。
+据此修改：
+- `slam_recovery/tools/bench_frame_cost.py` 默认 `--max-core-fraction 0` = **REPORT_ONLY**（退出码 0），只在显式给阈值时才 FAIL；
+- `docs/HOST_INTERFACE_CONTRACT.md` §4 改为"诊断项，不是门槛"，保留成本数据作判读（FIM≈63–82 ms、NIS≈11–12 ms，约 0.6–0.9 核 @10 Hz；
+  v5b ~1 核→宿主首休眠 66 s，v6 ~0.5–1 核→105–111 s，无 driver 基线 115.8 s）；
+- 主线优先"跑通"，成本影响宿主时序的问题在需要时再降载，不作为放行条件。
+本机复跑：`REPORT_ONLY`、`core_fraction=0.635`、exit 0。下一步：按既有授权流程申请 v7 构建 + 一次 run。
