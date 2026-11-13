@@ -1,0 +1,11 @@
+run_id=two_event_v5c_20261113T072824Z
+binary=785c0f20ed657c4c4aceb97ba547e8094bef942915892cdb2735f09fdaf8f7ff (v5, no rebuild)
+driver_main=16c4f71 (FIM matmul identity + support_reference packed unique)
+config=13086d7de1e91bed1d59cd4b80d2a99ccfd188b2b0bfb79bf1e6c6079d6a39d0
+bag=a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de
+E1=1711547999352267771 E2=1711548113452267771
+rate=1.0 duration=260s timeout=1200s
+driver_args=--first-pose-grace-sec 60 --pose-stale-sec 15 --host-hibernation-max-sec 90 --host-sleep-topic /Issleeping --host-build-topic /Isbuilding --wait-limit-sec 20 --repair-sync-timeout-sec 5
+record=/Odometry /Issleeping /Isbuilding -> frontend.bag
+hard_metrics=host first sleep ~115.8s; pose stream reaches E1 117.4s; report runtime.pose_callback/scan_callback n/p50/p95/max/mean
+stop: bag end + 20 s drain; failure kept, no retry, no rebuild

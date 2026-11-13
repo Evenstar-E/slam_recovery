@@ -110,3 +110,39 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
   （ingested 1137 / quarantined 1113）、bag 播到 `Done`；只是 driver 已退出，未收到任何位姿/扫描。
 - 判读：**driver 启动期看门狗口径问题**（应在首个位姿后再计时，或加启动宽限 ≥30 s），不是 host 或恢复通道缺陷。
 - 未重试、未再构建；原件 `two_event_v5_authorized/`。
+
+## ⑩ v5b 授权复验（2026-11-13）：FAIL（driver 共存下宿主提前休眠），但拿到定量成本
+
+- 不构建，v5 `785c0f20…`；driver 首次位姿宽限 60 s、`/Odometry` 已录制（`frontend.bag` 800 KB、259 s）。
+- `input_health = OK`（silence 0.063 s，不再误报 STALE）；`message_disposition` 输入 1019 位姿 / 2510 扫描，零回调错误。
+- **host_native 事件（相对 bag 首帧）**：休眠 66.2 s → 73.8 s 重建 → 81.3 s 休眠 → 94.3 s → 98.3 s；位姿流止于 **103.4 s**；
+  E1 在 **117.4 s**，仍未到达 → `scripted.fired=[]`、0 候选。对照 A/B（无 driver）首次休眠 115.8 s：
+  **driver 共存把宿主首次休眠提前约 50 s**。
+- **定量根因**：`runtime.pose_callback` n=1018、p50 **102 ms**、p95 **1255 ms**、max **1957 ms**、mean **244 ms**
+  （≈ 一个整核的持续占用）；`scan_callback` n=2510、p50 0.9 ms、p95 3.3 ms。即竞争来自 driver 的**逐位姿处理**，
+  不是扫描回调或恢复通道（A/B 已排除通道）。
+- 同一 run 也验证了共存策略：driver 收到宿主 sleep/build 后释放 hold（`input_fates` ingested 1274 / quarantined 978），
+  `host_native.state=PUBLISHING` 收尾，未发生 restore/reprocess（无 episode），v5 的 cp 失效路径未被触发。
+
+## ⑪ v5c 优化后授权 run（2026-11-13）：E1 首次到达；takeover 路径执行；仍非完整整链
+
+- 不构建，v5 `785c0f20…`；driver main `16c4f71`（FIM 恒等式 + packed-unique）。
+- **硬指标**：宿主首次休眠 **105.4 s**（v5b 66.2 s；无 driver 基线 115.8 s）→ 改善 39 s，仍早 10 s；
+  位姿流 **1.8–232.3 s**，**首次越过 E1（117.4 s）** ✔。
+- **E1 触发**：`fired=[(1711547999352267771, actual 115.6 s, kf 1092)]`，episode 1 个。
+  - `hold_skipped_host_state=HIBERNATING`（宿主 105.4→141.4 s 休眠中）；
+  - `host_reset_during_quarantine={signal: build, ts 1711548094.37}` → 按设计走 takeover，**不 restore/reprocess**；
+  - **armed snapshot 为空图**：`hold applied frame=1136 map_writes=held`、`snapshot applied frame=1140 map_points=2`
+    （E2 组 `map_points=1`）——因为宿主在休眠中已 `re_slam()` 清树。这证明"休眠期不应 snapshot"仍应补一层
+    host 侧判断（v5 只让 restore 拒绝，未阻止 snapshot 拍空图）。
+  - 收尾：`final_state=QUARANTINED`、`quarantine_open_at_exit=true`（takeover 后 segment 未被关闭）；E2 未触发。
+- **回调成本（新旧对比）**：
+
+| 回调 | v5b（旧） | v5c（新） |
+|---|---|---|
+| pose p50 / p95 / max / mean | 102 / 1255 / 1957 / 244 ms | **20 / 92 / 393 / 28 ms** |
+| scan p50 / p95 / max / mean | 0.9 / 3.3 / 1493 / 4.8 ms | 1.6 / **224** / 607 / 36.8 ms |
+
+  pose 路径改善 ~8.7×；scan 路径的 p95 反而升高（与录制/调度相关，需下次单独观察）。
+- `input_fates`：ingested 1277 / quarantined 982；首个 quarantined **115.4 s**（= E1−2 s，armed hold 正确）。
+- `input_health` OK（silence 0.06 s）；`message_disposition` 2063 位姿 / 2245 扫描、64 未配对位姿、246 未配对扫描。
