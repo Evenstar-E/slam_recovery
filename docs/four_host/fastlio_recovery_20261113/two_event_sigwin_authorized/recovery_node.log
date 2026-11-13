@@ -1,0 +1,2 @@
+[INFO] [1794560833.249724]: [slam_recovery] listening on /Odometry and /velodyne_points (repair publisher: on)
+[INFO] [1794561093.286880]: [slam_recovery] wrote 0 candidate rows to /tmp/wt-sim/docs/four_host/fastlio_recovery_20261113/two_event_sigwin_authorized

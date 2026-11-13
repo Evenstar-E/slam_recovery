@@ -1,0 +1,8 @@
+run_id=two_event_sigwin_20261113T090645Z
+binary=a40e20d516b14914728c98baf6b8807868bd6eb9b6f47523818c4caf1d7f0852 (v7)
+bag=a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de
+E1=1711547999352267771 E2=1711548113452267771
+rate=1.0 duration=260s timeout=1200s RECORD=1
+driver_args=--require-contract --first-pose-grace-sec 60 --pose-stale-sec 15 --host-signal-window-sec 30 --host-hibernation-max-sec 90 --host-sleep-topic /Issleeping --host-build-topic /Isbuilding --wait-limit-sec 20 --repair-sync-timeout-sec 5
+budget_diagnostic=total_ms: 47.536 core_fraction: 0.475 max_core_fraction: 0.25 status: FAIL  (NOT a gate)
+stop: bag end + 20 s drain; contract failure => exit before bag
