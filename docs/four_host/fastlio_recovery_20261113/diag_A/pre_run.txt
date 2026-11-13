@@ -1,0 +1,8 @@
+run_id=diag_A_20261113T061712Z
+mode=A (channel off, no driver)
+binary=86f850256cb8da2516740c88098e981168528aa582cfeffb563eac54c7f10279
+config=velodyne_m2dgr.yaml 13086d7de1e91bed1d59cd4b80d2a99ccfd188b2b0bfb79bf1e6c6079d6a39d0
+bag=a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de
+rate=1.0 duration=260s timeout=1200s
+record=/Odometry /Issleeping /Isbuilding
+stop: bag end + 5 s settle; failure => keep, no retry
