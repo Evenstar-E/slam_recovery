@@ -3249,3 +3249,17 @@ run 会在宿主即将恢复前被看门狗中止。修正（`pose_stream_health
 
 **待 S2（只改代码，不构建）**：`re_slam` 后到下一次正常发布前，`snapshot` 回 `valid=0 reason=host_reset_no_map`（或 capabilities 声明），
 避免休眠期空图快照；并说明 scan p95 升高（3.3→224 ms）是否与录制/调度有关。
+
+## 212. v6 代码（休眠期拒快照）核实入库；scan p95 的判读
+
+S2 `0802dd2`（`exp/growth-run`，v6 diff 472 行，仅 `-fsyntax-only`）已入 main（`40171da`；v5c 记录 `76bb6fc` 一并合入）。S1 核实：
+- `re_slam()` 置 `g_nr_host_reset=true`，首次正常 `publish_odometry()` 清除；标志为真期间 `snapshot` 回
+  `valid=0 reason=host_reset_no_map`，不覆盖已有 checkpoint；`capabilities.json` 增声明；
+- `check_source_contract.py` **26/26 PASS**（新增四条：re_slam 置位、snapshot 拒绝、publish 清除、capabilities 声明）；
+  `check_replay_regression.py` 仍 PASS。
+
+**共存规则现为四层**：①driver 休眠期不发 hold；②driver 对跨越宿主重置的隔离段不 restore/reprocess；③host 拒绝 `re_slam` 后的过期 cp；
+④host 拒绝休眠期的空图快照。二进制仍 v5 `785c0f20…`；v6 随下次授权构建生效。
+
+**scan p95（3.3→224 ms）判读**：S2 倾向录制/调度而非算法变慢——同 run `scan_callback.n=2245`（v5b 2510）未增加、p50 仅 0.9→1.6 ms，
+慢在尾部；本次新增 `rosbag record`（含 `--lz4` 结束突刺）与更密集的宿主休眠后消息集中到达。验证需下次授权 run 做"不录制 vs 录制"对照。
