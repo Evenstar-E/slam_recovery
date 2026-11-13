@@ -1,0 +1,40 @@
+"""The pose-stream watchdog: a host that stops publishing must end the run as an error.
+
+FAST-LIO hibernates when its position covariance crosses fixed thresholds and stops publishing
+/Odometry while it re-initialises (laserMapping.cpp:890-948). In the authorised run the driver
+then waited out the remaining 165 s for an E1 it could never receive. That condition is local to
+this host, so the driver stops and reports it instead of silently running to the wall clock.
+"""
+
+import unittest
+
+from slam_recovery.ros.recovery_node import pose_stream_health
+
+
+class PoseStreamHealthTest(unittest.TestCase):
+    def test_disabled_by_default(self):
+        h = pose_stream_health(0, None, 100.0, 200.0, 0.0)
+        self.assertEqual(h["status"], "DISABLED")
+
+    def test_no_pose_inside_the_startup_grace(self):
+        h = pose_stream_health(0, None, 100.0, 105.0, 15.0)
+        self.assertEqual(h["status"], "WAITING_FOR_FIRST_POSE")
+        self.assertEqual(h["silence_s"], 5.0)
+
+    def test_no_pose_beyond_the_grace_is_stale(self):
+        h = pose_stream_health(0, None, 100.0, 120.0, 15.0)
+        self.assertEqual(h["status"], "STALE")
+
+    def test_recent_pose_is_ok(self):
+        h = pose_stream_health(10, 190.0, 100.0, 200.0, 15.0)
+        self.assertEqual(h["status"], "OK")
+        self.assertEqual(h["silence_s"], 10.0)
+
+    def test_silence_beyond_the_limit_is_stale(self):
+        h = pose_stream_health(949, 195.0, 100.0, 216.0, 15.0)
+        self.assertEqual(h["status"], "STALE")
+        self.assertEqual(h["silence_s"], 21.0)
+
+
+if __name__ == "__main__":
+    unittest.main()

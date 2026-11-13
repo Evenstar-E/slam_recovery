@@ -2772,6 +2772,9 @@ class RosDriver:
         self.pose_count = 0
         self.scan_count = 0
         self._published = 0
+        self.last_pose_wall: Optional[float] = None
+        self.last_pose_ts_ns: Optional[int] = None
+        self.input_health: Dict[str, Any] = {"status": "NOT_EVALUATED"}
         self._pub = rospy.Publisher(status_topic, String, queue_size=20)
         self._sub_pose = rospy.Subscriber(pose_topic, Odometry, self._on_pose, queue_size=200)
         self._sub_scan = rospy.Subscriber(scan_topic, PointCloud2, self._on_scan, queue_size=20)
@@ -2792,7 +2795,9 @@ class RosDriver:
 
     def _on_pose(self, msg) -> None:
         self.pose_count += 1
+        self.last_pose_wall = time.time()
         ns = self._stamp_ns(msg.header.stamp)
+        self.last_pose_ts_ns = ns
         p = msg.pose.pose
         try:
             T = pose_to_matrix((p.position.x, p.position.y, p.position.z),
@@ -2835,6 +2840,12 @@ class RosDriver:
         if self.loop.records and len(self.loop.records) != self._published:
             self._publish_status()
 
+    def publish_input_health(self) -> None:
+        """Publish the input-health state so an external supervisor sees a stale stream."""
+        from std_msgs.msg import String
+        self._pub.publish(String(data=json.dumps({"status": "INPUT_HEALTH",
+                                                  **self.input_health})))
+
     def _publish_status(self) -> None:
         from std_msgs.msg import String
         row = self.loop.records[-1]
@@ -2849,6 +2860,32 @@ class RosDriver:
 # ---------------------------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------------------------
+def pose_stream_health(pose_count: int, last_pose_wall: Optional[float],
+                       started_wall: float, now_wall: float,
+                       limit_s: float) -> Dict[str, Any]:
+    """Whether the host is still producing the pose stream this run depends on.
+
+    A host that stops publishing (FAST-LIO does exactly that while it hibernates: isPublish is
+    false, laserMapping.cpp:947) leaves the driver waiting for a second event that can never
+    arrive. That is a host-local condition, not a generic property of every host, so the honest
+    response is to stop and report it rather than run out the clock silently.
+    """
+    out: Dict[str, Any] = {"limit_s": float(limit_s), "pose_messages": int(pose_count),
+                           "last_pose_wall": last_pose_wall}
+    if not limit_s or limit_s <= 0:
+        out["status"] = "DISABLED"
+        return out
+    if pose_count <= 0 or last_pose_wall is None:
+        waited = now_wall - started_wall
+        out["silence_s"] = round(waited, 3)
+        out["status"] = "STALE" if waited >= limit_s else "WAITING_FOR_FIRST_POSE"
+        return out
+    silence = now_wall - last_pose_wall
+    out["silence_s"] = round(silence, 3)
+    out["status"] = "STALE" if silence >= limit_s else "OK"
+    return out
+
+
 def _write_json(path: str, payload) -> None:
     tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8") as fh:
@@ -2870,6 +2907,11 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--scan-cap", type=int, default=SCAN_CAP)
     ap.add_argument("--sigma-meas-m", type=float, default=0.12,
                     help="the node's own noise scale; recorded, never re-derived here")
+    ap.add_argument("--pose-stale-sec", type=float, default=0.0,
+                    help="stop and report INPUT_STALE when no pose message has arrived for this "
+                         "long (0 = wait forever); a host that stops publishing cannot deliver "
+                         "the second event, and this is a host-local condition to surface, not "
+                         "to hide by running out the clock")
     ap.add_argument("--duration-sec", type=float, default=0.0,
                     help="stop after this many seconds of wall time (0 = run until shutdown)")
     ap.add_argument("--max-pairs", type=int, default=0,
@@ -2967,10 +3009,21 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     started = time.time()
     rate = rospy.Rate(2.0)
+    terminal_reason = None
     try:
         while not rospy.is_shutdown():
             rate.sleep()
             loop.service()
+            health = pose_stream_health(driver.pose_count, driver.last_pose_wall,
+                                        started, time.time(), args.pose_stale_sec)
+            driver.input_health = health
+            if health.get("status") == "STALE":
+                terminal_reason = "INPUT_STALE"
+                rospy.logerr("[slam_recovery] pose stream stale for %.1f s (last pose %s); "
+                             "host stopped publishing, stopping the run",
+                             health.get("silence_s") or 0.0, driver.last_pose_ts_ns)
+                driver.publish_input_health()
+                break
             if args.duration_sec and (time.time() - started) >= args.duration_sec:
                 break
             if args.max_pairs and loop.pairer.paired >= args.max_pairs:
@@ -2992,6 +3045,8 @@ def main(argv: Optional[List[str]] = None) -> int:
             "callback_error_count": len(driver.errors),
         },
         "launch_args": vars(args),
+        "terminal_reason": terminal_reason,
+        "input_health": dict(driver.input_health),
     })
     os.makedirs(args.run_dir, exist_ok=True)
     _write_json(os.path.join(args.run_dir, "run_summary.json"), summary)
