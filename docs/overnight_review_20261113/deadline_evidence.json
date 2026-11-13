@@ -1,0 +1,126 @@
+{
+  "window_utc8": [
+    "2026-11-12T17:53:00+08:00",
+    "2026-11-13T08:53:00+08:00"
+  ],
+  "fetch_utc8": "2026-11-13T08:53:23.6578822+08:00",
+  "main": "dff0057231a687a7271fd5e8e836aa68ae674d9f",
+  "prewindow_baseline": "43fcd2c1e7943ee42cae6e744ef869db1a74de99",
+  "prewindow_v6_delivered_at": "2026-11-12T17:30:55+08:00",
+  "command": "C:/Python315/python.exe -I -B D:/REPAIR/slam_recovery_upstream/docs/overnight_review_20261113/deadline_audit.py <new-output>",
+  "scope": "fixed saved data inventory and accepted evidence time binding; no full CLI/host/old controls rerun",
+  "populations": [
+    {
+      "run": "fl_native_20261112T065500Z_187992",
+      "population": {
+        "frames": 402,
+        "blocks": 90
+      },
+      "old_status": {
+        "AVAILABLE": 95,
+        "UNAVAILABLE": 307
+      },
+      "state_counts": {
+        "UNKNOWN": 402
+      },
+      "unknown_block_exposure_s": 45.0,
+      "longest_unknown_block_run_s": 45.0,
+      "no_data_blocks": 0,
+      "scope": "separate archived population, not full-message or independent fault denominator"
+    },
+    {
+      "run": "fl_native_20261112T070801Z_197026",
+      "population": {
+        "frames": 544,
+        "blocks": 120
+      },
+      "old_status": {
+        "AVAILABLE": 132,
+        "UNAVAILABLE": 412
+      },
+      "state_counts": {
+        "UNKNOWN": 544
+      },
+      "unknown_block_exposure_s": 60.0,
+      "longest_unknown_block_run_s": 60.0,
+      "no_data_blocks": 1,
+      "scope": "separate archived population, not full-message or independent fault denominator"
+    },
+    {
+      "run": "fl_native_20261112T115734Z_483777",
+      "population": 531,
+      "I_numeric_rows": 504,
+      "I_zero_eff_rows": 24,
+      "qualification_layers": {
+        "RAW_HEADER_CONTAINMENT": "HEURISTIC_UNPROVEN",
+        "SAME_UPDATE_PRE_POST": "INCOMPLETE",
+        "COMPLETE_POINT_MEMBERSHIP": "ASSERTED_NOT_VERIFIED",
+        "COVARIANCE_6D": "NOT_AVAILABLE"
+      },
+      "unknown_blocks": 120,
+      "unknown_block_exposure_s": 60.0,
+      "longest_unknown_block_run_s": 60.0,
+      "tail_rows": 47,
+      "tail_blocks": 12,
+      "tail_block_members": 51,
+      "e2_basis": "legacy_54s_not_run_bound",
+      "not_evaluable": [
+        "NORMAL_CONSISTENT",
+        "SUSPECT",
+        "false positive",
+        "missed detection",
+        "detection delay",
+        "wrong NORMAL"
+      ],
+      "scope": "block exposure is not continuous recovery or labelled normal/fault time"
+    },
+    {
+      "run": "fl_native_20261112T165438Z_669633",
+      "population": 482,
+      "I_numeric_rows": 462,
+      "I_zero_eff_rows": 18,
+      "qualification_layers": {
+        "RAW_HEADER_CONTAINMENT": "PASS",
+        "SAME_UPDATE_PRE_POST": "PASS",
+        "COMPLETE_POINT_MEMBERSHIP": "ASSERTED_NOT_VERIFIED",
+        "COVARIANCE_6D": "NOT_AVAILABLE"
+      },
+      "unknown_blocks": 106,
+      "unknown_block_exposure_s": 53.0,
+      "longest_unknown_block_run_s": 53.0,
+      "tail_rows": 303,
+      "tail_blocks": 64,
+      "tail_block_members": 304,
+      "e2_basis": "second_episode_deadline",
+      "not_evaluable": [
+        "NORMAL_CONSISTENT",
+        "SUSPECT",
+        "false positive",
+        "missed detection",
+        "detection delay",
+        "wrong NORMAL"
+      ],
+      "scope": "block exposure is not continuous recovery or labelled normal/fault time"
+    }
+  ],
+  "core_changed_paths": [
+    "slam_recovery/ros/recovery_node.py",
+    "slam_recovery/tests/test_recovery_node.py",
+    "slam_recovery/tests/test_repair_sync.py"
+  ],
+  "ALI_H_online_wiring": "NOT_IMPLEMENTED/NOT_EXECUTED in available deliveries",
+  "independent_normal_calibration_and_labels": "BLOCKED/NOT_AVAILABLE",
+  "new_recovery_slice": "PLAN_ONLY: S1 selected FAST-LIO2, implementation/execution not delivered",
+  "actual_user_GitHub_confirmation": "NOT_INDEPENDENTLY_VERIFIED; Codex-origin proposal is not label data or new approval",
+  "remote_process_state": "UNKNOWN: repository receipts only, no live remote measurement",
+  "whole_window_runtime_peak_cost": "UNAVAILABLE",
+  "hashes": {
+    "docs/ali_h_v1_research/t0_A.json": "99f276bee7ca2ca7f9779ea5e90351823b7993f4e6037b2414a950f208b2166f",
+    "docs/ali_h_v1_research/t0_B.json": "e8194850140977db6a524a830e2effed49ef7b0f476525a2d0e9b8ca75792c7e",
+    "docs/ali_h_v1_research/t2_summary.json": "d5439bf30da3af7e0e6b552595034d07d836f2e5cc5bb16210fee2fdb62383a6",
+    "docs/ali_h_v1_research/t2_v11_summary.json": "bfe335bb981012fde3af89423f9fe85761e2c97adf7ea48c1ae537985c2b6b8b",
+    "docs/ali_h_v1_research/重大阻塞记录.md": "851a81062aa02b7197175efe71d32c56d2edb20363321929a3b206b59d1456fd",
+    "docs/OVERNIGHT_RESULTS_20261113_S1.md": "cbbcc28a9353ba92d6961a0323f1c74b2a9f6f011650724b74ecd54d3dbca529",
+    "docs/COLLABORATION_STATUS.md": "42891454d8b88fc94784681c56a4b03f3f21326f36f576304a971bd7b5c39b0d"
+  }
+}
