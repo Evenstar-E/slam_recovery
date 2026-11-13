@@ -73,6 +73,9 @@ FAST-LIO 每个 LiDAR 帧的主循环（`FAST-LIO/src/laserMapping.cpp`）：
 | 事件/状态 | `re_slam`/`Issleeping`/`Isbuilding` 触发标志、`isPublish` | 用于解释 `has_out=0` 与事件边界，不作健康真值 |
 | 身份 | binary sha、library sha、config sha、bag sha、clock 模式、实际命令 | 与 run 目录 receipt 一致；跨 run/跨 build 不贴接 |
 
+**格式**：JSONL（一行一个对象）或 `# name ...` 空白表（按名读取，`pose7`/`pre_pose7` 块名可展开；
+`pre/post/pose` 前缀可识别）。缺任一必需字段时读取器**报错并列出缺项**，不做部分解析。
+
 **时间/身份规则**：同 update 用 `update_id` 绑定；不同 update 之间不允许按“最近时间”补 pre/post。
 `lidar_beg_time` 是 double 秒，若跨源比较用 ns，必须声明 512 ns 量化保护并保留多对一，不 nearest。
 
@@ -138,9 +141,10 @@ B2/B3 未解除前，本 host 只能交“资格/UNKNOWN/单位权 shadow”，�
 
 ## 9. 未阻塞、可继续的工作
 
-1. 本契约与读取器 `f2_fastlio_read.py`（按 §4 读取 JSONL、复用 T2 的 SE(3) Log/`V⁻¹`，
-   逐行 `eff=0`/缺 pair/重复 `update_id`/混合 run_id 均保留并标注；带合成自检
-   `python -I f2_fastlio_read.py selftest`，8 个用例通过）。
+1. 本契约与读取器 `f2_fastlio_read.py`（接受 §4 的 JSONL，或 `# name ...` 空白表；按名读取，
+   `pose7`/`pre_pose7` 块名可展开；复用 T2 的 SE(3) Log/`V⁻¹`）。逐行 `eff=0`/缺 pair/重复
+   `update_id`/混合 run_id 均保留并标注；带合成自检 `python -I f2_fastlio_read.py selftest`，
+   9 个用例通过。
 2. 导出到达后：同 update 绑定核对、`eff=0` 单列、support/context、逐帧/块三态与 scope、
    UNKNOWN 区间（数量/总时长/最长区间）。
 3. 同人口旧检测 vs ALI-H 的**观测对比**（不是检测率）：M/T/I present、UNKNOWN 占比、单位权分位。
