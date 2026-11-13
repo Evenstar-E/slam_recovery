@@ -1,0 +1,58 @@
+{
+  "legacy_index_fix": {
+    "rows": 531,
+    "numeric_rows": 504,
+    "changed_scores": 92,
+    "median": 72.29387608528863
+  },
+  "v11_existing_archive": {
+    "trace_rows": 792,
+    "has_out_rows": 725,
+    "paired_rows": 482,
+    "numeric_rows": 462,
+    "zero_effective_rows": 18,
+    "median_e_norm": 0.03424097551055872,
+    "median_unit_energy": 0.0011725995676058923,
+    "independent_translation_max_error": 4.708178291679133e-13,
+    "tail_rows": 303,
+    "deadline_rel_s": 21.002940433,
+    "all_unknown": true,
+    "layers": {
+      "RAW_HEADER_CONTAINMENT": "PASS",
+      "SAME_UPDATE_PRE_POST": "PASS",
+      "COMPLETE_POINT_MEMBERSHIP": "ASSERTED_NOT_VERIFIED",
+      "COVARIANCE_6D": "NOT_AVAILABLE"
+    }
+  },
+  "fastlio2_archive_checks": {
+    "messages": 4186,
+    "topics": {
+      "/Odometry": 4186,
+      "/cloud_registered": 4186,
+      "/cloud_registered_body": 4186,
+      "/path": 418,
+      "/Issleeping": 2,
+      "/Isbuilding": 2
+    },
+    "messages_total": 12980,
+    "gaps": [
+      {
+        "seconds": 23.799380302,
+        "jump_m": 60.47881367460649
+      },
+      {
+        "seconds": 26.899189473,
+        "jump_m": 71.12241634281042
+      }
+    ],
+    "e2_tail_s": 239.317980404,
+    "e2_tail_rows": 2126,
+    "imu_initial_done_log_count": 165,
+    "runner_120s_record_present": false,
+    "source_identity": "source_commit c6d9e3264bccc8e8762bb072ec0b3b741358d9bd\nsource_path /home/R26534/MM-LINS/FAST-LIO\nno-git-in-copy\nlivox 3d240d5666129e1a3052e78ee8487a04b08fdda3\nda889ce04ffcc2c8f0c226d14b37d1102cab62c5c28d95121555a75023e7929d  -\n",
+    "bag_reread": false
+  },
+  "native_build_run_replay_performed": false,
+  "core_diff_paths": [],
+  "independent_scope": "AST-extracted current pure functions and current pose-join statements; archived trace/JSON arithmetic. No archived CLI, native execution, full bag readback or full availability join."
+}

@@ -1,0 +1,17 @@
+{
+  "at_utc": "2026-11-13T00:18:43.748599+00:00",
+  "result": "PASS",
+  "python": "3.15.0",
+  "numpy": "2.5.4",
+  "input_files": 16,
+  "input_bytes": 4585638,
+  "float_relative_tolerance": 1e-10,
+  "float_absolute_tolerance": 1e-10,
+  "matches_original_review": true,
+  "core_diff_paths": [],
+  "native_build_run_replay_performed": false,
+  "full_availability_rejoin": false,
+  "bag_reread": false,
+  "numerical_body_ast_unchanged": true,
+  "publication_scope": "Reference review, fixed-input arithmetic tools and one collaboration index entry only."
+}
