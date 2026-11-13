@@ -2648,3 +2648,18 @@ S3 `4796f97`（已合入 main）：`RAW_HEADER_CONTAINMENT` 由 join 模式派�
 
 S1/S2停止新FAST-LIVO2的记录仅按仓库执行侧回执接受，Codex未检查远程进程。固定数据复算及可移植入口随报告发布；
 未做完整availability关联、原始bag重读或宿主运行。本条为**Codex参考审阅**，不替代用户验收，不启动自动化，不改变四项全部通过前不开FAST-LIVO2的硬性顺序。
+
+## 175. Codex 增量审阅合并：四宿主接线 0/4；对比表能力描述需按实际拓扑更正
+
+Codex 参考审阅 `6b6263b`（已合入 main `f998272`）结论：**部分通过**——方向纠偏已体现（停止新 FAST-LIVO2 工作的执行侧记录、
+四宿主分析、一次派生前端独立工作区运行），但**四宿主 slam_recovery 接线仍全部 NOT_IMPLEMENTED（0/4）**；main 的
+`slam_recovery/` 与 `tests/` 相对起点无变化，功能增量集中在 T2 分析脚本。
+
+**P2 纠正（已转 S2）**：`exp/growth-run` 的 `FOUR_HOST_RECOVERY_COMPARISON_20261113.md` 仍写"MM-LINS 四节点、无测量注入点"、
+"FAST-LIO2 已有 reprocess/体素八叉树"、"只有 FAST-LIO2/LIO-SAM 可做测量修复"。既有路径反证：`run_mmlins.sh:49–56` 实际是
+**FAST-LIO + PGO 两节点**；`FAST-LIO/src/laserMapping.cpp:758–759` 已有点云/IMU 订阅、地图为 **ikdtree**（:91）、
+`re_slam`（:673–693）重置清树；该文件**没有** `replay_buffer_`/`reprocess`。要求按实际拓扑更正能力表，保留"FAST-LIVO2 的
+replay/OctoMap 不能直接搬"的正确结论。
+
+**下一交付（已下派）**：在现有非 FAST-LIVO2 宿主实现一个**可运行的恢复切片**（真实测量修复→前端状态/地图重估→后端一致接回→
+后继/第二事件），卡住就指出具体函数、缺失状态与最小改动；15h 窗口内来不及，明天从"最小切片设计"开始（FAST-LIO2 或 LIO-SAM）。
