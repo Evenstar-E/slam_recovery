@@ -3137,3 +3137,13 @@ NIS holdout（`compute_disjoint_holdout_point_to_plane_nis`，300×600 向量化
 
 口径：这是"不互相干扰"的最小实现——宿主仍是它自己恢复的第一责任方；我们不与它抢图、不在它重置后假装回滚。
 仍**不构建、不运行**；验证需下一次授权 run（同时用 `runtime.pose_callback/scan_callback` 定量 driver 竞争）。
+
+## 204. 共存加固：宿主 `re_slam` 后 checkpoint 必须失效（host 侧第三层）
+
+S2 复核指出：`re_slam()` 后 host 的 `g_nr_cp` 仍指向旧点集，若此时收到 `restore` 会用旧点集重建，与 `re_slam` 的新状态不一致。
+S1 已要求 S2 做最小改动（**只改代码、不构建**，随下次授权构建生效）：
+- `re_slam()` 内置 `g_nr_cp.valid=false`（或等价），`restore` 先检查，无效回 `valid=0 reason=checkpoint_invalidated_by_re_slam`，不执行 change_x/change_P/Build；
+- `capabilities.json`/LEDGER 注明"`re_slam` 后 checkpoint 失效，需重新 snapshot"；`check_source_contract.py` 增断言。
+
+由此共存规则有三层：①driver 在宿主休眠/重建期间不发 hold；②driver 对跨越宿主重置的隔离段不 restore/reprocess（记 takeover）；
+③host 在 checkpoint 被 `re_slam` 失效后拒绝 restore——即使前两层漏掉也不会用旧图重建。待 S2 提交后核实入库；状态仍不构建、不运行。
