@@ -3347,3 +3347,12 @@ profile:native_recovery}`，与 driver `--require-contract` 的校验项完全�
   v5b ~1 核→宿主首休眠 66 s，v6 ~0.5–1 核→105–111 s，无 driver 基线 115.8 s）；
 - 主线优先"跑通"，成本影响宿主时序的问题在需要时再降载，不作为放行条件。
 本机复跑：`REPORT_ONLY`、`core_fraction=0.635`、exit 0。下一步：按既有授权流程申请 v7 构建 + 一次 run。
+
+## 219. 用户授权：1 次 v7 构建 + 1 次有界 run（契约校验 + 整链）
+
+用户于 17:0x 授权。条件已转 S2（消息 `7ed5ca5f…`）：构建 1 次 v7（capabilities semantics，记前后 sha）；
+运行 1 次，参数 `--require-contract --first-pose-grace-sec 60 --pose-stale-sec 15 --host-hibernation-max-sec 90
+--host-sleep-topic /Issleeping --host-build-topic /Isbuilding --wait-limit-sec 20 --repair-sync-timeout-sec 5`，录三个轻量话题；
+预算只记录不阻塞。验点：放 bag 前 `host_contract.problems=[]`；ack 序列逐条；E1/E2、takeover/abandon/rearm、final_state；
+`host_native`、`input_fates`、回调成本；失败保原件、不重试、不再构建。七步冒烟的 hold/snapshot/restore/replay 已由 ctrl2 覆盖，本次不重复。
+当前状态：授权已下达，构建与 run 尚未开始（以 S2 实交为准）。
