@@ -226,3 +226,29 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
   E2 在 229.7 s。`scripted.fired` 仍只有 E1。
 - 回调：pose n=1856、p50 53 / p95 387 / max 756 / mean 81 ms；scan n=2505、p50 1.1 / p95 153 / max 406 / mean 25 ms。
 - `input_fates`：ingested 1274 / quarantined 978；resume 多次（每轮宿主发布后）。
+
+## ⑮ 排空授权 run（2026-11-13）：E1 与 E2 均触发；E2 在排空期决策为 Mode 3 等待
+
+**非实时声明**：本 run 播放 260 s，driver 墙钟上限 360 s，bag 结束后排空 60 s 再 SIGINT。
+E2 的帧在排空期被处理；其 `actual_s=229.696` 是 **stamp 时间**，墙钟晚于 bag 结束，因此本 run 是
+"逻辑链验证"，不是实时性能证据。
+
+- 不构建，v7 `a40e20d5…`；契约通过；录三轻量话题。
+- **`scripted.fired` 两条**：E1 `115.599 s`（kf 1156）、**E2 `229.696 s`（kf 2054）**。
+- ep0（E1）：`hold_skipped_host_state=HIBERNATING`、`host_reset_during_quarantine(build)`、`segment_abandoned=True`；
+  lifecycle `segment_abandoned` + `rearm`。
+- ep1（E2）：触发 `1711548113473230600`，决策于 `1711548141172342539`（rel ≈259.9 s），
+  mode **`MODE3_SOFT_BRIDGE_WAIT`**、1 个候选 `cand_0001`、`accepted=false`；无 host 重置。
+- 收尾 `WAITING_FOR_EVIDENCE`、`open=true`：Mode 3 的等待段在 run 结束（排空后 STALE）前未关闭。
+- `poses_received=2085`（录制 2091）、`max_backlog=501`、`paired=2085`；`input_fates` ingested 1269 / quarantined 982。
+- **逐阶段成本**（`frame_cost_breakdown`）与回调：
+
+| 阶段 | n | p50 | p95 | max | mean |
+|---|---:|---:|---:|---:|---:|
+| **ingest** | 2083 | 51.4 | 216.8 | 522.4 | **69.9 ms** |
+| nis_measure | 2085 | 15.6 | 372.9 | 636.9 | 54.7 ms |
+| pose_callback（含两者+配对/分发） | 2085 | 61.9 | 450.6 | 1028.1 | 98.4 ms |
+| scan_callback | 2600 | 1.1 | 158.9 | 393.0 | 24.3 ms |
+
+  最长项：**`ingest`（mean 69.9 ms，占 pose_callback mean 的约 71%）**；`nis_measure` 次之（54.7 ms）。
+  仅标注，未做任何修改。
