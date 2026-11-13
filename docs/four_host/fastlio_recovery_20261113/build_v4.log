@@ -1,0 +1,36 @@
+[  0%] Built target geometry_msgs_generate_messages_eus
+[  0%] Built target geometry_msgs_generate_messages_lisp
+[  0%] Built target geometry_msgs_generate_messages_cpp
+[  0%] Built target geometry_msgs_generate_messages_py
+[  0%] Built target geometry_msgs_generate_messages_nodejs
+[  0%] Built target _fast_lio_generate_messages_check_deps_Pose6D
+[ 45%] Built target fast_lio_generate_messages_cpp
+[ 63%] Built target fast_lio_generate_messages_nodejs
+[ 63%] Built target fast_lio_generate_messages_lisp
+[ 63%] Built target fast_lio_generate_messages_eus
+[ 63%] Built target fast_lio_generate_messages_py
+[ 63%] Built target fast_lio_generate_messages
+[ 72%] Building CXX object FAST-LIO/CMakeFiles/fastlio_mapping.dir/src/laserMapping.cpp.o
+In file included from /home/R26534/mm/ros/include/boost/smart_ptr/detail/requires_cxx11.hpp:9,
+                 from /home/R26534/mm/ros/include/boost/smart_ptr/shared_ptr.hpp:17,
+                 from /home/R26534/mm/ros/include/boost/shared_ptr.hpp:17,
+                 from /home/R26534/mm/ros/include/ros/forwards.h:37,
+                 from /home/R26534/mm/ros/include/ros/common.h:37,
+                 from /home/R26534/mm/ros/include/ros/ros.h:43,
+                 from /home/R26534/fastlio2_ws/src/FAST-LIO/src/laserMapping.cpp:10:
+/home/R26534/mm/ros/include/boost/bind.hpp:36:1: note: ‘#pragma message: The practice of declaring the Bind placeholders (_1, _2, ...) in the global namespace is deprecated. Please use <boost/bind/bind.hpp> + using namespace boost::placeholders, or define BOOST_BIND_GLOBAL_PLACEHOLDERS to retain the current behavior.’
+   36 | BOOST_PRAGMA_MESSAGE(
+      | ^~~~~~~~~~~~~~~~~~~~
+[ 81%] Linking CXX executable /home/R26534/fastlio2_ws/devel/lib/fast_lio/fastlio_mapping
+[100%] Built target fastlio_mapping
+Base path: /home/R26534/fastlio2_ws
+Source space: /home/R26534/fastlio2_ws/src
+Build space: /home/R26534/fastlio2_ws/build
+Devel space: /home/R26534/fastlio2_ws/devel
+Install space: /home/R26534/fastlio2_ws/install
+####
+#### Running command: "make cmake_check_build_system" in "/home/R26534/fastlio2_ws/build"
+####
+####
+#### Running command: "make -j8" in "/home/R26534/fastlio2_ws/build/FAST-LIO"
+####

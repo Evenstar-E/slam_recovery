@@ -56,3 +56,18 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
   同一组内 hold 先执行、snapshot 后执行（快照取上一完成帧，与 hold 无关）。
 - `check_source_contract.py` 增加 5 条断言（deque 类型、push_back、pop_front、`<= now` 全量排空、按序执行），
   现共 **19 项，全部 PASS**；`check_replay_regression.py` 仍 PASS（83/899）。
+
+## ⑦ 授权复验（2026-11-13，v4 构建 `86f85025…`）
+
+- 构建 1 次：`df27a24c…` → **`86f85025…`**，退出码 0（`build_v4.log`）。
+- 运行 1 次（`two_event_authorized_20261113/`）：bag 播完（Done，259.99 s），driver 存活 260.6 s。
+- **v4 延期语义生效**：ack 依次为 `OK hold deferred stamp=1711547997352267771`（= E1−2 s）→
+  `OK hold applied valid=1 stamp_ns=1711547997274449664 frame=1137 map_writes=held` →
+  `OK snapshot applied valid=1 stamp_ns=1711547997774402048 frame=1142 map_points=221815`；第二组
+  E2−2 s 同样 applied（frame 2111/2117）。不再是 frame=0 / 空图。
+- **但整链仍 FAIL（0 候选）**：host 在 bag ≈ **93 s** 进入原生退化-重建循环（`Over-degeneracy` 8 次、
+  `IMU Initial Done` 163 次），**停止发布 `/Odometry`**；driver 的位姿流止于 bag 93.0 s，E1（116 s）
+  从未到达，`scripted.fired=[]`。这与 v4 无关（hold 在 116 s 才生效，之前 1137 帧均为 ingested）。
+- `input_fates`：ingested 1137 / quarantined 1113（首个 quarantined 恰为 E1−2 s），无 replayed。
+- 对照：此前同 bag 的完整 469 s 运行（独立构建）在 E1 处仍能发布位姿（停发于 E1+0.02 s）；本 run 的
+  93 s 停止更早，原因未定（负载/退化阈值与输入时序相关，需进一步验证；本次不重试）。
