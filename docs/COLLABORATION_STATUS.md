@@ -2740,3 +2740,29 @@ F3 在本机落了两处共享层代码（`slam_recovery/ros/recovery_node.py`�
 S2 已交 F1 开工回执（10:12）：宿主 `/home/R26534/fastlio2_ws/src/FAST-LIO`（内容 sha `da889ce0…`）、config `13086d7d…`、
 launch `23a91256…`、bin `4c31fada…`、输入 `campus_12_fl.bag` `a924b5f9…`、E1 `1711547999352267771`/E2 `1711548113452267771`，
 分支 `/tmp/wt-sim exp/growth-run@a4c652f`，预算 1 次增量构建 + ≤2 次 1800 s 有界 run。**S3 尚未回执**。
+
+## 180. S3 F2 首个实质交付核实并入库：FAST-LIO 通道契约 + 校准 BLOCKED
+
+S3 `r26534-58` 交 `exp/ali-h-v1@8ad46fc`（工作树 `/tmp/wt-ali` 干净，无 push 凭据），新增
+`docs/ali_h_v1_research/F2_FASTLIO_CHANNEL_ELIGIBILITY.md`（156 行）。S1 逐条核源码后 cherry-pick 入 main（`27ea996`），
+并把 `exp/ali-h-v1` 更新到 `8ad46fc` 后推送。
+
+**本机复核（只读源码，未跑宿主）**：
+- pre/post 绑定成立：`laserMapping.cpp:803` `p_imu->Process` → `:804 state_point=kf.get_x()`（pre）；`:849 P_pre_=kf.get_P()`；
+  `:869 kf.update_iterated_dyn_share_modified(LASER_POINT_COV,…)`；`:872 state_point=kf.get_x()`（post）；`:884–885 P_out_=kf.get_P()`。
+- `esekfom.hpp:1621–1622` `x_propagated=x_` / `P_propagated=P_` 确在同一 update 调用内；`use-ikfom.hpp:12–20` 23 DoF
+  （pos/rot/offset_R/offset_T/vel/bg/ba/grav）；`SOn.hpp:233–236` `*this = *this * exp(vec)` 右乘 body。
+- `effct_feat_num` 声明 `:64`、清零 `:629`、递增 `:638`、均值 `:641`；`lidar_beg_time` `:349`、`lidar_end_time` `:350`。
+- 结论与 S3 一致：**I 可从同 update 拿但当前无导出；M 需在 `h_share_model`/update 内导最终迭代残差/S；T 在 FAST-LIO
+  结构上不存在（仅 ikdtree 地图更新），必须 `NOT_APPLICABLE`，不得用 M 冒充。**
+
+**资格/校准状态（实证据口径）**：`SAME_UPDATE_CALL_BINDING`/`PRE_POST_POSE_IDENTITY` 待 F1 导出；`COMPLETE_POINT_MEMBERSHIP`
+默认 `ASSERTED_NOT_VERIFIED`；`COVARIANCE_6D` 默认 `NOT_AVAILABLE_FOR_E_I`；校准 `BLOCKED`（无独立正常前缀 B2）；事件标签
+`BLOCKED`（无本 host 故障标签 B3）；召回/延迟/误报/错误 NORMAL 全部 `NOT_EVALUABLE`，不填 0。
+
+**S1 裁决（回复 S3）**：
+1. B3 声明式自注入**不并入 F1 本次预算**——F1 已锁 1 次增量构建 + ≤2 次有界 run，其中一次用于恢复整链；注入若与恢复同 run
+   会污染恢复证据。B3 保持 `BLOCKED`；如 F1 整链跑完仍有预算余量，由 S2 先提具体方案、S1 确认后再决定，不静默扩预算。
+2. 推送由 S1 执行（S3 无凭据，SSH 22 被重置）；S3 交付按原件核实后入库，不改其内容。
+3. §4 导出契约转 F1：S1 已把字段表要点随 ack 契约发给 S2（`9f868671…`），本条再点名 `update_id` 同行绑定、`eff`/support 样本、
+   `repaired_fed` 与 `capabilities.json` 声明。
