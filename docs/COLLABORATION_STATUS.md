@@ -3263,3 +3263,15 @@ S2 `0802dd2`（`exp/growth-run`，v6 diff 472 行，仅 `-fsyntax-only`）已入
 
 **scan p95（3.3→224 ms）判读**：S2 倾向录制/调度而非算法变慢——同 run `scan_callback.n=2245`（v5b 2510）未增加、p50 仅 0.9→1.6 ms，
 慢在尾部；本次新增 `rosbag record`（含 `--lz4` 结束突刺）与更密集的宿主休眠后消息集中到达。验证需下次授权 run 做"不录制 vs 录制"对照。
+
+## 213. 用户授权：1 次 v6 构建 + 2 次 run（录制对照）
+
+用户于 16:0x 授权。条件已转 S2（消息 `b11fdfff…`）：
+- **构建 1 次**：v6 源码（休眠期拒快照），记日志/退出码/前后 sha（当前 v5 `785c0f20…`）；
+- **Run A（不录制）**：`two_event_v6_norec_authorized/`，不启 rosbag record，其余同参数；
+- **Run B（录制）**：`two_event_v6_rec_authorized/`，录 `/Odometry /Issleeping /Isbuilding`；
+- 并列判读：回调 n/p50/p95/max/mean（scan 尾部是否回落）；E1/E2 是否触发（尤其 rearm 后 E2）；休眠期 snapshot 是否
+  `valid=0 reason=host_reset_no_map`；收尾 `final_state` 与 `quarantine_open_at_exit`；`host_native` 与 `input_fates`；
+- 失败保原件、记 FAIL/BLOCKED、不重试、不再构建。
+
+当前状态：授权已下达，构建与两次 run 尚未开始（以 S2 实交为准）。
