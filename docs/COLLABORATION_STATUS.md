@@ -3022,3 +3022,15 @@ A/B/C 的 `/Odometry` 断点位置即可二分"通道开销 vs driver 竞争"。
 若严格同二进制，A 也需一次）。
 
 状态不变：不构建、不运行、不改码；二进制 `86f85025…`；原件与 LEDGER 不动；等用户决定。
+
+## 196. 用户授权 A/B 两次诊断 run（同 v4 二进制、无 driver）
+
+用户于 14:1x 授权"run 两次（A/B）"。条件已转 S2（消息 `e673a1ae…`）：
+- 同一 v4 二进制 `86f85025cb…`，不再构建；同 bag `campus_12_fl.bag`（`a924b5f9…`）、rate 1.0、260 s、外层 1800 s、私有 master；
+- **A（通道关，基线）**：不设 `native_recovery_dir`，无 driver；期望复现独立 run 的 E1 115.8 s 停发；
+- **B（通道开，无 driver）**：设 `native_recovery_dir`，确认 `capabilities.json` 后放 bag，不起 driver；
+- 只录 `/Odometry /Issleeping /Isbuilding`；每次记录 pre_run 身份与停止条件；A 完再 B；失败保原件、不重试；
+- 交件：各自 `/Odometry` 总条数/首末戳/所有 >1 s 缺口起点与长度/首次停发时刻、休眠与建图次数、host.log 计数、与 C（94.7–96.4 s）及旧独立 run（115.8 s）的对比。
+
+判读：A≈115.8 s 且 B≈A → 通道开销小、C 的提前来自 driver 竞争；B 明显早于 A → 通道自身开销。诊断性原生 run，不是整链或自动检测；不改阈值。
+当前状态：授权已下达，**两次 run 尚未开始**（以 S2 实交为准）。
