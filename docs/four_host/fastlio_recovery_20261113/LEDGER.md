@@ -180,3 +180,17 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
 - E2 不可达的量化原因：E2 在 bag 229.7 s，而 driver 的位姿流在 A 止于 226.5 s、B 止于 199.8 s；宿主在 E1 后继续
   多次 sleep/rebuild，未能在 E2 前恢复稳定发布。
 - `input_fates`：A ingested 1268 / quarantined 982；B 1270 / 980。
+
+## v7（2026-11-13，只写代码，未构建/未运行）：契约 semantics 块
+
+- `capabilities.json` 新增 `semantics`：
+  `{"apply_stamp":"YES","ack_levels":["deferred","applied"],"checkpoint_validity":"until_re_slam","publish_gating":"isPublish","profile":"native_recovery"}`；
+- 离线验证：从 C++ 字符串字面量重建整份 JSON 并用 `json.loads` 解析 → **合法**，顶层键含 `semantics`；
+- `check_source_contract.py` 增 5 条断言（五项字段），共 **31 项 PASS**；
+- 语法检查 rc=0；**未构建**，二进制仍 v6 `f167bf5e…`（v7 随下次授权构建生效）。
+
+## 预算门槛（driver 侧，供记录）
+
+`bench_frame_cost.py --rate 10 --max-core-fraction 0.25`：FIM≈82 ms + NIS≈12 ms ≈ 94 ms/对 → **0.94 核，FAIL**
+（与 v6 A/B 的 ~112 ms/对一致）。降到 0.25 核需声明式降采样（`max_eval_points` 1200→600 或
+`scan_cap` 减半），会改变 FIM/NIS 人口，待用户批准与离线等价证据；本项不在 host 侧。
