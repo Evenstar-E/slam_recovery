@@ -69,6 +69,9 @@ class _FakeCP:
         self.reprocess_end_stamp = None
         self.restore_ack = "OK restore valid=1 stamp_ns=0 frame=0\n"
         self.status_ack = "OK status valid=1 repair_received=0 repair_applied=0\n"
+        self.holds = 0
+        self.resumes = 0
+        self.expired = 0
         self._issued = None
         self._last_snapshot_wall = 0.0
 
@@ -93,6 +96,17 @@ class _FakeCP:
     def status(self):
         self._issued = "status"
         return {"command": "status"}
+
+    def hold(self, apply_stamp_ns=None):
+        self.holds += 1
+        return {"command": "hold"}
+
+    def resume(self):
+        self.resumes += 1
+        return {"command": "resume"}
+
+    def expire_pending(self, age_s):
+        self.expired += 1
 
     def restore(self):
         self.restore_calls += 1

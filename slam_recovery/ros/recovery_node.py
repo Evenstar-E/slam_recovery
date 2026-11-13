@@ -1271,6 +1271,12 @@ class NativeClosedLoop:
         # The first frame at which the detector left HEALTHY. The quarantine opens one dwell
         # window later, so the two timestamps measure different things.
         self._first_alarm_ts_ns: Optional[int] = None
+        # The host's own recovery state, from /Issleeping and /Isbuilding plus the first pose
+        # after a sleep. The host hibernates on its own covariance and clears its map in
+        # re_slam(); our hold must not survive that, or the host cannot rebuild and never
+        # publishes again (authorised run: map 221815 -> 1347 points while held).
+        self.host_native_state = "UNKNOWN"
+        self.host_native_events: List[Dict[str, Any]] = []
 
     # -- ingest -------------------------------------------------------------------------------
     def _fed(self, ts_ns: int) -> bool:
@@ -1698,6 +1704,43 @@ class NativeClosedLoop:
         }
         return poses, detail
 
+    def on_host_signal(self, kind: str, stamp_ns: Optional[int] = None) -> None:
+        """React to the host's own recovery signals, without fighting them.
+
+        FAST-LIO publishes Issleeping when it hibernates and Isbuilding when it starts a new
+        map; on re_slam() it clears the map. Holding map writes through that makes the host's
+        own recovery impossible, so our hold is released on either signal, and a quarantine that
+        was open is marked as taken over by the host instead of being rolled back against a map
+        that no longer exists.
+        """
+        now = round(time.time(), 3)
+        previous = self.host_native_state
+        if kind == "sleep":
+            self.host_native_state = "HIBERNATING"
+        elif kind == "build":
+            self.host_native_state = "REBUILDING"
+        elif kind == "publish":
+            self.host_native_state = "PUBLISHING"
+        else:
+            return
+        self.host_native_events.append({"event": f"host_{kind}", "ts_ns": stamp_ns,
+                                        "wall": now, "previous": previous,
+                                        "state": self.host_native_state})
+        if kind in ("sleep", "build") and self.cp is not None:
+            # Release, do not re-hold: the host is not writing anyway while isPublish is false,
+            # and it must be free to write its rebuilt map when it wakes.
+            try:
+                action = self.cp.resume()
+                action["trigger"] = f"host_{kind}"
+            except Exception:
+                pass
+        if kind in ("sleep", "build") and self._open is not None and not self._open.decided:
+            meta = getattr(self._open, "meta", None)
+            if meta is None:
+                self._open.meta = meta = {}
+            meta["host_reset_during_quarantine"] = {
+                "signal": kind, "ts_ns": stamp_ns, "wall": now}
+
     def _open_episode(self, ts_ns: int, pose: np.ndarray, segment=None) -> None:
         estimated = None
         q_start = None
@@ -1725,7 +1768,12 @@ class NativeClosedLoop:
             # Idempotent fallback. The checkpoint and capture start are declared at the trigger
             # stamp ahead of time (see main()), because a command sent here is applied at the
             # host's next processed frame, which lags the trigger under a playback backlog.
-            self.cp.hold()
+            if self.host_native_state in ("HIBERNATING", "REBUILDING"):
+                # The host is not writing its map; a hold here only blocks its rebuild.
+                ep.meta = getattr(ep, "meta", {}) or {}
+                ep.meta["hold_skipped_host_state"] = self.host_native_state
+            else:
+                self.cp.hold()
 
     def _checkpoint_boundary(self, ep: "Episode") -> Optional[int]:
         """The latest checkpoint stamp a segment may legitimately roll back to.
@@ -1969,6 +2017,13 @@ class NativeClosedLoop:
         # `RuntimeError: No active quarantine segment to validate` -- counted as an errored
         # candidate even though nothing was wrong with the candidate. The segment is already
         # closed and re-armed, so the honest result is a skip, not a verdict.
+        if (getattr(ep, "meta", {}) or {}).get("host_reset_during_quarantine"):
+            # The host hibernated and cleared its map inside this quarantine. There is no
+            # checkpoint to roll back to and no candidate to score; claiming a recovery here
+            # would describe a rollback of a map the host itself discarded.
+            ep.decided = True
+            ep.meta["decision_skipped"] = "HOST_NATIVE_RECOVERY_TAKEOVER"
+            return None
         seg_id = getattr(ep, "segment_id", None)
         if seg_id is not None:
             active = self.node.tx_mgr.active_quarantine
@@ -2565,6 +2620,7 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
         # from the commands that were sent: an UNDECLARED host may have executed them, but the
         # record must not claim it did.
         "host_capabilities": host_capabilities_record(loop),
+        "host_native": {"state": loop.host_native_state, "events": loop.host_native_events},
         "message_disposition": message_disposition(loop),
         "native_checkpoint_actions": loop.cp_actions,
         "null_field_counts": null_counts,
@@ -2760,11 +2816,11 @@ def arm_scripted_checkpoints(cp, stamps, margin_ns: int = 0) -> None:
 
 class RosDriver:
     def __init__(self, loop: NativeClosedLoop, pose_topic: str, scan_topic: str,
-                 status_topic: str) -> None:
+                 status_topic: str, sleep_topic: str = "", build_topic: str = "") -> None:
         import rospy
         from nav_msgs.msg import Odometry
         from sensor_msgs.msg import PointCloud2
-        from std_msgs.msg import String
+        from std_msgs.msg import Bool, String
 
         self._rospy = rospy
         self.loop = loop
@@ -2780,6 +2836,12 @@ class RosDriver:
         self._pub = rospy.Publisher(status_topic, String, queue_size=20)
         self._sub_pose = rospy.Subscriber(pose_topic, Odometry, self._on_pose, queue_size=200)
         self._sub_scan = rospy.Subscriber(scan_topic, PointCloud2, self._on_scan, queue_size=20)
+        # The host's own recovery signals. Subscribing is harmless when the host has no such
+        # topic; an empty name disables the subscription entirely.
+        self._sub_sleep = (rospy.Subscriber(sleep_topic, Bool, self._on_host_sleep, queue_size=10)
+                           if sleep_topic else None)
+        self._sub_build = (rospy.Subscriber(build_topic, Bool, self._on_host_build, queue_size=10)
+                           if build_topic else None)
         # INJECTION measurement repair: the corrected clouds go to the host's existing channel.
         # The publisher lives here because the node owns the trusted map the correction came from;
         # a separate process would have no reference to repair against.
@@ -2803,11 +2865,23 @@ class RosDriver:
             if len(self._pose_durations) < 5000:
                 self._pose_durations.append(time.perf_counter() - t_cb)
 
+    def _on_host_sleep(self, msg) -> None:
+        if bool(getattr(msg, "data", False)):
+            self.loop.on_host_signal("sleep", self.loop._last_ts_ns)
+
+    def _on_host_build(self, msg) -> None:
+        if bool(getattr(msg, "data", False)):
+            self.loop.on_host_signal("build", self.loop._last_ts_ns)
+
     def _on_pose_inner(self, msg) -> None:
         self.pose_count += 1
         self.last_pose_wall = time.time()
         ns = self._stamp_ns(msg.header.stamp)
         self.last_pose_ts_ns = ns
+        if self.loop.host_native_state in ("HIBERNATING", "REBUILDING"):
+            # Publishing resumed: the host finished its own recovery. Record the transition so a
+            # hold released during hibernation is never re-applied from a stale state.
+            self.loop.on_host_signal("publish", ns)
         p = msg.pose.pose
         try:
             T = pose_to_matrix((p.position.x, p.position.y, p.position.z),
@@ -2936,6 +3010,12 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--pose-topic", default="/aft_mapped_to_init")
     ap.add_argument("--scan-topic", default="/velodyne_points")
     ap.add_argument("--status-topic", default="/slam_recovery/gate_status")
+    ap.add_argument("--host-sleep-topic", default="/Issleeping",
+                    help="the host's hibernation flag (FAST-LIO publishes Issleeping); an empty "
+                         "name disables it")
+    ap.add_argument("--host-build-topic", default="/Isbuilding",
+                    help="the host's rebuild flag (FAST-LIO publishes Isbuilding); an empty name "
+                         "disables it")
     ap.add_argument("--candidate-source", default="host_poses",
                     choices=("host_poses", "icp_reregistration"))
     ap.add_argument("--confirmation-margin-sec", type=float, default=2.0)
@@ -3041,7 +3121,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         # that can be applied after its trigger and roll back only part of the segment.
         arm_scripted_checkpoints(loop.cp, loop.scripted_trigger_stamps_ns,
                                  loop.confirmation_margin_ns)
-    driver = RosDriver(loop, args.pose_topic, args.scan_topic, args.status_topic)
+    driver = RosDriver(loop, args.pose_topic, args.scan_topic, args.status_topic,
+                       sleep_topic=args.host_sleep_topic, build_topic=args.host_build_topic)
 
     started = time.time()
     rate = rospy.Rate(2.0)

@@ -3119,3 +3119,21 @@ NIS holdout（`compute_disjoint_holdout_point_to_plane_nis`，300×600 向量化
 
 **设计含义**：隔离期冻结地图在宿主**自身休眠/重建**时会帮倒忙。下一步 F3 应让 hold 在宿主发出 `Issleeping`/重建时释放（或重建期不冻结），
 验证需一次新授权 run；在此之前不改代码、不跑宿主。
+
+## 203. F3 共存策略：宿主休眠/重建时释放 hold，隔离段被宿主接管则不再回滚
+
+用户要求"我们的策略与宿主原生策略共存，最起码不互相干扰"。依据 §202 的诊断（hold 跨 `re_slam` 阻止重建），S1 在共享层实现：
+
+1. **订阅宿主原生信号**：`RosDriver` 新增 `/Issleeping`、`/Isbuilding` 订阅（参数 `--host-sleep-topic/--host-build-topic`，默认这两个名字，空名禁用）；
+   收到 true → `NativeClosedLoop.on_host_signal("sleep"/"build")`。首个 `/Odometry` 恢复时记 `host_publish` 转换。
+2. **共存规则**：
+   - 收到 `sleep`/`build`：**立即 `resume` 释放我们的 hold**（宿主此时本就不写图，且必须能重建）；事件记入 `host_native_events`；
+   - 宿主处于 `HIBERNATING/REBUILDING` 时**不再发 hold**（`_open_episode` 记 `hold_skipped_host_state`）；
+   - 隔离段内收到 `sleep/build`：在 episode meta 记 `host_reset_during_quarantine`；`decide()` 直接记
+     `decision_skipped=HOST_NATIVE_RECOVERY_TAKEOVER` 并跳过（**不 restore、不 reprocess**）——因为宿主的 `re_slam` 已清图，
+     我们的 checkpoint 不再存在，声称回滚等于回滚一张被宿主丢弃的地图。
+3. summary 新增 `host_native{state, events}`；事件含 stamp/wall/previous。
+4. 测试 6 项（sleep/build 释放、休眠期不发 hold、publish 状态转换、接管跳过）；全套 **259 项通过**。
+
+口径：这是"不互相干扰"的最小实现——宿主仍是它自己恢复的第一责任方；我们不与它抢图、不在它重置后假装回滚。
+仍**不构建、不运行**；验证需下一次授权 run（同时用 `runtime.pose_callback/scan_callback` 定量 driver 竞争）。
