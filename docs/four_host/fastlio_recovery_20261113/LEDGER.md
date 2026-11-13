@@ -211,3 +211,18 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
 - `input_fates`：ingested 1137 / quarantined 1113（首次 quarantined 于 E1−2 s）。
 - 判读：契约路径已验证；整链仍因**宿主在 E1 后长时间静默且未发出可用休眠信号**而无法覆盖 E2——属宿主原生行为与
   driver 状态映射（瞬断→PUBLISHING）的组合，不是接口契约问题。
+
+## ⑭ 信号窗授权 run（2026-11-13）：E1 静默期不再误杀；E2 仍因宿主后续停机未达
+
+- 不构建，v7 `a40e20d5…`；新增 `--host-signal-window-sec 30`；契约通过（`host_contract=DECLARED`）。
+- **E1 静默期的看门狗修复验证成功**：`host_native` 记录 `sleep 113.6 → build 117.7 → publish 141.4`；
+  driver 全程存活 260 s，`input_health` 期末 `status=OK`、`silence_s=0.198`，**没有 STALE 误杀**
+  （v7 那次曾在 133 s 被 STALE 终止，只差 1.3 s）。
+- **E1 触发** 115.7 s（kf 1157）；armed ack：`hold applied frame=1137 map_writes=held`、
+  `snapshot applied frame=1142 map_points=221815`；episode `hold_skipped_host_state=HIBERNATING`、
+  `host_reset_during_quarantine(build, ts 1711547999675624847)`、`segment_abandoned=True`；
+  **收尾 HEALTHY / open=false**。
+- **E2 未触发**：宿主在 E1 之后继续多轮 sleep/build（160.2、192.5、201.0 s），位姿流止于 **211.1 s**，
+  E2 在 229.7 s。`scripted.fired` 仍只有 E1。
+- 回调：pose n=1856、p50 53 / p95 387 / max 756 / mean 81 ms；scan n=2505、p50 1.1 / p95 153 / max 406 / mean 25 ms。
+- `input_fates`：ingested 1274 / quarantined 978；resume 多次（每轮宿主发布后）。
