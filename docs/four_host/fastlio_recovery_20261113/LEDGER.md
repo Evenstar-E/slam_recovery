@@ -71,3 +71,17 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
 - `input_fates`：ingested 1137 / quarantined 1113（首个 quarantined 恰为 E1−2 s），无 replayed。
 - 对照：此前同 bag 的完整 469 s 运行（独立构建）在 E1 处仍能发布位姿（停发于 E1+0.02 s）；本 run 的
   93 s 停止更早，原因未定（负载/退化阈值与输入时序相关，需进一步验证；本次不重试）。
+
+## ⑧ A/B 诊断（2026-11-13，v4 `86f85025…`，均无 driver）
+
+| run | 通道 | `/Odometry` | 首停发（>1 s 缺口起点） | 缺口 | `Issleeping`/`Isbuilding` | Over-degeneracy / IMU Initial |
+|---|---|---:|---:|---|---|---|
+| **A** | 关 | 2095 | **115.8 s** | 23.8 s；230.1 s / 26.5 s | 2 / 2（间隔 114.3 / 117.0 s） | 4 / 163 |
+| **B** | 开 | 2091 | **115.7 s** | 23.8 s；229.7 s / 26.8 s | 2 / 2（间隔 114.0 / 117.0 s） | 4 / 164 |
+| C（授权整链，有 driver） | 开 | 949（driver 侧） | **94.7–96.4 s** | — | — | 8 / 163 |
+| 旧独立 run（`4c31fada…`，469 s） | 关 | 4186 | 115.80 s | 23.8 s；229.70 s / 26.9 s | — | — |
+
+判读：**A ≈ B ≈ 基线**（115.7–115.8 s），**通道开销可忽略**；C 的 19–21 s 提前来自 **driver 竞争**
+（driver 每帧对 `/velodyne_points` 做 `cloud_to_xyz` 与 NIS 最近邻搜索，随地图增长而变重），
+不是恢复通道本身。原件：`diag_A/`、`diag_B/`（各含 `pre_run.txt`、`host.log`、`play.log`、
+`frontend.bag`、`bag_info.txt`、`analysis.json`；B 另有 `ctl/capabilities.json` 与 `ctl/input_fates.jsonl`）。

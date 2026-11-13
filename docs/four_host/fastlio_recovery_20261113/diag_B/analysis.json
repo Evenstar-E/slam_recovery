@@ -1,0 +1,29 @@
+{
+ "odom_messages": 2091,
+ "first_stamp_ns": 1711547883876847029,
+ "last_stamp_ns": 1711548143272218704,
+ "span_s": 259.4,
+ "gaps_gt_1s": [
+  {
+   "start_s": 115.7,
+   "len_s": 23.8
+  },
+  {
+   "start_s": 229.7,
+   "len_s": 26.8
+  }
+ ],
+ "first_stop_s": 115.7,
+ "Issleeping_true": 2,
+ "Isbuilding_true": 2,
+ "Issleeping_delta_s": [
+  0.0,
+  114.0
+ ],
+ "Isbuilding_delta_s": [
+  0.0,
+  117.01
+ ],
+ "host_over_degeneracy": 4,
+ "host_imu_initial_done": 164
+}
