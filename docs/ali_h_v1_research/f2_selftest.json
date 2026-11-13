@@ -1,0 +1,62 @@
+{
+ "pass": true,
+ "cases": {
+  "pure_translation": {
+   "e_I": [
+    0.0,
+    0.0,
+    0.0,
+    0.1,
+    0.0,
+    0.0
+   ],
+   "pass": true
+  },
+  "pure_rotation": {
+   "e_I": [
+    0.0,
+    0.0,
+    0.09999999999999945,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "pass": true
+  },
+  "missing_post": {
+   "statuses": {
+    "OK": 1,
+    "NO_PAIR": 1
+   },
+   "rows": 2,
+   "pass": true
+  },
+  "eff_zero": {
+   "eff_zero": true,
+   "zero_eff_zero_log": true,
+   "verdict": "UNKNOWN",
+   "pass": true
+  },
+  "duplicate_id": {
+   "duplicates": [
+    {
+     "update_id": 6,
+     "lines": [
+      null,
+      null
+     ]
+    }
+   ],
+   "rows": 2,
+   "pass": true
+  },
+  "blocks": {
+   "n_blocks": 2,
+   "pass": true
+  },
+  "support_guard": {
+   "class": "UNKNOWN_CONTEXT",
+   "pass": true
+  }
+ }
+}
