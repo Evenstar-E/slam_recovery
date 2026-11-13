@@ -98,6 +98,7 @@ FAST-LIO 每个 LiDAR 帧的主循环（`FAST-LIO/src/laserMapping.cpp`）：
 | `events.json` 静止窗 109–143 / 224–261 s | `/imu_raw` 低运动（gyro/acc 方差）独立佐证 | **只能**佐证“低运动窗”，且两窗正是声明事件窗；**低信息**，不能当 MAP_AND_MOTION 的正常参照 |
 | FAST-LIVO2 v7/v8/v11 | 462 行同行 pre/post、M/T/I | **不是本 host**；只作数学/来源参考，禁止贴成 FAST-LIO 证据 |
 | FAST-LIO 自注入 run | **不存在**：`injection_repair_20261112` 等是 FAST-LIVO2（hall01、`0d7e23de…`） | 不能给 FAST-LIO 故障类评价 |
+| 输入 bag 本身 | `campus_12_fl.bag` 只有 `/imu_raw` 93885 条 + `/velodyne_points` 4695 条，469.4 s；数据集目录无 GT 文件 | **无 GT/参考轨迹 topic**，不能从现有数据生成独立正常参照 |
 
 **结论**：
 - **正常开发前缀：没有独立依据。** “无注入/终态 HEALTHY/低运动窗”都不等于正常；campus_12 的
@@ -128,7 +129,7 @@ FAST-LIO 每个 LiDAR 帧的主循环（`FAST-LIO/src/laserMapping.cpp`）：
 | # | 缺项 | 影响 | 最低获取方式 |
 |---|---|---|---|
 | B1 | FAST-LIO 同 update 导出缺失（§4 字段） | I/M/support/eff 全 `NOT_AVAILABLE`，只能做契约与合成自检 | F1/S2 在 `laserMapping.cpp:849–874` 与 `esekfom.hpp:1621–1648` 处按 §4 写 trace；一次 run 即可，不需要新算法 |
-| B2 | 无独立正常开发前缀 | 校准 `BLOCKED`，三态只能 `UNKNOWN` | 同一输入上覆盖 ≥10 s（20 块）、有运动与几何的**外部参考**（GT/独立轨迹）；或经用户接受的“独立认证正常段”。静止/事件窗不能替代 |
+| B2 | 无独立正常开发前缀 | 校准 `BLOCKED`，三态只能 `UNKNOWN` | 同一输入上覆盖 ≥10 s（20 块）、有运动与几何的**外部参考**（GT/独立轨迹）；现有 `campus_12_fl.bag` 只有 IMU+LiDAR、无 GT，故参考必须来自本数据集之外，或经用户接受的“独立认证正常段”。静止/事件窗不能替代 |
 | B3 | 无本 host 故障事件标签 | 召回/延迟/误报 `NOT_EVALUABLE` | 在 FAST-LIO 输入面（relay 级）做**声明式自注入**并保存逐帧 mask（如 FAST-LIVO2 `corrupt_relay` 的做法）；或只评价 `DECLARED_OBSERVATION` 类，不作故障检测主张 |
 | B4 | T 通道结构不存在 | `I+T`/`T` 规则不可用 | 声明 `NOT_APPLICABLE`；若确需 scan-to-scan 残差，那是新方法，不是 ALI-H v1，需另立任务，不能在本线补造 |
 
