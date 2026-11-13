@@ -56,7 +56,11 @@ if [ "$RECORD" = "1" ]; then
   sleep 2
 fi
 setsid rosbag play --clock -r 1.0 --duration "$DUR" "$BAG" > "$OUT/play.log" 2>&1 & PLAY=$!
-wait "$PLAY"; sleep 20
+wait "$PLAY"
+# Drain: the driver processes the bag at ~7 Hz while the host publishes at ~8-10 Hz, so a queue of
+# bag-end frames remains when playback stops. Keep the driver alive long enough to work through it
+# before signalling; POST_PLAY_DRAIN controls how long (default keeps the old 20 s).
+sleep "${POST_PLAY_DRAIN:-20}"
 kill -INT "$NODE" 2>/dev/null
 if [ -n "$REC" ]; then kill -INT "$REC" 2>/dev/null; wait "$REC" 2>/dev/null; fi
 for _ in $(seq 1 120); do [ -d "/proc/$NODE" ] && sleep 1 || break; done
