@@ -194,3 +194,20 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
 `bench_frame_cost.py --rate 10 --max-core-fraction 0.25`：FIM≈82 ms + NIS≈12 ms ≈ 94 ms/对 → **0.94 核，FAIL**
 （与 v6 A/B 的 ~112 ms/对一致）。降到 0.25 核需声明式降采样（`max_eval_points` 1200→600 或
 `scan_cap` 减半），会改变 FIM/NIS 人口，待用户批准与离线等价证据；本项不在 host 侧。
+
+## ⑬ v7 授权 run（2026-11-13）：契约校验通过；宿主在 E1 后停止发布，驱动看门狗终止整链
+
+- 构建 1 次：v6 `f167bf5e…` → **v7 `a40e20d5…`**（semantics 块），退出码 0。
+- **契约**：`host_contract=DECLARED`，`semantics` 五项齐全 → `--require-contract` 在放 bag 前通过（bag 正常开始）。
+- **预算诊断**（不阻塞）：`bench_frame_cost` total 47.5 ms/对、**0.475 核**、`--max-core-fraction 0.25` 下 status FAIL（exit 1），按用户决定只记录。
+- **E1 触发** 115.7 s；armed `hold applied valid=1 stamp_ns=1711547997274449664 frame=1137 map_writes=held`、
+  `snapshot applied valid=1 stamp_ns=1711547997575793920 frame=1140 map_points=221815`。
+- **宿主在 117.7 s 后停止发布**：`host_native` 只记录到一次 111.4 s 的瞬断（111.5 s 即"发布"），driver 状态保持
+  `PUBLISHING`，因此 15 s 常规 STALE 判据生效：`pose stream stale for 15.2 s ... stopping the run`，
+  运行在约 133 s 结束（`terminal_reason=INPUT_STALE`），**未走 90 s 休眠上限分支**。
+- 决策：episode 1 个，`decided=True`、`decision_basis=bag_end`、候选 `cand_0000`、mode `MODE4_HARD_SLEEP_SPLIT`、
+  `accepted=False`、3 帧；`final_state=ABORTED`、`open=false`。E2 未到达。
+- 回调：pose n=1161、p50 58.5 / p95 255 / max 415 / mean 84.8 ms；scan n=1392、p50 1.1 / p95 55 / max 289 / mean 7.0 ms。
+- `input_fates`：ingested 1137 / quarantined 1113（首次 quarantined 于 E1−2 s）。
+- 判读：契约路径已验证；整链仍因**宿主在 E1 后长时间静默且未发出可用休眠信号**而无法覆盖 E2——属宿主原生行为与
+  driver 状态映射（瞬断→PUBLISHING）的组合，不是接口契约问题。
