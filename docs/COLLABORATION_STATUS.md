@@ -3448,3 +3448,14 @@ S2 报告"宿主在 E1 后多轮休眠、位姿流止于 211.1 s"。S1 从 `two_
 **结论（仅标注，不修改）**：最长阶段是 **`ingest`（mean 69.9 ms，约占 124.7 ms/对的 56%）**，其中离线实测 `compute_6dof_point_to_plane_fim`
 约 64 ms（m=1200 的距离矩阵 + argpartition）；其次 **`nis_measure`（54.7 ms）**，其 p95 373 ms 的长尾来自周期性支持参考重建。
 两者合计即 driver 无法维持 8–10 Hz 的主因。**本轮不做任何修改**；定位结果已标注，供后续决定。
+
+## 228. 排空 run 原件入库；E2 决策路径与收尾状态补记
+
+S2 `d265903`（`exp/growth-run`）已入 main：`two_event_drain_authorized/` 与 `two_event_q2000_authorized/` 全套原件、
+LEDGER、runner 排空参数。S1 复核与 §227 一致，并补两点：
+- **ep1（E2）决策**：触发 `1711548113473230600`，决策 `1711548141172342539`（rel ≈259.9 s），`MODE3_SOFT_BRIDGE_WAIT`、
+  候选 `cand_0001`、`accepted=false`；无宿主重置；
+- **收尾** `final_state=WAITING_FOR_EVIDENCE`、`quarantine_open_at_exit=true`：Mode 3 等待段在排空结束（STALE，`silence_s=15.06`）前未关闭——
+  是"260 s 输入 + 60 s 排空"窗口限制，不是接口缺陷；
+- 非实时声明随数据引用：E2 的 `actual_s=229.696` 是 stamp 时间，处理墙钟晚于 bag 结束；本 run 仅证明逻辑链。
+- 成本排序不变：`ingest` mean 69.9 ms（最长，FIM 约 64 ms）、`nis_measure` 54.7 ms；仅标注，未修改。
