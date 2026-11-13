@@ -65,7 +65,7 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
   `OK hold applied valid=1 stamp_ns=1711547997274449664 frame=1137 map_writes=held` →
   `OK snapshot applied valid=1 stamp_ns=1711547997774402048 frame=1142 map_points=221815`；第二组
   E2−2 s 同样 applied（frame 2111/2117）。不再是 frame=0 / 空图。
-- **但整链仍 FAIL（0 候选）**：host 在 bag ≈ **93 s** 进入原生退化-重建循环（`Over-degeneracy` 8 次、
+- **但整链仍 FAIL（0 候选）**：host 在 bag ≈ **95–96 s** 进入原生退化-重建循环（口径：`frame_diagnostics` 末条相对首帧 94.70 s；`pairing` 记录的最后配对准位姿相对同一首帧 96.41 s。此前文中"93.0 s"是误用了首个**配对**帧而非首帧作基准，作废）（`Over-degeneracy` 8 次、
   `IMU Initial Done` 163 次），**停止发布 `/Odometry`**；driver 的位姿流止于 bag 93.0 s，E1（116 s）
   从未到达，`scripted.fired=[]`。这与 v4 无关（hold 在 116 s 才生效，之前 1137 帧均为 ingested）。
 - `input_fates`：ingested 1137 / quarantined 1113（首个 quarantined 恰为 E1−2 s），无 replayed。
