@@ -2931,3 +2931,17 @@ S2 `a800dce` + `6bf6981`（`exp/growth-run`，纯源码，未构建/未运行）
 "hold RECEIVED 即写 snapshot" 的配对路径一致。两提交已 cherry-pick 入 main（`46e775d`、`6313bdd`），`exp/growth-run` 已推 `6bf6981`。
 
 授权前离线控制：`check_replay_regression.py`、`check_source_contract.py`（19 项）均 PASS。**仍不构建、不运行**；二进制 `df27a24c…`。
+
+## 191. 用户授权：1 次修复构建 + 1 次最小整链复验（v4）
+
+用户于 13:2x 授权"1 次修复构建 + 1 次最小整链复验"。条件已转 S2（消息 `16def7d3…`）：
+- **构建仅 1 次**：`fastlio2_ws` 源码已落 v4；`catkin_make --pkg fast_lio`，保存日志、退出码、构建前后二进制 sha（当前 `df27a24c…`）；
+- **运行仅 1 次**：新目录，同 bag `campus_12_fl.bag`（`a924b5f9…`）、E1 `1711547999352267771` / E2 `1711548113452267771`、rate 1.0、
+  `--duration-sec 260`、外层 timeout 1800 s、`--wait-limit-sec 20`、`-u` + ROS 图门控（脚本已核：driver 取 `/home/R26534/MM-LINS` main；
+  等 `/slam_recovery_native_loop` 注册后才放 bag）；
+- **验点**：启动 ack 为 `deferred`→`applied`（非 frame=0）、E1 前地图增长；E1 触发与 hold/决策/restore/reprocess 的真实 ack
+  （`stamp_ns/frame/repaired_fed/repaired_in_update/replay_suffix`）；重放后实时输入 `ingested`；E2 与尾段；`message_disposition`
+  `fully_accounted/fully_decided` 与 `unresolved`；wall/峰内存/吞吐；
+- **失败**：保原件、记 FAIL/BLOCKED、不重试、不再构建；不触碰旧进程；受控触发记 `CONTROLLED_INTERFACE_TEST`，`reprocess=PARTIAL` 只称有限原生缓冲重放。
+
+当前状态：授权已下达，**构建/运行尚未开始**（以 S2 实交为准）。离线控制仍为两项 PASS（19/19、83/899）。
