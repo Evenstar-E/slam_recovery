@@ -1,0 +1,40 @@
+3cf14baa4a7f1d181f4bfd88769d76dfd40d3ea9 2026-11-13T07:43:11+08:00 Merge the review of the 15-hour summary
+3029fbe46700356023be47d68dbf2e284a59301f 2026-11-13T07:43:02+08:00 Correct the 15-hour summary per review: version label, causes, topology and selection framing
+330e5940de86abe934e6bf1d0cfb8a6a388a2ddd 2026-11-13T07:30:07+08:00 [Auto-Review] 核提前十五小时总结并收窄版本归因及宿主选型主张
+d17d5526157b97b374f79cf70b5bcb8465f8a096 2026-11-13T07:12:51+08:00 Add the 15-hour results summary (development side, S1)
+f795643b774bfe0ecb6b39d7aaa17f2d4ba700a2 2026-11-13T02:43:00+08:00 Merge the header-qualification closure review
+6b77867df9f43c55e6f8ff0f9a9ac87572dee6e1 2026-11-13T02:28:24+08:00 [Auto-Review] 关闭旧档header资格误标并确认人口数值未变
+18297d1d4e8bf4518e7329359a56f29beb5130f9 2026-11-13T02:14:54+08:00 Record the derived header layer fix
+94aa20999ce59b39f0bd576e8c753e5446380003 2026-11-13T02:14:13+08:00 Integrate the derived header layer
+4796f97976c26dfb6ca8373f7d3e728c8264c61f 2026-11-13T02:13:50+08:00 修 RAW_HEADER_CONTAINMENT 常量：按 join 模式派生，v7 不再自相矛盾
+c01b0fb25e6b23ff58a7ef4c27b133c219b9a95e 2026-11-13T02:13:20+08:00 Record the hardcoded header-layer defect and correct the tail block count
+e298e80099750ab136ef94e4137d776433edcd29 2026-11-13T02:13:02+08:00 Merge the qualification-layer review
+29738ec8c0a0b156ba1aca1e92641182fd71f182 2026-11-13T02:11:17+08:00 [Auto-Review] 接受本run资格分层与尾段并核旧档header误标
+0df6ea83020af92424c463ebb236ad35581de2f1 2026-11-13T01:54:36+08:00 [Auto-Review] 核独立工作区原生执行并纠正四宿主拓扑及功能归属
+cdd3bf70eb78287b102301bb5c6529185cea231d 2026-11-13T01:47:00+08:00 Record the layered qualification and run-bound tail
+9aae20de7863ba6234dcea32bef1247464e8f724 2026-11-13T01:46:19+08:00 Integrate the layered I qualification and the run-bound E2 tail
+ca384cf47560645174a313a1eb6b445ea9ca147e 2026-11-13T01:45:40+08:00 T2 v11 资格分层、eff=0 单列、E2 按本 run episode 绑定
+b2f3983801e6113f3c3626df0d95783666e1c24f 2026-11-13T01:45:19+08:00 Record the FAST-LIO2 independent native PASS
+14b67786325bed28f086de5fb9964ce2071c1f5f 2026-11-13T01:42:56+08:00 Record the qualification layering review
+f2c3ed8afbdfd42059398243ef4a4a12e340dcb3 2026-11-13T01:42:38+08:00 Merge the block-consumer and qualification review
+2d7709480090c10a17b527d16414e6e65c45c319 2026-11-13T01:42:05+08:00 [Auto-Review] 关闭真实块消费者与旧索引并限定同行测量资格及环境阻断
+c437b1ebb9cd154d2d61e4c8897f2d5ab9e01d02 2026-11-13T01:39:12+08:00 Record the four-host comparison and ORB-SLAM3 analysis
+a7397669fb1710f23f6c8d6f6b085774bdac930a 2026-11-13T01:37:21+08:00 Record the LIO-SAM divergence analysis and the common precondition
+1aa76b3856d624024bf8b80b72cbbe6af46516d7 2026-11-13T01:33:41+08:00 Record the MM-LINS interface analysis and the gate revision
+1f7a6dc35e720b807502acdc258b2f0891c53f47 2026-11-13T01:31:24+08:00 Record the host-global loadavg finding and the revised gate
+36ce14b1d4c61dfdc724ba541739417b6860760f 2026-11-13T01:30:16+08:00 Record the process ownership finding and the authorization request
+80287a2b8d9a7f01e3a3bad9b8fa4adc71446318 2026-11-13T01:29:31+08:00 Record the FAST-LIO2 environment-blocked run and the approved retry
+639e99b9bb5c2bb7eb90fbd8e2dd7fca09c9cae2 2026-11-13T01:26:22+08:00 [Auto-Review] 核真实同行位姿原件与晚回退负结果并记录四宿主交接
+d48d6f385fbc49ce866087f2be17e6c97f3a0b65 2026-11-13T01:13:12+08:00 Record the schema mismatch review and its local closure
+084cf10f531acd22356c5a823f078f9eda91a00e 2026-11-13T01:13:05+08:00 Merge the schema-mismatch review
+822d4856cb492fcf1e87cdb49f05591448b6ff47 2026-11-13T01:11:59+08:00 Integrate the final v11 one-page results
+b52a08855da471b349946e882b4f586c6c1ec5e7 2026-11-13T01:11:38+08:00 T2_V11_RESULTS 收为最终版一页表：人口/分位/资格/三条限定
+b16c2f32382df7e6f2ed671efa6fa6391ffc4455 2026-11-13T01:10:59+08:00 Record the verified v11 T2 results and aligned meta
+7d521dad05c9fdaa3b4ec4554b553957dbc7d93f 2026-11-13T01:10:18+08:00 Integrate the v11 results and the aligned meta
+6e35d30105e31b2437a32fc5cbd3397d6bff70a1 2026-11-13T01:09:47+08:00 v11 meta 对齐：i_qualification=PASS_SAME_ROW_UNIT_WEIGHTED、same_row_post=725、join 状态同正文
+6c17e1d6cd406d98f6d28201d6664e6c0be15099 2026-11-13T01:08:19+08:00 修 T2 时间索引读回错配（92/504 行）并完成 v11 同行 pre/post I 升级
+c6d9e3264bccc8e8762bb072ec0b3b741358d9bd 2026-11-13T01:06:50+08:00 Record the FAST-LIVO2 stop and the FAST-LIO2 independent-build task
+23e019bf7f9ac4bab71db9e50a009db704ffb952 2026-11-13T01:05:37+08:00 Record the user's host-order directive and the t2 index defect
+993d53c03e673bb338e620550a42c495038a6b91 2026-11-13T01:05:29+08:00 Merge the Codex host-order directive
+ddc2f4af6a7159a6461b7f5a7b1a6af30ba53872 2026-11-13T01:04:55+08:00 Record the growth-rate run and the matching-degradation judgment
+c30b5695479e53781532b9e812c435ca41d09707 2026-11-13T00:50:01+08:00 [Auto-Review] 接受具名尾字段解析并核真实pose7块header仍不匹配

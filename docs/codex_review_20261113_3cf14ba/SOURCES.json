@@ -1,0 +1,286 @@
+{
+  "sources": [
+    {
+      "revision": "3cf14baa4a7f1d181f4bfd88769d76dfd40d3ea9",
+      "path": "AGENTS.md",
+      "snapshot": "main/AGENTS.md",
+      "bytes": 8397,
+      "sha256": "77003ceeb8dff719a2d42572fe74655140c39a6651cc7ed4e66713de8e734997"
+    },
+    {
+      "revision": "3cf14baa4a7f1d181f4bfd88769d76dfd40d3ea9",
+      "path": "REVIEW_AND_SIMULATION_PLAN.md",
+      "snapshot": "main/REVIEW_AND_SIMULATION_PLAN.md",
+      "bytes": 90854,
+      "sha256": "1e6dca37b0fb5636eedbf268774319099e75e0f076250b7952e311d2bb2bdd37"
+    },
+    {
+      "revision": "3cf14baa4a7f1d181f4bfd88769d76dfd40d3ea9",
+      "path": "docs/COLLABORATION_STATUS.md",
+      "snapshot": "main/docs/COLLABORATION_STATUS.md",
+      "bytes": 286538,
+      "sha256": "61bad58f9ef7256b478ae66e5a62678e40c7a00012f4fc3250c9b3fe1284b24e"
+    },
+    {
+      "revision": "3cf14baa4a7f1d181f4bfd88769d76dfd40d3ea9",
+      "path": "docs/MAINLINE_PROGRESS_STANDARD_20261109.md",
+      "snapshot": "main/docs/MAINLINE_PROGRESS_STANDARD_20261109.md",
+      "bytes": 18662,
+      "sha256": "0d1c81d7c0eb22e5c1b80a786b7e4a38a1873c2773d95832e6d41e9aa4312ede"
+    },
+    {
+      "revision": "3cf14baa4a7f1d181f4bfd88769d76dfd40d3ea9",
+      "path": "docs/OVERNIGHT_RESULTS_20261113_S1.md",
+      "snapshot": "main/docs/OVERNIGHT_RESULTS_20261113_S1.md",
+      "bytes": 9052,
+      "sha256": "cbbcc28a9353ba92d6961a0323f1c74b2a9f6f011650724b74ecd54d3dbca529"
+    },
+    {
+      "revision": "3cf14baa4a7f1d181f4bfd88769d76dfd40d3ea9",
+      "path": "docs/PROJECT_HISTORY.md",
+      "snapshot": "main/docs/PROJECT_HISTORY.md",
+      "bytes": 164949,
+      "sha256": "85e7e5da5de63df07d7d1f95b8c97aee0e3050a0d77c4910f7c5966baac972aa"
+    },
+    {
+      "revision": "3cf14baa4a7f1d181f4bfd88769d76dfd40d3ea9",
+      "path": "docs/ali_h_v1_research/T2_I_ELIGIBILITY.md",
+      "snapshot": "main/docs/ali_h_v1_research/T2_I_ELIGIBILITY.md",
+      "bytes": 6425,
+      "sha256": "a4660485f5057e40f8731f6ebd4f04d8801d3e4de529b73e95d84f995b49c899"
+    },
+    {
+      "revision": "3cf14baa4a7f1d181f4bfd88769d76dfd40d3ea9",
+      "path": "docs/ali_h_v1_research/t2_join.jsonl",
+      "snapshot": "main/docs/ali_h_v1_research/t2_join.jsonl",
+      "bytes": 526388,
+      "sha256": "adadb7d2261f3ef61b1d34bbb2b54ab2ebcd1dd301d79a16896a1f21af2f7926"
+    },
+    {
+      "revision": "3cf14baa4a7f1d181f4bfd88769d76dfd40d3ea9",
+      "path": "docs/ali_h_v1_research/t2_join_upgrade.py",
+      "snapshot": "main/docs/ali_h_v1_research/t2_join_upgrade.py",
+      "bytes": 9355,
+      "sha256": "d1bb85d4b595bb554a4fee3f5c6f081275389d4cfbee305802f0cc3bfd4bd4a7"
+    },
+    {
+      "revision": "3cf14baa4a7f1d181f4bfd88769d76dfd40d3ea9",
+      "path": "docs/ali_h_v1_research/T2_RESULTS.md",
+      "snapshot": "main/docs/ali_h_v1_research/T2_RESULTS.md",
+      "bytes": 15185,
+      "sha256": "7103d0e26d844fa03b032d4970841c7c1cd7bb64ce9dcbb9b81dc43c967dccc2"
+    },
+    {
+      "revision": "3cf14baa4a7f1d181f4bfd88769d76dfd40d3ea9",
+      "path": "docs/ali_h_v1_research/t2_run.py",
+      "snapshot": "main/docs/ali_h_v1_research/t2_run.py",
+      "bytes": 43435,
+      "sha256": "ff85dcc182117c6998034b976bd9183d8740afd035a5afe8331c7cd150c3a474"
+    },
+    {
+      "revision": "3cf14baa4a7f1d181f4bfd88769d76dfd40d3ea9",
+      "path": "docs/ali_h_v1_research/t2_summary.json",
+      "snapshot": "main/docs/ali_h_v1_research/t2_summary.json",
+      "bytes": 31433,
+      "sha256": "d5439bf30da3af7e0e6b552595034d07d836f2e5cc5bb16210fee2fdb62383a6"
+    },
+    {
+      "revision": "3cf14baa4a7f1d181f4bfd88769d76dfd40d3ea9",
+      "path": "docs/ali_h_v1_research/t2_v11_join.jsonl",
+      "snapshot": "main/docs/ali_h_v1_research/t2_v11_join.jsonl",
+      "bytes": 482478,
+      "sha256": "f4c80ebce9309e061089d0854be904ca5fcda739af9e8c64a50e29916b0075c4"
+    },
+    {
+      "revision": "3cf14baa4a7f1d181f4bfd88769d76dfd40d3ea9",
+      "path": "docs/ali_h_v1_research/T2_V11_RESULTS.md",
+      "snapshot": "main/docs/ali_h_v1_research/T2_V11_RESULTS.md",
+      "bytes": 7646,
+      "sha256": "14a356e5db2dde5c2cf21f1f9d86713e6e77ec0921e3e4f242cb07b8b76a8328"
+    },
+    {
+      "revision": "3cf14baa4a7f1d181f4bfd88769d76dfd40d3ea9",
+      "path": "docs/ali_h_v1_research/t2_v11_summary.json",
+      "snapshot": "main/docs/ali_h_v1_research/t2_v11_summary.json",
+      "bytes": 28347,
+      "sha256": "bfe335bb981012fde3af89423f9fe85761e2c97adf7ea48c1ae537985c2b6b8b"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "SC-PGO/launch/fastlio_ouster64.launch",
+      "snapshot": "growth/SC-PGO/launch/fastlio_ouster64.launch",
+      "bytes": 1980,
+      "sha256": "3c4258f6c5078bb4584d3d2cf36f8f0b4899e1d6e37760cd36ba4e93419a9aaf"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "FAST-LIO/src/laserMapping.cpp",
+      "snapshot": "growth/FAST-LIO/src/laserMapping.cpp",
+      "bytes": 42433,
+      "sha256": "5ca194929f91db637b96f73f49f32b790a1700dce44656c96029f5bd1784f9b3"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/four_host/FOUR_HOST_RECOVERY_COMPARISON_20261113.md",
+      "snapshot": "growth/docs/four_host/FOUR_HOST_RECOVERY_COMPARISON_20261113.md",
+      "bytes": 3542,
+      "sha256": "c6884eb49e13f8697d6772acb01e9f6482e2a99d641103b833ddae7b2e63eb6c"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/four_host/LIOSAM_DIVERGENCE_20261113.md",
+      "snapshot": "growth/docs/four_host/LIOSAM_DIVERGENCE_20261113.md",
+      "bytes": 6104,
+      "sha256": "099af51d3fa637623eb5cafa17b99c8f6c201c56a3e995b19c25091024b3bb06"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/four_host/MMLINS_RECOVERY_INTERFACE_20261113.md",
+      "snapshot": "growth/docs/four_host/MMLINS_RECOVERY_INTERFACE_20261113.md",
+      "bytes": 8303,
+      "sha256": "55303250693876d091b8930eca93b8beb52ef177ef3a749c0994b0c1faf6d283"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/four_host/ORBSLAM3_FAILURE_20261113.md",
+      "snapshot": "growth/docs/four_host/ORBSLAM3_FAILURE_20261113.md",
+      "bytes": 4832,
+      "sha256": "c9b7738c5900b58f7897bd49ed365f42e2ca8ae06cedd52987f7465a148c03aa"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/fastlio2_independent_20261113/analyze_bag.py",
+      "snapshot": "growth/docs/review_20261112_four_host/fastlio2_independent_20261113/analyze_bag.py",
+      "bytes": 3790,
+      "sha256": "fd82ada16aa5631c092ca7425d4dec688401f4ba512d565bb31dcbd54a708f3e"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/fastlio2_independent_20261113/binary_sha.txt",
+      "snapshot": "growth/docs/review_20261112_four_host/fastlio2_independent_20261113/binary_sha.txt",
+      "bytes": 101,
+      "sha256": "e0174097ec8b4b1536cf12f250c2d69e12bca4315476a67f241e20eb39c0ac83"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/fastlio2_independent_20261113/build.log",
+      "snapshot": "growth/docs/review_20261112_four_host/fastlio2_independent_20261113/build.log",
+      "bytes": 1053,
+      "sha256": "4bf4d37aab12f2647ec175adf19a35e6c4acf7a152acda6cfa74d3c3a18c01cd"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/fastlio2_independent_20261113/build2.log",
+      "snapshot": "growth/docs/review_20261112_four_host/fastlio2_independent_20261113/build2.log",
+      "bytes": 29159,
+      "sha256": "b122303959b4b48f5f924b039897cfd71f6af232537e59ef02742080c660970f"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/fastlio2_independent_20261113/REPORT.md",
+      "snapshot": "growth/docs/review_20261112_four_host/fastlio2_independent_20261113/REPORT.md",
+      "bytes": 4753,
+      "sha256": "0686cbd0cf304779ba35a2e51b604f65ae985714f063a978a6733d19ac51f20d"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/fastlio2_independent_20261113/run_fastlio2_independent.sh",
+      "snapshot": "growth/docs/review_20261112_four_host/fastlio2_independent_20261113/run_fastlio2_independent.sh",
+      "bytes": 4522,
+      "sha256": "18460eacddab2f5d518968c09860b188e22f8ad7eced1a877dd6732434fa13fe"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/fastlio2_independent_20261113/source_identity.txt",
+      "snapshot": "growth/docs/review_20261112_four_host/fastlio2_independent_20261113/source_identity.txt",
+      "bytes": 227,
+      "sha256": "f3e67773de74fee9ba762d628ac511d76839d3e434e1447992b1a2f8ca8a17aa"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/receipt.json",
+      "snapshot": "growth/docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/receipt.json",
+      "bytes": 2018,
+      "sha256": "8529773b1de68accf61b8a7061cef5b4af4eb645f7ea8709062fe8d35866e5aa"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/run_summary.json",
+      "snapshot": "growth/docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/run_summary.json",
+      "bytes": 223484,
+      "sha256": "f3b7b71b2f2508398921f3e54386d8e94faad1effce3287aeda5b7d13e596ac6"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/SHA256SUMS",
+      "snapshot": "growth/docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/SHA256SUMS",
+      "bytes": 505,
+      "sha256": "87e1049745a68a4f98210856b3b29967d8f7d78a1e2fe3532fdfe4eefcc922dc"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/mmlins_campus12_20261112/run_mmlins.sh",
+      "snapshot": "growth/docs/review_20261112_four_host/mmlins_campus12_20261112/run_mmlins.sh",
+      "bytes": 3072,
+      "sha256": "82ba367911a45f52ccfec8f8cc1646edb678460195fdf1aad51243e29203125b"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/host_logs/trace_cov.txt",
+      "snapshot": "growth/docs/review_20261112_four_host/growth_fl_native_20261112T165438Z_669633/host_logs/trace_cov.txt",
+      "bytes": 1213515,
+      "sha256": "b14d4f57e4c488f64365e5fa48c72c32d946ef51d00371a4f21456ac87ccd736"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/fastlio2_independent_20261113/run2/analysis.json",
+      "snapshot": "growth/docs/review_20261112_four_host/fastlio2_independent_20261113/run2/analysis.json",
+      "bytes": 2120,
+      "sha256": "8180709550220d6ce6298b410170ab2f4cfefb31a3d0553a2459ab8aa780612d"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/fastlio2_independent_20261113/run2/bag_info.txt",
+      "snapshot": "growth/docs/review_20261112_four_host/fastlio2_independent_20261113/run2/bag_info.txt",
+      "bytes": 1173,
+      "sha256": "83ee4f0eb2699654e6e9165ea32c25c8153f1eddfe4d92f1acbf468f99830152"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/fastlio2_independent_20261113/run2/binary_identity.txt",
+      "snapshot": "growth/docs/review_20261112_four_host/fastlio2_independent_20261113/run2/binary_identity.txt",
+      "bytes": 576,
+      "sha256": "02a2e35073ca12cdc8129b7077628f981fb1b356326d81a67f912e99c023803b"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/fastlio2_independent_20261113/run2/fastlio_node.log",
+      "snapshot": "growth/docs/review_20261112_four_host/fastlio2_independent_20261113/run2/fastlio_node.log",
+      "bytes": 27278,
+      "sha256": "9176c5667a2df82c2c31446dd08544b01550c228cfb08e83d90c94a8f64cda4f"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/fastlio2_independent_20261113/run2/loadavg.log",
+      "snapshot": "growth/docs/review_20261112_four_host/fastlio2_independent_20261113/run2/loadavg.log",
+      "bytes": 284,
+      "sha256": "d5c80774da05fcb0f8d633e6760e2ba8ac93fd2c913ceca28a89d66da520f789"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/fastlio2_independent_20261113/run2/record.log",
+      "snapshot": "growth/docs/review_20261112_four_host/fastlio2_independent_20261113/run2/record.log",
+      "bytes": 558,
+      "sha256": "50589de2435986a79975ed86604e677d8dae664e443666bb5a0a1387fd23934d"
+    },
+    {
+      "revision": "4f205ef55fd023af9573eda324f01c5fcef7c6b1",
+      "path": "docs/review_20261112_four_host/fastlio2_independent_20261113/run2/runner.log",
+      "snapshot": "growth/docs/review_20261112_four_host/fastlio2_independent_20261113/run2/runner.log",
+      "bytes": 600,
+      "sha256": "23807e1247bc5b5b319c8dffdf7928f851ce8a7b035fe952bd40853ac1952bde"
+    }
+  ],
+  "materialization_limit": "Stopped our sequential git-show materialization while awaiting availability_frames.jsonl.gz; original process exited 1 after our interrupt. No claim of full availability rejoin or gzip SHA verification. Three targeted topology/source blobs then fetched separately.",
+  "review_scope": "Read-only source and retained text/JSON archives. No native execution."
+}
