@@ -3356,3 +3356,12 @@ profile:native_recovery}`，与 driver `--require-contract` 的校验项完全�
 预算只记录不阻塞。验点：放 bag 前 `host_contract.problems=[]`；ack 序列逐条；E1/E2、takeover/abandon/rearm、final_state；
 `host_native`、`input_fates`、回调成本；失败保原件、不重试、不再构建。七步冒烟的 hold/snapshot/restore/replay 已由 ctrl2 覆盖，本次不重复。
 当前状态：授权已下达，构建与 run 尚未开始（以 S2 实交为准）。
+
+## 220. 本轮 v7 run 不含并发冒烟：单槽 cmd/ack 不允许两个写者
+
+S2 指出七步冒烟与 driver 共用 `cmd`/`ack` 单槽；S1 判定**并发冒烟不可取**——不是归属推断问题，而是会互相覆盖命令
+（driver 启动即 armed hold/snapshot 并周期 status）。因此本轮授权口径收紧为：
+- 构建 1 次 v7；
+- **只跑整链 run**（`--require-contract` 放 bag 前校验），七步冒烟的 hold/snapshot/restore/replay 证据沿用 ctrl2
+  （v2 二进制；v7 仅新增 semantics 块，未改这些行为）；
+- `tools/smoke7.py` 已入库（main `8e4543a`），留给将来**单独的 host-only 冒烟 run**（需另授权，不与 driver 同 run）。
