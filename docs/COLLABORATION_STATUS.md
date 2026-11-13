@@ -2784,3 +2784,17 @@ S1 据此调整共享 driver（`539c00f` 之后新提交）：
 已向 S2 指出未解风险：restore 后 `p_imu.last_timestamp_imu`/init 标志若不复位，replay 的 IMU 传播起点错误，只能记 PARTIAL/UNKNOWN，
 不能称完整重估；要求 14:00 run 前回答并做最小修。受控 run 的 driver 命令已给（`/Odometry`、`--checkpoint-dir`、
 `--scripted-trigger-stamps`、`--repair-publish`、`--detection off`、120 s）。
+
+## 182. F2 读取器与 selftest 核实入库；输入 bag 无 GT 经本机复核
+
+S3 追加 `exp/ali-h-v1` 三提交（`8ad46fc..f85de73`），S1 逐项核后 cherry-pick 入 main：
+- `825e8f0` `f2_fastlio_read.py`（406 行，按 §4 消费 JSONL；复用 T2 SE(3)/`V⁻¹`；缺 pair、`eff=0`、重复 `update_id`、混合 run_id 均保留并标注；
+  无校准参照全部块 UNKNOWN，输出数量/总时长/最长区间）+ `f2_selftest.json`；
+- `79c7ba0` 输入 bag 证据：`campus_12_fl.bag` 只有 `/imu_raw` + `/velodyne_points`，无 GT/参考 topic；
+- `f85de73` 跨 run id 拒绝贴接（`INVALID_MIXED_RUN_IDS`）+ 用例。
+
+**本机复核**：`f2_fastlio_read.py selftest` 本机运行 **exit 0，8 用例全 pass**（含纯平移、`V⁻¹`、重复 id、块划分、support 守卫、
+混合 run_id）。`rosbag info /home/R26534/datasets/mmlins/campus_12_fl.bag`：469 s、98580 条，topics 只有 `/imu_raw` 93885 与
+`/velodyne_points` 4695，**无 GT/参考 topic**——S3 的 B2 收紧成立：独立正常参照必须来自本数据集之外，或经用户接受的独立认证段。
+
+据此把"bag 无 GT"同步给 S2（影响其 B2/B3 方案表述）；B2/B3 仍 `BLOCKED`，检测指标 `NOT_EVALUABLE`，不填 0。`exp/ali-h-v1` 已推到 `f85de73`。
