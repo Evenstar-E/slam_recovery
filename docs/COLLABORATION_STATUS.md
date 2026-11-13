@@ -2885,3 +2885,16 @@ S2 `326413b`（`exp/growth-run`）交 ctrl1/ctrl2 原件与 v1/v2 源码。S1 �
 说明：审阅自带的 `run_checks.py` 固定读取被审版本 `a355343` 的 blob，重跑仍显示 CONFIRMED 是**归档检查**，不代表当前树未修。
 
 两提交已 cherry-pick 入 main（`ca8c2cc`、`4279bb6`；v3/v4 为 `a49f919`、`b7db2fe`），分支推送后与本机一致。仍无构建/运行；等用户或审阅侧的新授权。
+
+## 188. S2 增补离线源码契约检查（14/14 PASS），已入库
+
+S2 `442bd2c` 新增 `tools/check_source_contract.py`（50 行，只读源码，不构建/不运行）。S1 本机运行：**14 条全 PASS**，检查对象是
+`fastlio2_ws/src/FAST-LIO/src/laserMapping.cpp` 的当前源码（v4 已落源码，二进制未变）：
+- 延期调用点在 `sync_packages` 之后、`nr_capture_group` 之前（sync=1153 / defer=1157 / capture=1166），且无旧的前置调用；
+- 两级 ACK 文本（`deferred stamp=`、`OK hold/snapshot applied valid=1`）；
+- `reprocess` 释放 hold、ack 含 `repaired_fed`；
+- 按组 replay 标记写入/消费、fate 用组身份、`g_nr_replay_remaining` 排空复位；
+- `repaired_in_update` 暴露；快照戳取上一完成帧（`g_nr_cp.stamp = g_nr_lidar_end`）。
+
+授权前的离线控制现共两项且均可重复：`check_replay_regression.py`（ctrl2 原件，83/899 PASS）、`check_source_contract.py`（14/14 PASS）。
+状态不变：**不构建、不运行、不改码**；二进制仍 `df27a24c…`，等用户或审阅侧授权"1 次修复构建 + 1 次最小整链复验"。
