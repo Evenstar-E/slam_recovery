@@ -3055,3 +3055,16 @@ S1 用 rosbag 直接复算 `/Odometry` 时间线（相对 bag 起点 1711547883.
 
 **口径**：诊断性原生 run，不是整链、不是自动检测；未改阈值、未重试。下一步若要继续，需要在 driver 侧降载（如 `--scan-cap`/抽样、CPU 亲和）
 或有界对照，均需用户新授权。原件尚在 S2 工作树未提交，已请其提交后推送。
+
+## 198. A/B 原件入库与计数口径更正
+
+S2 `0208839`（`exp/growth-run`）已入 main：`diag_A/`、`diag_B/` 全套原件（pre_run、host.log、play.log、frontend.bag、
+bag_info、analysis.json；B 另有 ctl/capabilities.json 与 input_fates.jsonl）、`tools/run_diag_ab.sh`、`tools/analyze_diag.py`。
+S1 复核 `analysis.json` 与自算一致：A 2095 条、缺口 (115.8 s, 23.8 s)/(230.1 s, 26.5 s)；B 2091 条、缺口 (115.7 s, 23.8 s)/(229.7 s, 26.8 s)。
+
+**计数口径更正**：§197 表中 "Over-degeneracy 2" 是**休眠触发次数**（`Over-degeneracy has happened`）；S2 的 `host_over_degeneracy=4` 把
+`has happened` 与 `has disappear` 两类行都算入（2+2）。`Issleeping=true` 2 次（114.0–114.3 s、117.0 s）、`Isbuilding=true` 2 次；
+A/B 的 IMU 初始化 163/164 次。两种口径都保留，引用时须写清是哪一种。
+
+结论不变：**A≈B≈旧基线（115.7–115.8 s）；通道开关不影响宿主发布；C 的 94.7–96.4 s 提前停发只在 driver 在场时出现**，
+指向 driver 侧负载/时序竞争（逐帧 `cloud_to_xyz` + NIS 最近邻随参考集增长），不推广为所有宿主通用故障。
