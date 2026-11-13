@@ -53,6 +53,16 @@ check("restore names the re_slam invalidation",
 check("capabilities declares the invalidation",
       '\\"checkpoint_invalidated_by\\"' in s)
 
+# 6b. re_slam also refuses snapshots until odometry is published again
+i_pub = s.find("void publish_odometry")
+i_pub_end = s.find("\n}\n", i_pub) if i_pub >= 0 else -1
+pub_body = s[i_pub:i_pub_end] if i_pub >= 0 and i_pub_end > i_pub else ""
+check("re_slam marks the host as reset", "g_nr_host_reset = true;" in body)
+check("snapshot refuses while reset", "host_reset_no_map" in s)
+check("publish clears the reset flag", "g_nr_host_reset = false;" in pub_body)
+check("capabilities declares the snapshot refusal",
+      '\\"snapshot_refused_after_host_reset\\"' in s)
+
 # 6. the deferred queue is FIFO and executes every due entry (two commands can share one stamp)
 check("deferred queue is a deque", "std::deque<NrDeferred> g_nr_deferred;" in s)
 check("deferred enqueue is push_back", "g_nr_deferred.push_back(std::move(d));" in s)
