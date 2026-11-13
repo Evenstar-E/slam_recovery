@@ -36,5 +36,15 @@ class PoseStreamHealthTest(unittest.TestCase):
         self.assertEqual(h["silence_s"], 21.0)
 
 
+
+class DurationStatsTest(unittest.TestCase):
+    def test_percentiles_and_empty(self):
+        from slam_recovery.ros.recovery_node import duration_stats
+        self.assertEqual(duration_stats([]), {"n": 0})
+        s = duration_stats([0.001, 0.002, 0.003, 0.004])
+        self.assertEqual(s["n"], 4)
+        self.assertTrue(2.0 <= s["p50_ms"] <= 3.0)
+        self.assertAlmostEqual(s["max_ms"], 4.0, delta=1e-9)
+
 if __name__ == "__main__":
     unittest.main()

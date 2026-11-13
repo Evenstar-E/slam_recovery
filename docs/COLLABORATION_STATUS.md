@@ -3082,3 +3082,13 @@ A/B 结论指向 driver 侧负载后，S1 核查了逐帧成本构成：`LiveNis
 
 口径：这是 F3 侧的安全降载，不改 NIS/门/阈值，也不改变修复搜索结果；C 的提前停发机制仍未分离（候选：点云转换、订阅回调、Python GIL
 与容器 2.8 核竞争），需要新的有界对照才可定性。
+
+## 200. F3 增补：逐回调耗时统计（供下一次有界 run 定量 driver 竞争）
+
+为下一次授权 run 能定量"driver 竞争"而非只靠相关性，`run_summary.runtime` 新增：
+- `pose_callback` / `scan_callback`：各自 `{n, p50_ms, p95_ms, max_ms, mean_ms}`，来自每个回调的 `perf_counter` 计时；
+- 每类最多保留 5000 个样本，不随 bag 增长；计时本身 ~1 µs/消息。
+不改变任何决策、阈值或消息处理；`duration_stats` 有单测（空集、分位、max）。全套 **253 项通过**。
+
+口径：该统计只在**下一次获得授权**的 run 中产生数据；本机当前无 run。A/B 结论不变（通道无影响、driver 在场时提前停发），
+机制仍待定量分离（候选：`cloud_to_xyz`+`subsample` 的扫描回调、NIS holdout、Python GIL、容器 2.8 核）。

@@ -2774,6 +2774,8 @@ class RosDriver:
         self._published = 0
         self.last_pose_wall: Optional[float] = None
         self.last_pose_ts_ns: Optional[int] = None
+        self._pose_durations = []
+        self._scan_durations = []
         self.input_health: Dict[str, Any] = {"status": "NOT_EVALUATED"}
         self._pub = rospy.Publisher(status_topic, String, queue_size=20)
         self._sub_pose = rospy.Subscriber(pose_topic, Odometry, self._on_pose, queue_size=200)
@@ -2794,6 +2796,14 @@ class RosDriver:
         return int(stamp.secs) * 10**9 + int(stamp.nsecs)
 
     def _on_pose(self, msg) -> None:
+        t_cb = time.perf_counter()
+        try:
+            self._on_pose_inner(msg)
+        finally:
+            if len(self._pose_durations) < 5000:
+                self._pose_durations.append(time.perf_counter() - t_cb)
+
+    def _on_pose_inner(self, msg) -> None:
         self.pose_count += 1
         self.last_pose_wall = time.time()
         ns = self._stamp_ns(msg.header.stamp)
@@ -2811,6 +2821,14 @@ class RosDriver:
             self._dispatch(pose_ns, pose, scan, scan_ns)
 
     def _on_scan(self, msg) -> None:
+        t_cb = time.perf_counter()
+        try:
+            self._on_scan_inner(msg)
+        finally:
+            if len(self._scan_durations) < 5000:
+                self._scan_durations.append(time.perf_counter() - t_cb)
+
+    def _on_scan_inner(self, msg) -> None:
         self.scan_count += 1
         ns = self._stamp_ns(msg.header.stamp)
         try:
@@ -2860,6 +2878,24 @@ class RosDriver:
 # ---------------------------------------------------------------------------------------------
 # entry point
 # ---------------------------------------------------------------------------------------------
+def duration_stats(values) -> Dict[str, Any]:
+    """Percentiles of per-message callback durations, in milliseconds.
+
+    The authorised run stopped publishing earlier when the driver was present, and the driver's
+    per-frame cost is the leading explanation. Recording what each callback actually costs lets
+    the next run separate that from the host's own timing, instead of inferring it from CPU
+    load. The list is bounded by the caller, so this never grows with the bag.
+    """
+    vals = sorted(float(v) for v in values)
+    n = len(vals)
+    if n == 0:
+        return {"n": 0}
+    def pct(q):
+        return round(vals[min(n - 1, max(0, int(round(q * (n - 1))))) ] * 1000.0, 3)
+    return {"n": n, "p50_ms": pct(0.50), "p95_ms": pct(0.95), "max_ms": pct(1.0),
+            "mean_ms": round(sum(vals) / n * 1000.0, 3)}
+
+
 def pose_stream_health(pose_count: int, last_pose_wall: Optional[float],
                        started_wall: float, now_wall: float,
                        limit_s: float) -> Dict[str, Any]:
@@ -3041,6 +3077,8 @@ def main(argv: Optional[List[str]] = None) -> int:
             "peak_rss_kb": peak_rss_kb(),
             "pose_messages": driver.pose_count,
             "scan_messages": driver.scan_count,
+            "pose_callback": duration_stats(driver._pose_durations),
+            "scan_callback": duration_stats(driver._scan_durations),
             "callback_errors": driver.errors[:50],
             "callback_error_count": len(driver.errors),
         },
