@@ -2816,3 +2816,19 @@ S2 `326413b`（`exp/growth-run`）交 ctrl1/ctrl2 原件与 v1/v2 源码。S1 �
 **用户授权（2026-11-13 10:2x，本次会话确认）**：追加 **1 次**两事件整链 run（同一二进制 `df27a24c…`、同 bag、约 250 s 播放、1800 s 超时、
 不新增构建/安装/参数扫描）；失败保原件、只有具体可修原因才回报，不自行重试。授权已转 S2（消息 `9f2d1bb3…`）。预算台账：构建 2 次
 （第 2 次为自锁修复）、run 2 次（ctrl1 失败/ctrl2 通过）+ 授权 1 次。
+
+## 184. 整链 run 的启动失败台账（四次无效调用，根因已定位；第 5 次未开始）
+
+用户授权 1 次整链 run 后，S2 的启动尝试全部在**放 bag 前或 driver 未工作时**失败，均不计整链结果，保留原件：
+
+| # | 配置/目录 | 结果 | 原因（S1 复核） |
+|---|---|---|---|
+| 1 | wait-limit 0，`two_event_invalid_driver/` | 播放到 102/260 s 主动停 | driver 未启动（`-I` 忽略 PYTHONPATH，`ModuleNotFoundError`），无任何恢复动作 |
+| 2 | `$PY -I -m`，`two_event2/` | 放 bag 前退出 | argparse usage：`--` 被当位置参数 |
+| 3 | runpy + `--`，`two_event3_gate_misfire/` | driver 启动 1.4 s 后被门控 SIGINT | `setsid ... &` 的 `$!` 是包装进程，`kill -0` 立即失败 |
+| 4 | runpy 无 setsid，`two_event4/` | driver 启动 ~1.8 s 后被门控 SIGINT | **日志缓冲**：Python stdout 重定向到文件为块缓冲；门控 3 s 时 `grep "listening on"` 读到 0 字节文件 → 判 BLOCKED → cleanup 杀健康 driver。本机实测：`python3 -c "print(...); sleep(4)" > log &`，1 s 时进程存活但 log 0 字节，退出后才 12 字节 |
+
+**修正（已转 S2，消息 `99e68045…`）**：driver 启动加 `-u`（或 `PYTHONUNBUFFERED=1`）；门控以 `kill -0` 为主、`rosnode list` 查 `/slam_recovery_native_loop` 为确认，
+不依赖日志文本；注册轮询最多 10 s。**第 5 次为本次授权下最后一次调用**；再失败保原件、记 FAIL/BLOCKED、不重试。
+
+状态（10:42）：第 5 次**尚未开始**；无新增宿主进程（仅 11-06 起的旧进程与 S2 的等待循环）。S3 `r26534-58` idle、无新交付。main 仍 `0b343ae`。
