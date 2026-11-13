@@ -2974,3 +2974,10 @@ paired 949、`message_disposition.fully_accounted=true/fully_decided=true`、`ho
 
 **待用户决定**：(1) 把受控 E1/E2 前移到 host 健康区间（如 +60/+85 s，不改宿主）；(2) 换 FAST-LIO 稳定的另一条输入复验；
 (3) 先查 93–95 s 退化本身（疑与原 E1 自然休眠同机制，属原算法行为）。
+
+## 193. 截止时间口径更正：授权 run 的 driver 位姿流止于 bag 94.7–96.4 s
+
+S2 `163cd1d` 撤回"93.0 s"（误把首个配对帧当首帧），按同一首帧重算：`frame_diagnostics` 末条 `1711547976664449792` → **94.70 s**；
+最后配对准位姿 `1711547978375997782` → **96.41 s**。§192 记的 95.0 s 落在两口径之间，保留；93.0 s 作废。
+其余结论不变：v4 延期/两级 ack 已验证，整链 FAIL 因 host 在 E1（116.0 s）前进入原生退化休眠、停止发布 `/Odometry`；未重试。
+已 cherry-pick 入 main（`437cb2a`），`exp/growth-run` 推送 `163cd1d`。
