@@ -801,3 +801,11 @@ growth只新38行文字无map序列/原脚本，report0.43/12.7是回溯边界�
 独立原actions复算E1/E2 snapshot分别晚目标422.134/521.081ms，hold虽提前但cp不合法，v4 deferred PASS不接受。真实ack_received为RECEIVED snapshot无wall，client只有wall才触发_pipeline_armed_pair，且两snapshot wall均等于hold applied ack_wall，格式错配与实测一致；另有共享ack最后写值使最前hold永久pending的确定性控制。最低S1/S2统一生产RECEIVED、目标前双命令真实入队及唯一applied回执，不只看19项文本断言。
 
 update fallback调真实cp.status摘要而非status命令，实测receipt None/cmd未创建，fake接口不一致；reprocess ACK无repaired_in_update，须真实status并等相关replay/update边界，不只改字段。driver 949 never/full true而host1113Q，full accounted仅driver非全宿主。下一交生产格式双命令控制与update读取，用户另授权后方再验cp≤target→E1→update/map→live→E2；前移事件须预声明新受控协议不冒原事件/自动检测。A4/A6/A10/B11未闭合，A3/B3/B4不可评价，不调参。两-I控制exit0，不ROS/build/算法/main历史/门/private，中文SSH review，四Cron与18:00继续。
+
+## 102. 用户直接纠正：先跑通链条，取消工程/算力/内存放行门
+
+用户2026-11-13明确指出契约中仍有过多工程门和阈值，首要任务是跑通链条，不能继续在算力、内存上阻塞。S4此前把接口/资源问题提升为复验前置，偏离主线，现撤回这种安排；不再发布那组工程反例作为新阻断。[宿主接口记录](HOST_INTERFACE_CONTRACT.md)改为链条优先、诊断后置，[今日任务§0/§6](FASTLIO_ALI_AUTODETECTION_E2_TASK_20261113.md)同步：`--require-contract`启动退出、未过七步冒烟不进整链、硬件预算和接口检查均不作开工/复验前置。
+
+已有授权的v7构建和整链run直接执行，不附加退出型require-contract，其余授权输入/事件/窗口/预算不变，不新增重试。CPU/RSS、callback、看门狗、内存、ACK/契约字段和测试数量只作运行后诊断；只有实际输入错配或状态地图安全破坏才限制对应动作。科学评价门不转为工程开工门，标签/成本不足只限对应主张，不阻原生链。
+
+当前真实基线：v6两次run已有E1 takeover、abandon/rearm和final HEALTHY，但E2因宿主提前停发未到；E1生命周期成立不等于完整二事件。下一唯一交付为同次E1→宿主接管或实际修复→后继→重武装→E2→尾段，失败直接报告，不先修完工程。S1/S2沿用现有授权执行，S4只核结果不增设前置；不代跑、不改算法/历史/科学门/private，中文SSH仅任务契约与历史增量，四Cron及18:00如实报告继续。
