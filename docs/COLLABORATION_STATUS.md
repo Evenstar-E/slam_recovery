@@ -3199,3 +3199,22 @@ run 会在宿主即将恢复前被看门狗中止。修正（`pose_stream_health
 - 失败保原件、记 FAIL/BLOCKED、不重试、不再构建。
 
 当前状态：授权已下达，run 尚未开始（以 S2 实交为准）。
+
+## 209. v5b run 结果与 driver 降载：FIM 距离矩阵 + 支持参考去重的等价优化
+
+**v5b run（授权 1 次，不构建，v5 `785c0f20…`）**，S2 `e01bc62`，原件 `two_event_v5b_authorized/`。S1 核实：
+- driver 存活 260.0 s，`input_health=OK`（`silence_s=0.063`），**看门狗不再误报**；位姿 1019 / 扫描 2510，`callback_errors=0`；
+- `host_native` 事件：休眠 66.2 s → 发布 66.3 → 重建 73.8 → 发布 73.9 → 休眠 81.3 → 重建 81.3 → 发布 81.4 → 休眠 94.3 → 发布 94.4 →
+  重建 94.5 → 休眠 98.3 → 发布 98.4（相对首帧）；driver 侧帧诊断止于 bag 102.0 s，E1（117.4 s）未到达 → `scripted.fired=[]`、0 候选；
+- 对照 A/B（无 driver）首次休眠 115.8 s → **driver 共存把宿主首次休眠提前约 50 s**；
+- 共存策略生效：收到 sleep/build 后释放 hold（`input_fates` ingested 1274 / quarantined 978），`host_native.state=PUBLISHING` 收尾；
+- 定量：`pose_callback` p50 **102 ms**、p95 **1255 ms**、mean **244 ms**（n=1018）；`scan_callback` p50 0.9 ms——竞争来自逐位姿处理。
+
+**S1 离线剖析与等价优化（不改数值定义）**：
+1. `compute_6dof_point_to_plane_fim`：显式 `m×m×3` 差矩阵占 97 ms 中的 84 ms（m=1200）。改用
+   `‖a‖²+‖b‖²−2a·b` 的矩阵乘恒等式（含负值清零），**97 ms → 64 ms**；同帧 FIM 相对差 **3.0e-10**。
+2. `support_reference`（node）：`np.unique(q, axis=0)` 在 1.5M 点上 **2.46 s/次刷新**；改为三轴体素索引打包成 int64 的
+   `np.unique(key, return_index=True)`（首次出现语义不变），**2.46 s → 0.44 s**，选点**逐点相同**（max_abs_diff=0.0）。
+两项均有回归测试（FIM 对比旧实现、选点对比行式 unique）；全套 **265 项通过**。
+
+**口径**：两项都是等价优化，不改门阈值/NIS 定义；仍需一次新授权 run 才能确认回调成本下降、宿主能撑到 E1。

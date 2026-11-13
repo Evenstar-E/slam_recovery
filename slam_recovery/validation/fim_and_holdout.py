@@ -48,8 +48,13 @@ def compute_6dof_point_to_plane_fim(
         sub_pts = pts
 
     m = len(sub_pts)
-    diff = sub_pts[:, None, :] - sub_pts[None, :, :]
-    dist_sq = np.sum(diff ** 2, axis=-1)
+    # Squared distances via ||a||^2 + ||b||^2 - 2 a.b. The explicit m x m x 3 difference array
+    # cost 84 ms of the 97 ms per frame at m=1200 and was the driver's dominant cost, which in
+    # turn pushed the host into its hibernation before E1. The identity is the same quantity up
+    # to floating point; the guard removes tiny negatives from cancellation.
+    sq = np.einsum("ij,ij->i", sub_pts, sub_pts)
+    dist_sq = sq[:, None] + sq[None, :] - 2.0 * (sub_pts @ sub_pts.T)
+    np.maximum(dist_sq, 0.0, out=dist_sq)
     nn_idx = np.argpartition(dist_sq, kth=min(k_neighbors, m - 1), axis=1)[:, 1 : k_neighbors + 1]
 
     neighbors = sub_pts[nn_idx]

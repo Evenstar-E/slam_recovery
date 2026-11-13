@@ -259,7 +259,13 @@ class OnlineRecoveryTransactionNode:
         if len(pts) == 0:
             return pts
         q = np.floor(np.asarray(pts[:, :3], dtype=np.float64) / float(voxel_m)).astype(np.int64)
-        _, first = np.unique(q, axis=0, return_index=True)
+        # Row-wise np.unique(axis=0) on the whole map is O(N log N) with a wide comparison and
+        # was a multi-second cost per refresh on large maps; the driver's per-frame callback
+        # averaged 244 ms and the host hibernated before E1. Packing the three voxel indices
+        # into one int64 preserves the same first-occurrence selection (np.unique returns the
+        # first occurrence of each key) and sorts scalars instead of rows.
+        key = ((q[:, 0] & 0x1FFFFF) << 42) | ((q[:, 1] & 0x1FFFFF) << 21) | (q[:, 2] & 0x1FFFFF)
+        _, first = np.unique(key, return_index=True)
         return pts[np.sort(first)]
 
     def step_frame(
