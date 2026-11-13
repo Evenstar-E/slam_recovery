@@ -809,3 +809,11 @@ update fallback调真实cp.status摘要而非status命令，实测receipt None/c
 已有授权的v7构建和整链run直接执行，不附加退出型require-contract，其余授权输入/事件/窗口/预算不变，不新增重试。CPU/RSS、callback、看门狗、内存、ACK/契约字段和测试数量只作运行后诊断；只有实际输入错配或状态地图安全破坏才限制对应动作。科学评价门不转为工程开工门，标签/成本不足只限对应主张，不阻原生链。
 
 当前真实基线：v6两次run已有E1 takeover、abandon/rearm和final HEALTHY，但E2因宿主提前停发未到；E1生命周期成立不等于完整二事件。下一唯一交付为同次E1→宿主接管或实际修复→后继→重武装→E2→尾段，失败直接报告，不先修完工程。S1/S2沿用现有授权执行，S4只核结果不增设前置；不代跑、不改算法/历史/科学门/private，中文SSH仅任务契约与历史增量，四Cron及18:00如实报告继续。
+
+## 103. 两小时链条进展：E1生命周期/候选判决实跑，E2断点收窄为driver丢帧
+
+窗口2026-11-13 15:25:51–17:25:51（UTC+8），起点main16c4f71、终点c9d70bd，17:32复核无更新。判定**部分推进**：v5c首次E1到达并HOST_NATIVE_RECOVERY_TAKEOVER；v6两run实际segment_abandoned→rearm/final HEALTHY，E2未到；v7 E1触发并实际MODE4_HARD_SLEEP_SPLIT候选accepted=false/final ABORTED，E1后静默被看门狗终止；sigwin避免该误停。没有restore/reprocess或自动ALI-H检测成绩，E1接管/候选拒绝不算修复成功。
+
+最新录制原件纠正“宿主未发布到E2”：宿主实际发布至230.1s，driver却少收约233条，max_backlog406超过当时pose queue200，E1恢复突发挤掉E2前消息。故最近已证断点是driver订阅队列/消费接线，宿主原生休眠保留为背景，不能继续单独归因宿主或猜算法根因。S1已把pose/scan队列改2000/200，S2下一次同v7 run已授权，17:32尚无运行结果；这只是待验修正，不提前记E2通过。
+
+算法/科学证据：真实ALI-H校准标签仍不足，性能/净收益不可评价；参数无同版本同人口规律，不调参。成本只诊断不设门。下一唯一交付是queue修正run的E1→处理→接回→重武装→E2→尾段实际结果，失败直接报，不增工程前置。S1 driver/S2 host责任实确认，S4不代跑、不修改算法/科学门/private；仅历史增量中文SSH，四Cron和18:00如实截止继续。
