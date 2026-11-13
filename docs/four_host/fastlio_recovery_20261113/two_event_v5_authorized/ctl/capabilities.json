@@ -1,0 +1,13 @@
+{
+  "snapshot": "YES",
+  "restore": "YES",
+  "hold": "YES",
+  "reprocess": "PARTIAL",
+  "set_state": "NO",
+  "measurement_relay": "YES",
+  "checkpoint_contents": ["eskf_state", "eskf_cov", "ikdtree_points", "time_cursor"],
+  "checkpoint_excludes": ["imu_preintegration_cache", "deskew_cache", "external_poses_graph"],
+  "partial_notes": {"reprocess": "replays buffered lidar/imu groups through the normal loop; repaired clouds are substituted by header stamp within 1 ms of the group end; p_imu internal preintegration/deskew state is not checkpointed"},
+  "notes": "time cursors are part of the checkpoint; imu/deskew caches are not",
+  "checkpoint_invalidated_by": "re_slam (host-native reset); a new snapshot is required afterwards"
+}
