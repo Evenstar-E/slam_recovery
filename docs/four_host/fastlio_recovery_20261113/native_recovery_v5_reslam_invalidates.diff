@@ -1,0 +1,459 @@
+--- /home/R26534/MM-LINS/FAST-LIO/src/laserMapping.cpp	2026-10-30 14:31:42.154350573 +0800
++++ /home/R26534/fastlio2_ws/src/FAST-LIO/src/laserMapping.cpp	2026-11-13 14:46:28.663761706 +0800
+@@ -116,6 +116,367 @@
+ shared_ptr<Preprocess> p_pre(new Preprocess()); 
+ shared_ptr<ImuProcess> p_imu(new ImuProcess()); 
+ 
++// ===================== native recovery control channel (F1, FAST-LIO) =====================
++// Single-host recovery interface: hold / snapshot / restore / reprocess over a file command
++// channel, plus the input-fate record and the repaired-scan receipt. Capabilities are declared in
++// capabilities.json; anything not declared there is NOT supported. `re_slam()` is a reset, this is
++// a checkpoint/restore of the estimator state and the ikd-Tree point set.
++#include <sys/stat.h>
++#include <atomic>
++#include <deque>
++#include <map>
++#include <sstream>
++#include <iomanip>
++
++struct NrCheckpoint
++{
++    bool valid = false;
++    state_ikfom x;
++    Eigen::Matrix<double, 23, 23> P = Eigen::Matrix<double, 23, 23>::Zero();
++    PointVector map_pts;
++    double stamp = -1.0;
++    long frame = -1;
++    double last_imu_time = -1.0;      // IMU cursor at snapshot (p_imu internals are NOT in the cp)
++    double last_lidar_time = -1.0;
++};
++struct NrGroup
++{
++    PointCloudXYZI::Ptr lidar;
++    std::deque<sensor_msgs::Imu::ConstPtr> imu;
++    double beg = 0.0, end = 0.0;
++    bool replayed = false;
++};
++static std::mutex g_nr_mtx;
++static std::deque<std::pair<std::string, std::string>> g_nr_pending;   // cmd, payload
++static std::deque<NrGroup> g_nr_groups;                                // consumed since snapshot
++static std::atomic<bool> g_nr_hold{false};
++static std::atomic<bool> g_nr_replay{false};
++static NrCheckpoint g_nr_cp;
++static long g_nr_frame = 0;
++static double g_nr_lidar_end = -1.0;
++static std::atomic<int> g_nr_repair_received{0}, g_nr_repair_applied{0};
++static std::map<long long, PointCloudXYZI::Ptr> g_nr_repaired;          // keyed by header stamp (ns)
++static int g_nr_within = 0, g_nr_suffix = 0, g_nr_repaired_fed = 0;
++static std::string g_nr_dir;
++static std::ofstream g_nr_fates;
++static std::atomic<bool> g_nr_running{false};
++struct NrDeferred
++{
++    std::string cmd, payload;
++    long long stamp_ns = 0;
++};
++static std::deque<NrDeferred> g_nr_deferred;   // hold/snapshot armed with an apply stamp
++static std::map<long long, bool> g_nr_replay_marks;    // group end ns -> pushed by reprocess
++static std::map<long long, bool> g_nr_repaired_marks;  // group end ns -> carried a repaired cloud
++static bool g_nr_cur_is_replay = false;
++static bool g_nr_cur_repaired = false;
++static int g_nr_replay_remaining = 0;
++static int g_nr_repaired_in_update = 0;                // repaired clouds actually consumed by an update
++static long long g_nr_last_repaired_update_ns = 0;
++static bool g_nr_cp_invalidated_by_reslam = false;
++
++static void nr_write_ack(const std::string& text)
++{
++    if (g_nr_dir.empty()) return;
++    std::ofstream out(g_nr_dir + "/ack", std::ios::trunc);
++    out << text << "\n";
++}
++static void nr_write_caps()
++{
++    if (g_nr_dir.empty()) return;
++    std::ofstream out(g_nr_dir + "/capabilities.json", std::ios::trunc);
++    out << "{\n"
++           "  \"snapshot\": \"YES\",\n"
++           "  \"restore\": \"YES\",\n"
++           "  \"hold\": \"YES\",\n"
++           "  \"reprocess\": \"PARTIAL\",\n"
++           "  \"set_state\": \"NO\",\n"
++           "  \"measurement_relay\": \"YES\",\n"
++           "  \"checkpoint_contents\": [\"eskf_state\", \"eskf_cov\", \"ikdtree_points\", \"time_cursor\"],\n"
++           "  \"checkpoint_excludes\": [\"imu_preintegration_cache\", \"deskew_cache\", \"external_poses_graph\"],\n"
++           "  \"partial_notes\": {\"reprocess\": \"replays buffered lidar/imu groups through the "
++           "normal loop; repaired clouds are substituted by header stamp within 1 ms of the group "
++           "end; p_imu internal preintegration/deskew state is not checkpointed\"},\n"
++           "  \"notes\": \"time cursors are part of the checkpoint; imu/deskew caches are not\",\n"
++           "  \"checkpoint_invalidated_by\": \"re_slam (host-native reset); a new snapshot is required afterwards\"\n"
++           "}\n";
++}
++static std::string nr_hex16(unsigned long long v)
++{
++    std::ostringstream s; s << std::hex << std::setw(16) << std::setfill('0') << v; return s.str();
++}
++static void nr_poll_thread()
++{
++    const std::string cmd_path = g_nr_dir + "/cmd";
++    const std::string ack_recv = g_nr_dir + "/ack_received";
++    while (g_nr_running.load())
++    {
++        struct stat st;
++        if (!g_nr_dir.empty() && ::stat(cmd_path.c_str(), &st) == 0)
++        {
++            std::ifstream in(cmd_path);
++            std::string cmd, payload;
++            std::getline(in, cmd);
++            std::getline(in, payload);
++            in.close();
++            if (!cmd.empty())
++            {
++                std::rename(cmd_path.c_str(), (g_nr_dir + "/cmd.done").c_str());
++                { std::lock_guard<std::mutex> lk(g_nr_mtx); g_nr_pending.emplace_back(cmd, payload); }
++                std::ofstream rec(ack_recv, std::ios::trunc);
++                rec << "RECEIVED " << cmd << "\n";
++            }
++        }
++        std::this_thread::sleep_for(std::chrono::milliseconds(5));
++    }
++}
++// One row per consumed group: the trailing field is the group's fate.
++static void nr_log_fate(double end_time, double beg_time, const char* fate)
++{
++    if (!g_nr_fates.is_open()) return;
++    g_nr_fates << "{\"frame\":" << g_nr_frame << ",\"stamp_ns\":" << (long long)std::llround(end_time * 1e9)
++               << ",\"beg_s\":" << std::fixed << std::setprecision(6) << beg_time
++               << ",\"end_s\":" << end_time << ",\"fate\":\"" << fate << "\"}\n";
++}
++// Caller must hold g_nr_mtx.
++static bool nr_take_repair(double beg, double end, PointCloudXYZI::Ptr& out)
++{
++    if (g_nr_repaired.empty()) return false;
++    auto best = g_nr_repaired.end();
++    long long best_dt = 0;
++    for (auto it = g_nr_repaired.begin(); it != g_nr_repaired.end(); ++it)
++    {
++        const double t = (double)it->first * 1e-9;
++        if (t < beg - 1e-3 || t > end + 1e-3) continue;
++        const long long dt = std::llabs(it->first - (long long)std::llround(end * 1e9));
++        if (best == g_nr_repaired.end() || dt < best_dt) { best = it; best_dt = dt; }
++    }
++    if (best == g_nr_repaired.end()) return false;
++    out = best->second;
++    g_nr_repaired.erase(best);
++    g_nr_repair_applied.fetch_add(1);
++    return true;
++}
++static void nr_capture_group()
++{
++    // Called after a group is taken from the buffers; decides this group's identity (replayed or
++    // live, carried a repaired cloud or not) from the marks written when the replay was queued.
++    std::lock_guard<std::mutex> lk(g_nr_mtx);
++    const long long key = (long long)std::llround(lidar_end_time * 1e9);
++    g_nr_cur_is_replay = g_nr_replay_marks.erase(key) > 0;
++    g_nr_cur_repaired = g_nr_repaired_marks.erase(key) > 0;
++    NrGroup g;
++    g.lidar = Measures.lidar;
++    g.imu = Measures.imu;
++    g.beg = Measures.lidar_beg_time;
++    g.end = lidar_end_time;
++    g_nr_groups.push_back(g);
++    if (g_nr_groups.size() > 4000) g_nr_groups.pop_front();
++}
++static bool nr_restore_locked(std::string& why)
++{
++    if (!g_nr_cp.valid)
++    {
++        why = g_nr_cp_invalidated_by_reslam ? "checkpoint_invalidated_by_re_slam" : "no_checkpoint";
++        return false;
++    }
++    kf.change_x(g_nr_cp.x);
++    Eigen::Matrix<double, 23, 23> P = g_nr_cp.P;
++    kf.change_P(P);
++    ikdtree.clear();
++    if (!g_nr_cp.map_pts.empty()) ikdtree.Build(g_nr_cp.map_pts);
++    flg_EKF_inited = true;
++    // Rewind the input cursors too: without this a replayed IMU stream is judged stale or is
++    // propagated from a cursor later than the snapshot. p_imu's internal bias/init state is NOT
++    // checkpointed (declared in capabilities.json).
++    if (g_nr_cp.last_imu_time > 0.0) last_timestamp_imu = g_nr_cp.last_imu_time;
++    if (g_nr_cp.last_lidar_time > 0.0) last_timestamp_lidar = g_nr_cp.last_lidar_time;
++    g_nr_lidar_end = g_nr_cp.stamp;
++    g_nr_frame = g_nr_cp.frame;
++    return true;
++}
++static void nr_execute(const std::string& cmd, const std::string& payload)
++{
++        if (cmd == "status")
++        {
++            std::ostringstream s;
++            s << "OK status valid=" << (g_nr_cp.valid ? 1 : 0)
++              << " repair_received=" << g_nr_repair_received.load()
++              << " repair_applied=" << g_nr_repair_applied.load()
++              << " repaired_in_update=" << g_nr_repaired_in_update
++              << " last_repaired_update_ns=" << g_nr_last_repaired_update_ns
++              << " frame=" << g_nr_frame;
++            if (g_nr_lidar_end > 0.0)
++                s << " stamp_ns=" << (long long)std::llround(g_nr_lidar_end * 1e9);
++            else
++                s << " stamp_ns=NA no_timebase=1";
++            s << " map_writes=" << (g_nr_hold.load() ? "held" : "released");
++            nr_write_ack(s.str());
++        }
++        else if (cmd == "hold")
++        {
++            if (g_nr_lidar_end <= 0.0) { nr_write_ack("OK hold valid=0 reason=no_timebase"); return; }
++            g_nr_hold.store(true);
++            std::ostringstream s;
++            s << "OK hold applied valid=1 stamp_ns=" << (long long)std::llround(g_nr_lidar_end * 1e9)
++              << " frame=" << g_nr_frame << " map_writes=held";
++            nr_write_ack(s.str());
++        }
++        else if (cmd == "release" || cmd == "resume")
++        {
++            g_nr_hold.store(false);
++            std::ostringstream s;
++            s << "OK resume valid=1";
++            if (g_nr_lidar_end > 0.0) s << " stamp_ns=" << (long long)std::llround(g_nr_lidar_end * 1e9);
++            s << " frame=" << g_nr_frame << " map_writes=released";
++            nr_write_ack(s.str());
++        }
++        else if (cmd == "snapshot")
++        {
++            if (g_nr_lidar_end <= 0.0) { nr_write_ack("OK snapshot valid=0 reason=no_timebase"); return; }
++            std::lock_guard<std::mutex> lk(g_nr_mtx);
++            g_nr_cp.x = kf.get_x();
++            g_nr_cp.P = kf.get_P();
++            g_nr_cp.map_pts.clear();
++            if (ikdtree.Root_Node != nullptr)
++            {
++                PointVector pts;
++                ikdtree.flatten(ikdtree.Root_Node, pts, NOT_RECORD);
++                g_nr_cp.map_pts = pts;
++            }
++            g_nr_cp.stamp = g_nr_lidar_end;
++            g_nr_cp.frame = g_nr_frame;
++            g_nr_cp.last_imu_time = last_timestamp_imu;
++            g_nr_cp.last_lidar_time = last_timestamp_lidar;
++            g_nr_cp.valid = true;
++            g_nr_cp_invalidated_by_reslam = false;
++            g_nr_groups.clear();
++            std::ostringstream s;
++            s << "OK snapshot applied valid=1 stamp_ns=" << (long long)std::llround(g_nr_cp.stamp * 1e9)
++              << " frame=" << g_nr_cp.frame << " map_points=" << g_nr_cp.map_pts.size();
++            nr_write_ack(s.str());
++        }
++        else if (cmd == "restore")
++        {
++            std::lock_guard<std::mutex> lk(g_nr_mtx);
++            std::string why;
++            const bool ok = nr_restore_locked(why);
++            std::ostringstream s;
++            if (ok)
++                s << "OK restore valid=1 stamp_ns=" << (long long)std::llround(g_nr_lidar_end * 1e9)
++                  << " frame=" << g_nr_frame;
++            else
++                s << "OK restore valid=0 reason=" << why;
++            nr_write_ack(s.str());
++        }
++        else if (cmd == "reprocess")
++        {
++            std::lock_guard<std::mutex> lk(g_nr_mtx);
++            std::string why;
++            if (!nr_restore_locked(why))
++            {
++                nr_write_ack("OK reprocess valid=0 reason=" + why);
++                return;
++            }
++            long long end_ns = 0;
++            try { if (!payload.empty()) end_ns = std::stoll(payload); } catch (...) { end_ns = 0; }
++            g_nr_within = 0; g_nr_suffix = 0; g_nr_repaired_fed = 0;
++            // Re-feed the consumed groups in order; the normal loop processes them again.
++            for (auto it = g_nr_groups.rbegin(); it != g_nr_groups.rend(); ++it)
++            {
++                PointCloudXYZI::Ptr ins = it->lidar;
++                PointCloudXYZI::Ptr rep;
++                const long long gkey = (long long)std::llround(it->end * 1e9);
++                g_nr_replay_marks[gkey] = true;
++                if (nr_take_repair(it->beg, it->end, rep))
++                {
++                    ins = rep; ++g_nr_repaired_fed; g_nr_repaired_marks[gkey] = true;
++                }
++                lidar_buffer.push_front(ins);
++                time_buffer.push_front(it->beg);
++                for (auto iu = it->imu.rbegin(); iu != it->imu.rend(); ++iu) imu_buffer.push_front(*iu);
++                const long long g_ns = (long long)std::llround(it->end * 1e9);
++                if (end_ns > 0 && g_ns > end_ns) ++g_nr_suffix; else ++g_nr_within;
++            }
++            lidar_pushed = false;
++            g_nr_replay.store(true);
++            g_nr_replay_remaining = g_nr_within + g_nr_suffix;
++            // The replay writes the map (a held map would keep the repaired frames out).
++            g_nr_hold.store(false);
++            std::ostringstream s;
++            s << "OK reprocess replay_suffix=" << g_nr_suffix << " replay_within_end=" << g_nr_within
++              << " repaired_fed=" << g_nr_repaired_fed << " source=buffer";
++            nr_write_ack(s.str());
++            g_nr_groups.clear();
++        }
++        else if (cmd == "capabilities")
++        {
++            nr_write_caps();
++            nr_write_ack("OK capabilities written");
++        }
++        else
++        {
++            nr_write_ack("OK " + cmd + " UNSUPPORTED");
++        }
++}
++// Collects commands from the control thread; holds/snapshots that carry an apply stamp are ARMED
++// and executed later, at the frame boundary that reaches their stamp.
++static void nr_apply_pending()
++{
++    std::deque<std::pair<std::string, std::string>> due;
++    { std::lock_guard<std::mutex> lk(g_nr_mtx); due.swap(g_nr_pending); }
++    for (auto& c : due)
++    {
++        const std::string& cmd = c.first;
++        if ((cmd == "hold" || cmd == "snapshot") && !c.second.empty())
++        {
++            long long stamp_ns = 0;
++            try { stamp_ns = std::stoll(c.second); } catch (...) { stamp_ns = 0; }
++            if (stamp_ns > 0)
++            {
++                {
++                    std::lock_guard<std::mutex> lk(g_nr_mtx);
++                    NrDeferred d; d.cmd = cmd; d.payload = c.second; d.stamp_ns = stamp_ns;
++                    g_nr_deferred.push_back(std::move(d));
++                }
++                std::ostringstream s2;
++                s2 << "OK " << cmd << " deferred stamp=" << stamp_ns;
++                nr_write_ack(s2.str());
++                continue;
++            }
++        }
++        nr_execute(cmd, c.second);
++    }
++}
++// Applies armed hold/snapshot before the group whose end reaches their stamp is processed. The
++// snapshot therefore describes the PREVIOUS completed frame (kf still holds it) and its stamp is
++// that frame's end, which is strictly before the target -- a restore can never land after the
++// boundary it was armed for.
++static void nr_apply_deferred(double this_group_end)
++{
++    std::deque<NrDeferred> due;
++    {
++        std::lock_guard<std::mutex> lk(g_nr_mtx);
++        const long long now_ns = (this_group_end > 0.0) ? (long long)std::llround(this_group_end * 1e9) : 0;
++        if (now_ns <= 0) return;
++        while (!g_nr_deferred.empty() && g_nr_deferred.front().stamp_ns <= now_ns)
++        {
++            due.push_back(std::move(g_nr_deferred.front()));
++            g_nr_deferred.pop_front();
++        }
++    }
++    for (auto& d : due) nr_execute(d.cmd, d.payload);
++}
++static void nr_repaired_cbk(const sensor_msgs::PointCloud2::ConstPtr& msg)
++{
++    PointCloudXYZI::Ptr cloud(new PointCloudXYZI());
++    pcl::fromROSMsg(*msg, *cloud);
++    const long long key = (long long)std::llround(msg->header.stamp.toSec() * 1e9);
++    { std::lock_guard<std::mutex> lk(g_nr_mtx); g_nr_repaired[key] = cloud; }
++    g_nr_repair_received.fetch_add(1);
++}
++// =================== end native recovery control channel ===================
++
+ void SigHandle(int sig)
+ {
+     flg_exit = true;
+@@ -374,6 +735,7 @@
+ int process_increments = 0;
+ void map_incremental()
+ {
++    if (g_nr_hold.load()) return;   // native recovery: hold = stop map writes
+     PointVector PointToAdd;
+     PointVector PointNoNeedDownsample;
+     PointToAdd.reserve(feats_down_size);
+@@ -672,6 +1034,10 @@
+ 
+ void re_slam()
+ {
++    // A reset is not a restore: the map tree is cleared and the state goes back to the IMU
++    // initialisation point, so any checkpoint taken before it no longer describes this host.
++    // Refusing the restore here is the third layer after the driver's own sleep/build handling.
++    { std::lock_guard<std::mutex> lk(g_nr_mtx); g_nr_cp.valid = false; g_nr_cp_invalidated_by_reslam = true; }
+     // flg_reset = true;
+     state_ikfom t;                    
+     state_point = t;
+@@ -757,6 +1123,7 @@
+ 
+     ros::Subscriber sub_pcl = p_pre->lidar_type == AVIA ? nh.subscribe(lid_topic, 200000, livox_pcl_cbk) : nh.subscribe(lid_topic, 200000, standard_pcl_cbk); //fastlio2中只有面特征
+     ros::Subscriber sub_imu = nh.subscribe(imu_topic, 200000, imu_cbk);
++    ros::Subscriber sub_repaired;   // native recovery: repaired measurements
+     ros::Publisher pubLaserCloudFull = nh.advertise<sensor_msgs::PointCloud2>("/cloud_registered", 100000);
+     ros::Publisher pubLaserCloudFull_body = nh.advertise<sensor_msgs::PointCloud2>("/cloud_registered_body", 100000);
+     ros::Publisher pubLaserCloudFull_lidar = nh.advertise<sensor_msgs::PointCloud2>("/cloud_registered_lidar", 100000);
+@@ -766,6 +1133,18 @@
+     ros::Publisher pubPath = nh.advertise<nav_msgs::Path>("/path", 100000);
+     ros::Publisher pubissleeping = nh.advertise<std_msgs::Bool>("Issleeping", 10);
+     ros::Publisher pubisbuilding = nh.advertise<std_msgs::Bool>("Isbuilding", 10);
++    // Native recovery channel (F1). Off unless native_recovery_dir is set.
++    nh.param<std::string>("native_recovery_dir", g_nr_dir, "");
++    if (!g_nr_dir.empty())
++    {
++        ::mkdir(g_nr_dir.c_str(), 0755);
++        nr_write_caps();
++        g_nr_fates.open(g_nr_dir + "/input_fates.jsonl", std::ios::out);
++        g_nr_running.store(true);
++        std::thread(nr_poll_thread).detach();
++        sub_repaired = nh.subscribe("/native_recovery/repaired_scan", 50, nr_repaired_cbk);
++        ROS_INFO("[NATIVE_RECOVERY] channel on %s", g_nr_dir.c_str());
++    }
+ 
+     signal(SIGINT, SigHandle);
+     ros::Rate rate(5000);
+@@ -780,9 +1159,13 @@
+     {
+         if (flg_exit)
+             break;
++        nr_apply_pending();
+         ros::spinOnce();
+         if (sync_packages(Measures))
+         {
++            // Armed commands run here, before this group is captured or estimated: the snapshot
++            // then describes the previous completed frame and never lands after its boundary.
++            nr_apply_deferred(lidar_end_time);
+             if (flg_reset)
+             {
+                 ROS_WARN("reset when rosbag play back");
+@@ -791,6 +1174,7 @@
+                 Measures.imu.clear();
+                 continue;
+             }
++            nr_capture_group();
+             double t0, t1, t2, t3, t4, t5, match_start, solve_start, svd_time;
+             
+             match_time = 0;
+@@ -987,6 +1371,20 @@
+                 ext_euler = SO3ToEuler(state_point.offset_R_L_I);
+                 dump_lio_state_to_log(fp);
+             }
++            if (g_nr_cur_repaired)
++            {
++                // The repaired cloud went through this native update, not just through the queue.
++                ++g_nr_repaired_in_update;
++                g_nr_last_repaired_update_ns = (long long)std::llround(lidar_end_time * 1e9);
++            }
++            g_nr_lidar_end = lidar_end_time;
++            ++g_nr_frame;
++            nr_log_fate(lidar_end_time, Measures.lidar_beg_time,
++                        g_nr_cur_is_replay ? "replayed" : (g_nr_hold.load() ? "quarantined" : "ingested"));
++            if (g_nr_cur_is_replay && g_nr_replay_remaining > 0)
++            {
++                if (--g_nr_replay_remaining == 0) g_nr_replay.store(false);
++            }
+         }
+         status = ros::ok();
+         rate.sleep();
