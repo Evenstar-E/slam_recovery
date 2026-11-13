@@ -187,5 +187,37 @@ class BodyBiasTest(unittest.TestCase):
         self.assertAlmostEqual(bias, 0.5, places=9)
 
 
+class ReferenceGridQueryTest(unittest.TestCase):
+    def test_vectorised_query_matches_the_cell_neighbourhood_loop(self):
+        # The vectorised path must return exactly what the per-query loop over the same 27 cells
+        # returns; this pins that the speed-up did not change the distance definition.
+        import numpy as np
+        from slam_recovery.ros.cloud_repair import ReferenceGrid
+
+        rng = np.random.default_rng(3)
+        ref = rng.uniform(-3, 3, (500, 3))
+        queries = rng.uniform(-3, 3, (200, 3))
+        grid = ReferenceGrid(ref, cell_m=0.5)
+
+        def loop(q):
+            base = np.floor(np.asarray(q) / grid.cell).astype(np.int64)
+            best = np.inf
+            for dx in (-1, 0, 1):
+                for dy in (-1, 0, 1):
+                    for dz in (-1, 0, 1):
+                        arr = grid.cells.get((int(base[0] + dx), int(base[1] + dy),
+                                              int(base[2] + dz)))
+                        if arr is not None:
+                            best = min(best, float(np.min(np.linalg.norm(arr - q, axis=1))))
+            return best
+
+        expected = np.array([loop(q) for q in queries])
+        got = grid.nearest_distances(queries)
+        self.assertTrue(np.array_equal(np.isinf(expected), np.isinf(got)))
+        finite = np.isfinite(expected)
+        self.assertTrue(np.allclose(expected[finite], got[finite], atol=1e-12))
+
+
+
 if __name__ == "__main__":
     unittest.main()

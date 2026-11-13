@@ -3068,3 +3068,17 @@ A/B 的 IMU 初始化 163/164 次。两种口径都保留，引用时须写清�
 
 结论不变：**A≈B≈旧基线（115.7–115.8 s）；通道开关不影响宿主发布；C 的 94.7–96.4 s 提前停发只在 driver 在场时出现**，
 指向 driver 侧负载/时序竞争（逐帧 `cloud_to_xyz` + NIS 最近邻随参考集增长），不推广为所有宿主通用故障。
+
+## 199. F3 降载：ReferenceGrid 查询向量化（等价替换，非逐帧 NIS 热路径）
+
+A/B 结论指向 driver 侧负载后，S1 核查了逐帧成本构成：`LiveNis.measure` 走 `compute_disjoint_holdout_point_to_plane_nis`
+（300 holdout × 600 train 的向量化计算，单帧数毫秒级），**不使用** `ReferenceGrid`；`ReferenceGrid` 用于修复偏置搜索
+（`estimate_body_z_bias`，每次估计 80 次查询）。因此它不是 C 提前停发的直接解释。
+
+仍做了等价优化：`ReferenceGrid.nearest_distances` 从逐查询 Python 循环改为按查询所在 cell 分组、numpy 批量计算；
+候选集合仍是同样的 3×3×3 邻域，距离定义不变。本机基准（2 万参考点）：
+- 旧：1500 查询 67 ms、6000 查询 249 ms；新：1500 查询 50 ms、6000 查询 140 ms。
+新增等价性测试（与逐 cell 循环逐点比对，inf 语义一致）；全套 **252 项通过**。
+
+口径：这是 F3 侧的安全降载，不改 NIS/门/阈值，也不改变修复搜索结果；C 的提前停发机制仍未分离（候选：点云转换、订阅回调、Python GIL
+与容器 2.8 核竞争），需要新的有界对照才可定性。

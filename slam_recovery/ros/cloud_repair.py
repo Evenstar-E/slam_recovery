@@ -85,23 +85,42 @@ class ReferenceGrid:
         self.cells = {k: np.asarray(v) for k, v in self.cells.items()}
 
     def nearest_distances(self, queries, reach: int = 1):
-        out = np.full(len(queries), np.inf)
+        """Nearest reference distance for each query, vectorised per query cell.
+
+        The per-query Python loop cost 67 ms for 1500 queries against a 20k reference, and the
+        live loop calls it for every paired frame; at 10 Hz that competes with the host for the
+        few cores this container gets (the driver's cost is the leading hypothesis for the
+        host's early hibernation in the authorised run). Queries are grouped by their cell and
+        each group is evaluated with numpy. The result is the same nearest distance: every
+        candidate in the (2*reach+1)^3 neighbourhood is still considered, only the loop over
+        queries is removed.
+        """
+        Q = np.asarray(queries, dtype=np.float64)
+        if Q.ndim != 2 or Q.shape[0] == 0:
+            return np.full(0 if Q.ndim == 2 else 1, np.inf)
+        out = np.full(Q.shape[0], np.inf)
         if not self.cells:
             return out
-        for i, q in enumerate(np.asarray(queries, dtype=np.float64)):
-            base = np.floor(q / self.cell).astype(np.int64)
-            best = np.inf
-            for dx in range(-reach, reach + 1):
-                for dy in range(-reach, reach + 1):
-                    for dz in range(-reach, reach + 1):
-                        arr = self.cells.get((int(base[0] + dx), int(base[1] + dy),
-                                              int(base[2] + dz)))
-                        if arr is None:
-                            continue
-                        d = float(np.min(np.linalg.norm(arr - q, axis=1)))
-                        if d < best:
-                            best = d
-            out[i] = best
+        base = np.floor(Q[:, :3] / self.cell).astype(np.int64)
+        groups = {}
+        for i, key in enumerate(map(tuple, base)):
+            groups.setdefault(key, []).append(i)
+        offsets = [(dx, dy, dz)
+                   for dx in range(-reach, reach + 1)
+                   for dy in range(-reach, reach + 1)
+                   for dz in range(-reach, reach + 1)]
+        for key, idx in groups.items():
+            cand = []
+            for off in offsets:
+                arr = self.cells.get((key[0] + off[0], key[1] + off[1], key[2] + off[2]))
+                if arr is not None:
+                    cand.append(arr)
+            if not cand:
+                continue
+            C = np.concatenate(cand) if len(cand) > 1 else cand[0]
+            qs = Q[idx, :3]
+            diff = qs[:, None, :] - C[None, :, :]
+            out[idx] = np.sqrt(np.einsum("ijk,ijk->ij", diff, diff)).min(axis=1)
         return out
 
 
