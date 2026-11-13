@@ -110,3 +110,16 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
   （ingested 1137 / quarantined 1113）、bag 播到 `Done`；只是 driver 已退出，未收到任何位姿/扫描。
 - 判读：**driver 启动期看门狗口径问题**（应在首个位姿后再计时，或加启动宽限 ≥30 s），不是 host 或恢复通道缺陷。
 - 未重试、未再构建；原件 `two_event_v5_authorized/`。
+
+## ⑩ v5b 授权复验（2026-11-13）：FAIL（driver 共存下宿主提前休眠），但拿到定量成本
+
+- 不构建，v5 `785c0f20…`；driver 首次位姿宽限 60 s、`/Odometry` 已录制（`frontend.bag` 800 KB、259 s）。
+- `input_health = OK`（silence 0.063 s，不再误报 STALE）；`message_disposition` 输入 1019 位姿 / 2510 扫描，零回调错误。
+- **host_native 事件（相对 bag 首帧）**：休眠 66.2 s → 73.8 s 重建 → 81.3 s 休眠 → 94.3 s → 98.3 s；位姿流止于 **103.4 s**；
+  E1 在 **117.4 s**，仍未到达 → `scripted.fired=[]`、0 候选。对照 A/B（无 driver）首次休眠 115.8 s：
+  **driver 共存把宿主首次休眠提前约 50 s**。
+- **定量根因**：`runtime.pose_callback` n=1018、p50 **102 ms**、p95 **1255 ms**、max **1957 ms**、mean **244 ms**
+  （≈ 一个整核的持续占用）；`scan_callback` n=2510、p50 0.9 ms、p95 3.3 ms。即竞争来自 driver 的**逐位姿处理**，
+  不是扫描回调或恢复通道（A/B 已排除通道）。
+- 同一 run 也验证了共存策略：driver 收到宿主 sleep/build 后释放 hold（`input_fates` ingested 1274 / quarantined 978），
+  `host_native.state=PUBLISHING` 收尾，未发生 restore/reprocess（无 episode），v5 的 cp 失效路径未被触发。
