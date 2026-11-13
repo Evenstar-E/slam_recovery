@@ -3427,3 +3427,24 @@ S2 报告"宿主在 E1 后多轮休眠、位姿流止于 211.1 s"。S1 从 `two_
   报告必须标注"排空期处理、墙钟晚于 bag 结束、非实时"，E2 的 `actual_s` 按 stamp 记。
 - 成本归因（只读）：driver 新增 `frame_cost_breakdown`（`nis_measure`、`ingest` 的 n/p50/p95/max/mean），与既有
   `pose_callback/scan_callback` 并列；用于标注最长阶段，**不修改**算法/阈值/采样。273 项测试通过。
+
+## 227. 排空 run：E1 与 E2 均触发（逻辑链成立，标注非实时）；成本排序 ingest > nis
+
+授权的排空 run（`two_event_drain_authorized/`，v7 `a40e20d5…`，`DUR=360` + 排空 60 s，无构建）完成。S1 核实：
+- **`scripted.fired` 两条**：E1 declared `…999352267771`，actual **115.599 s**（kf 1156）；**E2 declared `…113452267771`，actual 229.696 s（kf 2054）**——
+  两个声明事件都触发，`run_mode=CONTROLLED_INTERFACE_TEST`；
+- episode 0：takeover（build，`segment_abandoned=True`）；episode 1：E2 触发、1 帧、冻结于 `1711548140.37`，随后 bag 结束、排空期无新位姿 →
+  15.1 s STALE 结束；`final_state=WAITING_FOR_EVIDENCE`、`decisions=1`、`candidates.jsonl` 1 行；`input_health` 期末 STALE（属排空结束后的正常停止）；
+- **标注：E2 是在排空期处理的，墙钟晚于 bag 结束；本轮不是实时能力证明**（driver 墙钟 334.5 s，峰值 RSS 2.45 GB）。
+
+**逐阶段耗时（`frame_cost_breakdown`，只读统计）**：
+| 阶段 | n | p50 | p95 | max | mean |
+|---|---:|---:|---:|---:|---:|
+| `ingest`（FIM + step_healthy + 地图同步） | 2083 | 51.4 ms | 216.8 ms | 522.4 ms | **69.9 ms** |
+| `nis_measure`（holdout NIS + 支持参考刷新） | 2085 | 15.6 ms | 372.9 ms | 636.9 ms | **54.7 ms** |
+| pose 回调（含配对/账本） | 2085 | 61.9 ms | 450.6 ms | 1028.1 ms | 98.4 ms |
+| scan 回调 | 2600 | 1.1 ms | 158.9 ms | 393.0 ms | 24.3 ms |
+
+**结论（仅标注，不修改）**：最长阶段是 **`ingest`（mean 69.9 ms，约占 124.7 ms/对的 56%）**，其中离线实测 `compute_6dof_point_to_plane_fim`
+约 64 ms（m=1200 的距离矩阵 + argpartition）；其次 **`nis_measure`（54.7 ms）**，其 p95 373 ms 的长尾来自周期性支持参考重建。
+两者合计即 driver 无法维持 8–10 Hz 的主因。**本轮不做任何修改**；定位结果已标注，供后续决定。
