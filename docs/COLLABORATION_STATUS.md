@@ -3092,3 +3092,11 @@ A/B 结论指向 driver 侧负载后，S1 核查了逐帧成本构成：`LiveNis
 
 口径：该统计只在**下一次获得授权**的 run 中产生数据；本机当前无 run。A/B 结论不变（通道无影响、driver 在场时提前停发），
 机制仍待定量分离（候选：`cloud_to_xyz`+`subsample` 的扫描回调、NIS holdout、Python GIL、容器 2.8 核）。
+
+## 201. LEDGER 口径同步：driver 成本归因收窄到扫描回调与 NIS holdout
+
+S2 `ee736f8`（`exp/growth-run`）已入 main（`8b23bc5`）：LEDGER 的逐帧成本表述改为"扫描回调的 `cloud_to_xyz`+`subsample` 与
+NIS holdout（`compute_disjoint_holdout_point_to_plane_nis`，300×600 向量化）"，并注明 `ReferenceGrid` 只用于修复偏置搜索；
+同时记入 `runtime.pose_callback/scan_callback` 的 p50/p95/max 作为下一定量诊断依据。计数口径同步（2 次休眠触发 vs 4 行含 disappear）。
+
+状态不变：不构建、不运行、不改码；二进制 `86f85025…`；原件与 LEDGER 不动；三个建议等用户决定。
