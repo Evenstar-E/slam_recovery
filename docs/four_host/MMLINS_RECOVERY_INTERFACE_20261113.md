@@ -3,6 +3,23 @@
 日期：2026-11-13。范围：只读源码与既有 run 报告，不构建、不运行、不改代码。
 证据引用格式 `文件:行`。凡需要构建或运行才能确认的点，明确标注"未确认"。
 
+## 0. 更正（2026-11-13，Codex 审阅 `6b6263b`）
+
+本文 §2 描述的 **4 节点 SC-PGO 流水线不是 `run_mmlins.sh` 实际启动的拓扑**。实际情况：
+
+- `run_mmlins.sh:49-56` 启动两个 roslaunch：
+  `fast_lio mapping_velodyne_m2dgr.launch`（节点 `/laserMapping`）与
+  `aloam_velodyne fastlio_ouster64.launch`（节点 `/alaserPGO`），就绪判定同时等待这两个节点。
+- PGO 通过 remap 消费前端：`/aft_mapped_to_init → /Odometry`、`/velodyne_cloud_registered_local →
+  /cloud_registered_body`、`/cloud_for_scancontext → /cloud_registered_lidar`
+  （`SC-PGO/launch/fastlio_ouster64.launch:28-30,36`）。
+- 因此 **MM-LINS 的测量输入面就是 FAST-LIO 前端的 `/velodyne_points` + IMU 订阅**
+  （`FAST-LIO/src/laserMapping.cpp:758-759`）；**话题级测量注入点是存在的**，与 FAST-LIO2 同构。
+- 相应地：前端地图是 `KD_TREE ikdtree`（`:91`），"重建"是 `re_slam()` 重置 ESKF 并清树（`:673-693`），
+  **没有 `replay_buffer_`/`reprocess`**（那套属于 FAST-LIVO2）。
+- 本文 §2/§5 中把 SC-PGO 的 4 节点链当作 MM-LINS 的主拓扑、以及"无测量注入点"的结论，**按此更正作废**；
+  4 节点链只适用于 SC-PGO 独立运行（A-LOAM 特征→里程计→建图）的模式。
+
 ## 1. 结论摘要
 
 - MM-LINS 是 **4 节点松耦合流水线**：`scanRegistration → laserOdometry → laserMapping →
