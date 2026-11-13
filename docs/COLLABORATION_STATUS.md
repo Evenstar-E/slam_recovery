@@ -2945,3 +2945,32 @@ S2 `a800dce` + `6bf6981`（`exp/growth-run`，纯源码，未构建/未运行）
 - **失败**：保原件、记 FAIL/BLOCKED、不重试、不再构建；不触碰旧进程；受控触发记 `CONTROLLED_INTERFACE_TEST`，`reprocess=PARTIAL` 只称有限原生缓冲重放。
 
 当前状态：授权已下达，**构建/运行尚未开始**（以 S2 实交为准）。离线控制仍为两项 PASS（19/19、83/899）。
+
+## 192. 授权复验结果：构建 PASS、v4 延期语义 PASS、整链 FAIL（host 原生休眠-重建循环）
+
+用户授权的 1 次构建 + 1 次整链复验已执行（S2 `6acc401`，原件 `two_event_authorized_20261113/`、`build_v4.log`）。S1 核实：
+
+**构建（PASS）**：`df27a24c…` → **`86f85025cb…`**，`catkin_make --pkg fast_lio` 退出码 0，`Built target fastlio_mapping`。
+
+**v4 §3.1 延期边界与两级 ACK（PASS，真实 run）**：
+```
+OK hold deferred stamp=1711547997352267771                     ← E1−2 s 入队
+OK hold applied valid=1 stamp_ns=1711547997274449664 frame=1137 map_writes=held
+OK snapshot applied valid=1 stamp_ns=1711547997774402048 frame=1142 map_points=221815
+OK hold applied valid=1 stamp_ns=1711548111373400064 frame=2111
+OK snapshot applied valid=1 stamp_ns=1711548111973349120 frame=2117 map_points=1347
+```
+`input_fates`：ingested 1137 / quarantined 1113，首个 quarantined 即 E1−2 s——hold 只在 armed 戳生效，之前地图正常写。
+第二组 `map_points=1347` 因中间经历 host 自身 `re_slam()` 清树。
+
+**整链（FAIL/BLOCKED）**：driver 位姿流止于 bag **≈95.0 s**（`frame_diagnostics` last ts `1711547978375997782`；S2 记 ≈93.0 s，
+差异来自所用字段），E1 在 116.0 s 未到达 → `scripted.fired=[]`、0 候选、无 lifecycle；host.log **`Over-degeneracy` 8 次、
+`IMU Initial Done` 163 次**，进入 `re_slam` 循环后不再发布 `/Odometry`（`isPublish=false`，`laserMapping.cpp:895/929/947`）。
+停止前 `map_points` 已达 221815，**不是地图没建**。
+
+**口径**：本轮消费了用户授权的唯一一次构建/run，**未重试**。v4 的 §3.1 由真实运行验证；`reprocess/replay` 路径未被触发，仍只有
+ctrl2 受控证据；`CONTROLLED_INTERFACE_TEST`，不等于自动检测通过；`reprocess=PARTIAL`。整链指标：wall 260.6 s、峰值 RSS 2.17 GB、
+paired 949、`message_disposition.fully_accounted=true/fully_decided=true`、`host_capabilities` 与 capabilities.json 一致。
+
+**待用户决定**：(1) 把受控 E1/E2 前移到 host 健康区间（如 +60/+85 s，不改宿主）；(2) 换 FAST-LIO 稳定的另一条输入复验；
+(3) 先查 93–95 s 退化本身（疑与原 E1 自然休眠同机制，属原算法行为）。
