@@ -3412,3 +3412,10 @@ S2 报告"宿主在 E1 后多轮休眠、位姿流止于 211.1 s"。S1 从 `two_
 
 **修复（driver，main）**：位姿订阅 `queue_size 200→2000`、扫描 `20→200`（注释记录本次证据）；全套 **273 项测试通过**。
 下一步：若授权，用同一 v7 二进制（无需构建）再跑一次，E2 的帧应在队列内被处理；预期 `scripted.fired` 出现 E2。
+
+## 225. 用户授权：1 次 run（队列修复后验证 E2，不构建）
+
+用户于 18:0x 授权。条件已转 S2（消息 `92d39393…`）：v7 二进制 `a40e20d5…`；参数同 sigwin run
+（`--require-contract --first-pose-grace-sec 60 --pose-stale-sec 15 --host-signal-window-sec 30 --host-hibernation-max-sec 90 ...`）；
+同 bag/E1/E2、260 s、录三轻量话题。driver 已扩队列（2000/200，main `0b4dc78`），预期不再丢 E1 后的 233 帧、`scripted.fired` 出现 E2。
+失败保原件、不重试、不构建。当前状态：授权已下达，run 尚未开始（以 S2 实交为准）。
