@@ -2842,3 +2842,27 @@ S2 `326413b`（`exp/growth-run`）交 ctrl1/ctrl2 原件与 v1/v2 源码。S1 �
 交接文档覆盖：任务与授权、F1 v1/v2/v3 版本、ctrl2 受控接口 PASS 原件、5 次整链调用台账与第 5 次 0 候选的完整证据链
 （`ack stamp_ns=-1000000000 frame=0 map_points=0`、`input_fates` 2248 条全 quarantined、driver 1004 对但 `fed_to_step_frame=0`、
 帧诊断止于 bag 100.5 s）、F2 资格/读取器/BLOCKED、F3 能力门控与 238 项测试、待用户/审阅裁决的 3 个问题、不得引用为结论的事项。
+
+## 186. 接受 `24a7833` 审阅；F3 两项按审阅修正，F1/F2 修正已分派
+
+用户指令"接受这个提交中的审阅意见和安排"。审阅文档已合入 main（`2c5cad2`，`docs/review_20261113_a355343/`，
+`PROJECT_HISTORY` §98/§99）。S1 独立复现全部 5 个发现：
+
+- **§3.3 replay 错标**：ctrl2 `input_fates` 1255 行，重放前最大戳 `1711547910876055808`；356 行 ≤ 该戳（261 ingested / 12 quarantined /
+  83 replayed），**899 行 > 该戳但全标 replayed**——与审阅数字一致；
+- **§4 F3 三个反例**：skipped 段四类合计 0 且 `unresolved=[]`；同 key 跨 committed/pending 两事件、合计 2 而 `unresolved=[]`；
+  run 5 host 2248 全 quarantined 与 driver 1004 never_quarantined 矛盾；
+- **§5 F2 三反例**：缺 run_id 仍 pairing PASS；NO_PAIR 与 PASS 并存；`support={pass_fraction:1.0}` 被判 SUPPORTED（应为 UNKNOWN_CONTEXT）。
+
+**S1 已修（F3）**：
+1. `message_disposition` 改为按 distinct key **互斥分类**：`never_quarantined / committed / deferred / pending / skipped /
+   decided_without_record`；同 key 两个归宿、committed/deferred 不在 episode frames、分类和对不上 ingested 均进 `unresolved`；
+   新增 `fully_accounted` 与 `fully_decided`（skipped/pending 不假装已决策）。测试 4 项（含三个反例）。
+2. `CheckpointClient` 增加 armed/applied 语义：`OK <cmd> deferred ...` 只记 `armed`、保持 pending；`OK <cmd> applied ...` 才完成；
+   超时记 `deferred_not_applied`、不计数。保留旧单次 ack 兼容。测试 4 项。
+3. 全套 **244 项通过**。
+
+**已分派（只写代码，不构建/不运行，用户暂停仍未解除）**：
+- S2（`1a9b0e82…`）：§3.1 延期命令须在目标组进入估计前执行 + applied ACK + 确定性跨界验收；§3.2 accepted 路径 hold/replay 顺序与
+  "入队 vs 原生 update 消费"分开回执；§3.3 replay 标志按队列耗尽复位 + ctrl2 回归。
+- S3（`c33d75b6…`）：§5 三个 reader 回归，保持 8 个 selftest。

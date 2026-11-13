@@ -185,17 +185,27 @@ class CheckpointClientTest(unittest.TestCase):
             lines = [ln.rstrip("\n") for ln in fh]
         self.assertEqual(lines[:2], ["snapshot", "987654321"])
 
-    def test_a_deferred_ack_is_a_receipt(self):
-        # The host acknowledges a stamped command when it queues it, not when it executes it.
-        self._host(ack="OK {cmd} deferred stamp=123")
-        client = CheckpointClient(self.dir, ack_timeout_s=5.0)
+    def test_a_deferred_ack_only_arms_the_command(self):
+        # A stamped command is acknowledged when it is queued, not when it executes. Counting
+        # that ack as completion released the next command and let the driver snapshot a frame
+        # the declaration did not name; the applied ack is what completes it.
+        host = self._host(ack="OK {cmd} deferred stamp=123")
+        client = CheckpointClient(self.dir, ack_timeout_s=1.0)
         event = client.hold(123)
-        deadline = time.time() + 3.0
-        while time.time() < deadline and not event.get("ok"):
+        deadline = time.time() + 2.0
+        while time.time() < deadline and not event.get("armed"):
             client.poll()
             time.sleep(0.005)
+        self.assertTrue(event.get("armed"))
+        self.assertNotIn("ok", event)
+        self.assertTrue(client.pending())
+        host.stop()
+        self.hosts.remove(host)
+        with open(os.path.join(self.dir, "ack"), "w", encoding="utf-8") as fh:
+            fh.write("OK hold applied stamp=123 frame=9\n")
+        client.poll()
         self.assertTrue(event["ok"])
-        self.assertIn("deferred", event["ack"])
+        self.assertIn("applied", event["ack"])
 
     def test_a_disabled_client_sends_nothing(self):
         client = CheckpointClient("")

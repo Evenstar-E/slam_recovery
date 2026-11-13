@@ -162,50 +162,74 @@ class CapabilityGateTest(unittest.TestCase):
 
 
 class MessageDispositionTest(unittest.TestCase):
-    def test_counts_and_unresolved_are_explicit(self):
+    def _loop(self, ingested):
         node = _FakeLoopNode(trigger_at=10 ** 9)
-        node.evaluate_and_commit_candidate = lambda *a, **k: _Report(
-            accepted=True, committed_pose_keys=[0, 1], deferred_pose_keys=[])
-        node.support_reference = _plane
         loop = NativeClosedLoop(node, run_id="run")
         loop.cp = None
-        loop.next_kf_id = 5
-        ep = Episode(0, 1_000, np.eye(4), 2_000)
-        ep.frames = [(0, 1_000, np.eye(4)), (1, 1_001, np.eye(4))]
-        ep.decided = True
-        ep.meta = {}
+        loop.next_kf_id = ingested
+        loop.episodes = []
+        loop.records = []
+        return loop
+
+    def _episode(self, idx, keys, decided=True, skipped=False, accepted=True):
+        ep = Episode(idx, 1_000 + idx, np.eye(4), 2_000 + idx)
+        ep.frames = [(k, 1_000, np.eye(4)) for k in keys]
+        ep.decided = decided
+        ep.meta = {"decision_skipped": "SEGMENT_CLOSED_BEFORE_DECISION"} if skipped else {}
+        rec = None
+        if decided and not skipped:
+            rec = {"candidate_id": ep.candidate_id,
+                   "committed_pose_keys": list(keys) if accepted else [],
+                   "deferred_pose_keys": [] if accepted else list(keys),
+                   "accepted": accepted}
+        return ep, rec
+
+    def test_each_key_is_in_exactly_one_class(self):
+        loop = self._loop(5)
+        ep, rec = self._episode(0, [0, 1])
         loop.episodes = [ep]
-        loop.records = [{"committed_pose_keys": [0, 1], "deferred_pose_keys": []}]
+        loop.records = [rec]
         loop.pairer.poses_received = 6
         loop.pairer.scans_received = 7
         loop.pairer.paired = 5
         loop.pairer.scans_unpaired = 2
         d = message_disposition(loop)
-        self.assertEqual(d["keyframes"]["ingested"], 5)
-        self.assertEqual(d["keyframes"]["quarantine_memberships"], 2)
-        self.assertEqual(d["keyframes"]["quarantine_distinct"], 2)
-        self.assertEqual(d["keyframes"]["never_quarantined"], 3)
-        self.assertEqual(d["keyframes"]["committed_distinct"], 2)
+        k = d["keyframes"]
+        self.assertEqual((k["ingested"], k["quarantine_distinct"], k["never_quarantined"]), (5, 2, 3))
+        self.assertEqual((k["committed"], k["deferred"], k["pending"], k["skipped"]), (2, 0, 0, 0))
+        self.assertTrue(d["fully_accounted"])
+        self.assertTrue(d["fully_decided"])
         self.assertEqual(d["unresolved"], [])
 
-    def test_a_committed_key_outside_the_episode_is_unresolved(self):
-        node = _FakeLoopNode(trigger_at=10 ** 9)
-        loop = NativeClosedLoop(node, run_id="run")
-        loop.cp = None
-        loop.next_kf_id = 3
-        ep = Episode(0, 1_000, np.eye(4), 2_000)
-        ep.frames = [(0, 1_000, np.eye(4))]
-        ep.decided = True
-        ep.meta = {}
+    def test_a_skipped_segment_is_counted_but_not_decided(self):
+        loop = self._loop(1)
+        ep, _ = self._episode(0, [0], decided=True, skipped=True)
         loop.episodes = [ep]
-        loop.records = [{"committed_pose_keys": [0, 7], "deferred_pose_keys": []}]
+        d = message_disposition(loop)
+        self.assertEqual(d["keyframes"]["skipped"], 1)
+        self.assertFalse(d["fully_decided"])
+        self.assertTrue(d["fully_accounted"])
+
+    def test_a_key_in_two_episodes_is_unresolved(self):
+        loop = self._loop(1)
+        ep1, rec1 = self._episode(0, [0], accepted=True)
+        ep2, _ = self._episode(1, [0], decided=False)
+        loop.episodes = [ep1, ep2]
+        loop.records = [rec1]
+        d = message_disposition(loop)
+        kinds = [u["kind"] for u in d["unresolved"]]
+        self.assertIn("key_with_more_than_one_outcome", kinds)
+        self.assertFalse(d["fully_accounted"])
+
+    def test_a_committed_key_outside_the_episode_is_unresolved(self):
+        loop = self._loop(3)
+        ep, rec = self._episode(0, [0], accepted=True)
+        rec["committed_pose_keys"] = [0, 7]
+        loop.episodes = [ep]
+        loop.records = [rec]
         d = message_disposition(loop)
         kinds = [u["kind"] for u in d["unresolved"]]
         self.assertIn("committed_key_not_in_episode_frames", kinds)
-
-
-if __name__ == "__main__":
-    unittest.main()
 
 
 class PartialCapabilityTest(unittest.TestCase):
@@ -262,3 +286,59 @@ class PartialCapabilityTest(unittest.TestCase):
         self.assertEqual(ep.meta["native_writeback_skipped"]["reason"], "set_state_unsupported")
         self.assertTrue(ep.meta["repair_entered_estimator"])
         self.assertEqual(ep.meta["repaired_fed"], 2)
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+
+class DeferredAckTest(unittest.TestCase):
+    """An armed ack is not an applied ack; the client must keep the command in flight."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.dir = self._tmp.name
+
+    def tearDown(self):
+        self._tmp.cleanup()
+
+    def test_deferred_ack_does_not_complete_the_command(self):
+        client = CheckpointClient(self.dir)
+        event = {"command": "snapshot", "wall": 0.0}
+        done, line = client._classify_ack(event, "snapshot", "OK snapshot deferred stamp=123")
+        self.assertFalse(done)
+        self.assertTrue(event["armed"])
+        self.assertEqual(event["armed_ack"], "OK snapshot deferred stamp=123")
+
+    def test_applied_ack_completes_the_command(self):
+        client = CheckpointClient(self.dir)
+        event = {"command": "snapshot", "wall": 0.0, "armed_ack": "OK snapshot deferred stamp=1"}
+        done, line = client._classify_ack(
+            event, "snapshot", "OK snapshot applied stamp=100 frame=9 map_points=42")
+        self.assertTrue(done)
+        self.assertIn("applied", line)
+
+    def test_poll_keeps_a_deferred_command_pending(self):
+        client = CheckpointClient(self.dir)
+        with open(os.path.join(self.dir, "ack"), "w", encoding="utf-8") as fh:
+            fh.write("OK hold deferred stamp=1711547997000000000\n")
+        from slam_recovery.ros.recovery_node import CheckpointClient as _CP
+        ev = {"command": "hold", "wall": 0.0}
+        client._pending.append(ev)
+        self.assertIsNone(client.poll())
+        self.assertEqual(len(client._pending), 1)
+        self.assertTrue(ev["armed"])
+
+    def test_a_command_that_is_never_applied_is_not_counted(self):
+        client = CheckpointClient(self.dir, ack_timeout_s=0.2)
+        ev = client.hold(1)                     # writing the command removes any stale ack
+        with open(os.path.join(self.dir, "ack"), "w", encoding="utf-8") as fh:
+            fh.write("OK hold deferred stamp=1\n")
+        got = client.collect(timeout_s=0.3)
+        self.assertFalse(got["ok"])
+        self.assertEqual(got["error"], "deferred_not_applied")
+        self.assertEqual(client.holds, 0)
+
+
+if __name__ == "__main__":
+    unittest.main()

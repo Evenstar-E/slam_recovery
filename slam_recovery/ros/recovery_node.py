@@ -843,10 +843,20 @@ class CheckpointClient:
         ack = os.path.join(self.dir, "ack")
         deadline = time.time() + (self.ack_timeout_s if timeout_s is None else timeout_s)
         line = self._read_ack_for(cmd)
-        while not line and time.time() < deadline:
+        while time.time() < deadline:
+            done, line = self._classify_ack(event, cmd, line)
+            if done:
+                break
             time.sleep(0.02)
             line = self._read_ack_for(cmd)
-        if line:
+        else:
+            done, line = self._classify_ack(event, cmd, line)
+        if line and not done:
+            # Armed but never applied: the host took the command and did not execute it. It must
+            # not be counted as executed, and the caller has to see why.
+            event.update(ok=False, error="deferred_not_applied", ack=line,
+                         ack_wall=round(time.time(), 3))
+        elif line:
             event.update(ok=line.startswith("OK"), ack=line, ack_wall=round(time.time(), 3))
             self.host_ready = True
         else:
@@ -858,6 +868,27 @@ class CheckpointClient:
         self.events.append(event)
         self._flush_outbox()
         return event
+
+    def _classify_ack(self, event: Dict[str, Any], cmd: str, line: str) -> Tuple[bool, str]:
+        """Decide whether an ack completes the command, or only arms it.
+
+        A host may queue a stamped command and answer ``OK <cmd> deferred ...`` before it runs.
+        That ack says the command was accepted, not that it happened; treating it as completion
+        would let the driver snapshot the wrong frame and count a rollback that never ran. An
+        ack that carries ``applied`` (or no ``deferred``) completes the command.
+        """
+        if not line:
+            return False, line
+        parts = line.split()
+        if len(parts) < 2 or parts[1] != cmd:
+            return False, ""
+        if "deferred" in parts and "applied" not in parts:
+            if event.get("armed_ack") != line:
+                event["armed"] = True
+                event["armed_ack"] = line
+                event["armed_wall"] = round(time.time(), 3)
+            return False, line
+        return True, line
 
     def _read_ack_for(self, cmd: str) -> str:
         """Read the ack once and return it only if it answers *this* command.
@@ -905,6 +936,9 @@ class CheckpointClient:
         line = self._read_ack_for(event["command"])
         if not line:
             return None
+        done, line = self._classify_ack(event, event["command"], line)
+        if not done:
+            return None                       # armed, not applied: still in flight
         with self._lock:
             self._pending.pop(0)
         event.update(ok=line.startswith("OK"), ack=line, ack_wall=round(time.time(), 3))
@@ -2197,45 +2231,75 @@ def host_capabilities_record(loop: NativeClosedLoop) -> Dict[str, Any]:
 
 
 def message_disposition(loop: NativeClosedLoop) -> Dict[str, Any]:
-    """Where every consumed message ended up, from counters the loop already keeps.
+    """Where every consumed message ended up, as mutually exclusive classes per distinct key.
 
-    The point is to make "the run continued" checkable: a keyframe is either on the healthy path,
-    in a quarantine that committed it, in one that deferred it, in a segment still open at exit,
-    or unresolved. Episode membership is counted both as memberships and as distinct keys,
-    because segments can overlap; the two numbers are not interchangeable and the rule says so.
-    Nothing here re-reads a bag or a host log -- these are the same events the decisions used.
+    The earlier version summed per-episode memberships and left overlapping or decision-skipped
+    frames out of every class while still reporting ``unresolved = []``; a review reproduced both
+    gaps. This version assigns each distinct keyframe at most one outcome, lists skipped segments
+    as their own class (never as decided), and puts any key with two outcomes, or any committed /
+    deferred key that is not in the episode frames, into ``unresolved``. ``fully_decided`` is false
+    whenever a segment closed without a decision, even though its frames are accounted for.
     """
     ingested = int(loop.next_kf_id)
     members = [(ep, int(kf)) for ep in loop.episodes for kf, _ts, _p in ep.frames]
     distinct = {kf for _ep, kf in members}
-    committed, deferred = set(), set()
+    records = {r.get("candidate_id"): r for r in loop.records}
+    outcomes: Dict[int, set] = {}
+    for ep in loop.episodes:
+        meta = getattr(ep, "meta", {}) or {}
+        if meta.get("decision_skipped"):
+            outcome = "skipped"
+        elif not ep.decided:
+            outcome = "pending"
+        else:
+            rec = records.get(ep.candidate_id)
+            if rec is None:
+                outcome = "decided_without_record"
+            elif rec.get("accepted") is True:
+                outcome = "committed"
+            else:
+                outcome = "deferred"
+        for kf, _ts, _p in ep.frames:
+            outcomes.setdefault(int(kf), set()).add(outcome)
+    classes = {"committed": set(), "deferred": set(), "pending": set(), "skipped": set(),
+               "decided_without_record": set()}
+    conflicts = []
+    for kf, outs in outcomes.items():
+        if len(outs) == 1:
+            classes[next(iter(outs))].add(kf)
+        else:
+            conflicts.append({"kf": kf, "outcomes": sorted(outs)})
+    committed_claimed, deferred_claimed = set(), set()
     for r in loop.records:
-        committed.update(int(k) for k in (r.get("committed_pose_keys") or []))
-        deferred.update(int(k) for k in (r.get("deferred_pose_keys") or []))
-    pending_frames = sum(len(ep.frames) for ep in loop.episodes if not ep.decided)
-    skipped = sum(1 for ep in loop.episodes
-                  if (getattr(ep, "meta", {}) or {}).get("decision_skipped"))
+        committed_claimed.update(int(k) for k in (r.get("committed_pose_keys") or []))
+        deferred_claimed.update(int(k) for k in (r.get("deferred_pose_keys") or []))
+    unresolved = []
+    if conflicts:
+        unresolved.append({"kind": "key_with_more_than_one_outcome",
+                           "count": len(conflicts), "sample": conflicts[:20]})
+    outside_committed = committed_claimed - distinct
+    if outside_committed:
+        unresolved.append({"kind": "committed_key_not_in_episode_frames",
+                           "keys": sorted(outside_committed)[:20], "count": len(outside_committed)})
+    outside_deferred = deferred_claimed - distinct
+    if outside_deferred:
+        unresolved.append({"kind": "deferred_key_not_in_episode_frames",
+                           "keys": sorted(outside_deferred)[:20], "count": len(outside_deferred)})
+    classified = sum(len(v) for v in classes.values())
+    never_quarantined = ingested - len(distinct)
+    if never_quarantined < 0:
+        unresolved.append({"kind": "more_distinct_quarantined_than_ingested",
+                           "distinct": len(distinct), "ingested": ingested})
+        never_quarantined = 0
+    if classified + never_quarantined != ingested:
+        unresolved.append({"kind": "accounting_mismatch",
+                           "classified": classified, "never_quarantined": never_quarantined,
+                           "ingested": ingested})
     repair_published = sum(int((getattr(ep, "meta", {}) or {})
                                .get("repair_publish", {}).get("published", 0) or 0)
                            for ep in loop.episodes)
     replay_suffix = sum(int((getattr(ep, "meta", {}) or {}).get("replay_suffix") or 0)
                         for ep in loop.episodes)
-    unresolved = []
-    outside = committed - distinct
-    if outside:
-        unresolved.append({"kind": "committed_key_not_in_episode_frames",
-                           "keys": sorted(outside)[:20], "count": len(outside)})
-    outside_deferred = deferred - distinct
-    if outside_deferred:
-        unresolved.append({"kind": "deferred_key_not_in_episode_frames",
-                           "keys": sorted(outside_deferred)[:20],
-                           "count": len(outside_deferred)})
-    if len(distinct) > ingested:
-        unresolved.append({"kind": "more_distinct_quarantined_than_ingested",
-                           "distinct": len(distinct), "ingested": ingested})
-    never_quarantined = ingested - len(distinct)
-    if never_quarantined < 0:
-        never_quarantined = 0
     return {
         "input": {"poses_received": int(loop.pairer.poses_received),
                   "scans_received": int(loop.pairer.scans_received),
@@ -2249,18 +2313,24 @@ def message_disposition(loop: NativeClosedLoop) -> Dict[str, Any]:
                       "quarantine_memberships": len(members),
                       "quarantine_distinct": len(distinct),
                       "never_quarantined": never_quarantined,
-                      "committed_distinct": len(committed),
-                      "deferred_distinct": len(deferred),
-                      "pending_at_exit_memberships": int(pending_frames),
-                      "segments_decision_skipped": int(skipped)},
+                      "committed": len(classes["committed"]),
+                      "deferred": len(classes["deferred"]),
+                      "pending": len(classes["pending"]),
+                      "skipped": len(classes["skipped"]),
+                      "decided_without_record": len(classes["decided_without_record"])},
+        "fully_decided": bool(not classes["pending"] and not classes["skipped"]
+                              and not classes["decided_without_record"]),
+        "fully_accounted": bool(classified + never_quarantined == ingested and not unresolved),
         "repair": {"clouds_published": int(repair_published),
                    "replay_suffix_frames_reported_by_host": int(replay_suffix)},
         "unresolved": unresolved,
-        "rule": "episode membership is counted as memberships and as distinct keys; overlapping "
-                "segments can double-count memberships. A keyframe is accounted for only if it "
-                "appears in exactly one of never_quarantined / committed / deferred / pending; "
-                "anything outside those sets is listed under unresolved rather than assumed "
-                "healthy. Counts come from the loop's own events, not from a re-read of the bag.",
+        "rule": "each distinct keyframe has at most one outcome (never_quarantined, committed, "
+                "deferred, pending, skipped, decided_without_record); a key with two outcomes is "
+                "unresolved. skipped is its own class and never counts as decided. "
+                "fully_accounted requires the classes plus never_quarantined to equal ingested "
+                "with no unresolved entry; fully_decided additionally requires no pending or "
+                "skipped segment. Counts come from the loop's own events, not a re-read of the "
+                "bag, and overlapping episodes no longer double-count a key.",
     }
 
 
