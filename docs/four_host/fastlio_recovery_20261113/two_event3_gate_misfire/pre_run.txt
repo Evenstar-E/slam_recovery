@@ -1,0 +1,7 @@
+run_id=two_event2_20261113T023758Z
+binary=df27a24ce941fe036eb8e30a134653cc96776de440195936dca2305fc0a891e9
+bag=/home/R26534/datasets/mmlins/campus_12_fl.bag a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de
+E1=1711547999352267771 E2=1711548113452267771
+rate=1.0 outer_timeout=1200s play_duration=260s wait_limit=20s
+driver=/home/R26534/MM-LINS (runpy, -I)
+stop_conditions: driver-start gate; bag end + 20 s drain

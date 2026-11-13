@@ -1,0 +1,315 @@
+{
+ "run_id": "two_event4",
+ "candidate_source": "host_poses",
+ "detection_enabled": false,
+ "gate_decision_validity": "A7_V2_GAUGE_CLEARED",
+ "gate_decision_caveat": "Gauge dependence was cleared by A7 v2. This statement is about the gate's invariance, not about whether a given candidate is good: the accept/refuse outcome still needs independent labels before it means anything in B10.",
+ "protocol": {
+  "ingest": "step_frame(kf_id, timestamp_ns, pose_se3=T_wb, scan_body_xyz, nis_value)",
+  "pose_convention": "T_wb (body -> world), matching world_points = pts @ R.T + t",
+  "decision": "once per quarantine episode, at t_trigger + confirmation_margin_ns, or at bag end with decision_basis=bag_end",
+  "candidate": "host poses recorded during the quarantine (candidate_source=host_poses)",
+  "incumbent": "constant-velocity translation extrapolation from the last trusted keyframes, rotation held at the anchor",
+  "what_this_proves": "the admission path only -- detect, quarantine, candidate, gate, commit or refuse. Not a re-estimating repairer.",
+  "pre_registered_expectation": "on this candidate population the archived four-arm already shows the gate refuses; a run whose gate accepts nothing measures the harmful side of B10 and the refusal half of B5, not the benefit side."
+ },
+ "parameters": {
+  "confirmation_margin_ns": 2000000000,
+  "pair_window_ns": 40000000,
+  "scan_cap": 6000,
+  "nis_radius_m": 3.0,
+  "extrap_frames": 5,
+  "sigma_meas_m": 0.12
+ },
+ "pairing": {
+  "pair_window_ns": 40000000,
+  "poses_received": 0,
+  "scans_received": 0,
+  "paired": 0,
+  "poses_unpaired": 0,
+  "scans_unpaired": 0,
+  "paired_fraction_of_poses": null,
+  "paired_fraction_of_scans": null,
+  "max_abs_dt_ns": 0,
+  "max_backlog_messages": 0,
+  "messages_considered": 0,
+  "pairing_rule": "nearest pose within 40 ms, no pose reused"
+ },
+ "pairing_diagnosis": {
+  "pose_stamps_logged": 0,
+  "scan_stamps_logged": 0,
+  "stamp_log_cap": 4000,
+  "truncated": false
+ },
+ "nis": {
+  "computed": 0,
+  "carried_forward": 0,
+  "unavailable": 0,
+  "reference_node_map": 0,
+  "reference_prev_scan": 0,
+  "reference_none": 0,
+  "nonfinite_estimator_output": 0,
+  "sigma_meas_m": 0.12
+ },
+ "frames": {
+  "paired": 0,
+  "ingested": 0,
+  "fed_to_step_frame": 0,
+  "ingested_without_detection": 0,
+  "consumed_after_first_decision": 0,
+  "first_decision_ts_ns": null
+ },
+ "quarantine": {
+  "episodes": 0,
+  "trigger_ts_ns": [],
+  "decisions": 0,
+  "second_and_later_events": 0,
+  "episode_detail": []
+ },
+ "warmup": {
+  "policy": "a frame the node cannot support against its own spatially sampled trusted map is ingested through the manager's healthy path but is NOT judged by the detector; it is recorded as detection_status=UNAVAILABLE. In diagnosis mode (detection=off) every frame is recorded as DISABLED_FOR_DIAGNOSIS and nothing is judged at all.",
+  "detection_status_counts": {
+   "AVAILABLE": 0,
+   "UNAVAILABLE": 0,
+   "DISABLED_FOR_DIAGNOSIS": 0
+  },
+  "frames_ingested_without_detection": 0,
+  "first_detected_kf": null,
+  "not_an_assumption": "no frame is labelled healthy; UNAVAILABLE says the detector had no reference, which is a statement about the evidence, not about the frame"
+ },
+ "pose_convention": {
+  "declared": "T_wb (body -> world), matching world_points = pts @ R.T + t",
+  "one_frame_check": {
+   "status": "NOT_REACHED"
+  }
+ },
+ "gate": {
+  "accepted": 0,
+  "rejected": 0,
+  "errored": 0,
+  "modes": [],
+  "committed_key_total": 0,
+  "deferred_key_total": 0
+ },
+ "lifecycle": {
+  "wait_limit_ns": 20000000000,
+  "state": "HEALTHY",
+  "events": [],
+  "unresolved_segments": 0,
+  "native_checkpoint_actions": [
+   {
+    "command": "hold",
+    "wall": 1794537623.064,
+    "ok": true,
+    "ack": "OK hold valid=1 stamp_ns=-1000000000 frame=0 map_writes=held",
+    "ack_wall": 1794537623.668
+   },
+   {
+    "command": "snapshot",
+    "wall": 1794537623.668,
+    "sent_wall": 1794537623.065,
+    "ok": true,
+    "ack": "OK snapshot valid=1 stamp_ns=-1000000000 frame=0 map_points=0",
+    "ack_wall": 1794537624.168
+   },
+   {
+    "command": "hold",
+    "wall": 1794537624.168,
+    "ok": true,
+    "ack": "OK hold valid=1 stamp_ns=-1000000000 frame=0 map_writes=held",
+    "ack_wall": 1794537624.977
+   }
+  ],
+  "checkpoint_checks": []
+ },
+ "run_mode": "CONTROLLED_TRIGGERS_NOT_FIRED",
+ "scripted_triggers": {
+  "declared_s": [],
+  "declared_ns": [
+   1711547999352267771,
+   1711548113452267771
+  ],
+  "fired": [],
+  "note": "the segment was opened by calling trigger_quarantine directly at a declared time; no detector output and no fault label was used, so this run says nothing about detection performance"
+ },
+ "native_checkpoint": {
+  "enabled": true,
+  "host_ready": true,
+  "snapshot_ack_timeouts": 0,
+  "snapshots_superseded": 0,
+  "snapshot_ack_s": [
+   0.5
+  ],
+  "dir": "/tmp/wt-sim/docs/four_host/fastlio_recovery_20261113/two_event4/ctl",
+  "snapshot_period_s": 2.0,
+  "snapshots": 1,
+  "restores": 0,
+  "reprocesses": 0,
+  "holds": 2,
+  "resumes": 0,
+  "failures": 0,
+  "events": [
+   {
+    "command": "hold",
+    "wall": 1794537623.064,
+    "ok": true,
+    "ack": "OK hold valid=1 stamp_ns=-1000000000 frame=0 map_writes=held",
+    "ack_wall": 1794537623.668
+   },
+   {
+    "command": "snapshot",
+    "wall": 1794537623.668,
+    "sent_wall": 1794537623.065,
+    "ok": true,
+    "ack": "OK snapshot valid=1 stamp_ns=-1000000000 frame=0 map_points=0",
+    "ack_wall": 1794537624.168
+   },
+   {
+    "command": "hold",
+    "wall": 1794537624.168,
+    "ok": true,
+    "ack": "OK hold valid=1 stamp_ns=-1000000000 frame=0 map_writes=held",
+    "ack_wall": 1794537624.977
+   }
+  ],
+  "note": "the checkpoint is the host's own _state and voxel map plus the IMU pre-integrator's cross-frame values; a snapshot taken while healthy is the trusted checkpoint, and its age at the trigger is the snapshot period"
+ },
+ "host_capabilities": {
+  "status": "DECLARED",
+  "commands": {
+   "snapshot": "YES",
+   "restore": "YES",
+   "hold": "YES",
+   "reprocess": "PARTIAL",
+   "set_state": "NO",
+   "measurement_relay": "YES"
+  },
+  "checkpoint": null,
+  "source": null
+ },
+ "message_disposition": {
+  "input": {
+   "poses_received": 0,
+   "scans_received": 0,
+   "paired": 0,
+   "poses_unpaired": 0,
+   "scans_unpaired": 0,
+   "stamp_log_truncated": false
+  },
+  "keyframes": {
+   "ingested": 0,
+   "quarantine_memberships": 0,
+   "quarantine_distinct": 0,
+   "never_quarantined": 0,
+   "committed_distinct": 0,
+   "deferred_distinct": 0,
+   "pending_at_exit_memberships": 0,
+   "segments_decision_skipped": 0
+  },
+  "repair": {
+   "clouds_published": 0,
+   "replay_suffix_frames_reported_by_host": 0
+  },
+  "unresolved": [],
+  "rule": "episode membership is counted as memberships and as distinct keys; overlapping segments can double-count memberships. A keyframe is accounted for only if it appears in exactly one of never_quarantined / committed / deferred / pending; anything outside those sets is listed under unresolved rather than assumed healthy. Counts come from the loop's own events, not from a re-read of the bag."
+ },
+ "native_checkpoint_actions": [
+  {
+   "command": "hold",
+   "wall": 1794537623.064,
+   "ok": true,
+   "ack": "OK hold valid=1 stamp_ns=-1000000000 frame=0 map_writes=held",
+   "ack_wall": 1794537623.668
+  },
+  {
+   "command": "snapshot",
+   "wall": 1794537623.668,
+   "sent_wall": 1794537623.065,
+   "ok": true,
+   "ack": "OK snapshot valid=1 stamp_ns=-1000000000 frame=0 map_points=0",
+   "ack_wall": 1794537624.168
+  },
+  {
+   "command": "hold",
+   "wall": 1794537624.168,
+   "ok": true,
+   "ack": "OK hold valid=1 stamp_ns=-1000000000 frame=0 map_writes=held",
+   "ack_wall": 1794537624.977
+  }
+ ],
+ "null_field_counts": {
+  "run_id": 0,
+  "candidate_id": 0,
+  "t_trigger_ns": 0,
+  "t_decision_ns": 0,
+  "mode": 0,
+  "accepted": 0,
+  "deferred_pose_keys": 0,
+  "committed_pose_keys": 0,
+  "refusal_reason": 0,
+  "weak_dir_info_before": 0,
+  "weak_dir_info_after": 0,
+  "holdout_nis": 0,
+  "paired_benefit_status": 0,
+  "wilson_lower_bound": 0,
+  "reentry_pos_jump_m": 0,
+  "parent_map_version": 0,
+  "candidate_source": 0,
+  "pose_se3_first_trigger": 0
+ },
+ "holdout_nis_nonfinite": 0,
+ "decision_errors": [],
+ "candidate_source_detail": {
+  "candidate_source": "host_poses",
+  "icp_seconds_total": 0.0,
+  "icp_candidates": 0,
+  "note": "the frozen 18-key stream stays at 18 keys; the ICP fields are written to icp_detail.jsonl and repeated here, because adding keys to some rows would break every consumer that parses by key",
+  "details": []
+ },
+ "candidate_detail_rows": 0,
+ "nis_vs_map_size": {
+  "frames_with_node_map_nis": 0,
+  "bins_are_half_open": "lo <= k <= hi inclusive at both ends",
+  "by_trusted_keyframes": [],
+  "by_map_points": []
+ },
+ "frame_diagnostics": [],
+ "final_state": "HEALTHY",
+ "quarantine_open_at_exit": false,
+ "trusted_keyframes_at_exit": 0,
+ "runtime": {
+  "wall_sec": 1.809,
+  "pid": 921555,
+  "pgid": 919733,
+  "peak_rss_kb": 56040,
+  "pose_messages": 0,
+  "scan_messages": 0,
+  "callback_errors": [],
+  "callback_error_count": 0
+ },
+ "launch_args": {
+  "run_dir": "/tmp/wt-sim/docs/four_host/fastlio_recovery_20261113/two_event4",
+  "pose_topic": "/Odometry",
+  "scan_topic": "/velodyne_points",
+  "status_topic": "/slam_recovery/gate_status",
+  "candidate_source": "host_poses",
+  "confirmation_margin_sec": 2.0,
+  "pair_dt_ms": 40.0,
+  "scan_cap": 6000,
+  "sigma_meas_m": 0.12,
+  "duration_sec": 260.0,
+  "max_pairs": 0,
+  "icp_time_budget_sec": 0.0,
+  "detection": "off",
+  "scripted_triggers": "",
+  "scripted_trigger_stamps": "1711547999352267771,1711548113452267771",
+  "checkpoint_dir": "/tmp/wt-sim/docs/four_host/fastlio_recovery_20261113/two_event4/ctl",
+  "checkpoint_period_sec": 2.0,
+  "wait_limit_sec": 20.0,
+  "repair_publish": true,
+  "repair_sync_timeout_sec": 5.0,
+  "repair_dry_run": false,
+  "availability_log": "",
+  "repair_sham": false
+ }
+}
