@@ -2972,7 +2972,8 @@ def duration_stats(values) -> Dict[str, Any]:
 
 def pose_stream_health(pose_count: int, last_pose_wall: Optional[float],
                        started_wall: float, now_wall: float,
-                       limit_s: float) -> Dict[str, Any]:
+                       limit_s: float, host_state: Optional[str] = None,
+                       hibernation_max_s: float = 0.0) -> Dict[str, Any]:
     """Whether the host is still producing the pose stream this run depends on.
 
     A host that stops publishing (FAST-LIO does exactly that while it hibernates: isPublish is
@@ -2981,7 +2982,7 @@ def pose_stream_health(pose_count: int, last_pose_wall: Optional[float],
     response is to stop and report it rather than run out the clock silently.
     """
     out: Dict[str, Any] = {"limit_s": float(limit_s), "pose_messages": int(pose_count),
-                           "last_pose_wall": last_pose_wall}
+                           "last_pose_wall": last_pose_wall, "host_state": host_state}
     if not limit_s or limit_s <= 0:
         out["status"] = "DISABLED"
         return out
@@ -2992,6 +2993,17 @@ def pose_stream_health(pose_count: int, last_pose_wall: Optional[float],
         return out
     silence = now_wall - last_pose_wall
     out["silence_s"] = round(silence, 3)
+    if host_state in ("HIBERNATING", "REBUILDING"):
+        # A silent stream during the host's own hibernation is expected: FAST-LIO stops
+        # publishing while isPublish is false and resumes after the rebuild. The ordinary
+        # stale limit would abort exactly the recovery we are waiting for, so it is replaced
+        # by a longer cap that only fires if the host never comes back.
+        out["hibernation_max_s"] = float(hibernation_max_s)
+        if hibernation_max_s and silence >= hibernation_max_s:
+            out["status"] = "HOST_HIBERNATION_TIMEOUT"
+        else:
+            out["status"] = "HOST_HIBERNATING"
+        return out
     out["status"] = "STALE" if silence >= limit_s else "OK"
     return out
 
@@ -3028,6 +3040,10 @@ def main(argv: Optional[List[str]] = None) -> int:
                          "long (0 = wait forever); a host that stops publishing cannot deliver "
                          "the second event, and this is a host-local condition to surface, not "
                          "to hide by running out the clock")
+    ap.add_argument("--host-hibernation-max-sec", type=float, default=90.0,
+                    help="while the host is in its own hibernation, allow this long without a "
+                         "pose before ending with HOST_HIBERNATION_TIMEOUT; the ordinary stale "
+                         "limit would abort the natural sleep/rebuild gap")
     ap.add_argument("--duration-sec", type=float, default=0.0,
                     help="stop after this many seconds of wall time (0 = run until shutdown)")
     ap.add_argument("--max-pairs", type=int, default=0,
@@ -3132,10 +3148,13 @@ def main(argv: Optional[List[str]] = None) -> int:
             rate.sleep()
             loop.service()
             health = pose_stream_health(driver.pose_count, driver.last_pose_wall,
-                                        started, time.time(), args.pose_stale_sec)
+                                        started, time.time(), args.pose_stale_sec,
+                                        host_state=loop.host_native_state,
+                                        hibernation_max_s=args.host_hibernation_max_sec)
             driver.input_health = health
-            if health.get("status") == "STALE":
-                terminal_reason = "INPUT_STALE"
+            if health.get("status") in ("STALE", "HOST_HIBERNATION_TIMEOUT"):
+                terminal_reason = ("INPUT_STALE" if health.get("status") == "STALE"
+                                   else "HOST_HIBERNATION_TIMEOUT")
                 rospy.logerr("[slam_recovery] pose stream stale for %.1f s (last pose %s); "
                              "host stopped publishing, stopping the run",
                              health.get("silence_s") or 0.0, driver.last_pose_ts_ns)

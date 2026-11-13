@@ -3159,3 +3159,15 @@ S2 `e8eb7df`（`exp/growth-run`，v5 diff 459 行，仅 `-fsyntax-only`）已入
 
 三层共存规则至此齐备：①driver 休眠期不发 hold；②driver 对跨越宿主重置的隔离段不 restore/reprocess；③host 在 `re_slam` 后拒绝 restore。
 二进制仍 **v4 `86f85025…`**；v5 随下次授权构建生效。状态不变：不构建、不运行。
+
+## 206. 看门狗修正：宿主休眠期间不用普通 STALE 判据；用户授权 1 次 v5 构建 + 1 次有界 run
+
+发现一个会在自然休眠时误杀整链的问题：FAST-LIO 在 E1 的自然休眠缺口是 **23.8 s**，若 `--pose-stale-sec 15` 在休眠期间照常生效，
+run 会在宿主即将恢复前被看门狗中止。修正（`pose_stream_health` + 主循环）：
+- 宿主处于 `HIBERNATING/REBUILDING` 时，状态返回 `HOST_HIBERNATING`，**不判 STALE**；
+- 新增 `--host-hibernation-max-sec`（默认 90 s）：休眠超过该时长才判 `HOST_HIBERNATION_TIMEOUT` 并结束（覆盖"C 中宿主永不恢复"的情况）；
+- 宿主恢复发布后回到 `PUBLISHING`，普通 15 s 判据恢复生效。
+测试 9 项（含自然休眠缺口、永不唤醒超时、发布态普通判据），全套 **262 项通过**。
+
+**用户授权（14:5x）**：1 次 v5 构建 + 1 次有界 run。条件已转 S2：同 bag/事件戳、260 s、外层 1800 s、`--wait-limit-sec 20`、
+`--pose-stale-sec 15`、`--host-hibernation-max-sec 90`、宿主信号话题、`-u` + ROS 图门控；失败保原件、不重试、不再构建。

@@ -35,6 +35,24 @@ class PoseStreamHealthTest(unittest.TestCase):
         self.assertEqual(h["status"], "STALE")
         self.assertEqual(h["silence_s"], 21.0)
 
+    def test_a_natural_sleep_gap_is_not_a_stale_stream(self):
+        # FAST-LIO's own E1 sleep is 23.8 s; a 15 s stale limit during it would abort the
+        # recovery the run is waiting for.
+        h = pose_stream_health(949, 195.0, 100.0, 216.0, 15.0,
+                               host_state="HIBERNATING", hibernation_max_s=90.0)
+        self.assertEqual(h["status"], "HOST_HIBERNATING")
+        self.assertEqual(h["silence_s"], 21.0)
+
+    def test_a_host_that_never_wakes_times_out(self):
+        h = pose_stream_health(949, 100.0, 100.0, 200.0, 15.0,
+                               host_state="HIBERNATING", hibernation_max_s=90.0)
+        self.assertEqual(h["status"], "HOST_HIBERNATION_TIMEOUT")
+
+    def test_publishing_uses_the_ordinary_limit(self):
+        h = pose_stream_health(949, 195.0, 100.0, 216.0, 15.0,
+                               host_state="PUBLISHING", hibernation_max_s=90.0)
+        self.assertEqual(h["status"], "STALE")
+
 
 
 class DurationStatsTest(unittest.TestCase):
