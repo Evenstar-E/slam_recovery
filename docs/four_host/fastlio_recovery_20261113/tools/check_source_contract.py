@@ -43,6 +43,16 @@ check("replay flag reset when drained", "g_nr_replay.store(false);" in s and "g_
 # 5. snapshot uses the previous completed frame's time base
 check("snapshot stamp from last completed frame", "g_nr_cp.stamp = g_nr_lidar_end;" in s)
 
+# 6a. re_slam invalidates the checkpoint, and restore says why
+i_rs = s.find("void re_slam()")
+i_rs_end = s.find("\n}\n", i_rs) if i_rs >= 0 else -1
+body = s[i_rs:i_rs_end] if i_rs >= 0 and i_rs_end > i_rs else ""
+check("re_slam invalidates the checkpoint", "g_nr_cp.valid = false;" in body)
+check("restore names the re_slam invalidation",
+      "checkpoint_invalidated_by_re_slam" in s)
+check("capabilities declares the invalidation",
+      '\\"checkpoint_invalidated_by\\"' in s)
+
 # 6. the deferred queue is FIFO and executes every due entry (two commands can share one stamp)
 check("deferred queue is a deque", "std::deque<NrDeferred> g_nr_deferred;" in s)
 check("deferred enqueue is push_back", "g_nr_deferred.push_back(std::move(d));" in s)

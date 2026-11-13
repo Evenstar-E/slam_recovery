@@ -87,3 +87,15 @@ v3 diff（`native_recovery_v3_deferred.diff`）：
 "扫描回调的 `cloud_to_xyz` + `subsample` 与 NIS holdout 计算"；driver 已加逐回调耗时统计
 （`runtime.pose_callback/scan_callback` 的 p50/p95/max），供下一定量诊断。原件：`diag_A/`、`diag_B/`（各含 `pre_run.txt`、`host.log`、`play.log`、
 `frontend.bag`、`bag_info.txt`、`analysis.json`；B 另有 `ctl/capabilities.json` 与 `ctl/input_fates.jsonl`）。
+
+## v5（2026-11-13，只写代码，未构建/未运行）：`re_slam` 使 checkpoint 失效
+
+共存规则第三层：即使 driver 的 sleep/build 信号丢失或未订阅，host 也拒绝用过期的 checkpoint 恢复。
+
+- `re_slam()` 内（持 `g_nr_mtx`）置 `g_nr_cp.valid = false; g_nr_cp_invalidated_by_reslam = true;`；
+- `nr_restore_locked()` 在无效时区分原因：`checkpoint_invalidated_by_re_slam`（否则 `no_checkpoint`），
+  不执行 `change_x/change_P/Build`；
+- 新的 `snapshot` 成功后清除该原因标志；
+- `capabilities.json` 增加 `"checkpoint_invalidated_by": "re_slam (host-native reset); a new snapshot is required afterwards"`；
+- `check_source_contract.py` 增加 3 条断言（re_slam 体内失效、restore 原因字符串、capabilities 声明），现共 **22 项 PASS**；
+- 语法检查 `-fsyntax-only` rc=0、0 errors；**未构建**，二进制仍 `86f85025…`（v5 随下次授权构建一起生效）。
