@@ -137,8 +137,9 @@ B2/B3 未解除前，本 host 只能交“资格/UNKNOWN/单位权 shadow”，�
 
 ## 9. 未阻塞、可继续的工作
 
-1. 本契约与读取器（按 §4 表头名解析，复用 `ali_h_v1.py`/T2 的 SE(3) 工具），带**合成自检**
-   （已知 pre/post → 已知 `e_I`；缺字段时明确 `NOT_AVAILABLE`）。
+1. 本契约与读取器 `f2_fastlio_read.py`（按 §4 读取 JSONL、复用 T2 的 SE(3) Log/`V⁻¹`，
+   逐行 `eff=0`/缺 pair/重复 `update_id` 均保留并标注；带合成自检 `python -I f2_fastlio_read.py selftest`，
+   7 个用例通过）。
 2. 导出到达后：同 update 绑定核对、`eff=0` 单列、support/context、逐帧/块三态与 scope、
    UNKNOWN 区间（数量/总时长/最长区间）。
 3. 同人口旧检测 vs ALI-H 的**观测对比**（不是检测率）：M/T/I present、UNKNOWN 占比、单位权分位。
