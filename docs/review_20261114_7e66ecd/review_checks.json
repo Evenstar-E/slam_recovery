@@ -1,0 +1,44 @@
+{
+  "reviewed_ref": "7e66ecdb2b575fa0b7b8f2db2c0d1587fd26f654",
+  "scope": "read-only Git originals; no ROS, host execution, rebuild, or algorithm changes",
+  "run3_lifecycle": {
+    "fired": 2,
+    "decisions": 2,
+    "final_state": "HEALTHY",
+    "quarantine_open_at_exit": false,
+    "terminal_reason": "INPUT_STALE",
+    "automatic_detection": "NOT_EXECUTED"
+  },
+  "e2": {
+    "restore_ack": "OK restore valid=1 stamp_ns=1711548111673373952 frame=2091",
+    "checkpoint_status": "LATE_AFTER_BOUNDARY",
+    "checkpoint_late_ns": 200143352,
+    "rollback_support": "UNSUPPORTED_AT_OR_BEFORE_QSTART",
+    "accepted": false,
+    "mode": "MODE3_SOFT_BRIDGE_WAIT",
+    "paired_frames": 11,
+    "improved_frames": 1,
+    "incumbent_mean_residual": 186.59430507006053,
+    "candidate_mean_residual": 194.70542930590156,
+    "icp_status": "ITERATION_LIMIT",
+    "icp_iterations": 20,
+    "correction_rotation_deg": 2.9128673446557403,
+    "correction_translation_m": 3.463194998085573,
+    "unresolved_raw_frame_refs": 92,
+    "unresolved_segments": 1,
+    "repair_clouds_published": 0,
+    "reprocesses": 0
+  },
+  "candidate_repeatability_same_binary_bag_E1": {
+    "run2_improved": "9/13",
+    "run3_improved": "3/12",
+    "binary_identity": "binary=aa04c5ffc7d0470ef901043f82a18406f0c06e1eaadb809477804f3b75455f32",
+    "bag_identity": "bag=a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de"
+  },
+  "reporting_caveat": {
+    "message_disposition_fully_decided": true,
+    "lifecycle_unresolved_segments": 1,
+    "interpretation": "driver classification says fully_decided while the lifecycle explicitly closes 92 frames unresolved; neither means those frames were repaired or replayed"
+  },
+  "verdict": "PARTIAL_FUNCTIONAL_PROGRESS; CONTROL_LIFECYCLE_CLOSED_WITHOUT_ACCEPTED_MEASUREMENT_REPAIR"
+}

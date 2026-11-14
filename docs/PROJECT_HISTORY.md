@@ -833,3 +833,11 @@ E2 native restore原件为`OK restore valid=0 reason=checkpoint_invalidated_by_r
 截止run binary/bag SHA固定，driver仅0b4dc78+且config/source身份不全；cp含ESKF/cov/ikdtree/time cursor但不含IMU preintegration/deskew。repair clouds0，真实修复→update/map本run NOT_EXECUTED；driver2085 paired/host1269+982、无replayed，fully_accounted仅driver且fully_decided false，catchup未实现。F2 reader 11合成通过但真实M/I未交、T NOT_APPLICABLE、独立正常/故障标签缺，同人口比较/自动检测NOT_EXECUTED，召回误报延迟错误NORMAL/UNKNOWN区间及净收益NOT_EVALUABLE。
 
 成本仅driver wall334.505s、峰RSS2446880KB及回调/ingest/nis诊断，整链峰值费用UNAVAILABLE、drain非实时，不设资源门。主要功能缺口为E2 paired evidence 1<4/reentry9.3957m、cp失效和失败restore误写已回滚，算法有效性/信息可恢复性证据不足，不调参。下一单一主线先闭合E2段/尾段并保持NO_ROLLBACK等真实归宿，再进入accepted修复→native update/map→E2；S1/S2/S3责任确认，S4不增工程前置。TODO固定require-contract建议与用户链条优先冲突不采用。一次性18:00任务自然消失，三持续Cron不停；标准库-I清单exit0，不ROS/build/install/算法/main历史/科学门/private，中文SSH正式截止。
+
+## 106. 7e66ecd三次新run：E2控制生命周期闭合，accepted修复仍卡单刚体ICP候选
+
+[增量审阅](review_20261114_7e66ecd/README.md)以2026-11-14 19:07 fetch的main `7e66ecdb2b575fa0b7b8f2db2c0d1587fd26f654`为准。开发归档三次授权run及v8/v9宿主diff/build：hold期间推迟re_slam并继续发布，第三run两次restore均valid=1，旧cp必失效断点关闭；E1拒绝后rearm、E2 Mode3按20s墙钟关闭→rearm→resume，final HEALTHY且无open quarantine。这是真实受控生命周期进展，不是自动检测或accepted恢复成功。
+
+当前E2主断点转为候选质量：整段单刚体ICP 20次ITERATION_LIMIT，修正2.912867°/3.463195m，仅1/11改善，candidate mean194.705429高于incumbent186.594305，门拒绝；同binary/bag的E1在run2/run3改善9/13→3/12支持候选不稳定，但不外推为E2重复统计。repair clouds=0、reprocess=0，真实accepted测量→native update/map仍未执行。E2 restore虽valid=1，snapshot却晚边界200143352ns，UNSUPPORTED_AT_OR_BEFORE_QSTART，合法完整回滚未闭合。
+
+E2“闭合”是安全放弃未解决段：lifecycle列92个raw_frame_refs unresolved、unresolved_segments=1，terminal INPUT_STALE，不是这些输入已修复/重放或完整尾段；driver fully_decided=true只限自身episode分类，必须并列unresolved，不外溢全输入恢复。下一唯一主线是在合法E2边界产生真实accepted修复→native update/map→接回→E2与归宿；S1先给逐帧/带运动先验候选最小方法方案，由用户按既有规则选择，第4次run保留，不降科学门、不盲调迭代/阈值。自动检测NOT_EXECUTED、ALI-H无新增仍NOT_EVALUABLE，0.5x非实时，资源不设开工门。标准库-I清单修正本机手算/文本比较断言后exit0；不ROS/build/算法/main历史/科学门/private，中文SSH增量。
