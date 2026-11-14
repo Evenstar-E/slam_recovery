@@ -3,6 +3,13 @@
 set -o pipefail
 OUT="${1:?out}"; BAG="${2:?bag}"; DUR="${3:-260}"
 E1="${4:-1711547999352267771}"; E2="${5:-1711548113452267771}"
+# The driver processes ~6 Hz while the host publishes at 10 Hz, so at rate 1.0 the driver is
+# ~40 s of bag time behind by the end and every command arrives after the host has moved on.
+# PLAY_RATE=0.5 lets the driver keep up; it is recorded in pre_run.txt because a slowed bag is
+# not real-time evidence.
+PLAY_RATE="${PLAY_RATE:-1.0}"
+ARM_LEAD="${ARM_LEAD:-3}"
+CANDIDATE_SOURCE="${CANDIDATE_SOURCE:-host_poses}"
 CTL="$OUT/ctl"; mkdir -p "$CTL" "$OUT"
 export PATH="$HOME/mm/ros/bin:$PATH"
 export LD_LIBRARY_PATH="$HOME/mm/ros/lib:${LD_LIBRARY_PATH:-}"
@@ -30,8 +37,9 @@ rosnode list | grep -q '^/laserMapping$' || { echo "BLOCKED: host did not start"
 $PY -u -I -c "import sys; sys.path.insert(0,'/home/R26534/MM-LINS'); import runpy; runpy.run_module('slam_recovery.ros.recovery_node', run_name='__main__')" \
   --run-dir "$OUT" --pose-topic /Odometry --scan-topic /velodyne_points --checkpoint-dir "$CTL" \
   --scripted-trigger-stamps "${E1},${E2}" --detection off --repair-publish \
+  --candidate-source "${CANDIDATE_SOURCE}" \
   --require-contract --repair-sync-timeout-sec 5 --wait-limit-sec 20 --pose-stale-sec 15 \
-  --first-pose-grace-sec 60 --host-signal-window-sec 30 \
+  --first-pose-grace-sec 60 --host-signal-window-sec 30 --arm-lead-sec "${ARM_LEAD}" \
   --host-hibernation-max-sec 90 --host-sleep-topic /Issleeping --host-build-topic /Isbuilding \
   --duration-sec "${DRIVER_DUR:-$DUR}" \
   > "$OUT/recovery_node.log" 2>&1 & NODE=$!
@@ -55,7 +63,7 @@ if [ "$RECORD" = "1" ]; then
   setsid rosbag record --lz4 -O "$OUT/frontend.bag" /Odometry /Issleeping /Isbuilding > "$OUT/record.log" 2>&1 & REC=$!
   sleep 2
 fi
-setsid rosbag play --clock -r 1.0 --duration "$DUR" "$BAG" > "$OUT/play.log" 2>&1 & PLAY=$!
+setsid rosbag play --clock -r "$PLAY_RATE" --duration "$DUR" "$BAG" > "$OUT/play.log" 2>&1 & PLAY=$!
 wait "$PLAY"
 # Drain: the driver processes the bag at ~7 Hz while the host publishes at ~8-10 Hz, so a queue of
 # bag-end frames remains when playback stops. Keep the driver alive long enough to work through it

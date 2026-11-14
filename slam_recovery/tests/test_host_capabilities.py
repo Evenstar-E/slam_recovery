@@ -373,3 +373,42 @@ class PendingActiveTest(unittest.TestCase):
             ev2 = {"command": "restore", "wall": 1.0}
             client._pending.append(ev2)
             self.assertTrue(client.pending_active())
+
+
+class HostContractTest(unittest.TestCase):
+    def _caps(self, **sem):
+        base = {"apply_stamp": "YES", "ack_levels": ["deferred", "applied"],
+                "checkpoint_validity": "until_re_slam", "publish_gating": "isPublish",
+                "native_reset_under_hold": "deferred", "profile": "native_recovery"}
+        base.update(sem)
+        return HostCapabilities({"commands": {k: "YES" for k in HostCapabilities.KEYS},
+                                 "semantics": base})
+
+    def test_a_complete_declaration_has_no_problems(self):
+        self.assertEqual(self._caps().contract_problems(), [])
+
+    def test_missing_semantics_are_reported(self):
+        caps = self._caps()
+        caps.sem = {}
+        problems = caps.contract_problems()
+        self.assertTrue(any("apply_stamp" in p for p in problems))
+        self.assertTrue(any("ack_levels" in p for p in problems))
+        self.assertTrue(any("checkpoint_validity" in p for p in problems))
+        self.assertTrue(any("publish_gating" in p for p in problems))
+        self.assertTrue(any("native_reset_under_hold" in p for p in problems))
+
+    def test_a_host_that_resets_while_held_fails_the_contract(self):
+        # A host that re_slams under an external hold invalidates the checkpoint the driver is
+        # about to replay from; the run must refuse before the bag rather than find out mid-chain.
+        caps = self._caps(native_reset_under_hold="immediate")
+        self.assertTrue(any("native_reset_under_hold" in p for p in caps.contract_problems()))
+
+    def test_apply_stamp_no_is_a_problem_and_disables_prearming(self):
+        caps = self._caps(apply_stamp="NO")
+        self.assertFalse(caps.apply_stamp_supported())
+        self.assertTrue(any("apply_stamp=NO" in p for p in caps.contract_problems()))
+
+    def test_an_unusable_command_is_a_problem(self):
+        caps = self._caps()
+        caps.commands["reprocess"] = "NO"
+        self.assertTrue(any("reprocess" in p for p in caps.contract_problems()))

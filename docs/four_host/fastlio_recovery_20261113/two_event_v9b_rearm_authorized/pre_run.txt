@@ -1,0 +1,14 @@
+run_id=two_event_v9b_rearm_20261114T1820Z
+binary=aa04c5ffc7d0470ef901043f82a18406f0c06e1eaadb809477804f3b75455f32 (v9, unchanged from run 2)
+driver_main=d9e4f34+ (adds: terminal-state re-arm on the wall-clock tick)
+bag=a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de campus_12_fl.bag
+E1=1711547999352267771 declared 115.599 s;  E2=1711548113452267771 declared 229.696 s
+candidate_source=icp_reregistration  (unchanged from run 2: no threshold, no candidate rule touched)
+play_rate=0.5  NOT REAL-TIME
+arm_lead=3s
+what_changed_vs_run2: only the lifecycle. Run 2's Mode 4 refusal left the manager ABORTED; the
+     re-arm lived on the next frame, which a scripted run with detection off never sees, so E2
+     never fired (fired 1/2, lifecycle.events=[]). The wall-clock tick now applies the same
+     ABORTED->rearm rule the detector path uses. No build required.
+authorization=user 2026-11-14: A1+A2, four new bounded runs (this is run 3 of 4)
+stop: bag 260 s at 0.5x + 90 s drain; contract failure => exit before bag

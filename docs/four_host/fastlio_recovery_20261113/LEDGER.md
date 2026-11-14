@@ -252,3 +252,78 @@ E2 的帧在排空期被处理；其 `actual_s=229.696` 是 **stamp 时间**，�
 
   最长项：**`ingest`（mean 69.9 ms，占 pose_callback mean 的约 71%）**；`nis_measure` 次之（54.7 ms）。
   仅标注，未做任何修改。
+
+## v8（2026-11-14，A1+A2 run 1）：hold 生效、checkpoint 存活、restore 首次成功；门拒绝健康段
+
+二进制 `1491433f…`（v8：`native_reset_under_hold=deferred`）；driver `d9e4f34`+（JIT 边界武装、
+hold 归属、run-end 关闭）；`PLAY_RATE=0.5`（**非实时**，driver ~6 Hz 才追得上宿主 10 Hz）。
+E1 声明 113.500 s（宿主自身 `Issleeping` 前 2.3 s），E2 227.000 s。
+
+- 武装：hold 于 108.6 s 写入、apply stamp 111.5，宿主在 frame 1117 **held**；snapshot frame 1119、
+  `map_points=221670` → checkpoint 有效。
+- **v8 的对称共存规则生效**：宿主在 ~117.0 s 进入退化、发 `Issleeping`，但**没有** `re_slam`；
+  `restore valid=1 stamp_ns=…5474589952 frame=1119` —— 这是真实退化事件上**第一次回滚成功**
+  （此前 drain/v7 都是 `checkpoint_invalidated_by_re_slam`）。
+- 段内 20 帧（此前同事件只有 3 帧）：因为 hold+snapshot 提前 2.3 s 落在宿主停发之前。
+- **门拒绝**：`candidate_source=host_poses`，`num_improved_frames=0/20`、`wilson_lower=0`、
+  `MODE3_SOFT_BRIDGE_WAIT`。原因可从数字读出：平台近乎静止（vel ≈0.01 m/s），"候选=宿主位姿"
+  与"incumbent=常速外推"几乎相同，没有可测的改善；这不是阈值问题，是候选定义问题。
+- **死锁**：拒绝后段进入 `WAITING_FOR_EVIDENCE`，而等待只在**帧到达**时计时。宿主被 hold 且已退化
+  → 停发 → 等待永不结束 → hold 永不释放 → 90 s 休眠上限终止 run（bag 207 s），E2 未到达。
+- 附带证据：snapshot 实际落在 111.698 s，比声明边界 111.5 s 晚 0.2 s（`checkpoint_check=LATE_AFTER_BOUNDARY`）。
+
+修复（run 2 前）：
+1. 等待的墙钟出口：`maybe_close_waiting_segment(..., elapsed_s=)` + driver `_close_stalled_wait`
+   （2 Hz 主循环里计时，无帧也能关段并 rearm→resume）。
+2. accepted 路径改用 `icp_reregistration`（11-12 三次 accepted 的 run 全部是这条路径；
+   `host_poses` 在静止平台上原理上无法改善）。
+3. v9：hold 期间继续发布 `/Odometry`（`publish_gating=isPublish+held`，capabilities 已声明），
+   否则段永远只能覆盖宿主 onset 之前的健康帧。
+
+## v9（2026-11-14，A1+A2 run 2）：段覆盖退化、ICP 候选 9/13 改善；第二事件仍未触发（ABORTED 无人 rearm）
+
+二进制 `aa04c5ff…`（v9：`publish_gating=isPublish+held`）；driver `d9e4f34`+；`PLAY_RATE=0.5`（非实时）；
+E1/E2 回到**清单原始声明** 115.599 / 229.696 s；`candidate_source=icp_reregistration`。
+
+- **v9 生效**：hold 期间宿主继续发 `/Odometry`，段内 13 个配对帧（v8 在 onset 只有 ~1–3 帧）。
+- **checkpoint 完全合规**：`checkpoint_check=AT_OR_BEFORE_BOUNDARY`（snapshot frame 1138、
+  `map_points=221815`，边界 113.6，实际 113.6）——JIT 武装把上一轮的 0.2 s 迟到消掉了。
+- **v8 的 reset 推迟仍然生效**：宿主 115.98 s 退化，`Issleeping` 后**继续发布**（sleep→publish 抖动，
+  无 `re_slam`），cp 一直有效。
+- **ICP 候选首次有改善**：`num_improved_frames=9/13`（69%），`candidate_mean_residual 1723` <
+  `incumbent 1986`，`wilson_lower=0.465` < 门槛 → `MODE4_HARD_SLEEP_SPLIT` 拒绝。
+  ICP 自身 `status=ITERATION_LIMIT`（20 次未收敛），`icp_residual=0.033 m`，
+  `correction_translation_m` 很大但 `reentry_pos_jump_m=0.217 m`——是绕远点旋转的平移分量，不是漂移 16 m。
+- **E2 未触发（fired 1/2）**：Mode 4 把 manager 留在 **ABORTED**；re-arm 依赖“下一帧”走 detector 路径，
+  而 `--detection off` 的脚本化 run 永远不走那条路径 → 管理器整轮停在 ABORTED，E2 的 `HEALTHY` 前提不成立。
+  `lifecycle.events=[]`、`state_after=ABORTED`、`unresolved=0` 都是这条链的证据。
+
+修复（run 3 前，纯 driver，无需重建）：
+- `_close_stalled_wait` 新增终态分支：`ABORTED && active_quarantine is None` → `detector.reset(); rearm()`
+  （与 `step_frame` 的既有规则同一条），使脚本化 run 在拒绝后能回到 HEALTHY 并接收第二事件。
+
+## v9b（2026-11-14，A1+A2 run 3）：**两事件全链生命周期闭合**；两次真实事件均被门拒绝
+
+二进制不变 `aa04c5ff…`；driver 只加了终态 rearm。`PLAY_RATE=0.5`（非实时）；E1/E2 = 清单原始声明。
+
+链路（全部有宿主 ack 原件）：
+| 步骤 | E1 | E2 |
+|---|---|---|
+| 触发 | 115.599 s / kf 1156 | 229.696 s / kf 2084 |
+| hold | frame 1136 `map_writes=held` | frame 2088 `held` |
+| snapshot | frame 1137，`map_points=221370` | frame 2091，`map_points=165950` |
+| checkpoint 合规 | `AT_OR_BEFORE_BOUNDARY` | `LATE_AFTER_BOUNDARY`（晚 0.2 s） |
+| 段帧数 | 12 | 11 |
+| 门 | **拒绝** 改善 3/12，wilson 0.105，MODE4 | **拒绝** 改善 1/11，wilson 0.021，MODE3 |
+| 回滚 | `restore valid=1` frame 1137 | `restore valid=1` frame 2091 |
+| 释放 | rearm→`resume` frame 1139 | wait 20 s 关闭→rearm→`resume` frame 2145 |
+
+- `run_mode=CONTROLLED_INTERFACE_TEST`，`fired 2/2`；`lifecycle` 事件依次为 rearm / wait_limit_closed / rearm，
+  退出时 `state=HEALTHY`、`unresolved=1`、无悬挂段。**A1 达成**：E2 的 Mode 3 等待段按声明关闭。
+- **A2 未达成**。拒绝原因可从 ICP 原件读出：段内只有一个刚体变换（`mode=single_rigid_transform_for_the_segment`），
+  E1 的 ICP 给出 `correction_rotation_deg=26.6`、`translation=25.1 m`、`status=ITERATION_LIMIT`（20 次未收敛）。
+  平台近乎静止而 ICP 接受了 26° 的解（`icp_residual=0.03 m`，低残差但不是真解），说明该段几何对这种单刚体拟合是**病态**的。
+  E2 同样 `ITERATION_LIMIT`，修正 2.9°/3.5 m，改善 1/11。
+- 与 run 2 对比：同样声明戳、同一二进制，E1 改善率从 9/13 掉到 3/12——候选**不稳定**，因为 20 次迭代未收敛、
+  初值附近存在多个低残差极小。这不是阈值问题，是候选生成器的问题。
+- 尾部：E2 释放后宿主按原生策略再次退化并停发，driver 在 15 s stale 判定处结束（bag ≈250 s，非排空到尾）。

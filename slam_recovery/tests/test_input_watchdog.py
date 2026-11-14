@@ -83,6 +83,28 @@ class PoseStreamHealthTest(unittest.TestCase):
                                host_state="PUBLISHING", hibernation_max_s=90.0)
         self.assertEqual(h["status"], "STALE")
 
+    def test_silence_while_the_driver_holds_is_not_a_dead_publisher(self):
+        # A held host stops publishing the moment its own covariance crosses; that silence is
+        # caused by this driver's recovery, so the ordinary 15 s limit must not abort it.
+        h = pose_stream_health(1100, 195.0, 100.0, 216.0, 15.0,
+                               host_state="PUBLISHING", hibernation_max_s=90.0,
+                               driver_holds=True)
+        self.assertEqual(h["status"], "HOST_HELD_BY_DRIVER")
+        self.assertTrue(h["driver_holds"])
+        self.assertEqual(h["silence_s"], 21.0)
+
+    def test_a_held_host_that_never_returns_still_times_out(self):
+        h = pose_stream_health(1100, 100.0, 100.0, 216.0, 15.0,
+                               host_state="PUBLISHING", hibernation_max_s=90.0,
+                               driver_holds=True)
+        self.assertEqual(h["status"], "HOST_HIBERNATION_TIMEOUT")
+
+    def test_a_held_host_that_keeps_publishing_is_ok(self):
+        h = pose_stream_health(1100, 214.0, 100.0, 216.0, 15.0,
+                               host_state="PUBLISHING", hibernation_max_s=90.0,
+                               driver_holds=True)
+        self.assertEqual(h["status"], "OK")
+
 
 
 class DurationStatsTest(unittest.TestCase):

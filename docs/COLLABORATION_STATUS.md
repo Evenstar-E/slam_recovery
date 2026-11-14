@@ -3465,3 +3465,31 @@ LEDGER、runner 排空参数。S1 复核与 §227 一致，并补两点：
 用户要求"把任务清单上传到 github"。已写入 `docs/TODO_PRIORITIES_20261113.md`：A 主线 FAST-LIO（A1–A7）、B 四宿主（B1–B4）、C ALI-H（C1–C4）、
 D 论文/复现（D1–D2）、E 运维与被打断项（E1–E6），逐项附现状证据、影响/紧急/成本与优先级、性价比；并列出需用户拍板的五项
 （A3 成本放行、A6 host-only 冒烟、C2/C3 数据或标签、E1 进程清理、D1 论文解禁）。评分口径与"非实时/仅标注不改"的限制写在文末。
+
+## 230. A1+A2 四次授权 run 的前三次：A1 达成（两事件生命周期闭合），A2 未达成（两次真实事件均被门拒绝）
+
+用户 2026-11-14 授权「做 A1 + A2，直接授权四次新的 run」。实际使用 3 次，第 4 次保留给由证据决定的实验。
+
+**代码/二进制（本轮实际交付）**
+- driver（main，本轮提交）：JIT 边界武装 `--arm-lead-sec`、hold 归属（持有时宿主 `Issleeping` 只记观察不判 takeover）、
+  看门狗 `HOST_HELD_BY_DRIVER`、**墙钟等待出口** `_close_stalled_wait`（含 `ABORTED` 终态 rearm）、run-end 关闭开段；
+  `maybe_close_waiting_segment(..., elapsed_s=)` 支持无帧计时；`native_reset_under_hold` 进入契约校验。测试 273 → 284。
+- host：v8 `1491433f…`（`native_reset_under_hold=deferred`：持有期间推迟 `re_slam`、reprocess 不清 hold、
+  重放窗口写图）、v9 `aa04c5ff…`（`publish_gating=isPublish+held`：持有期继续发 `/Odometry`）。
+  源码级契约检查 31 → 40 项全 PASS；diff `native_recovery_v8_hold_ownership.diff`、`native_recovery_v9_publish_while_held.diff`。
+
+**已核实的结论（原件：`two_event_v8_holdown_authorized/`、`two_event_v9_icp_authorized/`、`two_event_v9b_rearm_authorized/`）**
+1. **checkpoint 在真实退化事件上首次存活**：v8 的 reset 推迟使 `restore valid=1` 成功（此前一律
+   `checkpoint_invalidated_by_re_slam`）；v9 的段内 11–13 帧（此前 1–3 帧）。
+2. **A1 达成**：run 3 `fired 2/2`、`run_mode=CONTROLLED_INTERFACE_TEST`；E2 的 Mode 3 等待按 20 s 到期关闭
+   （`wait_limit_closed`）→ rearm → `resume`（frame 2145）；退出 `state=HEALTHY`、无悬挂段。
+3. **A2 未达成**：E1/E2 两次真实事件分别以 `MODE4_HARD_SLEEP_SPLIT`（改善 3/12）与 `MODE3_SOFT_BRIDGE_WAIT`
+   （改善 1/11）被门拒绝。ICP 原件显示根因不是阈值：段内只拟合**一个刚体变换**
+   （`single_rigid_transform_for_the_segment`），E1 给出 26.6°/25.1 m、`ITERATION_LIMIT`（20 次未收敛）；
+   run 2 同一戳同一二进制曾得 9/13——**候选不稳定**，该段几何对单刚体拟合病态。
+4. 全部 run 为 `PLAY_RATE=0.5`，**非实时**（driver ~6 Hz vs 宿主 10 Hz）；E2 收尾为宿主释放后再次退化停发，
+   在 15 s stale 判定结束（bag ≈250 s），非排空到尾。
+
+**待用户决定（方法层面，不是调参）**：候选生成器是否从「整段单刚体重配准」改为「逐帧/带运动先验重配准」，
+或接受「该序列两次事件均不可信 → 门拒绝」为结论。按 AGENTS.md §2.3，改方法需用户选择，本轮不自行替换。
+第 4 次 run 保留给该选择之后。

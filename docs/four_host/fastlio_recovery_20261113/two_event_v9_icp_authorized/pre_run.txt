@@ -1,0 +1,16 @@
+run_id=two_event_v9_icp_20261114T1800Z
+binary=aa04c5ffc7d0470ef901043f82a18406f0c06e1eaadb809477804f3b75455f32 (v9: publish_gating=isPublish+held)
+driver_main=d9e4f34+ (JIT arming, hold ownership, wall-clock wait close, run-end close)
+bag=a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de campus_12_fl.bag
+E1=1711547999352267771  declared 115.599 s = the event as declared in the manifest (host Issleeping 115.80)
+E2=1711548113452267771  declared 229.696 s = the second declared event (host Issleeping 229.89)
+candidate_source=icp_reregistration  (the only path that has ever passed the gate: 11-12 x3)
+play_rate=0.5  NOT REAL-TIME (driver keeps up at 0.5x; see run 1)
+arm_lead=3s
+why_v9: run 1 (v8, E1 at 113.5) produced 20/20 frames with NO improvement: the window lay before the
+     degeneracy, the platform was nearly stationary, and host_poses cannot beat a constant-velocity
+     incumbent. v8 also stopped publishing exactly at its own onset, so a window at the onset could
+     not collect frames at all. v9 keeps /Odometry flowing while the driver holds the map and
+     declares it (publish_gating=isPublish+held); the window now spans the degeneracy itself.
+authorization=user 2026-11-14: A1+A2, four new bounded runs (this is run 2 of 4)
+stop: bag 260 s at 0.5x + 90 s drain; contract failure => exit before bag

@@ -1,0 +1,939 @@
+Multi thread started 
+p_pre->lidar_type 2
+[0m[ INFO] [1794650079.746133279]: [NATIVE_RECOVERY] channel on /tmp/wt-sim/docs/four_host/fastlio_recovery_20261113/two_event_v9_icp_authorized/ctl[0m
+[0m[ INFO] [1794650091.355121560]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Over-degeneracy has happened, publish hibernating map operation!!!!!!!!!!!!!
+Degeneracy during external hold: native re_slam deferred (1)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (2)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (3)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (4)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (5)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (6)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (7)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (8)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (9)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (10)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (11)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (12)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (13)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (14)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (15)
+Degeneracy has happened 1 times
+Over-degeneracy has disappear, construct a new map.....................
+Degeneracy has happened 2 times
+Over-degeneracy has happened, publish hibernating map operation!!!!!!!!!!!!!
+Degeneracy during external hold: native re_slam deferred (16)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (17)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (18)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (19)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (20)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (21)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (22)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (23)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (24)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (25)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (26)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (27)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (28)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (29)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (30)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (31)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (32)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (33)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (34)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (35)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (36)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (37)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (38)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (39)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (40)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (41)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (42)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (43)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (44)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (45)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (46)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (47)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (48)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (49)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (50)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (51)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (52)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (53)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (54)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (55)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (56)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (57)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (58)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (59)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (60)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (61)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (62)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (63)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (64)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (65)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (66)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (67)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (68)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (69)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (70)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (71)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (72)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (73)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (74)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (75)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (76)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (77)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (78)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (79)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (80)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (81)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (82)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (83)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (84)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (85)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (86)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (87)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (88)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (89)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (90)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (91)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (92)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (93)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (94)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (95)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (96)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (97)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (98)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (99)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (100)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (101)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (102)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (103)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (104)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (105)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (106)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (107)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (108)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (109)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (110)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (111)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (112)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (113)
+Degeneracy has happened 1 times
+Over-degeneracy has disappear, construct a new map.....................
+Degeneracy has happened 2 times
+Over-degeneracy has happened, publish hibernating map operation!!!!!!!!!!!!!
+Degeneracy during external hold: native re_slam deferred (114)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (115)
+Degeneracy has happened 1 times
+Over-degeneracy has disappear, construct a new map.....................
+Degeneracy has happened 2 times
+Over-degeneracy has happened, publish hibernating map operation!!!!!!!!!!!!!
+Degeneracy during external hold: native re_slam deferred (116)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (117)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (118)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (119)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (120)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (121)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (122)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (123)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (124)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (125)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (126)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (127)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (128)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (129)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (130)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (131)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (132)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (133)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (134)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (135)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (136)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (137)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (138)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (139)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (140)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (141)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (142)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (143)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (144)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (145)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (146)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (147)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (148)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (149)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (150)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (151)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (152)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (153)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (154)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (155)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (156)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (157)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (158)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (159)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (160)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (161)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (162)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (163)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (164)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (165)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (166)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (167)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (168)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (169)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (170)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (171)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (172)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (173)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (174)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (175)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (176)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (177)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (178)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (179)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (180)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (181)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (182)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (183)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (184)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (185)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (186)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (187)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (188)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (189)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (190)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (191)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (192)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (193)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (194)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (195)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (196)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (197)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (198)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (199)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (200)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (201)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (202)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (203)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (204)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (205)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (206)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (207)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (208)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (209)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (210)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (211)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (212)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (213)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (214)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (215)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (216)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (217)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (218)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (219)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (220)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (221)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (222)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (223)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (224)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (225)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (226)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (227)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (228)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (229)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (230)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (231)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (232)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (233)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (234)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (235)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (236)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (237)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (238)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (239)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (240)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (241)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (242)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (243)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (244)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (245)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (246)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (247)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (248)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (249)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (250)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (251)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (252)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (253)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (254)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (255)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (256)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (257)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (258)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (259)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (260)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (261)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (262)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (263)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (264)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (265)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (266)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (267)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (268)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (269)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (270)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (271)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (272)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (273)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (274)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (275)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (276)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (277)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (278)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (279)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (280)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (281)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (282)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (283)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (284)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (285)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (286)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (287)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (288)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (289)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (290)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (291)
+Degeneracy has happened 1 times
+[33m[ WARN] [1794650704.982699909]: catch sig 2[0m
+Rebuild thread terminated normally
+... logging to /home/R26534/.ros/log/614c9802-e011-11f1-8f90-0242ac110013/roslaunch-DEV-99bef9-23593.log
+Checking log directory for disk usage. This may take a while.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+]2;/home/R26534/fastlio2_ws/src/FAST-LIO/launch/mapping_velodyne_m2dgr.launch
+[1mstarted roslaunch server http://127.0.0.1:38325/[0m
+
+SUMMARY
+========
+
+PARAMETERS
+ * /common/imu_topic: /imu_raw
+ * /common/lid_topic: /velodyne_points
+ * /common/time_sync_en: False
+ * /cube_side_length: 1000.0
+ * /dense_publish_enable: True
+ * /feature_extract_enable: False
+ * /filter_size_map: 0.5
+ * /filter_size_surf: 0.5
+ * /mapping/acc_cov: 0.1
+ * /mapping/b_acc_cov: 0.0001
+ * /mapping/b_gyr_cov: 0.0001
+ * /mapping/det_range: 100.0
+ * /mapping/extrinsic_R: [1, -0.011619, -0...
+ * /mapping/extrinsic_T: [0, 0, 0]
+ * /mapping/fov_degree: 180
+ * /mapping/gyr_cov: 0.1
+ * /max_iteration: 3
+ * /pcd_save_enable: False
+ * /point_filter_num: 4
+ * /preprocess/blind: 4
+ * /preprocess/lidar_type: 2
+ * /preprocess/scan_line: 64
+ * /publish/dense_publish_en: ture
+ * /publish/scan_bodyframe_pub_en: True
+ * /publish/scan_publish_en: True
+ * /rosdistro: noetic
+ * /rosversion: 1.17.0
+ * /runtime_pos_log_enable: False
+ * /scan_publish_enable: True
+
+NODES
+  /
+    laserMapping (fast_lio/fastlio_mapping)
+
+[1mROS_MASTER_URI=http://127.0.0.1:33001[0m
+]2;/home/R26534/fastlio2_ws/src/FAST-LIO/launch/mapping_velodyne_m2dgr.launch http://127.0.0.1:33001
+[1mprocess[laserMapping-1]: started with pid [24281][0m
+[laserMapping-1] killing on exit
+shutting down processing monitor...
+... shutting down processing monitor complete
+[1mdone[0m

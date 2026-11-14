@@ -1,0 +1,18 @@
+run_id=two_event_v8_holdown_20261114T1745Z
+binary=1491433fece77b8e50caa02191c2b6f7f8b98bbb421bb02c52efc3da2e5bf39e (v8: native_reset_under_hold=deferred)
+driver_main=d9e4f34 (JIT boundary arming, hold-ownership, run-end close)
+bag=a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de campus_12_fl.bag
+E1=1711547997276363519 declared 113.500 s  (host's own Issleeping at 115.80 s; last pose 115.799)
+E2=1711548110776363519 declared 227.000 s  (host's own Issleeping at 229.89 s; last pose 229.696)
+lead=E1 opens 2.30 s / E2 2.70 s before the host's own hibernation: the quarantine window needs
+     frames and the host stops publishing exactly at its onset, so a trigger at the onset can
+     never collect a candidate (drain run: 3 frames). This is the lead time a detector would need.
+play_rate=0.5  NOT REAL-TIME: the driver processes ~6 Hz against a 10 Hz host, so at 1.0 it is
+     ~40 s of bag time behind by bag end. At 0.5 the driver keeps up and commands are not late.
+     The run is CONTROLLED_INTERFACE_TEST; it is not real-time evidence either way.
+arm_lead=3s (hold+snapshot written at boundary-3 s, still carrying the boundary apply stamp)
+driver_args=--require-contract --first-pose-grace-sec 60 --pose-stale-sec 15 --host-signal-window-sec 30
+     --host-hibernation-max-sec 90 --host-sleep-topic /Issleeping --host-build-topic /Isbuilding
+     --wait-limit-sec 20 --arm-lead-sec 3 --repair-sync-timeout-sec 5
+authorization=user 2026-11-14: A1+A2, four new bounded runs
+stop: bag 260 s at 0.5x + 90 s drain; contract failure => exit before bag

@@ -18,8 +18,10 @@
     "ack_levels": ["deferred", "applied"],// deferred=已入队，applied=已执行
     "checkpoint_validity": "until_re_slam|run", // re_slam 后 cp 失效
     "publish_gating": "isPublish|always", // 休眠期间是否停发 /Odometry
+    "native_reset_under_hold": "deferred|immediate", // driver 持有 map 时 host 是否仍 re_slam
     "profile": "native_recovery|legacy"
   },
+  "hold_scope": "map_writes+native_reset",
   "checkpoint_invalidated_by": "re_slam (host-native reset); a new snapshot is required afterwards",
   "snapshot_refused_after_host_reset": "until the host publishes odometry again"
 }
@@ -33,6 +35,12 @@
 - `checkpoint_validity=until_re_slam`：host 在 `re_slam` 后必须使 cp 失效并拒绝 restore（具名原因）。
 - `publish_gating=isPublish`：driver 订阅 `Issleeping/Isbuilding`，休眠/重建时释放 hold、不 restore/reprocess；
   休眠期不以普通 STALE 判据误杀（用 `--host-hibernation-max-sec`）。
+- `native_reset_under_hold` 必须为 `deferred`，否则 `--require-contract` 启动前拒绝。语义是**对称共存**：
+  driver 不持有 map 时，host 的原生 `Issleeping`/`re_slam` 优先（driver 放弃该段，记 takeover）；
+  driver 持有 map 时，host 仍可观察并上报退化（照常发 `Issleeping`、照常置 `isPublish=false`），
+  但**不得**执行 `re_slam`——否则会清空 driver 即将回放的 checkpoint，两边互相破坏。
+  host 在 `status` 里以 `deferred_resets=N` 记录被推迟的重置次数；driver `resume` 后原生策略立即恢复，
+  若届时仍退化，host 按自己的规则重新计数并在两帧后 `re_slam`（不改变原生阈值）。
 
 ## 2. driver 侧拒绝（不猜）
 
@@ -40,6 +48,7 @@
 |---|---|
 | `--require-contract` 且无 capabilities.json | 启动前退出码 2，不跑 bag |
 | `--require-contract` 且 `contract_problems()` 非空 | 退出码 2，日志列出缺项 |
+| `native_reset_under_hold` 缺失或非 `deferred` | 同上：启动前退出码 2 |
 | accepted 但 `reprocess` 非 usable | 不发 reprocess、不发布修复云，记 `reprocess_unsupported` |
 | refused 但 `restore` 非 YES | 不发 restore，记 `restore_unsupported` |
 | `set_state` 非 YES | 不发写回，记 `set_state_unsupported` |

@@ -1,0 +1,306 @@
+CMake Deprecation Warning at CMakeLists.txt:4 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- Using CATKIN_DEVEL_PREFIX: /home/R26534/fastlio2_ws/devel
+-- Using CMAKE_PREFIX_PATH: /home/R26534/mm/ros
+-- This workspace overlays: /home/R26534/mm/ros
+CMake Warning (dev) at /home/R26534/mm/ros/share/catkin/cmake/python.cmake:4 (find_package):
+  Policy CMP0148 is not set: The FindPythonInterp and FindPythonLibs modules
+  are removed.  Run "cmake --help-policy CMP0148" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+
+Call Stack (most recent call first):
+  /home/R26534/mm/ros/share/catkin/cmake/all.cmake:164 (include)
+  /home/R26534/mm/ros/share/catkin/cmake/catkinConfig.cmake:20 (include)
+  CMakeLists.txt:58 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Using PYTHON_EXECUTABLE: /home/R26534/mm/ros/bin/python3.11
+-- Using default Python package layout
+-- Using empy: /home/R26534/mm/ros/lib/python3.11/site-packages/em.py
+-- Using CATKIN_ENABLE_TESTING: ON
+-- Call enable_testing()
+-- Using CATKIN_TEST_RESULTS_DIR: /home/R26534/fastlio2_ws/build/test_results
+-- Found gtest: gtests will be built
+-- Using Python nosetests: /home/R26534/mm/ros/bin/nosetests
+-- catkin 0.8.10
+-- BUILD_SHARED_LIBS is on
+-- BUILD_SHARED_LIBS is on
+-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- ~~  traversing 2 packages in topological order:
+-- ~~  - livox_ros_driver
+-- ~~  - fast_lio
+-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- +++ processing catkin package: 'livox_ros_driver'
+-- ==> add_subdirectory(livox_ros_driver/livox_ros_driver)
+CMake Deprecation Warning at livox_ros_driver/livox_ros_driver/CMakeLists.txt:3 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+-- livox_ros_driver version: 2.6.0
+CMake Warning (dev) at livox_ros_driver/livox_ros_driver/CMakeLists.txt:16 (find_package):
+  Policy CMP0167 is not set: The FindBoost module is removed.  Run "cmake
+  --help-policy CMP0167" for policy details.  Use the cmake_policy command to
+  set the policy and suppress this warning.
+
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found Boost: /home/R26534/mm/ros/lib/cmake/Boost-1.86.0/BoostConfig.cmake (found suitable version "1.86.0", minimum required is "1.54") found components: system thread chrono
+-- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+CMake Warning (dev) at /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:121 (find_package):
+  Policy CMP0167 is not set: The FindBoost module is removed.  Run "cmake
+  --help-policy CMP0167" for policy details.  Use the cmake_policy command to
+  set the policy and suppress this warning.
+
+Call Stack (most recent call first):
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:294 (find_boost)
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:559 (find_external_library)
+  livox_ros_driver/livox_ros_driver/CMakeLists.txt:36 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found Boost: /home/R26534/mm/ros/lib/cmake/Boost-1.86.0/BoostConfig.cmake (found suitable version "1.86.0", minimum required is "1.65.0") found components: system iostreams filesystem
+CMake Warning (dev) at /home/R26534/mm/ros/share/pcl-1.14/Modules/FindFLANN.cmake:45 (find_package):
+  Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT
+  variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the
+  cmake_policy command to set the policy and suppress this warning.
+
+  CMake variable FLANN_ROOT is set to:
+
+    /home/R26534/mm/ros
+
+  For compatibility, find_package is ignoring the variable, but code in a
+  .cmake module might still use it.
+Call Stack (most recent call first):
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:253 (find_package)
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:298 (find_flann)
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:559 (find_external_library)
+  livox_ros_driver/livox_ros_driver/CMakeLists.txt:36 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found flann version 1.9.2
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Found OpenGL: /home/R26534/mm/ros/lib/libGL.so
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Could NOT find freetype (missing: freetype_DIR)
+CMake Warning (dev) at /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:121 (find_package):
+  Policy CMP0167 is not set: The FindBoost module is removed.  Run "cmake
+  --help-policy CMP0167" for policy details.  Use the cmake_policy command to
+  set the policy and suppress this warning.
+
+Call Stack (most recent call first):
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:294 (find_boost)
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:559 (find_external_library)
+  livox_ros_driver/livox_ros_driver/CMakeLists.txt:36 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found OpenGL: /home/R26534/mm/ros/lib/libGL.so  found components: OpenGL GLX
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Could NOT find freetype (missing: freetype_DIR)
+-- Found Qhull version 8.0.2
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Could NOT find freetype (missing: freetype_DIR)
+-- looking for PCL_COMMON
+-- looking for PCL_KDTREE
+-- looking for PCL_OCTREE
+-- looking for PCL_SEARCH
+-- looking for PCL_SAMPLE_CONSENSUS
+-- looking for PCL_FILTERS
+-- looking for PCL_2D
+-- looking for PCL_GEOMETRY
+-- looking for PCL_IO
+-- looking for PCL_FEATURES
+-- looking for PCL_ML
+-- looking for PCL_SEGMENTATION
+-- looking for PCL_VISUALIZATION
+-- looking for PCL_SURFACE
+-- looking for PCL_REGISTRATION
+-- looking for PCL_KEYPOINTS
+-- looking for PCL_TRACKING
+-- looking for PCL_RECOGNITION
+-- looking for PCL_STEREO
+-- looking for PCL_OUTOFCORE
+-- looking for PCL_PEOPLE
+-- livox_ros_driver: 2 messages, 0 services
+/home/R26534/mm/ros/include/apr-1
+apr-1rtcryptpthreaddl
+find livox sdk library success
+-- +++ processing catkin package: 'fast_lio'
+-- ==> add_subdirectory(FAST-LIO)
+CMake Deprecation Warning at FAST-LIO/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+
+Current CPU archtecture: x86_64
+Processer number:  128
+core for MP: 3
+CMake Warning (dev) at /home/R26534/mm/ros/share/cmake-4.2/Modules/CMakeFindDependencyMacro.cmake:93 (find_package):
+  Policy CMP0167 is not set: The FindBoost module is removed.  Run "cmake
+  --help-policy CMP0167" for policy details.  Use the cmake_policy command to
+  set the policy and suppress this warning.
+
+Call Stack (most recent call first):
+  /home/R26534/mm/ros/share/cmake-4.2/Modules/CMakeFindDependencyMacro.cmake:125 (__find_dependency_common)
+  /home/R26534/mm/ros/lib/cmake/GTSAM/GTSAMConfig.cmake:21 (find_dependency)
+  FAST-LIO/CMakeLists.txt:43 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- GTSAM include directory:  /home/R26534/mm/ros/lib/cmake/GTSAM/../../../include
+CMake Warning (dev) at FAST-LIO/CMakeLists.txt:44 (find_package):
+  Policy CMP0148 is not set: The FindPythonInterp and FindPythonLibs modules
+  are removed.  Run "cmake --help-policy CMP0148" for policy details.  Use
+  the cmake_policy command to set the policy and suppress this warning.
+
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+CMake Warning (dev) at /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:121 (find_package):
+  Policy CMP0167 is not set: The FindBoost module is removed.  Run "cmake
+  --help-policy CMP0167" for policy details.  Use the cmake_policy command to
+  set the policy and suppress this warning.
+
+Call Stack (most recent call first):
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:294 (find_boost)
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:559 (find_external_library)
+  FAST-LIO/CMakeLists.txt:63 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+CMake Warning (dev) at /home/R26534/mm/ros/share/pcl-1.14/Modules/FindFLANN.cmake:45 (find_package):
+  Policy CMP0144 is not set: find_package uses upper-case <PACKAGENAME>_ROOT
+  variables.  Run "cmake --help-policy CMP0144" for policy details.  Use the
+  cmake_policy command to set the policy and suppress this warning.
+
+  CMake variable FLANN_ROOT is set to:
+
+    /home/R26534/mm/ros
+
+  For compatibility, find_package is ignoring the variable, but code in a
+  .cmake module might still use it.
+Call Stack (most recent call first):
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:253 (find_package)
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:298 (find_flann)
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:559 (find_external_library)
+  FAST-LIO/CMakeLists.txt:63 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found flann version 1.9.2
+-- Found OpenMP_CXX: -fopenmp (found version "4.5")
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Found OpenGL: /home/R26534/mm/ros/lib/libGL.so
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Could NOT find freetype (missing: freetype_DIR)
+CMake Warning (dev) at /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:121 (find_package):
+  Policy CMP0167 is not set: The FindBoost module is removed.  Run "cmake
+  --help-policy CMP0167" for policy details.  Use the cmake_policy command to
+  set the policy and suppress this warning.
+
+Call Stack (most recent call first):
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:294 (find_boost)
+  /home/R26534/mm/ros/share/pcl-1.14/PCLConfig.cmake:559 (find_external_library)
+  FAST-LIO/CMakeLists.txt:63 (find_package)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Found OpenGL: /home/R26534/mm/ros/lib/libGL.so  found components: OpenGL GLX
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Could NOT find freetype (missing: freetype_DIR)
+-- Found Qhull version 8.0.2
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR) 
+-- Could NOT find freetype (missing: freetype_DIR)
+-- looking for PCL_COMMON
+-- looking for PCL_KDTREE
+-- looking for PCL_OCTREE
+-- looking for PCL_SEARCH
+-- looking for PCL_SAMPLE_CONSENSUS
+-- looking for PCL_FILTERS
+-- looking for PCL_2D
+-- looking for PCL_GEOMETRY
+-- looking for PCL_IO
+-- looking for PCL_FEATURES
+-- looking for PCL_ML
+-- looking for PCL_SEGMENTATION
+-- looking for PCL_VISUALIZATION
+-- looking for PCL_SURFACE
+-- looking for PCL_REGISTRATION
+-- looking for PCL_KEYPOINTS
+-- looking for PCL_TRACKING
+-- looking for PCL_RECOGNITION
+-- looking for PCL_STEREO
+-- looking for PCL_OUTOFCORE
+-- looking for PCL_PEOPLE
+-- Found PCL: pcl_common;pcl_kdtree;pcl_octree;pcl_search;pcl_sample_consensus;pcl_filters;pcl_io;pcl_features;pcl_ml;pcl_segmentation;pcl_visualization;pcl_surface;pcl_registration;pcl_keypoints;pcl_tracking;pcl_recognition;pcl_stereo;pcl_outofcore;pcl_people;Boost::system;Boost::iostreams;Boost::filesystem;VTK::ChartsCore;VTK::CommonColor;VTK::CommonComputationalGeometry;VTK::CommonCore;VTK::CommonDataModel;VTK::CommonExecutionModel;VTK::CommonMath;VTK::CommonMisc;VTK::CommonTransforms;VTK::FiltersCore;VTK::FiltersExtraction;VTK::FiltersGeneral;VTK::FiltersGeometry;VTK::FiltersModeling;VTK::FiltersSources;VTK::ImagingCore;VTK::ImagingSources;VTK::InteractionImage;VTK::InteractionStyle;VTK::InteractionWidgets;VTK::IOCore;VTK::IOGeometry;VTK::IOImage;VTK::IOLegacy;VTK::IOPLY;VTK::RenderingAnnotation;VTK::RenderingCore;VTK::RenderingContext2D;VTK::RenderingLOD;VTK::RenderingFreeType;VTK::ViewsCore;VTK::ViewsContext2D;VTK::RenderingOpenGL2;VTK::RenderingContextOpenGL2;VTK::GUISupportQt;FLANN::FLANN;QHULL::QHULL (Required is at least version "1.8")
+Eigen:/home/R26534/mm/ros/include/eigen3
+-- fast_lio: 1 messages, 0 services
+-- Configuring done (16.5s)
+-- Generating done (8.8s)
+-- Build files have been written to: /home/R26534/fastlio2_ws/build
+[  0%] Built target std_msgs_generate_messages_py
+[  0%] Built target std_msgs_generate_messages_nodejs
+[  0%] Built target std_msgs_generate_messages_cpp
+[  0%] Built target std_msgs_generate_messages_eus
+[  0%] Built target std_msgs_generate_messages_lisp
+[  0%] Built target geometry_msgs_generate_messages_py
+[  0%] Built target geometry_msgs_generate_messages_lisp
+[  0%] Built target geometry_msgs_generate_messages_nodejs
+[  0%] Built target geometry_msgs_generate_messages_eus
+[  0%] Built target geometry_msgs_generate_messages_cpp
+[  0%] Built target _livox_ros_driver_generate_messages_check_deps_CustomPoint
+[  0%] Built target _fast_lio_generate_messages_check_deps_Pose6D
+[  0%] Built target _livox_ros_driver_generate_messages_check_deps_CustomMsg
+[ 24%] Built target fast_lio_generate_messages_cpp
+[ 35%] Built target fast_lio_generate_messages_py
+[ 37%] Built target livox_ros_driver_generate_messages_lisp
+[ 40%] Built target livox_ros_driver_generate_messages_cpp
+[ 40%] Built target livox_ros_driver_generate_messages_nodejs
+[ 40%] Built target livox_ros_driver_generate_messages_eus
+[ 40%] Built target livox_ros_driver_generate_messages_py
+[ 51%] Built target fast_lio_generate_messages_eus
+[ 51%] Built target fast_lio_generate_messages_lisp
+[ 51%] Built target fast_lio_generate_messages_nodejs
+[ 51%] Built target livox_ros_driver_generate_messages
+[ 51%] Built target fast_lio_generate_messages
+[ 56%] Building CXX object FAST-LIO/CMakeFiles/fastlio_mapping.dir/src/laserMapping.cpp.o
+[ 56%] Linking CXX executable /home/R26534/fastlio2_ws/devel/lib/livox_ros_driver/livox_ros_driver_node
+[ 91%] Built target livox_ros_driver_node
+In file included from /home/R26534/mm/ros/include/boost/smart_ptr/detail/requires_cxx11.hpp:9,
+                 from /home/R26534/mm/ros/include/boost/smart_ptr/shared_ptr.hpp:17,
+                 from /home/R26534/mm/ros/include/boost/shared_ptr.hpp:17,
+                 from /home/R26534/mm/ros/include/ros/forwards.h:37,
+                 from /home/R26534/mm/ros/include/ros/common.h:37,
+                 from /home/R26534/mm/ros/include/ros/ros.h:43,
+                 from /home/R26534/fastlio2_ws/src/FAST-LIO/src/laserMapping.cpp:10:
+/home/R26534/mm/ros/include/boost/bind.hpp:36:1: note: ‘#pragma message: The practice of declaring the Bind placeholders (_1, _2, ...) in the global namespace is deprecated. Please use <boost/bind/bind.hpp> + using namespace boost::placeholders, or define BOOST_BIND_GLOBAL_PLACEHOLDERS to retain the current behavior.’
+   36 | BOOST_PRAGMA_MESSAGE(
+      | ^~~~~~~~~~~~~~~~~~~~
+[ 94%] Linking CXX executable /home/R26534/fastlio2_ws/devel/lib/fast_lio/fastlio_mapping
+[100%] Built target fastlio_mapping
+Base path: /home/R26534/fastlio2_ws
+Source space: /home/R26534/fastlio2_ws/src
+Build space: /home/R26534/fastlio2_ws/build
+Devel space: /home/R26534/fastlio2_ws/devel
+Install space: /home/R26534/fastlio2_ws/install
+####
+#### Running command: "make cmake_check_build_system" in "/home/R26534/fastlio2_ws/build"
+####
+####
+#### Running command: "make -j8" in "/home/R26534/fastlio2_ws/build"
+####
+EXIT=0

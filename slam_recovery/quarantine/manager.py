@@ -519,7 +519,9 @@ class TrustedMapTransactionManager:
     # ----------------------------------------------------------------------------------------
     # Lifecycle after a refusal: a waiting segment that never gets evidence must not stall the run.
     # ----------------------------------------------------------------------------------------
-    def maybe_close_waiting_segment(self, now_ns: int) -> Optional[QuarantineSegment]:
+    def maybe_close_waiting_segment(self, now_ns: int,
+                                    elapsed_s: Optional[float] = None
+                                    ) -> Optional[QuarantineSegment]:
         """Close a Mode 3 wait once its declared limit has passed with no new evidence.
 
         A segment in WAITING_FOR_EVIDENCE keeps `active_quarantine` set so that arriving frames
@@ -528,6 +530,13 @@ class TrustedMapTransactionManager:
         two-event run silently becomes a one-event run. When a limit was declared for the run,
         the wait ends here and the frames it held are recorded as *unresolved* -- not committed,
         not silently deleted. The trusted map is untouched: it stays at the last commit.
+
+        ``elapsed_s`` is the wall-clock age of the wait. The ordinary call site is a frame, whose
+        stamp advances the wait; but the wait can deadlock exactly when no frame arrives -- the
+        driver holds the host's map, the host stops publishing, and the wait that would release
+        the hold can then never expire (v8 run: silence from 117.0 s, hold never released, host
+        hibernation cap ended the run at bag 207 s). A caller that has a wall clock passes it in
+        so the limit is measured even with no input at all.
         """
         # DIAGNOSTIC: the first ten evaluations, so the caller's clock can be compared with the
         # timer's start without changing either.
@@ -543,7 +552,9 @@ class TrustedMapTransactionManager:
                 or self.wait_limit_ns is None
                 or self.wait_started_ns is None):
             return None
-        if int(now_ns) - int(self.wait_started_ns) < int(self.wait_limit_ns):
+        if elapsed_s is None:
+            elapsed_s = (int(now_ns) - int(self.wait_started_ns)) / 1e9
+        if float(elapsed_s) + 1e-9 < int(self.wait_limit_ns) / 1e9:
             return None
         seg = self.active_quarantine
         self.unresolved_segments.append(seg)

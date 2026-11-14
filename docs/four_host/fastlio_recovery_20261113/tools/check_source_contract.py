@@ -29,9 +29,14 @@ check("enqueue ack says deferred", '" deferred stamp="' in s)
 check("executed hold ack says applied", '"OK hold applied valid=1' in s)
 check("executed snapshot ack says applied", '"OK snapshot applied valid=1' in s)
 
-# 3. reprocess releases hold and carries repaired_fed
-check("reprocess releases hold", "g_nr_hold.store(false);" in s)
+# 3. reprocess carries repaired_fed, and does not take the driver's hold away
+i_rp = s.find('else if (cmd == "reprocess")')
+i_rp_end = s.find('else if (cmd == "capabilities")', i_rp)
+rp_body = s[i_rp:i_rp_end] if 0 <= i_rp < i_rp_end else ""
 check("reprocess ack has repaired_fed", 'repaired_fed=' in s)
+check("reprocess does not clear the driver's hold", "g_nr_hold.store(false);" not in rp_body)
+check("map writes stay allowed during a replay",
+      "if (g_nr_hold.load() && !g_nr_cur_is_replay) return;" in s)
 
 # 4. per-group replay identity + update-linked receipt
 check("replay marks written on push", "g_nr_replay_marks[gkey] = true;" in s)
@@ -69,8 +74,27 @@ check("capabilities declares both ack levels",
       '\\"ack_levels\\": [\\"deferred\\", \\"applied\\"]' in s)
 check("capabilities declares checkpoint validity",
       '\\"checkpoint_validity\\": \\"until_re_slam\\"' in s)
-check("capabilities declares publish gating", '\\"publish_gating\\": \\"isPublish\\"' in s)
+check("capabilities declares publish gating", '\\"publish_gating\\": \\"isPublish+held\\"' in s)
 check("capabilities declares the profile", '\\"profile\\": \\"native_recovery\\"' in s)
+check("capabilities declares the reset policy under hold",
+      '\\"native_reset_under_hold\\": \\"deferred\\"' in s)
+
+# 6d. a held host defers its native reset instead of invalidating the driver's checkpoint
+i_deg = s.find("if( degradation_count > 1)")
+i_deg_end = s.find("}else{", i_deg) if i_deg >= 0 else -1
+deg_body = s[i_deg:i_deg_end] if 0 <= i_deg < i_deg_end else ""
+check("degeneracy path checks the external hold", "if (g_nr_hold.load())" in deg_body)
+check("held host counts the deferred reset", "++g_nr_deferred_resets;" in deg_body)
+check("held host does not call re_slam",
+      "re_slam();" in deg_body and deg_body.find("re_slam();") > deg_body.find("g_nr_hold.load()"))
+check("status exposes the deferred resets", '" deferred_resets="' in s)
+
+# 6e. a held host keeps publishing so the driver's window can span the degeneracy
+check("publication gate widened while held",
+      "if(isPublish || g_nr_hold.load()){" in s)
+check("capabilities declares publish-while-held",
+      '\\"publish_while_held\\": \\"YES\\"' in s
+      and '\\"publish_gating\\": \\"isPublish+held\\"' in s)
 
 # 6. the deferred queue is FIFO and executes every due entry (two commands can share one stamp)
 check("deferred queue is a deque", "std::deque<NrDeferred> g_nr_deferred;" in s)

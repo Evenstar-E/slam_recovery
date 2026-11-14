@@ -668,7 +668,7 @@ class HostCapabilities:
     KEYS = ("snapshot", "restore", "hold", "reprocess", "set_state", "measurement_relay")
 
     SEMANTICS = ("apply_stamp", "ack_levels", "checkpoint_validity", "publish_gating",
-                 "profile")
+                 "native_reset_under_hold", "profile")
 
     def __init__(self, raw: Optional[Dict[str, Any]] = None) -> None:
         self.raw = dict(raw or {})
@@ -714,6 +714,15 @@ class HostCapabilities:
             problems.append("semantics.checkpoint_validity missing")
         if not self.sem.get("publish_gating"):
             problems.append("semantics.publish_gating missing")
+        # A held host must not reset underneath the driver. Without this declaration the driver
+        # cannot tell a host observation from a native takeover, and the only safe reading is the
+        # one that discards a recovery that was still possible.
+        reset_policy = str(self.sem.get("native_reset_under_hold", "")).strip().lower()
+        if not reset_policy:
+            problems.append("semantics.native_reset_under_hold missing")
+        elif reset_policy != "deferred":
+            problems.append(f"semantics.native_reset_under_hold={reset_policy} "
+                            "(a held host must defer re_slam)")
         return problems
 
     def supports(self, name: str) -> bool:
@@ -1248,6 +1257,24 @@ class NativeClosedLoop:
         # Absolute pose stamps: the reproducible anchor. See _maybe_scripted_trigger.
         self.scripted_trigger_stamps_ns: List[int] = []
         self._scripted_done_ns: List[bool] = []
+        # Just-in-time arming (see _arm_scripted_boundary). Arming every declared stamp at startup
+        # left an armed command at the head of the client's queue for the whole run; the client
+        # serialises behind the head, so the takeover's `resume` was queued at 139 s and only
+        # written at 229 s, and the host's map stayed held for 116 s (v7 drain run). Arming a few
+        # seconds before the boundary keeps the same frame-aligned apply stamp without occupying
+        # the channel for minutes.
+        self.arm_lead_ns = 3_000_000_000
+        self._armed_stamps: set = set()
+        self.armed_boundaries: List[Dict[str, Any]] = []
+        # True from the moment this driver writes a `hold` until it writes the matching `resume`.
+        # While it is set, host sleep/build signals are the host's *observation* of degeneracy, not
+        # a native reset: the declared contract (capabilities.semantics.native_reset_under_hold)
+        # says a held host defers re_slam, so the segment is not a takeover and silence is expected.
+        self._host_held = False
+        self.run_end_close: Optional[Dict[str, Any]] = None
+        # Wall-clock start of a Mode 3 wait, so the limit can be evaluated without any input
+        # arriving (see _close_stalled_wait).
+        self._wait_wall_started: Optional[float] = None
         self._first_frame_ts_ns: Optional[int] = None
         self.scripted_fired: List[Dict[str, Any]] = []
         self.candidate_source = candidate_source
@@ -1474,6 +1501,37 @@ class NativeClosedLoop:
                 self.pending_decision = "confirmation_margin"
                 self._pending_decision_wall = time.time()
 
+    def _arm_scripted_boundary(self, ts_ns: int) -> None:
+        """Arm the hold+snapshot for a declared stamp shortly before its boundary.
+
+        The commands carry an apply stamp, so the host executes them at the frame that crosses
+        ``trigger - confirmation_margin`` no matter when they were written. Writing them at startup
+        therefore changed nothing about *when* they run, but it did occupy the client's single
+        in-flight slot for the whole run: `_start_or_queue` serialises behind the head of the
+        pending queue, so the resume a takeover needs and the second event's own snapshot waited
+        behind the first event's armed pair (drain run: resume written at 229.2 s, 116 s late; the
+        host's map was held the whole time and the second checkpoint held 1750 of 440k points).
+        Arming at ``boundary - 3 s`` keeps the aligned apply and leaves the channel free.
+        """
+        if self.cp is None or not self.scripted_trigger_stamps_ns:
+            return
+        for at_ns in self.scripted_trigger_stamps_ns:
+            key = int(at_ns)
+            if key in self._armed_stamps:
+                continue
+            boundary = key - int(self.confirmation_margin_ns)
+            if int(ts_ns) < boundary - int(self.arm_lead_ns):
+                continue
+            self._armed_stamps.add(key)
+            hold = self.cp.hold(boundary)
+            snap = self.cp.snapshot_now(boundary)
+            self._host_held = True
+            self.armed_boundaries.append({
+                "trigger_ns": key, "boundary_ns": boundary,
+                "armed_at_ts_ns": int(ts_ns),
+                "lead_s": round((boundary - int(ts_ns)) / 1e9, 3),
+                "hold_wall": hold.get("wall"), "snapshot_wall": snap.get("wall")})
+
     def _maybe_scripted_trigger(self, kf_id: int, ts_ns: int, pose: np.ndarray,
                                 scan_body: np.ndarray) -> bool:
         """Open a quarantine at a pre-declared time, through the manager's own entry point.
@@ -1492,6 +1550,7 @@ class NativeClosedLoop:
         """
         if not self.scripted_triggers_s and not self.scripted_trigger_stamps_ns:
             return False
+        self._arm_scripted_boundary(ts_ns)
         if self._first_frame_ts_ns is None:
             self._first_frame_ts_ns = int(ts_ns)
             self._scripted_done = [False] * len(self.scripted_triggers_s)
@@ -1778,6 +1837,11 @@ class NativeClosedLoop:
         own recovery impossible, so our hold is released on either signal, and a quarantine that
         was open is marked as taken over by the host instead of being rolled back against a map
         that no longer exists.
+
+        That is the rule for a host the driver is *not* holding. While the driver holds the map
+        the contract is the mirror image: a held host defers its native reset, so the same signal
+        is an observation and the segment keeps its checkpoint. Releasing the hold here would make
+        the driver's own recovery impossible and is what the takeover rule exists to avoid.
         """
         now = round(time.time(), 3)
         previous = self.host_native_state
@@ -1794,20 +1858,30 @@ class NativeClosedLoop:
         self.host_native_events.append({"event": f"host_{kind}", "ts_ns": stamp_ns,
                                         "wall": now, "previous": previous,
                                         "state": self.host_native_state})
-        if kind in ("sleep", "build") and self.cp is not None:
+        if kind in ("sleep", "build") and self.cp is not None and not self._host_held:
             # Release, do not re-hold: the host is not writing anyway while isPublish is false,
             # and it must be free to write its rebuilt map when it wakes.
             try:
                 action = self.cp.resume()
                 action["trigger"] = f"host_{kind}"
+                self._host_held = False
             except Exception:
                 pass
         if kind in ("sleep", "build") and self._open is not None and not self._open.decided:
             meta = getattr(self._open, "meta", None)
             if meta is None:
                 self._open.meta = meta = {}
-            meta["host_reset_during_quarantine"] = {
-                "signal": kind, "ts_ns": stamp_ns, "wall": now}
+            if self._host_held:
+                # The driver owns the map right now. The declared contract says a held host
+                # defers its native reset (capabilities.semantics.native_reset_under_hold), so
+                # this signal is the host's observation of degeneracy, not a reset: the map and
+                # the checkpoint are still the ones this segment was armed with. Treating it as
+                # a takeover would discard a recovery that is still possible.
+                meta["host_signal_while_held"] = {
+                    "signal": kind, "ts_ns": stamp_ns, "wall": now}
+            else:
+                meta["host_reset_during_quarantine"] = {
+                    "signal": kind, "ts_ns": stamp_ns, "wall": now}
 
     def _open_episode(self, ts_ns: int, pose: np.ndarray, segment=None) -> None:
         estimated = None
@@ -1836,12 +1910,19 @@ class NativeClosedLoop:
             # Idempotent fallback. The checkpoint and capture start are declared at the trigger
             # stamp ahead of time (see main()), because a command sent here is applied at the
             # host's next processed frame, which lags the trigger under a playback backlog.
-            if self.host_native_state in ("HIBERNATING", "REBUILDING"):
+            if self._host_held:
+                # The boundary hold was armed with its apply stamp before this frame arrived. It
+                # is already in the host's deferred queue; sending an immediate hold here would
+                # only queue behind it and move the applied boundary.
+                ep.meta = getattr(ep, "meta", {}) or {}
+                ep.meta["hold_armed_at_boundary"] = True
+            elif self.host_native_state in ("HIBERNATING", "REBUILDING"):
                 # The host is not writing its map; a hold here only blocks its rebuild.
                 ep.meta = getattr(ep, "meta", {}) or {}
                 ep.meta["hold_skipped_host_state"] = self.host_native_state
             else:
                 self.cp.hold()
+                self._host_held = True
 
     def _checkpoint_boundary(self, ep: "Episode") -> Optional[int]:
         """The latest checkpoint stamp a segment may legitimately roll back to.
@@ -2104,6 +2185,7 @@ class NativeClosedLoop:
             if self.cp is not None:
                 try:
                     self.cp.resume()
+                    self._host_held = False
                 except Exception:
                     pass
             return None
@@ -2328,6 +2410,14 @@ class NativeClosedLoop:
                     writeback = self.cp.set_state(repaired.get(last_key, ep.frames[-1][2]))
                     writeback["trigger"] = "accepted_pose"
                     ep.meta["native_writeback"] = writeback
+                # The replay has run; the driver no longer owns the map. Releasing it here, right
+                # after the replay ack, is what makes the re-entry observable: if the host's
+                # estimate is healthy it publishes the next frames itself, and if it is not, its
+                # own policy takes over from a map that was just rebuilt rather than reset.
+                resume = self.cp.resume()
+                resume["trigger"] = "repair_replayed"
+                ep.meta["native_resume"] = resume
+                self._host_held = False
             else:
                 if caps is not None and not caps.supports("restore"):
                     # A host that cannot restore keeps the frames it just judged in its map.
@@ -2367,8 +2457,46 @@ class NativeClosedLoop:
             self.cp._last_snapshot_wall = time.time()
         return row
 
+    def _close_stalled_wait(self, now_wall: float) -> None:
+        """Close a Mode 3 wait on wall time, even when no frame arrives.
+
+        The wait used to be evaluated only from an incoming frame's stamp, which is exactly the
+        input a driver-held host stops producing (isPublish=false). The segment then stays open,
+        the hold it justifies is never released, and the host never publishes again: a deadlock
+        that ended the v8 run at the 90 s hibernation cap instead of at the second event.
+        """
+        tx = self.node.tx_mgr
+        state = getattr(tx, "state", None)
+        if (state is RecoveryState.ABORTED
+                and getattr(tx, "active_quarantine", None) is None):
+            # Mode 4 leaves the manager terminal, and it is the next frame that re-arms it on the
+            # detector path. A scripted run with detection off never takes that path, so the
+            # manager stayed ABORTED for the rest of the v9 run and the second declared event
+            # could never open a segment (fired 1 of 2). Re-arm here, on the same rule.
+            self.node.detector.reset()
+            tx.rearm()
+            self._wait_wall_started = None
+            return
+        if state != RecoveryState.WAITING_FOR_EVIDENCE:
+            self._wait_wall_started = None
+            return
+        if self._wait_wall_started is None:
+            self._wait_wall_started = float(now_wall)
+            return
+        if getattr(tx, "wait_limit_ns", None) is None:
+            return
+        closed = tx.maybe_close_waiting_segment(
+            int(self._last_ts_ns or 0), elapsed_s=float(now_wall) - self._wait_wall_started)
+        if closed is not None:
+            self.node.detector.reset()
+            tx.rearm()
+            self._wait_wall_started = None
+
     def service(self, backlog_limit: int = 0) -> Optional[Dict[str, Any]]:
         """Perform a decision the callbacks have asked for. Runs on the main thread only."""
+        # The wait limit belongs to the manager, not to the host: a refused Mode 3 has to be
+        # closable even when no command channel exists.
+        self._close_stalled_wait(time.time())
         if self.cp is not None:
             # Account for commands written from the callback (the hold) before issuing anything
             # blocking, so one ack is never attributed to the wrong command.
@@ -2420,6 +2548,7 @@ class NativeClosedLoop:
             if ev.get("event") in ("rearm", "commit_closed"):
                 action = self.cp.resume()
                 action["trigger"] = ev.get("event")
+                self._host_held = False
         self._lifecycle_seen = len(events)
 
     def finish(self) -> None:
@@ -2430,6 +2559,17 @@ class NativeClosedLoop:
         if self._open is not None and not self._open.decided:
             if self.bag_end_ts_ns is not None:
                 self.decide(self.bag_end_ts_ns, "bag_end")
+        # A refused Mode 3 wait stays open until its wait limit expires. At bag end no further
+        # input can produce the evidence that closes it, so it would be reported open at exit with
+        # no event to explain why. Close it here as run-ended: the lifecycle ends where the
+        # evidence ends, and the frames stay listed as unresolved rather than silently dropped.
+        seg = getattr(self.node.tx_mgr, "active_quarantine", None)
+        if seg is not None and hasattr(self.node.tx_mgr, "abandon_segment"):
+            closed = bool(self.node.tx_mgr.abandon_segment(
+                getattr(seg, "segment_id", None), "RUN_ENDED_OPEN", int(self.bag_end_ts_ns or 0)))
+            self.run_end_close = {"segment_id": getattr(seg, "segment_id", None),
+                                  "reason": "RUN_ENDED_OPEN", "closed": closed,
+                                  "ts_ns": self.bag_end_ts_ns}
         self.pairer.flush()
 
 
@@ -2668,6 +2808,9 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
             "state": getattr(loop.node.tx_mgr.state, "value", loop.node.tx_mgr.state),
             "events": list(loop.node.tx_mgr.lifecycle_events),
             "unresolved_segments": len(loop.node.tx_mgr.unresolved_segments),
+            # A segment still open when the bag ended has no event that could close it; the
+            # close is recorded here instead of being left implicit in final_state.
+            "run_end_close": loop.run_end_close,
             # The host side of the same lifecycle: when its map was held and when it was released.
             # A re-arm the host never heard would otherwise look like a re-arm that happened.
             "native_checkpoint_actions": loop.cp_actions,
@@ -2694,6 +2837,7 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
             "declared_s": list(loop.scripted_triggers_s),
             "declared_ns": list(loop.scripted_trigger_stamps_ns),
             "fired": loop.scripted_fired,
+            "armed_boundaries": loop.armed_boundaries,
             "note": ("the segment was opened by calling trigger_quarantine directly at a declared "
                      "time; no detector output and no fault label was used, so this run says "
                      "nothing about detection performance"),
@@ -3068,7 +3212,8 @@ def pose_stream_health(pose_count: int, last_pose_wall: Optional[float],
                        hibernation_max_s: float = 0.0,
                        first_pose_grace_s: Optional[float] = None,
                        last_host_signal_wall: Optional[float] = None,
-                       recent_signal_window_s: float = 0.0) -> Dict[str, Any]:
+                       recent_signal_window_s: float = 0.0,
+                       driver_holds: bool = False) -> Dict[str, Any]:
     """Whether the host is still producing the pose stream this run depends on.
 
     A host that stops publishing (FAST-LIO does exactly that while it hibernates: isPublish is
@@ -3094,6 +3239,19 @@ def pose_stream_health(pose_count: int, last_pose_wall: Optional[float],
         return out
     silence = now_wall - last_pose_wall
     out["silence_s"] = round(silence, 3)
+    if driver_holds and silence >= limit_s:
+        # The driver is the one holding the map. While held, the host stops publishing as soon as
+        # its own covariance crosses (isPublish=false); that silence is caused by this driver's
+        # recovery, not by a dead publisher, so the ordinary stale limit would abort the very
+        # recovery that is running. The cap is the same one used for a native hibernation: if the
+        # host never comes back, the run still stops.
+        out["driver_holds"] = True
+        out["hibernation_max_s"] = float(hibernation_max_s)
+        if hibernation_max_s and silence >= hibernation_max_s:
+            out["status"] = "HOST_HIBERNATION_TIMEOUT"
+        else:
+            out["status"] = "HOST_HELD_BY_DRIVER"
+        return out
     inferred = (host_state not in ("HIBERNATING", "REBUILDING")
                 and recent_signal_window_s > 0 and last_host_signal_wall is not None
                 and (now_wall - last_host_signal_wall) <= recent_signal_window_s
@@ -3198,6 +3356,11 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--checkpoint-period-sec", type=float, default=2.0,
                     help="how often a rolling snapshot is taken while no segment is open; this "
                          "is also the worst-case age of the trusted checkpoint at a trigger")
+    ap.add_argument("--arm-lead-sec", type=float, default=3.0,
+                    help="scripted runs: write each event's hold+snapshot this many seconds "
+                         "(pose time) before its boundary instead of at startup. 0 restores the "
+                         "old startup pre-arming, which occupies the client's only in-flight slot "
+                         "for the whole run")
     ap.add_argument("--wait-limit-sec", type=float, default=0.0,
                     help="close a Mode 3 wait as unresolved after this many seconds without "
                          "evidence and re-arm (0 = wait indefinitely, which means a refused "
@@ -3276,17 +3439,26 @@ def main(argv: Optional[List[str]] = None) -> int:
             rospy.logerr("[slam_recovery] --require-contract: %s", "; ".join(contract_problems))
             return 2
     if loop.cp is not None and loop.scripted_trigger_stamps_ns:
-        # Every scripted stamp gets its own armed hold/snapshot. The first one was enough while
-        # the run had a single event; a second event otherwise falls back to a rolling checkpoint
-        # that can be applied after its trigger and roll back only part of the segment.
+        # Every scripted stamp gets its own armed hold/snapshot, but each pair is written shortly
+        # before its boundary rather than at startup (see _arm_scripted_boundary). Writing both
+        # at startup kept the client's only in-flight slot occupied for the whole run, so the
+        # resume after a takeover and the second event's own snapshot were queued behind a
+        # command that would not execute for minutes.
         if caps is not None and not caps.apply_stamp_supported():
             # Without apply-stamp the host cannot queue a command for the boundary. Sending one
             # now would execute it immediately and move the checkpoint away from the declaration.
             loop.arming_mode = "NOT_SUPPORTED_IMMEDIATE_ONLY"
             rospy.logwarn("[slam_recovery] host declares apply_stamp=NO; boundary pre-arming skipped")
         else:
-            arm_scripted_checkpoints(loop.cp, loop.scripted_trigger_stamps_ns,
-                                     loop.confirmation_margin_ns)
+            loop.arm_lead_ns = int(max(0.0, float(args.arm_lead_sec)) * 1e9)
+            loop.arming_mode = "JIT_BOUNDARY_MINUS_%gs" % float(args.arm_lead_sec)
+            if loop.arm_lead_ns <= 0:
+                # The old behaviour, kept explicit: arm every declared stamp at startup.
+                arm_scripted_checkpoints(loop.cp, loop.scripted_trigger_stamps_ns,
+                                         loop.confirmation_margin_ns)
+                for at in loop.scripted_trigger_stamps_ns:
+                    loop._armed_stamps.add(int(at))
+                loop._host_held = True
     driver = RosDriver(loop, args.pose_topic, args.scan_topic, args.status_topic,
                        sleep_topic=args.host_sleep_topic, build_topic=args.host_build_topic)
 
@@ -3303,7 +3475,8 @@ def main(argv: Optional[List[str]] = None) -> int:
                                         hibernation_max_s=args.host_hibernation_max_sec,
                                         first_pose_grace_s=args.first_pose_grace_sec,
                                         last_host_signal_wall=loop.last_host_signal_wall,
-                                        recent_signal_window_s=args.host_signal_window_sec)
+                                        recent_signal_window_s=args.host_signal_window_sec,
+                                        driver_holds=loop._host_held)
             driver.input_health = health
             if health.get("status") in ("STALE", "HOST_HIBERNATION_TIMEOUT"):
                 terminal_reason = ("INPUT_STALE" if health.get("status") == "STALE"
