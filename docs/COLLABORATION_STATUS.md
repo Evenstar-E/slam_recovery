@@ -3531,3 +3531,22 @@ D 论文/复现（D1–D2）、E 运维与被打断项（E1–E6），逐项附�
   "回滚+重启"生命周期，accepted 分支仅在 11-12 的受控设置下成立。
 - 本节与 run 产物已提交并推送 `origin/main@2c6a930`（`2004e4e..2c6a930`），推送后 `git config --local`
   中凭据计数为 0；宿主侧当前无进程在跑（`pgrep` 无匹配），未重复调参或重跑。
+
+## 233. 用户选择 option ①+②：运动先验约束多尺度重配准落地；自然事件 run A 仍拒绝
+
+用户 2026-11-14：「继续走主线 做 1 2，如果 1 2 结果都不好的话就选 3」。方法变更常数在确认 run
+之前冻结（`docs/four_host/fastlio_recovery_20261113/MOTION_PRIOR_METHOD_20261114.md`），代码与方法
+同批提交 `375e1be`（测试 285 → 291 全绿）。
+
+- **方法**：`candidate_source=motion_prior_reregistration`，逐帧、初值=incumbent、粗（500 点，门
+  1.2→0.6 m）→细（2000 点，0.5→0.25 m）、阻尼 0.7、位姿相对 incumbent 受包络
+  `min(2.0, 0.25+0.25·Δt²)` m 与 5° 约束；两层从同一 prior 量起（否则每层各花一次包络）。
+  冻结门、`IcpConfig`、宿主二进制 `aa04c5ff…`（v9）、声明戳均未改。
+- **run A**（`two_event_v9f_prior_natural`，campus_12_fl 原两事件 115.599/229.696 s，`PLAY_RATE=0.5`）：
+  两事件都触发，链路闭合（`final=HEALTHY`），门**拒绝**：2/21（wilson 0.032）与 1/19（wilson 0.012）。
+  `icp_detail`：包络全程为上限 2.0 m，逐帧修正 0.1–0.3 m，`ITERATION_LIMIT` 为主，
+  23 帧中 21/19 帧进入候选。与 §231 同因：自然事件没有可改善量。
+- **run B**（`two_event_v9g_prior_injected`，同一 bag，196.000–202.000 s 注入 body z +0.500 m，
+  INJECTION，同一新方法）已启动。写作时进程确在运行：driver PID 62106、relay 61962、宿主与播放
+  均在，`frontend.bag.active` 在增长；尚无判定，本文不写结果。
+- 旧结果全部保留；option ②（换宿主/序列）未开始。
