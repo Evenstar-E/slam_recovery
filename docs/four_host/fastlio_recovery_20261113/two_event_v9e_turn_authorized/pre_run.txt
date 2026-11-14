@@ -1,0 +1,23 @@
+run_id=two_event_v9e_turn_20261114T2005Z
+binary=aa04c5ffc7d0470ef901043f82a18406f0c06e1eaadb809477804f3b75455f32 (v9, unchanged)
+driver_main=2004e4e+ (icp candidate now starts from the incumbent, as _icp_candidate's contract says)
+bag=a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de campus_12_fl.bag
+PROVENANCE: INJECTION + event placed in a turning section, both declared below.
+window=[1711547935776363519, 1711547941776363519) = bag 52.000..58.000 s, body z +0.500 m
+E1=1711547935776363519 (52.000 s) = start of the corruption window
+E2=1711547958776363519 (75.000 s) = clean second event
+margin=4.0 s -> boundary 48.000 s; segment [52,56] inside the corruption
+candidate_source=icp_reregistration | wait_limit=2 s | play_rate=0.5 (NOT real-time)
+why this window (v9d at 196 s refused 7/40):
+  1. 196 s is AFTER the host's first native re_slam (115.8 s), so the driver's trusted map mixes
+     pre-reset and post-reset frames; the ICP reference is not one coordinate frame.
+  2. 52..58 s is the strongest turn before the first reset (yaw 12.8 deg/s, speed 0.90 m/s).
+     The incumbent baseline is constant velocity with rotation held, so a turning segment is
+     where an independent pose from the map is genuinely informative -- and where a refused
+     "do nothing" would be the wrong answer.
+  3. The 0.5 m body-z bias is also present, so the repair publisher has a declared bias to remove;
+     the fit now starts from the incumbent because a host-pose start absorbs the bias (~0.003 m
+     in run 043602Z) and can never see it.
+authorization=user 2026-11-14 (option 1): injected-bias controlled sequence for the accepted chain;
+     natural-event negative result retained (LEDGER v8/v9/v9b/v9c).
+stop: bag 95 s at 0.5x + 60 s drain; contract failure or dead relay => exit before bag

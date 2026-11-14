@@ -1,0 +1,4 @@
+[0m[ INFO] [1794654848.143553783]: Subscribing to /Isbuilding[0m
+[0m[ INFO] [1794654848.149244539]: Subscribing to /Issleeping[0m
+[0m[ INFO] [1794654848.151036190]: Subscribing to /Odometry[0m
+[0m[ INFO] [1794654848.153488484]: Recording to '/tmp/wt-sim/docs/four_host/fastlio_recovery_20261113/two_event_v9d_injected_authorized/frontend.bag'.[0m

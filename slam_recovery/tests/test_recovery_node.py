@@ -465,6 +465,9 @@ def test_icp_candidate_source_builds_poses_and_records_detail():
     assert len(loop.icp_details) == 1
     det = loop.icp_details[0]
     assert det["mode"] == "single_rigid_transform_for_the_segment"
+    # The initial pose is the independent extrapolation, not the host pose: a body-frame bias is
+    # absorbed into the host's pose, so a fit started there reports ~0 and can never recover it.
+    assert det["init_poses"] == "incumbent"
     assert det["frames_with_scan"] == det["frames_candidate"] > 0
     for key in ("icp_iterations", "icp_residual", "icp_converged", "icp_inliers"):
         assert key in det

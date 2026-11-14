@@ -1,0 +1,22 @@
+run_id=two_event_v9d_injected_20261114T1945Z
+binary=aa04c5ffc7d0470ef901043f82a18406f0c06e1eaadb809477804f3b75455f32 (v9, unchanged)
+driver_main=d9e4f34+ (per-frame candidate exists but this run uses icp_reregistration, the path that
+           produced every accepted chain on 2026-11-12)
+bag=a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de campus_12_fl.bag
+PROVENANCE: INJECTION. The scan stream is routed through slam_recovery.ros.corrupt_relay
+     (/velodyne_points -> /velodyne_points_raw on play, relay shifts body z by +0.500 m inside the
+     window and forwards every other field, header included). This is a declared controlled
+     corruption, not a natural event; the natural-event negative result stays as recorded in §231.
+window=[1711548079776363519, 1711548085776363519)  = bag 196.000..202.000 s, body z +0.500 m
+E1=1711548079776363519 (196.000 s) = start of the corruption window
+E2=1711548098776363519 (215.000 s) = clean second event (no corruption), for the tail
+margin=4.0 s -> boundary 192.000 s, armed 189.0 s; segment [196,200] is inside the corruption
+candidate_source=icp_reregistration   |  wait_limit=2 s  |  play_rate=0.5 (NOT real-time)
+why: the two natural events have no improvable error (platform ~0.01 m/s, incumbent already
+     optimal -> gate refuses correctly, runs 1-4). This run supplies an improvable, declared error
+     at a MOVING part of the sequence (median speed 1.3 m/s around 192-207 s) to exercise the
+     accepted branch end to end: accepted -> repair clouds published -> reprocess replay ->
+     re-entry -> second event -> tail.
+authorization=user 2026-11-14 (option 1): injected-bias controlled sequence for the accepted chain,
+     natural-event negative result retained.
+stop: bag 235 s at 0.5x + 90 s drain; contract failure or dead relay => exit before bag

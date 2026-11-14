@@ -3510,3 +3510,22 @@ D 论文/复现（D1–D2）、E 运维与被打断项（E1–E6），逐项附�
   两次 `restore valid=1`、等待按声明关闭、宿主 resume），不是一次修复提交。
 - 4 次授权 run 已用尽；后续若要「accepted 链」，需要一个人为可改善的事件（如注入偏置的受控序列，
   11-12 三次 accepted 全部来自该设置），或改换事件选取。这两条都需要用户决定，本文不自行开始。
+
+## 232. 注入偏置受控序列（option 1）：链路可执行，门仍拒绝；accepted 分支在本宿主+本序列仍未复现
+
+用户选择「用注入偏置的受控序列把 accepted 整链跑完，并保留自然退化负结果」。已执行两次 run
+（`two_event_v9d_injected/`、`two_event_v9e_turn/`），均使用项目自带 `corrupt_relay`：
+播放时 `/velodyne_points:=/velodyne_points_raw`，中继在声明窗口内给 body z 加 **+0.500 m**（`shifted=60` 帧）。
+
+- 两次 run 的**生命周期都完整**：hold → snapshot（101k–144k 点）→ 段 40/41 帧 → 拒绝 →
+  `restore valid=1` → wait 2 s 关闭 → rearm → `resume` → 第二事件 → 尾段；退出 `HEALTHY`。
+- **门仍拒绝**：196 s 窗口 7/40（inc 770.7 → cand 756.9）；52 s 转弯窗口 0/40（1437.6 → 1571.1）。
+- 判据是**相对增益** `(inc-cand)/inc ≥ 0.05` 且 Wilson ≥ 0.55，与 `sigma_meas` 无关——不是噪声尺度问题。
+- 同时修了一处接线：`_icp_candidate` 的契约要求初值取 incumbent（host 位姿会吸收 body 系偏置），
+  而 `decide()` 一直传 host 位姿；已改为传 `incumbent`（`icp_detail.jsonl` 中 `init_poses=incumbent` 可核）。
+  实测**未改善**：从 incumbent 起步的拟合 `ITERATION_LIMIT` 并飘离，候选比 incumbent 更差。
+- 唯一已知的 accepted 链（11-12 三次）是 **FAST-LIVO 宿主 v5 + 另一条 bag**，其候选/基线残差比 0.037；
+  本宿主+本序列最好 0.98。差距在扫描-地图几何与宿主，不在门阈值。
+- 下一步只有三条，都需要用户拍板：①换候选方法（如带运动先验/多尺度约束重配准）；②换宿主/序列
+  （FAST-LIVO 路径目前被"四宿主验收后再做 FAST-LIVO2"的顺序挡住）；③接受本宿主+本序列只能证明
+  "回滚+重启"生命周期，accepted 分支仅在 11-12 的受控设置下成立。

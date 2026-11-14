@@ -2284,7 +2284,14 @@ class NativeClosedLoop:
                 if self.candidate_source == "per_frame_reregistration":
                     repaired, icp_detail = self._per_frame_icp_candidate(ep)
                 else:
-                    repaired, icp_detail = self._icp_candidate(ep)
+                    # Pass the incumbent as the initial pose. A uniform body-frame measurement
+                    # bias is absorbed by the host's own estimator into its pose, so registering
+                    # at that pose sees the corrupted cloud already aligned and reports ~0
+                    # (run 043602Z: 0.003 m against an injected 0.5 m). The trusted map's
+                    # constant-velocity extrapolation is an independent pose: there the corrupted
+                    # cloud is displaced by the bias and the fit can recover it -- which is what
+                    # _icp_candidate's own contract says it is for. It was never wired.
+                    repaired, icp_detail = self._icp_candidate(ep, incumbent)
                 self.icp_details.append({"candidate_id": ep.candidate_id, **icp_detail})
             except BaseException as exc:
                 self.decision_errors.append({

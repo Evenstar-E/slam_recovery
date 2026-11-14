@@ -344,3 +344,26 @@ E1/E2 回到**清单原始声明** 115.599 / 229.696 s；`candidate_source=icp_r
   在该场景下这已经是最优解；任何 ICP 抖动都只会更差。**门拒绝是正确的**。
 - 结论（4 次授权 run 用尽）：在这两个声明事件上，"accepted 修复提交"不可达——不是阈值、不是候选实现，
   而是没有可改善量；恢复层的实际价值落在 run 3/4 已验证的**回滚 + 重启生命周期**上。
+
+## INJECTION（2026-11-14，A2 收尾两次 run）：注入偏置可执行，但门仍拒绝——候选压不过常速基线
+
+用户选定「用注入偏置的受控序列跑完 accepted 整链」。两次 run 都用项目自带 `corrupt_relay`
+（`/velodyne_points` 播放时重映射到 `_raw`，中继在窗口内给 body z 加 +0.500 m，其余字段与 header 原样转发）。
+
+| run | 窗口 | E1 | 段帧 | 门（改善/总） | inc → cand（gate residual） | ICP |
+|---|---|---|---|---|---|---|
+| `two_event_v9d_injected` | 196.000–202.000 s | 196.096 | 40 | **7/40** | 770.7 → 756.9 | CONVERGED，1.29 m / 1.22° |
+| `two_event_v9e_turn` | 52.000–58.000 s（转弯段 yaw 12.8°/s） | 52.200 | 41 | **0/40** | 1437.6 → 1571.1 | ITERATION_LIMIT，0.37 m / 0.55° |
+
+- 两次注入都真实生效：`relay_frames.jsonl` 记录 `shifted=60`（6 s × 10 Hz），其余帧原样转发。
+- 两次生命周期完整：hold → snapshot（101035/125429/144141 点）→ 段 40+ 帧 → 拒绝 → `restore valid=1`
+  → wait 2 s 关闭 → rearm → `resume`（`map_writes=released`）→ 第二事件 → 尾段。
+- **第二次 run 前修了一处接线**：`_icp_candidate` 的契约写明「初值取 incumbent，因为 host 位姿会把
+  body 系偏置吸收掉（run 043602Z 实测 0.003 m）」，但 `decide()` 一直传的是 host 位姿。改为传 `incumbent`
+  （`init_poses=incumbent` 已在 `icp_detail.jsonl` 中核实）。**结果没有变好**：从 incumbent 起步的拟合
+  `ITERATION_LIMIT` 并飘离，候选比 incumbent 更差（1571 vs 1437）。
+- 判据是**相对增益**（`(inc-cand)/inc ≥ 0.05`，Wilson ≥ 0.55），与 `sigma_meas` 无关；所以这不是噪声尺度问题。
+- 唯一已知的 accepted 链（11-12 三次）用的是 **FAST-LIVO 宿主 v5 + 另一条 bag**，其 candidate/incumbent
+  残差比 0.4/10.88 = 0.037；本宿主+本序列最好也只有 756.9/770.7 = 0.98。
+- 结论：注入把"可修复误差"造出来了，但本序列的扫描-地图几何撑不起一个能压过常速基线的候选；
+  两种初值（host / incumbent）都是这个结果。要继续必须换候选方法或换宿主/序列，均需用户决定。

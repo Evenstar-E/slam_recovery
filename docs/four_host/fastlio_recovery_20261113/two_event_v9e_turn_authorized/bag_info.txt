@@ -1,0 +1,12 @@
+path:         /tmp/wt-sim/docs/four_host/fastlio_recovery_20261113/two_event_v9e_turn_authorized/frontend.bag
+version:      2.0
+duration:     3:09s (189s)
+start:        Nov 14 2026 19:26:11.74 (1794655571.74)
+end:          Nov 14 2026 19:29:20.94 (1794655760.94)
+size:         367.5 KB
+messages:     947
+compression:  lz4 [1/1 chunks; 49.32%]
+uncompressed: 707.2 KB @ 3.7 KB/s
+compressed:   348.8 KB @ 1.8 KB/s (49.32%)
+types:        nav_msgs/Odometry [cd5e73d190d741a2f92e81eda573aca7]
+topics:       /Odometry   947 msgs    : nav_msgs/Odometry
