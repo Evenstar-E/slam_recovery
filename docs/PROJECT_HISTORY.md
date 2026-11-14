@@ -851,3 +851,13 @@ E2“闭合”是安全放弃未解决段：lifecycle列92个raw_frame_refs unre
 两次relay各有60条dz=+0.5m shifted帧，注入有执行证据。v9d移动段host init、CONVERGED、7/40，770.695532→756.930383略改善但未过门；v9e转弯段incumbent init、ITERATION_LIMIT、0/40且候选更差。2c6a930实际修了single-rigid未传incumbent的接线，故“不是实现问题”不能回溯排除；v9d/v9e同时换窗口与初值，不是同人口参数比较。两注入run E2为clean second event，不冒称第二独立故障；unresolved segments仍1/2/2，v9d terminal HOST_HIBERNATION_TIMEOUT，其余STALE，HEALTHY不等于全输入恢复。
 
 下一唯一主线仍是注入人口accepted候选→native update/map→接回后继与归宿。新run前S1先用已知+0.5m标签离线评价候选偏置方向/幅值、相对incumbent/注入真值误差和失败帧，缺导出写证据不足，再由用户决定一次有界oracle/native复验；不扫ICP/Wilson/增益门，不自动换模型/宿主。S2真实宿主与获授权run、S3独立评价，ALI-H缺项不阻原生链。标准库-I清单exit0，不ROS/build/算法/main历史/科学门/private，中文SSH增量。
+
+## 108. 1058932：option①未按冻结契约执行，E2 snapshot覆盖E1 checkpoint构成状态安全反例
+
+[增量审阅](review_20261114_1058932/README.md)固定20:32 main `105893283b566d1043f75d1b2977479b80836f98`。新增运动先验多尺度候选、自然/注入两run及campus_2_fl一run，accepted/repair/reprocess仍全0；开发记录称用户选option①+②，非本会话直接授权，只核归档不追加run。
+
+冻结方法明确“未收敛帧不进入候选”，但`build_motion_prior_candidate`实际接受CONVERGED和ITERATION_LIMIT：自然E1候选21中20未收敛，自然E2候选19全部未收敛，注入E1候选40全部未收敛。故2/21、1/19、9/40仅是当前实现负结果，不能宣布冻结方法确认失败；最低S1按原契约排除未收敛帧，不事后改文本/科学门，若保留未收敛候选须另方法重新冻结并用户选择。
+
+v9g action原件为E1 snapshot frame1760→E2 snapshot frame2084→E1 restore frame2084，E1实际恢复到E2 cp，晚自身边界32.500372397s，UNSUPPORTED_AT_OR_BEFORE_QSTART；第一cp本身也晚0.100298925s。valid=1不证明本事件合法状态/map。S1须给episode不可变cp身份，或单cp槽时E1判决/restore前禁止E2覆盖，无合法cp写NO_ROLLBACK；在该混淆关闭前v9g不作合法两事件链，E2全TOO_FEW也不能单独归因算法。
+
+option② campus_2_fl仅E1 4/38拒绝、ICP未收敛，E2因宿主休眠后90.16s无位姿HOST_HIBERNATION_TIMEOUT而未触发，CONTROLLED_TRIGGERS_NOT_FIRED，不称两事件结果。v9g relay真实为2350 frame/60 shifted，开发2352/61把window+summary两行计入，纠正不改注入事实。下一仍合法accepted→native update/map→接回后继与归宿，S2仅实际授权复验，自动检测/实时NOT_EXECUTED，ALI-H不阻。标准库-I清单exit0，不ROS/build/算法/main历史/科学门/private，中文SSH增量。

@@ -1,0 +1,55 @@
+{
+  "reviewed_ref": "105893283b566d1043f75d1b2977479b80836f98",
+  "scope": "read-only Git source and archived runs; no ROS, rebuild, or new experiment",
+  "accepted_native_repair": {
+    "accepted_candidates": 0,
+    "repair_clouds_published": 0,
+    "reprocesses": 0
+  },
+  "frozen_method_mismatch": {
+    "contract": "non-converged frames must not enter the candidate",
+    "source_accepts_statuses": [
+      "CONVERGED",
+      "ITERATION_LIMIT"
+    ],
+    "natural_E1": {
+      "candidate": 21,
+      "iteration_limit": 20,
+      "converged": 1
+    },
+    "natural_E2": {
+      "candidate": 19,
+      "iteration_limit": 19,
+      "converged": 0
+    },
+    "injected_E1": {
+      "candidate": 40,
+      "iteration_limit": 40,
+      "converged": 0
+    },
+    "impact": "option 1 runs do not confirm the frozen method as written"
+  },
+  "checkpoint_overwrite_counterexample": {
+    "first_snapshot_action_index": 3,
+    "second_snapshot_action_index": 5,
+    "first_restore_action_index": 6,
+    "first_snapshot_stamp_ns": 1711548075973547264,
+    "second_snapshot_stamp_ns": 1711548108373620736,
+    "first_restore_stamp_ns": 1711548108373620736,
+    "E1_restore_late_after_boundary_s": 32.500372397,
+    "impact": "E2 snapshot replaced the mutable checkpoint before E1 restore; valid=1 restored a future state, not the E1 checkpoint"
+  },
+  "injection_count_correction": {
+    "frame_records": 2350,
+    "shifted_frames": 60,
+    "development_text_claim": "received=2352 / shifted=61",
+    "actual_frame_and_summary_records": "received=2350 / shifted=60; 2352/61 counts window+summary lines rather than frames"
+  },
+  "sequence2": {
+    "declared_events": 2,
+    "fired_events": 1,
+    "E2": "NOT_REACHED",
+    "terminal_reason": "HOST_HIBERNATION_TIMEOUT"
+  },
+  "verdict": "NO_ACCEPTED_REPAIR; OPTION1_CONFIRMATION_INVALID_FOR_FROZEN_CONTRACT; CHECKPOINT_STATE_SAFETY_COUNTEREXAMPLE"
+}
