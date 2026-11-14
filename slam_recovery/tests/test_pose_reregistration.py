@@ -10,11 +10,16 @@ import numpy as np
 
 from slam_recovery.repair.pose_reregistration import (
     ICP_CONFIG,
+    MOTION_PRIOR_MAX_M,
     IcpConfig,
     VoxelGrid,
     build_icp_candidate,
+    build_motion_prior_candidate,
+    clamp_pose_to_envelope,
     estimate_normals,
+    motion_prior_envelope_m,
     reregister_frame,
+    reregister_frame_motion_prior,
     reregister_segment,
     restrict_reference,
     sample_scan,
@@ -240,3 +245,68 @@ def test_segment_registration_is_one_registration_not_one_per_frame():
 def test_segment_registration_without_frames_reports_it():
     res = reregister_segment({}, {}, _room(500))
     assert res.status == "NO_FRAMES"
+
+
+# ---------------------------------------------------------------------------------------------
+# motion-prior constrained, multi-scale re-registration
+# ---------------------------------------------------------------------------------------------
+def test_motion_prior_envelope_grows_with_elapsed_time_and_caps():
+    # The envelope is the declared prior-drift model: base uncertainty plus half an acceleration
+    # bound, capped. It must not depend on anything observed in a run.
+    assert motion_prior_envelope_m(0.0) == 0.25
+    assert abs(motion_prior_envelope_m(1.0) - 0.5) < 1e-12     # 0.25 + 0.5*0.5*1
+    assert motion_prior_envelope_m(100.0) == MOTION_PRIOR_MAX_M
+
+
+def test_envelope_clamp_holds_translation_and_attitude():
+    init = np.eye(4)
+    moved = _se3(np.eye(3), [1.5, 0.0, 0.0])
+    out, clamped = clamp_pose_to_envelope(moved, init, 0.3, 5.0)
+    assert clamped is True
+    assert abs(np.linalg.norm(out[:3, 3]) - 0.3) < 1e-9
+    turned = _se3(_rot("z", 20.0), [0.0, 0.0, 0.0])
+    out2, clamped2 = clamp_pose_to_envelope(turned, init, 0.3, 5.0)
+    assert clamped2 is True
+    residual = np.degrees(np.arccos(np.clip((np.trace(out2[:3, :3]) - 1) / 2, -1, 1)))
+    assert abs(residual - 5.0) < 1e-6
+    # inside the envelope nothing is touched
+    inside = _se3(np.eye(3), [0.05, 0.0, 0.0])
+    out3, clamped3 = clamp_pose_to_envelope(inside, init, 0.3, 5.0)
+    assert clamped3 is False and np.allclose(out3, inside)
+
+
+def test_motion_prior_registration_cannot_leave_the_envelope():
+    # The cloud sits 1 m from where the prior says it should be. The fit wants to follow it; the
+    # envelope is what stops the pose from leaving what the motion model permits, and it binds
+    # across both scales (each level must not spend the envelope again).
+    ref = _room(n=1500)
+    scan = ref + np.array([0.0, 0.0, 1.0])
+    res = reregister_frame_motion_prior(scan, ref, np.eye(4), 0.2)
+    assert res.displacement_from_init_m <= 0.2 + 1e-6
+    assert res.envelope_clamps > 0
+    assert res.envelope_m == 0.2
+
+
+def test_motion_prior_registration_recovers_a_shift_inside_the_envelope():
+    # With an envelope that permits it, the coarse-to-fine fit recovers the same 1 m shift the
+    # frozen solver recovers -- the envelope constrains, it does not cripple.
+    ref = _room(n=1500)
+    scan = ref + np.array([0.0, 0.0, 1.0])
+    res = reregister_frame_motion_prior(scan, ref, np.eye(4), 2.0)
+    assert res.status == "CONVERGED"
+    assert abs(res.displacement_from_init_m - 1.0) < 0.05
+    assert res.rotation_from_init_deg < 1.0
+
+
+def test_motion_prior_candidate_records_per_frame_envelopes_and_skips_frames_without_a_prior():
+    ref = _room(n=1200)
+    scans = {1: ref + np.array([0.0, 0.0, 0.2]),
+             2: ref + np.array([0.0, 0.0, 0.2]),
+             3: ref + np.array([0.0, 0.0, 0.2])}        # frame 3 has no prior pose
+    priors = {1: np.eye(4), 2: np.eye(4)}
+    ts = {1: 0, 2: 1_000_000_000, 3: 2_000_000_000}
+    poses, results = build_motion_prior_candidate(scans, ref, priors, ts, anchor_ts_ns=0)
+    assert sorted(poses) == [1, 2]
+    assert [k for k, _r in results] == [1, 2]
+    envelopes = {k: r.envelope_m for k, r in results}
+    assert envelopes[1] == 0.25 and abs(envelopes[2] - 0.5) < 1e-12

@@ -48,7 +48,9 @@ import numpy as np
 
 from slam_recovery.core import BackendDelta, RecoveryState, TangentFrame
 from slam_recovery.repair.pose_reregistration import (
-    ICP_CONFIG, build_icp_candidate, reregister_segment)
+    ICP_CONFIG, MOTION_PRIOR_ACCEL_MPS2, MOTION_PRIOR_BASE_M, MOTION_PRIOR_MAX_M,
+    MOTION_PRIOR_MAX_ROT_DEG, build_icp_candidate, build_motion_prior_candidate,
+    reregister_segment)
 from slam_recovery.ros.availability_log import AvailabilityRecorder
 from slam_recovery.ros.cloud_repair import (
     ReferenceGrid,
@@ -1820,6 +1822,77 @@ class NativeClosedLoop:
         }
         return poses, detail
 
+    def _motion_prior_icp_candidate(self, ep: "Episode",
+                                    incumbent_poses: Optional[Dict[int, np.ndarray]]):
+        """Per-frame coarse-to-fine ICP started at the incumbent, clamped to a prior envelope.
+
+        Two failures of the single-scale solver are addressed here. It starts at a 0.5 m
+        correspondence gate and tightens to 0.25 m after ten iterations, so a cloud displaced by
+        half a metre loses its correspondences and finishes at ITERATION_LIMIT with a
+        pseudo-correction; the coarse level holds a wide gate until the cloud is roughly in place.
+        And it is free to leave the pose the prior permits -- on this sequence it reported 3-23
+        deg corrections on a platform moving at 0.01 m/s. The envelope is a declared model of how
+        wrong the constant-velocity prior may be after dt seconds, so the fit can only move inside
+        what the motion model allows.
+
+        The initial pose is the incumbent, not the host pose: a uniform body-frame measurement
+        shift is absorbed by the host's estimator into its own pose and is invisible from there.
+        Frames whose fit fails are left out of the candidate, as in the other generators.
+        """
+        scans = {kf: self.node.scan_buffer_body[kf]
+                 for kf, _ts, _p in ep.frames if kf in self.node.scan_buffer_body}
+        ts_by_key = {kf: int(ts) for kf, ts, _p in ep.frames}
+        reference = self.node.get_trusted_map_points(max_pts=1 << 30)
+        anchor_ts = None
+        trusted = self.node.tx_mgr.trusted_poses
+        if trusted:
+            anchor_key = max(trusted.keys())
+            anchor_ts = self.node._kf_timestamps.get(anchor_key)
+        inits = {kf: np.asarray(incumbent_poses[kf], dtype=np.float64)
+                 for kf, _ts, _p in ep.frames if incumbent_poses and kf in incumbent_poses}
+        started = time.perf_counter()
+        if inits:
+            poses, results = build_motion_prior_candidate(
+                scans, reference, inits, ts_by_key, anchor_ts, ICP_CONFIG,
+                self.icp_time_budget_s)
+        else:
+            poses, results = {}, []
+        elapsed = time.perf_counter() - started
+        self.icp_seconds_total += elapsed
+        # The candidate is not one rigid transform; the repair publisher estimates its own bias.
+        self._last_icp_delta = None
+        statuses = [r.status for _k, r in results]
+        detail = {
+            "mode": "motion_prior_envelope_per_frame",
+            "init_poses": "incumbent",
+            "anchor_ts_ns": (None if anchor_ts is None else int(anchor_ts)),
+            "seconds": elapsed,
+            "frames_with_scan": len(scans),
+            "frames_candidate": len(poses),
+            "reference_points_total": int(len(reference)),
+            "envelope_policy": {
+                "base_m": MOTION_PRIOR_BASE_M,
+                "accel_mps2": MOTION_PRIOR_ACCEL_MPS2,
+                "cap_m": MOTION_PRIOR_MAX_M,
+                "max_rotation_deg": MOTION_PRIOR_MAX_ROT_DEG,
+            },
+            "status_counts": {s: statuses.count(s) for s in sorted(set(statuses))},
+            "per_frame": [{
+                "kf": int(k), "status": r.status,
+                "iterations": int(r.iterations),
+                "residual_m": (None if not np.isfinite(r.final_residual_m)
+                               else round(float(r.final_residual_m), 4)),
+                "correction_m": round(float(r.displacement_from_init_m), 4),
+                "correction_deg": round(float(r.rotation_from_init_deg), 3),
+                "envelope_m": round(float(r.envelope_m), 4),
+                "envelope_clamps": int(r.envelope_clamps),
+                "inliers": int(r.inliers),
+            } for k, r in results],
+        }
+        if not inits:
+            detail["status"] = "NO_PRIOR_POSE"
+        return poses, detail
+
     def _icp_candidate(self, ep: "Episode", incumbent_poses: Optional[Dict[int, np.ndarray]] = None):
         """One rigid correction for the whole segment, fitted against the frozen trusted map.
 
@@ -2272,7 +2345,8 @@ class NativeClosedLoop:
         self._last_incumbent = dict(incumbent)
 
         icp_detail = None
-        if self.candidate_source in ("icp_reregistration", "per_frame_reregistration"):
+        if self.candidate_source in ("icp_reregistration", "per_frame_reregistration",
+                                     "motion_prior_reregistration"):
             # A failure while building the candidate must leave a record, not a silent gap: the
             # episode is already marked decided by the time we get here, so an uncaught exception
             # would drop the decision entirely and the stream would show nothing happened.
@@ -2283,6 +2357,10 @@ class NativeClosedLoop:
                 # correspondence gate.
                 if self.candidate_source == "per_frame_reregistration":
                     repaired, icp_detail = self._per_frame_icp_candidate(ep)
+                elif self.candidate_source == "motion_prior_reregistration":
+                    # Coarse-to-fine, started at the incumbent and clamped to the declared
+                    # motion-prior envelope (COLLABORATION_STATUS §232 option ①).
+                    repaired, icp_detail = self._motion_prior_icp_candidate(ep, incumbent)
                 else:
                     # Pass the incumbent as the initial pose. A uniform body-frame measurement
                     # bias is absorbed by the host's own estimator into its pose, so registering
@@ -3367,7 +3445,8 @@ def main(argv: Optional[List[str]] = None) -> int:
                     help="the host's rebuild flag (FAST-LIO publishes Isbuilding); an empty name "
                          "disables it")
     ap.add_argument("--candidate-source", default="host_poses",
-                    choices=("host_poses", "icp_reregistration", "per_frame_reregistration"))
+                    choices=("host_poses", "icp_reregistration", "per_frame_reregistration",
+                             "motion_prior_reregistration"))
     ap.add_argument("--confirmation-margin-sec", type=float, default=2.0)
     ap.add_argument("--pair-dt-ms", type=float, default=PAIR_DT_NS / 1e6)
     ap.add_argument("--scan-cap", type=int, default=SCAN_CAP)

@@ -498,6 +498,27 @@ def test_per_frame_candidate_registers_each_frame_separately():
     assert build_summary(loop, {})["candidate_source_detail"]["icp_candidates"] == 1
 
 
+def test_motion_prior_candidate_starts_at_the_incumbent_inside_an_envelope():
+    # Option ① of §232: coarse-to-fine at the incumbent pose, clamped to the declared motion-prior
+    # envelope. The incumbent is the start -- the host pose absorbs a body-frame bias, so a fit
+    # from there cannot see it -- and every frame records the envelope it was allowed to use.
+    node = _FakeLoopNode(trigger_at=2)
+    loop = NativeClosedLoop(node, run_id="run", confirmation_margin_ns=1_000_000_000,
+                            candidate_source="motion_prior_reregistration")
+    for i in range(20):
+        loop.on_pair(i * 100_000_000, np.eye(4), _scan(200))
+        loop.service()
+    assert len(loop.records) == 1
+    assert loop.records[0]["candidate_source"] == "motion_prior_reregistration"
+    det = loop.icp_details[0]
+    assert det["mode"] == "motion_prior_envelope_per_frame"
+    assert det["init_poses"] == "incumbent"
+    assert det["envelope_policy"]["cap_m"] == 2.0
+    assert len(det["per_frame"]) == det["frames_with_scan"]
+    assert all(f["envelope_m"] >= 0.25 for f in det["per_frame"])
+    assert tuple(loop.records[0].keys()) == CANDIDATE_KEYS
+
+
 def test_no_quarantine_means_no_records_and_a_readable_summary():
     node = _FakeLoopNode(trigger_at=10 ** 9)
     loop = NativeClosedLoop(node, run_id="run")

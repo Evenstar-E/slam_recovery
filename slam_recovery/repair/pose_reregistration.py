@@ -91,6 +91,8 @@ class IcpResult:
     displacement_from_init_m: float
     rotation_from_init_deg: float
     gate_path: List[float] = field(default_factory=list)
+    envelope_m: float = 0.0
+    envelope_clamps: int = 0
 
     def as_dict(self) -> Dict[str, object]:
         return {
@@ -106,6 +108,8 @@ class IcpResult:
             "displacement_from_init_m": float(self.displacement_from_init_m),
             "rotation_from_init_deg": float(self.rotation_from_init_deg),
             "status": self.status,
+            "envelope_m": float(self.envelope_m),
+            "envelope_clamps": int(self.envelope_clamps),
         }
 
 
@@ -437,3 +441,262 @@ def _budget_exhausted(init_pose: np.ndarray, reference_world: np.ndarray,
                      correspondences=0, reference_points=len(ref), reference_total_points=total,
                      scan_points=0, status="BUDGET_EXHAUSTED",
                      displacement_from_init_m=0.0, rotation_from_init_deg=0.0)
+
+
+# ---------------------------------------------------------------------------------------------
+# motion-prior constrained, multi-scale re-registration (declared before the confirmation run)
+# ---------------------------------------------------------------------------------------------
+# COLLABORATION_STATUS §232 option ①. The prior is the incumbent pose -- the trusted map's
+# constant-velocity extrapolation. The solver may move away from it only inside an envelope sized
+# by a declared acceleration bound; the envelope models how wrong the prior may be, it is not an
+# acceptance parameter and it never touches the gate. The multi-scale schedule exists because the
+# single-scale solver starts at a 0.5 m correspondence gate and tightens to 0.25 m after ten
+# iterations: a cloud displaced by half a metre loses its correspondences at the tightening and
+# finishes at ITERATION_LIMIT with a pseudo-correction (v9d/v9e).
+MOTION_PRIOR_BASE_M = 0.25          # prior uncertainty at the anchor
+MOTION_PRIOR_ACCEL_MPS2 = 0.5       # declared acceleration envelope
+MOTION_PRIOR_MAX_M = 2.0            # cap on the envelope
+MOTION_PRIOR_MAX_ROT_DEG = 5.0      # attitude envelope, relative to the prior pose
+MULTISCALE_STEPS = (
+    {"scan_samples": 500, "gate_start_m": 1.20, "gate_end_m": 0.60, "iters": 8},
+    {"scan_samples": 2000, "gate_start_m": 0.50, "gate_end_m": 0.25, "iters": 20},
+)
+STEP_DAMPING = 0.7
+
+
+def motion_prior_envelope_m(dt_s: float,
+                            base_m: float = MOTION_PRIOR_BASE_M,
+                            accel_mps2: float = MOTION_PRIOR_ACCEL_MPS2,
+                            cap_m: float = MOTION_PRIOR_MAX_M) -> float:
+    """How far the prior may be wrong after ``dt_s``: half an acceleration bound, capped.
+
+    This is a declared model of prior drift, not a tuned limit: it grows only with elapsed time
+    since the anchor and does not depend on any observed outcome.
+    """
+    dt = max(0.0, float(dt_s))
+    return float(min(cap_m, base_m + 0.5 * accel_mps2 * dt * dt))
+
+
+def _log_so3(R: np.ndarray) -> np.ndarray:
+    c = (float(np.trace(R)) - 1.0) / 2.0
+    angle = float(np.arccos(np.clip(c, -1.0, 1.0)))
+    if angle < 1e-9:
+        return np.zeros(3, dtype=np.float64)
+    axis = np.array([R[2, 1] - R[1, 2], R[0, 2] - R[2, 0], R[1, 0] - R[0, 1]],
+                    dtype=np.float64) / (2.0 * np.sin(angle))
+    return axis * angle
+
+
+def _exp_so3(w: np.ndarray) -> np.ndarray:
+    w = np.asarray(w, dtype=np.float64)
+    theta = float(np.linalg.norm(w))
+    K = np.array([[0.0, -w[2], w[1]], [w[2], 0.0, -w[0]], [-w[1], w[0], 0.0]])
+    if theta < 1e-12:
+        return np.eye(3) + K
+    return (np.eye(3) + (np.sin(theta) / theta) * K
+            + ((1.0 - np.cos(theta)) / theta ** 2) * (K @ K))
+
+
+def clamp_pose_to_envelope(T: np.ndarray, init: np.ndarray, envelope_m: float,
+                           max_rot_deg: float) -> Tuple[np.ndarray, bool]:
+    """Project a pose onto the motion-prior envelope around ``init``.
+
+    Translation and attitude are clamped independently: both bounds come from the same prior model,
+    and a pose that violates either one is outside what the prior permits.
+    """
+    out = np.asarray(T, dtype=np.float64).copy()
+    init = np.asarray(init, dtype=np.float64)
+    clamped = False
+    d = out[:3, 3] - init[:3, 3]
+    dn = float(np.linalg.norm(d))
+    if dn > envelope_m:
+        out[:3, 3] = init[:3, 3] + (d * (envelope_m / dn) if dn > 1e-12 else 0.0)
+        clamped = True
+    w = _log_so3(out[:3, :3] @ init[:3, :3].T)
+    ang = float(np.degrees(np.linalg.norm(w)))
+    if ang > max_rot_deg:
+        out[:3, :3] = _exp_so3(w * (max_rot_deg / ang)) @ init[:3, :3]
+        clamped = True
+    return out, clamped
+
+
+def _sample_to(points: np.ndarray, cap: int) -> np.ndarray:
+    pts = np.asarray(points, dtype=np.float64)[:, :3]
+    if len(pts) <= cap:
+        return pts
+    step = int(np.ceil(len(pts) / max(1, int(cap))))
+    return pts[::step]
+
+
+def _icp_core_constrained(scan: np.ndarray, ref: np.ndarray, init: np.ndarray, total_ref: int,
+                          cfg: IcpConfig, gate_start_m: float, gate_end_m: float,
+                          switch_iter: int, max_iters: int, envelope_m: float,
+                          max_rot_deg: float,
+                          clamp_center: Optional[np.ndarray] = None) -> IcpResult:
+    """One scale of point-to-plane ICP, damped and clamped to the motion-prior envelope.
+
+    ``clamp_center`` is the pose the envelope is measured from -- the prior, not this scale's
+    starting pose. Passing the previous scale's output there would let each level spend the whole
+    envelope again and the multi-scale fit would drift outside what the prior permits.
+    """
+
+    def _fail(status: str, iterations: int = 0,
+              gate_path: Optional[List[float]] = None) -> IcpResult:
+        return IcpResult(pose=init.copy(), iterations=iterations, final_residual_m=float("nan"),
+                         converged=False, inliers=0, correspondences=0,
+                         reference_points=len(ref), reference_total_points=total_ref,
+                         scan_points=len(scan), status=status,
+                         displacement_from_init_m=0.0, rotation_from_init_deg=0.0,
+                         gate_path=gate_path or [], envelope_m=envelope_m)
+
+    if len(ref) < cfg.min_reference_points:
+        return _fail("REFERENCE_TOO_SMALL")
+    if len(scan) < 3:
+        return _fail("SCAN_TOO_SMALL")
+
+    grid = VoxelGrid(ref, cfg.cell_m)
+    normals, normal_valid = estimate_normals(ref, grid, cfg.normal_k)
+    if not np.any(normal_valid):
+        return _fail("NO_VALID_NORMALS")
+
+    T = np.asarray(init, dtype=np.float64).copy()
+    center = (T.copy() if clamp_center is None
+              else np.asarray(clamp_center, dtype=np.float64).copy())
+    gate_path: List[float] = []
+    correspondences = 0
+    inliers = 0
+    residual = float("nan")
+    converged = False
+    iterations = 0
+    clamps = 0
+    for it in range(int(max_iters)):
+        gate = gate_start_m if it < int(switch_iter) else gate_end_m
+        gate_path.append(float(gate))
+        world = scan @ T[:3, :3].T + T[:3, 3]
+        idx, d2 = grid.query(world, k=1)
+        idx = idx[:, 0]
+        d2 = d2[:, 0]
+        correspondences = int(np.sum(idx >= 0))
+        if correspondences < cfg.min_correspondences:
+            if it == 0:
+                return _fail("TOO_FEW_CORRESPONDENCES", iterations, gate_path)
+            return _fail("LOST_CORRESPONDENCES", iterations, gate_path)
+        take = (idx >= 0) & (d2 <= gate * gate)
+        take &= normal_valid[np.clip(idx, 0, len(ref) - 1)]
+        inliers = int(take.sum())
+        iterations = it + 1
+        if inliers < cfg.min_correspondences:
+            return _fail("TOO_FEW_INLIERS", iterations, gate_path)
+        p = world[take]
+        q = ref[idx[take]]
+        n = normals[idx[take]]
+        r0 = np.einsum("ij,ij->i", n, p - q)
+        J = np.hstack([np.cross(p, n), n])
+        xi, *_ = np.linalg.lstsq(J, -r0, rcond=None)
+        T = _exp_se3(xi * STEP_DAMPING) @ T
+        T, was_clamped = clamp_pose_to_envelope(T, center, envelope_m, max_rot_deg)
+        clamps += int(was_clamped)
+        residual = float(np.mean(np.abs(r0)))
+        if float(np.linalg.norm(xi)) < cfg.convergence_tol:
+            converged = True
+            break
+
+    return IcpResult(
+        pose=T, iterations=iterations, final_residual_m=residual, converged=converged,
+        inliers=inliers, correspondences=correspondences,
+        reference_points=len(ref), reference_total_points=total_ref, scan_points=len(scan),
+        status="CONVERGED" if converged else "ITERATION_LIMIT",
+        displacement_from_init_m=float(np.linalg.norm(T[:3, 3] - init[:3, 3])),
+        rotation_from_init_deg=_rotation_deg(T[:3, :3] @ init[:3, :3].T),
+        gate_path=gate_path, envelope_m=envelope_m, envelope_clamps=clamps,
+    )
+
+
+def reregister_frame_motion_prior(scan_body: np.ndarray, reference_world: np.ndarray,
+                                  prior_pose: np.ndarray, envelope_m: float,
+                                  cfg: IcpConfig = ICP_CONFIG,
+                                  max_rot_deg: float = MOTION_PRIOR_MAX_ROT_DEG) -> IcpResult:
+    """Coarse-to-fine ICP of one scan, started at the prior and clamped to its envelope."""
+    init = np.asarray(prior_pose, dtype=np.float64).copy()
+    if len(np.asarray(scan_body).shape) < 2 or np.asarray(scan_body).reshape(-1).size == 0:
+        return IcpResult(pose=init, iterations=0, final_residual_m=float("nan"), converged=False,
+                         inliers=0, correspondences=0, reference_points=0,
+                         reference_total_points=0, scan_points=0, status="SCAN_TOO_SMALL",
+                         displacement_from_init_m=0.0, rotation_from_init_deg=0.0,
+                         envelope_m=envelope_m)
+    T = init.copy()
+    total_iters = 0
+    clamps = 0
+    last: Optional[IcpResult] = None
+    for level in MULTISCALE_STEPS:
+        scan = _sample_to(scan_body, level["scan_samples"])
+        ref, total_ref = restrict_reference(reference_world, T, cfg)
+        res = _icp_core_constrained(
+            scan, ref, T, total_ref, cfg,
+            gate_start_m=level["gate_start_m"], gate_end_m=level["gate_end_m"],
+            switch_iter=max(1, level["iters"] // 2), max_iters=level["iters"],
+            envelope_m=envelope_m, max_rot_deg=max_rot_deg, clamp_center=init)
+        total_iters += res.iterations
+        clamps += res.envelope_clamps
+        last = res
+        if res.status not in ("CONVERGED", "ITERATION_LIMIT"):
+            return IcpResult(
+                pose=res.pose, iterations=total_iters, final_residual_m=res.final_residual_m,
+                converged=False, inliers=res.inliers, correspondences=res.correspondences,
+                reference_points=res.reference_points,
+                reference_total_points=res.reference_total_points,
+                scan_points=res.scan_points, status=res.status,
+                displacement_from_init_m=float(np.linalg.norm(res.pose[:3, 3] - init[:3, 3])),
+                rotation_from_init_deg=_rotation_deg(res.pose[:3, :3] @ init[:3, :3].T),
+                gate_path=res.gate_path, envelope_m=envelope_m, envelope_clamps=clamps)
+        T = res.pose
+    return IcpResult(
+        pose=T, iterations=total_iters,
+        final_residual_m=(last.final_residual_m if last else float("nan")),
+        converged=bool(last.converged if last else False),
+        inliers=(last.inliers if last else 0),
+        correspondences=(last.correspondences if last else 0),
+        reference_points=(last.reference_points if last else 0),
+        reference_total_points=(last.reference_total_points if last else 0),
+        scan_points=(last.scan_points if last else 0),
+        status=("CONVERGED" if last and last.converged else "ITERATION_LIMIT"),
+        displacement_from_init_m=float(np.linalg.norm(T[:3, 3] - init[:3, 3])),
+        rotation_from_init_deg=_rotation_deg(T[:3, :3] @ init[:3, :3].T),
+        gate_path=(last.gate_path if last else []),
+        envelope_m=envelope_m, envelope_clamps=clamps,
+    )
+
+
+def build_motion_prior_candidate(
+    scan_bodies: Dict[int, np.ndarray],
+    reference_world: np.ndarray,
+    prior_poses: Dict[int, np.ndarray],
+    frame_ts_ns: Dict[int, int],
+    anchor_ts_ns: Optional[int],
+    cfg: IcpConfig = ICP_CONFIG,
+    time_budget_s: float = 0.0,
+    max_rot_deg: float = MOTION_PRIOR_MAX_ROT_DEG,
+) -> Tuple[Dict[int, np.ndarray], List[Tuple[int, IcpResult]]]:
+    """Register every quarantined frame at its own incumbent pose inside its own envelope.
+
+    Same candidate contract as the other generators: a frame whose fit fails keeps no candidate
+    pose, because a candidate is a claim that the pose improved.
+    """
+    poses: Dict[int, np.ndarray] = {}
+    results: List[Tuple[int, IcpResult]] = []
+    started = time.perf_counter()
+    for kf_id in sorted(scan_bodies):
+        if kf_id not in prior_poses:
+            continue
+        if time_budget_s and (time.perf_counter() - started) > time_budget_s:
+            results.append((kf_id, _budget_exhausted(prior_poses[kf_id], reference_world, cfg)))
+            continue
+        ts = frame_ts_ns.get(kf_id)
+        dt = 0.0 if (ts is None or anchor_ts_ns is None) else (int(ts) - int(anchor_ts_ns)) * 1e-9
+        envelope = motion_prior_envelope_m(dt)
+        res = reregister_frame_motion_prior(scan_bodies[kf_id], reference_world,
+                                            prior_poses[kf_id], envelope, cfg, max_rot_deg)
+        results.append((kf_id, res))
+        if res.status in ("CONVERGED", "ITERATION_LIMIT"):
+            poses[kf_id] = res.pose
+    return poses, results
