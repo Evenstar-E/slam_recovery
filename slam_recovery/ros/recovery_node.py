@@ -47,7 +47,8 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 
 from slam_recovery.core import BackendDelta, RecoveryState, TangentFrame
-from slam_recovery.repair.pose_reregistration import ICP_CONFIG, reregister_segment
+from slam_recovery.repair.pose_reregistration import (
+    ICP_CONFIG, build_icp_candidate, reregister_segment)
 from slam_recovery.ros.availability_log import AvailabilityRecorder
 from slam_recovery.ros.cloud_repair import (
     ReferenceGrid,
@@ -1771,6 +1772,54 @@ class NativeClosedLoop:
                                                <= out["nis_reversed_T_bw"]) else "REVERSED_SELECTED"
         return out
 
+    def _per_frame_icp_candidate(self, ep: "Episode"):
+        """Re-register each quarantined frame against the frozen trusted map, one fit per frame.
+
+        A single rigid transform cannot represent a pose that drifts inside the window. On this
+        sequence it accepted a 26.6 deg / 25.1 m correction that never converged (v9 run 3), and
+        the same declared stamp gave 9/13 improved frames in one run and 3/12 in the next. A
+        per-frame fit estimates each frame's correction at that frame's own host pose, so the
+        candidate is one pose per frame instead of one transform smeared over the window. The
+        measured cost is ~0.2 s per frame at 12-13 frames; the time budget, when set, stops the
+        loop and the frames it did not reach are absent from the candidate.
+
+        The initial pose is the frame's own host pose, never the incumbent: initialising at the
+        incumbent would have the gate compare the incumbent against its own local refinement and
+        call that an improvement. Frames whose fit fails are left out of the candidate (the gate
+        reports them as deferred), not filled in with their host pose.
+        """
+        scans = {kf: self.node.scan_buffer_body[kf]
+                 for kf, _ts, _p in ep.frames if kf in self.node.scan_buffer_body}
+        inits = {kf: np.asarray(pose, dtype=np.float64) for kf, _ts, pose in ep.frames}
+        reference = self.node.get_trusted_map_points(max_pts=1 << 30)
+        started = time.perf_counter()
+        poses, results = build_icp_candidate(scans, reference, inits, ICP_CONFIG,
+                                             self.icp_time_budget_s)
+        elapsed = time.perf_counter() - started
+        self.icp_seconds_total += elapsed
+        # No single correction exists in this mode; the repair publisher estimates its own bias.
+        self._last_icp_delta = None
+        statuses = [r.status for _k, r in results]
+        detail = {
+            "mode": "per_frame_registration",
+            "init_poses": "host_poses",
+            "seconds": elapsed,
+            "frames_with_scan": len(scans),
+            "frames_candidate": len(poses),
+            "reference_points_total": int(len(reference)),
+            "status_counts": {s: statuses.count(s) for s in sorted(set(statuses))},
+            "per_frame": [{
+                "kf": int(k), "status": r.status,
+                "iterations": int(r.iterations),
+                "residual_m": (None if not np.isfinite(r.final_residual_m)
+                               else round(float(r.final_residual_m), 4)),
+                "correction_m": round(float(r.displacement_from_init_m), 4),
+                "correction_deg": round(float(r.rotation_from_init_deg), 3),
+                "inliers": int(r.inliers),
+            } for k, r in results],
+        }
+        return poses, detail
+
     def _icp_candidate(self, ep: "Episode", incumbent_poses: Optional[Dict[int, np.ndarray]] = None):
         """One rigid correction for the whole segment, fitted against the frozen trusted map.
 
@@ -2223,7 +2272,7 @@ class NativeClosedLoop:
         self._last_incumbent = dict(incumbent)
 
         icp_detail = None
-        if self.candidate_source == "icp_reregistration":
+        if self.candidate_source in ("icp_reregistration", "per_frame_reregistration"):
             # A failure while building the candidate must leave a record, not a silent gap: the
             # episode is already marked decided by the time we get here, so an uncaught exception
             # would drop the decision entirely and the stream would show nothing happened.
@@ -2232,7 +2281,10 @@ class NativeClosedLoop:
                 # accepted. The measurement bias is estimated separately, at the incumbent pose,
                 # because a single rigid fit at an 0.8 m-off init does not converge inside the
                 # correspondence gate.
-                repaired, icp_detail = self._icp_candidate(ep)
+                if self.candidate_source == "per_frame_reregistration":
+                    repaired, icp_detail = self._per_frame_icp_candidate(ep)
+                else:
+                    repaired, icp_detail = self._icp_candidate(ep)
                 self.icp_details.append({"candidate_id": ep.candidate_id, **icp_detail})
             except BaseException as exc:
                 self.decision_errors.append({
@@ -3308,7 +3360,7 @@ def main(argv: Optional[List[str]] = None) -> int:
                     help="the host's rebuild flag (FAST-LIO publishes Isbuilding); an empty name "
                          "disables it")
     ap.add_argument("--candidate-source", default="host_poses",
-                    choices=("host_poses", "icp_reregistration"))
+                    choices=("host_poses", "icp_reregistration", "per_frame_reregistration"))
     ap.add_argument("--confirmation-margin-sec", type=float, default=2.0)
     ap.add_argument("--pair-dt-ms", type=float, default=PAIR_DT_NS / 1e6)
     ap.add_argument("--scan-cap", type=int, default=SCAN_CAP)

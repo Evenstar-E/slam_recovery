@@ -473,6 +473,28 @@ def test_icp_candidate_source_builds_poses_and_records_detail():
     assert build_summary(loop, {})["candidate_source_detail"]["icp_candidates"] == 1
 
 
+def test_per_frame_candidate_registers_each_frame_separately():
+    # A single rigid transform cannot follow a pose that drifts inside the window (v9 run 3:
+    # 26.6 deg / 25.1 m, never converged). The per-frame source fits every frame at its own host
+    # pose, and a frame whose fit fails is deferred rather than filled with its host pose.
+    node = _FakeLoopNode(trigger_at=2)
+    loop = NativeClosedLoop(node, run_id="run", confirmation_margin_ns=1_000_000_000,
+                            candidate_source="per_frame_reregistration")
+    for i in range(20):
+        loop.on_pair(i * 100_000_000, np.eye(4), _scan(200))
+        loop.service()
+    assert len(loop.records) == 1
+    assert loop.records[0]["candidate_source"] == "per_frame_reregistration"
+    det = loop.icp_details[0]
+    assert det["mode"] == "per_frame_registration"
+    assert det["init_poses"] == "host_poses"
+    assert det["frames_with_scan"] == det["frames_candidate"]
+    assert len(det["per_frame"]) == det["frames_with_scan"]
+    assert sum(det["status_counts"].values()) == len(det["per_frame"])
+    assert tuple(loop.records[0].keys()) == CANDIDATE_KEYS
+    assert build_summary(loop, {})["candidate_source_detail"]["icp_candidates"] == 1
+
+
 def test_no_quarantine_means_no_records_and_a_readable_summary():
     node = _FakeLoopNode(trigger_at=10 ** 9)
     loop = NativeClosedLoop(node, run_id="run")

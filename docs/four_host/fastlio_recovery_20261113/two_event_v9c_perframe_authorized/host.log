@@ -1,0 +1,748 @@
+Multi thread started 
+p_pre->lidar_type 2
+[0m[ INFO] [1794653915.691090193]: [NATIVE_RECOVERY] channel on /tmp/wt-sim/docs/four_host/fastlio_recovery_20261113/two_event_v9c_perframe_authorized/ctl[0m
+[0m[ INFO] [1794653927.622918191]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Over-degeneracy has happened, publish hibernating map operation!!!!!!!!!!!!!
+Degeneracy during external hold: native re_slam deferred (1)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (2)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (3)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (4)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (5)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (6)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (7)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (8)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (9)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (10)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (11)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (12)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (13)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (14)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (15)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (16)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (17)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (18)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (19)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (20)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (21)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (22)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (23)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (24)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (25)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (26)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (27)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (28)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (29)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (30)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (31)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (32)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (33)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (34)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (35)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (36)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (37)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (38)
+Degeneracy has happened 1 times
+Over-degeneracy has disappear, construct a new map.....................
+Degeneracy has happened 2 times
+Over-degeneracy has happened, publish hibernating map operation!!!!!!!!!!!!!
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654177.011952228]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654177.610719535]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654178.211565168]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654178.810561333]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654179.414690025]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654180.010487258]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654180.610627088]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654181.215158865]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654181.815446040]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654182.411450483]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654183.014759388]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654183.610922971]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654184.210859693]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654184.810922614]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654185.411021671]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654186.011234669]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654186.610872193]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654187.213497810]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654187.811245987]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654188.411202412]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654189.010998493]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654189.611096643]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654190.211212138]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654190.811278195]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654191.411031829]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654192.011368028]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654192.611340881]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654193.211285322]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654193.811306871]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654194.412505708]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654195.011350812]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654195.612180212]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654196.215136845]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654196.811405800]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654197.411405175]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654198.012084611]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654198.614319592]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654199.211561949]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654199.811519219]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654200.411858563]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654201.013422805]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654201.617273649]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654202.217277560]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654202.812061455]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654203.415554113]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654204.013497137]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654204.611686503]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654205.211781178]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654205.811825982]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654206.411683810]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654207.012835104]: IMU Initial Done[0m
+Over-degeneracy has disappear, construct a new map.....................
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Over-degeneracy has happened, publish hibernating map operation!!!!!!!!!!!!!
+Degeneracy during external hold: native re_slam deferred (39)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (40)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (41)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (42)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (43)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (44)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (45)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (46)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (47)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (48)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (49)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (50)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (51)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (52)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (53)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (54)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (55)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (56)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (57)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (58)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (59)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (60)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (61)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (62)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (63)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (64)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (65)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (66)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (67)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (68)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (69)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (70)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (71)
+Degeneracy has happened 1 times
+Over-degeneracy has disappear, construct a new map.....................
+Degeneracy has happened 2 times
+Over-degeneracy has happened, publish hibernating map operation!!!!!!!!!!!!!
+Degeneracy during external hold: native re_slam deferred (72)
+Over-degeneracy has disappear, construct a new map.....................
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Over-degeneracy has happened, publish hibernating map operation!!!!!!!!!!!!!
+Degeneracy during external hold: native re_slam deferred (73)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (74)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (75)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (76)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (77)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (78)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (79)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (80)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (81)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (82)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (83)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (84)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (85)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (86)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (87)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (88)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (89)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (90)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (91)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (92)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (93)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (94)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (95)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (96)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (97)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (98)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (99)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (100)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (101)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (102)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (103)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (104)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (105)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (106)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (107)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (108)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (109)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (110)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (111)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (112)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (113)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (114)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (115)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Degeneracy during external hold: native re_slam deferred (116)
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654421.207075651]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654421.807077080]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654422.407169268]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654423.006715432]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654423.608587789]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654424.206289382]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654424.807769772]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654425.407287219]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654426.006556547]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654426.606522162]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654427.206047104]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654427.806657474]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654428.411180280]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654429.005729564]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654429.609242579]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654430.206910713]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654430.805556273]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654431.406333958]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654432.006989567]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654432.606447038]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654433.805815871]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654434.405216759]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654435.005042520]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654435.605624892]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654436.206415391]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654436.806081707]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654437.405472458]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654438.407880069]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654439.006234607]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654439.605518566]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654440.204982672]: IMU Initial Done[0m
+Degeneracy has happened 1 times
+Degeneracy has happened 2 times
+Try dynamic initialization!!!!!
+[0m[ INFO] [1794654440.805385339]: IMU Initial Done[0m
+Over-degeneracy has disappear, construct a new map.....................
+[33m[ WARN] [1794654540.131910795]: catch sig 2[0m
+Rebuild thread terminated normally
+... logging to /home/R26534/.ros/log/4edabfa6-e01a-11f1-bcfd-0242ac110013/roslaunch-DEV-99bef9-38892.log
+Checking log directory for disk usage. This may take a while.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+]2;/home/R26534/fastlio2_ws/src/FAST-LIO/launch/mapping_velodyne_m2dgr.launch
+[1mstarted roslaunch server http://127.0.0.1:45033/[0m
+
+SUMMARY
+========
+
+PARAMETERS
+ * /common/imu_topic: /imu_raw
+ * /common/lid_topic: /velodyne_points
+ * /common/time_sync_en: False
+ * /cube_side_length: 1000.0
+ * /dense_publish_enable: True
+ * /feature_extract_enable: False
+ * /filter_size_map: 0.5
+ * /filter_size_surf: 0.5
+ * /mapping/acc_cov: 0.1
+ * /mapping/b_acc_cov: 0.0001
+ * /mapping/b_gyr_cov: 0.0001
+ * /mapping/det_range: 100.0
+ * /mapping/extrinsic_R: [1, -0.011619, -0...
+ * /mapping/extrinsic_T: [0, 0, 0]
+ * /mapping/fov_degree: 180
+ * /mapping/gyr_cov: 0.1
+ * /max_iteration: 3
+ * /pcd_save_enable: False
+ * /point_filter_num: 4
+ * /preprocess/blind: 4
+ * /preprocess/lidar_type: 2
+ * /preprocess/scan_line: 64
+ * /publish/dense_publish_en: ture
+ * /publish/scan_bodyframe_pub_en: True
+ * /publish/scan_publish_en: True
+ * /rosdistro: noetic
+ * /rosversion: 1.17.0
+ * /runtime_pos_log_enable: False
+ * /scan_publish_enable: True
+
+NODES
+  /
+    laserMapping (fast_lio/fastlio_mapping)
+
+[1mROS_MASTER_URI=http://127.0.0.1:56289[0m
+]2;/home/R26534/fastlio2_ws/src/FAST-LIO/launch/mapping_velodyne_m2dgr.launch http://127.0.0.1:56289
+[1mprocess[laserMapping-1]: started with pid [39560][0m
+[laserMapping-1] killing on exit
+shutting down processing monitor...
+... shutting down processing monitor complete
+[1mdone[0m

@@ -1,0 +1,15 @@
+run_id=two_event_v9c_perframe_20261114T1915Z
+binary=aa04c5ffc7d0470ef901043f82a18406f0c06e1eaadb809477804f3b75455f32 (v9, unchanged)
+driver_main=d9e4f34+ (adds candidate_source=per_frame_reregistration)
+bag=a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de campus_12_fl.bag
+E1=1711547999352267771 declared 115.599 s;  E2=1711548113452267771 declared 229.696 s
+candidate_source=per_frame_reregistration   <-- the only change vs run 3
+play_rate=0.5  NOT REAL-TIME
+arm_lead=3s
+why: run 3 refused both events because the candidate was ONE rigid transform over the segment
+     (E1: 26.6 deg / 25.1 m, ITERATION_LIMIT; E2: 2.9 deg / 3.5 m), and the same stamp gave
+     9/13 in run 2 and 3/12 in run 3. The user chose per-frame (or motion-prior) re-registration
+     on 2026-11-14. Per-frame fits each frame at its own host pose; unfit frames are deferred.
+     No gate threshold, no ICP constant and no declaration changed.
+authorization=user 2026-11-14: A1+A2, four new bounded runs (this is run 4 of 4)
+stop: bag 260 s at 0.5x + 90 s drain; contract failure => exit before bag
