@@ -1,0 +1,4 @@
+[0m[ INFO] [1794658753.645686716]: Subscribing to /Isbuilding[0m
+[0m[ INFO] [1794658753.649852577]: Subscribing to /Issleeping[0m
+[0m[ INFO] [1794658753.652645242]: Subscribing to /Odometry[0m
+[0m[ INFO] [1794658753.656622184]: Recording to '/tmp/two_event_v9h_seq2_turn/frontend.bag'.[0m

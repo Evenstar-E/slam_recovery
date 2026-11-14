@@ -383,3 +383,14 @@ E1/E2 回到**清单原始声明** 115.599 / 229.696 s；`candidate_source=icp_r
   逐帧配准无候选；该段门记 `no_repaired_poses`。
 - 两次 `checkpoint_check=LATE_AFTER_BOUNDARY`（实际帧 2084，两次 hold/snapshot 交错），如实记录，未解释。
 - 结论：option ① 不好。按用户指示转 option ②（换序列），不重跑这两次。
+
+## OPTION-② run 1（2026-11-14，campus_2_fl 转弯窗）：E1 拒绝，宿主自入睡导致 E2 未触发
+
+`two_event_v9h_seq2_turn`；bag `campus_2_fl.bag`（start 1711524029.51），E1=52 s、E2=342 s，
+`candidate_source=icp_reregistration`（11-12 accepted 的路径），无注入，`PLAY_RATE=0.5`。
+
+- E1（51.694 s，kf 517）：hold→snapshot（93217 点，frame 478）→ 41 帧 → **拒绝 4/38**（wilson 0.048，
+  inc 1735.8 → cand 1704.1）→ restore → wait 2 s 关闭 → rearm → resume。ICP `ITERATION_LIMIT`，0.45 m/1.56°。
+- E2 未触发：宿主在相对 157.7 s 自入睡并保持 `HIBERNATING`，90.16 s 无位姿 → `HOST_HIBERNATION_TIMEOUT`，
+  `run_mode=CONTROLLED_TRIGGERS_NOT_FIRED`，退出 `HEALTHY`。
+- 读数：从 incumbent 起步的整段刚体 ICP 只是局部精修，残差变化 1.8%，与 v9e 同型。

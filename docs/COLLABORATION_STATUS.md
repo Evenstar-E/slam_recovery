@@ -3561,3 +3561,11 @@ D 论文/复现（D1–D2）、E 运维与被打断项（E1–E6），逐项附�
   （start 1711524029.51），按 IMU |gyro z| 选两个转弯窗（50 s 与 340–345 s 附近，5 s 窗均值 0.29/0.28 rad/s），
   声明 E1=52 s、E2=342 s；`candidate_source=icp_reregistration`（11-12 accepted 走的就是这条路径），
   无注入，`PLAY_RATE=0.5`。run 已启动（`/tmp/two_event_v9h_seq2_turn`），结果未出，本文不写。
+- **option ② run 1（`two_event_v9h_seq2_turn`，campus_2_fl，E1=52 s / E2=342 s，`candidate_source=icp_reregistration`）**：
+  E1 触发（51.694 s，kf 517），hold→snapshot（93217 点，frame 478，`LATE_AFTER_BOUNDARY` 0.6 ms）→
+  段 41 帧 → 拒绝（**4/38**，wilson 0.048，inc 1735.8 → cand 1704.1，ICP `ITERATION_LIMIT` 0.45 m/1.56°）→
+  restore → wait 2 s 关闭 → rearm → resume。E2 **未触发**：宿主在相对 157.7 s 自入睡
+  （`host_sleep`，`HIBERNATING`），此后 90.16 s 无位姿，`HOST_HIBERNATION_TIMEOUT` 终止，
+  `run_mode=CONTROLLED_TRIGGERS_NOT_FIRED`，退出 `HEALTHY`。
+  观察到的事实：`icp_reregistration` 从 incumbent 起步只是局部精修，残差只动 1.8%；
+  该序列在 158 s 有一个真实休眠事件，但 E2 在它之后，未到达。

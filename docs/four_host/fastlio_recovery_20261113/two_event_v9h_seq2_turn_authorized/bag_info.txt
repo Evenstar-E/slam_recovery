@@ -1,0 +1,15 @@
+path:         /tmp/two_event_v9h_seq2_turn/frontend.bag
+version:      2.0
+duration:     11:59s (719s)
+start:        Nov 14 2026 20:19:14.68 (1794658754.68)
+end:          Nov 14 2026 20:31:13.83 (1794659473.83)
+size:         1.2 MB
+messages:     3133
+compression:  lz4 [4/4 chunks; 49.31%]
+uncompressed: 2.3 MB @ 3.2 KB/s
+compressed:   1.1 MB @ 1.6 KB/s (49.31%)
+types:        nav_msgs/Odometry [cd5e73d190d741a2f92e81eda573aca7]
+              std_msgs/Bool     [8b94c1b53db61fb6aed406028ad6332a]
+topics:       /Isbuilding      1 msg     : std_msgs/Bool    
+              /Issleeping      1 msg     : std_msgs/Bool    
+              /Odometry     3131 msgs    : nav_msgs/Odometry
