@@ -1,0 +1,15 @@
+path:         /tmp/two_event_v9g_prior_injected/frontend.bag
+version:      2.0
+duration:     7:48s (468s)
+start:        Nov 14 2026 20:09:12.53 (1794658152.53)
+end:          Nov 14 2026 20:17:01.32 (1794658621.32)
+size:         798.2 KB
+messages:     2091
+compression:  lz4 [3/3 chunks; 49.18%]
+uncompressed:   1.5 MB @ 3.3 KB/s
+compressed:   765.0 KB @ 1.6 KB/s (49.18%)
+types:        nav_msgs/Odometry [cd5e73d190d741a2f92e81eda573aca7]
+              std_msgs/Bool     [8b94c1b53db61fb6aed406028ad6332a]
+topics:       /Isbuilding      1 msg     : std_msgs/Bool    
+              /Issleeping      2 msgs    : std_msgs/Bool    
+              /Odometry     2088 msgs    : nav_msgs/Odometry

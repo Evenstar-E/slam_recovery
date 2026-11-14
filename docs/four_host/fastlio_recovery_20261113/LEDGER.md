@@ -367,3 +367,19 @@ E1/E2 回到**清单原始声明** 115.599 / 229.696 s；`candidate_source=icp_r
   残差比 0.4/10.88 = 0.037；本宿主+本序列最好也只有 756.9/770.7 = 0.98。
 - 结论：注入把"可修复误差"造出来了，但本序列的扫描-地图几何撑不起一个能压过常速基线的候选；
   两种初值（host / incumbent）都是这个结果。要继续必须换候选方法或换宿主/序列，均需用户决定。
+
+## OPTION-① 确认（2026-11-14）：运动先验多尺度重配准，自然事件与注入窗口都被拒绝
+
+方法常数在任何 run 之前冻结于 `MOTION_PRIOR_METHOD_20261114.md`，代码同批 `375e1be`（测试 291 全绿）。
+
+| run | 序列/事件 | 候选源 | E1 | E2 | 判定 |
+|---|---|---|---|---|---|
+| `two_event_v9f_prior_natural` | campus_12_fl 115.599 / 229.696 s | `motion_prior_reregistration` | 2/21，wilson 0.032 | 1/19，wilson 0.012 | 两拒绝，`final=HEALTHY` |
+| `two_event_v9g_prior_injected` | 同 bag，196–202 s 注入 body z +0.5 m（INJECTION） | 同上 | 9/40，wilson 0.136 | 0/41（全部 `TOO_FEW_CORRESPONDENCES`） | 两拒绝 |
+
+- run A 的逐帧修正 0.1–0.3 m、`ITERATION_LIMIT` 为主，包络全程取 2.0 m 上限——自然事件无改善量（同 §231）。
+- run B 注入真实生效（`relay_frames` 2352 帧、61 帧位移）；E1 能看见偏置但改善 9/40 仍低于 5% 相对增益门；
+  E2 的 41 帧在 incumbent 上首轮就找不到对应点，说明常速先验已飘出地图参考半径（>30 m），
+  逐帧配准无候选；该段门记 `no_repaired_poses`。
+- 两次 `checkpoint_check=LATE_AFTER_BOUNDARY`（实际帧 2084，两次 hold/snapshot 交错），如实记录，未解释。
+- 结论：option ① 不好。按用户指示转 option ②（换序列），不重跑这两次。

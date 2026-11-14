@@ -1,0 +1,2 @@
+[INFO] [1794657547.293458]: [slam_recovery] listening on /Odometry and /velodyne_points (repair publisher: on)
+[INFO] [1794658097.715520]: [slam_recovery] wrote 2 candidate rows to /tmp/two_event_v9f_prior_natural

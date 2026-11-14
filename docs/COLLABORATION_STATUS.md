@@ -3550,3 +3550,14 @@ D 论文/复现（D1–D2）、E 运维与被打断项（E1–E6），逐项附�
   INJECTION，同一新方法）已启动。写作时进程确在运行：driver PID 62106、relay 61962、宿主与播放
   均在，`frontend.bag.active` 在增长；尚无判定，本文不写结果。
 - 旧结果全部保留；option ②（换宿主/序列）未开始。
+- **run B 结果（已结束）**：`two_event_v9g_prior_injected`，注入窗口 196.000–202.000 s、body z +0.500 m
+  （relay `received=2352 / shifted=61`，INJECTION），同一新方法。E1（196.096 s，kf 1725）40 帧、
+  改善 **9/40**、wilson 0.136 → 拒绝；E2（225.697 s，kf 2021）41 帧，候选**全部**
+  `TOO_FEW_CORRESPONDENCES`（首轮对应点不足，prior 已飘出地图 30 m 参考半径）→ `no_repaired_poses`。
+  ICP 用时 47.0 s / 10.1 s。两次 `checkpoint_check` 都记为 `LATE_AFTER_BOUNDARY`（实际帧均 2084，
+  与两次 hold/snapshot 交错一致），退出 `HEALTHY`。**option ① 判定：不好**——注入偏置在运动窗口内
+  可以看见（E1 有 9/40 改善）但仍压不过基线；E2 暴露了更大的问题：常速先验在长隔离段会飘出配准可达范围。
+- **option ② 已开始**：换序列（FAST-LIVO 路径仍被四宿主顺序挡住）。选 `campus_2_fl.bag`
+  （start 1711524029.51），按 IMU |gyro z| 选两个转弯窗（50 s 与 340–345 s 附近，5 s 窗均值 0.29/0.28 rad/s），
+  声明 E1=52 s、E2=342 s；`candidate_source=icp_reregistration`（11-12 accepted 走的就是这条路径），
+  无注入，`PLAY_RATE=0.5`。run 已启动（`/tmp/two_event_v9h_seq2_turn`），结果未出，本文不写。
