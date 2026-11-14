@@ -861,3 +861,11 @@ E2“闭合”是安全放弃未解决段：lifecycle列92个raw_frame_refs unre
 v9g action原件为E1 snapshot frame1760→E2 snapshot frame2084→E1 restore frame2084，E1实际恢复到E2 cp，晚自身边界32.500372397s，UNSUPPORTED_AT_OR_BEFORE_QSTART；第一cp本身也晚0.100298925s。valid=1不证明本事件合法状态/map。S1须给episode不可变cp身份，或单cp槽时E1判决/restore前禁止E2覆盖，无合法cp写NO_ROLLBACK；在该混淆关闭前v9g不作合法两事件链，E2全TOO_FEW也不能单独归因算法。
 
 option② campus_2_fl仅E1 4/38拒绝、ICP未收敛，E2因宿主休眠后90.16s无位姿HOST_HIBERNATION_TIMEOUT而未触发，CONTROLLED_TRIGGERS_NOT_FIRED，不称两事件结果。v9g relay真实为2350 frame/60 shifted，开发2352/61把window+summary两行计入，纠正不改注入事实。下一仍合法accepted→native update/map→接回后继与归宿，S2仅实际授权复验，自动检测/实时NOT_EXECUTED，ALI-H不阻。标准库-I清单exit0，不ROS/build/算法/main历史/科学门/private，中文SSH增量。
+
+## 109. 19:24–21:24两小时：paired-benefit首次显著通过，accepted仍未达；重入并非唯一门断点
+
+[两小时与最新增量审阅](review_20261114_07e47af/README.md)以main2004e4e→07e47af8286a2801f967a5bdbb5e9e6764ae881a为准，判定**部分推进**。窗口有注入偏置、运动先验方法、新序列真实run；最新campus_1_2_fl host_poses的E1 36/41、Wilson0.769922，E2 41/41、0.938086，是首次显著paired-benefit证据。但所有候选未accepted、repair/reprocess=0，宿主位姿胜过常速incumbent不等于测量修复或地图净收益，自动检测/ALI-H未推进。
+
+完整门腿纠正开发“E1/E2均被0.5m重入拒绝、静止+注入即可”的充分性判断：E1重入4.089475m，在Δt4.199651s对应0.5+2Δt=8.899303m包络内PASS；E2 74.664804m超过15.400101s对应31.300203m，FAIL。两事件还同时失败信息kappa：E1 18.231571<36.037668，E2 31.068320<54.883795；holdout NIS也失败：2293.048515/38.593832均>2.5。两cp均LATE，E2 armed lead−1.782s。静止+注入只可能控制重入，不证明能解决信息/holdout，不得选容易窗口后外推或降门。
+
+主要算法断点是候选未收敛/不稳定及信息、holdout证据不足，信息不可恢复未证；工程断点是未收敛帧违反冻结候选契约、v9g跨事件cp覆盖32.500372397s、晚武装/边界与宿主休眠使E2未达；参数无同版本同人口规律，不扫ICP/Wilson/info/holdout/reentry门。下一唯一交付是所有适用门腿和cp合法的accepted测量修复→native update/map→接回后继及归宿；S1先修episode-cp不可变关联和候选契约、交全门腿表，S2仅实际授权有界复验，S3独立评价不阻原生链。标准库-I清单exit0，不ROS/build/算法/main历史/科学门/private，中文SSH增量。

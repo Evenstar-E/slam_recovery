@@ -1,0 +1,61 @@
+{
+  "reviewed_ref": "07e47af8286a2801f967a5bdbb5e9e6764ae881a",
+  "window_utc8": "2026-11-14 19:24–21:24",
+  "scope": "read-only archived evidence and source; no ROS, rebuild, new run, or algorithm execution",
+  "latest_run": "two_event_v9i_seq2_hostposes",
+  "gate_legs": [
+    {
+      "candidate_id": "cand_0000",
+      "candidate_source": "host_poses",
+      "paired_benefit_status": "PASSED",
+      "wilson_lower_bound": 0.7699215190380977,
+      "num_improved_frames": 36,
+      "num_paired_frames": 41,
+      "reentry_elapsed_s": 4.19965148,
+      "reentry_envelope_m": 8.89930296,
+      "reentry_jump_m": 4.089475237801644,
+      "reentry_envelope_pass": true,
+      "info_before": 18.018834207695548,
+      "info_after": 18.231570733350964,
+      "info_kappa_required": 36.037668415391096,
+      "info_kappa_pass": false,
+      "holdout_nis": 2293.0485145005614,
+      "holdout_max": 2.5,
+      "holdout_pass": false,
+      "checkpoint_status": "LATE_AFTER_BOUNDARY",
+      "accepted": false,
+      "refusal_reason": "Insufficient verified info; maintaining soft bridge while waiting for new evidence"
+    },
+    {
+      "candidate_id": "cand_0001",
+      "candidate_source": "host_poses",
+      "paired_benefit_status": "FAILED",
+      "wilson_lower_bound": 0.9380857673512978,
+      "num_improved_frames": 41,
+      "num_paired_frames": 41,
+      "reentry_elapsed_s": 15.400101423,
+      "reentry_envelope_m": 31.300202846,
+      "reentry_jump_m": 74.66480412996675,
+      "reentry_envelope_pass": false,
+      "info_before": 27.441897465262542,
+      "info_after": 31.068320292446007,
+      "info_kappa_required": 54.883794930525085,
+      "info_kappa_pass": false,
+      "holdout_nis": 38.59383213176467,
+      "holdout_max": 2.5,
+      "holdout_pass": false,
+      "checkpoint_status": "LATE_AFTER_BOUNDARY",
+      "accepted": false,
+      "refusal_reason": "Refused Mode 2 atomic commit: a committed segment begins beyond the boundary jump bound (per-segment continuity failed)"
+    }
+  ],
+  "correction": "E1 reentry passes the elapsed-time envelope; both events also fail information-kappa and holdout-NIS, so 0.5 m reentry is not the sole binding constraint",
+  "accepted_native_repair": {
+    "accepted_candidates": 0,
+    "repair_clouds_published": 0,
+    "reprocesses": 0,
+    "unresolved_segments": 2
+  },
+  "interpretation": "host_poses beating constant-velocity extrapolation is real paired-benefit progress, not accepted measurement repair or proof of map benefit",
+  "verdict": "PARTIAL_MAINLINE_PROGRESS; PAIRED_BENEFIT_FIRST_PASS_WITHOUT_NATIVE_COMMIT"
+}
