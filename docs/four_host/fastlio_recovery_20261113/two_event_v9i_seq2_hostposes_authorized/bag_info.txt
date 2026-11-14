@@ -1,0 +1,15 @@
+path:         /tmp/two_event_v9i_seq2_hostposes/frontend.bag
+version:      2.0
+duration:     5:39s (339s)
+start:        Nov 14 2026 20:32:44.92 (1794659564.92)
+end:          Nov 14 2026 20:38:24.12 (1794659904.12)
+size:         602.7 KB
+messages:     1570
+compression:  lz4 [2/2 chunks; 49.26%]
+uncompressed:   1.1 MB @ 3.4 KB/s
+compressed:   576.0 KB @ 1.7 KB/s (49.26%)
+types:        nav_msgs/Odometry [cd5e73d190d741a2f92e81eda573aca7]
+              std_msgs/Bool     [8b94c1b53db61fb6aed406028ad6332a]
+topics:       /Isbuilding      1 msg     : std_msgs/Bool    
+              /Issleeping      1 msg     : std_msgs/Bool    
+              /Odometry     1568 msgs    : nav_msgs/Odometry

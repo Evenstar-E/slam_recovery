@@ -394,3 +394,20 @@ E1/E2 回到**清单原始声明** 115.599 / 229.696 s；`candidate_source=icp_r
 - E2 未触发：宿主在相对 157.7 s 自入睡并保持 `HIBERNATING`，90.16 s 无位姿 → `HOST_HIBERNATION_TIMEOUT`，
   `run_mode=CONTROLLED_TRIGGERS_NOT_FIRED`，退出 `HEALTHY`。
 - 读数：从 incumbent 起步的整段刚体 ICP 只是局部精修，残差变化 1.8%，与 v9e 同型。
+
+## OPTION-② run 2（2026-11-14，campus_1_2_fl 移动窗，候选=host_poses）：收益判据首次通过，连续性界拒绝
+
+`two_event_v9i_seq2_hostposes`；bag `campus_1_2_fl.bag`（start 1711547453.30），E1=60 s、E2=140 s，
+`candidate_source=host_poses`，无注入，`PLAY_RATE=0.5`。
+
+| 事件 | 帧 | 改善 | wilson | inc → cand | 重入跳跃 | 结果 |
+|---|---|---|---|---|---|---|
+| E1 59.699 s（kf 597） | 41 | **36/41** | **0.770** | 3187.6 → 2156.9（0.68） | **4.089 m** | 收益过，连续性拒绝 |
+| E2 139.698 s（kf 1268） | 41 | **41/41** | **0.938** | 651.1 → 38.9（0.06） | **74.66 m** | 收益过，连续性拒绝 |
+
+- E2 的 0.06 与 11-12 accepted 链的 0.037 同量级；宿主在 116.35 s 自然休眠并 `re_slam`，E2 快照仅 2792 点，
+  隔离段跨过这次重置，跳跃 74.66 m 来自重置本身。
+- E2 武装晚于边界（`armed_boundaries` lead **-1.782 s**，快照帧 1203 晚 2.1 s），如实记录，未解释。
+- 链路：两次 wait_limit_closed(2 s) → rearm → resume；退出 `HEALTHY`，`terminal=INPUT_STALE`（bag 末静默 15.4 s）。
+- 结论：0.5 m 重入连续性界是当前的绑定约束；能同时满足连续性与收益的设置是「静止窗口 + 注入偏置」，
+  v9d/v9e 的注入窗都在移动段。该方向需用户授权，本轮不自行开始。

@@ -3569,3 +3569,17 @@ D 论文/复现（D1–D2）、E 运维与被打断项（E1–E6），逐项附�
   `run_mode=CONTROLLED_TRIGGERS_NOT_FIRED`，退出 `HEALTHY`。
   观察到的事实：`icp_reregistration` 从 incumbent 起步只是局部精修，残差只动 1.8%；
   该序列在 158 s 有一个真实休眠事件，但 E2 在它之后，未到达。
+- **option ② run 2（`two_event_v9i_seq2_hostposes`，campus_1_2_fl，E1=60 s / E2=140 s，`candidate_source=host_poses`）**：
+  **收益判据首次在本宿主+真实链上通过**，但提交被**边界连续性**拒绝。
+  - E1（59.699 s，kf 597）：41 帧，**36/41 改善**，wilson **0.770**，inc 3187.6 → cand 2156.9（比 0.68），
+    `paired_benefit_status` 通过；但 `reentry_pos_jump_m=4.089` > 0.5 m 连续性界 → Mode 3 拒绝 → 关闭 → rearm → resume。
+  - E2（139.698 s，kf 1268）：41 帧，**41/41 改善**，wilson **0.938**，inc 651.1 → cand **38.9**（比 0.06，
+    与 11-12 accepted 的 0.037 同量级）；但宿主在 116.35 s 自然休眠并 `re_slam` 重建（快照仅 2792 点），
+    `reentry_pos_jump_m=74.66` → 连续性拒绝。
+  - 两次 `checkpoint_check=LATE_AFTER_BOUNDARY`（E2 实际帧 1203 比声明边界晚 2.1 s，`armed_boundaries` 记
+    lead **-1.782 s**，即武装晚于边界）；退出 `HEALTHY`，`terminal=INPUT_STALE`（bag 末 15.4 s 静默）。
+- **诊断**：门不是「不可达」——移动窗口里宿主位姿作为候选让收益判据大幅通过（0.68 / 0.06）；
+  真正的约束是 **0.5 m 重入连续性界**：平台在隔离段内真实移动 ~4 m、或宿主中途重置，必然越界。
+  同时满足两者的可控设置是：**平台静止的窗口 + 注入测量偏置**（静止 → 连续性；偏置 → 收益），
+  而 v9d 的注入选在移动窗（192–196 s，中位 1.3 m/s，必然跳跃 >0.5 m），v9e 选在转弯窗（同样移动）。
+  这是一条新的、有界的实验方向，**未被本轮授权覆盖**，按规则交用户决定（见 §234）。
