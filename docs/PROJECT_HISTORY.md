@@ -841,3 +841,13 @@ E2 native restore原件为`OK restore valid=0 reason=checkpoint_invalidated_by_r
 当前E2主断点转为候选质量：整段单刚体ICP 20次ITERATION_LIMIT，修正2.912867°/3.463195m，仅1/11改善，candidate mean194.705429高于incumbent186.594305，门拒绝；同binary/bag的E1在run2/run3改善9/13→3/12支持候选不稳定，但不外推为E2重复统计。repair clouds=0、reprocess=0，真实accepted测量→native update/map仍未执行。E2 restore虽valid=1，snapshot却晚边界200143352ns，UNSUPPORTED_AT_OR_BEFORE_QSTART，合法完整回滚未闭合。
 
 E2“闭合”是安全放弃未解决段：lifecycle列92个raw_frame_refs unresolved、unresolved_segments=1，terminal INPUT_STALE，不是这些输入已修复/重放或完整尾段；driver fully_decided=true只限自身episode分类，必须并列unresolved，不外溢全输入恢复。下一唯一主线是在合法E2边界产生真实accepted修复→native update/map→接回→E2与归宿；S1先给逐帧/带运动先验候选最小方法方案，由用户按既有规则选择，第4次run保留，不降科学门、不盲调迭代/阈值。自动检测NOT_EXECUTED、ALI-H无新增仍NOT_EVALUABLE，0.5x非实时，资源不设开工门。标准库-I清单修正本机手算/文本比较断言后exit0；不ROS/build/算法/main历史/科学门/private，中文SSH增量。
+
+## 107. 9c52e6e：逐帧与注入偏置均为负结果，“事件无可改善量”被E2原件反例限定
+
+[增量审阅](review_20261114_9c52e6e/README.md)固定19:50 main `9c52e6e30962e1d8fa652e2d665cf205c45f9b5a`，实质为2004e4e逐帧第4run和2c6a930两次注入偏置run。三run六候选全拒绝、repair clouds/reprocess均0，真实accepted→native update/map未发生；自动检测NOT_EXECUTED，0.5x非实时。开发记录称用户选择逐帧与注入，非本会话直接授权，只核已归档结果不追加run。
+
+关键反例：v9c自然E2逐帧候选5/11改善，mean338.028180→320.392278，实际相对改善5.217288%，只是Wilson LB0.242090不足而拒绝。因此只能说“平均改善存在但逐帧一致性不足”，不能称“没有可改善量/两种候选都未超过incumbent”，不降门也不把拒绝外推为信息不可恢复。v9c E2 cp仍LATE。
+
+两次relay各有60条dz=+0.5m shifted帧，注入有执行证据。v9d移动段host init、CONVERGED、7/40，770.695532→756.930383略改善但未过门；v9e转弯段incumbent init、ITERATION_LIMIT、0/40且候选更差。2c6a930实际修了single-rigid未传incumbent的接线，故“不是实现问题”不能回溯排除；v9d/v9e同时换窗口与初值，不是同人口参数比较。两注入run E2为clean second event，不冒称第二独立故障；unresolved segments仍1/2/2，v9d terminal HOST_HIBERNATION_TIMEOUT，其余STALE，HEALTHY不等于全输入恢复。
+
+下一唯一主线仍是注入人口accepted候选→native update/map→接回后继与归宿。新run前S1先用已知+0.5m标签离线评价候选偏置方向/幅值、相对incumbent/注入真值误差和失败帧，缺导出写证据不足，再由用户决定一次有界oracle/native复验；不扫ICP/Wilson/增益门，不自动换模型/宿主。S2真实宿主与获授权run、S3独立评价，ALI-H缺项不阻原生链。标准库-I清单exit0，不ROS/build/算法/main历史/科学门/private，中文SSH增量。

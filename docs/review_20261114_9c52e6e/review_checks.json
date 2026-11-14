@@ -1,0 +1,59 @@
+{
+  "reviewed_ref": "9c52e6e30962e1d8fa652e2d665cf205c45f9b5a",
+  "scope": "read-only archived evidence; no ROS, rebuild, new run, or algorithm execution",
+  "all_three_runs": {
+    "accepted_candidates": 0,
+    "repair_clouds_published": 0,
+    "reprocesses": 0,
+    "automatic_detection": "NOT_EXECUTED"
+  },
+  "natural_E2_per_frame_counterexample": {
+    "improved_frames": "5/11",
+    "incumbent_mean_residual": 338.0281800420326,
+    "candidate_mean_residual": 320.3922776398418,
+    "relative_mean_improvement": 0.052172876237708526,
+    "wilson_lower_bound": 0.24209040759667674,
+    "approved": false,
+    "reason": "wilson_sequential_benefit_lower_bound_failed",
+    "interpretation": "mean improvement exists but frame-consistent evidence is insufficient; this does not prove the event has no improvable error",
+    "checkpoint": {
+      "boundary_stamp_ns": 1711548111473230600,
+      "actual_stamp_ns": 1711548111673373952,
+      "actual_frame": 2078,
+      "status": "LATE_AFTER_BOUNDARY",
+      "rollback_support": "UNSUPPORTED_AT_OR_BEFORE_QSTART"
+    }
+  },
+  "injection": {
+    "injected_moving": {
+      "frame_records": 2350,
+      "shifted_frames": 60,
+      "shift_body_z_m": 0.5,
+      "unresolved_segments": 2,
+      "terminal_reason": "HOST_HIBERNATION_TIMEOUT"
+    },
+    "injected_turn": {
+      "frame_records": 950,
+      "shifted_frames": 60,
+      "shift_body_z_m": 0.5,
+      "unresolved_segments": 2,
+      "terminal_reason": "INPUT_STALE"
+    }
+  },
+  "candidate_initialization_comparison": {
+    "moving_host_init": {
+      "improved": "7/40",
+      "icp_status": "CONVERGED",
+      "candidate_mean_residual": 756.9303831053368,
+      "incumbent_mean_residual": 770.695532475887
+    },
+    "turn_incumbent_init": {
+      "improved": "0/40",
+      "icp_status": "ITERATION_LIMIT",
+      "candidate_mean_residual": 1571.0764620059203,
+      "incumbent_mean_residual": 1437.6072756747544
+    },
+    "limit": "different windows and initializations; not a same-population parameter comparison"
+  },
+  "verdict": "REAL_NEGATIVE_EVIDENCE; ACCEPTED_NATIVE_REPAIR_NOT_REACHED; NO_IMPROVABLE_ERROR_CLAIM_NOT_ESTABLISHED"
+}
