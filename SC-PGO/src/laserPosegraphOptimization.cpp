@@ -685,6 +685,19 @@ void performSimilarClosure(void)
     mKF.lock();
     for (int i = 0; i < Mapmanager.SleepMapList.size(); ++i)
     {
+        // A sleeping map can hold no ScanContext descriptors: act_change() (mapmanager.hpp) pushes the
+        // active map without checking, and a map slept before its first keyframe stays empty. Building
+        // the invariant-key KD-tree over an empty matrix aborts in
+        // KDTreeVectorOfVectorsAdaptor.h:61, so such maps are skipped. similar_mapindexes stays
+        // index-aligned with SleepMapList (sentinel 1e9 can never win the minimum) and the sentinel
+        // detection result (-1) never triggers a merge.
+        if (Mapmanager.SleepMapList[i]->scmanager.polarcontext_invkeys_mat_.empty())
+        {
+            ROS_WARN("[NATIVE_RECOVERY] similar-closure: skipping sleeping map %d with no keyframes", i);
+            detectResult_sleepmap.push_back(std::pair<int, float>(-1, 0.0f));
+            similar_mapindexes.push_back(1e9);
+            continue;
+        }
         detectResult_sleepmap.push_back(Mapmanager.SleepMapList[i]->scmanager.similar_detectLoopClosureID(Mapmanager.ActiveMap->scmanager.polarcontext_invkeys_mat_, Mapmanager.ActiveMap->scmanager.polarcontexts_));
         similar_mapindexes.push_back(Mapmanager.SleepMapList[i]->optimal_matchvalue);
     }
