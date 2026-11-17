@@ -4027,3 +4027,24 @@ host-only run（`/tmp/mmlins_hostonly_v3_20261117`，0.5×，同 bag）。原件
 **写回与接回输入仍未发生**——当前缺口在候选过门，不在接线。
 
 **不声称**：不声称整链完成；不声称修法 A 修好 v2 根因；不声称候选不可修复。
+
+## 251. 审阅新增 `48179f4`（冻结在 `main@103ae5b`）：与 v1–v4 结果不冲突，但其「不再开新 run」早于全部授权
+
+审阅分支 `review/repair-f3-handoff-20261110` 由 `5baae1c` 前进到 **`48179f4`**（14:13），新增
+`docs/review_20261117_103ae5b/{README.md,review_checks.py,review_checks.json}` 与 `PROJECT_HISTORY.md` 6 行。
+S1 已核原件：
+
+- **冻结基线是 `origin/main=103ae5b`**，即「第一步交付」那一刻；它**不含** `f80dbe3`（接线）、
+  `bc71167`（v1）、以及后续 v2/v3/v4 与修法 A。文中「不再开新 run」对应的是该基线时的判断，
+  而用户此后的三次授权（v1、v2、v3、v4）都发生在它之后——两者不矛盾，**但不得用它回退已授权的 run**。
+- 它接受的两点与本次工作一致：option ③ 收口形态成立；五案例全部 `MODE3_SOFT_BRIDGE_WAIT`、
+  `simulator_validity=FAILED`、旧 R5 Mode2 被替换为拒绝结果；`street_08` 已统一为 2.85–3.53 / 1.38。
+- 它的「不接受外溢」清单（收口包≠accepted、host-only 七步≠有内容重放、四宿主 `P`≠验收、
+  不启动 FAST-LIVO2）与 §246/§250 的口径一致。
+
+**本次审阅未覆盖的、由后续授权 run 产生的实际结果**（均在 main 分支本地提交中，尚未推送）：
+v4 的两事件生命周期闭环、E1 检查点首次 `AT_OR_BEFORE_BOUNDARY`、修法 A 在 819 次空休眠图下生效、
+以及**仍然 0 accepted / `clouds_published=0`**。审阅若要覆盖这些，需在其侧 fetch 到 `a1fdbc5` 之后的 main。
+
+**版本状态（实际）**：本机 `main@a1fdbc5`（本节提交后前进）；远端 `slam_recovery/main` 仍 `103ae5b`；
+未推送提交 13 条；本会话无任何 GitHub 凭据（已三次报用户请求内联 PAT）。
