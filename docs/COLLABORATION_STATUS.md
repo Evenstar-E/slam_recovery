@@ -3950,3 +3950,21 @@ E2 快照 `map_points=167263`（v1 只有 3873，说明地图被保住）。判�
 
 **下一步**（都需用户决定）：先在不做 hold 的条件复现 PGO 崩溃路径并定位；再决定 stale 判据按回放速率
 换算还是改用中间速率。两者落地前不再开 run，门阈值不动。
+
+## 247. PGO 崩溃的静态定位（无新 run）：空休眠地图 + `performSimilarClosure` 缺守卫
+
+v2 的 `alaserPGO` SIGABRT 做了纯静态追查，结论写进
+`docs/four_host/mmlins_recovery_20261117/PGO_CRASH_ANALYSIS_20261117.md`。要点：
+
+- `process_map_surveillance()` 的休眠分支（`laserPosegraphOptimization.cpp:862`）调用
+  `Mapmanager.act_change()`，**不检查活动图是否为空**（`mapmanager.hpp:73-76`）；
+- `performSimilarClosure()`（:677-707）只用活动图的大小做门限，**不检查每张休眠图的描述子数**；
+- 对空休眠图调用 `similar_detectLoopClosureID()` 时，`Scancontext.cpp:362-366` 在空矩阵上
+  `make_unique<InvKeyTree>`，命中 `KDTreeVectorOfVectorsAdaptor.h:61` 的 `assert`。
+
+**关联只说机制**：冻结期间关键帧不插入，活动图更容易在「还没长出关键帧」时被 sleep，从而走到这条路径。
+**没有栈回溯、没有最小复现**，所以这不是已证实的根因，也不能据此给 `pgo_hold` 定性。
+
+候选修法两条（**均未实施，等用户选择**）：A 在 `performSimilarClosure` 跳过空休眠图（非空时行为不变）；
+B 在 `act_change()` 前拒绝推进空地图（影响地图管理与回环候选集合，面更大）。
+两者都不改门阈值/ICP/估计器。
