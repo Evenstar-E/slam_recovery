@@ -3911,3 +3911,16 @@ run 已结束（11:53，`runner_stdout RUNNER_EXIT=0`，`final_state=HEALTHY`）
 **版本状态（实际，非推断）**：本机 `main` HEAD `bc71167`；远端 `slam_recovery/main` 仍 `103ae5b`。
 `f80dbe3`、`bc71167` **尚未推送**——本机无任何 GitHub 凭据（无 credential helper、无凭据文件、无 `gh`），
 `git ls-remote` 只能匿名读取。该项已报用户，等待凭据方式；文档与提交本身完整可核。
+
+## 245. MM-LINS 两事件 run v2（`PLAY_RATE=0.5`）已启动，结果未出
+
+用户 2026-11-17「推送，授权」授权在 v1 之后再跑一次有界 run。run 前写定预登记补充
+`docs/four_host/mmlins_recovery_20261117/PREREGISTRATION_V2_20261117.md`：与 v1 的唯一差异是
+`PLAY_RATE=1.0→0.5`，bag、E1/E2、候选源、`arm_lead`、`margin`、`wait_limit`、两个二进制与 driver
+均不变；并声明这是**非实时证据**，且 wall 量（20 s / 15 s / 3 s）在 0.5× 下等于 40 s / 30 s / 6 s bag 时间。
+
+12:40 启动（`/tmp/mmlins_two_event_v2_20261117`，私有 master）。12:42 核到的事实：前端/后端/录制/driver/回放
+进程均在；`pre_run.txt` 记 `play_rate=0.5`、E1/E2 原戳。**尚无任何事件、检查点或门判定原件**，本文件不写结果。
+
+**版本状态不变**：本地 main `34c0dd9`、远端 `103ae5b`，`f80dbe3`/`bc71167`/`34c0dd9` 仍未推送——
+本会话确认无任何凭据（无 helper、无凭据文件、无 `gh`、settings 无 token），已两次报用户请求内联 PAT。
