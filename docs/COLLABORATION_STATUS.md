@@ -3756,3 +3756,13 @@ S1 已按审阅「只允许版本化负结果、实现边界与受控生命周�
 - **编译核验**：本机 `/tmp/texlive` 缺 Courier TFM（`pcrr8t`），用临时副本把 `\ttdefault` 换为 `lmtt`
   仅做语法/引用核验（未改仓库字体设置）：根文件 733 KB、stage1 235 KB，bibtex 后 0 个未定义引用/文献。
   该核验不等于完整构建（字体被替换）。
+
+### 238. 用户决定（2026-11-17）：ALI-H 按 ① 资格-only 收口
+
+用户选择「① 接受资格-only 收口」。最终口径写入
+`docs/ali_h_v1_research/ALI_H_FINAL_CLOSURE_20261117.md`：
+
+- C2/C3 `BLOCKED`、C4 检测指标 `NOT_EVALUABLE`；可报的只有离线资格层（join 状态、UNKNOWN 区间、
+  单位权 `|e_I|²` 分位、覆盖与成本），原件与数值逐项列在该文件。
+- 不得把 UNKNOWN 当零风险、不得填 NORMAL/SUSPECT 分类、误报/漏检/延迟或净收益。
+- 越过上限需要独立正常参照 + 同 run 逐帧标签 + 新预算授权，已在文件中列明但**未启动**。
