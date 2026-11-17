@@ -891,3 +891,11 @@ A3资源继续后置，A6冒烟非前置；ALI-B2不代选A/B/C，完整评价�
 [增量复核](review_20261117_6e2b87c/README.md)固定main `6e2b87c16383d2c6351543089cdcc78eab5fc244`，无新宿主run。开发撤回“0.5m唯一绑定/与真实运动互斥”和一般不可达，改当前实现/协议下未获accepted；v9i E1重入通过、信息/holdout失败，v9j重入通过、Wilson/holdout失败，v9i仅限定paired-benefit，口径与审阅一致。
 
 `_icp_candidate`仅CONVERGED/ITERATION_LIMIT生成候选，其余失败返回poses={}、_last_icp_delta=None、candidate_suppressed=true、frames_candidate=0，覆盖TOO_FEW/LOST/REFERENCE_TOO_SMALL，不再delta@inits克隆candidate=incumbent，冻结门/ICP常数/binary不变。新增回归以REFERENCE_TOO_SMALL走同一失败分支，源码级接受且不扩矩阵；开发报292全绿为归档，本机Python两次确认无pytest，未独立执行/安装，不把测试数当原生accepted。历史负结果保留，真实宿主未复验，自动检测/ALI-H仍NOT_EVALUABLE，A4/A6/A9/B2/B11不全表重评。下一仅option③诚实生命周期收口，未来复验须用户新授权，中文SSH增量。
+
+## 113. 08:37–11:10两小时：host-only ACK与失败语义推进，accepted仍未发生
+
+[两小时与最新审阅](review_20261117_55d4ccb/README.md)以main07e47af→55d4ccb477893bf93f52b2df780304e4d480a6e3为准，判定**部分推进**。静止注入50帧+0.5m、E1合法cp与restore valid1为实际负结果；6e2b87c失败ICP不再克隆incumbent候选并撤回重入/不可达错误结论；host-only七步有真实ACK。所有accepted/repair/replay content为0，native update/map仍未发生。
+
+七步status/capabilities/hold/snapshot/restore/reprocess/resume ACK存在，hold/snapshot/restore/resume valid1，但reprocess replay_suffix=0/repaired_fed=0，只接受命令路径，不是有内容重放或地图重建；cp仍排除IMU preintegration/deskew。D1摘要明确No native accepted repair commit，重入时间包络/离线构造区分；street_08数值不一致及未绑定数值保留，临时lmtt零未定义引用不等于完整构建或全部数值复核。ALI-H C2/C3 BLOCKED、C4 NOT_EVALUABLE，106块53s全UNKNOWN非零风险，无新增run/注入/数据/参考，资格-only不填检测指标。
+
+算法断点为候选未收敛/失效、Wilson与holdout不足，信息不可恢复未证；工程断点为修复语义未宿主复验、零重放、E2晚cp/unresolved；参数无同人口规律，A3 FIM热点约80%但1.8x波动，仅后置诊断。下一仅option③诚实可核回滚+重启收口包，不开新run；S1修语义/撤回，S2真实回执，S3资格盘点，S4核原件。局部A2/A10推进，A4/A6/A9/B2/B11未闭合，标准库-I检查exit0，不ROS/build/算法/main历史/科学门/private，中文SSH增量。
