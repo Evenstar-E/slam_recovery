@@ -899,3 +899,9 @@ A3资源继续后置，A6冒烟非前置；ALI-B2不代选A/B/C，完整评价�
 七步status/capabilities/hold/snapshot/restore/reprocess/resume ACK存在，hold/snapshot/restore/resume valid1，但reprocess replay_suffix=0/repaired_fed=0，只接受命令路径，不是有内容重放或地图重建；cp仍排除IMU preintegration/deskew。D1摘要明确No native accepted repair commit，重入时间包络/离线构造区分；street_08数值不一致及未绑定数值保留，临时lmtt零未定义引用不等于完整构建或全部数值复核。ALI-H C2/C3 BLOCKED、C4 NOT_EVALUABLE，106块53s全UNKNOWN非零风险，无新增run/注入/数据/参考，资格-only不填检测指标。
 
 算法断点为候选未收敛/失效、Wilson与holdout不足，信息不可恢复未证；工程断点为修复语义未宿主复验、零重放、E2晚cp/unresolved；参数无同人口规律，A3 FIM热点约80%但1.8x波动，仅后置诊断。下一仅option③诚实可核回滚+重启收口包，不开新run；S1修语义/撤回，S2真实回执，S3资格盘点，S4核原件。局部A2/A10推进，A4/A6/A9/B2/B11未闭合，标准库-I检查exit0，不ROS/build/算法/main历史/科学门/private，中文SSH增量。
+
+## 114. 103ae5b：option③收口包与四宿主状态表成立，仿真五案例全拒绝
+
+[增量审阅](review_20261117_103ae5b/README.md)固定main `103ae5bf6ac77d82bbe9cade640a2e8c58e32b6e`，本机只读文档/manifest未重跑。收口包保留E1合法cp、restore/rearm/resume、E2晚cp/unresolved、零重放和失败语义修复，明确当前实现/协议未获accepted而非一般不可达；四宿主表按证据V/P/F/N/U绑定，P非通过、不是新评分，其它宿主任务不视为已授权执行。
+
+ba2942d重生成五gate案例全MODE3：R4 133.686、B5 17.856、R5 10.38、B6点混合14.629、B6辅助图10.38，simulator_validity FAILED且五scenario全失败，旧R5 Mode2/1.409不得再引成功。street_08统一2.85–3.53/1.38，fig3逐案例阈值，已跟踪PDF未重生成、完整TeX及其它未绑定数值另核，不把撤回当有效。接受收口与负结果整理，拒绝外溢accepted/有内容重放/仿真有效/四宿主通过或FAST-LIVO2启动。下一冻结回滚+重启收口，不开新run，局部A2/A10非全表，标准库-I检查exit0，不ROS/sim/build/算法/main历史/科学门/private，中文SSH增量。

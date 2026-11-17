@@ -1,0 +1,42 @@
+{
+  "reviewed_ref": "103ae5bf6ac77d82bbe9cade640a2e8c58e32b6e",
+  "scope": "read-only archived documents and regenerated manifest; no host, simulation, build, or new run",
+  "simulation": {
+    "cases": {
+      "R4_Dual_Blind_No_Evidence": {
+        "mode": "MODE3_SOFT_BRIDGE_WAIT",
+        "holdout_nis": 133.686
+      },
+      "B5_Narrow_FoV_Filter_LIOSAM": {
+        "mode": "MODE3_SOFT_BRIDGE_WAIT",
+        "holdout_nis": 17.856
+      },
+      "R5_Delayed_Revisit_Loop": {
+        "mode": "MODE3_SOFT_BRIDGE_WAIT",
+        "holdout_nis": 10.38
+      },
+      "B6_Ours_Point_Mixture_FASTLIO2": {
+        "mode": "MODE3_SOFT_BRIDGE_WAIT",
+        "holdout_nis": 14.629
+      },
+      "B6_Ours_Aux_PoseGraph_LIOSAM": {
+        "mode": "MODE3_SOFT_BRIDGE_WAIT",
+        "holdout_nis": 10.38
+      }
+    },
+    "simulator_validity": "FAILED",
+    "all_mode3": true
+  },
+  "closure": {
+    "accepted_repair": false,
+    "general_impossibility_claim": false,
+    "reprocess_replay_suffix_zero_disclosed": true,
+    "new_scientific_evidence": false
+  },
+  "four_host_progress": {
+    "new_score": false,
+    "P_means_pass": false,
+    "other_host_new_run": false
+  },
+  "verdict": "CLOSURE_AND_SIMULATION_NEGATIVE_EVIDENCE_ADVANCED; ACCEPTED_NATIVE_REPAIR_NOT_REACHED"
+}
