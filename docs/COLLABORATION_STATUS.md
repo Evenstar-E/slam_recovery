@@ -3892,3 +3892,22 @@ run 已结束（11:53，`runner_stdout RUNNER_EXIT=0`，`final_state=HEALTHY`）
 
 **下一步**：要拿到真正的写回+接回，需新的一次用户授权 run，并先解决 driver 落后（如 `PLAY_RATE=0.5`
 并声明非实时证据）。门阈值不动——候选被拒也是证据。
+
+## 244. 审阅新增 `5baae1c`（覆盖至 `55d4ccb`）：与 §242/§243 无冲突；其「不再开新 run」早于用户授权
+
+审阅分支 `review/repair-f3-handoff-20261110` 由 `423fee0` 前进到 `5baae1c`（11:52:17），
+新增 `docs/review_20261117_55d4ccb/{README.md,review_checks.py,review_checks.json}` 与
+`PROJECT_HISTORY.md` 8 行。S1 已核原件，要点：
+
+- **窗口是 08:37–11:10（main `07e47af`→`55d4ccb`）**，即**早于**本日 MM-LINS 接线（`f80dbe3`）
+  与 run（`bc71167`）；其「下一主线仍是 option ③ 收口、不再开新 run」对应的是该窗口时的状态，
+  用户随后「执行下一步，我授权run」在其之后，两者不矛盾，但**不得用该条否决本次授权 run**。
+- 其对 FAST-LIO2 的保留项与本机 MM-LINS 结果互为佐证：`reprocess` 为 `replay_suffix=0`、
+  零重放内容；「E2 checkpoint 晚边界」在 MM-LINS 上同样出现且更严重（晚 9.71 s）。
+- 其对 ALI-H 的口径（C2/C3 BLOCKED、C4 `NOT_EVALUABLE`）与 `ALI_H_FINAL_CLOSURE_20261117.md` 一致。
+- 未关闭项与 §240 相同：失败 ICP 语义修正未在真实宿主 run 复验；无 accepted；A4/A6/A9/B2/B11 未闭合；
+  不做全表新评分。
+
+**版本状态（实际，非推断）**：本机 `main` HEAD `bc71167`；远端 `slam_recovery/main` 仍 `103ae5b`。
+`f80dbe3`、`bc71167` **尚未推送**——本机无任何 GitHub 凭据（无 credential helper、无凭据文件、无 `gh`），
+`git ls-remote` 只能匿名读取。该项已报用户，等待凭据方式；文档与提交本身完整可核。
