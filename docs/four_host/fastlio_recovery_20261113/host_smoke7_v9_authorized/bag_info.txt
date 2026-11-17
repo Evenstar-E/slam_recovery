@@ -1,0 +1,12 @@
+path:        /home/R26534/datasets/mmlins/campus_12_fl.bag
+version:     2.0
+duration:    7:49s (469s)
+start:       Mar 27 2024 21:58:03.36 (1711547883.36)
+end:         Mar 27 2024 22:05:52.80 (1711548352.80)
+size:        2.5 GB
+messages:    98580
+compression: none [2099/2099 chunks]
+types:       sensor_msgs/Imu         [6a62c6daae103f4ff57a132d6f95cec2]
+             sensor_msgs/PointCloud2 [1158d486dd51d683ce2f1be655c3c181]
+topics:      /imu_raw           93885 msgs    : sensor_msgs/Imu        
+             /velodyne_points    4695 msgs    : sensor_msgs/PointCloud2

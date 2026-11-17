@@ -1,0 +1,7 @@
+{"step": "status", "ack": "OK status valid=0 repair_received=0 repair_applied=0 repaired_in_update=0 last_repaired_update_ns=0 deferred_resets=0 frame=248 stamp_ns=1711547908476218624 map_writes=released"}
+{"step": "capabilities", "ack": "OK capabilities written"}
+{"step": "hold", "ack": "OK hold applied valid=1 stamp_ns=1711547908676193024 frame=250 map_writes=held"}
+{"step": "snapshot", "ack": "OK snapshot applied valid=1 stamp_ns=1711547908776218368 frame=251 map_points=45100"}
+{"step": "restore", "ack": "OK restore valid=1 stamp_ns=1711547908776218368 frame=251"}
+{"step": "reprocess", "ack": "OK reprocess replay_suffix=0 replay_within_end=1 repaired_fed=0 source=buffer"}
+{"step": "resume", "ack": "OK resume valid=1 stamp_ns=1711547908976163328 frame=253 map_writes=released"}

@@ -3659,3 +3659,53 @@ accepted 测量修复提交；现有证据不支持对宿主+序列作一般『�
 确认独立正常数据/标签来源，否则接受资格-only 收口；C2/C3 可作为最终 `NOT_EVALUABLE`；E1 可按
 「当前观测无匹配」收口（原因仍 UNKNOWN，本机未独立核远端）；D1 由用户决定且只允许版本化负结果、
 实现边界与受控生命周期，不解禁 accepted/性能/净收益主张；门研究不重开。以上均待用户拍板，本文不代拍。
+
+## 236. 用户授权执行其余事项（2026-11-17）：A6 七步冒烟通过、A3 成本测量、E1 收口
+
+用户：「可以开始执行其余事项了，你来分工」。分工与结果：
+
+### A6 host-only 七步冒烟 —— 通过（含一条限制）
+
+新增 `docs/four_host/fastlio_recovery_20261113/tools/run_host_smoke.sh`（host-only，单一 cmd/ack 写者），
+`campus_12_fl` 前 80 s、rate 1.0，45 s 后执行 `smoke7.py`。七步 ack 全部来自宿主自己的 ack 文件：
+
+| 步 | ack |
+|---|---|
+| status | `OK status valid=0 … deferred_resets=0 frame=248 map_writes=released` |
+| capabilities | `OK capabilities written`；`capabilities.json` 含 `semantics`/`hold_scope`/`native_reset_under_hold`/`publish_while_held` |
+| hold | `OK hold applied valid=1 stamp_ns=…908676193024 frame=250 map_writes=held` |
+| snapshot | `OK snapshot applied valid=1 frame=251 map_points=45100` |
+| restore | `OK restore valid=1 frame=251` |
+| reprocess | `OK reprocess replay_suffix=0 replay_within_end=1 repaired_fed=0 source=buffer` |
+| resume | `OK resume valid=1 frame=253 map_writes=released` |
+
+- **限制（如实记录）**：这次 reprocess 的 `replay_suffix=0`——hold→restore 只跨 3 帧，缓冲区内没有可重放帧，
+  因此**只验证了 reprocess 的 ACK 路径**，没有验证「重放带内容」；也没有 repair cloud（`repaired_fed=0`）。
+- 证据目录：`/tmp/host_smoke7_v9/`（`smoke7.jsonl`、`smoke7.log`、`ctl/capabilities.json`、`host.log`、`play.log`），
+  已复制到 `docs/four_host/fastlio_recovery_20261113/host_smoke7_v9_authorized/`。
+
+### A3 成本测量（只测不改）—— FIM 是热点，噪声大
+
+`slam_recovery/tools/bench_frame_cost.py --rate 10`（REPORT_ONLY），4 次：
+
+| 次数 | fim_ms | nis_ms | total_ms | core_fraction |
+|---|---|---|---|---|
+| 1 | 44.99 | 9.57 | 54.56 | 0.546 |
+| 2 | 37.53 | 9.82 | 47.35 | 0.473 |
+| 3 | 67.66 | 9.85 | 77.51 | 0.775 |
+| 4 | 42.13 | 11.87 | 54.00 | 0.540 |
+
+FIM 占整对 ~80%，是唯一有意义的优化目标；本机噪声使单次读数有 ~1.8× 波动，任何优化必须以同机对比衡量。
+**未改任何代码**。可选方向（都需用户选择，未执行）：①只优化 FIM 的实现（同一数学、不改变评价人口）；
+②降低 FIM 计算频率或用降采样（**改变人口/评价量，属方法变更**，须预设并留痕）；③接受当前缺口。
+审阅侧对 A3 的分类为「非阻断、继续后置」，本轮只补测量。
+
+### E1 遗留进程 —— 按当前观测收口
+
+2026-11-17 多次检查 `pgrep -af "mmlins_ws|alaserPGO|mmlins"` 均为 0。按审阅意见按「当前观测无匹配」收口；
+此前 16 个进程的退出原因仍为 UNKNOWN，本会话从未终止任何进程，也不推断是谁结束的。
+
+### 门研究新方向 —— 维持关闭
+
+`62f294b` / `aa731b5` 已关闭；C-2 旋转相关、不得集成；无新数据或新证据。审阅分类「非阻断、不重开」，
+本轮不启动「在线误报上游检测」。
