@@ -877,3 +877,11 @@ option② campus_2_fl仅E1 4/38拒绝、ICP未收敛，E2因宿主休眠后90.16
 E1 ICP TOO_FEW_INLIERS/0，失败退回incumbent使候选与基线相同，0/8，不是“无可改善量”证明；E2 ITERATION_LIMIT、0.847934m/0.667044°，0/22且candidate mean2150.976477高于incumbent2016.020454。两事件信息kappa均PASS、重入均在0.5+2Δt包络内PASS，但Wilson均0、holdout NIS 2183.551628/2137.903387均FAIL；E2 cp另晚0.100296696s。故“只剩0.5m结构约束/科学不可达”不适用于本run，option③仅是当前候选生成和冻结协议下按预注册停止新run，不是恢复成功或所有方法无效。
 
 下一唯一主线按option③提交诚实可核的回滚+重启生命周期收口包，不再开新run：S1交全门腿/归宿并限定“当前实现未获accepted”，S2保预注册与原生原件且统一成本UNAVAILABLE，S3无真实M/I/标签继续BLOCKED/NOT_EVALUABLE。未来accepted须用户另选候选方法/范围，不降Wilson/holdout/reentry等科学门。局部A2/A10生命周期证据，A4/A6/A9/B2/B11未闭合，不全表重评分。标准库-I清单exit0，不ROS/build/算法/main历史/科学门/private，中文SSH增量。
+
+## 111. aa1ce5a逐项审阅回复：不可达必须收窄，重入不是与真实运动互斥，v9j失败语义需一条回归
+
+[逐项回复](review_20261117_aa1ce5a/README.md)针对开发审阅请求，未新run/重建/改算法或科学门。结论：当前FAST-LIO派生宿主、已试候选生成器、已试窗口和冻结协议下未获accepted，不能外推为宿主+序列科学不可达；option③可停止新run但非恢复成功。`core.py`在有elapsed时使用jump≤0.5+2Δt，裸0.5只在elapsed None使用；v9i E1 4.089<8.899 PASS，v9j两事件重入也PASS，故“真实运动与0.5m互斥”被源码和原件否定。论文若推导须给实际Δt、锚点/首帧、速度/加速度假设及不确定性，不新增run。
+
+v9i可单列另一序列host_poses的限定paired-benefit（36/41、41/41），不是修复器/GT/accepted；E1信息/holdout失败，E2重入/信息/holdout/cp失败。v9j `_icp_core._fail`返回init，整段路径仍组成candidate=incumbent，属候选生成实现缺陷，非门阈值或无可改善量；S1只需一条“失败不得克隆初值进入有效候选”的回归，不扩异常矩阵。现有负结果不重跑；未来方法确认须先修语义并获用户新授权有界复验。
+
+A3资源继续后置，A6冒烟非前置；ALI-B2不代选A/B/C，完整评价仍须独立正常校准+故障标签，缺则资格-only/NOT_EVALUABLE；C2/C3可最终NOT_EVALUABLE不填0；E1仅以开发pgrep0作当前观测，原因UNKNOWN不杀进程；D1仅建议负结果/边界/生命周期更新，accepted/ALI/净收益不解禁；门研究既有关闭不重开。下一仅option③诚实生命周期收口，局部评分不全表，成本未确认UNAVAILABLE，中文SSH增量。
