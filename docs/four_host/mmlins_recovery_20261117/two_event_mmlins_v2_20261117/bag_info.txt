@@ -1,0 +1,16 @@
+path:         /tmp/mmlins_two_event_v2_20261117/host.bag
+version:      2.0
+duration:     15:37s (937s)
+start:        Nov 17 2026 12:41:02.75 (1794890462.75)
+end:          Nov 17 2026 12:56:40.75 (1794891400.75)
+size:         1.7 MB
+messages:     6183
+compression:  lz4 [6/6 chunks; 34.88%]
+uncompressed: 4.5 MB @ 4.9 KB/s
+compressed:   1.6 MB @ 1.7 KB/s (34.88%)
+types:        nav_msgs/Odometry [cd5e73d190d741a2f92e81eda573aca7]
+              std_msgs/Bool     [8b94c1b53db61fb6aed406028ad6332a]
+topics:       /Isbuilding        4 msgs    : std_msgs/Bool    
+              /Issleeping        4 msgs    : std_msgs/Bool    
+              /Odometry       4277 msgs    : nav_msgs/Odometry
+              /aft_pgo_odom   1898 msgs    : nav_msgs/Odometry

@@ -1,0 +1,46 @@
+[0m[ INFO] [1794890449.673855802]: [NATIVE_RECOVERY] pgo_hold marker directory /tmp/mmlins_two_event_v2_20261117/ctl[0m
+[33mposegraph odom node 100 added.
+[33m[ WARN] [1794890689.949475914]: [NATIVE_RECOVERY] pgo_hold present: keyframe insertion frozen[0m
+Whether to sleep the currently active map: 1
+Whether to start a new active map: 1
+[0m[ INFO] [1794890699.335432366]: [NATIVE_RECOVERY] pgo_hold released: keyframe insertion resumed[0m
+Whether to sleep the currently active map: 1
+Whether to start a new active map: 1
+alaserPGO: /home/R26534/mmlins_ws/src/SC-PGO/include/scancontext/KDTreeVectorOfVectorsAdaptor.h:61: KDTreeVectorOfVectorsAdaptor<VectorOfVectorsType, num_t, DIM, Distance, IndexType>::KDTreeVectorOfVectorsAdaptor(size_t, const VectorOfVectorsType&, int) [with VectorOfVectorsType = std::vector<std::vector<float> >; num_t = float; int DIM = -1; Distance = nanoflann::metric_L2; IndexType = long unsigned int; size_t = long unsigned int]: Assertion `mat.size() != 0 && mat[0].size() != 0' failed.
+[31m[alaserPGO-1] process has died [pid 270816, exit code -6, cmd /home/R26534/mmlins_ws/devel/lib/aloam_velodyne/alaserPGO /aft_mapped_to_init:=/Odometry /velodyne_cloud_registered_local:=/cloud_registered_body /cloud_for_scancontext:=/cloud_registered_lidar __name:=alaserPGO __log:=/home/R26534/.ros/log/086db036-e241-11f1-866b-0242ac110013/alaserPGO-1.log].
+log file: /home/R26534/.ros/log/086db036-e241-11f1-866b-0242ac110013/alaserPGO-1*.log[0m
+... logging to /home/R26534/.ros/log/086db036-e241-11f1-866b-0242ac110013/roslaunch-DEV-99bef9-270011.log
+Checking log directory for disk usage. This may take a while.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+]2;/home/R26534/mmlins_ws/src/SC-PGO/launch/fastlio_ouster64.launch
+[1mstarted roslaunch server http://127.0.0.1:33319/[0m
+
+SUMMARY
+========
+
+PARAMETERS
+ * /keyframe_meter_gap: 0.5
+ * /lidar_type: OS1-64
+ * /mapping_line_resolution: 0.4
+ * /mapping_plane_resolution: 0.8
+ * /mapviz_filter_size: 0.5
+ * /minimum_range: 0.5
+ * /rosdistro: noetic
+ * /rosversion: 1.17.0
+ * /save_directory: /home/R26534/Desk...
+ * /sc_dist_thres: 0.3
+ * /sc_max_radius: 80.0
+ * /scan_line: 64
+
+NODES
+  /
+    alaserPGO (aloam_velodyne/alaserPGO)
+
+[1mROS_MASTER_URI=http://127.0.0.1:60153[0m
+]2;/home/R26534/mmlins_ws/src/SC-PGO/launch/fastlio_ouster64.launch http://127.0.0.1:60153
+[1mprocess[alaserPGO-1]: started with pid [270816][0m
+all processes on machine have died, roslaunch will exit
+shutting down processing monitor...
+... shutting down processing monitor complete
+[1mdone[0m

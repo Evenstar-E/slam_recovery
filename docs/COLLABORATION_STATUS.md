@@ -3924,3 +3924,29 @@ run 已结束（11:53，`runner_stdout RUNNER_EXIT=0`，`final_state=HEALTHY`）
 
 **版本状态不变**：本地 main `34c0dd9`、远端 `103ae5b`，`f80dbe3`/`bc71167`/`34c0dd9` 仍未推送——
 本会话确认无任何凭据（无 helper、无凭据文件、无 `gh`、settings 无 token），已两次报用户请求内联 PAT。
+
+## 246. run v2（0.5×）结果：检查点时机修好，但后端崩溃 + driver 早停，仍无写回
+
+原件：`docs/four_host/mmlins_recovery_20261117/two_event_mmlins_v2_20261117/`，
+报告 `REPORT_V2_20261117.md`。12:40–12:57，`RUNNER_EXIT=0`，`final_state=HEALTHY`。
+
+**修好的（相对 v1）**：E2 触发从晚 26.41 s 变为早 0.39 s；E2 hold 从晚 36.3 s 变为早 0.10 s；
+E1/E2 快照相对越界点从晚 0.223 s / **9.71 s** 降到晚 **0.118 s / 0.00013 s**；
+E2 快照 `map_points=167263`（v1 只有 3873，说明地图被保住）。判据仍严格记为
+`LATE_AFTER_BOUNDARY`，但量级已从协议失败降到单帧到达量级。
+
+**新出现的两个失败（如实记）**：
+1. **`alaserPGO` 12:45:52 以 exit -6（SIGABRT）退出**：`KDTreeVectorOfVectorsAdaptor` 断言
+   `mat.size() != 0` 失败（SessionContext 空描述子），发生在 E1 resume 后 53 s、地图
+   「sleep/start a new active map」路径附近。**第二事件全程没有后端**，`pgo.log` 只有 E1 的
+   frozen/released 一对。同一源码与二进制在 v1（1.0×）跑完未崩——**未复现、未定位**，
+   既不能算到接线头上，也不能排除。
+2. **driver 12:49:23 `INPUT_STALE` 早停**：E2 后宿主休眠闸口 14.0 s bag = **28 s 墙钟** >
+   `--pose-stale-sec 15`，回放还继续 213 s bag 但没有 driver，第二事件之后的尾段不存在。
+
+**门与写回**：仍 `accepted 0 / rejected 2`，`clouds_published=0`。v2 的 paired 变为 0/12、0/15
+（Wilson 0），NIS 567.78 / 422.35；v1 的 paired 是 12/13、21/21 但检查点晚边界。
+**二者同时变化，不足以判定因果，不写「晚检查点制造了配对收益」这类结论。**
+
+**下一步**（都需用户决定）：先在不做 hold 的条件复现 PGO 崩溃路径并定位；再决定 stale 判据按回放速率
+换算还是改用中间速率。两者落地前不再开 run，门阈值不动。

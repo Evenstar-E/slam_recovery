@@ -30,4 +30,4 @@ driver 单帧成本 mean：pose 43.8 ms、scan 68.7 ms；v1 实收 4212+3553 帧
 
 ## 4. 结果
 
-（run 后填写，只写原件可核内容。）
+run 已结束，见 `REPORT_V2_20261117.md` 与 `two_event_mmlins_v2_20261117/`。本节只作索引，不改判据。
