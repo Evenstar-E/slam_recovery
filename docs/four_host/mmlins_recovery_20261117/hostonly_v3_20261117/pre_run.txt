@@ -1,0 +1,11 @@
+bag=/home/R26534/datasets/mmlins/campus_12_fl.bag
+bag_sha=a924b5f9b593fad111f2ef91197735b85c8d26d340f04d5ca61535f25eaaf2de
+dur_bag_sec=470
+play_rate=0.5
+recovery_commands=NONE
+master=http://127.0.0.1:41157
+2026-11-17T13:22:38+08:00
+2066f02533db78d61d753366bd322a8ac6e861976f5a5443ca112425afd7b2de  2026-11-17 11:43:54.378636549 +0800  /home/R26534/mmlins_ws/devel/lib/fast_lio/fastlio_mapping
+cc99d2ea5be3ac923c965cd9708b7e5b8587a76b1628dba0207e06693f82f886  2026-11-17 13:21:50.455253391 +0800  /home/R26534/mmlins_ws/devel/lib/aloam_velodyne/alaserPGO
+7b6291fdf17e5b66ba6888846ad5ace32f7f46a647694f02ac35f35421f0eca4  2026-11-17 13:21:11.538309369 +0800  /home/R26534/MM-LINS/SC-PGO/src/laserPosegraphOptimization.cpp
+mmlins_head=0b130ca73c0af39a48e79b0164c3dece9548ed01

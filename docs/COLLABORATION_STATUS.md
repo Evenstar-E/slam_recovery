@@ -3968,3 +3968,21 @@ v2 的 `alaserPGO` SIGABRT 做了纯静态追查，结论写进
 候选修法两条（**均未实施，等用户选择**）：A 在 `performSimilarClosure` 跳过空休眠图（非空时行为不变）；
 B 在 `act_change()` 前拒绝推进空地图（影响地图管理与回环候选集合，面更大）。
 两者都不改门阈值/ICP/估计器。
+
+## 248. host-only 复现 run（v3）：无 hold 不崩、守卫零触发，崩溃归因仍 `UNKNOWN`
+
+用户「A 授权」后：改法 A 已落地（`0b130ca`，`performSimilarClosure` 跳过空休眠图并打印
+`skipping sleeping map N`），`alaserPGO` 重建为 `cc99d2ea…`；随后跑了一次**无 driver、无任何恢复命令**的
+host-only run（`/tmp/mmlins_hostonly_v3_20261117`，0.5×，同 bag）。原件与报告：
+`docs/four_host/mmlins_recovery_20261117/{REPORT_HOSTONLY_V3_20261117.md,hostonly_v3_20261117/}`。
+
+**实测**：`pgo_alive_at_exit=1`，`/aft_pgo_odom` 7927 条到 bag 尾；`skipping sleeping map` **0 条**；
+`/Odometry` 两段休眠闸口 **23.7 s / 26.8 s**（bag 时间），与 2026-11-12 旧报告逐项一致；161 次 IMU 重初始化。
+
+**按预登记判据**：本次命中「无 skip 且不崩」——**既证明不了守卫被触发，也证明不了该路径原生可达**。
+三次 run 合并看：v1（1.0×+hold）不崩、v2（0.5×+hold）E1 后崩、v3（0.5×、无 hold）不崩；
+崩溃单次未复现，**归因保持 `UNKNOWN`**，既不写「原生缺陷」，也不写「接线导致」。
+
+**下一步（需新授权）**：① 用同速率+hold 重跑，验证修法 A 是否让 PGO 存活；若再崩且守卫未触发，
+需要栈回溯/core dump 另定位。② `--pose-stale-sec` 与回放速率不匹配已被 v3 证实必然误杀
+（47 s/54 s 墙钟断口 vs 15 s），要么按速率换算并在预登记声明，要么回到 1.0×。

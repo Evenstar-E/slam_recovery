@@ -1,0 +1,15 @@
+total 8904
+drwxr-xr-x 3 R26534 R26534     353 Nov 17 13:39 .
+drwxr-xr-x 6 R26534 R26534     426 Nov 17 13:39 ..
+-rw-r--r-- 1 R26534 R26534     751 Nov 17 13:39 bag_info.txt
+drwxr-xr-x 2 R26534 R26534      70 Nov 17 13:39 ctl
+-rw-r--r-- 1 R26534 R26534   26768 Nov 17 13:39 frontend.log
+-rw-r--r-- 1 R26534 R26534      62 Nov 17 13:39 host_bag_info.txt
+-rw-r--r-- 1 R26534 R26534     108 Nov 17 13:39 host_bag_sha256.txt
+-rw-r--r-- 1 R26534 R26534       0 Nov 17 13:39 listing.txt
+-rw-r--r-- 1 R26534 R26534    3718 Nov 17 13:39 pgo.log
+-rw-r--r-- 1 R26534 R26534 9040779 Nov 17 13:39 play.log
+-rw-r--r-- 1 R26534 R26534     773 Nov 17 13:39 pre_run.txt
+-rw-r--r-- 1 R26534 R26534     366 Nov 17 13:39 record.log
+-rw-r--r-- 1 R26534 R26534       5 Nov 17 13:39 result.txt
+-rw-r--r-- 1 R26534 R26534      14 Nov 17 13:39 runner_stdout.log

@@ -1,0 +1,78 @@
+[0m[ INFO] [1794892972.476057579]: [NATIVE_RECOVERY] pgo_hold marker directory /tmp/mmlins_hostonly_v3_20261117/ctl[0m
+[33mposegraph odom node 100 added.
+Whether to sleep the currently active map: 1
+Whether to start a new active map: 1
+Hold back, this is great!*******0.277861
+Number of sleeping maps after fusion: 0
+The number of keyframes of the currently active map after fusion: 155
+[33mposegraph odom node 200 added.
+[33mposegraph odom node 300 added.
+Whether to sleep the currently active map: 1
+Whether to start a new active map: 1
+Hold back, this is great!*******0.036883
+Number of sleeping maps after fusion: 0
+The number of keyframes of the currently active map after fusion: 320
+[SC loop] ICP fitness test failed (1.4684 > 0.7). Reject this SC loop.
+[SC loop] ICP fitness test failed (2.13065 > 0.7). Reject this SC loop.
+[SC loop] ICP fitness test failed (2.77032 > 0.7). Reject this SC loop.
+[SC loop] ICP fitness test failed (2.9151 > 0.7). Reject this SC loop.
+[SC loop] ICP fitness test failed (4.39916 > 0.7). Reject this SC loop.
+[SC loop] ICP fitness test failed (3.86198 > 0.7). Reject this SC loop.
+[SC loop] ICP fitness test failed (4.16483 > 0.7). Reject this SC loop.
+[SC loop] ICP fitness test failed (4.59111 > 0.7). Reject this SC loop.
+[33mposegraph odom node 400 added.
+[SC loop] ICP fitness test failed (0.947843 > 0.7). Reject this SC loop.
+[33mposegraph odom node 500 added.
+[SC loop] ICP fitness test failed (1.27045 > 0.7). Reject this SC loop.
+[SC loop] ICP fitness test failed (1.41033 > 0.7). Reject this SC loop.
+[SC loop] ICP fitness test failed (2.45205 > 0.7). Reject this SC loop.
+[SC loop] ICP fitness test failed (3.16646 > 0.7). Reject this SC loop.
+[33mposegraph odom node 600 added.
+[SC loop] ICP fitness test failed (1.38236 > 0.7). Reject this SC loop.
+[SC loop] ICP fitness test failed (1.23871 > 0.7). Reject this SC loop.
+[SC loop] ICP fitness test passed (0.503497 < 0.7). Add this SC loop.
+[SC loop] ICP fitness test passed (0.48443 < 0.7). Add this SC loop.
+[SC loop] ICP fitness test passed (0.426318 < 0.7). Add this SC loop.
+[SC loop] ICP fitness test passed (0.317881 < 0.7). Add this SC loop.
+[SC loop] ICP fitness test passed (0.23707 < 0.7). Add this SC loop.
+[SC loop] ICP fitness test passed (0.270998 < 0.7). Add this SC loop.
+[SC loop] ICP fitness test passed (0.293473 < 0.7). Add this SC loop.
+[SC loop] ICP fitness test passed (0.307224 < 0.7). Add this SC loop.
+[SC loop] ICP fitness test passed (0.30329 < 0.7). Add this SC loop.
+[SC loop] ICP fitness test passed (0.243622 < 0.7). Add this SC loop.
+terminate called without an active exception
+... logging to /home/R26534/.ros/log/e8245fe0-e246-11f1-8ca9-0242ac110013/roslaunch-DEV-99bef9-278365.log
+Checking log directory for disk usage. This may take a while.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+]2;/home/R26534/mmlins_ws/src/SC-PGO/launch/fastlio_ouster64.launch
+[1mstarted roslaunch server http://127.0.0.1:33657/[0m
+
+SUMMARY
+========
+
+PARAMETERS
+ * /keyframe_meter_gap: 0.5
+ * /lidar_type: OS1-64
+ * /mapping_line_resolution: 0.4
+ * /mapping_plane_resolution: 0.8
+ * /mapviz_filter_size: 0.5
+ * /minimum_range: 0.5
+ * /rosdistro: noetic
+ * /rosversion: 1.17.0
+ * /save_directory: /home/R26534/Desk...
+ * /sc_dist_thres: 0.3
+ * /sc_max_radius: 80.0
+ * /scan_line: 64
+
+NODES
+  /
+    alaserPGO (aloam_velodyne/alaserPGO)
+
+[1mROS_MASTER_URI=http://127.0.0.1:41157[0m
+]2;/home/R26534/mmlins_ws/src/SC-PGO/launch/fastlio_ouster64.launch http://127.0.0.1:41157
+[1mprocess[alaserPGO-1]: started with pid [279193][0m
+[alaserPGO-1] killing on exit
+shutting down processing monitor...
+... shutting down processing monitor complete
+[1mdone[0m
