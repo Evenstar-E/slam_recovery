@@ -3861,3 +3861,34 @@ rate 1.0，E1 `1711547999352267771`、E2 `1711548113452267771`（DECLARED_OBSERV
 `ctl/capabilities.json` 已生成（`native_reset_under_hold=deferred`、`hold_scope=map_writes+native_reset`、
 `publish_while_held=YES`）；driver 已在 `/Odometry`+`/velodyne_points` 注册。
 **尚无 E1/E2、hold/restore、PGO 冻结或尾段的原件**，不据此写任何结论。
+
+## 243. MM-LINS 两事件 run v1 结果：生命周期闭合，门两次拒绝，**无写回/接回**
+
+run 已结束（11:53，`runner_stdout RUNNER_EXIT=0`，`final_state=HEALTHY`）。原件：
+`docs/four_host/mmlins_recovery_20261117/two_event_mmlins_v1_20261117/`，报告
+`docs/four_host/mmlins_recovery_20261117/REPORT_20261117.md`。
+
+**达到的**：
+- 两事件都执行了完整检查点动作：E1 hold(frame 1135)→snapshot(221046 点)→restore→resume；
+  E2 hold(frame 2271)→snapshot(**3873 点**)→restore→resume；ack 全部 `valid=1`。
+- 跨进程冻结生效：`pgo.log` 有 `pgo_hold present: keyframe insertion frozen` 与
+  `released`，run 结束时标记无残留。
+- 宿主原生 `re_slam` 在 hold 期间被抑制（`deferred (12)…(20)`）；第二事件由同一生命周期处理；
+  尾段到 bag 结束（`trusted_keyframes_at_exit=2732`，录制 468 s）。
+- 门两次**安全拒绝**：E1 `MODE4_HARD_SLEEP_SPLIT`（holdout NIS 1393.57）、
+  E2 `MODE3_SOFT_BRIDGE_WAIT`（信息比 1.74<κ、NIS 53.06、重入 71.22 m）。
+
+**未达到的（主线两段）**：`message_disposition.repair.clouds_published=0`——
+**没有修复点云发布，也没有修复帧进入原生更新**。因此「原生恢复写回 → 接回输入 → 第二事件」
+中只有「第二事件」与检查点生命周期成立，**写回与接回未发生**。
+
+**本次暴露的缺陷（如实记）**：
+1. 两次检查点都是 `LATE_AFTER_BOUNDARY`（E1 晚 0.22 s，**E2 晚 9.71 s**），
+   `rollback_support=UNSUPPORTED_AT_OR_BEFORE_QSTART`——「回滚到污染前」未满足；
+2. driver 跟不上 10 Hz：E2 声明 230.09 s、实际 256.50 s 才触发（晚 26.41 s），`max_backlog=429`；
+   这直接导致 1；
+3. 恢复层没挡住宿主自身重建：E2 快照只剩 3873 点（E1 为 221046），全程 152 次 `IMU Initial Done`
+   （50 次在 E1 窗、85 次在 E2 窗）。无「不做 hold」基线，不能把重启归因于接线。
+
+**下一步**：要拿到真正的写回+接回，需新的一次用户授权 run，并先解决 driver 落后（如 `PLAY_RATE=0.5`
+并声明非实时证据）。门阈值不动——候选被拒也是证据。
