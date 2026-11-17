@@ -528,11 +528,11 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
     seeds = [42, 43, 44, 45, 46]
 
     # S1: Counterfactual R4 (no revisit) vs. R5 (loop revisit to Zone A) across 5 seeds
-    r4_nis_list, r4_info_list = [], []
-    r5_nis_list, r5_info_list = [], []
-    b5_narrow_nis_list, b5_narrow_info_list = [], []
-    b6_point_nis_list, b6_point_info_list = [], []
-    b6_pg_nis_list, b6_pg_info_list = [], []
+    r4_nis_list, r4_info_list, r4_before_list = [], [], []
+    r5_nis_list, r5_info_list, r5_before_list = [], [], []
+    b5_narrow_nis_list, b5_narrow_info_list, b5_narrow_before_list = [], [], []
+    b6_point_nis_list, b6_point_info_list, b6_point_before_list = [], [], []
+    b6_pg_nis_list, b6_pg_info_list, b6_pg_before_list = [], [], []
     # Tri-state paired-benefit evidence outcome recorded per branch (P1-1)
     r4_evidence_list, r5_evidence_list, b5_evidence_list = [], [], []
     b6_point_evidence_list, b6_pg_evidence_list = [], []
@@ -651,6 +651,7 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             reentry_anchor_pose=_bridge_anchor_at(min(quar_poses_drifted_r4)),
         )
         r4_info_list.append(rep_r4.weak_dir_info_after)
+        r4_before_list.append(rep_r4.weak_dir_info_before)
         r4_nis_list.append(rep_r4.holdout_nis)
         r4_evidence_list.append(rep_r4.evidence_status)
 
@@ -680,6 +681,7 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
         )
         b5_evidence_list.append(rep_b5.evidence_status)
         b5_narrow_info_list.append(rep_b5.weak_dir_info_after)
+        b5_narrow_before_list.append(rep_b5.weak_dir_info_before)
         b5_narrow_nis_list.append(rep_b5.holdout_nis)
 
         # Unscaled 3D voxel contamination of B5 when narrow-FoV LIO-SAM candidate is committed without Mode 2 screening:
@@ -734,6 +736,7 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             reentry_anchor_pose=_bridge_anchor_at(r5_keys[0]),
         )
         r5_info_list.append(rep_r5.weak_dir_info_after)
+        r5_before_list.append(rep_r5.weak_dir_info_before)
         r5_nis_list.append(rep_r5.holdout_nis)
         r5_evidence_list.append(rep_r5.evidence_status)
 
@@ -769,6 +772,7 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             reentry_anchor_pose=_bridge_anchor_at(r5_keys[0]),
         )
         b6_point_info_list.append(rep_b6_pm.weak_dir_info_after)
+        b6_point_before_list.append(rep_b6_pm.weak_dir_info_before)
         b6_point_nis_list.append(rep_b6_pm.holdout_nis)
         b6_point_evidence_list.append(rep_b6_pm.evidence_status)
         b6_point_mode_list.append(rep_b6_pm.mode.value)
@@ -809,6 +813,7 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             reentry_anchor_pose=_bridge_anchor_at(r5_keys[0]),
         )
         b6_pg_info_list.append(rep_b6_pg.weak_dir_info_after)
+        b6_pg_before_list.append(rep_b6_pg.weak_dir_info_before)
         b6_pg_nis_list.append(rep_b6_pg.holdout_nis)
         b6_pg_evidence_list.append(rep_b6_pg.evidence_status)
 
@@ -827,18 +832,24 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
         "S1_CrossScan_Holdout_Gate_Verification": {
             "R4_Dual_Blind_No_Evidence": {
                 "weak_dir_info_after": round(float(np.mean(r4_info_list)), 2),
+                "weak_dir_info_before": round(float(np.mean(r4_before_list)), 4),
+                "info_threshold_applied": round(max(3.0, 2.0 * float(np.mean(r4_before_list))), 4),
                 "holdout_nis": round(float(np.mean(r4_nis_list)), 3),
                 "mode": rep_r4.mode.value,
                 "paired_evidence_status": sorted(set(r4_evidence_list)),
             },
             "B5_Narrow_FoV_Filter_LIOSAM": {
                 "weak_dir_info_after": round(float(np.mean(b5_narrow_info_list)), 2),
+                "weak_dir_info_before": round(float(np.mean(b5_narrow_before_list)), 4),
+                "info_threshold_applied": round(max(3.0, 2.0 * float(np.mean(b5_narrow_before_list))), 4),
                 "holdout_nis": round(float(np.mean(b5_narrow_nis_list)), 3),
                 "mode": rep_b5.mode.value,
                 "paired_evidence_status": sorted(set(b5_evidence_list)),
             },
             "R5_Delayed_Revisit_Loop": {
                 "weak_dir_info_after": round(float(np.mean(r5_info_list)), 2),
+                "weak_dir_info_before": round(float(np.mean(r5_before_list)), 4),
+                "info_threshold_applied": round(max(3.0, 2.0 * float(np.mean(r5_before_list))), 4),
                 "holdout_nis": round(float(np.mean(r5_nis_list)), 3),
                 "mode": rep_r5.mode.value,
                 "paired_evidence_status": sorted(set(r5_evidence_list)),
@@ -846,6 +857,8 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             },
             "B6_Ours_Point_Mixture_FASTLIO2": {
                 "weak_dir_info_after": round(float(np.mean(b6_point_info_list)), 2),
+                "weak_dir_info_before": round(float(np.mean(b6_point_before_list)), 4),
+                "info_threshold_applied": round(max(3.0, 2.0 * float(np.mean(b6_point_before_list))), 4),
                 "holdout_nis": round(float(np.mean(b6_point_nis_list)), 3),
                 "mode": rep_b6_pm.mode.value,
                 "paired_evidence_status": sorted(set(b6_point_evidence_list)),
@@ -858,6 +871,8 @@ def run_s1_counterfactual_r4_vs_r5_and_s2_voxel_contamination() -> dict:
             },
             "B6_Ours_Aux_PoseGraph_LIOSAM": {
                 "weak_dir_info_after": round(float(np.mean(b6_pg_info_list)), 2),
+                "weak_dir_info_before": round(float(np.mean(b6_pg_before_list)), 4),
+                "info_threshold_applied": round(max(3.0, 2.0 * float(np.mean(b6_pg_before_list))), 4),
                 "holdout_nis": round(float(np.mean(b6_pg_nis_list)), 3),
                 "mode": rep_b6_pg.mode.value,
                 "paired_evidence_status": sorted(set(b6_pg_evidence_list)),

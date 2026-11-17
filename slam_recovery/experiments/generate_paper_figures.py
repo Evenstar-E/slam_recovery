@@ -635,6 +635,9 @@ def fig3_weak_direction_information_gain_and_4mode_gate() -> str:
     info_after = [gc[k]["weak_dir_info_after"] for k, _ in case_order]
     holdout_nis = [gc[k]["holdout_nis"] for k, _ in case_order]
     modes = [gc[k]["mode"] for k, _ in case_order]
+    # Current rule: J_after >= max(3.0, 2.0 * J_before). The manifest carries the applied value per
+    # case; a manifest produced before the relative rule has no field and keeps the historic 25.0.
+    info_thr = [float(gc[k].get("info_threshold_applied", 25.0)) for k, _ in case_order]
 
     bar_fills = [
         AUX_FILL if ("WAIT" in m or "Rejected" in m) else LIDAR_FILL
@@ -651,7 +654,7 @@ def fig3_weak_direction_information_gain_and_4mode_gate() -> str:
     _draw_dashed_group(
         ax_bg,
         (0.015, 0.525, 0.97, 0.455),
-        r"(a) Weak-Direction Fisher Information $v^\top \Lambda_{\mathrm{after}} v$ vs. Gate $\tau_{\mathrm{info}} = 25.0$",
+        r"(a) Weak-Direction Fisher Information $v^\top \Lambda_{\mathrm{after}} v$ vs. Gate $\max(\tau_{\mathrm{abs}},\, \kappa J_v^{\mathrm{before}})$ ($\tau_{\mathrm{abs}}=3.0$, $\kappa=2.0$)",
         "ONLINE_SIM_3D_MESH (S1)",
         title_size=11.0,
     )
@@ -670,12 +673,13 @@ def fig3_weak_direction_information_gain_and_4mode_gate() -> str:
     _style_inner_ax(ax2, "y")
 
     bars1 = ax1.bar(x, info_after, width=0.46, color=bar_fills, edgecolor=INK, linewidth=1.25, zorder=3)
-    ax1.axhline(25.0, color=AMBER_LINE, linestyle="--", linewidth=1.6, zorder=4, label=r"Observability Gate Threshold ($\tau_{\mathrm{info}} = 25.0$)")
+    ax1.hlines(info_thr, x - 0.33, x + 0.33, color=AMBER_LINE, linestyle="--", linewidth=1.9, zorder=4,
+               label=r"Gate $\max(3.0,\,2.0 J_v^{\mathrm{before}})$ (per case)")
 
     for b, m_str, b_fc in zip(bars1, modes, badge_fills):
         h = b.get_height()
         short_m = "Mode 2: Commit" if "MODE2" in m_str else "Mode 3: Wait"
-        y_pos = max(h + 4.5, 29.0) if (15.0 <= h <= 24.8) else (h + 4.5)
+        y_pos = max(h, info_thr[int(round(b.get_x() + b.get_width() / 2))]) + 4.5 if h < 25.0 else (h + 4.5)
         ax1.text(
             b.get_x() + b.get_width() / 2,
             y_pos,
@@ -714,7 +718,9 @@ def fig3_weak_direction_information_gain_and_4mode_gate() -> str:
         )
 
     ax2.set_ylabel(r"Holdout NIS $D_{\mathrm{holdout}}$", fontweight="bold")
-    ax2.set_ylim(0, 7.4)
+    # The regenerated cases reject with NIS 10-134, so the axis must follow the data instead of the
+    # historic 7.4 ceiling (which was set when every value was below 5.3).
+    ax2.set_ylim(0, max(7.4, float(np.max(holdout_nis)) * 1.18))
     ax2.set_xticks(x)
     ax2.set_xticklabels(cases, fontsize=9.0, fontweight="bold")
     leg2 = ax2.legend(loc="upper right", frameon=True, fontsize=8.6)

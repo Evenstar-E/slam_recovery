@@ -66,29 +66,112 @@
   },
   "gate_verification_cases": {
     "R4_Dual_Blind_No_Evidence": {
-      "weak_dir_info_after": 0.78,
-      "holdout_nis": 5.253,
-      "mode": "MODE3_SOFT_BRIDGE_WAIT"
+      "weak_dir_info_after": 0.79,
+      "weak_dir_info_before": 0.6431,
+      "info_threshold_applied": 3.0,
+      "holdout_nis": 133.686,
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "paired_evidence_status": [
+        "FAILED"
+      ]
     },
     "B5_Narrow_FoV_Filter_LIOSAM": {
-      "weak_dir_info_after": 20.51,
-      "holdout_nis": 2.522,
-      "mode": "MODE3_SOFT_BRIDGE_WAIT"
+      "weak_dir_info_after": 20.67,
+      "weak_dir_info_before": 2.0,
+      "info_threshold_applied": 4.0,
+      "holdout_nis": 17.856,
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "paired_evidence_status": [
+        "FAILED",
+        "PASSED"
+      ]
     },
     "R5_Delayed_Revisit_Loop": {
-      "weak_dir_info_after": 87.87,
-      "holdout_nis": 1.41,
-      "mode": "MODE2_ATOMIC_COMMIT"
+      "weak_dir_info_after": 88.09,
+      "weak_dir_info_before": 0.6431,
+      "info_threshold_applied": 3.0,
+      "holdout_nis": 10.38,
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "paired_evidence_status": [
+        "PASSED"
+      ],
+      "paired_evidence_diagnostics": {
+        "num_paired_frames": 10,
+        "required_paired_frames": 8,
+        "candidate_keyframes": 10,
+        "pairable_frames": 10,
+        "frames_without_independent_reference": 0,
+        "reference_frames_from_candidate": 16,
+        "num_improved_frames": 10,
+        "improved_fraction": 1.0,
+        "wilson_lower_bound": 0.7870282011880192,
+        "approved": true,
+        "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+        "incumbent_mean_residual": 30.614354393966636,
+        "candidate_mean_residual": 11.16718257919488,
+        "reentry_pos_jump_m": 0.007419211926453025
+      }
     },
     "B6_Ours_Point_Mixture_FASTLIO2": {
-      "weak_dir_info_after": 81.24,
-      "holdout_nis": 0.825,
-      "mode": "MODE2_ATOMIC_COMMIT"
+      "weak_dir_info_after": 73.07,
+      "weak_dir_info_before": 2.0,
+      "info_threshold_applied": 4.0,
+      "holdout_nis": 14.629,
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "paired_evidence_status": [
+        "PASSED"
+      ],
+      "gate_modes": [
+        "MODE3_SOFT_BRIDGE_WAIT"
+      ],
+      "trusted_keyframes_after_commit": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "committed_voxels_per_scenario": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "committed_voxels_mean": 0.0,
+      "contam_3d_per_scenario": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "paired_evidence_diagnostics": {
+        "num_paired_frames": 10,
+        "required_paired_frames": 8,
+        "candidate_keyframes": 10,
+        "pairable_frames": 10,
+        "frames_without_independent_reference": 0,
+        "reference_frames_from_candidate": 0,
+        "num_improved_frames": 10,
+        "improved_fraction": 1.0,
+        "wilson_lower_bound": 0.7870282011880192,
+        "approved": true,
+        "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
+        "incumbent_mean_residual": 148.3459412122715,
+        "candidate_mean_residual": 14.973099073417353,
+        "reentry_pos_jump_m": 0.007419211926453025
+      }
     },
     "B6_Ours_Aux_PoseGraph_LIOSAM": {
-      "weak_dir_info_after": 112.56,
-      "holdout_nis": 1.462,
-      "mode": "MODE2_ATOMIC_COMMIT"
+      "weak_dir_info_after": 112.78,
+      "weak_dir_info_before": 2.0,
+      "info_threshold_applied": 4.0,
+      "holdout_nis": 10.38,
+      "mode": "MODE3_SOFT_BRIDGE_WAIT",
+      "paired_evidence_status": [
+        "PASSED"
+      ]
     }
   },
   "s2_true_3d_voxel_contamination": {
@@ -114,10 +197,10 @@
     "provenance": "ONLINE_SIM_3D_MESH",
     "R4_no_evidence_mode": "MODE3_SOFT_BRIDGE_WAIT",
     "R4_accepted": false,
-    "R5_delayed_revisit_mode": "MODE2_ATOMIC_COMMIT",
+    "R5_delayed_revisit_mode": "MODE3_SOFT_BRIDGE_WAIT",
     "R5_accepted": true,
-    "R5_weak_dir_info_before": 0.78,
-    "R5_weak_dir_info_after": 87.87,
-    "R5_weak_dir_info_gain": 87.09
+    "R5_weak_dir_info_before": 0.79,
+    "R5_weak_dir_info_after": 88.09,
+    "R5_weak_dir_info_gain": 87.3
   }
 }

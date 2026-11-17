@@ -3766,3 +3766,37 @@ S1 已按审阅「只允许版本化负结果、实现边界与受控生命周�
   单位权 `|e_I|²` 分位、覆盖与成本），原件与数值逐项列在该文件。
 - 不得把 UNKNOWN 当零风险、不得填 NORMAL/SUSPECT 分类、误报/漏检/延迟或净收益。
 - 越过上限需要独立正常参照 + 同 run 逐帧标签 + 新预算授权，已在文件中列明但**未启动**。
+
+## 239. 用户决定（2026-11-17）：重新生成仿真数据/重绘 fig3；street_08 以 stage1 数值为准
+
+用户：「重新生成数据/重绘」「street_08 两篇数值不一致 … 都以后者为准」。
+
+### 重新生成（ONLINE_SIM_3D_MESH，无宿主 run）
+
+- `slam_recovery/sim/run_s1_s2_simulation_experiments.py` 现记录每例的 `weak_dir_info_before` 与
+  `info_threshold_applied = max(3.0, 2.0·J_before)`，属**记录字段**，不改门。
+- 重跑后五个 gate 案例**全部 MODE3（拒绝）**，与「修正参考后每个候选都被拒」一致：
+
+  | 案例 | J_before | J_after | 阈值 | holdout NIS | mode |
+  |---|---|---|---|---|---|
+  | R4 Dual-Blind | 0.6431 | 0.79 | 3.0 | 133.686 | MODE3 |
+  | B5 Narrow-FoV | 2.0 | 20.67 | 4.0 | 17.856 | MODE3 |
+  | R5 Delayed Revisit | 0.6431 | 88.09 | 3.0 | **10.38** | MODE3 |
+  | B6 Point Mixture | 2.0 | 73.07 | 4.0 | 14.629 | MODE3 |
+  | B6 Aux Pose-Graph | 2.0 | 112.78 | 4.0 | 10.38 | MODE3 |
+
+  旧值（R5 NIS 1.409/Mode2、B5 20.51/2.522 等）是修正参考前的版本，已被本次重跑取代；
+  `e2_ablation_b0_b7_and_r4_r5.json` 随 sim manifest 一并重生成，ATE 等其它字段未变。
+- **fig3 重绘**：阈值线改为逐案例 `max(3.0, 2.0 J_before)`（不再画 25.0），holdout 轴按新数据
+  （最大 133.686）自适应；PNG/PDF 同时更新到 `slam_recovery/experiments/figures/` 与
+  `paper_submission_package/figures/`。已目视核对两面板。
+
+### 论文同步
+
+- 根文件与 `paper_submission_package/paper_main.tex`（同步为同一版本）、stage1：fig3 图注、Mode 2 说明、
+  B5 数值（20.67 / 17.856）、stage1 表（0.79/133.686、20.67/17.856、88.09/10.38，B5 Paired 标 Mixed）、
+  以及 stage1 关于阈值来源的说明，均按重生成数据改写。
+- **street_08 统一**：以 stage1 的 `2.85–3.53`（清洁段）与 `1.38`（校准后桥接分数）为准，根文件同步。
+- **编译核验**：两份论文在本机（`/tmp/texlive`，缺 Courier TFM，临时副本 `\ttdefault=lmtt`）均 0 错误、
+  0 未定义引用；根 733 KB、stage1 235 KB。**已跟踪的两份 PDF（`paper_submission_package/paper_main.pdf`、
+  `paper_rss2027_stage1/paper_main.pdf`）未重生成**——本机 TeX 不完整，需在完整 TeX 环境重编译后再提交 PDF。

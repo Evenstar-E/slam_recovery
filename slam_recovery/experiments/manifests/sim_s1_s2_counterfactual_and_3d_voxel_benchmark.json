@@ -6,6 +6,8 @@
   "S1_CrossScan_Holdout_Gate_Verification": {
     "R4_Dual_Blind_No_Evidence": {
       "weak_dir_info_after": 0.79,
+      "weak_dir_info_before": 0.6431,
+      "info_threshold_applied": 3.0,
       "holdout_nis": 133.686,
       "mode": "MODE3_SOFT_BRIDGE_WAIT",
       "paired_evidence_status": [
@@ -14,6 +16,8 @@
     },
     "B5_Narrow_FoV_Filter_LIOSAM": {
       "weak_dir_info_after": 20.67,
+      "weak_dir_info_before": 2.0,
+      "info_threshold_applied": 4.0,
       "holdout_nis": 17.856,
       "mode": "MODE3_SOFT_BRIDGE_WAIT",
       "paired_evidence_status": [
@@ -23,6 +27,8 @@
     },
     "R5_Delayed_Revisit_Loop": {
       "weak_dir_info_after": 88.09,
+      "weak_dir_info_before": 0.6431,
+      "info_threshold_applied": 3.0,
       "holdout_nis": 10.38,
       "mode": "MODE3_SOFT_BRIDGE_WAIT",
       "paired_evidence_status": [
@@ -40,13 +46,15 @@
         "wilson_lower_bound": 0.7870282011880192,
         "approved": true,
         "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
-        "incumbent_mean_residual": 30.614354393966657,
-        "candidate_mean_residual": 11.167182579194877,
+        "incumbent_mean_residual": 30.614354393966636,
+        "candidate_mean_residual": 11.16718257919488,
         "reentry_pos_jump_m": 0.007419211926453025
       }
     },
     "B6_Ours_Point_Mixture_FASTLIO2": {
       "weak_dir_info_after": 73.07,
+      "weak_dir_info_before": 2.0,
+      "info_threshold_applied": 4.0,
       "holdout_nis": 14.629,
       "mode": "MODE3_SOFT_BRIDGE_WAIT",
       "paired_evidence_status": [
@@ -89,13 +97,15 @@
         "wilson_lower_bound": 0.7870282011880192,
         "approved": true,
         "reason": "passed_wilson_sequential_benefit_and_boundary_continuity",
-        "incumbent_mean_residual": 148.3459412122714,
-        "candidate_mean_residual": 14.973099073417321,
+        "incumbent_mean_residual": 148.3459412122715,
+        "candidate_mean_residual": 14.973099073417353,
         "reentry_pos_jump_m": 0.007419211926453025
       }
     },
     "B6_Ours_Aux_PoseGraph_LIOSAM": {
       "weak_dir_info_after": 112.78,
+      "weak_dir_info_before": 2.0,
+      "info_threshold_applied": 4.0,
       "holdout_nis": 10.38,
       "mode": "MODE3_SOFT_BRIDGE_WAIT",
       "paired_evidence_status": [
@@ -159,7 +169,7 @@
         "holdout_overlapping_reference": [],
         "reference_points_after_commit": 1500,
         "reference_mutated_by_candidate": false,
-        "gate_holdout_nis_for_candidate": 18.468519163093497,
+        "gate_holdout_nis_for_candidate": 18.468519163093493,
         "gate_holdout_support": {
           "holdout_frames_total": 2,
           "holdout_frames_scorable": 2,
@@ -216,7 +226,7 @@
         "holdout_overlapping_reference": [],
         "reference_points_after_commit": 1500,
         "reference_mutated_by_candidate": false,
-        "gate_holdout_nis_for_candidate": 21.995252923488096,
+        "gate_holdout_nis_for_candidate": 21.995252923488078,
         "gate_holdout_support": {
           "holdout_frames_total": 2,
           "holdout_frames_scorable": 2,
@@ -330,7 +340,7 @@
         "holdout_overlapping_reference": [],
         "reference_points_after_commit": 1500,
         "reference_mutated_by_candidate": false,
-        "gate_holdout_nis_for_candidate": 8.621922488014024,
+        "gate_holdout_nis_for_candidate": 8.621922488014027,
         "gate_holdout_support": {
           "holdout_frames_total": 2,
           "holdout_frames_scorable": 2,
@@ -387,7 +397,7 @@
         "holdout_overlapping_reference": [],
         "reference_points_after_commit": 1500,
         "reference_mutated_by_candidate": false,
-        "gate_holdout_nis_for_candidate": 11.51242861120919,
+        "gate_holdout_nis_for_candidate": 11.512428611209202,
         "gate_holdout_support": {
           "holdout_frames_total": 2,
           "holdout_frames_scorable": 2,
