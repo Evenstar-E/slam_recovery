@@ -885,3 +885,9 @@ E1 ICP TOO_FEW_INLIERS/0，失败退回incumbent使候选与基线相同，0/8�
 v9i可单列另一序列host_poses的限定paired-benefit（36/41、41/41），不是修复器/GT/accepted；E1信息/holdout失败，E2重入/信息/holdout/cp失败。v9j `_icp_core._fail`返回init，整段路径仍组成candidate=incumbent，属候选生成实现缺陷，非门阈值或无可改善量；S1只需一条“失败不得克隆初值进入有效候选”的回归，不扩异常矩阵。现有负结果不重跑；未来方法确认须先修语义并获用户新授权有界复验。
 
 A3资源继续后置，A6冒烟非前置；ALI-B2不代选A/B/C，完整评价仍须独立正常校准+故障标签，缺则资格-only/NOT_EVALUABLE；C2/C3可最终NOT_EVALUABLE不填0；E1仅以开发pgrep0作当前观测，原因UNKNOWN不杀进程；D1仅建议负结果/边界/生命周期更新，accepted/ALI/净收益不解禁；门研究既有关闭不重开。下一仅option③诚实生命周期收口，局部评分不全表，成本未确认UNAVAILABLE，中文SSH增量。
+
+## 112. 6e2b87c：重入错误结论撤回，失败ICP不再克隆incumbent候选
+
+[增量复核](review_20261117_6e2b87c/README.md)固定main `6e2b87c16383d2c6351543089cdcc78eab5fc244`，无新宿主run。开发撤回“0.5m唯一绑定/与真实运动互斥”和一般不可达，改当前实现/协议下未获accepted；v9i E1重入通过、信息/holdout失败，v9j重入通过、Wilson/holdout失败，v9i仅限定paired-benefit，口径与审阅一致。
+
+`_icp_candidate`仅CONVERGED/ITERATION_LIMIT生成候选，其余失败返回poses={}、_last_icp_delta=None、candidate_suppressed=true、frames_candidate=0，覆盖TOO_FEW/LOST/REFERENCE_TOO_SMALL，不再delta@inits克隆candidate=incumbent，冻结门/ICP常数/binary不变。新增回归以REFERENCE_TOO_SMALL走同一失败分支，源码级接受且不扩矩阵；开发报292全绿为归档，本机Python两次确认无pytest，未独立执行/安装，不把测试数当原生accepted。历史负结果保留，真实宿主未复验，自动检测/ALI-H仍NOT_EVALUABLE，A4/A6/A9/B2/B11不全表重评。下一仅option③诚实生命周期收口，未来复验须用户新授权，中文SSH增量。
