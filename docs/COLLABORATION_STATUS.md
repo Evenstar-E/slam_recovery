@@ -4077,3 +4077,28 @@ v4 检查点回到边界内后 incumbent 干净（499.5），候选就无优势�
 **可过门的结构性前提**：候选必须来自「隔离段扫描 → trusted map」的配准（`icp_reregistration` /
 `per_frame_*` / `motion_prior_*`），而不是复用宿主自己的位姿。这是选项 ② 的内容；
 FAST-LIO2 上同类候选 11 次 run 均卡 ③/④，故对其预期不高。
+
+## 253. LIO-SAM 恢复层接线完成，首次两事件 run：生命周期闭合、门两拒、检查点 stamp 缺陷已修
+
+用户 2026-11-17 选定「① 转 LIO-SAM/ORB」并授权本次 run。原件
+`docs/four_host/liosam_recovery_20261117/two_event_liosam_v1_20261117/`，报告 `REPORT_V1_20261117.md`。
+
+**接线**：`LIO-SAM/src/mapOptmization.cpp` +254/−3（补丁存档 `patches/`）。hold 只停关键帧与图写入、
+继续跟踪发布；snapshot 复制位姿/关键帧云/iSAM2 因子与估计；restore 用全图 `update()` 重建。
+诚实声明 `reprocess=NO`、`measurement_relay=NO`、`native_reset_under_hold=not_applicable`，
+故本次**未启用 `--require-contract`**。
+
+**run（17:4x，118 s bag @0.5×，E1/E2=40/80 s，早于 120–140 s 输入退化窗）**：
+- 两事件 `hold→snapshot→restore→resume` 全部 `valid=1`（E1 kf 9/factors 15；E2 kf 23/factors 30）；
+- driver `terminal_reason=None`；`/lio_sam/mapping/odometry` 589 条覆盖 0–117.6 s、无断流；
+- 门两次拒绝（`MODE3`）：E1 info 20.20→**19.80**（负增益）、NIS 213.70、paired 1/11；
+  E2 18.92→**17.59**、NIS 1134.66、paired 0/11；`clouds_published=0`。
+
+**发现的自身缺陷（已修未复验）**：两次检查点都记 `LATE_AFTER_BOUNDARY` 且恰好晚 0.10019 s——
+延迟命令在到达帧入口执行，内容虽是上一帧状态，但 stamp 用了到达帧。改为记录
+`nr_last_proc_time` 并把延迟检查移入 `mappingProcessInterval` 分支；新二进制 `e9373b30…`。
+本报告数字全部来自修正前的 `f7733000…`。
+
+**M2DGR 相机数据核查**：`datasets/mmlins/*` 的 8 个 bag **无任何相机话题**；
+`M2DGR/raw/` 中 hall_01(351 s)、hall_02(128 s)、room_02(75 s)、room_dark_01(106 s) **有相机**，
+room_dark_02 与 street_08 没有。故 ORB-SLAM3 的「换序列」只能从这四个里选，且仍需验证视差。

@@ -1,0 +1,4 @@
+[0m[ INFO] [1794908922.707985897]: Subscribing to /lio_sam/mapping/loop_closure_constraints[0m
+[0m[ INFO] [1794908922.709084592]: Subscribing to /lio_sam/mapping/odometry[0m
+[0m[ INFO] [1794908922.709840308]: Subscribing to /lio_sam/mapping/path[0m
+[0m[ INFO] [1794908922.962221531, 1711547453.303819550]: Recording to '/tmp/liosam_two_event_v1_20261117/host.bag'.[0m

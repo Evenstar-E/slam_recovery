@@ -1,0 +1,2 @@
+[INFO] [1794908916.534289, 0.000000]: [slam_recovery] listening on /lio_sam/mapping/odometry and /velodyne_points (repair publisher: off)
+[INFO] [1794909179.817749, 1711547571.295384]: [slam_recovery] wrote 2 candidate rows to /tmp/liosam_two_event_v1_20261117

@@ -1,0 +1,17 @@
+bag=/home/R26534/datasets/mmlins/campus_1(2)-003.bag
+bag_sha=1fb5d827696b193471de9d5bc636230705fec8514e749f7a82e4fef7ebdddea3
+dur_bag_sec=118
+E1=1711547493390621184
+E2=1711547533390621184
+play_rate=0.5
+arm_lead=3
+candidate_source=host_poses
+margin=2.0
+guard_pose_stale=30 guard_signal_window=60 guard_hib_max=180 guard_repair_sync=10 guard_first_grace=120
+master=http://127.0.0.1:53713
+2026-11-17T17:48:16+08:00
+f773300095bf15ed24217d39c88c60c87fd2e466d20d2491649543f208efd5a8  2026-11-17 17:19:15.417724607 +0800  /home/R26534/catkin_ws/devel/lib/lio_sam/lio_sam_mapOptmization
+dd727cc726a465827a299e395841fcf001acb70609a0e7f74c061faa3d136a74  2026-11-17 17:17:52.421130107 +0800  /home/R26534/LIO-SAM/src/mapOptmization.cpp
+67a14f0a01a0df49482c306b10735cf90e19e58d5c9b02265523e70adb76057b  2026-11-02 17:56:45.589571182 +0800  /home/R26534/LIO-SAM/config/params_mmlins.yaml
+00691c6b55423adc035d679ced54796ec4f2d768e2e39a647c7f08c85a64d5d4  2026-11-17 10:18:03.711869573 +0800  /home/R26534/MM-LINS/slam_recovery/ros/recovery_node.py
+liosam_commit=0be1fbe6275fb8366d5b800af4fc8c76a885c869

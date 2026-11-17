@@ -1,0 +1,17 @@
+{
+  "snapshot": "YES",
+  "restore": "YES",
+  "hold": "YES",
+  "reprocess": "NO",
+  "set_state": "NO",
+  "measurement_relay": "NO",
+  "checkpoint_contents": ["keyframe_poses", "keyframe_clouds", "isam2_factors", "isam2_values", "current_transform"],
+  "checkpoint_excludes": ["imu_preintegration (owned by the imuPreintegration node)", "current downsampled scan"],
+  "notes": "restore rebuilds ISAM2 from the stored factors with one full update; the IMU preintegration state of the other nodes is not checkpointed",
+  "semantics": {"apply_stamp": "YES", "ack_levels": ["deferred", "applied"],
+                 "checkpoint_validity": "until_restore_or_keyframe_reset",
+                 "publish_gating": "always (hold suppresses keyframe and graph writes, not publication)",
+                 "native_reset_under_hold": "not_applicable (LIO-SAM has no native reset path)"},
+  "hold_scope": "keyframe_and_graph_writes",
+  "publish_while_held": "YES"
+}
