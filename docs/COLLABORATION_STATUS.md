@@ -3986,3 +3986,23 @@ host-only run（`/tmp/mmlins_hostonly_v3_20261117`，0.5×，同 bag）。原件
 **下一步（需新授权）**：① 用同速率+hold 重跑，验证修法 A 是否让 PGO 存活；若再崩且守卫未触发，
 需要栈回溯/core dump 另定位。② `--pose-stale-sec` 与回放速率不匹配已被 v3 证实必然误杀
 （47 s/54 s 墙钟断口 vs 15 s），要么按速率换算并在预登记声明，要么回到 1.0×。
+
+## 249. 配对翻转的落脚点（纯分析，无新 run）：incumbent 变好，不是 candidate 变差
+
+用两份已提交的 `run_summary.json` 比对 `paired_evidence`：
+
+| run/事件 | incumbent | candidate | 改善帧 | Wilson |
+|---|---|---|---|---|
+| v1 E1 | 1730.1 | 1418.2 | 12/13 | 0.718 |
+| v2 E1 | **439.7** | 564.5 | 0/12 | 0.0 |
+| v1 E2 | 1514.4 | 54.5 | 21/21 | 0.886 |
+| v2 E2 | **408.2** | 426.1 | 0/15 | 0.0 |
+
+两 run 的 `reference_frames_from_candidate` 均为 1、`frames_without_independent_reference` 均为 0，
+即配对基准构造方式未变；变的是**未修复轨迹质量**（v2 incumbent 约为 v1 的 1/4），candidate 略差，
+于是由通过变不通过。
+
+与「v1 检查点晚于越界点、污染进入 incumbent」机制一致，但**不是证明**——两 run 之间还同时变了速率；
+要分离需固定速率只移检查点位置的对照实验。本节不改 REPORT_V2 §4 的「不判因果」口径。
+
+**版本**：本机 `main@04fba07`（本节提交后前进），远端仍 `103ae5b`；待推提交继续累积，凭据仍缺。
