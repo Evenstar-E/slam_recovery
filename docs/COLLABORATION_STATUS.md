@@ -3709,3 +3709,50 @@ FIM 占整对 ~80%，是唯一有意义的优化目标；本机噪声使单次�
 
 `62f294b` / `aa731b5` 已关闭；C-2 旋转相关、不得集成；无新数据或新证据。审阅分类「非阻断、不重开」，
 本轮不启动「在线误报上游检测」。
+
+## 237. 其余事项执行（2026-11-17）：ALI-H 资格盘点、D1 受限范围改写、论文编译核验
+
+用户授权「开始执行其余事项」。分工：S1 做运行/测量（§236 A6/A3/E1），两个**只读**审计同时进行
+（ALI-H 原件盘点、`paper_main.tex` 证据一致性审计）。本节的结论均由 S1 抽查原件后采纳。
+
+### ALI-H（ALI-B2 / C2 / C3）——今天上限是「资格-only」
+
+只读盘点结果（原件：`docs/ali_h_v1_research/manifest.json`（`normal_reference` 为空/`BLOCKED`）、
+`REPORT.md`、`T2_RESULTS.md`、`T2_V11_RESULTS.md`、`F2_FASTLIO_CHANNEL_ELIGIBILITY.md`、
+`docs/milestone_m0_keys.json`、`docs/DAILY_20261109.md`）：
+
+- **没有任何同时满足「独立确认正常前缀」的材料**；`labels.jsonl` 在归档中为空；无人工标注文件。
+- 数据集层面有 M2DGR `hall_01`（Leica 3-DoF GT）与 `room_*`（Vicon 6-DoF GT），但**未被 ALI-H 使用**，
+  且轨迹 GT ≠ 健康/故障标签；`campus_12_fl.bag` 只有 IMU+LiDAR、无 GT；KITTI 未下载。
+- 版本化的注入记录存在（M0 `INJECTION_ORACLE` 19.939 s/200 帧；E1/E2 文字声明），但**未与 ALI-H run
+  同 run、逐帧绑定**；`injection: NONE` 只表示运行时不额外自注入。
+- 因此 C2/C3 仍 `BLOCKED`、C4 `NOT_EVALUABLE`；今天可报的只有资格层（run/input 身份、逐帧资格、
+  join 状态、UNKNOWN 区间、单位权 `|e_I|²` 分位、覆盖与成本），**不得**填 NORMAL/SUSPECT 分类、
+  误报/漏检/延迟或方法有效性。
+
+**请用户三选一（互不新增 run/注入，除非另行授权）**：
+① 接受资格-only 收口（零新增授权，C2/C3/C4 明确写 `BLOCKED`/`NOT_EVALUABLE`）；
+② 授权把 `hall_01` 的 Leica 3-DoF GT 作为**代理正常参照**做离线校准（需核对时间基/覆盖，仍无事件标签，
+   漏检/延迟仍 `NOT_EVALUABLE`）；
+③ 在②基础上，把现有声明注入窗登记为**仅离线标签**（单窗、不可外推自然故障）。
+未选择前不写收口文档，保持现状。
+
+### D1 论文——按审阅受限范围改写（只做事实更正与主张限定）
+
+审计（只读）逐行核对两份 tex：根 `paper_main.tex` 与 `paper_rss2027_stage1/paper_main.tex`（两篇不同论文）。
+S1 已按审阅「只允许版本化负结果、实现边界与受控生命周期」的范围**改写事实与措辞，未删除任何性能数字**：
+
+- stage1：信息腿改为 `J_c ≥ max(3.0, 2.0 J_0)`（原写 25，且 25 只是测试配置）；重入改为时间包络
+  `d ≤ 0.50 + 2.0 Δt`（原写裸 0.5 m）；「verified admission」改为「该分支同样什么都没接纳」；
+  revisit 的 `20/20、7.4 mm、Admit` 明确标为**已撤回**（表内改 `Withdrawn` 并加脚注）。
+- 根文件：摘要「accepted repair passes」限定为「离线构造、仅在校准噪声尺度下通过、无原生 accepted 提交」；
+  Mode 2 公式补上 `max(τ_abs, κ·J_before)`、`holdout`、`P_after`、`L(k,n)≥w_min`、重入包络，并注明
+  `κ=2.0, τ_abs=3.0, w_min=0.55`；图注注明图内 `τ=25.0` 为历史阈值；Campus-2 改「离线图级检查」；
+  ORB-SLAM3 B6 标 `OFFLINE_CONSTRUCT`；ALI 检测 `1.000` 改为「脚本标签下 5/5；真实扫描误报/漏检仍
+  `NOT_EVALUABLE`」；street_08 与 room_dark_02 的措辞按包络与校准限定。
+- **未解决（需用户决定/归档核对）**：根文件 `:396` 与 stage1 `:108` 的 street_08 清洁段数值不一致
+  （`2.80–3.56` vs `2.85–3.53`，校准后 `1.42` vs `1.38`）；若干性能/点数数值在四份证据文档中无对应记录，
+  已保留原值但要求逐项绑定原始归档后再引用于结论。
+- **编译核验**：本机 `/tmp/texlive` 缺 Courier TFM（`pcrr8t`），用临时副本把 `\ttdefault` 换为 `lmtt`
+  仅做语法/引用核验（未改仓库字体设置）：根文件 733 KB、stage1 235 KB，bibtex 后 0 个未定义引用/文献。
+  该核验不等于完整构建（字体被替换）。
