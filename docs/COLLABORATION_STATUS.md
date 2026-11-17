@@ -3800,3 +3800,19 @@ S1 已按审阅「只允许版本化负结果、实现边界与受控生命周�
 - **编译核验**：两份论文在本机（`/tmp/texlive`，缺 Courier TFM，临时副本 `\ttdefault=lmtt`）均 0 错误、
   0 未定义引用；根 733 KB、stage1 235 KB。**已跟踪的两份 PDF（`paper_submission_package/paper_main.pdf`、
   `paper_rss2027_stage1/paper_main.pdf`）未重生成**——本机 TeX 不完整，需在完整 TeX 环境重编译后再提交 PDF。
+
+## 240. 审阅回传（`423fee0`）：接受撤回与失败候选语义修复；无新 accepted；主线仍 option ③
+
+审阅分支 `review/repair-f3-handoff-20261110` 新增 `423fee0`（基线 `origin/main=6e2b87c`），
+文件 `docs/review_20261117_6e2b87c/README.md`。S1 已核对：
+
+- **接受**两处撤回（「0.5 m 重入是唯一绑定约束」「与真实运动互斥」）与 v9i/v9j 的限定口径；
+- **接受源码级关闭** v9j 的失败候选克隆缺陷：`_icp_candidate` 仅在 `CONVERGED/ITERATION_LIMIT`
+  产出候选，其它失败状态 `poses={}`、`_last_icp_delta=None`、`candidate_suppressed=true`；
+  不要求扩异常矩阵。审阅侧未独立跑 pytest（其 Python 无 pytest），我方 291→292 全绿按开发侧记录。
+- **未关闭**：修复后的失败语义尚未在真实 FAST-LIO run 中复验；无新 accepted、无 native update/map；
+  ALI-H 仍 `NOT_EVALUABLE`；option ③ 仍表示「当前实现/协议下停止并收口」，不是科学不可达。
+- 下一主线仍是**诚实、可核的回滚＋重启收口包**，不再开新 run；若将来用户重新授权候选方法复验，
+  使用本次失败语义修正，不通过降门制造 accepted。
+
+本文件 §236–§239 的提交（`e6c08b9`、`55d4ccb`、`ba2942d`）在 `423fee0` 之后，审阅尚未覆盖；不代其判断。
