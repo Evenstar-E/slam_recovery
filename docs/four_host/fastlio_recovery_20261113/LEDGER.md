@@ -411,3 +411,20 @@ E1/E2 回到**清单原始声明** 115.599 / 229.696 s；`candidate_source=icp_r
 - 链路：两次 wait_limit_closed(2 s) → rearm → resume；退出 `HEALTHY`，`terminal=INPUT_STALE`（bag 末静默 15.4 s）。
 - 结论：0.5 m 重入连续性界是当前的绑定约束；能同时满足连续性与收益的设置是「静止窗口 + 注入偏置」，
   v9d/v9e 的注入窗都在移动段。该方向需用户授权，本轮不自行开始。
+
+## STATIC-INJECTION（2026-11-17，§234 预注册的唯一授权 run）：候选生成器失效，门拒绝；option ③ 收口
+
+`two_event_v9j_static_injected`；campus_12_fl，注入窗 bag 111.000–116.000 s、body z +0.500 m
+（relay 2352 帧），E1=115.599 s、E2=229.696 s，`candidate_source=icp_reregistration`，`PLAY_RATE=0.5`。
+
+| 事件 | 帧 | 改善 | inc → cand | 重入跳跃 | 拒绝 |
+|---|---|---|---|---|---|
+| E1 115.599 s（kf 1156） | 22（配对 8） | **0/8** | 2319.8 → 2319.8（逐位相同） | 1.074 m | Mode 4 |
+| E2 229.696 s（kf 2090） | 22 | **0/22** | 2016.0 → 2151.0 | 0.071 m | Mode 3 |
+
+- E1 的 ICP 段拟合 `TOO_FEW_INLIERS`（0.5 m 位移下收紧到 0.25 m 门后内点不足），失败路径把位姿退回初值，
+  候选=incumbent，收益必为 0。**这是候选生成器的失败，不是「无可改善量」的证明**，如实记录。
+- 链路仍闭合：hold→snapshot（221901 点，frame 1117，`AT_OR_BEFORE_BOUNDARY`）→ 22 帧 → restore →
+  wait 2 s 关闭 → rearm → resume；E2 快照 166079 点（`LATE_AFTER_BOUNDARY` 0.1 s）；退出 `HEALTHY`。
+- 按 §234 预注册判据（门是否接受）与用户规则，**转 option ③**：不再开新 run，accepted 链在本宿主+本序列
+  判为不可达；最终口径见 COLLABORATION_STATUS §234 末条。
