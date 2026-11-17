@@ -1,0 +1,81 @@
+{
+  "reviewed_ref": "7b134b37a62d8d1dcbe4075caf6b2013252b60a8",
+  "scope": "read-only archived run and source; no ROS, rebuild, new run, or algorithm execution",
+  "injection": {
+    "frame_records": 2350,
+    "shifted_frames": 50,
+    "body_z_m": 0.5
+  },
+  "events": [
+    {
+      "candidate_id": "cand_0000",
+      "icp_status": "TOO_FEW_INLIERS",
+      "icp_inliers": 0,
+      "improved_frames": 0,
+      "paired_frames": 8,
+      "incumbent_mean_residual": 2319.838641826977,
+      "candidate_mean_residual": 2319.838641826977,
+      "wilson_lower_bound": 0.0,
+      "info_before": 0.19870250677659348,
+      "info_after": 160.72062133983994,
+      "info_kappa_pass": true,
+      "holdout_nis": 2183.5516283751977,
+      "holdout_pass": false,
+      "reentry_elapsed_s": 4.100947857,
+      "reentry_envelope_m": 8.701895714,
+      "reentry_jump_m": 1.074036554583728,
+      "reentry_envelope_pass": true,
+      "checkpoint_check": {
+        "boundary_stamp_ns": 1711547995375663519,
+        "actual_stamp_ns": 1711547995374664704,
+        "actual_frame": 1117,
+        "status": "AT_OR_BEFORE_BOUNDARY",
+        "rollback_support": "WITHIN_DECLARED_BOUNDARY"
+      },
+      "accepted": false
+    },
+    {
+      "candidate_id": "cand_0001",
+      "icp_status": "ITERATION_LIMIT",
+      "icp_inliers": 1751,
+      "improved_frames": 0,
+      "paired_frames": 22,
+      "incumbent_mean_residual": 2016.0204536526237,
+      "candidate_mean_residual": 2150.976476675817,
+      "wilson_lower_bound": 0.0,
+      "info_before": 17.702251928751668,
+      "info_after": 196.49851647231577,
+      "info_kappa_pass": true,
+      "holdout_nis": 2137.9033874094703,
+      "holdout_pass": false,
+      "reentry_elapsed_s": 4.199670554,
+      "reentry_envelope_m": 8.899341108,
+      "reentry_jump_m": 0.07112884948164097,
+      "reentry_envelope_pass": true,
+      "checkpoint_check": {
+        "boundary_stamp_ns": 1711548109473230600,
+        "actual_stamp_ns": 1711548109573527296,
+        "actual_frame": 2048,
+        "status": "LATE_AFTER_BOUNDARY",
+        "rollback_support": "UNSUPPORTED_AT_OR_BEFORE_QSTART"
+      },
+      "accepted": false
+    }
+  ],
+  "lifecycle": {
+    "final_state": "HEALTHY",
+    "quarantine_open_at_exit": false,
+    "unresolved_segments": 1,
+    "terminal_reason": "INPUT_STALE",
+    "repair_clouds_published": 0,
+    "reprocesses": 0,
+    "automatic_detection": "NOT_EXECUTED"
+  },
+  "interpretation": {
+    "option3": "a preregistered stop/closure decision, not accepted recovery or proof that repair is scientifically impossible",
+    "E1": "candidate generation failed and returned incumbent; zero measured benefit does not prove zero improvable error",
+    "reentry": "both events pass the elapsed-time envelope; 0.5 m is not the sole or current binding constraint",
+    "other_gates": "both events fail Wilson and holdout NIS; E2 checkpoint is also late"
+  },
+  "verdict": "REAL_NEGATIVE_RESULT_AND_PARTIAL_LIFECYCLE_EVIDENCE; NO_ACCEPTED_NATIVE_REPAIR"
+}
