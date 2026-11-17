@@ -1,4 +1,5 @@
 #include <fstream>
+#include <unistd.h>
 #include <math.h>
 #include <vector>
 #include <mutex>
@@ -78,6 +79,18 @@ int sleepmapsize  = 0;
 
 Pose6D odom_pose_prev{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // init
 Pose6D odom_pose_curr{0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; // init pose is zero
+
+// MM-LINS recovery: the front-end owns the hold state and publishes it as a marker file in the
+// same directory as its cmd/ack channel. While the marker exists this node consumes odometry and
+// scans but inserts no keyframe, adds no factor and runs no optimisation, so the pose graph keeps
+// the state it had when the trusted map was snapshotted.
+static std::string g_nr_dir;
+static int g_nr_hold_state = 0;   // 0 = not yet observed, 1 = released, 2 = held
+static bool pgo_map_held()
+{
+    if (g_nr_dir.empty()) return false;
+    return ::access((g_nr_dir + "/pgo_hold").c_str(), F_OK) == 0;
+}
 
 std::queue<nav_msgs::Odometry::ConstPtr> odometryBuf;
 std::queue<sensor_msgs::PointCloud2ConstPtr> fullResBuf;
@@ -991,6 +1004,28 @@ void process_pg()
                 translationAccumulated += delta_translation;
                 rotaionAccumulated += (dtf.roll + dtf.pitch + dtf.yaw); // sum just naive approach.
 
+                // Native recovery hold: the front-end is publishing from a held map, so consume the
+                // frame but insert nothing. Resetting the accumulator makes the first post-resume
+                // keyframe measure displacement from the last pose seen while held, not the whole
+                // quarantined interval.
+                if (pgo_map_held())
+                {
+                    if (g_nr_hold_state != 2)
+                    {
+                        g_nr_hold_state = 2;
+                        ROS_WARN("[NATIVE_RECOVERY] pgo_hold present: keyframe insertion frozen");
+                    }
+                    translationAccumulated = 0.0;
+                    rotaionAccumulated = 0.0;
+                    isNowKeyFrame = false;
+                    continue;
+                }
+                if (g_nr_hold_state == 2)
+                {
+                    g_nr_hold_state = 1;
+                    ROS_INFO("[NATIVE_RECOVERY] pgo_hold released: keyframe insertion resumed");
+                }
+
                 if (translationAccumulated > keyframeMeterGap || rotaionAccumulated > keyframeRadGap)
                 {
                     isNowKeyFrame = true;
@@ -1246,7 +1281,10 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "laserPGO");
     ros::NodeHandle nh;
 
-    nh.param<double>("keyframe_meter_gap", keyframeMeterGap, 0.5); 
+    nh.param<double>("keyframe_meter_gap", keyframeMeterGap, 0.5);
+    nh.param<std::string>("native_recovery_dir", g_nr_dir, "");
+    if (!g_nr_dir.empty())
+        ROS_INFO("[NATIVE_RECOVERY] pgo_hold marker directory %s", g_nr_dir.c_str());
     nh.param<double>("keyframe_deg_gap", keyframeDegGap, 5.0);     
     keyframeRadGap = rad2deg_(keyframeDegGap);                    
     nh.param<double>("sc_dist_thres", scDistThres, 0.6);     

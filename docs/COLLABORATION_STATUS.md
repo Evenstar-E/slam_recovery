@@ -3830,3 +3830,34 @@ S1 已按审阅「只允许版本化负结果、实现边界与受控生命周�
   11 次 run 的已验证项、未达成项、收窄口径、产物索引与重开条件。
 - 事实核对：v9i 的拒绝原因是信息增益比 1.012（<κ=2.0）与 holdout 2293，不是重入连续性；
   v9j E1 的候选≡incumbent 是候选生成器缺陷（已修）。两处与 §233/§235 一致。
+
+## 242. MM-LINS 恢复层接线（源码级）与一次有界两事件 run 的启动
+
+按用户 2026-11-17「执行下一步，我授权run」执行。**只写已发生的动作与可复核的构建事实；run 结果另记。**
+
+**前端端口（可复核）**：`FAST-LIO/src/laserMapping.cpp` 换成 FAST-LIO2 v9 恢复通道版。
+复核方式：把原 MM-LINS 文件在 `/tmp` 里套 `diff -u` 补丁后与
+`/home/R26534/fastlio2_ws/src/FAST-LIO/src/laserMapping.cpp` 比较，sha 同为 `4bd859a9…`，
+即端口是已验证的同一份代码，不是手抄。总 diff：+458/−3 行（相对原 MM-LINS 文件）。
+
+**新增 `pgo_hold`（仅 MM-LINS）**：前端 `hold` 应用时写 `<native_recovery_dir>/pgo_hold`，
+`resume/release` 时删除；SC-PGO `process_pg()` 在累积位移后检查该标记，存在则消费该帧但不插关键帧、
+不加因子、不跑 iSAM2，并清零 `translationAccumulated`/`rotaionAccumulated`。标记路径取自 ROS 参数
+`native_recovery_dir`（两节点启动前 `rosparam set`）。PGO 侧改动 +40 行。
+门阈值、`IcpConfig`、前端 LIO、PGO 噪声模型、关键帧间距、bag 与事件戳**均未改**。
+
+**构建（实际命令与环境）**：`catkin_make -j4`，需显式
+`LIBRARY_PATH=$HOME/mm/ros/lib` 才能链接 `-ltbb/-ltbbmalloc`（首轮链接失败即此原因）。
+现二进制：前端 `fastlio_mapping` sha `2066f025…`（11:43）、后端 `alaserPGO` sha `e3766eb3…`（11:43）；
+两者 `strings` 均含 `nr_write_pgo_hold` / `pgo_hold present: keyframe insertion frozen`。
+**如实记录**：首轮链接失败使旧前端二进制被 ld 删除，旧 sha `59674a8f…`
+（`mmlins_campus12_20261112/REPORT.md` 记录的那枚）在本机已不存在，仅可引旧报告。
+
+**run（进行中，非结果）**：预登记 `docs/four_host/mmlins_recovery_20261117/PREREGISTRATION_20261117.md`
+（run 前写定判据）。11:45 启动
+`run_two_event_mmlins.sh /tmp/mmlins_two_event_v1_20261117 campus_12_fl.bag 470`，
+rate 1.0，E1 `1711547999352267771`、E2 `1711548113452267771`（DECLARED_OBSERVATION，非注入），
+`--detection off`，`host_poses` 候选。核到的事实：前端/后端/录制/driver/回放五个进程同刻存活；
+`ctl/capabilities.json` 已生成（`native_reset_under_hold=deferred`、`hold_scope=map_writes+native_reset`、
+`publish_while_held=YES`）；driver 已在 `/Odometry`+`/velodyne_points` 注册。
+**尚无 E1/E2、hold/restore、PGO 冻结或尾段的原件**，不据此写任何结论。
