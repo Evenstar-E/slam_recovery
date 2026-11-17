@@ -39,6 +39,7 @@ trap cleanup EXIT
   echo "bag=$BAG"; echo "bag_sha=$(sha256sum "$BAG" | cut -d' ' -f1)"; echo "dur_bag_sec=$DUR"
   echo "E1=$E1"; echo "E2=$E2"; echo "play_rate=$PLAY_RATE"; echo "arm_lead=${ARM_LEAD}"
   echo "candidate_source=$CANDIDATE_SOURCE"; echo "margin=$MARGIN"; echo "wait_limit=$WAIT_LIMIT"
+  echo "guard_pose_stale=${POSE_STALE:-15} guard_signal_window=${SIGNAL_WINDOW:-30} guard_hib_max=${HIB_MAX:-90} guard_repair_sync=${REPAIR_SYNC:-5} guard_first_grace=${FIRST_GRACE:-60}"
   echo "master=$ROS_MASTER_URI"; date -Is
   for f in /home/R26534/mmlins_ws/devel/lib/fast_lio/fastlio_mapping \
            /home/R26534/mmlins_ws/devel/lib/aloam_velodyne/alaserPGO \
@@ -78,10 +79,12 @@ $PY -u -I -c "import sys; sys.path.insert(0,'/home/R26534/MM-LINS'); import runp
   --run-dir "$OUT" --pose-topic /Odometry --scan-topic /velodyne_points --checkpoint-dir "$CTL" \
   --scripted-trigger-stamps "${E1},${E2}" --detection off --repair-publish \
   --candidate-source "${CANDIDATE_SOURCE}" \
-  --require-contract --repair-sync-timeout-sec 5 --wait-limit-sec "${WAIT_LIMIT}" --pose-stale-sec 15 \
+  --require-contract --repair-sync-timeout-sec "${REPAIR_SYNC:-5}" --wait-limit-sec "${WAIT_LIMIT}" \
+  --pose-stale-sec "${POSE_STALE:-15}" \
   --confirmation-margin-sec "${MARGIN}" \
-  --first-pose-grace-sec 60 --host-signal-window-sec 30 --arm-lead-sec "${ARM_LEAD}" \
-  --host-hibernation-max-sec 90 --host-sleep-topic /Issleeping --host-build-topic /Isbuilding \
+  --first-pose-grace-sec "${FIRST_GRACE:-60}" --host-signal-window-sec "${SIGNAL_WINDOW:-30}" \
+  --arm-lead-sec "${ARM_LEAD}" \
+  --host-hibernation-max-sec "${HIB_MAX:-90}" --host-sleep-topic /Issleeping --host-build-topic /Isbuilding \
   --duration-sec "${DRIVER_DUR:-$((DUR + 180))}" \
   > "$OUT/recovery_node.log" 2>&1 & NODE=$!
 NODE_OK=0
