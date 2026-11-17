@@ -1,0 +1,44 @@
+{
+  "reviewed_ref": "b5f1dc938029a467a88c0420fda29fdd75192a06",
+  "scope": "read-only archived MM-LINS run and LIO-SAM patch; no ROS, build, new run, or algorithm execution",
+  "mmlins_v4": {
+    "fired_events": 2,
+    "final_state": "HEALTHY",
+    "terminal_reason": null,
+    "unresolved_segments": 1,
+    "accepted_candidates": 0,
+    "repair_clouds_published": 0,
+    "reprocesses": 0,
+    "pgo_output_messages": 7921,
+    "pgo_guard_activations": 819,
+    "pgo_hold_at_exit": "absent",
+    "E1_checkpoint": {
+      "boundary_stamp_ns": 1711547997375663519,
+      "actual_stamp_ns": 1711547997374492928,
+      "actual_frame": 1137,
+      "status": "AT_OR_BEFORE_BOUNDARY",
+      "rollback_support": "WITHIN_DECLARED_BOUNDARY"
+    },
+    "E2_checkpoint": {
+      "boundary_stamp_ns": 1711548111473230600,
+      "actual_stamp_ns": 1711548111673373952,
+      "actual_frame": 2094,
+      "status": "LATE_AFTER_BOUNDARY",
+      "rollback_support": "UNSUPPORTED_AT_OR_BEFORE_QSTART"
+    },
+    "E2_checkpoint_late_ns": 200143352,
+    "E1_improved": "5/13",
+    "E2_improved": "0/11",
+    "E1_holdout_nis": 493.6013764462789,
+    "E2_holdout_nis": 387.82803392528723,
+    "automatic_detection": "NOT_EXECUTED"
+  },
+  "liosam": {
+    "status": "PATCH_AND_PREREGISTRATION_ONLY",
+    "build": "NOT_EXECUTED_IN_ARCHIVED_COMMIT",
+    "run": "NOT_EXECUTED_IN_ARCHIVED_COMMIT",
+    "reprocess": "NO",
+    "measurement_relay": "NO"
+  },
+  "verdict": "PARTIAL_NATIVE_LIFECYCLE_PROGRESS; NO_ACCEPTED_REPAIR_OR_LIO_SAM_RUN"
+}

@@ -905,3 +905,9 @@ A3资源继续后置，A6冒烟非前置；ALI-B2不代选A/B/C，完整评价�
 [增量审阅](review_20261117_103ae5b/README.md)固定main `103ae5bf6ac77d82bbe9cade640a2e8c58e32b6e`，本机只读文档/manifest未重跑。收口包保留E1合法cp、restore/rearm/resume、E2晚cp/unresolved、零重放和失败语义修复，明确当前实现/协议未获accepted而非一般不可达；四宿主表按证据V/P/F/N/U绑定，P非通过、不是新评分，其它宿主任务不视为已授权执行。
 
 ba2942d重生成五gate案例全MODE3：R4 133.686、B5 17.856、R5 10.38、B6点混合14.629、B6辅助图10.38，simulator_validity FAILED且五scenario全失败，旧R5 Mode2/1.409不得再引成功。street_08统一2.85–3.53/1.38，fig3逐案例阈值，已跟踪PDF未重生成、完整TeX及其它未绑定数值另核，不把撤回当有效。接受收口与负结果整理，拒绝外溢accepted/有内容重放/仿真有效/四宿主通过或FAST-LIVO2启动。下一冻结回滚+重启收口，不开新run，局部A2/A10非全表，标准库-I检查exit0，不ROS/sim/build/算法/main历史/科学门/private，中文SSH增量。
+
+## 115. b5f1dc9：MM-LINS跨进程生命周期与PGO存活推进，accepted仍零；LIO-SAM仅补丁
+
+[增量审阅](review_20261117_b5f1dc9/README.md)固定日终main `b5f1dc938029a467a88c0420fda29fdd75192a06`，本机只读未ROS/build。MM-LINS v4两scripted事件均处理，E1 cp AT_OR_BEFORE且restore valid1；PGO /aft_pgo_odom 7921条、空休眠图守卫819次、退出pgo_hold absent、driver terminal None，接口与存活为真实推进。E1 5/13 Wilson0.201580、E2 0/11，accepted/repair/reprocess全0，E2 cp晚0.200143352s且1 unresolved segment，host_poses非修复器，native accepted update/map未发生。v1晚cp/落后、v2 PGO SIGABRT+driver STALE、v3无hold不崩且守卫0均保留，v4行为有效不证明v2唯一根因，归因UNKNOWN。
+
+LIO-SAM仅PREREGISTRATION/runner/mapOptmization.patch，声明hold/snapshot/restore YES、reprocess/measurement_relay NO，无build日志/binary ACK/run_summary/两事件原件，build/run NOT_EXECUTED，事件40/80s仅计划0.5x。下一唯一主线是MM-LINS真实scan→pre-quarantine trusted map候选→accepted native update/map→接回E2全归宿，S1候选、S2仅实际授权run，不降门；LIO-SAM后续独立构建/run，不启动FAST-LIVO2。局部MM-LINS A4/A9/A10生命周期，B4/B11未闭合，不全表评分。标准库-I检查exit0，不ROS/build/算法/main历史/科学门/private，中文SSH增量。
