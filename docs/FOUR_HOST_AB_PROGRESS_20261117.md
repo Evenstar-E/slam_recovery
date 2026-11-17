@@ -62,7 +62,7 @@
 | 宿主 | 最小下一任务 | 前置/阻断 | 负责人 |
 |---|---|---|---|
 | FAST-LIO2 | 整理 option ③ 收口包（见 `docs/four_host/fastlio_recovery_20261113/FASTLIO2_OPTION3_CLOSURE_PACKAGE_20261117.md`）；不再开 run | 无 | S1 |
-| MM-LINS | 先修协议时机：让 hold/snapshot 落在越界点之前（降 `PLAY_RATE` 或降低单帧成本），再谈写回 | 检查点两次 `LATE_AFTER_BOUNDARY`；E2 触发晚 26.4 s；门两次拒绝，`clouds_published=0`；测量级修复需改宿主算法（需用户批准） | S1（无 S2/S3 会话） |
+| MM-LINS | 先定位 `alaserPGO` 的 ScanContext 空描述子断言（v2 在 E1 后 SIGABRT），再定 stale 判据与回放速率的换算，之后才谈写回 | PGO 崩溃未复现未定位；driver 因 28 s 墙钟静默早停（14 s bag 休眠）；门两次拒绝，`clouds_published=0`；测量级修复需改宿主算法（需用户批准） | S1（无 S2/S3 会话） |
 | LIO-SAM | 先把事件窗口移到 130 s 之前（0–120 s 无发散段），或在同一 bag 上确认前端发散的可复现边界；恢复接线随后 | 输入退化（120–140 s 点数 26k→203）非恢复层可修 | S1 |
 | ORB-SLAM3 | 换一条视差足够的序列验证“能稳定跟踪”，否则两事件无从谈起 | 低视差初始化失败、exit 139；离线读盘无话题注入面 | S1 |
 
