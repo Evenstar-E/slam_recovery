@@ -30,7 +30,7 @@
 | A1 输入与身份 | P | P | P | P | 四宿主均有 bag/config/binary sha；MM-LINS 的构建溯源缺口（二进制 mtime 早于 HEAD）见其 REPORT；ORB 为离线帧序列 |
 | A2 原生执行与运行身份 | P | P | P | P | FAST-LIO2 receipts 最全（每 run 的 binary/lib sha、ack）；LIO/ORB 有 run_receipt |
 | A3 在线检测与起点估计 | N | N | N | N | 本线 run 均 `--detection off` 或脚本触发；ALI-H 检测指标 `NOT_EVALUABLE` |
-| A4 完整可信检查点 | P | P | N | N（有 Atlas API） | MM-LINS：hold/snapshot/restore 实测两轮（221046→3873 点），但快照均晚于越界点，`rollback_support=UNSUPPORTED_AT_OR_BEFORE_QSTART`。FAST-LIO2：范围为 `STATE_AND_MAP_ROLLBACK_ONLY`，`p_imu` 预积分未入检查点（replay `PARTIAL`） |
+| A4 完整可信检查点 | P | P | N | N（有 Atlas API） | MM-LINS：四次 run 累计，v4 的 E1 首次 `AT_OR_BEFORE_BOUNDARY`（-1.17 ms）/`WITHIN_DECLARED_BOUNDARY`，E2 仍晚 0.200 s；地图检查点（221637 / 166448 点）与 restore ack 均在。FAST-LIO2：范围为 `STATE_AND_MAP_ROLLBACK_ONLY`，`p_imu` 预积分未入检查点（replay `PARTIAL`） |
 | A5 隔离与帧归宿 | P | P | N | N | MM-LINS：34 个隔离键全部有归宿（`fully_accounted=true`），`repair.clouds_published=0`。FAST-LIO2 有段/延迟键计数；v9i 存在 `unresolved=2` |
 | A6 历史重处理与重建 | N | P | N | N | FAST-LIO2 reprocess/replay 路径存在（smoke `replay_suffix=0`；run 中 `PARTIAL`）；四宿主均无完整重建证据 |
 | A7 独立证据准入 | N | P | N | N | 门与 paired evidence 有实现；accepted 未达成 |
@@ -45,7 +45,7 @@
 | 行 | MM-LINS | FAST-LIO2 | LIO-SAM | ORB-SLAM3 | 说明 |
 |---|---|---|---|---|---|
 | B1 失效问题与保护必要性 | P | P | P | P | 四宿主都实际出现了失效/退化；事件定义与污染时序未冻结 |
-| B2 保护正确性 | F | P | N | N | MM-LINS：restore ack 成功但快照晚于越界点、且宿主随后原生重建（E2 快照仅 3873 点），回滚到污染前**未成立**。仅 FAST-LIO2 有 rollback/restore 与负结果；事务缺陷已有局部修复 |
+| B2 保护正确性 | P | P | N | N | MM-LINS：v4 E1 检查点在边界内、restore ack 有效、E2 快照 166448 点（地图未被宿主重建掉）；但两事件候选均被门拒绝，**没有任何写回**，保护正确性只在「不写」这一侧被验证。FAST-LIO2 有 rollback/restore 与负结果 |
 | B3 检测能力 | U | U | U | U | ALI-H 资格-only 收口，检测指标 `NOT_EVALUABLE` |
 | B4 修复净收益 | F | F | F | F | MM-LINS：恢复层 run 两事件均被门拒绝，`clouds_published=0`，无净收益。FAST-LIO2：11 次 run 未获 accepted，无净收益；LIO/ORB 原生失效 |
 | B5 门增量价值 | N | P | N | N | 有拒绝与仿真对照；无同候选流的无条件 vs 门控真实比较 |
@@ -62,7 +62,7 @@
 | 宿主 | 最小下一任务 | 前置/阻断 | 负责人 |
 |---|---|---|---|
 | FAST-LIO2 | 整理 option ③ 收口包（见 `docs/four_host/fastlio_recovery_20261113/FASTLIO2_OPTION3_CLOSURE_PACKAGE_20261117.md`）；不再开 run | 无 | S1 |
-| MM-LINS | 先定位 `alaserPGO` 的 ScanContext 空描述子断言（v2 在 E1 后 SIGABRT），再定 stale 判据与回放速率的换算，之后才谈写回 | PGO 崩溃未复现未定位；driver 因 28 s 墙钟静默早停（14 s bag 休眠）；门两次拒绝，`clouds_published=0`；测量级修复需改宿主算法（需用户批准） | S1（无 S2/S3 会话） |
+| MM-LINS | 接线与后端已闭环（v4：两事件生命周期、E1 检查点在界内、PGO 存活）；下一任务是**候选能否过门**的方法问题——是否需要换候选方法需用户按 §2.3 选择 | 门两次拒绝（NIS 493.6/387.8，Wilson 0.202/0.0）；`clouds_published=0`；0.5× 非实时证据；测量级修复需改宿主算法（需用户批准） | S1（无 S2/S3 会话） |
 | LIO-SAM | 先把事件窗口移到 130 s 之前（0–120 s 无发散段），或在同一 bag 上确认前端发散的可复现边界；恢复接线随后 | 输入退化（120–140 s 点数 26k→203）非恢复层可修 | S1 |
 | ORB-SLAM3 | 换一条视差足够的序列验证“能稳定跟踪”，否则两事件无从谈起 | 低视差初始化失败、exit 139；离线读盘无话题注入面 | S1 |
 
