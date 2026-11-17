@@ -428,3 +428,12 @@ E1/E2 回到**清单原始声明** 115.599 / 229.696 s；`candidate_source=icp_r
   wait 2 s 关闭 → rearm → resume；E2 快照 166079 点（`LATE_AFTER_BOUNDARY` 0.1 s）；退出 `HEALTHY`。
 - 按 §234 预注册判据（门是否接受）与用户规则，**转 option ③**：不再开新 run，accepted 链在本宿主+本序列
   判为不可达；最终口径见 COLLABORATION_STATUS §234 末条。
+
+## 更正（2026-11-17，审阅 0cd10fa/764afca 回传后）
+
+上一条 STATIC-INJECTION 中「0.5 m 连续性与真实运动结构互斥」**撤回**：`core.py` 的重入判据是
+`jump <= 0.5 + 2.0*Δt`（仅无时间信息时才用裸 0.5 m）。v9j E1 重入包络通过（1.074/8.702），
+拒绝来自 Wilson=0 与 holdout NIS 2183.6；v9j E2 同样三项全败。v9i E1 重入通过（4.089/8.899），
+拒绝来自信息增益比 1.012（<κ=2.0）与 holdout 2293。v9i E2 重入失败（74.66 > 31.30）。
+另：整段刚体路径在 ICP 失败时曾把初值克隆成候选（v9j E1 的 candidate≡incumbent），已修：
+失败状态不产出候选，并加一条回归测试（292 全绿）。

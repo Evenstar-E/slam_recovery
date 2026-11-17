@@ -1926,17 +1926,28 @@ class NativeClosedLoop:
                             + inits[k][:3, 3] for k, v in sorted(scans.items())]) \
             if scans else np.zeros((0, 3))
         delta = np.asarray(res.pose, dtype=np.float64)
-        # The same correction that makes the candidate poses also describes the measurement bias
-        # for the frames it covers; the repair publisher projects it onto the declared body axis,
-        # using the rotations of the same initial poses.
-        self._last_icp_delta = delta.copy()
-        poses = {k: delta @ np.asarray(inits[k], dtype=np.float64) for k in inits}
+        # A failed fit returns its initial pose. Turning that into candidate poses would put the
+        # incumbent into the candidate population as if the repair had produced it, and the gate
+        # would then score "candidate == incumbent" as a measured zero -- v9j E1 did exactly that
+        # (TOO_FEW_INLIERS, identical residuals, 0/8). A repair that produced nothing must report
+        # nothing; the empty candidate is what the gate labels "no candidate was produced".
+        fit_succeeded = res.status in ("CONVERGED", "ITERATION_LIMIT")
+        if fit_succeeded:
+            # The same correction that makes the candidate poses also describes the measurement
+            # bias for the frames it covers; the repair publisher projects it onto the declared
+            # body axis, using the rotations of the same initial poses.
+            self._last_icp_delta = delta.copy()
+            poses = {k: delta @ np.asarray(inits[k], dtype=np.float64) for k in inits}
+        else:
+            self._last_icp_delta = None
+            poses = {}
         detail = {
             "mode": "single_rigid_transform_for_the_segment",
             "init_poses": "incumbent" if incumbent_poses else "host_poses",
             "seconds": elapsed,
             "frames_with_scan": len(scans),
             "frames_candidate": len(poses),
+            "candidate_suppressed": (not fit_succeeded),
             "reference_points_total": int(len(reference)),
             "segment_points_before_sampling": int(len(corpus)),
             "status": res.status,

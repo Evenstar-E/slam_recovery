@@ -519,6 +519,30 @@ def test_motion_prior_candidate_starts_at_the_incumbent_inside_an_envelope():
     assert tuple(loop.records[0].keys()) == CANDIDATE_KEYS
 
 
+def test_failed_segment_fit_yields_no_candidate_instead_of_an_incumbent_clone():
+    # Reviewer minimum (docs/review_20261117_aa1ce5a, item 4): a fit that fails returns its
+    # initial pose, and the segment path used to turn that into candidate poses. The gate then
+    # scored "candidate == incumbent" as a measured zero (v9j E1: TOO_FEW_INLIERS, identical
+    # residuals, 0/8). A repair that produced nothing must report nothing.
+    node = _FakeLoopNode(trigger_at=2)
+    # the candidate's reference is empty, so the fit cannot start; the warm-up path keeps its
+    # own copy of the map so the fixture's bookkeeping still works
+    node.get_trusted_map_points = lambda max_pts=2000: np.zeros((0, 3))
+    loop = NativeClosedLoop(node, run_id="run", confirmation_margin_ns=1_000_000_000,
+                            candidate_source="icp_reregistration")
+    for i in range(20):
+        loop.on_pair(i * 100_000_000, np.eye(4), _scan(200))
+        loop.service()
+    assert len(loop.records) == 1
+    det = loop.icp_details[0]
+    assert det["status"] == "REFERENCE_TOO_SMALL"
+    assert det["candidate_suppressed"] is True
+    assert det["frames_candidate"] == 0
+    # no poses reached the gate: it reports missing paired evidence, not a measured zero
+    assert loop.records[0]["accepted"] is False
+    assert loop.records[0]["refusal_reason"] == "insufficient_paired_frames"
+
+
 def test_no_quarantine_means_no_records_and_a_readable_summary():
     node = _FakeLoopNode(trigger_at=10 ** 9)
     loop = NativeClosedLoop(node, run_id="run")
