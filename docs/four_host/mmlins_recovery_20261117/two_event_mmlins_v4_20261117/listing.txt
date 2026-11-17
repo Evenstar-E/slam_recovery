@@ -1,0 +1,19 @@
+total 9680
+drwxr-xr-x 3 R26534 R26534     501 Nov 17 15:07 .
+drwxr-xr-x 7 R26534 R26534     568 Nov 17 15:07 ..
+-rw-r--r-- 1 R26534 R26534     752 Nov 17 15:07 bag_info.txt
+drwxr-xr-x 2 R26534 R26534     117 Nov 17 15:07 ctl
+-rw-r--r-- 1 R26534 R26534     406 Nov 17 15:07 ctl_listing_at_exit.txt
+-rw-r--r-- 1 R26534 R26534   30054 Nov 17 15:07 frontend.log
+-rw-r--r-- 1 R26534 R26534      62 Nov 17 15:07 host_bag_info.txt
+-rw-r--r-- 1 R26534 R26534     109 Nov 17 15:07 host_bag_sha256.txt
+-rw-r--r-- 1 R26534 R26534       0 Nov 17 15:07 listing.txt
+-rw-r--r-- 1 R26534 R26534  101155 Nov 17 15:07 pgo.log
+-rw-r--r-- 1 R26534 R26534       7 Nov 17 15:07 pgo_hold_at_exit.txt
+-rw-r--r-- 1 R26534 R26534 9039397 Nov 17 15:07 play.log
+-rw-r--r-- 1 R26534 R26534    1277 Nov 17 15:07 pre_run.txt
+-rw-r--r-- 1 R26534 R26534     367 Nov 17 15:07 record.log
+-rw-r--r-- 1 R26534 R26534     215 Nov 17 15:07 recovery_node.log
+-rw-r--r-- 1 R26534 R26534       5 Nov 17 15:07 result.txt
+-rw-r--r-- 1 R26534 R26534  682939 Nov 17 15:07 run_summary.json
+-rw-r--r-- 1 R26534 R26534      14 Nov 17 15:07 runner_stdout.log

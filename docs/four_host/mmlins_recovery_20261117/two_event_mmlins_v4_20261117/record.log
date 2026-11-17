@@ -1,0 +1,5 @@
+[0m[ INFO] [1794898232.063531948]: Subscribing to /Isbuilding[0m
+[0m[ INFO] [1794898232.069275629]: Subscribing to /Issleeping[0m
+[0m[ INFO] [1794898232.071691027]: Subscribing to /Odometry[0m
+[0m[ INFO] [1794898232.074427175]: Subscribing to /aft_pgo_odom[0m
+[0m[ INFO] [1794898232.078915553]: Recording to '/tmp/mmlins_two_event_v4_20261117/host.bag'.[0m

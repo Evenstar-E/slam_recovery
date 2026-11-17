@@ -1,0 +1,8 @@
+total 528
+drwxr-xr-x 2 R26534 R26534   4096 Nov 17 14:59 .
+drwxr-xr-x 3 R26534 R26534   4096 Nov 17 15:06 ..
+-rw-r--r-- 1 R26534 R26534     78 Nov 17 14:59 ack
+-rw-r--r-- 1 R26534 R26534     16 Nov 17 14:59 ack_received
+-rw-r--r-- 1 R26534 R26534   1226 Nov 17 14:50 capabilities.json
+-rw-r--r-- 1 R26534 R26534      8 Nov 17 14:59 cmd.done
+-rw-r--r-- 1 R26534 R26534 508177 Nov 17 15:06 input_fates.jsonl

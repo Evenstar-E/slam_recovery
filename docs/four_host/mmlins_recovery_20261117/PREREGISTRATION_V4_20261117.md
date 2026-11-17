@@ -49,4 +49,5 @@
 
 ## 5. 结果
 
-（run 后填写。）
+见 `REPORT_V4_20261117.md` 与 `two_event_mmlins_v4_20261117/`。要点：PGO 全程存活、守卫触发 819 次、
+E1 检查点首次 `AT_OR_BEFORE_BOUNDARY`、E2 尾段存在；门仍 0 accepted、`clouds_published=0`。

@@ -4006,3 +4006,24 @@ host-only run（`/tmp/mmlins_hostonly_v3_20261117`，0.5×，同 bag）。原件
 要分离需固定速率只移检查点位置的对照实验。本节不改 REPORT_V2 §4 的「不判因果」口径。
 
 **版本**：本机 `main@04fba07`（本节提交后前进），远端仍 `103ae5b`；待推提交继续累积，凭据仍缺。
+
+## 250. run v4（0.5×+hold+监护 bag 等价）：修法 A 在真实 hold 下生效，E1 检查点首次在边界内；门仍全拒
+
+用户「① 0.5×+hold+监护参数 bag 等价化 授权run」。原件
+`docs/four_host/mmlins_recovery_20261117/two_event_mmlins_v4_20261117/`，报告 `REPORT_V4_20261117.md`。
+
+**实测**（14:50–15:06，`RUNNER_EXIT=0`）：
+- `alaserPGO` **全程存活**：7921 条 `/aft_pgo_odom`，最后一条在录制终点（墙钟 958.5 s），无崩溃；
+- **`skipping sleeping map N` 触发 819 次**——v2 断言的同一空休眠图条件在带 hold 的运行里确实出现，
+  修法 A 把它拦住了（这是修法 A 的直接证据，但不等于证明 v2 根因）；
+- driver **`terminal_reason=None`**（v2 为 `INPUT_STALE`），位姿 4323 / 扫描 4058，尾段存在；
+- **E1 检查点首次 `AT_OR_BEFORE_BOUNDARY`**（比边界早 1.17 ms，`WITHIN_DECLARED_BOUNDARY`）；
+  E2 晚 0.200 s；
+- `/Odometry` 只有一处休眠闸口（119.3→140.0 s），**E2 处无闸口**（v2/v3 有 23.7/26.8 s）；
+  同一观察与「hold+restore 抑制宿主重建」一致，但混有监护参数变化，不作因果结论。
+
+**门与写回**：仍 `accepted 0 / rejected 2`，`clouds_published=0`。E1 `MODE4_HARD_SLEEP_SPLIT`
+（NIS 493.60、paired 5/13 Wilson 0.202）、E2 `MODE3_SOFT_BRIDGE_WAIT`（NIS 387.83、paired 0/11）。
+**写回与接回输入仍未发生**——当前缺口在候选过门，不在接线。
+
+**不声称**：不声称整链完成；不声称修法 A 修好 v2 根因；不声称候选不可修复。

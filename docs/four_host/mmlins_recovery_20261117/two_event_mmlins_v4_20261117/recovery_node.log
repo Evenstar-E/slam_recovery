@@ -1,0 +1,2 @@
+[INFO] [1794898226.944018]: [slam_recovery] listening on /Odometry and /velodyne_points (repair publisher: on)
+[INFO] [1794899192.198452]: [slam_recovery] wrote 2 candidate rows to /tmp/mmlins_two_event_v4_20261117
