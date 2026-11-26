@@ -82,24 +82,37 @@ def run(args, events, output):
     probe_remaining = 0
     imu_delta = None
     total = 0
+    needs_rearm = False
+    healthy_count = 0
+
+    def observe_reentry(result):
+        nonlocal needs_rearm, healthy_count
+        if not needs_rearm:
+            return
+        healthy_count = healthy_count + 1 if result is not None and healthy(result) else 0
+        if healthy_count >= 3:
+            needs_rearm = False
+            events.emit("rearmed", event=event_id, coordinate_verified=False,
+                        timestamp=result["timestamp"])
 
     def reject(reason):
-        nonlocal private, aligned, previous, imu_delta, anchor_pair
+        nonlocal private, aligned, previous, imu_delta, anchor_pair, needs_rearm, healthy_count
         events.emit("reject", event=event_id, reason=reason, preserved_anchor=anchor["timestamp"])
         if private is not None:
             close(private, f"candidate-{event_id}")
             private = None
         aligned = False
+        needs_rearm, healthy_count = True, 0
         for pair, view, weak in pending:
             result = active.consume(pair, "skip" if weak else view)
             publish(result, "local_unverified", False)
+            observe_reentry(result)
             if result is not None:
                 anchor_pair = pair
         previous = active.snapshot
         imu_delta = None
         pending.clear()
         probation.clear()
-        events.emit("rearmed", event=event_id, coordinate_verified=False)
 
     try:
         for pair in frames:
@@ -163,7 +176,13 @@ def run(args, events, output):
                     reject("bounded_candidate_window")
                 continue
 
-            armed = (active.snapshot is not None and healthy(active.snapshot)
+            if needs_rearm and weak:
+                active.consume(pair, "skip")
+                observe_reentry(None)
+                events.emit("reentry_wait", event=event_id, timestamp=pair.timestamp)
+                continue
+
+            armed = (not needs_rearm and active.snapshot is not None and healthy(active.snapshot)
                      and (imu_delta is None or imu_delta <= 0.20))
             if weak and (pending or armed):
                 pending.append((pair, view, weak))
@@ -203,6 +222,7 @@ def run(args, events, output):
             publish(result, "native" if aligned else "local_unverified", aligned)
             previous = result
             anchor_pair = pair
+            observe_reentry(result)
 
             if checkpoint_probe is not None:
                 copied = checkpoint_probe.consume(pair, view, images)
