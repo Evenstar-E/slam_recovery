@@ -1,0 +1,20 @@
+path: /home/tong/e1_hilti_stream_20261126/upstream_campus12_smoke/observed.bag
+version: 2.0
+duration: 40.358450
+start: 1795663538.014278
+end: 1795663578.372729
+size: 475156
+messages: 590
+indexed: True
+compression: none
+types:
+    - type: nav_msgs/Odometry
+      md5: cd5e73d190d741a2f92e81eda573aca7
+topics:
+    - topic: /Odometry
+      type: nav_msgs/Odometry
+      messages: 397
+    - topic: /aft_pgo_odom
+      type: nav_msgs/Odometry
+      messages: 193
+

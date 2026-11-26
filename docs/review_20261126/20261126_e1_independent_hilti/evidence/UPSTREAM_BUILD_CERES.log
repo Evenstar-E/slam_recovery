@@ -1,0 +1,379 @@
+-- The C compiler identification is GNU 9.4.0
+-- The CXX compiler identification is GNU 9.4.0
+-- Check for working C compiler: /usr/bin/cc
+-- Check for working C compiler: /usr/bin/cc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Check for working CXX compiler: /usr/bin/c++
+-- Check for working CXX compiler: /usr/bin/c++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Using CATKIN_DEVEL_PREFIX: /home/tong/e1_hilti_stream_20261126/ros1_ceres/devel
+-- Using CMAKE_PREFIX_PATH: /opt/ros/noetic;/home/tong/e1_hilti_stream_20261126/ceres-root/usr;
+-- This workspace overlays: /opt/ros/noetic
+-- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+-- Using PYTHON_EXECUTABLE: /usr/bin/python3
+-- Using Debian Python package layout
+-- Found PY_em: /usr/lib/python3/dist-packages/em.py  
+-- Using empy: /usr/lib/python3/dist-packages/em.py
+-- Using CATKIN_ENABLE_TESTING: ON
+-- Call enable_testing()
+-- Using CATKIN_TEST_RESULTS_DIR: /home/tong/e1_hilti_stream_20261126/ros1_ceres/build/test_results
+-- Forcing gtest/gmock from source, though one was otherwise available.
+-- Found gtest sources under '/usr/src/googletest': gtests will be built
+-- Found gmock sources under '/usr/src/googletest': gmock will be built
+-- Found PythonInterp: /usr/bin/python3 (found version "3.8.10") 
+-- Found Threads: TRUE  
+-- Using Python nosetests: /usr/bin/nosetests3
+-- catkin 0.8.12
+-- BUILD_SHARED_LIBS is on
+-- BUILD_SHARED_LIBS is on
+-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- ~~  traversing 3 packages in topological order:
+-- ~~  - livox_ros_driver
+-- ~~  - aloam_velodyne
+-- ~~  - fast_lio
+-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-- +++ processing catkin package: 'livox_ros_driver'
+-- ==> add_subdirectory(livox_ros_driver)
+-- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+-- livox_ros_driver: 2 messages, 0 services
+-- +++ processing catkin package: 'aloam_velodyne'
+-- ==> add_subdirectory(MM-LINS/SC-PGO)
+-- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+-- Checking for module 'eigen3'
+--   Found eigen3, version 3.3.7
+-- Found Eigen: /usr/include/eigen3 (Required is at least version "3.1") 
+-- Eigen found (include: /usr/include/eigen3, version: 3.3.7)
+-- Found Boost: /usr/include (found suitable version "1.71.0", minimum required is "1.55.0") found components: system filesystem date_time iostreams regex 
+-- Checking for module 'flann'
+--   Found flann, version 1.9.1
+-- Found FLANN: /usr/lib/x86_64-linux-gnu/libflann_cpp.so  
+-- The imported target "vtkParseOGLExt" references the file
+   "/usr/bin/vtkParseOGLExt-7.1"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/cmake/vtk-7.1/VTKTargets.cmake"
+but not all the files it references.
+
+-- The imported target "vtkRenderingPythonTkWidgets" references the file
+   "/usr/lib/x86_64-linux-gnu/libvtkRenderingPythonTkWidgets.so"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/cmake/vtk-7.1/VTKTargets.cmake"
+but not all the files it references.
+
+-- The imported target "vtk" references the file
+   "/usr/bin/vtk"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/cmake/vtk-7.1/VTKTargets.cmake"
+but not all the files it references.
+
+-- The imported target "pvtk" references the file
+   "/usr/bin/pvtk"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/cmake/vtk-7.1/VTKTargets.cmake"
+but not all the files it references.
+
+-- Checking for module 'libusb-1.0'
+--   No package 'libusb-1.0' found
+-- Could NOT find USB_10 (missing: USB_10_LIBRARY USB_10_INCLUDE_DIR) 
+-- OpenNI disabled because libusb-1.0 not found.
+** WARNING ** io features related to openni will be disabled
+-- Checking for module 'libusb-1.0'
+--   No package 'libusb-1.0' found
+-- Could NOT find USB_10 (missing: USB_10_LIBRARY USB_10_INCLUDE_DIR) 
+-- OpenNI 2 disabled because libusb-1.0 not found.
+** WARNING ** io features related to openni2 will be disabled
+** WARNING ** io features related to pcap will be disabled
+** WARNING ** io features related to png will be disabled
+-- LIBUSB_1_LIBRARY (missing: LIBUSB_1_INCLUDE_DIR) 
+** WARNING ** io features related to libusb-1.0 will be disabled
+-- Checking for module 'libusb-1.0'
+--   No package 'libusb-1.0' found
+-- Could NOT find USB_10 (missing: USB_10_LIBRARY USB_10_INCLUDE_DIR) 
+-- OpenNI disabled because libusb-1.0 not found.
+** WARNING ** visualization features related to openni will be disabled
+-- Checking for module 'libusb-1.0'
+--   No package 'libusb-1.0' found
+-- Could NOT find USB_10 (missing: USB_10_LIBRARY USB_10_INCLUDE_DIR) 
+-- OpenNI 2 disabled because libusb-1.0 not found.
+** WARNING ** visualization features related to openni2 will be disabled
+-- Found Qhull: optimized;/usr/lib/x86_64-linux-gnu/libqhull.so;debug;/usr/lib/x86_64-linux-gnu/libqhull.so  
+-- QHULL found (include: /usr/include, lib: optimized;/usr/lib/x86_64-linux-gnu/libqhull.so;debug;/usr/lib/x86_64-linux-gnu/libqhull.so)
+-- Checking for module 'libusb-1.0'
+--   No package 'libusb-1.0' found
+-- Could NOT find USB_10 (missing: USB_10_LIBRARY USB_10_INCLUDE_DIR) 
+-- OpenNI disabled because libusb-1.0 not found.
+** WARNING ** apps features related to openni will be disabled
+-- looking for PCL_COMMON
+-- Found PCL_COMMON: /usr/lib/x86_64-linux-gnu/libpcl_common.so  
+-- looking for PCL_KDTREE
+-- Found PCL_KDTREE: /usr/lib/x86_64-linux-gnu/libpcl_kdtree.so  
+-- looking for PCL_OCTREE
+-- Found PCL_OCTREE: /usr/lib/x86_64-linux-gnu/libpcl_octree.so  
+-- looking for PCL_SEARCH
+-- Found PCL_SEARCH: /usr/lib/x86_64-linux-gnu/libpcl_search.so  
+-- looking for PCL_SAMPLE_CONSENSUS
+-- Found PCL_SAMPLE_CONSENSUS: /usr/lib/x86_64-linux-gnu/libpcl_sample_consensus.so  
+-- looking for PCL_FILTERS
+-- Found PCL_FILTERS: /usr/lib/x86_64-linux-gnu/libpcl_filters.so  
+-- looking for PCL_2D
+-- Found PCL_2D: /usr/include/pcl-1.10  
+-- looking for PCL_GEOMETRY
+-- Found PCL_GEOMETRY: /usr/include/pcl-1.10  
+-- looking for PCL_IO
+-- Found PCL_IO: /usr/lib/x86_64-linux-gnu/libpcl_io.so  
+-- looking for PCL_FEATURES
+-- Found PCL_FEATURES: /usr/lib/x86_64-linux-gnu/libpcl_features.so  
+-- looking for PCL_ML
+-- Found PCL_ML: /usr/lib/x86_64-linux-gnu/libpcl_ml.so  
+-- looking for PCL_SEGMENTATION
+-- Found PCL_SEGMENTATION: /usr/lib/x86_64-linux-gnu/libpcl_segmentation.so  
+-- looking for PCL_VISUALIZATION
+-- Found PCL_VISUALIZATION: /usr/lib/x86_64-linux-gnu/libpcl_visualization.so  
+-- looking for PCL_SURFACE
+-- Found PCL_SURFACE: /usr/lib/x86_64-linux-gnu/libpcl_surface.so  
+-- looking for PCL_REGISTRATION
+-- Found PCL_REGISTRATION: /usr/lib/x86_64-linux-gnu/libpcl_registration.so  
+-- looking for PCL_KEYPOINTS
+-- Found PCL_KEYPOINTS: /usr/lib/x86_64-linux-gnu/libpcl_keypoints.so  
+-- looking for PCL_TRACKING
+-- Found PCL_TRACKING: /usr/lib/x86_64-linux-gnu/libpcl_tracking.so  
+-- looking for PCL_RECOGNITION
+-- Found PCL_RECOGNITION: /usr/lib/x86_64-linux-gnu/libpcl_recognition.so  
+-- looking for PCL_STEREO
+-- Found PCL_STEREO: /usr/lib/x86_64-linux-gnu/libpcl_stereo.so  
+-- looking for PCL_APPS
+-- Found PCL_APPS: /usr/lib/x86_64-linux-gnu/libpcl_apps.so  
+-- looking for PCL_IN_HAND_SCANNER
+-- Found PCL_IN_HAND_SCANNER: /usr/include/pcl-1.10  
+-- looking for PCL_POINT_CLOUD_EDITOR
+-- Found PCL_POINT_CLOUD_EDITOR: /usr/include/pcl-1.10  
+-- looking for PCL_OUTOFCORE
+-- Found PCL_OUTOFCORE: /usr/lib/x86_64-linux-gnu/libpcl_outofcore.so  
+-- looking for PCL_PEOPLE
+-- Found PCL_PEOPLE: /usr/lib/x86_64-linux-gnu/libpcl_people.so  
+-- Found PCL: pcl_common;pcl_kdtree;pcl_octree;pcl_search;pcl_sample_consensus;pcl_filters;pcl_io;pcl_features;pcl_ml;pcl_segmentation;pcl_visualization;pcl_surface;pcl_registration;pcl_keypoints;pcl_tracking;pcl_recognition;pcl_stereo;pcl_apps;pcl_outofcore;pcl_people;/usr/lib/x86_64-linux-gnu/libboost_system.so;/usr/lib/x86_64-linux-gnu/libboost_filesystem.so;/usr/lib/x86_64-linux-gnu/libboost_date_time.so;/usr/lib/x86_64-linux-gnu/libboost_iostreams.so;/usr/lib/x86_64-linux-gnu/libboost_regex.so;optimized;/usr/lib/x86_64-linux-gnu/libqhull.so;debug;/usr/lib/x86_64-linux-gnu/libqhull.so;vtkChartsCore;vtkCommonColor;vtkCommonCore;vtksys;vtkCommonDataModel;vtkCommonMath;vtkCommonMisc;vtkCommonSystem;vtkCommonTransforms;vtkCommonExecutionModel;vtkFiltersGeneral;vtkCommonComputationalGeometry;vtkFiltersCore;vtkInfovisCore;vtkFiltersExtraction;vtkFiltersStatistics;vtkImagingFourier;vtkImagingCore;vtkalglib;vtkRenderingContext2D;vtkRenderingCore;vtkFiltersGeometry;vtkFiltersSources;vtkRenderingFreeType;/usr/lib/x86_64-linux-gnu/libfreetype.so;/usr/lib/x86_64-linux-gnu/libz.so;vtkFiltersModeling;vtkImagingSources;vtkInteractionStyle;vtkInteractionWidgets;vtkFiltersHybrid;vtkImagingColor;vtkImagingGeneral;vtkImagingHybrid;vtkIOImage;vtkDICOMParser;vtkmetaio;/usr/lib/x86_64-linux-gnu/libjpeg.so;/usr/lib/x86_64-linux-gnu/libpng.so;/usr/lib/x86_64-linux-gnu/libtiff.so;vtkRenderingAnnotation;vtkRenderingVolume;vtkIOXML;vtkIOCore;vtkIOXMLParser;/usr/lib/x86_64-linux-gnu/libexpat.so;vtkIOGeometry;vtkIOLegacy;vtkIOPLY;vtkRenderingLOD;vtkViewsContext2D;vtkViewsCore;vtkRenderingContextOpenGL2;vtkRenderingOpenGL2;FLANN::FLANN  
+-- Found OpenCV: /usr (found version "4.2.0") 
+-- Found installed version of Eigen: /usr/lib/cmake/eigen3
+-- Found required Ceres dependency: Eigen version 3.3.7 in /usr/include/eigen3
+-- Found required Ceres dependency: glog
+-- Found installed version of gflags: /usr/lib/x86_64-linux-gnu/cmake/gflags
+-- Detected gflags version: 2.2.2
+-- Found required Ceres dependency: gflags
+-- Found Ceres version: 1.14.0 installed in: /home/tong/e1_hilti_stream_20261126/ceres-root/usr with components: [EigenSparse, SparseLinearAlgebraLibrary, LAPACK, SuiteSparse, CXSparse, SchurSpecializations, OpenMP, Multithreading]
+-- Found OpenMP_C: -fopenmp (found version "4.5") 
+-- Found OpenMP_CXX: -fopenmp (found version "4.5") 
+-- Found OpenMP: TRUE (found version "4.5")  
+-- GTSAM include directory:  /opt/ros/noetic/lib/cmake/GTSAM/../../../include
+-- +++ processing catkin package: 'fast_lio'
+-- ==> add_subdirectory(MM-LINS/FAST-LIO)
+Current CPU archtecture: x86_64
+Processer number:  2
+-- GTSAM include directory:  /opt/ros/noetic/lib/cmake/GTSAM/../../../include
+-- Found PythonLibs: /usr/lib/x86_64-linux-gnu/libpython3.8.so (found version "3.8.10") 
+-- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+-- Eigen found (include: /usr/include/eigen3, version: 3.3.7)
+-- The imported target "vtkParseOGLExt" references the file
+   "/usr/bin/vtkParseOGLExt-7.1"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/cmake/vtk-7.1/VTKTargets.cmake"
+but not all the files it references.
+
+-- The imported target "vtkRenderingPythonTkWidgets" references the file
+   "/usr/lib/x86_64-linux-gnu/libvtkRenderingPythonTkWidgets.so"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/cmake/vtk-7.1/VTKTargets.cmake"
+but not all the files it references.
+
+-- The imported target "vtk" references the file
+   "/usr/bin/vtk"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/cmake/vtk-7.1/VTKTargets.cmake"
+but not all the files it references.
+
+-- The imported target "pvtk" references the file
+   "/usr/bin/pvtk"
+but this file does not exist.  Possible reasons include:
+* The file was deleted, renamed, or moved to another location.
+* An install or uninstall procedure did not complete successfully.
+* The installation package was faulty and contained
+   "/usr/lib/cmake/vtk-7.1/VTKTargets.cmake"
+but not all the files it references.
+
+-- Checking for module 'libusb-1.0'
+--   No package 'libusb-1.0' found
+-- Could NOT find USB_10 (missing: USB_10_LIBRARY USB_10_INCLUDE_DIR) 
+-- OpenNI disabled because libusb-1.0 not found.
+** WARNING ** io features related to openni will be disabled
+-- Checking for module 'libusb-1.0'
+--   No package 'libusb-1.0' found
+-- Could NOT find USB_10 (missing: USB_10_LIBRARY USB_10_INCLUDE_DIR) 
+-- OpenNI 2 disabled because libusb-1.0 not found.
+** WARNING ** io features related to openni2 will be disabled
+** WARNING ** io features related to pcap will be disabled
+** WARNING ** io features related to png will be disabled
+-- LIBUSB_1_LIBRARY (missing: LIBUSB_1_INCLUDE_DIR) 
+** WARNING ** io features related to libusb-1.0 will be disabled
+-- Checking for module 'libusb-1.0'
+--   No package 'libusb-1.0' found
+-- Could NOT find USB_10 (missing: USB_10_LIBRARY USB_10_INCLUDE_DIR) 
+-- OpenNI disabled because libusb-1.0 not found.
+** WARNING ** visualization features related to openni will be disabled
+-- Checking for module 'libusb-1.0'
+--   No package 'libusb-1.0' found
+-- Could NOT find USB_10 (missing: USB_10_LIBRARY USB_10_INCLUDE_DIR) 
+-- OpenNI 2 disabled because libusb-1.0 not found.
+** WARNING ** visualization features related to openni2 will be disabled
+-- QHULL found (include: /usr/include, lib: optimized;/usr/lib/x86_64-linux-gnu/libqhull.so;debug;/usr/lib/x86_64-linux-gnu/libqhull.so)
+-- Checking for module 'libusb-1.0'
+--   No package 'libusb-1.0' found
+-- Could NOT find USB_10 (missing: USB_10_LIBRARY USB_10_INCLUDE_DIR) 
+-- OpenNI disabled because libusb-1.0 not found.
+** WARNING ** apps features related to openni will be disabled
+-- looking for PCL_COMMON
+-- looking for PCL_KDTREE
+-- looking for PCL_OCTREE
+-- looking for PCL_SEARCH
+-- looking for PCL_SAMPLE_CONSENSUS
+-- looking for PCL_FILTERS
+-- looking for PCL_2D
+-- looking for PCL_GEOMETRY
+-- looking for PCL_IO
+-- looking for PCL_FEATURES
+-- looking for PCL_ML
+-- looking for PCL_SEGMENTATION
+-- looking for PCL_VISUALIZATION
+-- looking for PCL_SURFACE
+-- looking for PCL_REGISTRATION
+-- looking for PCL_KEYPOINTS
+-- looking for PCL_TRACKING
+-- looking for PCL_RECOGNITION
+-- looking for PCL_STEREO
+-- looking for PCL_APPS
+-- looking for PCL_IN_HAND_SCANNER
+-- looking for PCL_POINT_CLOUD_EDITOR
+-- looking for PCL_OUTOFCORE
+-- looking for PCL_PEOPLE
+-- Found PCL: pcl_common;pcl_kdtree;pcl_octree;pcl_search;pcl_sample_consensus;pcl_filters;pcl_io;pcl_features;pcl_ml;pcl_segmentation;pcl_visualization;pcl_surface;pcl_registration;pcl_keypoints;pcl_tracking;pcl_recognition;pcl_stereo;pcl_apps;pcl_outofcore;pcl_people;/usr/lib/x86_64-linux-gnu/libboost_system.so;/usr/lib/x86_64-linux-gnu/libboost_filesystem.so;/usr/lib/x86_64-linux-gnu/libboost_date_time.so;/usr/lib/x86_64-linux-gnu/libboost_iostreams.so;/usr/lib/x86_64-linux-gnu/libboost_regex.so;optimized;/usr/lib/x86_64-linux-gnu/libqhull.so;debug;/usr/lib/x86_64-linux-gnu/libqhull.so;vtkChartsCore;vtkCommonColor;vtkCommonCore;vtksys;vtkCommonDataModel;vtkCommonMath;vtkCommonMisc;vtkCommonSystem;vtkCommonTransforms;vtkCommonExecutionModel;vtkFiltersGeneral;vtkCommonComputationalGeometry;vtkFiltersCore;vtkInfovisCore;vtkFiltersExtraction;vtkFiltersStatistics;vtkImagingFourier;vtkImagingCore;vtkalglib;vtkRenderingContext2D;vtkRenderingCore;vtkFiltersGeometry;vtkFiltersSources;vtkRenderingFreeType;/usr/lib/x86_64-linux-gnu/libfreetype.so;/usr/lib/x86_64-linux-gnu/libz.so;vtkFiltersModeling;vtkImagingSources;vtkInteractionStyle;vtkInteractionWidgets;vtkFiltersHybrid;vtkImagingColor;vtkImagingGeneral;vtkImagingHybrid;vtkIOImage;vtkDICOMParser;vtkmetaio;/usr/lib/x86_64-linux-gnu/libjpeg.so;/usr/lib/x86_64-linux-gnu/libpng.so;/usr/lib/x86_64-linux-gnu/libtiff.so;vtkRenderingAnnotation;vtkRenderingVolume;vtkIOXML;vtkIOCore;vtkIOXMLParser;/usr/lib/x86_64-linux-gnu/libexpat.so;vtkIOGeometry;vtkIOLegacy;vtkIOPLY;vtkRenderingLOD;vtkViewsContext2D;vtkViewsCore;vtkRenderingContextOpenGL2;vtkRenderingOpenGL2;FLANN::FLANN (Required is at least version "1.8") 
+Eigen:/usr/include/eigen3
+-- fast_lio: 1 messages, 0 services
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/tong/e1_hilti_stream_20261126/ros1_ceres/build
+Scanning dependencies of target _livox_ros_driver_generate_messages_check_deps_CustomMsg
+Scanning dependencies of target std_msgs_generate_messages_eus
+[  0%] Built target std_msgs_generate_messages_eus
+Scanning dependencies of target _livox_ros_driver_generate_messages_check_deps_CustomPoint
+[  0%] Built target _livox_ros_driver_generate_messages_check_deps_CustomMsg
+Scanning dependencies of target std_msgs_generate_messages_py
+[  0%] Built target std_msgs_generate_messages_py
+[  0%] Built target _livox_ros_driver_generate_messages_check_deps_CustomPoint
+Scanning dependencies of target std_msgs_generate_messages_cpp
+Scanning dependencies of target std_msgs_generate_messages_nodejs
+[  0%] Built target std_msgs_generate_messages_nodejs
+[  0%] Built target std_msgs_generate_messages_cpp
+Scanning dependencies of target std_msgs_generate_messages_lisp
+[  0%] Built target std_msgs_generate_messages_lisp
+Scanning dependencies of target kittiHelper
+Scanning dependencies of target alaserOdometry
+[  2%] Building CXX object MM-LINS/SC-PGO/CMakeFiles/kittiHelper.dir/src/kittiHelper.cpp.o
+[  5%] Building CXX object MM-LINS/SC-PGO/CMakeFiles/alaserOdometry.dir/src/laserOdometry.cpp.o
+[  8%] Linking CXX executable /home/tong/e1_hilti_stream_20261126/ros1_ceres/devel/lib/aloam_velodyne/kittiHelper
+[  8%] Built target kittiHelper
+Scanning dependencies of target alaserPGO
+[ 11%] Building CXX object MM-LINS/SC-PGO/CMakeFiles/alaserPGO.dir/src/laserPosegraphOptimization.cpp.o
+[ 14%] Linking CXX executable /home/tong/e1_hilti_stream_20261126/ros1_ceres/devel/lib/aloam_velodyne/alaserOdometry
+[ 14%] Built target alaserOdometry
+Scanning dependencies of target ascanRegistration
+[ 17%] Building CXX object MM-LINS/SC-PGO/CMakeFiles/ascanRegistration.dir/src/scanRegistration.cpp.o
+In file included from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/SC-PGO/src/laserPosegraphOptimization.cpp:61:
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/SC-PGO/include/mapmanager.hpp: In member function ‘void mapmanager::transformmap(Eigen::Affine3f)’:
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/SC-PGO/include/mapmanager.hpp:123:27: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<Pose6D>::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+  123 |         for (int i = 0; i < ActiveMap->keyframeposes.size(); ++i)
+      |                         ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/SC-PGO/src/laserPosegraphOptimization.cpp: In function ‘void performSimilarClosure()’:
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/SC-PGO/src/laserPosegraphOptimization.cpp:677:23: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<std::shared_ptr<MapmanagerType> >::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+  677 |     for (int i = 0; i < Mapmanager.SleepMapList.size(); ++i)
+      |                     ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/SC-PGO/src/laserPosegraphOptimization.cpp:685:23: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<double>::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+  685 |     for (int i = 1; i < similar_mapindexes.size(); ++i)
+      |                     ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/SC-PGO/src/laserPosegraphOptimization.cpp: In function ‘void process_pg()’:
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/SC-PGO/src/laserPosegraphOptimization.cpp:1018:35: warning: comparison of integer expressions of different signedness: ‘int’ and ‘std::vector<std::shared_ptr<MapmanagerType> >::size_type’ {aka ‘long unsigned int’} [-Wsign-compare]
+ 1018 |                 for (int i = 0; i < Mapmanager.SleepMapList.size(); ++i)
+      |                                 ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/SC-PGO/src/laserPosegraphOptimization.cpp: In function ‘void process_icp()’:
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/SC-PGO/src/laserPosegraphOptimization.cpp:1205:33: warning: variable ‘sc_initial’ set but not used [-Wunused-but-set-variable]
+ 1205 |                 Eigen::Affine3f sc_initial = pcl::getTransformation(0, 0, 0, 0, 0, Yaw_diff);
+      |                                 ^~~~~~~~~~
+[ 20%] Linking CXX executable /home/tong/e1_hilti_stream_20261126/ros1_ceres/devel/lib/aloam_velodyne/ascanRegistration
+[ 20%] Built target ascanRegistration
+Scanning dependencies of target alaserMapping
+[ 23%] Building CXX object MM-LINS/SC-PGO/CMakeFiles/alaserMapping.dir/src/laserMapping.cpp.o
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/SC-PGO/src/laserPosegraphOptimization.cpp: In function ‘void process_map()’:
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/SC-PGO/src/laserPosegraphOptimization.cpp:1102:18: warning: ‘newisam’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+ 1102 |             isam = newisam;
+      |             ~~~~~^~~~~~~~~
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/SC-PGO/src/laserPosegraphOptimization.cpp: In function ‘void process_map_surveillance()’:
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/SC-PGO/src/laserPosegraphOptimization.cpp:897:18: warning: ‘newisam’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+  897 |             isam = newisam;
+      |             ~~~~~^~~~~~~~~
+[ 26%] Linking CXX executable /home/tong/e1_hilti_stream_20261126/ros1_ceres/devel/lib/aloam_velodyne/alaserMapping
+[ 26%] Built target alaserMapping
+Scanning dependencies of target fastlio_mapping
+[ 29%] Building CXX object MM-LINS/FAST-LIO/CMakeFiles/fastlio_mapping.dir/src/laserMapping.cpp.o
+In file included from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/IMU_Processing.hpp:11,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/laserMapping.cpp:12:
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/include/common_lib.h:8:10: fatal error: fast_lio/Pose6D.h: No such file or directory
+    8 | #include <fast_lio/Pose6D.h>
+      |          ^~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make[2]: *** [MM-LINS/FAST-LIO/CMakeFiles/fastlio_mapping.dir/build.make:63: MM-LINS/FAST-LIO/CMakeFiles/fastlio_mapping.dir/src/laserMapping.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:2729: MM-LINS/FAST-LIO/CMakeFiles/fastlio_mapping.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+[ 32%] Building CXX object MM-LINS/SC-PGO/CMakeFiles/alaserPGO.dir/include/scancontext/Scancontext.cpp.o
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/SC-PGO/include/scancontext/Scancontext.cpp: In function ‘float xy2theta(const float&, const float&)’:
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/SC-PGO/include/scancontext/Scancontext.cpp:33:1: warning: control reaches end of non-void function [-Wreturn-type]
+   33 | } // xy2theta
+      | ^
+[ 35%] Linking CXX executable /home/tong/e1_hilti_stream_20261126/ros1_ceres/devel/lib/aloam_velodyne/alaserPGO
+[ 35%] Built target alaserPGO
+make: *** [Makefile:141: all] Error 2
+Base path: /home/tong/e1_hilti_stream_20261126/ros1_ceres
+Source space: /home/tong/e1_hilti_stream_20261126/ros1_ceres/src
+Build space: /home/tong/e1_hilti_stream_20261126/ros1_ceres/build
+Devel space: /home/tong/e1_hilti_stream_20261126/ros1_ceres/devel
+Install space: /home/tong/e1_hilti_stream_20261126/ros1_ceres/install
+Creating symlink "/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/CMakeLists.txt" pointing to "/opt/ros/noetic/share/catkin/cmake/toplevel.cmake"
+####
+#### Running command: "cmake /home/tong/e1_hilti_stream_20261126/ros1_ceres/src -DCATKIN_DEVEL_PREFIX=/home/tong/e1_hilti_stream_20261126/ros1_ceres/devel -DCMAKE_INSTALL_PREFIX=/home/tong/e1_hilti_stream_20261126/ros1_ceres/install -G Unix Makefiles" in "/home/tong/e1_hilti_stream_20261126/ros1_ceres/build"
+####
+####
+#### Running command: "make -j2 -l2" in "/home/tong/e1_hilti_stream_20261126/ros1_ceres/build"
+####
+Invoking "make -j2 -l2" failed

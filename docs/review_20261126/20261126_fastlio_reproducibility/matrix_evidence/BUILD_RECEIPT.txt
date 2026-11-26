@@ -1,0 +1,12 @@
+[100%] Built target fastlio_mapping
+Base path: /home/tong/fastlio_repro_work_20261126/frozen/fastlio_stability_20261126/v2/ws
+Source space: /home/tong/fastlio_repro_work_20261126/frozen/fastlio_stability_20261126/v2/ws/src
+Build space: /home/tong/fastlio_repro_work_20261126/frozen/fastlio_stability_20261126/v2/ws/build
+Devel space: /home/tong/fastlio_repro_work_20261126/frozen/fastlio_stability_20261126/v2/ws/devel
+Install space: /home/tong/fastlio_repro_work_20261126/frozen/fastlio_stability_20261126/v2/ws/install
+####
+#### Running command: "cmake /home/tong/fastlio_repro_work_20261126/frozen/fastlio_stability_20261126/v2/ws/src -DCATKIN_DEVEL_PREFIX=/home/tong/fastlio_repro_work_20261126/frozen/fastlio_stability_20261126/v2/ws/devel -DCMAKE_INSTALL_PREFIX=/home/tong/fastlio_repro_work_20261126/frozen/fastlio_stability_20261126/v2/ws/install -G Unix Makefiles" in "/home/tong/fastlio_repro_work_20261126/frozen/fastlio_stability_20261126/v2/ws/build"
+####
+####
+#### Running command: "make -j2 -l2" in "/home/tong/fastlio_repro_work_20261126/frozen/fastlio_stability_20261126/v2/ws/build"
+####

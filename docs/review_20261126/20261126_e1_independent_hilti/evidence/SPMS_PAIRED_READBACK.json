@@ -1,0 +1,6 @@
+{
+  "lidar": 371,
+  "imu": 15194,
+  "lidar_stamp_payload_and_arrival_match": true,
+  "imu_stamp_and_serialized_payload_match": true
+}

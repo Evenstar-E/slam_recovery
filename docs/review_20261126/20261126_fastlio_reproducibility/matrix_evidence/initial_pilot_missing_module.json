@@ -1,0 +1,29 @@
+{
+  "code": 1,
+  "run": "accept_drop",
+  "started": "2026-11-26T10:22:23+08:00",
+  "finished": "2026-11-26T10:22:27+08:00",
+  "events": [],
+  "final": null,
+  "public": 0,
+  "public_increasing": true,
+  "private_leaked": 0,
+  "refusal_receipts": [],
+  "bridge_applied": [],
+  "groups": 0,
+  "public_stamps_ns": [],
+  "refusal_state": [],
+  "maps": {},
+  "run_error_tail": [
+    "    from run_retiming import RetimedController",
+    "  File \"/home/tong/fastlio_repro_work_20261126/frozen/fastlio_rtp03_clock_retiming_20261126/run_retiming.py\", line 13, in <module>",
+    "    from run_confirmation import ConfirmedController, frozen",
+    "  File \"/home/tong/fastlio_repro_work_20261126/frozen/fastlio_rtp03_clock_confirmation_20261126/run_confirmation.py\", line 14, in <module>",
+    "    import mixed_controller as frozen",
+    "  File \"/home/tong/fastlio_repro_work_20261126/frozen/fastlio_stability_20261126/v2/mixed_controller.py\", line 19, in <module>",
+    "    from step3_controller import Dual, integer, measures, odd_error, estimate, map_score, summary",
+    "  File \"/home/tong/fastlio_repro_work_20261126/frozen/ntuviral_fastlio_step5_20261125/step3_controller.py\", line 26, in <module>",
+    "    from ray_candidate import estimate, measures",
+    "ModuleNotFoundError: No module named 'ray_candidate'"
+  ]
+}

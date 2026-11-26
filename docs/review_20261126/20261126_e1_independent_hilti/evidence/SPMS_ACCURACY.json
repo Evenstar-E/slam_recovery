@@ -1,0 +1,28 @@
+[
+  {
+    "event": 1,
+    "kind": "sync",
+    "count_shared": 82,
+    "native": {
+      "n": 82,
+      "rmse_m": 0.0853538423896722
+    },
+    "plugin": {
+      "n": 82,
+      "rmse_m": 0.08786467895075634
+    }
+  },
+  {
+    "event": 2,
+    "kind": "attenuation",
+    "count_shared": 23,
+    "native": {
+      "n": 23,
+      "rmse_m": 0.05080214123624776
+    },
+    "plugin": {
+      "n": 23,
+      "rmse_m": 0.05306967679073135
+    }
+  }
+]

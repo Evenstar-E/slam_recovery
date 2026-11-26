@@ -1,0 +1,106 @@
+{
+  "profile": "spms_fault",
+  "rate": 1,
+  "recovery_controls_source_clock": false,
+  "same_lidar": true,
+  "same_imu": true,
+  "native": {
+    "exit": 0,
+    "source_scans": 371,
+    "controller_scans": 371,
+    "source_drops": 0,
+    "imu_arrivals": 15194,
+    "peak_queued_scans": 1,
+    "lidar_deadline_lateness_p95_ms": 3.5832170000000003,
+    "imu_deadline_lateness_p95_ms": 0.46583379999999974,
+    "queue_delay_p95_ms": 0.2410515,
+    "queue_delay_max_ms": 0.973449,
+    "publication_latency_p95_ms": 135.6330342,
+    "public": 369,
+    "unbound_public": 0,
+    "output_monotonic": true,
+    "peak_pss_and_swap_mib": 856.779296875,
+    "reset_markers": [],
+    "corrected_scans": 0,
+    "transitions": [],
+    "map_evidence": [],
+    "preview_stops": [],
+    "events": [
+      {
+        "id": 1,
+        "kind": "sync",
+        "input": 60,
+        "public": 60,
+        "gap_data_seconds": 0.099997759,
+        "after_fault_s": 0.000339741,
+        "historical_api_delivered": 0
+      },
+      {
+        "id": 2,
+        "kind": "attenuation",
+        "input": 61,
+        "public": 61,
+        "gap_data_seconds": 0.099997759,
+        "after_fault_s": 0.099923605,
+        "historical_api_delivered": 0
+      }
+    ],
+    "final_mode": "CALIBRATING"
+  },
+  "plugin": {
+    "exit": 0,
+    "source_scans": 371,
+    "controller_scans": 371,
+    "source_drops": 0,
+    "imu_arrivals": 15194,
+    "peak_queued_scans": 3,
+    "lidar_deadline_lateness_p95_ms": 4.2961005,
+    "imu_deadline_lateness_p95_ms": 0.4506322499999999,
+    "queue_delay_p95_ms": 0.22991499999999998,
+    "queue_delay_max_ms": 210.140249,
+    "publication_latency_p95_ms": 102.4488245,
+    "public": 306,
+    "unbound_public": 0,
+    "output_monotonic": true,
+    "peak_pss_and_swap_mib": 841.1181640625,
+    "reset_markers": [],
+    "corrected_scans": 60,
+    "transitions": [
+      "preview_readonly_map_verified",
+      "preview_native_fallback",
+      "triggered",
+      "refused_caught_up_released",
+      "rearmed"
+    ],
+    "map_evidence": [
+      {
+        "action": "preview_readonly_map_verified",
+        "unchanged": true,
+        "before_sha256": "3797ee80e055ed04f5fd53b2800376f079c4139e0c30bd56b25fd3cca2cd5b99",
+        "after_sha256": "3797ee80e055ed04f5fd53b2800376f079c4139e0c30bd56b25fd3cca2cd5b99"
+      }
+    ],
+    "preview_stops": [],
+    "events": [
+      {
+        "id": 1,
+        "kind": "sync",
+        "input": 60,
+        "public": 60,
+        "gap_data_seconds": 0.099997759,
+        "after_fault_s": 0.000339741,
+        "historical_api_delivered": 0
+      },
+      {
+        "id": 2,
+        "kind": "attenuation",
+        "input": 61,
+        "public": 0,
+        "gap_data_seconds": 6.39984417,
+        "after_fault_s": 0.299918646,
+        "historical_api_delivered": 0
+      }
+    ],
+    "final_mode": "ARMED"
+  }
+}

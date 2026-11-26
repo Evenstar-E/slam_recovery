@@ -1,0 +1,25 @@
+path: /home/tong/e1_hilti_stream_20261126/upstream_spms_paired/observed.bag
+version: 2.0
+duration: 38.191126
+start: 1795663675.735109
+end: 1795663713.926234
+size: 3237865
+messages: 1085
+indexed: True
+compression: none
+types:
+    - type: nav_msgs/Odometry
+      md5: cd5e73d190d741a2f92e81eda573aca7
+    - type: nav_msgs/Path
+      md5: 6227e2b7e9cce15051f669a5e197bbf7
+topics:
+    - topic: /Odometry
+      type: nav_msgs/Odometry
+      messages: 369
+    - topic: /aft_pgo_odom
+      type: nav_msgs/Odometry
+      messages: 358
+    - topic: /aft_pgo_path
+      type: nav_msgs/Path
+      messages: 358
+

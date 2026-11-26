@@ -1,0 +1,17 @@
+{
+  "origin_ns": 1624181089160560613,
+  "read_s": [
+    26,
+    65
+  ],
+  "lidar_feed_s": [
+    27,
+    64
+  ],
+  "topics": {
+    "/os1_cloud_node1/points": 390,
+    "/imu/imu": 15194
+  },
+  "clipped_bag_sha256": "f0e4bf9f102b6a0b55a893b07a55187fed2b0ee62c29e0133bc2ca307e998ca2",
+  "original_bag_sha256": "aab9a47298beaa532247f36f6f1ba06aed469eb3ee0f0178c5441facf6667be0"
+}

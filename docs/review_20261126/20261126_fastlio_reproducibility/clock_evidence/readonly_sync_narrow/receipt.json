@@ -1,0 +1,1608 @@
+{
+  "code": 0,
+  "run": "readonly_sync_narrow",
+  "started": "2026-11-26T10:37:27+08:00",
+  "finished": "2026-11-26T10:37:52+08:00",
+  "events": [
+    {
+      "action": "preview_started"
+    },
+    {
+      "action": "clock_suspect",
+      "episode": 1,
+      "scan_ns": 1609055168223503638,
+      "phase_ns": 49975934,
+      "arrived_wall_ns": 1292418748146,
+      "startup_interval_ns": 103021886,
+      "header_step_ns": 49375438,
+      "buffered": true
+    },
+    {
+      "action": "clock_confirmed",
+      "episode": 1,
+      "scan_ns": 1609055168223503638,
+      "phase_ns": 49975934,
+      "arrived_wall_ns": 1292418748146,
+      "confirmation_scan_ns": 1609055168326779092,
+      "confirmation_phase_ns": 50063703,
+      "confirmation_wall_ns": 1292482960552,
+      "last_forwarded_scan_ns": 1609055168071106314,
+      "imu_sent_before_confirmation": 3139,
+      "header_offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055168223503638,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 49975934,
+      "header_offset_ns": 49375438,
+      "interval_ns": 152397324,
+      "ordinary_distance_ns": 48275903,
+      "reverse_distance_ns": 97651341,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055168223503638,
+      "corrected_ns": 1609055168174128200,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055168326779092,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50063703,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103275454,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48529471,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055168326779092,
+      "corrected_ns": 1609055168277403654,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055168429848815,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 29749518,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103069723,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48323740,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055168429848815,
+      "corrected_ns": 1609055168380473377,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055168532652855,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50417304,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102804040,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48058057,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055168532652855,
+      "corrected_ns": 1609055168483277417,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055168635685849,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 49949073,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103032994,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48287011,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055168635685849,
+      "corrected_ns": 1609055168586310411,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055168739079098,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50183834,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103393249,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48647266,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055168739079098,
+      "corrected_ns": 1609055168689703660,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055168842130469,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50044459,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103051371,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48305388,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055168842130469,
+      "corrected_ns": 1609055168792755031,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055168945235795,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50084822,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103105326,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48359343,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055168945235795,
+      "corrected_ns": 1609055168895860357,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055169048229769,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50020641,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102993974,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48247991,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055169048229769,
+      "corrected_ns": 1609055168998854331,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055169118821498,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 51023402,
+      "header_offset_ns": 49375438,
+      "interval_ns": 70591729,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 15845746,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055169118821498,
+      "corrected_ns": 1609055169069446060,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055169220395544,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 49931724,
+      "header_offset_ns": 49375438,
+      "interval_ns": 101574046,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 46828063,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055169220395544,
+      "corrected_ns": 1609055169171020106,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055169323409428,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50211668,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103013884,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48267901,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055169323409428,
+      "corrected_ns": 1609055169274033990,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055169426554369,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 49951599,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103144941,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48398958,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055169426554369,
+      "corrected_ns": 1609055169377178931,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055169529572731,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50540654,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103018362,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48272379,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055169529572731,
+      "corrected_ns": 1609055169480197293,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055169632808934,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 49913523,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103236203,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48490220,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055169632808934,
+      "corrected_ns": 1609055169583433496,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055169735728625,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50222020,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102919691,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48173708,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055169735728625,
+      "corrected_ns": 1609055169686353187,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055169838963710,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50165917,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103235085,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48489102,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055169838963710,
+      "corrected_ns": 1609055169789588272,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055169941989353,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50189999,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103025643,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48279660,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055169941989353,
+      "corrected_ns": 1609055169892613915,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055170045791436,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50130155,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103802083,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 49056100,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055170045791436,
+      "corrected_ns": 1609055169996415998,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055170148069973,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50146637,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102278537,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 47532554,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055170148069973,
+      "corrected_ns": 1609055170098694535,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055170218601560,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50368728,
+      "header_offset_ns": 49375438,
+      "interval_ns": 70531587,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 15785604,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055170218601560,
+      "corrected_ns": 1609055170169226122,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055170320894102,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 49946264,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102292542,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 47546559,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055170320894102,
+      "corrected_ns": 1609055170271518664,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055170423339370,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50365757,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102445268,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 47699285,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055170423339370,
+      "corrected_ns": 1609055170373963932,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055170526449076,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50250631,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103109706,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48363723,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055170526449076,
+      "corrected_ns": 1609055170477073638,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055170629489469,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 51285759,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103040393,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48294410,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055170629489469,
+      "corrected_ns": 1609055170580114031,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055170732699431,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50106956,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103209962,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48463979,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055170732699431,
+      "corrected_ns": 1609055170683323993,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055170835728045,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50148941,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103028614,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48282631,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055170835728045,
+      "corrected_ns": 1609055170786352607,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055170938960382,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50184062,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103232337,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48486354,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055170938960382,
+      "corrected_ns": 1609055170889584944,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055171042015730,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50069413,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103055348,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48309365,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055171042015730,
+      "corrected_ns": 1609055170992640292,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055171145966276,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50029182,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103950546,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 49204563,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055171145966276,
+      "corrected_ns": 1609055171096590838,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055171248335411,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50013757,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102369135,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 47623152,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055171248335411,
+      "corrected_ns": 1609055171198959973,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055171318906606,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50915307,
+      "header_offset_ns": 49375438,
+      "interval_ns": 70571195,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 15825212,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055171318906606,
+      "corrected_ns": 1609055171269531168,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055171421071860,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50081624,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102165254,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 47419271,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055171421071860,
+      "corrected_ns": 1609055171371696422,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055171523484931,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 49975343,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102413071,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 47667088,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055171523484931,
+      "corrected_ns": 1609055171474109493,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055171626456550,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 49905691,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102971619,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48225636,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055171626456550,
+      "corrected_ns": 1609055171577081112,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055171729416442,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50203731,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102959892,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48213909,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055171729416442,
+      "corrected_ns": 1609055171680041004,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055171832621945,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50189110,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103205503,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48459520,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055171832621945,
+      "corrected_ns": 1609055171783246507,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055171935638168,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 49968379,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103016223,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48270240,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055171935638168,
+      "corrected_ns": 1609055171886262730,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055172039297846,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50065800,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103659678,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48913695,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055172039297846,
+      "corrected_ns": 1609055171989922408,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055172142117298,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50017233,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102819452,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48073469,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055172142117298,
+      "corrected_ns": 1609055172092741860,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055172245892711,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50181132,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103775413,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 49029430,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055172245892711,
+      "corrected_ns": 1609055172196517273,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055172348303931,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50028539,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102411220,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 47665237,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055172348303931,
+      "corrected_ns": 1609055172298928493,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055172418671701,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 51017051,
+      "header_offset_ns": 49375438,
+      "interval_ns": 70367770,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 15621787,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055172418671701,
+      "corrected_ns": 1609055172369296263,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055172520332099,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50130639,
+      "header_offset_ns": 49375438,
+      "interval_ns": 101660398,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 46914415,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055172520332099,
+      "corrected_ns": 1609055172470956661,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055172623397041,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 49998499,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103064942,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48318959,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055172623397041,
+      "corrected_ns": 1609055172574021603,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055172726875897,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50019482,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103478856,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48732873,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055172726875897,
+      "corrected_ns": 1609055172677500459,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055172829771057,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50389148,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102895160,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48149177,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055172829771057,
+      "corrected_ns": 1609055172780395619,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055172933216856,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50188668,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103445799,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48699816,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055172933216856,
+      "corrected_ns": 1609055172883841418,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055173036268966,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50032621,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103052110,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48306127,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055173036268966,
+      "corrected_ns": 1609055172986893528,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055173139127910,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50137204,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102858944,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48112961,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055173139127910,
+      "corrected_ns": 1609055173089752472,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055173241949662,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50443770,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102821752,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48075769,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055173241949662,
+      "corrected_ns": 1609055173192574224,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055173345656404,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50066040,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103706742,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48960759,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055173345656404,
+      "corrected_ns": 1609055173296280966,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055173448043911,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50149013,
+      "header_offset_ns": 49375438,
+      "interval_ns": 102387507,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 47641524,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055173448043911,
+      "corrected_ns": 1609055173398668473,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055173518479175,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50426988,
+      "header_offset_ns": 49375438,
+      "interval_ns": 70435264,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 15689281,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055173518479175,
+      "corrected_ns": 1609055173469103737,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055173620307302,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50115169,
+      "header_offset_ns": 49375438,
+      "interval_ns": 101828127,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 47082144,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055173620307302,
+      "corrected_ns": 1609055173570931864,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055173723457791,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 49960511,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103150489,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48404506,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055173723457791,
+      "corrected_ns": 1609055173674082353,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055173826516171,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50180204,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103058380,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48312397,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055173826516171,
+      "corrected_ns": 1609055173777140733,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055173929648664,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50183882,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103132493,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48386510,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055173929648664,
+      "corrected_ns": 1609055173880273226,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055174032855419,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 49901620,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103206755,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48460772,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055174032855419,
+      "corrected_ns": 1609055173983479981,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055174135955664,
+      "state": "shifted",
+      "measured_receiver_phase_ns": 50110769,
+      "header_offset_ns": 49375438,
+      "interval_ns": 103100245,
+      "ordinary_distance_ns": 0,
+      "reverse_distance_ns": 48354262,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_retime",
+      "scan_ns": 1609055174135955664,
+      "corrected_ns": 1609055174086580226,
+      "offset_ns": 49375438
+    },
+    {
+      "action": "sensor_clock_frame",
+      "episode": 1,
+      "scan_ns": 1609055174189383295,
+      "state": "returned",
+      "measured_receiver_phase_ns": 236694,
+      "header_offset_ns": 49375438,
+      "interval_ns": 53427631,
+      "ordinary_distance_ns": 16871360,
+      "reverse_distance_ns": 0,
+      "healthy_interval_bounds_ns": [
+        70298991,
+        104121421
+      ]
+    },
+    {
+      "action": "preview_readonly_map_verified",
+      "unchanged": true,
+      "before_sha256": "d7aec2b494ee71b0913b4d7ac87ae6eea199696730b8ae6e4d6a91914d58cec7",
+      "after_sha256": "d7aec2b494ee71b0913b4d7ac87ae6eea199696730b8ae6e4d6a91914d58cec7"
+    },
+    {
+      "action": "preview_stopped",
+      "scan_ns": 1609055187182844682,
+      "reason": "additional_geometry_or_unverified_clock"
+    }
+  ],
+  "final": {
+    "site": "sbs_02",
+    "scenario": "sync_narrow",
+    "arm": "readonly",
+    "events": [],
+    "mode": "PREVIEW_STOPPED",
+    "tail": "OK status valid=0 repair_received=0 repair_applied=0 repaired_in_update=0 last_repaired_update_ns=0 repaired_map_updates=0 replay_remaining=0 map_points=45497 refusal_consumed=0 refusal_imu=0 refusal_localize=0 refusal_suffix=0 lab_frozen=0 captured_groups=0 deferred_resets=0 frame=258 stamp_ns=1609055187164417792 map_writes=released",
+    "groups": 370,
+    "speed": 1.65
+  },
+  "public": 258,
+  "public_increasing": true,
+  "private_leaked": 0,
+  "refusal_receipts": [],
+  "bridge_applied": [],
+  "groups": 370,
+  "public_stamps_ns": [
+    1609055161454103231,
+    1609055161556243420,
+    1609055161658722162,
+    1609055161761863232,
+    1609055161864375114,
+    1609055161968391657,
+    1609055162071078777,
+    1609055162174271345,
+    1609055162277209997,
+    1609055162381439686,
+    1609055162483585596,
+    1609055162553901672,
+    1609055162656735897,
+    1609055162758480787,
+    1609055162861684322,
+    1609055162964695930,
+    1609055163067837000,
+    1609055163171509027,
+    1609055163274367571,
+    1609055163377411842,
+    1609055163480471134,
+    1609055163583517313,
+    1609055163654023170,
+    1609055163755539656,
+    1609055163858467817,
+    1609055163961714745,
+    1609055164065649033,
+    1609055164168903351,
+    1609055164272181749,
+    1609055164375066280,
+    1609055164478249073,
+    1609055164581215858,
+    1609055164683302879,
+    1609055164754485607,
+    1609055164856305361,
+    1609055164959359884,
+    1609055165061927080,
+    1609055165164934397,
+    1609055165267433643,
+    1609055165370681286,
+    1609055165473134995,
+    1609055165575797558,
+    1609055165680427551,
+    1609055165783058882,
+    1609055165854374647,
+    1609055165956653118,
+    1609055166059702158,
+    1609055166162795067,
+    1609055166265822411,
+    1609055166369105577,
+    1609055166472215176,
+    1609055166575304508,
+    1609055166678549767,
+    1609055166781748056,
+    1609055166884694338,
+    1609055166955227613,
+    1609055167056630611,
+    1609055167160053968,
+    1609055167263216019,
+    1609055167366023779,
+    1609055167469379902,
+    1609055167572469234,
+    1609055167675745010,
+    1609055167778733253,
+    1609055167881380081,
+    1609055167984912872,
+    1609055168054915667,
+    1609055168157482624,
+    1609055168260528088,
+    1609055168363781214,
+    1609055168466848850,
+    1609055168569551468,
+    1609055168672620296,
+    1609055168776014805,
+    1609055168879096508,
+    1609055168982145786,
+    1609055169085129023,
+    1609055169155796528,
+    1609055169257763386,
+    1609055169360373735,
+    1609055169463553667,
+    1609055169566562176,
+    1609055169667806625,
+    1609055169772629738,
+    1609055169873903990,
+    1609055169975769520,
+    1609055170080398560,
+    1609055170183095932,
+    1609055170250901937,
+    1609055170352365494,
+    1609055170454782724,
+    1609055170559104443,
+    1609055170663691044,
+    1609055170767716885,
+    1609055170872263670,
+    1609055170969699144,
+    1609055171073134899,
+    1609055171179049253,
+    1609055171280629635,
+    1609055171350405216,
+    1609055171453728914,
+    1609055171560004473,
+    1609055171660962105,
+    1609055171763528824,
+    1609055171868396044,
+    1609055171968693972,
+    1609055172071220875,
+    1609055172175656557,
+    1609055172280547857,
+    1609055172382926941,
+    1609055172453259468,
+    1609055172554935932,
+    1609055172657962322,
+    1609055172761485100,
+    1609055172864355087,
+    1609055172967812777,
+    1609055173071253777,
+    1609055173175665379,
+    1609055173278834581,
+    1609055173382508993,
+    1609055173484584332,
+    1609055173555457830,
+    1609055173657322168,
+    1609055173760447741,
+    1609055173863440752,
+    1609055173966582298,
+    1609055174069838762,
+    1609055174172947168,
+    1609055174275791407,
+    1609055174378750801,
+    1609055174481363058,
+    1609055174584764957,
+    1609055174655328274,
+    1609055174756480694,
+    1609055174859485149,
+    1609055174962550402,
+    1609055175065552235,
+    1609055175168831110,
+    1609055175271995544,
+    1609055175374811411,
+    1609055175477955103,
+    1609055175581019878,
+    1609055175684139252,
+    1609055175754682302,
+    1609055175857118368,
+    1609055175959385157,
+    1609055176062450647,
+    1609055176165688038,
+    1609055176268821239,
+    1609055176372004032,
+    1609055176474863052,
+    1609055176578123331,
+    1609055176681174994,
+    1609055176784266472,
+    1609055176854655743,
+    1609055176957008600,
+    1609055177059695721,
+    1609055177162758589,
+    1609055177265830278,
+    1609055177368991852,
+    1609055177471935272,
+    1609055177574646950,
+    1609055177678075552,
+    1609055177780068636,
+    1609055177883874893,
+    1609055177954030991,
+    1609055178056594133,
+    1609055178158758402,
+    1609055178261892319,
+    1609055178364108324,
+    1609055178468361855,
+    1609055178571682453,
+    1609055178674882174,
+    1609055178778115034,
+    1609055178881705999,
+    1609055178984266281,
+    1609055179055029392,
+    1609055179156350851,
+    1609055179257447958,
+    1609055179362097979,
+    1609055179465038300,
+    1609055179568542480,
+    1609055179672167063,
+    1609055179774555445,
+    1609055179878090620,
+    1609055179981993437,
+    1609055180084453583,
+    1609055180154842138,
+    1609055180256492615,
+    1609055180359657764,
+    1609055180462795973,
+    1609055180566325426,
+    1609055180669259310,
+    1609055180772883415,
+    1609055180875144005,
+    1609055180978241920,
+    1609055181081180811,
+    1609055181184159517,
+    1609055181254298449,
+    1609055181356677771,
+    1609055181459235430,
+    1609055181562307358,
+    1609055181666132450,
+    1609055181768901825,
+    1609055181871919394,
+    1609055181975122929,
+    1609055182078713179,
+    1609055182182541609,
+    1609055182284082174,
+    1609055182354501247,
+    1609055182456094980,
+    1609055182558737516,
+    1609055182661784172,
+    1609055182765063286,
+    1609055182868267775,
+    1609055182971626282,
+    1609055183074772596,
+    1609055183178429604,
+    1609055183280920506,
+    1609055183384008408,
+    1609055183454562187,
+    1609055183556773424,
+    1609055183659294367,
+    1609055183762571335,
+    1609055183864897966,
+    1609055183967900038,
+    1609055184071720839,
+    1609055184174682856,
+    1609055184278084993,
+    1609055184381490946,
+    1609055184484160185,
+    1609055184554602861,
+    1609055184655289412,
+    1609055184759416342,
+    1609055184862579346,
+    1609055184965791941,
+    1609055185067995787,
+    1609055185171835899,
+    1609055185274820089,
+    1609055185378058195,
+    1609055185479632378,
+    1609055185584109068,
+    1609055185653812885,
+    1609055185756489992,
+    1609055185859432459,
+    1609055185960977077,
+    1609055186065475941,
+    1609055186167644024,
+    1609055186271538496,
+    1609055186374643326,
+    1609055186477925539,
+    1609055186581807375,
+    1609055186683187962,
+    1609055186753562689,
+    1609055186855696440,
+    1609055186958030939,
+    1609055187061331749,
+    1609055187164417744
+  ],
+  "refusal_state": [],
+  "maps": {
+    "preview_begin.xyz32": {
+      "bytes": 212484,
+      "sha256": "d7aec2b494ee71b0913b4d7ac87ae6eea199696730b8ae6e4d6a91914d58cec7"
+    },
+    "preview_end.xyz32": {
+      "bytes": 212484,
+      "sha256": "d7aec2b494ee71b0913b4d7ac87ae6eea199696730b8ae6e4d6a91914d58cec7"
+    }
+  },
+  "run_error_tail": []
+}

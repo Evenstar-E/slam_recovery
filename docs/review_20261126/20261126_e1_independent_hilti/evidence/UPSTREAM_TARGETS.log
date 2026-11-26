@@ -1,0 +1,188 @@
+Scanning dependencies of target geometry_msgs_generate_messages_cpp
+Scanning dependencies of target _fast_lio_generate_messages_check_deps_Pose6D
+[  0%] Built target geometry_msgs_generate_messages_cpp
+[  0%] Built target _fast_lio_generate_messages_check_deps_Pose6D
+Scanning dependencies of target fast_lio_generate_messages_cpp
+[100%] Generating C++ code from fast_lio/Pose6D.msg
+[100%] Built target fast_lio_generate_messages_cpp
+[  0%] Built target std_msgs_generate_messages_cpp
+[  0%] Built target _livox_ros_driver_generate_messages_check_deps_CustomMsg
+[  0%] Built target _livox_ros_driver_generate_messages_check_deps_CustomPoint
+Scanning dependencies of target livox_ros_driver_generate_messages_cpp
+[ 50%] Generating C++ code from livox_ros_driver/CustomPoint.msg
+[100%] Generating C++ code from livox_ros_driver/CustomMsg.msg
+[100%] Built target livox_ros_driver_generate_messages_cpp
+[ 50%] Building CXX object MM-LINS/FAST-LIO/CMakeFiles/fastlio_mapping.dir/src/laserMapping.cpp.o
+[ 50%] Building CXX object MM-LINS/FAST-LIO/CMakeFiles/fastlio_mapping.dir/include/ikd-Tree/ikd_Tree.cpp.o
+[ 75%] Building CXX object MM-LINS/FAST-LIO/CMakeFiles/fastlio_mapping.dir/src/preprocess.cpp.o
+In file included from /usr/include/boost/preprocessor/tuple/elem.hpp:23,
+                 from /usr/include/boost/preprocessor/arithmetic/add.hpp:21,
+                 from /usr/include/boost/mpl/aux_/preprocessor/def_params_tail.hpp:66,
+                 from /usr/include/boost/mpl/aux_/na_spec.hpp:28,
+                 from /usr/include/boost/mpl/next_prior.hpp:18,
+                 from /usr/include/boost/mpl/next.hpp:17,
+                 from /usr/include/boost/mpl/list/aux_/push_front.hpp:18,
+                 from /usr/include/boost/mpl/list/list0.hpp:19,
+                 from /usr/include/boost/mpl/list/list10.hpp:18,
+                 from /usr/include/boost/mpl/list/list20.hpp:18,
+                 from /usr/include/boost/mpl/list.hpp:36,
+                 from /usr/include/boost/math/policies/policy.hpp:9,
+                 from /usr/include/boost/math/policies/error_handling.hpp:21,
+                 from /usr/include/boost/math/special_functions/round.hpp:14,
+                 from /opt/ros/noetic/include/ros/time.h:58,
+                 from /opt/ros/noetic/include/ros/ros.h:38,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/laserMapping.cpp:10:
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.h:46:75: warning: ‘using uint8_t = uint8_t’ is deprecated: use std::uint8_t instead of pcl::uint8_t [-Wdeprecated-declarations]
+   46 |                                   (float, x, x)(float, y, y)(float, z, z)(uint8_t, intensity, intensity)(uint16_t, ring, ring)(double, timestamp, timestamp))
+      |                                                                           ^~~~~~~
+In file included from /usr/include/pcl-1.10/pcl/point_types.h:42,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/include/common_lib.h:6,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/IMU_Processing.hpp:11,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/laserMapping.cpp:12:
+/usr/include/pcl-1.10/pcl/pcl_macros.h:92:9: note: declared here
+   92 |   using uint8_t [[deprecated("use std::uint8_t instead of pcl::uint8_t")]] = std::uint8_t;
+      |         ^~~~~~~
+In file included from /usr/include/boost/preprocessor/tuple/elem.hpp:23,
+                 from /usr/include/boost/preprocessor/arithmetic/add.hpp:21,
+                 from /usr/include/boost/mpl/aux_/preprocessor/def_params_tail.hpp:66,
+                 from /usr/include/boost/mpl/aux_/na_spec.hpp:28,
+                 from /usr/include/boost/mpl/next_prior.hpp:18,
+                 from /usr/include/boost/mpl/next.hpp:17,
+                 from /usr/include/boost/mpl/list/aux_/push_front.hpp:18,
+                 from /usr/include/boost/mpl/list/list0.hpp:19,
+                 from /usr/include/boost/mpl/list/list10.hpp:18,
+                 from /usr/include/boost/mpl/list/list20.hpp:18,
+                 from /usr/include/boost/mpl/list.hpp:36,
+                 from /usr/include/boost/math/policies/policy.hpp:9,
+                 from /usr/include/boost/math/policies/error_handling.hpp:21,
+                 from /usr/include/boost/math/special_functions/round.hpp:14,
+                 from /opt/ros/noetic/include/ros/time.h:58,
+                 from /opt/ros/noetic/include/ros/ros.h:38,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/laserMapping.cpp:10:
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.h:46:106: warning: ‘using uint16_t = uint16_t’ is deprecated: use std::uint16_t instead of pcl::uint16_t [-Wdeprecated-declarations]
+   46 |                                   (float, x, x)(float, y, y)(float, z, z)(uint8_t, intensity, intensity)(uint16_t, ring, ring)(double, timestamp, timestamp))
+      |                                                                                                          ^~~~~~~~
+In file included from /usr/include/pcl-1.10/pcl/point_types.h:42,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/include/common_lib.h:6,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/IMU_Processing.hpp:11,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/laserMapping.cpp:12:
+/usr/include/pcl-1.10/pcl/pcl_macros.h:94:9: note: declared here
+   94 |   using uint16_t [[deprecated("use std::uint16_t instead of pcl::uint16_t")]] = std::uint16_t;
+      |         ^~~~~~~~
+In file included from /usr/include/boost/preprocessor/tuple/elem.hpp:23,
+                 from /usr/include/boost/preprocessor/arithmetic/add.hpp:21,
+                 from /usr/include/boost/mpl/aux_/preprocessor/def_params_tail.hpp:66,
+                 from /usr/include/boost/mpl/aux_/na_spec.hpp:28,
+                 from /usr/include/boost/mpl/next_prior.hpp:18,
+                 from /usr/include/boost/mpl/next.hpp:17,
+                 from /usr/include/boost/mpl/list/aux_/push_front.hpp:18,
+                 from /usr/include/boost/mpl/list/list0.hpp:19,
+                 from /usr/include/boost/mpl/list/list10.hpp:18,
+                 from /usr/include/boost/mpl/list/list20.hpp:18,
+                 from /usr/include/boost/mpl/list.hpp:36,
+                 from /usr/include/boost/math/policies/policy.hpp:9,
+                 from /usr/include/boost/math/policies/error_handling.hpp:21,
+                 from /usr/include/boost/math/special_functions/round.hpp:14,
+                 from /opt/ros/noetic/include/ros/time.h:58,
+                 from /opt/ros/noetic/include/ros/ros.h:38,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/laserMapping.cpp:10:
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.h:62:6: warning: ‘using uint16_t = uint16_t’ is deprecated: use std::uint16_t instead of pcl::uint16_t [-Wdeprecated-declarations]
+   62 |     (uint16_t, ring, ring)
+      |      ^~~~~~~~
+In file included from /usr/include/pcl-1.10/pcl/point_types.h:42,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/include/common_lib.h:6,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/IMU_Processing.hpp:11,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/laserMapping.cpp:12:
+/usr/include/pcl-1.10/pcl/pcl_macros.h:94:9: note: declared here
+   94 |   using uint16_t [[deprecated("use std::uint16_t instead of pcl::uint16_t")]] = std::uint16_t;
+      |         ^~~~~~~~
+In file included from /usr/include/boost/preprocessor/tuple/elem.hpp:23,
+                 from /usr/include/boost/preprocessor/arithmetic/add.hpp:21,
+                 from /usr/include/boost/mpl/aux_/preprocessor/def_params_tail.hpp:66,
+                 from /usr/include/boost/mpl/aux_/na_spec.hpp:28,
+                 from /usr/include/boost/mpl/next_prior.hpp:18,
+                 from /usr/include/boost/mpl/next.hpp:17,
+                 from /usr/include/boost/mpl/list/aux_/push_front.hpp:18,
+                 from /usr/include/boost/mpl/list/list0.hpp:19,
+                 from /usr/include/boost/mpl/list/list10.hpp:18,
+                 from /usr/include/boost/mpl/list/list20.hpp:18,
+                 from /usr/include/boost/mpl/list.hpp:36,
+                 from /usr/include/boost/math/policies/policy.hpp:9,
+                 from /usr/include/boost/math/policies/error_handling.hpp:21,
+                 from /usr/include/boost/math/special_functions/round.hpp:14,
+                 from /opt/ros/noetic/include/ros/time.h:58,
+                 from /opt/ros/noetic/include/ros/ros.h:38,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.h:1,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.cpp:1:
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.h:46:75: warning: ‘using uint8_t = uint8_t’ is deprecated: use std::uint8_t instead of pcl::uint8_t [-Wdeprecated-declarations]
+   46 |                                   (float, x, x)(float, y, y)(float, z, z)(uint8_t, intensity, intensity)(uint16_t, ring, ring)(double, timestamp, timestamp))
+      |                                                                           ^~~~~~~
+In file included from /usr/include/pcl-1.10/pcl/PCLPointField.h:10,
+                 from /usr/include/pcl-1.10/pcl/conversions.h:46,
+                 from /opt/ros/noetic/include/pcl_conversions/pcl_conversions.h:44,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.h:2,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.cpp:1:
+/usr/include/pcl-1.10/pcl/pcl_macros.h:92:9: note: declared here
+   92 |   using uint8_t [[deprecated("use std::uint8_t instead of pcl::uint8_t")]] = std::uint8_t;
+      |         ^~~~~~~
+In file included from /usr/include/boost/preprocessor/tuple/elem.hpp:23,
+                 from /usr/include/boost/preprocessor/arithmetic/add.hpp:21,
+                 from /usr/include/boost/mpl/aux_/preprocessor/def_params_tail.hpp:66,
+                 from /usr/include/boost/mpl/aux_/na_spec.hpp:28,
+                 from /usr/include/boost/mpl/next_prior.hpp:18,
+                 from /usr/include/boost/mpl/next.hpp:17,
+                 from /usr/include/boost/mpl/list/aux_/push_front.hpp:18,
+                 from /usr/include/boost/mpl/list/list0.hpp:19,
+                 from /usr/include/boost/mpl/list/list10.hpp:18,
+                 from /usr/include/boost/mpl/list/list20.hpp:18,
+                 from /usr/include/boost/mpl/list.hpp:36,
+                 from /usr/include/boost/math/policies/policy.hpp:9,
+                 from /usr/include/boost/math/policies/error_handling.hpp:21,
+                 from /usr/include/boost/math/special_functions/round.hpp:14,
+                 from /opt/ros/noetic/include/ros/time.h:58,
+                 from /opt/ros/noetic/include/ros/ros.h:38,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.h:1,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.cpp:1:
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.h:46:106: warning: ‘using uint16_t = uint16_t’ is deprecated: use std::uint16_t instead of pcl::uint16_t [-Wdeprecated-declarations]
+   46 |                                   (float, x, x)(float, y, y)(float, z, z)(uint8_t, intensity, intensity)(uint16_t, ring, ring)(double, timestamp, timestamp))
+      |                                                                                                          ^~~~~~~~
+In file included from /usr/include/pcl-1.10/pcl/PCLPointField.h:10,
+                 from /usr/include/pcl-1.10/pcl/conversions.h:46,
+                 from /opt/ros/noetic/include/pcl_conversions/pcl_conversions.h:44,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.h:2,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.cpp:1:
+/usr/include/pcl-1.10/pcl/pcl_macros.h:94:9: note: declared here
+   94 |   using uint16_t [[deprecated("use std::uint16_t instead of pcl::uint16_t")]] = std::uint16_t;
+      |         ^~~~~~~~
+In file included from /usr/include/boost/preprocessor/tuple/elem.hpp:23,
+                 from /usr/include/boost/preprocessor/arithmetic/add.hpp:21,
+                 from /usr/include/boost/mpl/aux_/preprocessor/def_params_tail.hpp:66,
+                 from /usr/include/boost/mpl/aux_/na_spec.hpp:28,
+                 from /usr/include/boost/mpl/next_prior.hpp:18,
+                 from /usr/include/boost/mpl/next.hpp:17,
+                 from /usr/include/boost/mpl/list/aux_/push_front.hpp:18,
+                 from /usr/include/boost/mpl/list/list0.hpp:19,
+                 from /usr/include/boost/mpl/list/list10.hpp:18,
+                 from /usr/include/boost/mpl/list/list20.hpp:18,
+                 from /usr/include/boost/mpl/list.hpp:36,
+                 from /usr/include/boost/math/policies/policy.hpp:9,
+                 from /usr/include/boost/math/policies/error_handling.hpp:21,
+                 from /usr/include/boost/math/special_functions/round.hpp:14,
+                 from /opt/ros/noetic/include/ros/time.h:58,
+                 from /opt/ros/noetic/include/ros/ros.h:38,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.h:1,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.cpp:1:
+/home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.h:62:6: warning: ‘using uint16_t = uint16_t’ is deprecated: use std::uint16_t instead of pcl::uint16_t [-Wdeprecated-declarations]
+   62 |     (uint16_t, ring, ring)
+      |      ^~~~~~~~
+In file included from /usr/include/pcl-1.10/pcl/PCLPointField.h:10,
+                 from /usr/include/pcl-1.10/pcl/conversions.h:46,
+                 from /opt/ros/noetic/include/pcl_conversions/pcl_conversions.h:44,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.h:2,
+                 from /home/tong/e1_hilti_stream_20261126/ros1_ceres/src/MM-LINS/FAST-LIO/src/preprocess.cpp:1:
+/usr/include/pcl-1.10/pcl/pcl_macros.h:94:9: note: declared here
+   94 |   using uint16_t [[deprecated("use std::uint16_t instead of pcl::uint16_t")]] = std::uint16_t;
+      |         ^~~~~~~~
+[100%] Linking CXX executable /home/tong/e1_hilti_stream_20261126/ros1_ceres/devel/lib/fast_lio/fastlio_mapping
+[100%] Built target fastlio_mapping
+[100%] Built target alaserPGO

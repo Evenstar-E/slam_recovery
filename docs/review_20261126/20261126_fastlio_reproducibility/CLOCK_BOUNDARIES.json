@@ -1,0 +1,39 @@
+{
+  "eee_clean": {
+    "exit": 0,
+    "exact_inputs": true,
+    "public": 367,
+    "increasing": true,
+    "corrected": 0,
+    "first_fault_correction_exact": true,
+    "stops": [],
+    "map_evidence": [],
+    "stopped_during_second_fault": false,
+    "mode": "ARMED"
+  },
+  "sync_narrow": {
+    "exit": 0,
+    "exact_inputs": true,
+    "public": 258,
+    "increasing": true,
+    "corrected": 60,
+    "first_fault_correction_exact": true,
+    "stops": [
+      {
+        "action": "preview_stopped",
+        "scan_ns": 1609055187182844682,
+        "reason": "additional_geometry_or_unverified_clock"
+      }
+    ],
+    "map_evidence": [
+      {
+        "action": "preview_readonly_map_verified",
+        "unchanged": true,
+        "before_sha256": "d7aec2b494ee71b0913b4d7ac87ae6eea199696730b8ae6e4d6a91914d58cec7",
+        "after_sha256": "d7aec2b494ee71b0913b4d7ac87ae6eea199696730b8ae6e4d6a91914d58cec7"
+      }
+    ],
+    "stopped_during_second_fault": true,
+    "mode": "PREVIEW_STOPPED"
+  }
+}

@@ -1,0 +1,589 @@
+{
+  "passed": true,
+  "cases": {
+    "z_shift": {
+      "exit": 0,
+      "inputs_exact": true,
+      "public": 305,
+      "public_increasing": true,
+      "unbound_public": 0,
+      "final_mode": "ARMED",
+      "retimed": 0,
+      "exact_clock_population": true,
+      "map_evidence": [],
+      "preview_stops": [],
+      "fallback_requests": [
+        {
+          "action": "preview_native_fallback",
+          "scan_ns": 1609060368762521847
+        }
+      ],
+      "events": [
+        {
+          "outcome": "refused_caught_up_released",
+          "episode": 1,
+          "rearmed": true,
+          "alarm_key": 1609060368762521847,
+          "alarm_delay_ms": 0.0,
+          "confirm_delay_ms": null,
+          "channels": [
+            "beam"
+          ],
+          "checkpoint_ns": 1609060368744588544,
+          "checkpoint_before_fault": true,
+          "hold_matches_checkpoint": true,
+          "captured": 60,
+          "all_faults_captured": true,
+          "retimed": 0,
+          "localization": 0,
+          "imu_only": 60,
+          "healthy_updates": 2,
+          "public_map_updates": 0,
+          "rearm_pose_ns": 1609060375034499645,
+          "native_refusal_input_exact": true,
+          "map_gate": {
+            "scored_frames": 12,
+            "support": 0.6302083333333334,
+            "distance_rms_m": 0.7226148368532889
+          },
+          "full_closure": true,
+          "fault_public": 0,
+          "source_scan_count": 60,
+          "isolates": 1,
+          "detection_pass": true,
+          "refusal_map_hash_matches": true,
+          "native_disposition_pass": true,
+          "rearm_key": 1609060374949338298,
+          "rearm_pass": true,
+          "full_pass": true
+        }
+      ],
+      "passed": true
+    },
+    "rigid_ramp": {
+      "exit": 0,
+      "inputs_exact": true,
+      "public": 305,
+      "public_increasing": true,
+      "unbound_public": 0,
+      "final_mode": "ARMED",
+      "retimed": 0,
+      "exact_clock_population": true,
+      "map_evidence": [],
+      "preview_stops": [],
+      "fallback_requests": [
+        {
+          "action": "preview_native_fallback",
+          "scan_ns": 1609060368762521847
+        }
+      ],
+      "events": [
+        {
+          "outcome": "refused_caught_up_released",
+          "episode": 1,
+          "rearmed": true,
+          "alarm_key": 1609060368762521847,
+          "alarm_delay_ms": 0.0,
+          "confirm_delay_ms": null,
+          "channels": [
+            "beam"
+          ],
+          "checkpoint_ns": 1609060368744588544,
+          "checkpoint_before_fault": true,
+          "hold_matches_checkpoint": true,
+          "captured": 60,
+          "all_faults_captured": true,
+          "retimed": 0,
+          "localization": 0,
+          "imu_only": 60,
+          "healthy_updates": 2,
+          "public_map_updates": 0,
+          "rearm_pose_ns": 1609060375034499645,
+          "native_refusal_input_exact": true,
+          "full_closure": true,
+          "fault_public": 0,
+          "source_scan_count": 60,
+          "isolates": 1,
+          "detection_pass": true,
+          "refusal_map_hash_matches": true,
+          "native_disposition_pass": true,
+          "rearm_key": 1609060374949338298,
+          "rearm_pass": true,
+          "full_pass": true
+        }
+      ],
+      "passed": true
+    },
+    "occlusion": {
+      "exit": 0,
+      "inputs_exact": true,
+      "public": 305,
+      "public_increasing": true,
+      "unbound_public": 0,
+      "final_mode": "ARMED",
+      "retimed": 0,
+      "exact_clock_population": true,
+      "map_evidence": [],
+      "preview_stops": [],
+      "fallback_requests": [
+        {
+          "action": "preview_native_fallback",
+          "scan_ns": 1609060368762521847
+        }
+      ],
+      "events": [
+        {
+          "outcome": "refused_caught_up_released",
+          "episode": 1,
+          "rearmed": true,
+          "alarm_key": 1609060368762521847,
+          "alarm_delay_ms": 0.0,
+          "confirm_delay_ms": null,
+          "channels": [
+            "beam"
+          ],
+          "checkpoint_ns": 1609060368744588544,
+          "checkpoint_before_fault": true,
+          "hold_matches_checkpoint": true,
+          "captured": 60,
+          "all_faults_captured": true,
+          "retimed": 0,
+          "localization": 0,
+          "imu_only": 60,
+          "healthy_updates": 2,
+          "public_map_updates": 0,
+          "rearm_pose_ns": 1609060375034499645,
+          "native_refusal_input_exact": true,
+          "full_closure": true,
+          "fault_public": 0,
+          "source_scan_count": 60,
+          "isolates": 1,
+          "detection_pass": true,
+          "refusal_map_hash_matches": true,
+          "native_disposition_pass": true,
+          "rearm_key": 1609060374949338298,
+          "rearm_pass": true,
+          "full_pass": true
+        }
+      ],
+      "passed": true
+    },
+    "attenuation": {
+      "exit": 0,
+      "inputs_exact": true,
+      "public": 305,
+      "public_increasing": true,
+      "unbound_public": 0,
+      "final_mode": "ARMED",
+      "retimed": 0,
+      "exact_clock_population": true,
+      "map_evidence": [],
+      "preview_stops": [],
+      "fallback_requests": [
+        {
+          "action": "preview_native_fallback",
+          "scan_ns": 1609060368762521847
+        }
+      ],
+      "events": [
+        {
+          "outcome": "refused_caught_up_released",
+          "episode": 1,
+          "rearmed": true,
+          "alarm_key": 1609060368762521847,
+          "alarm_delay_ms": 0.0,
+          "confirm_delay_ms": null,
+          "channels": [
+            "beam"
+          ],
+          "checkpoint_ns": 1609060368744588544,
+          "checkpoint_before_fault": true,
+          "hold_matches_checkpoint": true,
+          "captured": 60,
+          "all_faults_captured": true,
+          "retimed": 0,
+          "localization": 6,
+          "imu_only": 54,
+          "healthy_updates": 2,
+          "public_map_updates": 0,
+          "rearm_pose_ns": 1609060375034499645,
+          "native_refusal_input_exact": true,
+          "full_closure": true,
+          "fault_public": 0,
+          "source_scan_count": 60,
+          "isolates": 1,
+          "detection_pass": true,
+          "refusal_map_hash_matches": true,
+          "native_disposition_pass": true,
+          "rearm_key": 1609060374949338298,
+          "rearm_pass": true,
+          "full_pass": true
+        }
+      ],
+      "passed": true
+    },
+    "narrow_fov": {
+      "exit": 0,
+      "inputs_exact": true,
+      "public": 305,
+      "public_increasing": true,
+      "unbound_public": 0,
+      "final_mode": "ARMED",
+      "retimed": 0,
+      "exact_clock_population": true,
+      "map_evidence": [],
+      "preview_stops": [],
+      "fallback_requests": [
+        {
+          "action": "preview_native_fallback",
+          "scan_ns": 1609060368762521847
+        }
+      ],
+      "events": [
+        {
+          "outcome": "refused_caught_up_released",
+          "episode": 1,
+          "rearmed": true,
+          "alarm_key": 1609060368762521847,
+          "alarm_delay_ms": 0.0,
+          "confirm_delay_ms": null,
+          "channels": [
+            "azimuth_coverage"
+          ],
+          "checkpoint_ns": 1609060368744588544,
+          "checkpoint_before_fault": true,
+          "hold_matches_checkpoint": true,
+          "captured": 60,
+          "all_faults_captured": true,
+          "retimed": 0,
+          "localization": 5,
+          "imu_only": 55,
+          "healthy_updates": 2,
+          "public_map_updates": 0,
+          "rearm_pose_ns": 1609060375034499645,
+          "native_refusal_input_exact": true,
+          "full_closure": true,
+          "fault_public": 0,
+          "source_scan_count": 60,
+          "isolates": 1,
+          "detection_pass": true,
+          "refusal_map_hash_matches": true,
+          "native_disposition_pass": true,
+          "rearm_key": 1609060374949338298,
+          "rearm_pass": true,
+          "full_pass": true
+        }
+      ],
+      "passed": true
+    },
+    "sync": {
+      "exit": 0,
+      "inputs_exact": true,
+      "public": 367,
+      "public_increasing": true,
+      "unbound_public": 0,
+      "final_mode": "ARMED",
+      "retimed": 60,
+      "exact_clock_population": true,
+      "map_evidence": [
+        {
+          "action": "preview_readonly_map_verified",
+          "unchanged": true,
+          "before_sha256": "99dabaf443aeac8802ae6957e07d9ca793ba523c4b7f641cdc67de451b21eef1",
+          "after_sha256": "99dabaf443aeac8802ae6957e07d9ca793ba523c4b7f641cdc67de451b21eef1"
+        }
+      ],
+      "preview_stops": [],
+      "fallback_requests": [],
+      "events": [
+        {
+          "kind": "sync",
+          "lane": "readonly_clock",
+          "fault_output_coverage": 60,
+          "clock_exact": true,
+          "full_pass": true
+        }
+      ],
+      "passed": true
+    },
+    "accept_drop": {
+      "exit": 0,
+      "inputs_exact": true,
+      "public": 290,
+      "public_increasing": true,
+      "unbound_public": 0,
+      "final_mode": "ARMED",
+      "retimed": 0,
+      "exact_clock_population": true,
+      "map_evidence": [],
+      "preview_stops": [],
+      "fallback_requests": [
+        {
+          "action": "preview_native_fallback",
+          "scan_ns": 1609060366150029296
+        }
+      ],
+      "events": [
+        {
+          "outcome": "committed_released",
+          "episode": 1,
+          "rearmed": true,
+          "alarm_key": 1609060366150029296,
+          "alarm_delay_ms": 0.0,
+          "confirm_delay_ms": null,
+          "channels": [
+            "beam"
+          ],
+          "checkpoint_ns": 1609060366133700096,
+          "checkpoint_before_fault": true,
+          "hold_matches_checkpoint": true,
+          "captured": 13,
+          "all_faults_captured": true,
+          "retimed": 0,
+          "localization": 0,
+          "imu_only": 0,
+          "healthy_updates": 2,
+          "public_map_updates": 13,
+          "rearm_pose_ns": 1609060367747970104,
+          "native_refusal_input_exact": false,
+          "map_gate": {
+            "scored_frames": 3,
+            "support": 0.9652777777777777,
+            "distance_rms_m": 0.3351541494730178
+          },
+          "native_commit_verified": true,
+          "full_closure": true,
+          "fault_public": 0,
+          "source_scan_count": 13,
+          "isolates": 1,
+          "detection_pass": true,
+          "native_disposition_pass": true,
+          "rearm_key": 1609060367662819910,
+          "rearm_pass": true,
+          "full_pass": true
+        },
+        {
+          "outcome": "refused_caught_up_released",
+          "episode": 2,
+          "rearmed": true,
+          "alarm_key": 1609060368762521847,
+          "alarm_delay_ms": 0.0,
+          "confirm_delay_ms": null,
+          "channels": [
+            "beam"
+          ],
+          "checkpoint_ns": 1609060368744588544,
+          "checkpoint_before_fault": true,
+          "hold_matches_checkpoint": true,
+          "captured": 60,
+          "all_faults_captured": true,
+          "retimed": 0,
+          "localization": 6,
+          "imu_only": 54,
+          "healthy_updates": 2,
+          "public_map_updates": 0,
+          "rearm_pose_ns": 1609060375034499645,
+          "native_refusal_input_exact": true,
+          "full_closure": true,
+          "fault_public": 0,
+          "source_scan_count": 60,
+          "isolates": 1,
+          "detection_pass": true,
+          "refusal_map_hash_matches": true,
+          "native_disposition_pass": true,
+          "rearm_key": 1609060374949338298,
+          "rearm_pass": true,
+          "full_pass": true
+        }
+      ],
+      "passed": true
+    },
+    "rigid_occlusion": {
+      "exit": 0,
+      "inputs_exact": true,
+      "public": 242,
+      "public_increasing": true,
+      "unbound_public": 0,
+      "final_mode": "ARMED",
+      "retimed": 0,
+      "exact_clock_population": true,
+      "map_evidence": [],
+      "preview_stops": [],
+      "fallback_requests": [
+        {
+          "action": "preview_native_fallback",
+          "scan_ns": 1609060368762521847
+        }
+      ],
+      "events": [
+        {
+          "outcome": "refused_caught_up_released",
+          "episode": 1,
+          "rearmed": true,
+          "alarm_key": 1609060368762521847,
+          "alarm_delay_ms": 0.0,
+          "confirm_delay_ms": null,
+          "channels": [
+            "beam"
+          ],
+          "checkpoint_ns": 1609060368744588544,
+          "checkpoint_before_fault": true,
+          "hold_matches_checkpoint": true,
+          "captured": 60,
+          "all_faults_captured": true,
+          "retimed": 0,
+          "localization": 0,
+          "imu_only": 60,
+          "healthy_updates": 2,
+          "public_map_updates": 0,
+          "rearm_pose_ns": 1609060375034499645,
+          "native_refusal_input_exact": true,
+          "full_closure": true,
+          "fault_public": 0,
+          "source_scan_count": 60,
+          "isolates": 1,
+          "detection_pass": true,
+          "refusal_map_hash_matches": true,
+          "native_disposition_pass": true,
+          "rearm_key": 1609060374949338298,
+          "rearm_pass": true,
+          "full_pass": true
+        },
+        {
+          "outcome": "refused_caught_up_released",
+          "episode": 2,
+          "rearmed": true,
+          "alarm_key": 1609060387770676229,
+          "alarm_delay_ms": 0.0,
+          "confirm_delay_ms": null,
+          "channels": [
+            "beam"
+          ],
+          "checkpoint_ns": 1609060387752763648,
+          "checkpoint_before_fault": true,
+          "hold_matches_checkpoint": true,
+          "captured": 61,
+          "all_faults_captured": true,
+          "retimed": 0,
+          "localization": 0,
+          "imu_only": 61,
+          "healthy_updates": 2,
+          "public_map_updates": 0,
+          "rearm_pose_ns": 1609060394144239426,
+          "native_refusal_input_exact": true,
+          "full_closure": true,
+          "fault_public": 0,
+          "source_scan_count": 61,
+          "isolates": 1,
+          "detection_pass": true,
+          "refusal_map_hash_matches": true,
+          "native_disposition_pass": true,
+          "rearm_key": 1609060394061050990,
+          "rearm_pass": true,
+          "full_pass": true
+        }
+      ],
+      "passed": true
+    },
+    "sync_narrow": {
+      "exit": 0,
+      "inputs_exact": true,
+      "public": 306,
+      "public_increasing": true,
+      "unbound_public": 0,
+      "final_mode": "ARMED",
+      "retimed": 60,
+      "exact_clock_population": true,
+      "map_evidence": [
+        {
+          "action": "preview_readonly_map_verified",
+          "unchanged": true,
+          "before_sha256": "cc2e249beb487d57712894451b90db10fb5952500a61ba99291c32bdbacfbaa9",
+          "after_sha256": "cc2e249beb487d57712894451b90db10fb5952500a61ba99291c32bdbacfbaa9"
+        }
+      ],
+      "preview_stops": [],
+      "fallback_requests": [
+        {
+          "action": "preview_native_fallback",
+          "scan_ns": 1609055187182844682
+        }
+      ],
+      "events": [
+        {
+          "kind": "sync",
+          "lane": "readonly_clock",
+          "fault_output_coverage": 60,
+          "clock_exact": true,
+          "full_pass": true
+        },
+        {
+          "outcome": "refused_caught_up_released",
+          "episode": 1,
+          "rearmed": true,
+          "alarm_key": 1609055187182844682,
+          "alarm_delay_ms": 0.0,
+          "confirm_delay_ms": null,
+          "channels": [
+            "azimuth_coverage"
+          ],
+          "checkpoint_ns": 1609055187164417792,
+          "checkpoint_before_fault": true,
+          "hold_matches_checkpoint": true,
+          "captured": 60,
+          "all_faults_captured": true,
+          "retimed": 0,
+          "localization": 43,
+          "imu_only": 17,
+          "healthy_updates": 2,
+          "public_map_updates": 0,
+          "rearm_pose_ns": 1609055193447835922,
+          "native_refusal_input_exact": true,
+          "full_closure": true,
+          "fault_public": 0,
+          "source_scan_count": 60,
+          "isolates": 1,
+          "detection_pass": true,
+          "refusal_map_hash_matches": true,
+          "native_disposition_pass": true,
+          "rearm_key": 1609055193370196669,
+          "rearm_pass": true,
+          "full_pass": true
+        }
+      ],
+      "passed": true
+    },
+    "eee_clean": {
+      "exit": 0,
+      "inputs_exact": true,
+      "public": 367,
+      "public_increasing": true,
+      "unbound_public": 0,
+      "final_mode": "ARMED",
+      "retimed": 0,
+      "exact_clock_population": true,
+      "map_evidence": [],
+      "preview_stops": [],
+      "fallback_requests": [],
+      "events": [],
+      "clean_pass": true,
+      "passed": true
+    },
+    "sbs_clean": {
+      "exit": 0,
+      "inputs_exact": true,
+      "public": 368,
+      "public_increasing": true,
+      "unbound_public": 0,
+      "final_mode": "ARMED",
+      "retimed": 0,
+      "exact_clock_population": true,
+      "map_evidence": [],
+      "preview_stops": [],
+      "fallback_requests": [],
+      "events": [],
+      "clean_pass": true,
+      "passed": true
+    }
+  }
+}

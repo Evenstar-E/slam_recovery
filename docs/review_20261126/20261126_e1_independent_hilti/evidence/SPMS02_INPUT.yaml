@@ -1,0 +1,97 @@
+path: spms_02/spms_02.bag
+version: 2.0
+duration: 398.148122
+start: 1624181056.398351
+end: 1624181454.546474
+size: 14325817510
+messages: 768954
+indexed: True
+compression: none
+types:
+    - type: geometry_msgs/PoseStamped
+      md5: d3812c3cbc69362b77dc0b19b345f8f5
+    - type: geometry_msgs/QuaternionStamped
+      md5: e57f1e547e0e1fd13504588ffc8334e2
+    - type: nav_msgs/Path
+      md5: 6227e2b7e9cce15051f669a5e197bbf7
+    - type: sensor_msgs/Image
+      md5: 060021388200f6f0f447d0fcd9c64743
+    - type: sensor_msgs/Imu
+      md5: 6a62c6daae103f4ff57a132d6f95cec2
+    - type: sensor_msgs/MagneticField
+      md5: 2f3b0b43eed0c9501de0fa3ff89a45aa
+    - type: sensor_msgs/NavSatFix
+      md5: 2d3a8cd499b9b4a0249fb98fd05cfa48
+    - type: sensor_msgs/PointCloud2
+      md5: 1158d486dd51d683ce2f1be655c3c181
+    - type: sensor_msgs/Temperature
+      md5: ff71b307acdbe7c871a5a6d7ed359100
+    - type: std_msgs/Float32
+      md5: 73fcbf46b49191e672908e50842a83d4
+    - type: std_msgs/UInt8
+      md5: 7c8164229e7d2c17eb95e9231617fdee
+    - type: uwb_driver/UwbEcho
+      md5: f1a385f1339907d35ee7c622674bd4e6
+    - type: uwb_driver/UwbRange
+      md5: 1065ab177c929b8c39cb8fde961d3e9e
+    - type: visualization_msgs/Marker
+      md5: 4048c9de2a16f4ae8e0538085ebf1b97
+topics:
+    - topic: /dji_sdk/attitude
+      type: geometry_msgs/QuaternionStamped
+      messages: 36540
+    - topic: /dji_sdk/gps_health
+      type: std_msgs/UInt8
+      messages: 18270
+    - topic: /dji_sdk/gps_position
+      type: sensor_msgs/NavSatFix
+      messages: 18270
+    - topic: /dji_sdk/height_above_takeoff
+      type: std_msgs/Float32
+      messages: 18270
+    - topic: /dji_sdk/imu
+      type: sensor_msgs/Imu
+      messages: 146159
+    - topic: /imu/imu
+      type: sensor_msgs/Imu
+      messages: 142020
+    - topic: /imu/magnetic_field
+      type: sensor_msgs/MagneticField
+      messages: 142018
+    - topic: /imu/temperature
+      type: sensor_msgs/Temperature
+      messages: 142018
+    - topic: /left/image_raw
+      type: sensor_msgs/Image
+      messages: 3652
+    - topic: /leica/pose/relative
+      type: geometry_msgs/PoseStamped
+      messages: 5529
+    - topic: /node_pos_marker_sc
+      type: visualization_msgs/Marker
+      messages: 463
+    - topic: /node_pos_sc
+      type: nav_msgs/Path
+      messages: 463
+    - topic: /os1_cloud_node1/imu
+      type: sensor_msgs/Imu
+      messages: 36536
+    - topic: /os1_cloud_node1/points
+      type: sensor_msgs/PointCloud2
+      messages: 3653
+    - topic: /os1_cloud_node2/imu
+      type: sensor_msgs/Imu
+      messages: 36535
+    - topic: /os1_cloud_node2/points
+      type: sensor_msgs/PointCloud2
+      messages: 3654
+    - topic: /right/image_raw
+      type: sensor_msgs/Image
+      messages: 3652
+    - topic: /uwb_endorange_info
+      type: uwb_driver/UwbRange
+      messages: 10789
+    - topic: /uwb_exorange_info
+      type: uwb_driver/UwbEcho
+      messages: 463
+

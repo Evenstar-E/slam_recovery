@@ -1,0 +1,189 @@
+{
+  "fault_scans": 60,
+  "window_scans": 90,
+  "common_scored_estimates": 90,
+  "first_common_after_end_s": 0.191050881,
+  "arms": {
+    "native": {
+      "exit": 0,
+      "fault_window_public": 60,
+      "complete_input": true,
+      "window_public": 90,
+      "maximum_public_gap_s": 0.103677511,
+      "maximum_observed_wall_output_gap_s": 0.06900453,
+      "first_post_fault_public_delay_s": 0.019390856,
+      "own_first_post_fault_displacement_error_m": -0.05700136876114392,
+      "common_window_displacement_rmse": {
+        "n": 90,
+        "rmse_m": 0.06779199642526368
+      },
+      "common_first_post_fault_displacement_error": {
+        "n": 1,
+        "rmse_m": 0.02824553136514041
+      },
+      "unbound_public": 0,
+      "retimed": 0,
+      "preview_retime_exact_fault_window": null,
+      "native_refusal_retimed": 0,
+      "preview_stops": [],
+      "native_resets": [],
+      "authoritative_map": "run's native map",
+      "readonly_map_evidence": [],
+      "host_final_status": "OK status valid=0 repair_received=0 repair_applied=0 repaired_in_update=0 last_repaired_update_ns=0 repaired_map_updates=0 replay_remaining=0 map_points=67157 refusal_consumed=0 refusal_imu=0 refusal_localize=0 refusal_suffix=0 lab_frozen=0 captured_groups=0 deferred_resets=0 frame=367 stamp_ns=1609060398752430336 map_writes=released",
+      "native_maps": {}
+    },
+    "frozen": {
+      "exit": 0,
+      "fault_window_public": 0,
+      "complete_input": true,
+      "window_public": 28,
+      "maximum_public_gap_s": 6.28989517,
+      "maximum_observed_wall_output_gap_s": 4.901386631,
+      "first_post_fault_public_delay_s": 0.191050881,
+      "own_first_post_fault_displacement_error_m": 0.4383998920615886,
+      "common_window_displacement_rmse": {
+        "n": 90,
+        "rmse_m": 0.21309282102949295
+      },
+      "common_first_post_fault_displacement_error": {
+        "n": 1,
+        "rmse_m": 0.4383998920615886
+      },
+      "unbound_public": 0,
+      "retimed": 0,
+      "preview_retime_exact_fault_window": null,
+      "native_refusal_retimed": 60,
+      "preview_stops": [],
+      "native_resets": [],
+      "authoritative_map": "run's native map",
+      "readonly_map_evidence": [],
+      "host_final_status": "OK status valid=1 repair_received=0 repair_applied=0 repaired_in_update=0 last_repaired_update_ns=0 repaired_map_updates=0 replay_remaining=0 map_points=66381 refusal_consumed=62 refusal_imu=55 refusal_localize=5 refusal_suffix=2 lab_frozen=0 captured_groups=238 deferred_resets=0 frame=367 stamp_ns=1609060398752430336 map_writes=released",
+      "native_maps": {
+        "E1_refusal.xyz32": {
+          "bytes": 134100,
+          "sha256": "c0252a4535d5c7a85723b8d715d829cbf88f2fe259d7576224a62f923c732e57"
+        },
+        "E1_checkpoint.xyz32": {
+          "bytes": 73092,
+          "sha256": "99dabaf443aeac8802ae6957e07d9ca793ba523c4b7f641cdc67de451b21eef1"
+        }
+      }
+    },
+    "preview": {
+      "exit": 0,
+      "fault_window_public": 60,
+      "complete_input": true,
+      "window_public": 90,
+      "maximum_public_gap_s": 0.103677511,
+      "maximum_observed_wall_output_gap_s": 0.129498964,
+      "first_post_fault_public_delay_s": 0.019390856,
+      "own_first_post_fault_displacement_error_m": -0.029728080257353184,
+      "common_window_displacement_rmse": {
+        "n": 90,
+        "rmse_m": 0.0649104639769773
+      },
+      "common_first_post_fault_displacement_error": {
+        "n": 1,
+        "rmse_m": 0.030586368272259357
+      },
+      "unbound_public": 0,
+      "retimed": 60,
+      "preview_retime_exact_fault_window": true,
+      "native_refusal_retimed": 0,
+      "preview_stops": [],
+      "native_resets": [],
+      "authoritative_map": "isolated experimental map",
+      "readonly_map_evidence": [],
+      "host_final_status": "OK status valid=0 repair_received=0 repair_applied=0 repaired_in_update=0 last_repaired_update_ns=0 repaired_map_updates=0 replay_remaining=0 map_points=66578 refusal_consumed=0 refusal_imu=0 refusal_localize=0 refusal_suffix=0 lab_frozen=0 captured_groups=0 deferred_resets=0 frame=367 stamp_ns=1609060398752430336 map_writes=released",
+      "native_maps": {}
+    },
+    "readonly": {
+      "exit": 0,
+      "fault_window_public": 60,
+      "complete_input": true,
+      "window_public": 90,
+      "maximum_public_gap_s": 0.103677511,
+      "maximum_observed_wall_output_gap_s": 0.183182723,
+      "first_post_fault_public_delay_s": 0.019390856,
+      "own_first_post_fault_displacement_error_m": -0.023174824978522857,
+      "common_window_displacement_rmse": {
+        "n": 90,
+        "rmse_m": 0.0649342598873423
+      },
+      "common_first_post_fault_displacement_error": {
+        "n": 1,
+        "rmse_m": 0.02084244498160448
+      },
+      "unbound_public": 0,
+      "retimed": 60,
+      "preview_retime_exact_fault_window": true,
+      "native_refusal_retimed": 0,
+      "preview_stops": [],
+      "native_resets": [],
+      "authoritative_map": "isolated experimental map",
+      "readonly_map_evidence": [
+        {
+          "action": "preview_readonly_map_verified",
+          "unchanged": true,
+          "before_sha256": "99dabaf443aeac8802ae6957e07d9ca793ba523c4b7f641cdc67de451b21eef1",
+          "after_sha256": "99dabaf443aeac8802ae6957e07d9ca793ba523c4b7f641cdc67de451b21eef1"
+        }
+      ],
+      "host_final_status": "OK status valid=0 repair_received=0 repair_applied=0 repaired_in_update=0 last_repaired_update_ns=0 repaired_map_updates=0 replay_remaining=0 map_points=62747 refusal_consumed=0 refusal_imu=0 refusal_localize=0 refusal_suffix=0 lab_frozen=0 captured_groups=0 deferred_resets=0 frame=367 stamp_ns=1609060398752430336 map_writes=released",
+      "native_maps": {
+        "preview_begin.xyz32": {
+          "bytes": 73092,
+          "sha256": "99dabaf443aeac8802ae6957e07d9ca793ba523c4b7f641cdc67de451b21eef1"
+        },
+        "preview_end.xyz32": {
+          "bytes": 73092,
+          "sha256": "99dabaf443aeac8802ae6957e07d9ca793ba523c4b7f641cdc67de451b21eef1"
+        }
+      }
+    },
+    "fallback": {
+      "exit": 0,
+      "fault_window_public": 60,
+      "complete_input": true,
+      "window_public": 90,
+      "maximum_public_gap_s": 0.103677511,
+      "maximum_observed_wall_output_gap_s": 0.185419833,
+      "first_post_fault_public_delay_s": 0.019390856,
+      "own_first_post_fault_displacement_error_m": -0.023174824978522857,
+      "common_window_displacement_rmse": {
+        "n": 90,
+        "rmse_m": 0.0649342598873423
+      },
+      "common_first_post_fault_displacement_error": {
+        "n": 1,
+        "rmse_m": 0.02084244498160448
+      },
+      "unbound_public": 0,
+      "retimed": 60,
+      "preview_retime_exact_fault_window": true,
+      "native_refusal_retimed": 0,
+      "preview_stops": [],
+      "native_resets": [],
+      "authoritative_map": "isolated experimental map",
+      "readonly_map_evidence": [
+        {
+          "action": "preview_readonly_map_verified",
+          "unchanged": true,
+          "before_sha256": "99dabaf443aeac8802ae6957e07d9ca793ba523c4b7f641cdc67de451b21eef1",
+          "after_sha256": "99dabaf443aeac8802ae6957e07d9ca793ba523c4b7f641cdc67de451b21eef1"
+        }
+      ],
+      "host_final_status": "OK status valid=0 repair_received=0 repair_applied=0 repaired_in_update=0 last_repaired_update_ns=0 repaired_map_updates=0 replay_remaining=0 map_points=62747 refusal_consumed=0 refusal_imu=0 refusal_localize=0 refusal_suffix=0 lab_frozen=0 captured_groups=0 deferred_resets=0 frame=367 stamp_ns=1609060398752430336 map_writes=released",
+      "native_maps": {
+        "preview_begin.xyz32": {
+          "bytes": 73092,
+          "sha256": "99dabaf443aeac8802ae6957e07d9ca793ba523c4b7f641cdc67de451b21eef1"
+        },
+        "preview_end.xyz32": {
+          "bytes": 73092,
+          "sha256": "99dabaf443aeac8802ae6957e07d9ca793ba523c4b7f641cdc67de451b21eef1"
+        }
+      }
+    }
+  }
+}

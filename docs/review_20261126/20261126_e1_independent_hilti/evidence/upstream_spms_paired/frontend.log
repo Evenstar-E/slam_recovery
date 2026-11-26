@@ -1,0 +1,57 @@
+Multi thread started 
+p_pre->lidar_type 3
+[33m[WARN] [1795663714.779329217]: catch sig 2[0m
+[0m[INFO] [1795663675.515642394]: IMU Initial Done[0m
+Rebuild thread terminated normally
+... logging to /home/tong/e1_hilti_stream_20261126/upstream_spms_paired/ros_logs/5b4d8da8-e949-11f1-8dfc-4fbd1dc4bc5e/roslaunch-Tong-1292.log
+Checking log directory for disk usage. This may take a while.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+]2;/home/tong/e1_hilti_stream_20261126/upstream_spms_paired/ntulab.launch
+[1mstarted roslaunch server http://127.0.0.1:36821/[0m
+
+SUMMARY
+========
+
+PARAMETERS
+ * /common/imu_topic: /imu_raw
+ * /common/lid_topic: /velodyne_points
+ * /common/time_sync_en: False
+ * /cube_side_length: 1000.0
+ * /dense_publish_enable: True
+ * /feature_extract_enable: False
+ * /filter_size_map: 0.5
+ * /filter_size_surf: 0.5
+ * /mapping/acc_cov: 0.1
+ * /mapping/b_acc_cov: 0.0001
+ * /mapping/b_gyr_cov: 0.0001
+ * /mapping/det_range: 100.0
+ * /mapping/extrinsic_R: [1, 0, 0, 0, 1, 0...
+ * /mapping/extrinsic_T: [-0.05, 0.0, 0.055]
+ * /mapping/fov_degree: 180
+ * /mapping/gyr_cov: 0.1
+ * /max_iteration: 3
+ * /pcd_save_enable: False
+ * /point_filter_num: 4
+ * /preprocess/blind: 4
+ * /preprocess/lidar_type: 3
+ * /preprocess/scan_line: 16
+ * /publish/dense_publish_en: ture
+ * /publish/scan_bodyframe_pub_en: True
+ * /publish/scan_publish_en: True
+ * /rosdistro: noetic
+ * /rosversion: 1.17.4
+ * /runtime_pos_log_enable: False
+ * /scan_publish_enable: True
+
+NODES
+  /
+    laserMapping (fast_lio/fastlio_mapping)
+
+[1mROS_MASTER_URI=http://127.0.0.1:37379[0m
+]2;/home/tong/e1_hilti_stream_20261126/upstream_spms_paired/ntulab.launch http://127.0.0.1:37379
+[1mprocess[laserMapping-1]: started with pid [1357][0m
+[laserMapping-1] killing on exit
+shutting down processing monitor...
+... shutting down processing monitor complete
+[1mdone[0m

@@ -1,0 +1,36 @@
+terminate called without an active exception
+... logging to /home/tong/e1_hilti_stream_20261126/upstream_hilti_revisit/ros_logs/cdc39742-e949-11f1-98d6-c3f01a1d1061/roslaunch-Tong-785.log
+Checking log directory for disk usage. This may take a while.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+]2;/home/tong/e1_hilti_stream_20261126/upstream/SC-PGO/launch/fastlio_ouster64.launch
+[1mstarted roslaunch server http://127.0.0.1:36853/[0m
+
+SUMMARY
+========
+
+PARAMETERS
+ * /keyframe_meter_gap: 0.5
+ * /lidar_type: OS1-64
+ * /mapping_line_resolution: 0.4
+ * /mapping_plane_resolution: 0.8
+ * /mapviz_filter_size: 0.5
+ * /minimum_range: 0.5
+ * /rosdistro: noetic
+ * /rosversion: 1.17.4
+ * /save_directory: /home/tong/Deskto...
+ * /sc_dist_thres: 0.3
+ * /sc_max_radius: 80.0
+ * /scan_line: 64
+
+NODES
+  /
+    alaserPGO (aloam_velodyne/alaserPGO)
+
+[1mROS_MASTER_URI=http://127.0.0.1:53963[0m
+]2;/home/tong/e1_hilti_stream_20261126/upstream/SC-PGO/launch/fastlio_ouster64.launch http://127.0.0.1:53963
+[1mprocess[alaserPGO-1]: started with pid [850][0m
+[alaserPGO-1] killing on exit
+shutting down processing monitor...
+... shutting down processing monitor complete
+[1mdone[0m

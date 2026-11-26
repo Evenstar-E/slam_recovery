@@ -1,0 +1,13 @@
+case,event,fault,reused,fault_scans,triggered,decision,map_updates,retimed,localization_only,imu_only,full_pass,rearm_s,published,native_published,public_gap_s,common_scans,native_rmse_m,plugin_rmse_m
+z_shift,1,z_shift,False,60,1,refused_caught_up_released,0,0,0,60,True,40.191050881,28,90,6.28989517,90,0.29631039601402953,0.6868870329842923
+rigid_ramp,1,rigid_ramp,False,60,1,refused_caught_up_released,0,0,0,60,True,40.191050881,28,90,6.28989517,90,0.934119467883745,0.6868870329842923
+occlusion,1,occlusion,False,60,1,refused_caught_up_released,0,0,0,60,True,40.191050881,28,90,6.28989517,90,3.04681491225419,0.6868870329842923
+attenuation,1,attenuation,False,60,1,refused_caught_up_released,0,0,6,54,True,40.191050881,28,90,6.28989517,90,0.05404750721790718,0.2348760007348639
+narrow_fov,1,narrow_fov,False,60,1,refused_caught_up_released,0,0,5,55,True,40.191050881,28,90,6.28989517,90,0.3029521160008829,1.4562594419645931
+sync,1,sync,False,60,1,refused_caught_up_released,0,60,5,55,True,40.191050881,28,90,6.28989517,90,0.06779199642526368,0.21309282102949295
+accept_drop,1,z_shift,False,13,1,committed_released,13,0,0,0,True,32.904532493,11,26,1.614281052,26,0.3641426652975299,0.021999273246632017
+accept_drop,2,attenuation,False,60,1,refused_caught_up_released,0,0,6,54,True,40.191050881,28,90,6.28989517,90,0.0532653708420824,0.23487803411527094
+rigid_occlusion,1,rigid_ramp,False,60,1,refused_caught_up_released,0,0,0,60,True,40.191050881,28,90,6.28989517,90,0.934119467883745,0.6868870329842923
+rigid_occlusion,2,occlusion,False,61,1,refused_caught_up_released,0,0,0,61,True,59.302763573,27,90,6.393462423,90,3.730209088011243,1.2997000827426242
+sync_narrow,1,sync,False,60,1,refused_caught_up_released,0,60,41,19,True,40.22698432,28,90,6.324322535,90,0.02847630402580906,0.030588118025958264
+sync_narrow,2,narrow_fov,False,60,1,refused_caught_up_released,0,0,41,19,True,59.20175214,28,90,6.29014147,89,0.024894197229549112,0.0551882297730428

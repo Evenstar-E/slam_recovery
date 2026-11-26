@@ -1,0 +1,21 @@
+{
+  "lidar": 371,
+  "imu": 15194,
+  "windows": [
+    {
+      "id": 1,
+      "kind": "sync",
+      "onset_ns": 1624181123160560613,
+      "end_ns": 1624181129160560613,
+      "inject_z_m": 0.5
+    },
+    {
+      "id": 2,
+      "kind": "attenuation",
+      "onset_ns": 1624181140160560613,
+      "end_ns": 1624181146160560613,
+      "inject_z_m": 0.5
+    }
+  ],
+  "identical_native_input_identity": true
+}

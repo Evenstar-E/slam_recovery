@@ -1,0 +1,408 @@
+{
+  "pose_source": "official TLS-aligned development poses, scoring only",
+  "point_clock": "adapted scan start plus per-point relative microseconds",
+  "fixed_rules": {
+    "grid_m": 0.1,
+    "support_m": 0.15,
+    "retest_after_s": 6,
+    "true_revisit_below_m": 0.5,
+    "no_revisit_at_least_m": 1.0,
+    "partial_support": [
+      0.05,
+      0.8
+    ],
+    "requires_three_suffix_scans": true
+  },
+  "scan_count": 44,
+  "samples": 92362,
+  "surface_voxel_candidates": 8650,
+  "empty_voxel_candidates": 13456,
+  "empty_status": "unqualified: TLS first-hit agreement and visibility exclusion not applied",
+  "loop_status": "qualification only; requires upstream observed map merge",
+  "routes": [
+    {
+      "occlusion_candidate_from_s": 6,
+      "prefix_s": [
+        0,
+        6
+      ],
+      "fault_s": [
+        6,
+        12
+      ],
+      "suffix_s": [
+        12,
+        14
+      ],
+      "physical_nearest_prefix_m": [
+        0.45543252838280335,
+        0.7897989678162685,
+        1.0280168488445562,
+        1.108990617472222
+      ],
+      "suffix": [
+        {
+          "stamp_ns": 1649856240622534036,
+          "matched": 595,
+          "samples": 2850
+        },
+        {
+          "stamp_ns": 1649856241122065544,
+          "matched": 307,
+          "samples": 3026
+        },
+        {
+          "stamp_ns": 1649856241623364925,
+          "matched": 282,
+          "samples": 2800
+        },
+        {
+          "stamp_ns": 1649856242123226881,
+          "matched": 593,
+          "samples": 2671
+        }
+      ],
+      "status": "revisit_candidate"
+    },
+    {
+      "occlusion_candidate_from_s": 7,
+      "prefix_s": [
+        1,
+        7
+      ],
+      "fault_s": [
+        7,
+        13
+      ],
+      "suffix_s": [
+        13,
+        15
+      ],
+      "physical_nearest_prefix_m": [
+        1.0280168488445562,
+        1.108990617472222,
+        1.1497111139964282,
+        1.2947451896524242
+      ],
+      "suffix": [
+        {
+          "stamp_ns": 1649856241623364925,
+          "matched": 284,
+          "samples": 2800
+        },
+        {
+          "stamp_ns": 1649856242123226881,
+          "matched": 594,
+          "samples": 2671
+        },
+        {
+          "stamp_ns": 1649856242620067119,
+          "matched": 445,
+          "samples": 2763
+        },
+        {
+          "stamp_ns": 1649856243120398998,
+          "matched": 310,
+          "samples": 2705
+        }
+      ],
+      "status": "no_revisit_partial_overlap"
+    },
+    {
+      "occlusion_candidate_from_s": 8,
+      "prefix_s": [
+        2,
+        8
+      ],
+      "fault_s": [
+        8,
+        14
+      ],
+      "suffix_s": [
+        14,
+        16
+      ],
+      "physical_nearest_prefix_m": [
+        1.0885551571154146,
+        1.2465867568736015,
+        1.402636585813364
+      ],
+      "suffix": [
+        {
+          "stamp_ns": 1649856242620067119,
+          "matched": 842,
+          "samples": 2763
+        },
+        {
+          "stamp_ns": 1649856243120398998,
+          "matched": 541,
+          "samples": 2705
+        },
+        {
+          "stamp_ns": 1649856243622518062,
+          "matched": 429,
+          "samples": 2355
+        }
+      ],
+      "status": "no_revisit_partial_overlap"
+    },
+    {
+      "occlusion_candidate_from_s": 9,
+      "prefix_s": [
+        3,
+        9
+      ],
+      "fault_s": [
+        9,
+        15
+      ],
+      "suffix_s": [
+        15,
+        17
+      ],
+      "physical_nearest_prefix_m": [
+        1.3669054739456623,
+        1.4029727062026094,
+        1.1821353856701349,
+        1.148174547751682
+      ],
+      "suffix": [
+        {
+          "stamp_ns": 1649856243622518062,
+          "matched": 558,
+          "samples": 2355
+        },
+        {
+          "stamp_ns": 1649856244123692035,
+          "matched": 387,
+          "samples": 2355
+        },
+        {
+          "stamp_ns": 1649856244620038032,
+          "matched": 581,
+          "samples": 2352
+        },
+        {
+          "stamp_ns": 1649856245120722055,
+          "matched": 457,
+          "samples": 2394
+        }
+      ],
+      "status": "no_revisit_partial_overlap"
+    },
+    {
+      "occlusion_candidate_from_s": 10,
+      "prefix_s": [
+        4,
+        10
+      ],
+      "fault_s": [
+        10,
+        16
+      ],
+      "suffix_s": [
+        16,
+        18
+      ],
+      "physical_nearest_prefix_m": [
+        1.3901638106366343,
+        1.1684779192771315,
+        1.1359494865889364,
+        1.383304840548994,
+        1.8855308855445365
+      ],
+      "suffix": [
+        {
+          "stamp_ns": 1649856244123692035,
+          "matched": 446,
+          "samples": 2355
+        },
+        {
+          "stamp_ns": 1649856244620038032,
+          "matched": 617,
+          "samples": 2352
+        },
+        {
+          "stamp_ns": 1649856245120722055,
+          "matched": 524,
+          "samples": 2394
+        },
+        {
+          "stamp_ns": 1649856245620523929,
+          "matched": 228,
+          "samples": 2362
+        },
+        {
+          "stamp_ns": 1649856246122945070,
+          "matched": 39,
+          "samples": 2413
+        }
+      ],
+      "status": "unqualified"
+    },
+    {
+      "occlusion_candidate_from_s": 11,
+      "prefix_s": [
+        5,
+        11
+      ],
+      "fault_s": [
+        11,
+        17
+      ],
+      "suffix_s": [
+        17,
+        19
+      ],
+      "physical_nearest_prefix_m": [
+        1.3820239649289627,
+        1.8844284457653147,
+        2.5488835942379757,
+        3.2837575135618113
+      ],
+      "suffix": [
+        {
+          "stamp_ns": 1649856245620523929,
+          "matched": 228,
+          "samples": 2362
+        },
+        {
+          "stamp_ns": 1649856246122945070,
+          "matched": 40,
+          "samples": 2413
+        },
+        {
+          "stamp_ns": 1649856246621738910,
+          "matched": 0,
+          "samples": 2438
+        },
+        {
+          "stamp_ns": 1649856247122993946,
+          "matched": 0,
+          "samples": 2379
+        }
+      ],
+      "status": "unqualified"
+    },
+    {
+      "occlusion_candidate_from_s": 12,
+      "prefix_s": [
+        6,
+        12
+      ],
+      "fault_s": [
+        12,
+        18
+      ],
+      "suffix_s": [
+        18,
+        20
+      ],
+      "physical_nearest_prefix_m": [
+        2.5488835942379757,
+        3.2837575135618113,
+        4.02584594400113,
+        4.754700036701013
+      ],
+      "suffix": [
+        {
+          "stamp_ns": 1649856246621738910,
+          "matched": 0,
+          "samples": 2438
+        },
+        {
+          "stamp_ns": 1649856247122993946,
+          "matched": 0,
+          "samples": 2379
+        },
+        {
+          "stamp_ns": 1649856247621201038,
+          "matched": 0,
+          "samples": 2363
+        },
+        {
+          "stamp_ns": 1649856248122308015,
+          "matched": 0,
+          "samples": 2208
+        }
+      ],
+      "status": "no_verified_overlap"
+    },
+    {
+      "occlusion_candidate_from_s": 13,
+      "prefix_s": [
+        7,
+        13
+      ],
+      "fault_s": [
+        13,
+        19
+      ],
+      "suffix_s": [
+        19,
+        21
+      ],
+      "physical_nearest_prefix_m": [
+        4.02584594400113,
+        4.754700036701013,
+        5.454578593741858
+      ],
+      "suffix": [
+        {
+          "stamp_ns": 1649856247621201038,
+          "matched": 0,
+          "samples": 2363
+        },
+        {
+          "stamp_ns": 1649856248122308015,
+          "matched": 0,
+          "samples": 2208
+        },
+        {
+          "stamp_ns": 1649856248621446132,
+          "matched": 0,
+          "samples": 2042
+        }
+      ],
+      "status": "no_verified_overlap"
+    },
+    {
+      "occlusion_candidate_from_s": 14,
+      "prefix_s": [
+        8,
+        14
+      ],
+      "fault_s": [
+        14,
+        20
+      ],
+      "suffix_s": [
+        20,
+        22
+      ],
+      "physical_nearest_prefix_m": [
+        5.460474645601116,
+        6.1020824243535845,
+        6.6474512799561944
+      ],
+      "suffix": [
+        {
+          "stamp_ns": 1649856248621446132,
+          "matched": 0,
+          "samples": 2042
+        },
+        {
+          "stamp_ns": 1649856249123764038,
+          "matched": 0,
+          "samples": 1807
+        },
+        {
+          "stamp_ns": 1649856249621164798,
+          "matched": 0,
+          "samples": 2454
+        }
+      ],
+      "status": "no_verified_overlap"
+    }
+  ]
+}

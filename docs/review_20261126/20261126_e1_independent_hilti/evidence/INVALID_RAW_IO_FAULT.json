@@ -1,0 +1,96 @@
+{
+  "profile": "spms_fault",
+  "rate": 1,
+  "recovery_controls_source_clock": false,
+  "same_lidar": true,
+  "same_imu": true,
+  "native": {
+    "exit": 0,
+    "source_scans": 371,
+    "controller_scans": 371,
+    "source_drops": 0,
+    "imu_arrivals": 15194,
+    "peak_queued_scans": 1,
+    "lidar_deadline_lateness_p95_ms": 7207.1686225,
+    "imu_deadline_lateness_p95_ms": 36.75544984999997,
+    "queue_delay_p95_ms": 0.3069615,
+    "queue_delay_max_ms": 0.81833,
+    "publication_latency_p95_ms": 2037.9972221999992,
+    "public": 369,
+    "unbound_public": 0,
+    "output_monotonic": true,
+    "peak_pss_and_swap_mib": 798.6865234375,
+    "reset_markers": [],
+    "corrected_scans": 0,
+    "transitions": [],
+    "map_evidence": [],
+    "preview_stops": [],
+    "events": [
+      {
+        "id": 1,
+        "kind": "sync",
+        "input": 60,
+        "public": 60,
+        "gap_data_seconds": 0.099997759,
+        "after_fault_s": 0.000339741,
+        "historical_api_delivered": 0
+      },
+      {
+        "id": 2,
+        "kind": "attenuation",
+        "input": 61,
+        "public": 61,
+        "gap_data_seconds": 0.099997759,
+        "after_fault_s": 0.099923605,
+        "historical_api_delivered": 0
+      }
+    ],
+    "final_mode": "CALIBRATING"
+  },
+  "plugin": {
+    "exit": 0,
+    "source_scans": 371,
+    "controller_scans": 351,
+    "source_drops": 20,
+    "imu_arrivals": 15194,
+    "peak_queued_scans": 32,
+    "lidar_deadline_lateness_p95_ms": 7515.95133,
+    "imu_deadline_lateness_p95_ms": 38.35976809999994,
+    "queue_delay_p95_ms": 280.0429785,
+    "queue_delay_max_ms": 408.51628,
+    "publication_latency_p95_ms": 1855.10134555,
+    "public": 218,
+    "unbound_public": 0,
+    "output_monotonic": true,
+    "peak_pss_and_swap_mib": 890.1865234375,
+    "reset_markers": [],
+    "corrected_scans": 0,
+    "transitions": [
+      "preview_native_fallback",
+      "triggered"
+    ],
+    "map_evidence": [],
+    "preview_stops": [],
+    "events": [
+      {
+        "id": 1,
+        "kind": "sync",
+        "input": 60,
+        "public": 40,
+        "gap_data_seconds": 0.79998064,
+        "after_fault_s": 0.000339741,
+        "historical_api_delivered": 0
+      },
+      {
+        "id": 2,
+        "kind": "attenuation",
+        "input": 61,
+        "public": 0,
+        "gap_data_seconds": 6.099925524,
+        "after_fault_s": null,
+        "historical_api_delivered": 0
+      }
+    ],
+    "final_mode": "HELD"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "counts": {
+    "/Odometry": 369,
+    "/aft_pgo_odom": 358,
+    "/aft_pgo_path": 358
+  },
+  "true_transition_signals": {},
+  "validated_historical_downstream_receipts": 0,
+  "gauge_merge_verified": false
+}
