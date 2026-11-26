@@ -11,6 +11,7 @@ import cv2
 
 from .blind_history import recover_history
 from .live import LiveInput, PosePublisher
+from .standby import StandbyQueue
 from .stream import EventLog, InputFault, Worker, euroc, read_pair
 from .vision import (HeldOutStereo, healthy, in_public_world, input_support,
                      qualify_replay, replay_delta)
@@ -56,6 +57,8 @@ def run(args, events, output):
     workers = []
     command = args.worker, args.vocabulary, args.settings
     parallel = ThreadPoolExecutor(max_workers=1) if incremental else None
+    queued = StandbyQueue(parallel) if incremental else None
+    retired_workers = []
 
     def new_lane(name):
         worker = Worker(command, output / f"{name}.log", wait_ready=args.realtime)
@@ -103,21 +106,24 @@ def run(args, events, output):
     healthy_count = 0
     candidate_fitted = False
 
-    def consume_public(pair, view, images=None):
+    def retire_busy_standby():
         nonlocal standby
-        if standby is None:
-            return active.consume(pair, view, images)
-        if images is None and view != "skip":
-            images = read_pair(pair, view)
-        mirrored = parallel.submit(standby.consume, pair, view, images)
-        result = active.consume(pair, view, images)
-        try:
-            mirrored.result()
-        except WORKER_FAILURE as error:
-            events.emit("standby_unavailable", reason=str(error), timestamp=pair.timestamp)
-            close(standby, "standby_failed")
-            standby = None
-        return result
+        worker = standby.worker
+        retired_workers.append(queued.retire(worker.close))
+        workers.remove(worker)
+        standby = None
+
+    def consume_public(pair, view, images=None):
+        if standby is not None:
+            if images is None and view != "skip":
+                images = read_pair(pair, view)
+            try:
+                if queued.offer(standby.consume, pair, view, images):
+                    events.emit("standby_queue_pressure", timestamp=pair.timestamp)
+            except WORKER_FAILURE as error:
+                events.emit("standby_unavailable", reason=str(error), timestamp=pair.timestamp)
+                retire_busy_standby()
+        return active.consume(pair, view, images)
 
     def catch_up_standby(retired):
         nonlocal standby
@@ -274,16 +280,24 @@ def run(args, events, output):
                     if args.mode == "qualify":
                         reject("clean_replay_mode")
                         continue
-                    private, standby = standby, None
-                    if private is None:
+                    if standby is None:
                         reject("incremental_checkpoint_unavailable")
                         continue
                     started = time.monotonic_ns()
+                    try:
+                        mirrored_pending = queued.at_boundary()
+                    except WORKER_FAILURE as error:
+                        events.emit("standby_unavailable", event=event_id, reason=str(error))
+                        retire_busy_standby()
+                        reject("incremental_checkpoint_not_ready")
+                        continue
+                    private, standby = standby, None
                     if not qualify_replay(active, private, events, "incremental_checkpoint",
                                           event=event_id, prefix_frames_replayed=0):
                         reject("incremental_checkpoint_difference")
                         continue
                     events.emit("checkpoint_ready", event=event_id, frames_replayed=0,
+                                mirrored_pending_at_isolation=mirrored_pending,
                                 through=private.snapshot["timestamp"], started_ns=started,
                                 finished_ns=time.monotonic_ns())
                     history_anchor = private.snapshot
@@ -339,6 +353,8 @@ def run(args, events, output):
             publisher.close()
         if parallel is not None:
             parallel.shutdown()
+        for receipt in retired_workers:
+            events.emit("worker_exit", name="retired_standby", exit=receipt.result())
         for worker in workers:
             events.emit("worker_exit", exit=worker.close())
 
