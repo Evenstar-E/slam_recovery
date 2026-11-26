@@ -50,7 +50,7 @@ def align(estimated, true):
 def score(dataset, settings, paths):
     stamps, positions = reference(dataset)
     camera_to_body = HeldOutStereo(settings).camera_to_body
-    results, errors = {}, {}
+    results, errors, scopes = {}, {}, {}
     for path in paths:
         counts = Counter()
         timestamps, matched = [], {}
@@ -91,6 +91,7 @@ def score(dataset, settings, paths):
             residuals = {stamp: float(np.linalg.norm(R @ position + shift - truth))
                          for stamp, (position, truth) in matched.items()}
         errors[str(path)] = residuals
+        scopes[str(path)] = (origin, windows)
         coverage = [
             {"start_s": start, "end_s": end,
              "input_frames": sum(start <= (t - origin)/1e9 < end for t in timestamps),
@@ -104,6 +105,14 @@ def score(dataset, settings, paths):
     for name, values in errors.items():
         results[name]["common_scored"] = len(common)
         results[name]["common_rmse_m"] = rms(values[t] for t in sorted(common))
+        origin, windows = scopes[name]
+        for case, (start, end) in zip(results[name]["cases"], windows):
+            blind = [values[t] for t in values if start <= (t - origin) / 1e9 < end]
+            compare = [values[t] for t in sorted(common)
+                       if start <= (t - origin) / 1e9 < end + 3.0]
+            case["blind_rmse_m"] = rms(blind)
+            case["common_fault_through_3s_after_frames"] = len(compare)
+            case["common_fault_through_3s_after_rmse_m"] = rms(compare)
     return results
 
 

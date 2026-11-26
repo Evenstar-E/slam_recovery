@@ -71,9 +71,13 @@ def euroc(root: Path):
         previous = stamp
 
 
-def read_pair(pair, view):
-    images = tuple(cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
-                   for path in (pair.left, pair.right))
+def read_pair(pair, view, payload=None):
+    if payload is None:
+        images = tuple(cv2.imread(str(path), cv2.IMREAD_GRAYSCALE)
+                       for path in (pair.left, pair.right))
+    else:
+        images = tuple(cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_GRAYSCALE)
+                       for image in payload)
     if any(image is None for image in images) or images[0].shape != images[1].shape:
         raise InputFault("image_observation", f"unreadable stereo pair {pair.timestamp}")
     if view == "occluded":
@@ -85,13 +89,14 @@ def read_pair(pair, view):
 
 
 class Worker:
-    def __init__(self, command, log_path):
+    def __init__(self, command, log_path, wait_ready=False):
         read_end, write_end = os.pipe()
         try:
             with log_path.open("xb") as log:
                 self.process = subprocess.Popen(
                     [*map(str, command), str(write_end)], stdin=subprocess.PIPE,
                     stdout=log, stderr=log, pass_fds=(write_end,),
+                    env=dict(os.environ, ORB_VIO_REPORT_READY="1") if wait_ready else None,
                 )
         except BaseException:
             os.close(read_end)
@@ -99,6 +104,10 @@ class Worker:
         finally:
             os.close(write_end)
         self.responses = os.fdopen(read_end, "rb", buffering=0)
+        if wait_ready:
+            if not select.select([self.responses], [], [], 60)[0] or self.responses.readline() != b"READY\n":
+                self.close()
+                raise RuntimeError("native worker did not report readiness")
 
     def track(self, pair, images, imu):
         height, width = images[0].shape

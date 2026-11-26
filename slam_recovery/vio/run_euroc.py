@@ -8,6 +8,8 @@ from pathlib import Path
 
 import cv2
 
+from .blind_history import recover_history
+from .live import LiveInput, PosePublisher
 from .stream import EventLog, InputFault, Worker, euroc, read_pair
 from .vision import (HeldOutStereo, healthy, in_public_world, input_support,
                      qualify_replay, replay_delta)
@@ -41,20 +43,26 @@ class Lane:
 
 
 def run(args, events, output):
-    frames = itertools.islice(euroc(args.dataset), args.limit)
+    source = None
+    publisher = None
     native = args.mode == "native"
     vision = HeldOutStereo(args.settings)
     workers = []
     command = args.worker, args.vocabulary, args.settings
 
     def new_lane(name):
-        worker = Worker(command, output / f"{name}.log")
+        worker = Worker(command, output / f"{name}.log", wait_ready=args.realtime)
         workers.append(worker)
         return Lane(worker, args.delay)
 
     def publish(result, channel, verified):
-        if result and result["tracking"] == 2:
-            events.emit("pose", channel=channel, coordinate_verified=verified, **result)
+        if result is None or (channel != "inertial_history" and result["tracking"] != 2):
+            return
+        row = dict(result, type="pose", channel=channel, coordinate_verified=verified)
+        if publisher is not None:
+            row["delivery_id"] = publisher.send(row)
+        kind = row.pop("type")
+        events.emit(kind, **row)
 
     def replay(source, name):
         lane = new_lane(name)
@@ -67,12 +75,13 @@ def run(args, events, output):
             events.emit("worker_exit", name=name, exit=lane.worker.close())
             workers.remove(lane.worker)
 
-    active = new_lane("native")
+    active = None
     primary = None
     probation = []
     pending = []
     anchor_pair = None
     anchor = None
+    history_anchor = None
     private = None
     event_id = 0
     origin = None
@@ -115,14 +124,25 @@ def run(args, events, output):
         probation.clear()
 
     try:
-        for pair in frames:
+        if args.subscriber is not None:
+            publisher = PosePublisher(args.subscriber)
+        active = new_lane("native")
+        if args.realtime:
+            source = LiveInput(args.dataset, args.limit, output / "input_clock.jsonl")
+            frames = iter(source)
+        else:
+            frames = ((pair, None, None) for pair in itertools.islice(euroc(args.dataset), args.limit))
+        for pair, arrival, payload in frames:
+            if arrival is not None:
+                events.emit("consume", timestamp=pair.timestamp, arrival_ns=arrival,
+                            consume_ns=time.monotonic_ns())
             if origin is None:
                 origin = pair.timestamp
             total += 1
             seconds = (pair.timestamp - origin) / 1e9
             obscured = any(start <= seconds < end for start, end in args.occlude)
             view = "occluded" if obscured else "raw"
-            images = read_pair(pair, view)
+            images = read_pair(pair, view, payload)
             if native:
                 result = active.consume(pair, view, images)
                 publish(result, "native", result["maps"] == 1 and result["map_id"] == 0)
@@ -160,9 +180,15 @@ def run(args, events, output):
                         retired, active = active, private
                         private = None
                         aligned = True
+                        inertial, closure = recover_history(history_anchor, anchor_pair, pending,
+                                                            probation[0], vision)
+                        events.emit("blind_history", event=event_id, **closure)
                         events.emit("promote", event=event_id, checkpoint=anchor["timestamp"],
                                     through=pair.timestamp,
+                                    accepted_blind_history=[row["timestamp"] for row in inertial],
                                     accepted_history=[row["timestamp"] for row in probation])
+                        for row in inertial:
+                            publish(row, "inertial_history", True)
                         for row in probation:
                             publish(row, "repaired_history", True)
                         close(retired, f"retired-{event_id}")
@@ -205,6 +231,7 @@ def run(args, events, output):
                     if not qualify_replay(active, private, events, "checkpoint_replay", event=event_id):
                         reject("checkpoint_replay_difference")
                         continue
+                    history_anchor = private.snapshot
                     for deferred, _, _ in pending:
                         private.consume(deferred, "skip")
                 continue
@@ -251,6 +278,10 @@ def run(args, events, output):
         events.emit("input_fault", kind=error.kind, detail=str(error))
         raise
     finally:
+        if source is not None:
+            source.close()
+        if publisher is not None:
+            publisher.close()
         for worker in workers:
             events.emit("worker_exit", exit=worker.close())
 
@@ -261,6 +292,8 @@ def main():
         parser.add_argument(name, type=Path)
     parser.add_argument("--mode", choices=("native", "recover", "qualify"), required=True)
     parser.add_argument("--limit", type=int)
+    parser.add_argument("--realtime", action="store_true")
+    parser.add_argument("--subscriber", type=Path)
     parser.add_argument("--delay", type=float, default=0.012, help="extra frame pacing in seconds")
     parser.add_argument("--qualify-at", type=float, default=25.0)
     parser.add_argument("--occlude", nargs=2, type=float, action="append", default=[],
@@ -269,6 +302,10 @@ def main():
     if (any(not 0 <= start < end for start, end in args.occlude)
             or args.delay < 0 or args.limit is not None and args.limit <= 0):
         parser.error("invalid frame limit, cadence or fault interval")
+    if args.realtime:
+        if args.mode == "qualify":
+            parser.error("checkpoint qualification uses offline replay")
+        args.delay = 0
     cv2.setNumThreads(1)
     cv2.setRNGSeed(73)
     args.output.mkdir()
@@ -276,7 +313,9 @@ def main():
         events = EventLog(stream)
         events.emit("run", mode=args.mode, dataset=str(args.dataset.resolve()),
                     fault_intervals_s=args.occlude, delay_s=args.delay,
-                    drain_local_mapping="ORB_VIO_DRAIN_LOCAL_MAPPING" in os.environ)
+                    drain_local_mapping="ORB_VIO_DRAIN_LOCAL_MAPPING" in os.environ,
+                    realtime=args.realtime,
+                    external_subscriber=args.subscriber is not None)
         run(args, events, args.output)
 
 

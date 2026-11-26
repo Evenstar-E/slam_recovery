@@ -26,6 +26,10 @@ int main(int argc, char* argv[]) try {
 
     cv::setNumThreads(1);
     ORB_SLAM3::System slam(argv[1], argv[2], ORB_SLAM3::System::IMU_STEREO, false);
+    if (std::getenv("ORB_VIO_REPORT_READY")) {
+        if (std::fputs("READY\n", responses) == EOF || std::fflush(responses))
+            throw std::runtime_error("cannot report worker readiness");
+    }
     for (std::uint32_t width; std::cin.peek() != EOF;) {
         std::int64_t timestamp;
         std::uint32_t height, samples;
