@@ -1,6 +1,7 @@
 """Run the native baseline or the stereo-inertial recovery transaction."""
 import argparse
 from collections import deque
+from concurrent.futures import ThreadPoolExecutor
 import itertools
 import os
 import time
@@ -15,18 +16,22 @@ from .vision import (HeldOutStereo, healthy, in_public_world, input_support,
                      qualify_replay, replay_delta)
 
 
+WORKER_FAILURE = (RuntimeError, TimeoutError, BrokenPipeError)
+
+
 class Lane:
-    def __init__(self, worker, delay):
+    def __init__(self, worker, delay, keep_journal=False):
         self.worker = worker
         self.delay = delay
-        self.journal = []
+        self.journal = [] if keep_journal else None
         self.pending_imu = []
         self.snapshot = None
         self.recent = deque(maxlen=16)
         self.gauge = None
 
     def consume(self, pair, view, images=None):
-        self.journal.append((pair, view))
+        if self.journal is not None:
+            self.journal.append((pair, view))
         self.pending_imu.extend(pair.imu)
         if view == "skip":
             return None
@@ -46,14 +51,16 @@ def run(args, events, output):
     source = None
     publisher = None
     native = args.mode == "native"
+    incremental = args.mode == "recover"
     vision = HeldOutStereo(args.settings)
     workers = []
     command = args.worker, args.vocabulary, args.settings
+    parallel = ThreadPoolExecutor(max_workers=1) if incremental else None
 
     def new_lane(name):
         worker = Worker(command, output / f"{name}.log", wait_ready=args.realtime)
         workers.append(worker)
-        return Lane(worker, args.delay)
+        return Lane(worker, args.delay, keep_journal=args.mode == "qualify")
 
     def publish(result, channel, verified):
         if result is None or (channel != "inertial_history" and result["tracking"] != 2):
@@ -76,6 +83,7 @@ def run(args, events, output):
             workers.remove(lane.worker)
 
     active = None
+    standby = None
     primary = None
     probation = []
     pending = []
@@ -93,6 +101,40 @@ def run(args, events, output):
     total = 0
     needs_rearm = False
     healthy_count = 0
+    candidate_fitted = False
+
+    def consume_public(pair, view, images=None):
+        nonlocal standby
+        if standby is None:
+            return active.consume(pair, view, images)
+        if images is None and view != "skip":
+            images = read_pair(pair, view)
+        mirrored = parallel.submit(standby.consume, pair, view, images)
+        result = active.consume(pair, view, images)
+        try:
+            mirrored.result()
+        except WORKER_FAILURE as error:
+            events.emit("standby_unavailable", reason=str(error), timestamp=pair.timestamp)
+            close(standby, "standby_failed")
+            standby = None
+        return result
+
+    def catch_up_standby(retired):
+        nonlocal standby
+        if not incremental:
+            return
+        started = time.monotonic_ns()
+        try:
+            for buffered, _, weak in pending:
+                retired.consume(buffered, "skip" if weak else "fit")
+        except WORKER_FAILURE as error:
+            events.emit("standby_unavailable", reason=str(error), event=event_id)
+            close(retired, "standby_catchup_failed")
+            return
+        standby = retired
+        events.emit("standby_catchup", event=event_id, frames=len(pending),
+                    through=retired.snapshot["timestamp"], started_ns=started,
+                    finished_ns=time.monotonic_ns())
 
     def observe_reentry(result):
         nonlocal needs_rearm, healthy_count
@@ -105,15 +147,22 @@ def run(args, events, output):
                         timestamp=result["timestamp"])
 
     def reject(reason):
-        nonlocal private, aligned, previous, imu_delta, anchor_pair, needs_rearm, healthy_count
-        events.emit("reject", event=event_id, reason=reason, preserved_anchor=anchor["timestamp"])
+        nonlocal private, aligned, previous, imu_delta, anchor_pair, needs_rearm, healthy_count, standby
+        events.emit("reject", event=event_id, reason=reason, preserved_anchor=anchor["timestamp"],
+                    decided_ns=time.monotonic_ns())
         if private is not None:
-            close(private, f"candidate-{event_id}")
+            if not candidate_fitted and reason in ("bounded_candidate_window", "end_of_input"):
+                # No native visual update was attempted. Only the unsent IMU queue
+                # changed; both replicas can resume from the original boundary.
+                private.pending_imu.clear()
+                standby = private
+            else:
+                close(private, f"candidate-{event_id}")
             private = None
         aligned = False
         needs_rearm, healthy_count = True, 0
         for pair, view, weak in pending:
-            result = active.consume(pair, "skip" if weak else view)
+            result = consume_public(pair, "skip" if weak else view)
             publish(result, "local_unverified", False)
             observe_reentry(result)
             if result is not None:
@@ -127,6 +176,8 @@ def run(args, events, output):
         if args.subscriber is not None:
             publisher = PosePublisher(args.subscriber)
         active = new_lane("native")
+        if incremental:
+            standby = new_lane("standby")
         if args.realtime:
             source = LiveInput(args.dataset, args.limit, output / "input_clock.jsonl")
             frames = iter(source)
@@ -162,13 +213,14 @@ def run(args, events, output):
                     private.consume(pair, "skip")
                     probation.clear()
                 else:
+                    candidate_fitted = True
                     try:
                         fitted = private.consume(pair, "fit")
-                    except (RuntimeError, TimeoutError, BrokenPipeError) as error:
+                    except WORKER_FAILURE as error:
                         reject(f"candidate_worker: {error}")
                         continue
                     proof = vision.validate(read_pair(anchor_pair, "raw"), images, anchor, fitted)
-                    eligible = (healthy(fitted) and fitted["map_id"] == anchor["map_id"]
+                    eligible = (aligned and healthy(fitted) and fitted["map_id"] == anchor["map_id"]
                                 and fitted["maps"] == anchor["maps"] and proof["passed"])
                     events.emit("candidate", event=event_id, timestamp=pair.timestamp,
                                 snapshot=fitted, gate=proof, eligible=eligible)
@@ -184,14 +236,14 @@ def run(args, events, output):
                                                             probation[0], vision)
                         events.emit("blind_history", event=event_id, **closure)
                         events.emit("promote", event=event_id, checkpoint=anchor["timestamp"],
-                                    through=pair.timestamp,
+                                    through=pair.timestamp, decided_ns=time.monotonic_ns(),
                                     accepted_blind_history=[row["timestamp"] for row in inertial],
                                     accepted_history=[row["timestamp"] for row in probation])
                         for row in inertial:
                             publish(row, "inertial_history", True)
                         for row in probation:
                             publish(row, "repaired_history", True)
-                        close(retired, f"retired-{event_id}")
+                        catch_up_standby(retired)
                         previous = active.snapshot
                         imu_delta = None
                         anchor_pair = pair
@@ -203,7 +255,7 @@ def run(args, events, output):
                 continue
 
             if needs_rearm and weak:
-                active.consume(pair, "skip")
+                consume_public(pair, "skip")
                 observe_reentry(None)
                 events.emit("reentry_wait", event=event_id, timestamp=pair.timestamp)
                 continue
@@ -214,23 +266,26 @@ def run(args, events, output):
                 pending.append((pair, view, weak))
                 if len(pending) == 2:
                     event_id += 1
+                    candidate_fitted = False
                     anchor = active.snapshot
                     events.emit("isolate", event=event_id, fault="image_observation",
                                 first_untrusted=pending[0][0].timestamp, detected=pair.timestamp,
-                                checkpoint=anchor)
+                                checkpoint=anchor, detected_ns=time.monotonic_ns())
                     if args.mode == "qualify":
                         reject("clean_replay_mode")
                         continue
-                    private = new_lane(f"candidate-{event_id}")
-                    try:
-                        for saved_pair, saved_view in active.journal:
-                            private.consume(saved_pair, saved_view)
-                    except (RuntimeError, TimeoutError, BrokenPipeError) as error:
-                        reject(f"checkpoint_worker: {error}")
+                    private, standby = standby, None
+                    if private is None:
+                        reject("incremental_checkpoint_unavailable")
                         continue
-                    if not qualify_replay(active, private, events, "checkpoint_replay", event=event_id):
-                        reject("checkpoint_replay_difference")
+                    started = time.monotonic_ns()
+                    if not qualify_replay(active, private, events, "incremental_checkpoint",
+                                          event=event_id, prefix_frames_replayed=0):
+                        reject("incremental_checkpoint_difference")
                         continue
+                    events.emit("checkpoint_ready", event=event_id, frames_replayed=0,
+                                through=private.snapshot["timestamp"], started_ns=started,
+                                finished_ns=time.monotonic_ns())
                     history_anchor = private.snapshot
                     for deferred, _, _ in pending:
                         private.consume(deferred, "skip")
@@ -238,10 +293,10 @@ def run(args, events, output):
 
             if pending:  # A single weak frame did not confirm an occlusion.
                 deferred, deferred_view, _ = pending.pop()
-                previous = active.consume(deferred, deferred_view)
+                previous = consume_public(deferred, deferred_view)
                 publish(previous, "native" if aligned else "local_unverified", aligned)
 
-            result = active.consume(pair, view, images)
+            result = consume_public(pair, view, images)
             imu_delta = vision.imu_residual(previous, result)
             if previous is not None and (previous["map_id"] != result["map_id"]
                                          or previous["maps"] != result["maps"]):
@@ -269,7 +324,7 @@ def run(args, events, output):
             reject("end_of_input")
         elif pending:
             deferred, view, _ = pending.pop()
-            publish(active.consume(deferred, view), "native", aligned)
+            publish(consume_public(deferred, view), "native", aligned)
         if not total:
             raise ValueError("no stereo frames")
         events.emit("complete", input_pairs=total, events=event_id,
@@ -282,6 +337,8 @@ def run(args, events, output):
             source.close()
         if publisher is not None:
             publisher.close()
+        if parallel is not None:
+            parallel.shutdown()
         for worker in workers:
             events.emit("worker_exit", exit=worker.close())
 

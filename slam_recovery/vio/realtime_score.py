@@ -43,8 +43,9 @@ def describe(run, receipt_file):
         raise ValueError("receipt clock regressed")
     counts = Counter(row["channel"] for row in output)
     lifecycle = [row for row in trace if row["type"] in
-                 ("isolate", "checkpoint_replay", "blind_history", "promote", "reject", "rearmed",
-                  "complete", "worker_exit")]
+                 ("isolate", "checkpoint_replay", "incremental_checkpoint", "checkpoint_ready",
+                  "standby_catchup", "standby_unavailable", "blind_history", "promote",
+                  "reject", "rearmed", "complete", "worker_exit")]
     validations = []
     for row in lifecycle:
         if row["type"] == "promote":
@@ -71,6 +72,9 @@ def describe(run, receipt_file):
         after = next((row for row in output if row["timestamp"] >= begin), None)
         live = next((row for row in output if row["timestamp"] >= stop
                      and row["channel"] in ("native", "local_unverified")), None)
+        # Measure delay after the first restored camera pair enters the input queue.
+        healthy_arrival = next((row["arrival_ns"] for row in enqueued
+                                if row["timestamp"] >= stop), None)
         event_stats.append({
             "window_s": [start, end], "input_blind_frames": len(affected),
             "received_blind_frames": sum(t in poses for t in affected),
@@ -80,6 +84,8 @@ def describe(run, receipt_file):
             if pre and after else None,
             "to_live_output_s": elapsed(pre["received_ns"], live["received_ns"])
             if pre and live else None,
+            "healthy_input_to_ordinary_receipt_s": elapsed(healthy_arrival, live["received_ns"])
+            if healthy_arrival is not None and live else None,
         })
     lag = [elapsed(row["arrival_ns"], row["consume_ns"]) for row in consumed]
     scheduling = [elapsed(row["scheduled_ns"], row["arrival_ns"]) for row in input_rows]
@@ -106,6 +112,14 @@ def main():
         parser.add_argument(key, type=Path)
     args = parser.parse_args()
     native, plugin = (args.native / "events.jsonl", args.plugin / "events.jsonl")
+    source_keys = []
+    for arm in (args.native, args.plugin):
+        source_keys.append([
+            (row["timestamp"], row.get("image_sha256"), row.get("imu_count"))
+            for row in rows(arm / "input_clock.jsonl")
+        ])
+    if source_keys[0] != source_keys[1]:
+        raise ValueError("the native and plugin source streams differ")
     positional = score(args.dataset, args.settings, [native, plugin])
     summary = {}
     for label, run, receipt, path in (

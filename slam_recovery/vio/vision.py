@@ -91,11 +91,18 @@ def qualify_replay(public, private, event_log, record_type, **context):
                    failed_prefix_pairs=[dict(row, timestamp=state["timestamp"])
                                         for state, row in zip(before[1:], checks)
                                         if not row["qualified"]])
-    private.gauge = gauge
+    if not qualified:
+        return False
+    if private.gauge is None:
+        private.gauge = gauge
+    else:
+        R, t = private.gauge
+        delta_R, delta_t = gauge
+        private.gauge = R @ delta_R, t + R @ delta_t
     private.recent.clear()
     private.recent.extend(in_public_world(row, gauge) for row in after)
     private.snapshot = private.recent[-1]
-    return qualified
+    return True
 
 
 def replay_delta(saved, replayed):
