@@ -15,7 +15,7 @@ Publishes:
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Sequence, Tuple
 import os
 import time
 
@@ -25,6 +25,7 @@ from ..core import (
     BackendDelta,
     CandidateMap,
     GateThresholds,
+    HealthDecision,
     HealthWindow,
     RecoveryMode,
     RecoveryState,
@@ -40,6 +41,8 @@ from ..validation import (
     compute_disjoint_holdout_point_to_plane_nis,
     evaluate_paired_sequential_benefit,
 )
+from ..validation.spatial_index import RadiusIndex as _RadiusIndex
+from ..validation.surface_admission import VOXEL_M, SurfaceEvidence, SurfaceView, surface_admission
 
 
 def boundary_jump_within_envelope(jump_m: float, elapsed_s: float, jump_bound_m: float,
@@ -52,57 +55,6 @@ def boundary_jump_within_envelope(jump_m: float, elapsed_s: float, jump_bound_m:
     The envelope keeps the bound for the instantaneous case and scales it with elapsed time.
     """
     return float(jump_m) <= float(jump_bound_m) + float(speed_m_s) * max(0.0, float(elapsed_s))
-
-
-class _RadiusIndex:
-    """Exact "is there a reference point within r" queries without a distance matrix.
-
-    The support test asks one question per query point: is any reference point within `radius`.
-    Answering it with the full distance matrix is O(queries * points) per call, and the decision
-    calls it for every candidate frame twice -- 4 s of a 4.4 s decision on a 100k-point map.
-    Bucketing the reference into cells of exactly `radius` answers the same question exactly:
-    a point within `radius` of a query must lie in one of the 27 cells around it, so no true
-    neighbour is ever missed and no approximate structure is introduced.
-    """
-
-    def __init__(self, points: np.ndarray, cell: float) -> None:
-        self.cell = float(cell)
-        pts = np.asarray(points, dtype=np.float64)[:, :3]
-        self.points = pts
-        q = np.floor(pts / self.cell).astype(np.int64)
-        self.origin = q.min(axis=0) - 1
-        q = q - self.origin
-        self.dims = q.max(axis=0) + 2
-        lin = (q[:, 0] * self.dims[1] + q[:, 1]) * self.dims[2] + q[:, 2]
-        order = np.argsort(lin, kind="stable")
-        self.sorted_lin = lin[order]
-        self.sorted_idx = order
-
-    def within_radius_mask(self, queries: np.ndarray, radius: float) -> np.ndarray:
-        queries = np.asarray(queries, dtype=np.float64)[:, :3]
-        cell = np.floor(queries / self.cell).astype(np.int64) - self.origin
-        inside = np.zeros(len(queries), dtype=bool)
-        r2 = float(radius) * float(radius)
-        for dx in (-1, 0, 1):
-            for dy in (-1, 0, 1):
-                for dz in (-1, 0, 1):
-                    c = cell + np.array([dx, dy, dz], dtype=np.int64)
-                    valid = np.all((c >= 0) & (c < self.dims), axis=1)
-                    if not valid.any():
-                        continue
-                    valid &= ~inside
-                    lin = (c[:, 0] * self.dims[1] + c[:, 1]) * self.dims[2] + c[:, 2]
-                    lo = np.searchsorted(self.sorted_lin, lin, side="left")
-                    hi = np.searchsorted(self.sorted_lin, lin, side="right")
-                    hit = valid & (hi > lo)
-                    for i in np.flatnonzero(hit):
-                        if inside[i]:
-                            continue
-                        cand = self.sorted_idx[lo[i]:hi[i]]
-                        d2 = np.sum((self.points[cand] - queries[i]) ** 2, axis=1)
-                        if d2.size and d2.min() <= r2:
-                            inside[i] = True
-        return inside
 
 
 class OnlineRecoveryTransactionNode:
@@ -133,6 +85,9 @@ class OnlineRecoveryTransactionNode:
         # setting the clean run's NIS to 1 (sigma* = RMS of its point-to-plane residuals).
         self.sigma_meas_m = float(sigma_meas_m)
         self.voxel_size_m = float(voxel_size_m)
+        if gate_thresholds.require_surface_evidence and self.voxel_size_m != VOXEL_M:
+            raise ValueError(f"surface admission requires the frozen {VOXEL_M} m voxel grid")
+        self.last_surface_evidence: Optional[SurfaceEvidence] = None
         self.holdout_stride = int(holdout_stride)
         # Smallest sample size at which a unanimous frame-wise improvement still clears the
         # 0.55 Wilson lower bound (n=3 -> 0.526, n=4 -> 0.596). Below this the paired test
@@ -178,6 +133,9 @@ class OnlineRecoveryTransactionNode:
         q = np.floor(pts_world[:, :3] / self.voxel_size_m).astype(np.int32)
         return set(map(tuple, q.tolist()))
 
+    def _placed_scan(self, key: int, pose: np.ndarray) -> np.ndarray:
+        return self.scan_buffer_body[key][:, :3] @ pose[:3, :3].T + pose[:3, 3]
+
     def _sync_spatial_map_with_trusted_poses(self) -> None:
         """
         Keep `voxel_store`, `voxel_journal`, and `committed_map_points` strictly synchronized with
@@ -205,16 +163,14 @@ class OnlineRecoveryTransactionNode:
             for sk in sorted(self._kf_applied_poses.keys()):
                 if sk in self.scan_buffer_body:
                     T_s = self._kf_applied_poses[sk]
-                    pts_b = self.scan_buffer_body[sk][:, :3]
-                    pts_w = (pts_b @ T_s[:3, :3].T) + T_s[:3, 3]
+                    pts_w = self._placed_scan(sk, T_s)
                     for v_key in self._quantize_voxels(pts_w):
                         self.voxel_journal.put(v_key, int(sk))
 
         for kf_id in sorted(added_keys | modified_keys):
             if kf_id in self.tx_mgr.trusted_poses and kf_id in self.scan_buffer_body:
                 T_w_b = self.tx_mgr.trusted_poses[kf_id].copy()
-                pts_b = self.scan_buffer_body[kf_id][:, :3]
-                pts_w = (pts_b @ T_w_b[:3, :3].T) + T_w_b[:3, 3]
+                pts_w = self._placed_scan(kf_id, T_w_b)
                 for v_key in self._quantize_voxels(pts_w):
                     self.voxel_journal.put(v_key, int(kf_id))
                 self._kf_applied_poses[kf_id] = T_w_b
@@ -279,7 +235,11 @@ class OnlineRecoveryTransactionNode:
         loso_aux: float = 0.5,
         sync_lag_sec: float = 0.0,
         loop_spike: float = 0.3,
-    ) -> Optional[ValidationReport]:
+        *,
+        observe_only: bool = False,
+        geometry_can_trigger: bool = True,
+        quarantine_ready: Optional[Callable[[HealthDecision], bool]] = None,
+    ) -> Optional[HealthDecision]:
         self.scan_buffer_body[kf_id] = np.asarray(scan_body_xyz, dtype=np.float64)[:, :3].copy()
         self._kf_timestamps[kf_id] = int(timestamp_ns)
         fim_6x6, cov_6x6, min_r, min_t, weak_dir = compute_6dof_point_to_plane_fim(
@@ -302,7 +262,10 @@ class OnlineRecoveryTransactionNode:
             Cross_corr_lag_sec=sync_lag_sec,
             loop_residual_spike=loop_spike,
         )
-        decision = self.detector.step(win)
+        decision = (self.detector.step(win) if geometry_can_trigger else
+                    self.detector.step(win, geometry_can_trigger=False))
+        if observe_only:
+            return decision
 
         # A wait that never ends is a run that can never see a second event. When the run declared
         # a wait limit, close the segment here and re-arm; the frames it was holding are recorded
@@ -319,6 +282,8 @@ class OnlineRecoveryTransactionNode:
 
         if self.tx_mgr.state == RecoveryState.HEALTHY:
             if decision.state == RecoveryState.QUARANTINED:
+                if quarantine_ready is not None and not quarantine_ready(decision):
+                    return decision
                 # `weak_dir` and `fim_6x6` are produced from this scan's own points, i.e. in the
                 # body frame of `kf_id`, and that frame is kept as the gate's evaluation basis.
                 # The repaired candidate is assembled from world-frame points, so it carries the
@@ -618,6 +583,10 @@ class OnlineRecoveryTransactionNode:
         incumbent_poses: Optional[Dict[int, np.ndarray]] = None,
         reentry_anchor_pose: Optional[np.ndarray] = None,
         reentry_anchor_ts_ns: Optional[int] = None,
+        *,
+        surface_views: Sequence[SurfaceView] = (),
+        surface_decision_ns: Optional[int] = None,
+        observed_host_poses: Optional[Dict[int, np.ndarray]] = None,
     ) -> ValidationReport:
         """
         Perform true cross-scan holdout validation (Section 3.2 S1):
@@ -630,6 +599,7 @@ class OnlineRecoveryTransactionNode:
         # window, and the quarantine keeps registering frames while it runs. Env-gated so a run's
         # log stays quiet; the numbers are what decide whether the window is even meetable.
         _t = {"start": time.perf_counter()}
+        self.last_surface_evidence = None
 
         def _mark(name: str) -> None:
             _t[name] = time.perf_counter()
@@ -681,14 +651,38 @@ class OnlineRecoveryTransactionNode:
         # the paired-evidence coverage test, and rebuilding it (or the distance matrix) per frame
         # was most of the decision's 4.4 s.
         support_index = (_RadiusIndex(support_ref, 1.0) if len(support_ref) else None)
-        committable = {
-            k
-            for k in kf_sorted
-            if k not in reference_keys
-            and (incumbent_keys is None or k in incumbent_keys)
-            and self._frame_has_reference_support(k, support_ref, repaired_poses,
-                                                 index=support_index)
+        commit_population = (set(kf_sorted) if incumbent_keys is None
+                             else set(kf_sorted) & incumbent_keys)
+        assessment_keys = commit_population if observed_host_poses is None else set(kf_sorted)
+        candidate_support = {
+            k for k in assessment_keys - reference_keys
+            if self._frame_has_reference_support(k, support_ref, repaired_poses, index=support_index)
         }
+        committable = candidate_support & commit_population
+        host_support_evidence = None
+        if observed_host_poses is not None:
+            observed = set(observed_host_poses) - reference_keys
+            comparable = (observed & set(kf_sorted) & self.scan_buffer_body.keys())
+            host_support = {
+                k for k in observed & self.scan_buffer_body.keys()
+                if ((k in candidate_support) if repaired_poses.get(k) is observed_host_poses[k]
+                    else self._frame_has_reference_support(k, support_ref, observed_host_poses,
+                                                          index=support_index))
+            }
+            host_support_evidence = {
+                "baseline": "observed_host_during_quarantine",
+                "reference_points": len(support_ref),
+                "observed_frame_count": len(observed_host_poses),
+                "candidate_frame_count": len(kf_sorted),
+                "comparable_frame_count": len(comparable),
+                "both_supported": sorted(host_support & candidate_support & comparable),
+                "both_unsupported": sorted(comparable - (host_support | candidate_support)),
+                "candidate_only_supported": sorted((candidate_support - host_support) & comparable),
+                "host_only_supported": sorted((host_support - candidate_support) & comparable),
+                "missing_candidate_pose": sorted(observed - set(kf_sorted)),
+                "missing_host_pose": sorted(set(kf_sorted) - set(observed_host_poses)),
+                "frames_missing_scan": sorted((observed | set(kf_sorted)) - self.scan_buffer_body.keys()),
+            }
         commit_keys: List[int] = [k for k in kf_sorted if k in committable]
         deferred_keys = [k for k in kf_sorted if k not in set(commit_keys)]
         candidate_poses = {k: repaired_poses[k] for k in commit_keys}
@@ -836,7 +830,25 @@ class OnlineRecoveryTransactionNode:
             reentry_candidate_pose=(repaired_poses[kf_sorted[0]] if kf_sorted else None),
         )
 
+        if host_support_evidence is not None:
+            self.last_paired_evidence["observed_host_reference_support"] = host_support_evidence
         _mark("paired_evidence")
+        if self.tx_mgr.gate_thresholds.require_surface_evidence:
+            if set(commit_keys) & self.tx_mgr.trusted_poses.keys():
+                self.last_surface_evidence = SurfaceEvidence("MISSING", "patch_is_not_additive")
+            else:
+                patch_keys = set()
+                for k, pose in candidate_poses.items():
+                    patch_keys.update(self._quantize_voxels(self._placed_scan(k, pose)))
+                candidate_end = (max(self._kf_timestamps[k] for k in kf_sorted)
+                                 if kf_sorted and all(k in self._kf_timestamps for k in kf_sorted)
+                                 else None)
+                self.last_surface_evidence = surface_admission(
+                    self.voxel_store, patch_keys, surface_views,
+                    candidate_end_ns=candidate_end, decision_ns=surface_decision_ns,
+                )
+            _mark("surface_evidence")
+
         cand = CandidateMap(
             candidate_id=candidate_id,
             parent_map_version=self.tx_mgr.trusted_version,
@@ -865,6 +877,8 @@ class OnlineRecoveryTransactionNode:
             paired_benefit_approved=paired_ok,
             wilson_lower_bound=wilson_lb,
             reentry_pos_jump_m=reentry_jump,
+            surface_evidence_status=(None if self.last_surface_evidence is None
+                                     else self.last_surface_evidence.status),
         )
         _mark("candidate_built")
         report = self.tx_mgr.validate_and_resolve(cand)

@@ -349,6 +349,7 @@ class CandidateMap:
     # indistinguishable in that regime, and the gate records the weaker basis rather than
     # presenting it as continuity evidence.
     boundary_basis: str = ""
+    surface_evidence_status: Optional[str] = None
 
 
 @dataclass
@@ -431,6 +432,7 @@ class GateThresholds:
     sigma_bridge: float = 4.00             # Bridge uncertainty upper bound \Sigma_{bridge}
     min_wilson_lower_bound: float = 0.55   # Minimum Wilson score lower bound on paired holdout benefit
     max_reentry_jump_m: float = 0.50       # Maximum re-entry boundary position jump (m)
+    require_surface_evidence: bool = False
 
 
 def evaluate_four_mode_gate(
@@ -709,6 +711,22 @@ def evaluate_four_mode_gate(
             and p_after <= thresholds.sigma_tol
             and wilson_ok
         ):
+            if thresholds.require_surface_evidence and candidate.surface_evidence_status != "PASSED":
+                surface_status = ("FAILED" if candidate.surface_evidence_status == "FAILED"
+                                  else "MISSING")
+                return ValidationReport(
+                    accepted=False,
+                    mode=(RecoveryMode.MODE3_SOFT_BRIDGE_WAIT if p_prop < thresholds.sigma_bridge
+                          else RecoveryMode.MODE4_HARD_SLEEP_SPLIT),
+                    weak_dir_info_before=info_before,
+                    weak_dir_info_after=info_after,
+                    weak_dir_info_gain=info_gain,
+                    holdout_nis=d_hold,
+                    posterior_cov_norm=p_after,
+                    propagated_cov_norm=p_prop,
+                    reason=f"Refused Mode 2 atomic commit: held-out surface evidence {surface_status}",
+                    evidence_status=surface_status,
+                )
             return ValidationReport(
                 accepted=True,
                 mode=RecoveryMode.MODE2_ATOMIC_COMMIT,

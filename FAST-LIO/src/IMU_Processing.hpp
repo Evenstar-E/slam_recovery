@@ -53,6 +53,40 @@ class ImuProcess
                         esekfom::esekf<state_ikfom, 12, input_ikfom> &kf_state, 
                         PointCloudXYZI::Ptr pcl_un_,
                         esekfom::esekf<state_ikfom, 12, input_ikfom> &kf_point);
+  struct RecoveryState
+  {
+    sensor_msgs::ImuConstPtr last_imu;
+    V3D cov_acc, cov_gyr, mean_acc, mean_gyr, angvel_last, acc_last;
+    Eigen::Matrix<double, 12, 12> process_noise;
+    double first_lidar_time, start_time, last_lidar_end_time;
+    int init_iter_num;
+    bool first_frame, need_init, dynamic_init;
+  };
+  RecoveryState recovery_state() const
+  {
+    return {last_imu_, cov_acc, cov_gyr, mean_acc, mean_gyr, angvel_last, acc_s_last,
+            Q, first_lidar_time, start_timestamp_, last_lidar_end_time_, init_iter_num,
+            b_first_frame_, imu_need_init_, imu_init_dynamic};
+  }
+  void restore_recovery_state(const RecoveryState& state)
+  {
+    last_imu_ = state.last_imu;
+    cov_acc = state.cov_acc;
+    cov_gyr = state.cov_gyr;
+    mean_acc = state.mean_acc;
+    mean_gyr = state.mean_gyr;
+    angvel_last = state.angvel_last;
+    acc_s_last = state.acc_last;
+    Q = state.process_noise;
+    first_lidar_time = state.first_lidar_time;
+    start_timestamp_ = state.start_time;
+    last_lidar_end_time_ = state.last_lidar_end_time;
+    init_iter_num = state.init_iter_num;
+    b_first_frame_ = state.first_frame;
+    imu_need_init_ = state.need_init;
+    imu_init_dynamic = state.dynamic_init;
+    IMUpose.clear();
+  }
   ofstream fout_imu;    
   V3D cov_acc;                
   V3D cov_gyr;                
@@ -60,7 +94,7 @@ class ImuProcess
   V3D cov_gyr_scale;
   V3D cov_bias_gyr;     
   V3D cov_bias_acc;     
-  double first_lidar_time; 
+  double first_lidar_time = 0.0;
   bool  imu_init_dynamic = false;                                    
 
  private:
@@ -86,7 +120,7 @@ class ImuProcess
   V3D angvel_last;                                                                     
   V3D acc_s_last;                                                                         
   double start_timestamp_;                                                
-  double last_lidar_end_time_;                                            
+  double last_lidar_end_time_ = 0.0;
   int    init_iter_num = 1;                                                             
   bool   b_first_frame_ = true;                                               
   bool   imu_need_init_ = true;                                              

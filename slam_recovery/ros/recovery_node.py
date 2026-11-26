@@ -42,6 +42,7 @@ import sys
 import threading
 import time
 from collections import deque
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -52,12 +53,16 @@ from slam_recovery.repair.pose_reregistration import (
     MOTION_PRIOR_MAX_ROT_DEG, build_icp_candidate, build_motion_prior_candidate,
     reregister_segment)
 from slam_recovery.ros.availability_log import AvailabilityRecorder
+from slam_recovery.ros.refusal_comparison import summarize_refusal_comparison
+from slam_recovery.ros.imu_recovery_observation import ImuRecoveryObservations, score_imu_observation
 from slam_recovery.ros.cloud_repair import (
     ReferenceGrid,
     body_z_bias,
     estimate_body_z_bias,
     shift_z_cloud,
 )
+from slam_recovery.ros.live_health import SUPPORT_RADIUS_M, SUPPORT_FRACTION, score_local_planes
+from slam_recovery.validation.spatial_index import RadiusIndex
 from slam_recovery.sim.transaction_manager_node import OnlineRecoveryTransactionNode
 from slam_recovery.validation import (
     compute_6dof_point_to_plane_fim,
@@ -440,12 +445,14 @@ class LiveNis:
 
     def __init__(self, node: OnlineRecoveryTransactionNode, radius_m: float = NIS_RADIUS_M,
                  min_train: int = NIS_MIN_TRAIN, min_holdout: int = NIS_MIN_HOLDOUT,
-                 refresh_ns: int = REFERENCE_REFRESH_NS) -> None:
+                 refresh_ns: int = REFERENCE_REFRESH_NS, *, local_planes: bool = False) -> None:
         self.node = node
         self.radius_m = float(radius_m)
         self.min_train = int(min_train)
         self.min_holdout = int(min_holdout)
         self.refresh_ns = int(refresh_ns)
+        self.local_planes = bool(local_planes)
+        self._plane_index: Optional[RadiusIndex] = None
         self._prev_world: Optional[np.ndarray] = None
         self._last_value: Optional[float] = None
         self._last_value_kf: Optional[int] = None
@@ -482,6 +489,9 @@ class LiveNis:
             or (now - self._last_refresh_ns) >= self.refresh_ns)
         if due:
             self._support_cache = self.node.support_reference()
+            if self.local_planes:
+                self._plane_index = (RadiusIndex(self._support_cache, SUPPORT_RADIUS_M)
+                                     if len(self._support_cache) >= self.min_train else None)
             self._support_key = key
             self._last_refresh_ns = now if now is not None else self._last_refresh_ns
             # Identity of the cloud this and the support test both use. Hashed once per refresh:
@@ -556,6 +566,29 @@ class LiveNis:
                            "min_train": int(self.min_train),
                            "min_holdout": int(self.min_holdout),
                            "attempted": False, "computed": False})
+        if self.local_planes:
+            reference = self.support_reference(now_ts_ns)
+            value, sampled, matched = (score_local_planes(
+                self._plane_index, world, self.node.sigma_meas_m, self.min_holdout)
+                if self._plane_index is not None else (None, 0, 0))
+            src = "computed" if value is not None else "unavailable"
+            name = "node_map" if self._plane_index is not None else "none"
+            self.counts[src] += 1
+            self.counts[f"reference_{name}"] += 1
+            if detail is not None:
+                detail.update({"source": src, "effective_nis": value,
+                               "selected_reference_source": name,
+                               "selected_reference_points": int(len(reference)),
+                               "computed": value is not None,
+                               "local_support": {
+                                   "radius_m": SUPPORT_RADIUS_M,
+                                   "threshold_fraction": SUPPORT_FRACTION,
+                                   "sampled_query_count": sampled,
+                                   "locally_matched_count": matched,
+                                   "supported_fraction": matched / sampled if sampled else None,
+                                   "reason": "ok" if value is not None else "insufficient_local_planes",
+                                   "pass": value is not None}})
+            return value, src, name
         ref, ref_name = self._reference(pose, now_ts_ns, detail=detail)
         value: Optional[float] = None
         if ref is not None and len(world) >= self.min_holdout:
@@ -651,10 +684,13 @@ class Episode:
         self.frames_after_freeze = 0
         self.decided = False
         self.candidate_id = f"cand_{index:04d}"
+        self.meta: Dict[str, Any] = {}
         # The manager segment this episode was opened for. A wait-limit close can end that
         # segment before the queued decision runs; without the id the driver cannot tell the
         # difference between "still open" and "closed while this decision waited".
         self.segment_id: Optional[str] = None
+        self.healthy_suffix: List[int] = []
+        self.refusal_started: Optional[float] = None
 
 
 class HostCapabilities:
@@ -669,6 +705,7 @@ class HostCapabilities:
     """
 
     KEYS = ("snapshot", "restore", "hold", "reprocess", "set_state", "measurement_relay")
+    OPTIONAL_KEYS = ("reprocess_refusal",)
 
     SEMANTICS = ("apply_stamp", "ack_levels", "checkpoint_validity", "publish_gating",
                  "native_reset_under_hold", "profile")
@@ -677,8 +714,9 @@ class HostCapabilities:
         self.raw = dict(raw or {})
         commands = self.raw.get("commands")
         if not isinstance(commands, dict):
-            commands = {k: v for k, v in self.raw.items() if k in self.KEYS}
-        self.commands = {k: str(commands.get(k, "NO")).strip().upper() for k in self.KEYS}
+            commands = self.raw
+        keys = self.KEYS + tuple(k for k in self.OPTIONAL_KEYS if k in commands)
+        self.commands = {k: str(commands.get(k, "NO")).strip().upper() for k in keys}
         self.checkpoint = self.raw.get("checkpoint") if isinstance(
             self.raw.get("checkpoint"), dict) else None
         self.sem = self.raw.get("semantics") if isinstance(
@@ -861,6 +899,11 @@ class CheckpointClient:
         try:
             if os.path.exists(ack) and not skip_unlink:
                 os.unlink(ack)
+            if cmd == "hold":
+                try:
+                    os.unlink(os.path.join(self.dir, "ack.hold"))
+                except FileNotFoundError:
+                    pass
             tmp = path + ".tmp"
             with open(tmp, "w", encoding="utf-8") as fh:
                 fh.write(cmd + "\n" + payload + "\n")
@@ -980,17 +1023,17 @@ class CheckpointClient:
         The ack file is shared, so a late ack for an earlier command must not be mistaken for a
         reply to the current one; the host writes "OK <cmd> ..." for exactly this check.
         """
-        try:
-            with open(os.path.join(self.dir, "ack"), "r", encoding="utf-8") as fh:
-                line = fh.read().strip()
-        except OSError:
-            return ""
-        if not line:
-            return ""
-        parts = line.split()
-        if len(parts) < 2 or parts[1] != cmd:
-            return ""
-        return line
+        paths = ("ack.hold", "ack") if cmd == "hold" else ("ack",)
+        for path in paths:
+            try:
+                with open(os.path.join(self.dir, path), "r", encoding="utf-8") as fh:
+                    line = fh.read().strip()
+            except OSError:
+                continue
+            parts = line.split()
+            if len(parts) >= 2 and parts[1] == cmd:
+                return line
+        return ""
 
     def _read_received_for(self, cmd: str) -> Optional[float]:
         try:
@@ -1141,6 +1184,9 @@ class CheckpointClient:
         payload = "" if apply_stamp_ns is None else str(int(apply_stamp_ns))
         return self._write("hold", payload=payload, preempt_snapshot=True)
 
+    def hold_with_imu_probe(self, boundary_ns: int) -> Dict[str, Any]:
+        return self._send("hold", f"imu_before_ns={int(boundary_ns)}")
+
     def tick(self, now_wall: float, quiescent: bool) -> Optional[Dict[str, Any]]:
         """Rolling snapshot while nothing is being judged; nothing at all once stopped.
 
@@ -1175,6 +1221,17 @@ class CheckpointClient:
         """Replay the host's captured frames, optionally only up to `end_stamp_ns`."""
         payload = "" if end_stamp_ns is None else str(int(end_stamp_ns))
         return self._send("reprocess", payload)
+
+    def reprocess_refusal(self, boundary_ns: int, healthy_starts: List[int]) -> Dict[str, Any]:
+        payload = " ".join(str(value) for value in (boundary_ns, *healthy_starts))
+        return self._send("reprocess_refusal", payload)
+
+    def refusal_comparison(self, checkpoint_ns: int, target_ns: int, expected: int) -> dict:
+        return summarize_refusal_comparison(
+            Path(self.dir) / "refusal_comparison.jsonl", checkpoint_ns, target_ns, expected)
+
+    def request_status(self) -> Dict[str, Any]:
+        return self._write("status")
 
     def resume(self) -> Dict[str, Any]:
         """Let the host write its map again; the host side of the recovery loop's re-arm."""
@@ -1238,8 +1295,14 @@ class NativeClosedLoop:
         repair_dry_run: bool = False,
         repair_sham: bool = False,
         availability_log: Optional[str] = None,
+        online_refusal_wait_s: Optional[float] = None,
+        online_health_evidence: str = "joint",
+        imu_recovery_observation: bool = False,
     ) -> None:
         self.node = node
+        self.online_refusal_wait_s = online_refusal_wait_s
+        self.geometry_can_trigger = online_health_evidence == "joint"
+        self.unarmed_online_alarms: Dict[int, Dict[str, Any]] = {}
         self.run_id = run_id
         # Per-frame availability evidence, separate from the capped summary diagnostics.
         self.availability = AvailabilityRecorder(availability_log, run_id=run_id)
@@ -1287,7 +1350,9 @@ class NativeClosedLoop:
             else node.tx_mgr.confirmation_margin_ns)
         self.scan_cap = int(scan_cap)
         self.pairer = FramePairer(pair_dt_ns)
-        self.nis = LiveNis(node)
+        self.nis = LiveNis(node, local_planes=online_refusal_wait_s is not None)
+        self.imu_recovery = (ImuRecoveryObservations(Path(self.cp.dir) / "imu_recovery_observations.jsonl")
+                             if imu_recovery_observation and self.cp is not None else None)
         self.next_kf_id = 0
         self.episodes: List[Episode] = []
         self._open: Optional[Episode] = None
@@ -1433,9 +1498,13 @@ class NativeClosedLoop:
             return
 
         support_detail: Dict[str, Any] = {}
-        supported = self.node._frame_has_reference_support(
-            kf_id, support_ref, {kf_id: np.asarray(pose, dtype=np.float64)},
-            detail=(support_detail if self.availability.enabled else None))
+        if self.nis.local_planes:
+            supported = value is not None
+            support_detail = nis_detail.get("local_support", {})
+        else:
+            supported = self.node._frame_has_reference_support(
+                kf_id, support_ref, {kf_id: np.asarray(pose, dtype=np.float64)},
+                detail=(support_detail if self.availability.enabled else None))
         predicted_support: Optional[Dict[str, Any]] = None
         prediction_basis: Optional[Dict[str, Any]] = None
         if self.availability.enabled:
@@ -1449,6 +1518,17 @@ class NativeClosedLoop:
         # reference. "Unsupported" and "healthy" are different statements and are recorded as such:
         # an unsupported frame is ingested so the map can grow, but the detector does not judge it.
         available = bool(supported) and value is not None
+        ep = self._open
+        imu_evidence = None
+        if (self.imu_recovery is not None and ep is not None and self._host_held
+                and scan_ns is not None and self.nis._plane_index is not None):
+            row = self.imu_recovery.at_scan(scan_ns)
+            boundary = self._checkpoint_boundary(ep)
+            if row is not None and boundary is not None:
+                imu_evidence = score_imu_observation(
+                    row, self.nis._plane_index, self.node.sigma_meas_m, self.nis.min_holdout,
+                    boundary, self.node.tx_mgr.gate_thresholds.max_reentry_jump_m)
+                nis_detail["imu_recovery"] = imu_evidence
         status = "AVAILABLE" if available else "UNAVAILABLE"
         self.detection_counts[status] += 1
         self._record_availability(kf_id, ts_ns, scan_ns, pose, scan_body, support_detail,
@@ -1457,11 +1537,37 @@ class NativeClosedLoop:
                                   prediction_basis=prediction_basis)
 
         before = self.node.tx_mgr.active_quarantine
+        if (self.online_refusal_wait_s is not None and ep is not None and ep.frozen
+                and (not ep.decided or ep.refusal_started is not None)):
+            # Frames arriving during evaluation/refusal are observations of the host's private
+            # state. Keep them out of the trusted map and out of the frozen candidate.
+            recovery_value = value if available else None
+            if (recovery_value is None and imu_evidence is not None
+                    and imu_evidence["status"] == "AVAILABLE"):
+                recovery_value = imu_evidence["imu_deskewed"]["nis"]
+                if ep.refusal_started is not None:
+                    ep.meta["online_refusal"].setdefault("imu_evidence_scan_starts_ns", []).append(scan_ns)
+            decision = (self.node.step_frame(
+                kf_id, ts_ns, pose, scan_body, recovery_value, observe_only=True,
+                geometry_can_trigger=self.geometry_can_trigger)
+                        if recovery_value is not None and np.isfinite(recovery_value) else None)
+            self._observe_healthy_suffix(ep, scan_ns, decision)
+            if before is not None:
+                self.node.tx_mgr.register_quarantined_frame(kf_id, ts_ns)
+            self.frames_fed += 1
+            self._record_diag(kf_id, ts_ns, value, source, reference, status, kfs_before, pts_before)
+            self._track_episode(kf_id, ts_ns, pose)
+            return
         if available:
             if self.first_detected_kf is None:
                 self.first_detected_kf = kf_id
                 self.pose_convention_check = self._pose_convention_check(pose, scan_body, ts_ns)
-            self.node.step_frame(kf_id, ts_ns, pose, scan_body, value)
+            if self.online_refusal_wait_s is None:
+                self.node.step_frame(kf_id, ts_ns, pose, scan_body, value)
+            else:
+                self.node.step_frame(kf_id, ts_ns, pose, scan_body, value,
+                                     quarantine_ready=self._online_quarantine_ready,
+                                     geometry_can_trigger=self.geometry_can_trigger)
             self.frames_fed += 1
             det_state = getattr(self.node.detector.state, "value", self.node.detector.state)
             if self._first_alarm_ts_ns is None and det_state != "HEALTHY":
@@ -2054,7 +2160,11 @@ class NativeClosedLoop:
                 ep.meta = getattr(ep, "meta", {}) or {}
                 ep.meta["hold_skipped_host_state"] = self.host_native_state
             else:
-                self.cp.hold()
+                boundary = self._checkpoint_boundary(ep)
+                if self.imu_recovery is not None and boundary is not None:
+                    self.cp.hold_with_imu_probe(boundary)
+                else:
+                    self.cp.hold()
                 self._host_held = True
 
     def _checkpoint_boundary(self, ep: "Episode") -> Optional[int]:
@@ -2405,6 +2515,9 @@ class NativeClosedLoop:
         t_before_eval = time.time()
         report = None
         error = None
+        host_comparison = {}
+        if self.online_refusal_wait_s is not None:
+            host_comparison["observed_host_poses"] = {kf: pose for kf, _ts, pose in ep.frames}
         try:
             report = self.node.evaluate_and_commit_candidate(
                 ep.candidate_id,
@@ -2412,6 +2525,7 @@ class NativeClosedLoop:
                 incumbent_poses=incumbent,
                 reentry_anchor_pose=anchor,
                 reentry_anchor_ts_ns=anchor_ts_ns,
+                **host_comparison,
             )
         except BaseException as exc:       # a refused attempt must still be recorded
             error = {"candidate_id": ep.candidate_id, "error": f"{type(exc).__name__}: {exc}"}
@@ -2567,6 +2681,10 @@ class NativeClosedLoop:
                 ep.meta["native_resume"] = resume
                 self._host_held = False
             else:
+                if self.online_refusal_wait_s is not None:
+                    ep.refusal_started = time.monotonic()
+                    ep.meta["online_refusal"] = {"status": "WAIT_HEALTHY_SUFFIX"}
+                    return row
                 if caps is not None and not caps.supports("restore"):
                     # A host that cannot restore keeps the frames it just judged in its map.
                     # Saying "refused" without saying the rollback did not happen would read as
@@ -2604,6 +2722,136 @@ class NativeClosedLoop:
             # The decision is made; the next event needs its own trusted checkpoint.
             self.cp._last_snapshot_wall = time.time()
         return row
+
+    def _online_quarantine_ready(self, decision) -> bool:
+        boundary = int(decision.quarantine_start_ns)
+        checkpoints = []
+        for event in reversed(self.cp.events):
+            if event.get("command") != "snapshot":
+                continue
+            fields = self._native_ack(event)
+            if fields.get("valid") != "1":
+                continue
+            stamp = fields.get("stamp_ns", "")
+            if not stamp.isdigit():
+                continue
+            checkpoints.append(int(stamp))
+            if len(checkpoints) == 2:
+                break
+        if any(0 < stamp <= boundary for stamp in checkpoints):
+            return True
+        onset = int(decision.estimated_onset_ns)
+        alarm = self.unarmed_online_alarms.setdefault(onset, {
+            "reason": "NO_PREBOUNDARY_NATIVE_CHECKPOINT",
+            "estimated_onset_ns": onset,
+            "checkpoint_boundary_ns": boundary,
+            "last_acknowledged_checkpoint_ns": checkpoints,
+            "observations": 0,
+        })
+        alarm["observations"] += 1
+        return False
+
+    def _observe_healthy_suffix(self, ep: Episode, scan_ns: Optional[int], decision) -> None:
+        dwell = self.node.detector.cfg.min_dwell_windows
+        streak = ep.healthy_suffix
+        if (scan_ns is None or decision is None or decision.state != RecoveryState.HEALTHY
+                or (streak and scan_ns <= streak[-1])):
+            ep.healthy_suffix = []
+            return
+        # An unavailable match breaks the streak above. The host additionally checks these
+        # identities against its capture and refuses an omitted scan inside the suffix.
+        ep.healthy_suffix = (streak + [int(scan_ns)])[-dwell:]
+
+    @staticmethod
+    def _native_ack(event: Dict[str, Any]) -> Dict[str, str]:
+        if event.get("ok") is not True:
+            return {}
+        return dict(token.split("=", 1) for token in (event.get("ack") or "").split()
+                    if "=" in token)
+
+    def _service_online_refusal(self) -> None:
+        ep = self._open
+        if ep is None or ep.refusal_started is None:
+            return
+        trace = ep.meta["online_refusal"]
+        phase = trace["status"]
+        if phase.startswith("FAILED"):
+            return
+        if time.monotonic() - ep.refusal_started > self.online_refusal_wait_s:
+            trace["status"] = "FAILED_TIMEOUT_" + phase
+            return
+        if self.cp.pending():
+            return
+        if phase == "WAIT_HEALTHY_SUFFIX":
+            suffix = ep.healthy_suffix
+            if len(suffix) < self.node.detector.cfg.min_dwell_windows:
+                return
+            boundary = self._checkpoint_boundary(ep)
+            if boundary is None or not self._host_held:
+                trace["status"] = "FAILED_NO_BOUNDARY_OR_HOLD"
+                return
+            action = self.cp.reprocess_refusal(boundary, suffix)
+            trace.update(status="WAIT_NATIVE_REPLAY", healthy_scan_starts_ns=list(suffix),
+                         checkpoint_boundary_ns=boundary, replay_request=action)
+            return
+        if phase == "WAIT_NATIVE_REPLAY":
+            queued = self._native_ack(trace["replay_request"])
+            if queued.get("valid") != "1":
+                trace["status"] = "FAILED_REPLAY_REQUEST"
+                return
+            try:
+                target = int(queued["target_ns"])
+                target_scan = int(queued["target_scan_ns"])
+                count = int(queued["queued"])
+                checkpoint = int(queued["checkpoint_stamp_ns"])
+            except (KeyError, ValueError):
+                trace["status"] = "FAILED_MISSING_REPLAY_IDENTITY"
+                return
+            if (not 0 < checkpoint <= trace["checkpoint_boundary_ns"]
+                    or count < len(trace["healthy_scan_starts_ns"])
+                    or abs(target_scan - trace["healthy_scan_starts_ns"][-1]) > 1024
+                    or target < target_scan):
+                trace["status"] = "FAILED_REPLAY_IDENTITY"
+                return
+            trace.update(status="WAIT_REPLAY_DRAIN", status_request=self.cp.request_status())
+            return
+        if phase == "WAIT_REPLAY_DRAIN":
+            observed = self._native_ack(trace["status_request"])
+            queued = self._native_ack(trace["replay_request"])
+            if not observed:
+                trace["status"] = "FAILED_STATUS_REQUEST"
+                return
+            if observed.get("replay_remaining") != "0":
+                trace["status_request"] = self.cp.request_status()
+                return
+            if (observed.get("refusal_consumed") != queued.get("queued")
+                    or observed.get("stamp_ns") != queued.get("target_ns")
+                    or observed.get("map_writes") != "held"):
+                trace["status"] = "FAILED_REPLAY_RECEIPT"
+                return
+            if queued.get("comparison") == "1":
+                trace["paired_native_outcomes"] = self.cp.refusal_comparison(
+                    int(queued["checkpoint_stamp_ns"]), int(queued["target_ns"]), int(queued["queued"]))
+            trace.update(status="WAIT_RELEASE", native_completion=dict(observed),
+                         resume_request=self.cp.resume())
+            return
+        if phase == "WAIT_RELEASE":
+            resumed = self._native_ack(trace["resume_request"])
+            queued = self._native_ack(trace["replay_request"])
+            if (resumed.get("valid") != "1" or resumed.get("map_writes") != "released"
+                    or resumed.get("stamp_ns") != queued.get("target_ns")):
+                trace["status"] = "FAILED_RESUME_RECEIPT"
+                return
+            tx = self.node.tx_mgr
+            restored_ns = int(queued["target_ns"])
+            tx.abandon_segment(ep.segment_id, "NATIVE_REFUSAL_CAUGHT_UP", restored_ns)
+            self.node.detector.reset()
+            tx.rearm()
+            self._lifecycle_seen = len(tx.lifecycle_events)
+            self._first_alarm_ts_ns = None
+            self._host_held = False
+            ep.refusal_started = None
+            trace["status"] = "RELEASED_AND_REARMED"
 
     def _close_stalled_wait(self, now_wall: float) -> None:
         """Close a Mode 3 wait on wall time, even when no frame arrives.
@@ -2644,7 +2892,8 @@ class NativeClosedLoop:
         """Perform a decision the callbacks have asked for. Runs on the main thread only."""
         # The wait limit belongs to the manager, not to the host: a refused Mode 3 has to be
         # closable even when no command channel exists.
-        self._close_stalled_wait(time.time())
+        if self.online_refusal_wait_s is None or not self._host_held:
+            self._close_stalled_wait(time.time())
         if self.cp is not None:
             # Account for commands written from the callback (the hold) before issuing anything
             # blocking, so one ack is never attributed to the wrong command.
@@ -2656,12 +2905,19 @@ class NativeClosedLoop:
             # A snapshot that has not answered in half a second is dropped, not waited on: the
             # decision path runs on this thread and must never queue behind a map copy.
             self.cp.expire_pending(0.5)
-            self._apply_lifecycle()
+            if self.online_refusal_wait_s is not None:
+                self._service_online_refusal()
+                if self._open is not None and self._open.refusal_started is not None:
+                    return None
+            if self.online_refusal_wait_s is None or not self._host_held:
+                self._apply_lifecycle()
         # The rolling checkpoint is taken here, on the main thread, while no episode is open: a
         # deep copy of the map inside a subscriber callback would delay exactly the frames the
         # pairing depends on.
         if (self.cp is not None and self.node.tx_mgr.active_quarantine is None
-                and not self.scripted_trigger_stamps_ns):
+                and not self.scripted_trigger_stamps_ns
+                and (self.online_refusal_wait_s is None or
+                     (not self._host_held and self.node.detector.state == RecoveryState.HEALTHY))):
             # A scripted run declares its checkpoints at the trigger stamps ahead of time. Rolling
             # snapshots are not just redundant there: one issued before a trigger can be applied
             # after it under backlog and overwrite the armed checkpoint, so the restore then rolls
@@ -2671,6 +2927,7 @@ class NativeClosedLoop:
             # A command is in flight: no new candidate is built until the host has applied it.
             # Armed commands for a later declared stamp are not in flight.
             return None
+        self._release_closed_episode_cache()
         if self.pending_decision is None or self._open is None or self._open.decided:
             return None
         if backlog_limit and (len(self.pairer._poses) + len(self.pairer._scans)) > backlog_limit:
@@ -2680,6 +2937,30 @@ class NativeClosedLoop:
         basis = self.pending_decision
         self.pending_decision = None
         return self.decide(self._last_ts_ns or self._open.trigger_ts_ns, basis)
+
+    def _release_closed_episode_cache(self) -> None:
+        """Drop raw repair copies after the decision and its native commands finish."""
+        if self.node.tx_mgr.active_quarantine is not None:
+            return
+        for ep in self.episodes:
+            if not ep.decided or "cache_cleanup" in ep.meta:
+                continue
+            indexed = raw_messages = 0
+            for kf, _stamp, _pose in ep.frames:
+                scan = self._scan_index.pop(kf, None)
+                if scan is not None:
+                    indexed += 1
+                    if self._scan_msgs.pop(scan[0], None) is not None:
+                        raw_messages += 1
+            ep.meta["cache_cleanup"] = {
+                "scan_index_entries": indexed,
+                "raw_message_cache_entries": raw_messages,
+                "frozen_frame_count": len(ep.frozen_frames),
+            }
+            ep.frozen_frames.clear()
+        if self._open is not None and self._open.decided:
+            self._last_incumbent.clear()
+            self._last_icp_delta = None
 
     def _apply_lifecycle(self) -> None:
         """Follow the manager's lifecycle: the host may write again when quarantine ends.
@@ -2853,6 +3134,7 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
         "run_id": loop.run_id,
         "candidate_source": loop.candidate_source,
         "detection_enabled": loop.detection_enabled,
+        "unarmed_online_alarms": list(loop.unarmed_online_alarms.values()),
         # A7 v2 cleared the gauge dependence: the transported weak direction is no longer
         # re-normalised by a non-Ad-invariant length, and the covariance is carried back to the
         # trigger frame's body basis before it meets a fixed tolerance. Verified locally by
@@ -2915,7 +3197,8 @@ def build_summary(loop: NativeClosedLoop, extra: Dict[str, Any]) -> Dict[str, An
                  "frame_freeze": {
                      "frozen": bool(ep.frozen),
                      "frozen_at_ns": ep.frozen_at_ns,
-                     "frozen_frames": len(ep.frozen_frames),
+                     "frozen_frames": ep.meta.get("cache_cleanup", {}).get(
+                         "frozen_frame_count", len(ep.frozen_frames)),
                      "frames_after_freeze": int(ep.frames_after_freeze),
                  },
                  "frames_registered": len(ep.frames), **(getattr(ep, "meta", {}) or {})}
@@ -3528,10 +3811,25 @@ def main(argv: Optional[List[str]] = None) -> int:
                     help="write one JSON line per paired frame to this path: the support mask "
                          "evaluation and the NIS branch that decided whether the frame was fed to "
                          "the detector. No cap, no change to the decision")
+    ap.add_argument("--imu-recovery-observation", action="store_true",
+                    help="compare checkpoint-based IMU prediction and deskew after native hold")
+    ap.add_argument("--online-health-evidence", choices=("joint", "innovation"), default="joint",
+                    help="innovation scopes native refusal testing to consistency alarms; "
+                         "geometry still informs routing and candidate validation")
+    ap.add_argument("--online-refusal-catchup-sec", type=float, default=0.0,
+                    help="opt-in automatic refusal catch-up budget with native private observations")
     ap.add_argument("--repair-sham", action="store_true", default=False,
                     help="sham control: publish the same number of clouds with the same batching "
                          "and receipts, but unchanged (zero shift); isolates the correction")
     args, _unknown = ap.parse_known_args(argv)
+    online_refusal = args.online_refusal_catchup_sec > 0.0
+    if args.imu_recovery_observation and not online_refusal:
+        ap.error("--imu-recovery-observation requires online refusal")
+    if args.online_health_evidence == "innovation" and not online_refusal:
+        ap.error("--online-health-evidence innovation requires online refusal")
+    if online_refusal and (not args.checkpoint_dir or args.detection != "on"
+                           or args.scripted_triggers or args.scripted_trigger_stamps):
+        ap.error("online refusal requires checkpoint-dir and detection=on without scripted triggers")
 
     import rospy
     rospy.init_node("slam_recovery_native_loop", anonymous=False, disable_signals=False)
@@ -3539,7 +3837,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     node = OnlineRecoveryTransactionNode(
         confirmation_margin_sec=args.confirmation_margin_sec,
         sigma_meas_m=args.sigma_meas_m,
-        wait_limit_sec=(args.wait_limit_sec if args.wait_limit_sec > 0 else None),
+        wait_limit_sec=(args.wait_limit_sec if args.wait_limit_sec > 0 and not online_refusal else None),
     )
     run_id = os.path.basename(os.path.normpath(args.run_dir))
     loop = NativeClosedLoop(
@@ -3559,6 +3857,9 @@ def main(argv: Optional[List[str]] = None) -> int:
         repair_dry_run=args.repair_dry_run,
         repair_sham=args.repair_sham,
         availability_log=(args.availability_log or None),
+        online_refusal_wait_s=(args.online_refusal_catchup_sec if online_refusal else None),
+        online_health_evidence=args.online_health_evidence,
+        imu_recovery_observation=args.imu_recovery_observation,
     )
     if args.scripted_triggers:
         loop.scripted_triggers_s = [float(x) for x in args.scripted_triggers.split(",") if x.strip()]
@@ -3586,6 +3887,15 @@ def main(argv: Optional[List[str]] = None) -> int:
             return 2
         if contract_problems:
             rospy.logerr("[slam_recovery] --require-contract: %s", "; ".join(contract_problems))
+            return 2
+    if online_refusal:
+        caps = loop.cp.capabilities()
+        if (caps is None or not caps.supports("reprocess_refusal")
+                or caps.raw.get("refusal_observation_topic") != args.pose_topic):
+            rospy.logerr("online refusal requires the host's declared private observation topic and catch-up")
+            return 2
+        if args.imu_recovery_observation and caps.raw.get("imu_recovery_observation") != "YES":
+            rospy.logerr("IMU recovery requires the host checkpoint observation contract")
             return 2
     if loop.cp is not None and loop.scripted_trigger_stamps_ns:
         # Every scripted stamp gets its own armed hold/snapshot, but each pair is written shortly

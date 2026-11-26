@@ -40,8 +40,11 @@ def shift_z_cloud(msg, dz: float):
     """
     step = int(msg.point_step)
     off = z_field_offset(msg)
-    raw = np.frombuffer(bytes(msg.data), dtype=np.uint8).reshape(-1, step).copy()
-    z = raw[:, off:off + 4].view(np.float32).reshape(-1)
+    raw = bytearray(msg.data)
+    # PointCloud2 interleaves fields. View z directly with the original point and row strides.
+    z = np.ndarray((int(msg.height), int(msg.width)),
+                   dtype=">f4" if msg.is_bigendian else "<f4",
+                   buffer=raw, offset=off, strides=(int(msg.row_step), step))
     z += np.float32(dz)
     out = type(msg)()
     out.header = msg.header
@@ -51,7 +54,7 @@ def shift_z_cloud(msg, dz: float):
     out.is_bigendian = msg.is_bigendian
     out.point_step = msg.point_step
     out.row_step = msg.row_step
-    out.data = raw.tobytes()
+    out.data = bytes(raw)
     out.is_dense = msg.is_dense
     return out
 

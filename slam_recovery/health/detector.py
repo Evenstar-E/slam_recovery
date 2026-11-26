@@ -154,7 +154,7 @@ class JointHealthDetector:
         self.suspect_dwell = 0
         self.suspect_onset_ns = None
 
-    def step(self, window: HealthWindow) -> HealthDecision:
+    def step(self, window: HealthWindow, *, geometry_can_trigger: bool = True) -> HealthDecision:
         g_t = self.update_cusum(window.nis_mean)
 
         geo_weak = (
@@ -166,7 +166,7 @@ class JointHealthDetector:
         sync_alarm = abs(window.Cross_corr_lag_sec) > self.cfg.sync_lag_sec_th
         loop_alarm = window.loop_residual_spike > self.cfg.loop_spike_th
 
-        any_soft_alarm = geo_weak or nis_alarm or loso_alarm or sync_alarm or loop_alarm
+        any_soft_alarm = (geo_weak and geometry_can_trigger) or nis_alarm or loso_alarm or sync_alarm or loop_alarm
         score = float(
             max(
                 g_t / max(self.cfg.nis_cusum_h, 1e-6),
@@ -213,6 +213,8 @@ class JointHealthDetector:
                 "cusum": g_t,
                 "min_eig_rot": window.min_eig_rot,
                 "min_eig_trans": window.min_eig_trans,
+                "geometry_weak": float(geo_weak),
+                "innovation_alarm": float(nis_alarm),
                 "loso_primary": window.loso_primary_conflict,
             },
         )

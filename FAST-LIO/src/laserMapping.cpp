@@ -3,6 +3,8 @@
 #include <math.h>
 #include <thread>
 #include <fstream>
+#include <iomanip>
+#include <memory>
 #include <csignal>
 #include <unistd.h>
 #include <Python.h>
@@ -44,8 +46,8 @@ bool runtime_pos_log = false, pcd_save_en = false, time_sync_en = false;
 
 
 //NOTE:
-bool hasPubsleep = false;
-bool hasPubbuild = false;
+
+
 
 float res_last[100000] = {0.0}; 
 float DET_RANGE = 300.0f;         
@@ -128,6 +130,9 @@ shared_ptr<ImuProcess> p_imu(new ImuProcess());
 #include <sstream>
 #include <iomanip>
 
+BoxPointType LocalMap_Points;
+bool Localmap_Initialized = false;
+
 struct NrCheckpoint
 {
     bool valid = false;
@@ -136,22 +141,52 @@ struct NrCheckpoint
     PointVector map_pts;
     double stamp = -1.0;
     long frame = -1;
-    double last_imu_time = -1.0;      // IMU cursor at snapshot (p_imu internals are NOT in the cp)
-    double last_lidar_time = -1.0;
+    ImuProcess::RecoveryState imu;
+    BoxPointType local_map;
+    bool local_map_initialized = false;
+    double first_lidar_stamp = 0.0;
+    int queue_index = 0;
+    esekfom::esekf<state_ikfom, 12, input_ikfom> queue[kfQueLength], degradation_pre;
+    int degradation_count = 0, degradation_history = 0;
+    bool dynamic_imu = false, is_publish = false, pub_sleep = false, pub_build = false;
 };
 struct NrGroup
 {
     PointCloudXYZI::Ptr lidar;
     std::deque<sensor_msgs::Imu::ConstPtr> imu;
     double beg = 0.0, end = 0.0;
-    bool replayed = false;
+    bool repaired = false;
+    bool imu_only = false;
 };
 static std::mutex g_nr_mtx;
 static std::deque<std::pair<std::string, std::string>> g_nr_pending;   // cmd, payload
+static std::deque<NrGroup> g_nr_replay_groups;
 static std::deque<NrGroup> g_nr_groups;                                // consumed since snapshot
 static std::atomic<bool> g_nr_hold{false};
 static std::atomic<bool> g_nr_replay{false};
-static NrCheckpoint g_nr_cp;
+static NrCheckpoint g_nr_cp, g_nr_previous_cp;
+static bool g_nr_online_refusal = false;
+static bool g_nr_history_truncated = false;
+static std::deque<NrGroup> g_nr_after_refusal;
+static long long g_nr_refusal_target = 0;
+static int g_nr_refusal_consumed = 0, g_nr_refusal_expected = 0;
+static bool g_nr_compare_refusal = true;
+static bool g_nr_native_arm_running = false;
+static bool g_nr_refusal_comparison = false;
+static std::deque<NrGroup> g_nr_intervention_groups;
+static std::ofstream g_nr_comparison_trace;
+static bool g_nr_imu_probe_enabled = false;
+struct NrImuProbe
+{
+    esekfom::esekf<state_ikfom, 12, input_ikfom> filter;
+    ImuProcess imu;
+    PointCloudXYZI::Ptr deskewed{new PointCloudXYZI()};
+    long long checkpoint_ns = 0;
+    double end = 0.0;
+};
+static std::unique_ptr<NrImuProbe> g_nr_imu_probe;
+static std::ofstream g_nr_imu_trace;
+static long long nr_ns(double stamp) { return std::llround(stamp * 1e9); }
 static long g_nr_frame = 0;
 static double g_nr_lidar_end = -1.0;
 static std::atomic<int> g_nr_repair_received{0}, g_nr_repair_applied{0};
@@ -166,8 +201,12 @@ struct NrDeferred
     long long stamp_ns = 0;
 };
 static std::deque<NrDeferred> g_nr_deferred;   // hold/snapshot armed with an apply stamp
-static std::map<long long, bool> g_nr_replay_marks;    // group end ns -> pushed by reprocess
-static std::map<long long, bool> g_nr_repaired_marks;  // group end ns -> carried a repaired cloud
+static int g_nr_degradation_count = 0, g_nr_degradation_history = 0;
+static bool g_nr_dynamic_imu = false, g_nr_is_publish = false;
+bool hasPubsleep = false;
+bool hasPubbuild = false;
+static int g_nr_repaired_map_updates = 0;
+static std::ofstream g_nr_updates;
 static bool g_nr_cur_is_replay = false;
 static bool g_nr_cur_repaired = false;
 static int g_nr_replay_remaining = 0;
@@ -180,6 +219,16 @@ static bool g_nr_host_reset = false;   // re_slam ran; true until odometry is pu
 static void nr_write_ack(const std::string& text)
 {
     if (g_nr_dir.empty()) return;
+    // The same boundary group can apply hold and snapshot back-to-back.
+    if (text.rfind("OK hold applied ", 0) == 0 || text.rfind("OK hold valid=0 ", 0) == 0)
+    {
+        const std::string path = g_nr_dir + "/ack.hold";
+        {
+            std::ofstream hold(path + ".tmp", std::ios::trunc);
+            hold << text << "\n";
+        }
+        std::rename((path + ".tmp").c_str(), path.c_str());
+    }
     std::ofstream out(g_nr_dir + "/ack", std::ios::trunc);
     out << text << "\n";
 }
@@ -206,6 +255,9 @@ static void nr_write_caps()
            "  \"restore\": \"YES\",\n"
            "  \"hold\": \"YES\",\n"
            "  \"reprocess\": \"PARTIAL\",\n"
+           "  \"reprocess_refusal\": \"" << (g_nr_online_refusal ? "YES" : "NO") << "\",\n"
+           "  \"refusal_observation_topic\": \"/native_recovery/observation_odom\",\n"
+           "  \"imu_recovery_observation\": \"" << (g_nr_imu_probe_enabled ? "YES" : "NO") << "\",\n"
            "  \"set_state\": \"NO\",\n"
            "  \"measurement_relay\": \"YES\",\n"
            "  \"checkpoint_contents\": [\"eskf_state\", \"eskf_cov\", \"ikdtree_points\", \"time_cursor\"],\n"
@@ -249,7 +301,9 @@ static void nr_poll_thread()
                 std::rename(cmd_path.c_str(), (g_nr_dir + "/cmd.done").c_str());
                 { std::lock_guard<std::mutex> lk(g_nr_mtx); g_nr_pending.emplace_back(cmd, payload); }
                 std::ofstream rec(ack_recv, std::ios::trunc);
-                rec << "RECEIVED " << cmd << "\n";
+                const ros::WallTime received = ros::WallTime::now();
+                rec << "RECEIVED " << cmd << " wall=" << received.sec << '.'
+                    << std::setw(9) << std::setfill('0') << received.nsec << "\n";
             }
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
@@ -258,7 +312,7 @@ static void nr_poll_thread()
 // One row per consumed group: the trailing field is the group's fate.
 static void nr_log_fate(double end_time, double beg_time, const char* fate)
 {
-    if (!g_nr_fates.is_open()) return;
+    if (!g_nr_fates.is_open() || g_nr_native_arm_running) return;
     g_nr_fates << "{\"frame\":" << g_nr_frame << ",\"stamp_ns\":" << (long long)std::llround(end_time * 1e9)
                << ",\"beg_s\":" << std::fixed << std::setprecision(6) << beg_time
                << ",\"end_s\":" << end_time << ",\"fate\":\"" << fate << "\"}\n";
@@ -284,19 +338,19 @@ static bool nr_take_repair(double beg, double end, PointCloudXYZI::Ptr& out)
 }
 static void nr_capture_group()
 {
-    // Called after a group is taken from the buffers; decides this group's identity (replayed or
-    // live, carried a repaired cloud or not) from the marks written when the replay was queued.
+    if (g_nr_cur_is_replay || !g_nr_cp.valid) return;
     std::lock_guard<std::mutex> lk(g_nr_mtx);
-    const long long key = (long long)std::llround(lidar_end_time * 1e9);
-    g_nr_cur_is_replay = g_nr_replay_marks.erase(key) > 0;
-    g_nr_cur_repaired = g_nr_repaired_marks.erase(key) > 0;
     NrGroup g;
     g.lidar = Measures.lidar;
     g.imu = Measures.imu;
     g.beg = Measures.lidar_beg_time;
     g.end = lidar_end_time;
     g_nr_groups.push_back(g);
-    if (g_nr_groups.size() > 4000) g_nr_groups.pop_front();
+    if (g_nr_groups.size() > 4000)
+    {
+        g_nr_groups.pop_front();
+        g_nr_history_truncated = true;
+    }
 }
 static bool nr_restore_locked(std::string& why)
 {
@@ -311,25 +365,148 @@ static bool nr_restore_locked(std::string& why)
     ikdtree.clear();
     if (!g_nr_cp.map_pts.empty()) ikdtree.Build(g_nr_cp.map_pts);
     flg_EKF_inited = true;
-    // Rewind the input cursors too: without this a replayed IMU stream is judged stale or is
-    // propagated from a cursor later than the snapshot. p_imu's internal bias/init state is NOT
-    // checkpointed (declared in capabilities.json).
-    if (g_nr_cp.last_imu_time > 0.0) last_timestamp_imu = g_nr_cp.last_imu_time;
-    if (g_nr_cp.last_lidar_time > 0.0) last_timestamp_lidar = g_nr_cp.last_lidar_time;
+    p_imu->restore_recovery_state(g_nr_cp.imu);
+    LocalMap_Points = g_nr_cp.local_map;
+    Localmap_Initialized = g_nr_cp.local_map_initialized;
+    first_lidar_time = g_nr_cp.first_lidar_stamp;
+    kfindex = g_nr_cp.queue_index;
+    for (int i = 0; i < kfQueLength; ++i) kfqueue[i] = g_nr_cp.queue[i];
+    Degradationpre_point = g_nr_cp.degradation_pre;
+    g_nr_degradation_count = g_nr_cp.degradation_count;
+    g_nr_degradation_history = g_nr_cp.degradation_history;
+    g_nr_dynamic_imu = g_nr_cp.dynamic_imu;
+    g_nr_is_publish = g_nr_cp.is_publish;
+    hasPubsleep = g_nr_cp.pub_sleep;
+    hasPubbuild = g_nr_cp.pub_build;
     g_nr_lidar_end = g_nr_cp.stamp;
     g_nr_frame = g_nr_cp.frame;
     return true;
 }
+static bool nr_advance_imu_probe(NrImuProbe& probe, const MeasureGroup& group, double end)
+{
+    if (end <= probe.end || group.imu.empty() || !group.lidar || group.lidar->empty())
+        return false;
+    probe.imu.Process(group, probe.filter, probe.deskewed, probe.filter);
+    probe.end = end;
+    return probe.deskewed->size() == group.lidar->size();
+}
+
+static bool nr_start_imu_probe(long long boundary)
+{
+    if (!g_nr_imu_trace.is_open() || g_nr_history_truncated || boundary <= 0) return false;
+    const bool use_latest = g_nr_cp.valid && nr_ns(g_nr_cp.stamp) <= boundary;
+    const auto& checkpoint = use_latest ? g_nr_cp : g_nr_previous_cp;
+    if (!checkpoint.valid || nr_ns(checkpoint.stamp) > boundary ||
+        checkpoint.imu.need_init || !checkpoint.imu.last_imu) return false;
+    auto trial = std::unique_ptr<NrImuProbe>(new NrImuProbe());
+    trial->filter = kf;
+    auto state = checkpoint.x;
+    trial->filter.change_x(state);
+    Eigen::Matrix<double, 23, 23> cov = checkpoint.P;
+    trial->filter.change_P(cov);
+    trial->imu.restore_recovery_state(checkpoint.imu);
+    trial->imu.cov_bias_acc = p_imu->cov_bias_acc;
+    trial->imu.cov_bias_gyr = p_imu->cov_bias_gyr;
+    trial->checkpoint_ns = nr_ns(checkpoint.stamp);
+    trial->end = checkpoint.stamp;
+    for (const auto& group : g_nr_groups)
+    {
+        if (group.end <= checkpoint.stamp) continue;
+        MeasureGroup measurement;
+        measurement.lidar = group.lidar;
+        measurement.imu = group.imu;
+        measurement.lidar_beg_time = group.beg;
+        if (!nr_advance_imu_probe(*trial, measurement, group.end)) return false;
+    }
+    if (trial->end != g_nr_lidar_end) return false;
+    g_nr_imu_probe = std::move(trial);
+    return true;
+}
+
+static void nr_write_imu_observation(const state_ikfom& fused)
+{
+    if (!g_nr_imu_probe || !g_nr_hold.load() || g_nr_cur_is_replay) return;
+    const auto predicted = g_nr_imu_probe->filter.get_x();
+    const auto cov = g_nr_imu_probe->filter.get_P();
+    const double sigma_pos = std::sqrt(cov.template block<3, 3>(0, 0).trace());
+    if (!std::isfinite(sigma_pos) || !predicted.pos.allFinite() ||
+        !predicted.rot.coeffs().allFinite() || !fused.pos.allFinite() ||
+        !fused.rot.coeffs().allFinite()) return;
+    // Native deskew sorts a copy of this array by point time and preserves its ordering.
+    PointVector raw = Measures.lidar->points;
+    std::sort(raw.begin(), raw.end(), time_list);
+    const auto& deskewed = g_nr_imu_probe->deskewed->points;
+    const size_t step = std::max<size_t>(1, raw.size() / 300);
+    std::ostringstream out;
+    out << std::setprecision(10)
+        << "{\"scan_ns\":" << nr_ns(Measures.lidar_beg_time)
+        << ",\"end_ns\":" << nr_ns(lidar_end_time)
+        << ",\"checkpoint_ns\":" << g_nr_imu_probe->checkpoint_ns
+        << ",\"position_sigma_m\":" << sigma_pos << ",\"points\":[";
+    for (size_t j = 0, i = 0; i < raw.size() && j < 300; ++j, i += step)
+    {
+        const V3D p(raw[i].x, raw[i].y, raw[i].z);
+        const V3D d(deskewed[i].x, deskewed[i].y, deskewed[i].z);
+        const V3D a = fused.rot * (fused.offset_R_L_I * p + fused.offset_T_L_I) + fused.pos;
+        const V3D b = predicted.rot * (predicted.offset_R_L_I * p + predicted.offset_T_L_I) + predicted.pos;
+        const V3D c = predicted.rot * (predicted.offset_R_L_I * d + predicted.offset_T_L_I) + predicted.pos;
+        if (!a.allFinite() || !b.allFinite() || !c.allFinite()) return;
+        if (j) out << ',';
+        out << '[' << a(0) << ',' << a(1) << ',' << a(2) << ','
+            << b(0) << ',' << b(1) << ',' << b(2) << ','
+            << c(0) << ',' << c(1) << ',' << c(2) << ']';
+    }
+    g_nr_imu_trace << out.str() << "]}" << std::endl;
+}
+
+static void nr_record_comparison_frame(const char* result)
+{
+    if (!g_nr_refusal_comparison || !g_nr_refusal_target || !g_nr_cur_is_replay ||
+        !g_nr_comparison_trace.is_open()) return;
+    g_nr_comparison_trace << "{\"checkpoint_ns\":" << nr_ns(g_nr_cp.stamp)
+        << ",\"target_ns\":" << g_nr_refusal_target
+        << ",\"branch\":\"" << (g_nr_native_arm_running ? "native" : "refusal")
+        << "\",\"scan_ns\":" << nr_ns(Measures.lidar_beg_time)
+        << ",\"end_ns\":" << nr_ns(lidar_end_time)
+        << ",\"result\":\"" << result << "\"}\n";
+}
+
+static void nr_start_refusal_after_native_arm()
+{
+    if (!g_nr_native_arm_running || !g_nr_replay_groups.empty()) return;
+    g_nr_native_arm_running = false;
+    std::string why;
+    if (!nr_restore_locked(why))
+    {
+        ROS_ERROR("Cannot restore refusal comparison checkpoint: %s", why.c_str());
+        return;
+    }
+    g_nr_replay_groups.swap(g_nr_intervention_groups);
+    g_nr_replay_remaining = static_cast<int>(g_nr_replay_groups.size());
+    g_nr_replay.store(!g_nr_replay_groups.empty());
+}
+
 static void nr_execute(const std::string& cmd, const std::string& payload)
 {
         if (cmd == "status")
         {
+            if (g_nr_replay_groups.empty())
+            {
+                if (g_nr_fates.is_open()) g_nr_fates.flush();
+                if (g_nr_comparison_trace.is_open()) g_nr_comparison_trace.flush();
+            }
             std::ostringstream s;
             s << "OK status valid=" << (g_nr_cp.valid ? 1 : 0)
               << " repair_received=" << g_nr_repair_received.load()
               << " repair_applied=" << g_nr_repair_applied.load()
               << " repaired_in_update=" << g_nr_repaired_in_update
               << " last_repaired_update_ns=" << g_nr_last_repaired_update_ns
+              << " repaired_map_updates=" << g_nr_repaired_map_updates
+              << " replay_remaining=" << g_nr_replay_remaining
+              << " refusal_target_ns=" << g_nr_refusal_target
+              << " refusal_consumed=" << g_nr_refusal_consumed
+              << " refusal_expected=" << g_nr_refusal_expected
+              << " map_points=" << ikdtree.validnum()
               << " deferred_resets=" << g_nr_deferred_resets
               << " frame=" << g_nr_frame;
             if (g_nr_lidar_end > 0.0)
@@ -344,13 +521,39 @@ static void nr_execute(const std::string& cmd, const std::string& payload)
             if (g_nr_lidar_end <= 0.0) { nr_write_ack("OK hold valid=0 reason=no_timebase"); return; }
             g_nr_hold.store(true);
             nr_write_pgo_hold(true);
+            const std::string prefix = "imu_before_ns=";
+            const bool imu_requested = g_nr_imu_probe_enabled && payload.rfind(prefix, 0) == 0;
+            bool imu_started = false;
+            if (imu_requested)
+            {
+                g_nr_imu_probe.reset();
+                try { imu_started = nr_start_imu_probe(std::stoll(payload.substr(prefix.size()))); }
+                catch (const std::invalid_argument&) {}
+                catch (const std::out_of_range&) {}
+            }
             std::ostringstream s;
             s << "OK hold applied valid=1 stamp_ns=" << (long long)std::llround(g_nr_lidar_end * 1e9)
               << " frame=" << g_nr_frame << " map_writes=held";
+            if (imu_requested)
+                s << " imu_probe=" << (imu_started ? "started" : "unavailable");
             nr_write_ack(s.str());
         }
         else if (cmd == "release" || cmd == "resume")
         {
+            if (g_nr_refusal_target &&
+                (!g_nr_replay_groups.empty() || g_nr_refusal_consumed != g_nr_refusal_expected ||
+                 nr_ns(g_nr_lidar_end) != g_nr_refusal_target))
+            {
+                nr_write_ack("OK resume valid=0 reason=refusal_not_consumed");
+                return;
+            }
+            if (g_nr_refusal_target)
+            {
+                g_nr_refusal_target = 0;
+                g_nr_refusal_comparison = false;
+                g_nr_cp.valid = g_nr_previous_cp.valid = false;
+            }
+            g_nr_imu_probe.reset();
             g_nr_hold.store(false);
             nr_write_pgo_hold(false);
             std::ostringstream s;
@@ -364,6 +567,20 @@ static void nr_execute(const std::string& cmd, const std::string& payload)
             if (g_nr_lidar_end <= 0.0) { nr_write_ack("OK snapshot valid=0 reason=no_timebase"); return; }
             if (g_nr_host_reset) { nr_write_ack("OK snapshot valid=0 reason=host_reset_no_map"); return; }
             std::lock_guard<std::mutex> lk(g_nr_mtx);
+            if (g_nr_online_refusal && g_nr_hold.load())
+            {
+                nr_write_ack("OK snapshot valid=0 reason=recovery_held");
+                return;
+            }
+            if (g_nr_online_refusal)
+            {
+                g_nr_previous_cp = std::move(g_nr_cp);
+                while (!g_nr_groups.empty() && g_nr_groups.front().end <= g_nr_previous_cp.stamp)
+                    g_nr_groups.pop_front();
+                // The first snapshot after a reset starts a new capture.
+                if (!g_nr_previous_cp.valid) g_nr_groups.clear();
+            }
+            else g_nr_groups.clear();
             g_nr_cp.x = kf.get_x();
             g_nr_cp.P = kf.get_P();
             g_nr_cp.map_pts.clear();
@@ -375,11 +592,22 @@ static void nr_execute(const std::string& cmd, const std::string& payload)
             }
             g_nr_cp.stamp = g_nr_lidar_end;
             g_nr_cp.frame = g_nr_frame;
-            g_nr_cp.last_imu_time = last_timestamp_imu;
-            g_nr_cp.last_lidar_time = last_timestamp_lidar;
+            g_nr_cp.imu = p_imu->recovery_state();
+            g_nr_cp.local_map = LocalMap_Points;
+            g_nr_cp.local_map_initialized = Localmap_Initialized;
+            g_nr_cp.first_lidar_stamp = first_lidar_time;
+            g_nr_cp.queue_index = kfindex;
+            for (int i = 0; i < kfQueLength; ++i) g_nr_cp.queue[i] = kfqueue[i];
+            g_nr_cp.degradation_pre = Degradationpre_point;
+            g_nr_cp.degradation_count = g_nr_degradation_count;
+            g_nr_cp.degradation_history = g_nr_degradation_history;
+            g_nr_cp.dynamic_imu = g_nr_dynamic_imu;
+            g_nr_cp.is_publish = g_nr_is_publish;
+            g_nr_cp.pub_sleep = hasPubsleep;
+            g_nr_cp.pub_build = hasPubbuild;
             g_nr_cp.valid = true;
             g_nr_cp_invalidated_by_reslam = false;
-            g_nr_groups.clear();
+            if (!g_nr_previous_cp.valid) g_nr_history_truncated = false;
             std::ostringstream s;
             s << "OK snapshot applied valid=1 stamp_ns=" << (long long)std::llround(g_nr_cp.stamp * 1e9)
               << " frame=" << g_nr_cp.frame << " map_points=" << g_nr_cp.map_pts.size();
@@ -398,6 +626,103 @@ static void nr_execute(const std::string& cmd, const std::string& payload)
                 s << "OK restore valid=0 reason=" << why;
             nr_write_ack(s.str());
         }
+        else if (cmd == "reprocess_refusal" && g_nr_online_refusal)
+        {
+            std::lock_guard<std::mutex> lk(g_nr_mtx);
+            std::istringstream request(payload);
+            long long boundary = 0, scan = 0;
+            std::vector<long long> confirmed;
+            request >> boundary;
+            while (request >> scan) confirmed.push_back(scan);
+            if (!g_nr_hold.load() || g_nr_refusal_target || !g_nr_replay_groups.empty() ||
+                boundary <= 0 || confirmed.empty() ||
+                !std::is_sorted(confirmed.begin(), confirmed.end()) || boundary >= confirmed.front())
+            {
+                nr_write_ack("OK reprocess_refusal valid=0 reason=invalid_request");
+                return;
+            }
+
+            const bool use_latest = g_nr_cp.valid && nr_ns(g_nr_cp.stamp) <= boundary;
+            const NrCheckpoint& checkpoint = use_latest ? g_nr_cp : g_nr_previous_cp;
+            if (!checkpoint.valid || nr_ns(checkpoint.stamp) > boundary || g_nr_history_truncated)
+            {
+                nr_write_ack("OK reprocess_refusal valid=0 reason=no_preboundary_checkpoint_or_history");
+                return;
+            }
+
+            // ROS stamps and the host's floating point time cursor can differ by sub-microseconds.
+            constexpr long long match_ns = 1024;
+            std::deque<NrGroup> replay, later;
+            size_t verified = 0;
+            for (const auto& captured : g_nr_groups)
+            {
+                if (captured.end <= checkpoint.stamp) continue;
+                NrGroup group = captured;
+                const long long begin = nr_ns(group.beg);
+                if (begin > confirmed.back() + match_ns)
+                {
+                    later.push_back(std::move(group));
+                    continue;
+                }
+                if (group.imu.empty())
+                {
+                    nr_write_ack("OK reprocess_refusal valid=0 reason=missing_imu");
+                    return;
+                }
+                group.imu_only = nr_ns(group.end) >= boundary && begin < confirmed.front() - match_ns;
+                if (!group.imu_only && begin >= confirmed.front() - match_ns)
+                {
+                    if (verified >= confirmed.size() || std::llabs(begin - confirmed[verified]) > match_ns)
+                    {
+                        nr_write_ack("OK reprocess_refusal valid=0 reason=unverified_suffix_group");
+                        return;
+                    }
+                    ++verified;
+                }
+                replay.push_back(std::move(group));
+            }
+            if (verified != confirmed.size() || replay.empty() ||
+                nr_ns(replay.back().end) < confirmed.back())
+            {
+                nr_write_ack("OK reprocess_refusal valid=0 reason=confirmed_suffix_not_captured");
+                return;
+            }
+
+            if (!use_latest) g_nr_cp = std::move(g_nr_previous_cp);
+            std::string why;
+            if (!nr_restore_locked(why))
+            {
+                nr_write_ack("OK reprocess_refusal valid=0 reason=" + why);
+                return;
+            }
+            g_nr_imu_probe.reset();
+            g_nr_refusal_expected = int(replay.size());
+            g_nr_refusal_consumed = 0;
+            g_nr_refusal_target = nr_ns(replay.back().end);
+            const auto last_scan = nr_ns(replay.back().beg);
+            g_nr_refusal_comparison = g_nr_compare_refusal && g_nr_comparison_trace.is_open();
+            if (g_nr_refusal_comparison)
+            {
+                g_nr_intervention_groups.swap(replay);
+                g_nr_replay_groups = g_nr_intervention_groups;
+                for (auto& group : g_nr_replay_groups) group.imu_only = false;
+                g_nr_native_arm_running = true;
+            }
+            else g_nr_replay_groups.swap(replay);
+            g_nr_after_refusal.swap(later);
+            g_nr_groups.clear();
+            // sync_packages may have peeked the next live scan without popping it while waiting
+            // for IMU. Replay reuses Measures. Restage that same unpopped scan on return.
+            lidar_pushed = false;
+            g_nr_replay_remaining = g_nr_refusal_expected;
+            g_nr_replay.store(true);
+            std::ostringstream ack;
+            ack << "OK reprocess_refusal valid=1 checkpoint_stamp_ns=" << nr_ns(g_nr_cp.stamp)
+                << " target_ns=" << g_nr_refusal_target << " target_scan_ns=" << last_scan
+                << " queued=" << g_nr_refusal_expected << " pending_live=" << g_nr_after_refusal.size()
+                << " comparison=" << (g_nr_refusal_comparison ? 1 : 0);
+            nr_write_ack(ack.str());
+        }
         else if (cmd == "reprocess")
         {
             std::lock_guard<std::mutex> lk(g_nr_mtx);
@@ -410,24 +735,21 @@ static void nr_execute(const std::string& cmd, const std::string& payload)
             long long end_ns = 0;
             try { if (!payload.empty()) end_ns = std::stoll(payload); } catch (...) { end_ns = 0; }
             g_nr_within = 0; g_nr_suffix = 0; g_nr_repaired_fed = 0;
-            // Re-feed the consumed groups in order; the normal loop processes them again.
-            for (auto it = g_nr_groups.rbegin(); it != g_nr_groups.rend(); ++it)
+            for (const auto& captured : g_nr_groups)
             {
-                PointCloudXYZI::Ptr ins = it->lidar;
+                if (captured.end <= g_nr_cp.stamp) continue;
+                NrGroup group = captured;
                 PointCloudXYZI::Ptr rep;
-                const long long gkey = (long long)std::llround(it->end * 1e9);
-                g_nr_replay_marks[gkey] = true;
-                if (nr_take_repair(it->beg, it->end, rep))
+                if (nr_take_repair(group.beg, group.end, rep))
                 {
-                    ins = rep; ++g_nr_repaired_fed; g_nr_repaired_marks[gkey] = true;
+                    group.lidar = rep;
+                    group.repaired = true;
+                    ++g_nr_repaired_fed;
                 }
-                lidar_buffer.push_front(ins);
-                time_buffer.push_front(it->beg);
-                for (auto iu = it->imu.rbegin(); iu != it->imu.rend(); ++iu) imu_buffer.push_front(*iu);
-                const long long g_ns = (long long)std::llround(it->end * 1e9);
-                if (end_ns > 0 && g_ns > end_ns) ++g_nr_suffix; else ++g_nr_within;
+                const long long stamp = (long long)std::llround(group.end * 1e9);
+                if (end_ns > 0 && stamp > end_ns) ++g_nr_suffix; else ++g_nr_within;
+                g_nr_replay_groups.push_back(std::move(group));
             }
-            lidar_pushed = false;
             g_nr_replay.store(true);
             g_nr_replay_remaining = g_nr_within + g_nr_suffix;
             // The replay writes the map even while the driver holds it: a held map would keep the
@@ -435,7 +757,10 @@ static void nr_execute(const std::string& cmd, const std::string& payload)
             // driver releases it with `resume` once its recovery is finished. Clearing it here is
             // what let v7's replay hand the map back mid-recovery.
             std::ostringstream s;
-            s << "OK reprocess replay_suffix=" << g_nr_suffix << " replay_within_end=" << g_nr_within
+            s << "OK reprocess valid=1 checkpoint_stamp_ns="
+              << (long long)std::llround(g_nr_cp.stamp * 1e9)
+              << " checkpoint_frame=" << g_nr_cp.frame
+              << " replay_suffix=" << g_nr_suffix << " replay_within_end=" << g_nr_within
               << " repaired_fed=" << g_nr_repaired_fed << " source=buffer";
             nr_write_ack(s.str());
             g_nr_groups.clear();
@@ -501,7 +826,9 @@ static void nr_apply_deferred(double this_group_end)
 static void nr_repaired_cbk(const sensor_msgs::PointCloud2::ConstPtr& msg)
 {
     PointCloudXYZI::Ptr cloud(new PointCloudXYZI());
-    pcl::fromROSMsg(*msg, *cloud);
+    // The measurement topic carries raw Velodyne fields, including per-return time.
+    p_pre->process(msg, cloud);
+    if (cloud->size() <= 1) return;
     const long long key = (long long)std::llround(msg->header.stamp.toSec() * 1e9);
     { std::lock_guard<std::mutex> lk(g_nr_mtx); g_nr_repaired[key] = cloud; }
     g_nr_repair_received.fetch_add(1);
@@ -588,8 +915,6 @@ void points_cache_collect()
     // for (int i = 0; i < points_history.size(); i++)
         // _featsArray->push_back(points_history[i]); 
 }
-BoxPointType LocalMap_Points;      
-bool Localmap_Initialized = false;
 void lasermap_fov_segment()
 {
     cub_needrm.clear();
@@ -1070,7 +1395,8 @@ void re_slam()
     // A reset is not a restore: the map tree is cleared and the state goes back to the IMU
     // initialisation point, so any checkpoint taken before it no longer describes this host.
     // Refusing the restore here is the third layer after the driver's own sleep/build handling.
-    { std::lock_guard<std::mutex> lk(g_nr_mtx); g_nr_cp.valid = false; g_nr_cp_invalidated_by_reslam = true; }
+    { std::lock_guard<std::mutex> lk(g_nr_mtx);
+      g_nr_cp.valid = g_nr_previous_cp.valid = false; g_nr_cp_invalidated_by_reslam = true; }
     g_nr_host_reset = true;
     // flg_reset = true;
     state_ikfom t;                    
@@ -1169,11 +1495,23 @@ int main(int argc, char **argv)
     ros::Publisher pubisbuilding = nh.advertise<std_msgs::Bool>("Isbuilding", 10);
     // Native recovery channel (F1). Off unless native_recovery_dir is set.
     nh.param<std::string>("native_recovery_dir", g_nr_dir, "");
+    nh.param<bool>("native_recovery_online_refusal", g_nr_online_refusal, false);
+    nh.param<bool>("native_recovery_compare_refusal", g_nr_compare_refusal, true);
+    nh.param<bool>("native_recovery_imu_probe", g_nr_imu_probe_enabled, false);
+    g_nr_imu_probe_enabled = g_nr_online_refusal && g_nr_imu_probe_enabled;
+    ros::Publisher private_odom;
+    if (g_nr_online_refusal)
+        private_odom = nh.advertise<nav_msgs::Odometry>("/native_recovery/observation_odom", 1000);
     if (!g_nr_dir.empty())
     {
         ::mkdir(g_nr_dir.c_str(), 0755);
         nr_write_caps();
         g_nr_fates.open(g_nr_dir + "/input_fates.jsonl", std::ios::out);
+        g_nr_updates.open(g_nr_dir + "/repair_updates.jsonl", std::ios::out);
+        if (g_nr_online_refusal && g_nr_compare_refusal)
+            g_nr_comparison_trace.open(g_nr_dir + "/refusal_comparison.jsonl", std::ios::out);
+        if (g_nr_imu_probe_enabled)
+            g_nr_imu_trace.open(g_nr_dir + "/imu_recovery_observations.jsonl", std::ios::out);
         g_nr_running.store(true);
         std::thread(nr_poll_thread).detach();
         sub_repaired = nh.subscribe("/native_recovery/repaired_scan", 50, nr_repaired_cbk);
@@ -1185,21 +1523,41 @@ int main(int argc, char **argv)
     bool status = ros::ok();
 
     int key = 0;
-    int degradation_count = 0;
-    int getDegradationpre_point = 0;
-    bool isIMU_init_dynamic = false;
-    bool isPublish = false;
+    auto& degradation_count = g_nr_degradation_count;
+    auto& getDegradationpre_point = g_nr_degradation_history;
+    auto& isIMU_init_dynamic = g_nr_dynamic_imu;
+    auto& isPublish = g_nr_is_publish;
     while (status)
     {
         if (flg_exit)
             break;
+        // Finish the private arm before answering status, so a drained native arm is never
+        // mistaken for completed refusal replay by the controller.
+        nr_start_refusal_after_native_arm();
         nr_apply_pending();
         ros::spinOnce();
-        if (sync_packages(Measures))
+        g_nr_cur_is_replay = !g_nr_replay_groups.empty();
+        g_nr_cur_repaired = false;
+        bool replay_imu_only = false;
+        const bool draining_live = !g_nr_hold.load() && !g_nr_after_refusal.empty();
+        if (g_nr_cur_is_replay || draining_live || (!g_nr_refusal_target && sync_packages(Measures)))
         {
-            // Armed commands run here, before this group is captured or estimated: the snapshot
-            // then describes the previous completed frame and never lands after its boundary.
-            nr_apply_deferred(lidar_end_time);
+            if (g_nr_cur_is_replay || draining_live)
+            {
+                auto& queue = g_nr_cur_is_replay ? g_nr_replay_groups : g_nr_after_refusal;
+                NrGroup group = std::move(queue.front());
+                queue.pop_front();
+                Measures.lidar = group.lidar;
+                Measures.imu = std::move(group.imu);
+                Measures.lidar_beg_time = group.beg;
+                lidar_end_time = group.end;
+                g_nr_cur_repaired = group.repaired;
+                replay_imu_only = group.imu_only;
+                g_nr_replay_remaining = (int)g_nr_replay_groups.size();
+                g_nr_replay.store(g_nr_replay_remaining > 0);
+            }
+            else
+                nr_apply_deferred(lidar_end_time);
             if (flg_reset)
             {
                 ROS_WARN("reset when rosbag play back");
@@ -1209,6 +1567,9 @@ int main(int argc, char **argv)
                 continue;
             }
             nr_capture_group();
+            if (g_nr_imu_probe && g_nr_hold.load() && !g_nr_cur_is_replay &&
+                !nr_advance_imu_probe(*g_nr_imu_probe, Measures, lidar_end_time))
+                g_nr_imu_probe.reset();
             double t0, t1, t2, t3, t4, t5, match_start, solve_start, svd_time;
             
             match_time = 0;
@@ -1222,16 +1583,28 @@ int main(int argc, char **argv)
             state_point = kf.get_x();
             pos_lid = state_point.pos + state_point.rot * state_point.offset_T_L_I;
 
+            if (replay_imu_only)
+            {
+                g_nr_lidar_end = lidar_end_time;
+                ++g_nr_frame;
+                ++g_nr_refusal_consumed;
+                nr_record_comparison_frame("imu_only");
+                nr_log_fate(lidar_end_time, Measures.lidar_beg_time, "replayed_imu_only");
+                continue;
+            }
+
             if (feats_undistort->empty() || (feats_undistort == NULL))
             {
                 first_lidar_time = Measures.lidar_beg_time;
                 p_imu->first_lidar_time = first_lidar_time;
+                nr_record_comparison_frame("no_scan_update");
                 // cout<<"FAST-LIO not ready"<<endl;
                 continue;
             }
 
             flg_EKF_inited = (Measures.lidar_beg_time - first_lidar_time) < INIT_TIME ? false : true;
-            lasermap_fov_segment();
+            if (!g_nr_online_refusal || !g_nr_hold.load() || g_nr_cur_is_replay)
+                lasermap_fov_segment();
 
             /*** downsample the feature points in a scan ***/
             downSizeFilterSurf.setInputCloud(feats_undistort);
@@ -1335,11 +1708,18 @@ int main(int argc, char **argv)
                         // 发布消息
                         std_msgs::Bool issleeping;
                         issleeping.data = true;
-                        pubissleeping.publish(issleeping);
+                        if (!g_nr_native_arm_running) pubissleeping.publish(issleeping);
                         cout<<"Over-degeneracy has happened, publish hibernating map operation!!!!!!!!!!!!!"<<endl;
                         hasPubsleep = true;
                     }
                     degradation_count = 0;
+                    if (g_nr_native_arm_running)
+                    {
+                        nr_record_comparison_frame("native_reset_due");
+                        g_nr_replay_groups.clear();
+                        continue;
+                    }
+                    nr_record_comparison_frame("refusal_reset_due");
                     if (g_nr_hold.load())
                     {
                         // The driver holds the map, so the driver owns the recovery. re_slam()
@@ -1370,7 +1750,7 @@ int main(int argc, char **argv)
                         isPublish = true;
                         std_msgs::Bool isbuilding;
                         isbuilding.data = true;
-                        pubisbuilding.publish(isbuilding);
+                        if (!g_nr_native_arm_running) pubisbuilding.publish(isbuilding);
                         hasPubbuild = true; 
                     }
                     hasPubsleep = false;
@@ -1385,18 +1765,38 @@ int main(int argc, char **argv)
             // 20/20 frames improved by nothing, gate refused). Map writes stay governed by the
             // hold inside map_incremental(); only the publication gate is widened here, and the
             // capability declares it as publish_gating=isPublish+held.
-            if(isPublish || g_nr_hold.load()){
-                publish_odometry(pubOdomAftMapped);
+            if(isPublish || (g_nr_hold.load() && !g_nr_native_arm_running)){
+                const bool public_output = !g_nr_online_refusal || !g_nr_hold.load();
+                if (g_nr_online_refusal && !g_nr_cur_is_replay)
+                {
+                    nav_msgs::Odometry observation;
+                    // Pair with the original LiDAR scan start, rather than its end.
+                    observation.header.stamp = ros::Time().fromSec(Measures.lidar_beg_time);
+                    observation.header.frame_id = "camera_init";
+                    observation.child_frame_id = "lidar";
+                    const Eigen::Quaterniond lidar_rotation(state_point.rot * state_point.offset_R_L_I);
+                    observation.pose.pose.position.x = pos_lid.x();
+                    observation.pose.pose.position.y = pos_lid.y();
+                    observation.pose.pose.position.z = pos_lid.z();
+                    observation.pose.pose.orientation.x = lidar_rotation.x();
+                    observation.pose.pose.orientation.y = lidar_rotation.y();
+                    observation.pose.pose.orientation.z = lidar_rotation.z();
+                    observation.pose.pose.orientation.w = lidar_rotation.w();
+                    nr_write_imu_observation(state_point);
+                    private_odom.publish(observation);
+                }
+                if (public_output) publish_odometry(pubOdomAftMapped);
                 /*** add the feature points to map kdtree ***/
                 t3 = omp_get_wtime();
                 map_incremental();
+                if (g_nr_cur_repaired) ++g_nr_repaired_map_updates;
                 t5 = omp_get_wtime();
 
                 /******* Publish points *******/
-                publish_path(pubPath);
-                if (scan_pub_en || pcd_save_en)
+                if (public_output) publish_path(pubPath);
+                if (public_output && (scan_pub_en || pcd_save_en))
                     publish_frame_world(pubLaserCloudFull);
-                if (scan_pub_en && scan_body_pub_en && isPublish)
+                if (public_output && scan_pub_en && scan_body_pub_en && isPublish)
                 {
                     publish_frame_body(pubLaserCloudFull_body);
                     publish_frame_lidar(pubLaserCloudFull_lidar);
@@ -1433,15 +1833,20 @@ int main(int argc, char **argv)
                 // The repaired cloud went through this native update, not just through the queue.
                 ++g_nr_repaired_in_update;
                 g_nr_last_repaired_update_ns = (long long)std::llround(lidar_end_time * 1e9);
+                g_nr_updates << "{\"scan_stamp_ns\":"
+                    << (long long)std::llround(Measures.lidar_beg_time * 1e9)
+                    << ",\"end_stamp_ns\":" << g_nr_last_repaired_update_ns
+                    << ",\"map_update_count\":" << g_nr_repaired_map_updates
+                    << ",\"map_points\":" << ikdtree.validnum() << "}" << std::endl;
             }
             g_nr_lidar_end = lidar_end_time;
             ++g_nr_frame;
+            nr_record_comparison_frame(isPublish ? "lidar_tracking" : "tracking_unavailable");
+            if (g_nr_refusal_target && g_nr_cur_is_replay && !g_nr_native_arm_running)
+                ++g_nr_refusal_consumed;
             nr_log_fate(lidar_end_time, Measures.lidar_beg_time,
                         g_nr_cur_is_replay ? "replayed" : (g_nr_hold.load() ? "quarantined" : "ingested"));
-            if (g_nr_cur_is_replay && g_nr_replay_remaining > 0)
-            {
-                if (--g_nr_replay_remaining == 0) g_nr_replay.store(false);
-            }
+
         }
         status = ros::ok();
         rate.sleep();

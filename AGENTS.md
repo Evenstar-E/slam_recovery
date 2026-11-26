@@ -1,5 +1,17 @@
 # Automatic review and mainline progress
 
+## 当前开发优先级（2026-11-24，用户确认）
+
+所有后续开发任务首先服务于一次可验收的原生恢复闭环。在当前宿主的同一次运行中，完成可信检查点、原始测量重处理、经现有准入规则写回宿主状态与地图、接回真实输入及处理第二次事件。用实际消费回执与地图状态证明每一步。受控触发可用于接线验收，在线检测证据单独记录。
+
+按实际运行的首个阻塞点推进。复用现有宿主、恢复接口和候选实现，只写解除当前阻塞所需的代码。暂缓推测性的防御代码、异常矩阵和反复调参。沿用已冻结的科学门和参数，保留失败、拒绝与未测结果。
+
+先在 FAST-LIO2 的单一工作线上跑通，再将已验证的闭环迁移到其他宿主。四宿主的工程和论文要求全部验收后，才进入 FAST-LIVO2 适配。相关历史执行安排以本节为准。
+
+本机 WSL 开发将源码、依赖、输入 bag、编译工作区和运行产物放在 Linux 文件系统上。
+
+每次事件收尾后释放该事件可重建的临时缓存和重复副本，保留输入、检查点、后续事件待用数据、候选与运行证据。安全拒绝、恢复旧状态并接回输入也算一次事件处理完成。
+
 > every auto review needs read and plan to work on main line according to this table
 
 Before every automatic review, read [the mainline progress standard](docs/MAINLINE_PROGRESS_STANDARD_20261109.md), including its two score tables, metric definitions, dependency order, and review handoff template. Also read the applicable current instructions and [the review protocol](REVIEW_AND_SIMULATION_PLAN.md), especially sections 10.10–10.13.
