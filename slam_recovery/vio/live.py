@@ -40,8 +40,11 @@ class LiveInput:
         pairs = list(islice(euroc(dataset), limit))
         if not pairs:
             raise ValueError("no stereo frames")
-        self.fifo = mp.Queue(capacity)
-        self.process = mp.Process(target=paced_source, args=(pairs, self.fifo, output))
+        # A fork here would retain the ORB worker's stdin writers and the
+        # subscriber socket while the independent replay is still publishing.
+        context = mp.get_context("spawn")
+        self.fifo = context.Queue(capacity)
+        self.process = context.Process(target=paced_source, args=(pairs, self.fifo, output))
         self.process.start()
 
     def __iter__(self):

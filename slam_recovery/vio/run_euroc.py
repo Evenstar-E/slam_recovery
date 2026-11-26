@@ -106,11 +106,14 @@ def run(args, events, output):
     healthy_count = 0
     candidate_fitted = False
 
+    def retire_worker(lane, name):
+        worker = lane.worker
+        retired_workers.append((name, queued.retire(worker.close)))
+        workers.remove(worker)
+
     def retire_busy_standby():
         nonlocal standby
-        worker = standby.worker
-        retired_workers.append(queued.retire(worker.close))
-        workers.remove(worker)
+        retire_worker(standby, "retired_standby")
         standby = None
 
     def consume_public(pair, view, images=None):
@@ -135,7 +138,7 @@ def run(args, events, output):
                 retired.consume(buffered, "skip" if weak else "fit")
         except WORKER_FAILURE as error:
             events.emit("standby_unavailable", reason=str(error), event=event_id)
-            close(retired, "standby_catchup_failed")
+            retire_worker(retired, "standby_catchup_failed")
             return
         standby = retired
         events.emit("standby_catchup", event=event_id, frames=len(pending),
@@ -163,7 +166,7 @@ def run(args, events, output):
                 private.pending_imu.clear()
                 standby = private
             else:
-                close(private, f"candidate-{event_id}")
+                retire_worker(private, f"candidate-{event_id}")
             private = None
         aligned = False
         needs_rearm, healthy_count = True, 0
@@ -353,8 +356,8 @@ def run(args, events, output):
             publisher.close()
         if parallel is not None:
             parallel.shutdown()
-        for receipt in retired_workers:
-            events.emit("worker_exit", name="retired_standby", exit=receipt.result())
+        for name, receipt in retired_workers:
+            events.emit("worker_exit", name=name, exit=receipt.result())
         for worker in workers:
             events.emit("worker_exit", exit=worker.close())
 
