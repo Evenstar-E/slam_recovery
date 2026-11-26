@@ -41,7 +41,7 @@ ORB_VIO_DRAIN_LOCAL_MAPPING=1 python3 -m slam_recovery.vio.run_euroc \
 wait "$subscriber_pid"
 ```
 
-输入进程按原始纳秒时戳发送左右 PNG 字节及其 IMU，控制器重放期间持续送入队列。输入队列最多缓存 512 对，溢出记录丢帧。订阅进程收录位姿和接收时钟后逐条应答。使用以下命令对公开交付做校验，并用 Vicon 进行独立位置评分。
+输入进程按原始纳秒时戳发送左右 PNG 字节及其 IMU，控制器重放期间持续送入队列。输入队列最多缓存 512 对，溢出记录丢帧。输入源用 spawn 启动，避免继承控制器持有的候选句柄。健康期备用队列上限为 8 个，触发时核对同一物理帧，最多等待 0.35 秒。验证不通过时，候选在后台收尾。订阅进程收录位姿和接收时钟后逐条应答。使用以下命令对公开交付做校验，并用 Vicon 进行独立位置评分。
 
 ```bash
 python3 -m slam_recovery.vio.realtime_score "$sequence" "$settings" \
