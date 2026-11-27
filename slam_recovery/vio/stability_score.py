@@ -38,7 +38,9 @@ def evaluate(folder, meta, ground_truth, body_offset):
     keys = [(row["timestamp"], row["image_sha256"], row["imu_count"]) for row in input_rows]
     digest = hashlib.sha256(json.dumps(keys).encode()).hexdigest()
     origin = input_rows[0]["timestamp"]
-    first_fault = min((w[0] for w in trace[0]["fault_intervals_s"]), default=25)
+    fault_intervals = sorted(trace[0]["fault_intervals_s"] +
+                             [row[:2] for row in trace[0].get("regional_cover", [])])
+    first_fault = min((w[0] for w in fault_intervals), default=25)
     arrivals = {row["timestamp"]: row["arrival_ns"] for row in input_rows}
     truth = {}
     for stamp in arrivals:
@@ -64,7 +66,7 @@ def evaluate(folder, meta, ground_truth, body_offset):
               for r in delivery if r["timestamp"] in truth}
     useful = {stamp for stamp, error in errors.items() if error <= 0.5 and delays[stamp] <= 1}
     event_populations = []
-    for start, end in trace[0]["fault_intervals_s"]:
+    for start, end in fault_intervals:
         window = {stamp for stamp in truth if start <= elapsed(origin, stamp) < end + 3}
         event_populations.append({"fault_span_s": [start, end], "physical_frames": len(window),
                                   "verified": len(window & measurement.keys()),

@@ -50,4 +50,37 @@ python3 -m slam_recovery.vio.realtime_score "$sequence" "$settings" \
 
 传感器时间、发送／接收墙钟和回填历史使用不同字段。算法不读取真值。实时源独立送帧。用实际外部接收时钟衡量停发、复明到普通交付的追赶延迟，以及双宿主并行造成的排队开销。
 
+## 备用异步追赶
+
+用新版 worker，在 recover 命令上加上 `--async-recovery`。若需要从持久快照重建备用，同时使用 `--rebuild-standby --native-checkpoints`。保留原实验的 `ORB_VIO_DRAIN_LOCAL_MAPPING=1` 可对照逐帧等待基线。常规跟踪与镜像仍遵循现有调度。私有候选和短窗追赶走异步建图路径。
+
+隔离后，主实例与备用在同一物理帧读取同步状态，再用原有一致性门核验。候选连续通过三帧留出视觉检查后，只在正式接回前同步一次，复验末帧的原生状态与留出几何。同步失败或状态不一致沿现有拒绝路径。可信快照保存继续使用原有原生加锁接口。新开关需要支持边界协议的 worker。
+
+参见 [异步追赶复验](../../docs/vio/ASYNC_RECOVERY_REPORT.md)。
+
 [ORB-SLAM3 论文](https://arxiv.org/abs/2007.11898) · [EuRoC 官方数据](https://projects.asl.ethz.ch/datasets/euroc-mav/)
+
+
+### Adaptive holdout and stereo host adapters
+
+ORB-SLAM3 accepts `--adaptive-gate` for the VIO experiment. The controller freezes the reserved cells on the first recovery observation. The independent gate needs eight inliers, a 60% inlier ratio, and support in at least two cells in each frame. The original distance, orientation, reprojection limits and three consecutive qualifying frames still govern admission.
+
+`python3 -m slam_recovery.vio.hosts.build_worker --help` builds either native adapter against its pinned host build. `python3 -m slam_recovery.vio.hosts.controller --help` runs the same stereo recovery controller for both adapters. Run `slam_recovery.vio.subscribe` as the external subscriber. The VINS-Fusion adapter needs ROS Noetic and a dedicated ROS master. Use separate estimator output directories through the primary configuration and `VIO_VINS_SPARE_CONFIG`. The OKVIS2 adapter needs the native vocabulary directory. Both use their recorded stereo/IMU settings and an independent EuRoC camera calibration for verification. The fixed experiment and its raw metrics are described in [the remote VIO report](../../docs/vio/REMOTE_ADAPTIVE_GATE_REPORT.md).
+
+The shared controller runs the standby off the foreground path by default. Use
+`--serial-standby` to reproduce the previous schedule on the same inputs. Native
+adapters record request and response transport, frontend, and optimization time
+as `native_stage` events. The [scheduling report](../../docs/vio/FOREGROUND_SCHEDULING_REPORT.md)
+defines the measured stages and reports external receipt latency.
+
+Live input is decoded and checked on a separate ordered queue. Use
+`--mode detect` to measure detection while retaining normal host output.
+`--primary-cpus` and `--standby-cpus` can assign equal, disjoint Linux CPU
+budgets for the role swap. `--standby-backlog` bounds the retained original
+updates. A delayed replica earns takeover eligibility only after exact
+pre-fault boundary verification.
+
+The OKVIS2 adapter consumes the existing optimized graph callback by default.
+Use `--blocking-callback` for a paired test that waits for every native solve.
+See the [input and callback report](../../docs/vio/PLUGIN_FLOW_REPORT.md)
+for the measured configurations and receipt checks.

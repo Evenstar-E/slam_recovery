@@ -1,0 +1,2418 @@
+{
+  "arms": {
+    "okvis-recover-clean-background-950": {
+      "run_metadata": {
+        "host": "okvis",
+        "sequence": "V2_01_easy",
+        "mode": "recover",
+        "condition": "clean",
+        "schedule": "background",
+        "controller_exit": 0,
+        "subscriber_exit": 0
+      },
+      "ordered_input_sha256": "935fc1edebd874741c6fe462bc6751b893582d2c21a20859e2967528c3748b3f",
+      "controller_and_subscriber_zero": true,
+      "input_frames": 950,
+      "input_drop": 0,
+      "input_clock_span_s": 47.449196746,
+      "max_input_gap_s": 0.05029472,
+      "end_to_end_span_s": 61.390856524,
+      "delivered": 949,
+      "channels": {
+        "native": 949
+      },
+      "scoreable_frames": 790,
+      "anchor_pairs": 335,
+      "timely_outputs": 390,
+      "verified_outputs": 790,
+      "position_within_limit": 790,
+      "timely_usable": 390,
+      "timely_usable_fraction": 0.4936708860759494,
+      "receipt_latency_p95_s": 11.707003748849997,
+      "arm_position_rmse_m": 0.11006038739221258,
+      "longest_wall_gap_s": 0.169787426,
+      "per_event": [],
+      "history_delivered": [],
+      "lifecycle": [
+        {
+          "type": "worker_exit",
+          "name": 412798,
+          "exit": 0
+        },
+        {
+          "type": "worker_exit",
+          "name": 412800,
+          "exit": 0
+        }
+      ],
+      "event_populations": [],
+      "source_file_sha256": {
+        "okvis-recover-clean-background-950/events.jsonl": "0bd37604e98cc87a9d5bc600a05e8c491eb1fc0733cdaf3b5f88c6cfe1047414",
+        "okvis-recover-clean-background-950/input_clock.jsonl": "29e446f06e024672c3db3516c9f721edaeb9aee302675acb6969740624bf9184",
+        "okvis-recover-clean-background-950.subscriber.jsonl": "8b2067507d1fa22a0385219142c58358327a714b7c394e6c823273edb13722eb",
+        "okvis-recover-clean-background-950.json": "2c2dd3e1d913b1e745b24ec63e2782b93d54697f5c8dd97408f30659996c4370"
+      },
+      "controller_counts": {
+        "run": 1,
+        "worker_started": 2,
+        "consume": 950,
+        "native_stage": 1900,
+        "pose": 949,
+        "worker_exit": 2
+      },
+      "worker_failures": 0,
+      "stage_8_to_24_8_seconds": {
+        "public": {
+          "frames": 336,
+          "mean_ms": {
+            "pipe_ms": 1.3707380684523813,
+            "frontend_ms": 15.473057928571425,
+            "optimization_ms": 24.370435693452386,
+            "other_native_ms": 1.9390522380952366
+          },
+          "p95_ms": {
+            "pipe_ms": 1.618951,
+            "frontend_ms": 18.347704999999998,
+            "optimization_ms": 31.08042975,
+            "other_native_ms": 2.49893225
+          },
+          "mean_total_ms": 43.15328392857143,
+          "p95_total_ms": 52.9089575,
+          "share_pct": {
+            "pipe_ms": 3.1764397599989533,
+            "frontend_ms": 35.85603810403602,
+            "optimization_ms": 56.47411616179904,
+            "other_native_ms": 4.49340597416598
+          },
+          "mean_request_ms": 1.235975351190476,
+          "mean_reply_ms": 0.13476271726190475
+        },
+        "spare": {
+          "frames": 336,
+          "mean_ms": {
+            "pipe_ms": 1.4084949523809531,
+            "frontend_ms": 15.536039395833345,
+            "optimization_ms": 24.47015552976191,
+            "other_native_ms": 1.9251718244047606
+          },
+          "p95_ms": {
+            "pipe_ms": 1.734626,
+            "frontend_ms": 18.4299435,
+            "optimization_ms": 31.1243915,
+            "other_native_ms": 2.47855925
+          },
+          "mean_total_ms": 43.33986170238097,
+          "p95_total_ms": 53.0919715,
+          "share_pct": {
+            "pipe_ms": 3.2498833569272194,
+            "frontend_ms": 35.84699808808997,
+            "optimization_ms": 56.46108355813601,
+            "other_native_ms": 4.442034996846787
+          },
+          "mean_request_ms": 1.2714404345238097,
+          "mean_reply_ms": 0.13705451785714287
+        }
+      },
+      "prefault_queue_p95_s": 0.44912160275,
+      "prefault_processing_hz": 19.353229230654893
+    },
+    "okvis-recover-short_long-background-950": {
+      "run_metadata": {
+        "host": "okvis",
+        "sequence": "V2_01_easy",
+        "mode": "recover",
+        "condition": "short_long",
+        "schedule": "background",
+        "controller_exit": 0,
+        "subscriber_exit": 0
+      },
+      "ordered_input_sha256": "935fc1edebd874741c6fe462bc6751b893582d2c21a20859e2967528c3748b3f",
+      "controller_and_subscriber_zero": true,
+      "input_frames": 950,
+      "input_drop": 0,
+      "input_clock_span_s": 47.449152555,
+      "max_input_gap_s": 0.050188903,
+      "end_to_end_span_s": 58.652216429,
+      "delivered": 915,
+      "channels": {
+        "native": 749,
+        "inertial_history": 7,
+        "repaired_history": 3,
+        "local_unverified": 156
+      },
+      "scoreable_frames": 790,
+      "anchor_pairs": 335,
+      "timely_outputs": 374,
+      "verified_outputs": 600,
+      "position_within_limit": 600,
+      "timely_usable": 374,
+      "timely_usable_fraction": 0.47341772151898737,
+      "receipt_latency_p95_s": 9.50700825175,
+      "arm_position_rmse_m": 0.09906467352803877,
+      "longest_wall_gap_s": 0.464725543,
+      "per_event": [
+        {
+          "window_s": [
+            25.0,
+            25.35
+          ],
+          "input_blind_frames": 7,
+          "received_blind_frames": 7,
+          "received_blind_history": 7,
+          "public_interruption_s": 0.464725543,
+          "to_live_output_s": 0.525972709,
+          "healthy_input_to_ordinary_receipt_s": 0.860240695
+        },
+        {
+          "window_s": [
+            38.0,
+            39.7
+          ],
+          "input_blind_frames": 34,
+          "received_blind_frames": 0,
+          "received_blind_history": 0,
+          "public_interruption_s": 0.272556041,
+          "to_live_output_s": 0.272556041,
+          "healthy_input_to_ordinary_receipt_s": 4.933694569
+        }
+      ],
+      "history_delivered": [
+        {
+          "event": 1,
+          "verified_historical_blind_frames": 7,
+          "verified_historical_visual_frames": 3,
+          "local_historical_blind_frames": 0,
+          "local_historical_visual_frames": 0,
+          "receipts": [
+            {
+              "timestamp": 1413393237255760384,
+              "pose_cw": [
+                2.4510660740227275,
+                -0.03377418369876328,
+                1.708475117902852,
+                0.566818059487697,
+                -0.5765133112136728,
+                0.43919308315187183,
+                0.391738592869788
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 500,
+              "received_ns": 84642604861484
+            },
+            {
+              "timestamp": 1413393237305760512,
+              "pose_cw": [
+                2.4491690666122534,
+                -0.0020040383903948134,
+                1.706574360232447,
+                0.5692000717102886,
+                -0.5742649829593852,
+                0.4419723483403334,
+                0.3884474881038493
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 501,
+              "received_ns": 84642605100391
+            },
+            {
+              "timestamp": 1413393237355760384,
+              "pose_cw": [
+                2.454217003272038,
+                0.020438067507656532,
+                1.6969906587470465,
+                0.5714366269553187,
+                -0.5722027405283642,
+                0.4433377613461474,
+                0.3866469118851772
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 502,
+              "received_ns": 84642605276478
+            },
+            {
+              "timestamp": 1413393237405760512,
+              "pose_cw": [
+                2.462319977676778,
+                0.034623507975700796,
+                1.6846193449405713,
+                0.5720386434783127,
+                -0.5705259573575143,
+                0.44454247138838837,
+                0.3868512808311324
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 503,
+              "received_ns": 84642605452110
+            },
+            {
+              "timestamp": 1413393237455760384,
+              "pose_cw": [
+                2.477741863191366,
+                0.02779847088023063,
+                1.664115028801463,
+                0.5715518823738979,
+                -0.5704517339552451,
+                0.4432322200539236,
+                0.3891766489505482
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 504,
+              "received_ns": 84642605595443
+            },
+            {
+              "timestamp": 1413393237505760512,
+              "pose_cw": [
+                2.500893824850506,
+                0.00024401225859249642,
+                1.6343112762217988,
+                0.5693925594512451,
+                -0.5719228603859348,
+                0.43934481074369097,
+                0.3945535353816019
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 505,
+              "received_ns": 84642605742011
+            },
+            {
+              "timestamp": 1413393237555760384,
+              "pose_cw": [
+                2.5271535955963684,
+                -0.045981311256999946,
+                1.5995522439500858,
+                0.5666194577953868,
+                -0.5750698673953223,
+                0.43305454480788264,
+                0.4008750414815393
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 506,
+              "received_ns": 84642605964860
+            },
+            {
+              "timestamp": 1413393237605760512,
+              "map_id": 0,
+              "inertial": [
+                0.1927462589458786,
+                0.20327295154395902,
+                -0.11893290454803862,
+                -0.030183987505652297,
+                0.18982768971168815,
+                0.06263572245384944,
+                -0.001517577443855141,
+                0.02434919227408069,
+                0.08042840185514936
+              ],
+              "pose_cw": [
+                2.5520726213524836,
+                -0.09258749463554312,
+                1.5647684584464596,
+                0.5632817074386716,
+                -0.5780720608674919,
+                0.42697481854201647,
+                0.407724067036026
+              ],
+              "type": "pose",
+              "channel": "repaired_history",
+              "coordinate_verified": true,
+              "delivery_id": 507,
+              "received_ns": 84642606150951
+            },
+            {
+              "timestamp": 1413393237655760384,
+              "map_id": 0,
+              "inertial": [
+                0.18706871979531475,
+                0.19235801483567655,
+                -0.11548922139815662,
+                -0.02674057512166693,
+                0.18858477601607096,
+                0.05840726791813819,
+                -0.001568256378703551,
+                0.024295245351224872,
+                0.08046231712832291
+              ],
+              "pose_cw": [
+                2.574336128782585,
+                -0.14815943889907324,
+                1.5248912933175782,
+                0.5611884433784352,
+                -0.5817995501752272,
+                0.4192581517433993,
+                0.4132788606148406
+              ],
+              "type": "pose",
+              "channel": "repaired_history",
+              "coordinate_verified": true,
+              "delivery_id": 508,
+              "received_ns": 84642606327624
+            },
+            {
+              "timestamp": 1413393237705760512,
+              "map_id": 0,
+              "inertial": [
+                0.1806968347206688,
+                0.177901657517265,
+                -0.11509519804109554,
+                -0.026348324019635817,
+                0.18311631412661775,
+                0.05888969094900692,
+                -0.0016424323787839568,
+                0.02427423110198795,
+                0.08043613508988202
+              ],
+              "pose_cw": [
+                2.592307365118052,
+                -0.18987122258268385,
+                1.4908642831637133,
+                0.5593888685867098,
+                -0.5841910604526183,
+                0.41331500334152077,
+                0.41830085656298216
+              ],
+              "type": "pose",
+              "channel": "repaired_history",
+              "coordinate_verified": true,
+              "delivery_id": 509,
+              "received_ns": 84642606512523
+            }
+          ]
+        }
+      ],
+      "lifecycle": [
+        {
+          "type": "isolate",
+          "event": 1,
+          "fault": "image_observation",
+          "first_untrusted": 1413393237255760384,
+          "detected": 1413393237305760512,
+          "checkpoint": {
+            "timestamp": 1413393237205760512,
+            "map_id": 0,
+            "inertial": [
+              0.21979238937388373,
+              0.020758543533314175,
+              0.18897643050762,
+              -0.013750346412994337,
+              0.20793648030313056,
+              0.07899369771476694,
+              -0.0016142715931463769,
+              0.024417767529012088,
+              0.08007534456658505
+            ],
+            "pose_cw": [
+              2.4551696109902643,
+              -0.08329997472825584,
+              1.7076483139598708,
+              0.5648451060396651,
+              -0.5804408977646173,
+              0.43424558329645374,
+              0.3942957567268093
+            ]
+          },
+          "detected_ns": 84642150370094
+        },
+        {
+          "type": "incremental_checkpoint",
+          "event": 1,
+          "qualified": true,
+          "maximum_state_differences": [
+            0.00773038215645836,
+            0.0017320632366375037,
+            0.021064045704202384,
+            0.028087482506354733,
+            0.0003702308587904151
+          ],
+          "prefix_frames_replayed": 0
+        },
+        {
+          "type": "blind_history",
+          "event": 1,
+          "endpoint_position_residual_m": 0.011510203249421314,
+          "endpoint_orientation_residual_rad": 0.0013317735488745208,
+          "blind_frames": 7,
+          "accepted": true
+        },
+        {
+          "type": "promote",
+          "event": 1,
+          "checkpoint": 1413393237205760512,
+          "through": 1413393237705760512,
+          "decided_ns": 84642604756043,
+          "coordinate_verified": true,
+          "accepted_blind_history": [
+            1413393237255760384,
+            1413393237305760512,
+            1413393237355760384,
+            1413393237405760512,
+            1413393237455760384,
+            1413393237505760512,
+            1413393237555760384
+          ],
+          "accepted_history": [
+            1413393237605760512,
+            1413393237655760384,
+            1413393237705760512
+          ]
+        },
+        {
+          "type": "rearmed",
+          "event": 1,
+          "coordinate_verified": true
+        },
+        {
+          "type": "standby_catchup",
+          "event": 1,
+          "frames": 10,
+          "through": 1413393237705760512,
+          "started_ns": 84642606844501,
+          "finished_ns": 84642782077448
+        },
+        {
+          "type": "isolate",
+          "event": 2,
+          "fault": "image_observation",
+          "first_untrusted": 1413393250255760384,
+          "detected": 1413393250305760512,
+          "checkpoint": {
+            "timestamp": 1413393250205760512,
+            "map_id": 0,
+            "inertial": [
+              -0.04529836378196702,
+              0.23556279754344037,
+              -0.144815475020419,
+              -0.07595154981446525,
+              0.14603330144263832,
+              0.08499484467820054,
+              -0.002264364983527214,
+              0.024504530301884216,
+              0.08147899808926724
+            ],
+            "pose_cw": [
+              2.1671828447493064,
+              0.29429736262658585,
+              -1.2294553842482554,
+              0.6927878747240142,
+              -0.4339209895497891,
+              0.3260881510676023,
+              0.4747884299315099
+            ]
+          },
+          "detected_ns": 84660826057072
+        },
+        {
+          "type": "incremental_checkpoint",
+          "event": 2,
+          "qualified": true,
+          "maximum_state_differences": [
+            0.004256991314294833,
+            0.0012725300120506493,
+            0.006827553326201109,
+            0.0579641304331162,
+            0.000267571780418605
+          ],
+          "prefix_frames_replayed": 0
+        },
+        {
+          "type": "reject",
+          "event": 2,
+          "reason": "bounded_candidate_window",
+          "decided_ns": 84660987716548,
+          "preserved_anchor": 1413393250205760512
+        },
+        {
+          "type": "worker_exit",
+          "name": 317083,
+          "exit": 0
+        },
+        {
+          "type": "worker_exit",
+          "name": 317085,
+          "exit": 0
+        }
+      ],
+      "event_populations": [
+        {
+          "fault_span_s": [
+            25.0,
+            25.35
+          ],
+          "physical_frames": 67,
+          "verified": 67,
+          "timely_usable": 34
+        },
+        {
+          "fault_span_s": [
+            38.0,
+            39.7
+          ],
+          "physical_frames": 94,
+          "verified": 0,
+          "timely_usable": 0
+        }
+      ],
+      "source_file_sha256": {
+        "okvis-recover-short_long-background-950/events.jsonl": "60329f8e8ef328b31b9601d8013410678ee10327b2f9b9bad73ec5348ee7b338",
+        "okvis-recover-short_long-background-950/input_clock.jsonl": "aa06805476b59dfbbf36e82c0aa9e093b9ddb98c8f2cbac0130b2d2e1de155eb",
+        "okvis-recover-short_long-background-950.subscriber.jsonl": "492d11daaa399cd439458686ea75e4bafbdd30e59267c9a16eb21988622b9499",
+        "okvis-recover-short_long-background-950.json": "3bd0619624f815b85ca1694e6f92990021bb4b9072d298666257e1e6d9148cb0"
+      },
+      "controller_counts": {
+        "run": 1,
+        "worker_started": 2,
+        "consume": 950,
+        "native_stage": 1741,
+        "pose": 915,
+        "isolate": 2,
+        "incremental_checkpoint": 2,
+        "validation_partition": 1,
+        "candidate": 3,
+        "blind_history": 1,
+        "promote": 1,
+        "rearmed": 1,
+        "standby_catchup": 1,
+        "reject": 1,
+        "worker_exit": 2
+      },
+      "worker_failures": 0,
+      "stage_8_to_24_8_seconds": {
+        "public": {
+          "frames": 336,
+          "mean_ms": {
+            "pipe_ms": 1.3462548958333336,
+            "frontend_ms": 15.482947410714281,
+            "optimization_ms": 24.446246958333344,
+            "other_native_ms": 1.9448831428571438
+          },
+          "p95_ms": {
+            "pipe_ms": 1.574794,
+            "frontend_ms": 18.1046265,
+            "optimization_ms": 30.01823525,
+            "other_native_ms": 2.4290059999999998
+          },
+          "mean_total_ms": 43.220332407738105,
+          "p95_total_ms": 51.57479175,
+          "share_pct": {
+            "pipe_ms": 3.114864742669823,
+            "frontend_ms": 35.823295537500854,
+            "optimization_ms": 56.56191333215319,
+            "other_native_ms": 4.499926387676127
+          },
+          "mean_request_ms": 1.2203602380952379,
+          "mean_reply_ms": 0.12589465773809522
+        },
+        "spare": {
+          "frames": 336,
+          "mean_ms": {
+            "pipe_ms": 1.3666123928571419,
+            "frontend_ms": 15.722356354166667,
+            "optimization_ms": 24.840397133928573,
+            "other_native_ms": 1.9871143869047623
+          },
+          "p95_ms": {
+            "pipe_ms": 1.570143,
+            "frontend_ms": 19.362190249999998,
+            "optimization_ms": 32.61128075,
+            "other_native_ms": 2.5875897500000002
+          },
+          "mean_total_ms": 43.916480267857146,
+          "p95_total_ms": 55.38674575,
+          "share_pct": {
+            "pipe_ms": 3.111844083409793,
+            "frontend_ms": 35.80058387710546,
+            "optimization_ms": 56.562814192806506,
+            "other_native_ms": 4.524757846678228
+          },
+          "mean_request_ms": 1.2442373303571428,
+          "mean_reply_ms": 0.12237506249999999
+        }
+      },
+      "prefault_queue_p95_s": 0.5611475985,
+      "prefault_processing_hz": 19.28636515320642
+    },
+    "okvis-recover-short_long-serial-950": {
+      "run_metadata": {
+        "host": "okvis",
+        "sequence": "V2_01_easy",
+        "mode": "recover",
+        "condition": "short_long",
+        "schedule": "serial",
+        "controller_exit": 0,
+        "subscriber_exit": 0
+      },
+      "ordered_input_sha256": "935fc1edebd874741c6fe462bc6751b893582d2c21a20859e2967528c3748b3f",
+      "controller_and_subscriber_zero": true,
+      "input_frames": 950,
+      "input_drop": 0,
+      "input_clock_span_s": 47.449208486,
+      "max_input_gap_s": 0.050109962,
+      "end_to_end_span_s": 87.981996356,
+      "delivered": 915,
+      "channels": {
+        "native": 749,
+        "inertial_history": 7,
+        "repaired_history": 3,
+        "local_unverified": 156
+      },
+      "scoreable_frames": 790,
+      "anchor_pairs": 335,
+      "timely_outputs": 0,
+      "verified_outputs": 600,
+      "position_within_limit": 600,
+      "timely_usable": 0,
+      "timely_usable_fraction": 0.0,
+      "receipt_latency_p95_s": 38.914332633499995,
+      "arm_position_rmse_m": 0.10479239497235372,
+      "longest_wall_gap_s": 0.423023351,
+      "per_event": [
+        {
+          "window_s": [
+            25.0,
+            25.35
+          ],
+          "input_blind_frames": 7,
+          "received_blind_frames": 7,
+          "received_blind_history": 7,
+          "public_interruption_s": 0.423023351,
+          "to_live_output_s": 0.671505777,
+          "healthy_input_to_ordinary_receipt_s": 16.010474747
+        },
+        {
+          "window_s": [
+            38.0,
+            39.7
+          ],
+          "input_blind_frames": 34,
+          "received_blind_frames": 0,
+          "received_blind_history": 0,
+          "public_interruption_s": 0.270167831,
+          "to_live_output_s": 0.270167831,
+          "healthy_input_to_ordinary_receipt_s": 34.593010276
+        }
+      ],
+      "history_delivered": [
+        {
+          "event": 1,
+          "verified_historical_blind_frames": 7,
+          "verified_historical_visual_frames": 3,
+          "local_historical_blind_frames": 0,
+          "local_historical_visual_frames": 0,
+          "receipts": [
+            {
+              "timestamp": 1413393237255760384,
+              "pose_cw": [
+                2.4391177617515316,
+                -0.02265420668766771,
+                1.7041192588167942,
+                0.5669311726080062,
+                -0.5751942623747599,
+                0.44053429258129395,
+                0.3920078355292991
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 500,
+              "received_ns": 84925402923493
+            },
+            {
+              "timestamp": 1413393237305760512,
+              "pose_cw": [
+                2.4368120682576966,
+                0.009270032692137886,
+                1.7019383960245855,
+                0.5693164823115773,
+                -0.5729658306824701,
+                0.44326317968426354,
+                0.388724392564854
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 501,
+              "received_ns": 84925403151230
+            },
+            {
+              "timestamp": 1413393237355760384,
+              "pose_cw": [
+                2.441359171477559,
+                0.03204421160648652,
+                1.6917119650497616,
+                0.5715652522444253,
+                -0.570932864073303,
+                0.44455380268975714,
+                0.3869376482870309
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 502,
+              "received_ns": 84925403375251
+            },
+            {
+              "timestamp": 1413393237405760512,
+              "pose_cw": [
+                2.4489442441303733,
+                0.04666553610532154,
+                1.678500819014219,
+                0.5721847108853424,
+                -0.5692885367459398,
+                0.4456692991909933,
+                0.3871615868307864
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 503,
+              "received_ns": 84925403545262
+            },
+            {
+              "timestamp": 1413393237455760384,
+              "pose_cw": [
+                2.463901915811818,
+                0.040366489359777435,
+                1.6572683533334038,
+                0.5717212986851269,
+                -0.5692475049883546,
+                0.44426919556427275,
+                0.38950855775836174
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 504,
+              "received_ns": 84925403685069
+            },
+            {
+              "timestamp": 1413393237505760512,
+              "pose_cw": [
+                2.4867160652195572,
+                0.013371843386775828,
+                1.6270728400355534,
+                0.569589065163403,
+                -0.570746982995521,
+                0.4403016860265932,
+                0.3949058160244422
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 505,
+              "received_ns": 84925403824885
+            },
+            {
+              "timestamp": 1413393237555760384,
+              "pose_cw": [
+                2.5128041930208216,
+                -0.03235241147402168,
+                1.5925070994396495,
+                0.566841990159256,
+                -0.5739142251814189,
+                0.4339553503320085,
+                0.40124228870462947
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 506,
+              "received_ns": 84925403976653
+            },
+            {
+              "timestamp": 1413393237605760512,
+              "map_id": 0,
+              "inertial": [
+                0.1927458504955901,
+                0.20226952691871083,
+                -0.11859962004856751,
+                -0.030862185397062966,
+                0.19068774211730793,
+                0.06148304971322066,
+                -0.0014253565387501355,
+                0.024300872749355693,
+                0.08035421050313366
+              ],
+              "pose_cw": [
+                2.537738623646946,
+                -0.07869365275226302,
+                1.5586484605174227,
+                0.5635231640762226,
+                -0.5769215876084959,
+                0.42785435694625357,
+                0.4080977512103236
+              ],
+              "type": "pose",
+              "channel": "repaired_history",
+              "coordinate_verified": true,
+              "delivery_id": 507,
+              "received_ns": 84925404261103
+            },
+            {
+              "timestamp": 1413393237655760384,
+              "map_id": 0,
+              "inertial": [
+                0.18771562098010058,
+                0.19100831929850237,
+                -0.11476420675583847,
+                -0.027845810918465507,
+                0.18818668732882382,
+                0.05696774198899115,
+                -0.0014588555759434392,
+                0.024275232371342104,
+                0.08039443083963364
+              ],
+              "pose_cw": [
+                2.560877361920329,
+                -0.13243827998426422,
+                1.519565379192994,
+                0.5614142354896275,
+                -0.5806860807194268,
+                0.4202288635540817,
+                0.41355221445949647
+              ],
+              "type": "pose",
+              "channel": "repaired_history",
+              "coordinate_verified": true,
+              "delivery_id": 508,
+              "received_ns": 84925404452284
+            },
+            {
+              "timestamp": 1413393237705760512,
+              "map_id": 0,
+              "inertial": [
+                0.18122527408595152,
+                0.17812323886214976,
+                -0.11473265639607702,
+                -0.02739057577896375,
+                0.1828262069757665,
+                0.057469747207044196,
+                -0.0015082002405468955,
+                0.024256130088064178,
+                0.08039230338816275
+              ],
+              "pose_cw": [
+                2.5794354944554905,
+                -0.17370410187850618,
+                1.4862239802619817,
+                0.5595891408405613,
+                -0.5830567080797148,
+                0.4144342034170501,
+                0.4185082551809983
+              ],
+              "type": "pose",
+              "channel": "repaired_history",
+              "coordinate_verified": true,
+              "delivery_id": 509,
+              "received_ns": 84925404615453
+            }
+          ]
+        }
+      ],
+      "lifecycle": [
+        {
+          "type": "isolate",
+          "event": 1,
+          "fault": "image_observation",
+          "first_untrusted": 1413393237255760384,
+          "detected": 1413393237305760512,
+          "checkpoint": {
+            "timestamp": 1413393237205760512,
+            "map_id": 0,
+            "inertial": [
+              0.20392870772414043,
+              0.02128989734072588,
+              0.1918074610414402,
+              -0.01895983720536507,
+              0.18262172311587993,
+              0.07599019054212623,
+              -0.0015237800838306143,
+              0.02426124312497685,
+              0.08029012016984889
+            ],
+            "pose_cw": [
+              2.4434982627474096,
+              -0.07205850914776296,
+              1.703007078671636,
+              0.5649650480229618,
+              -0.5791201511802488,
+              0.43560428193427464,
+              0.3945671737105145
+            ]
+          },
+          "detected_ns": 84924990174260
+        },
+        {
+          "type": "incremental_checkpoint",
+          "event": 1,
+          "qualified": true,
+          "maximum_state_differences": [
+            0.002723509554377769,
+            0.0013851602340198433,
+            0.006616041066015874,
+            0.011658052318054148,
+            0.00018063766948691476
+          ],
+          "prefix_frames_replayed": 0
+        },
+        {
+          "type": "blind_history",
+          "event": 1,
+          "endpoint_position_residual_m": 0.01433263916195629,
+          "endpoint_orientation_residual_rad": 0.0018716346400504565,
+          "blind_frames": 7,
+          "accepted": true
+        },
+        {
+          "type": "promote",
+          "event": 1,
+          "checkpoint": 1413393237205760512,
+          "through": 1413393237705760512,
+          "decided_ns": 84925402811036,
+          "coordinate_verified": true,
+          "accepted_blind_history": [
+            1413393237255760384,
+            1413393237305760512,
+            1413393237355760384,
+            1413393237405760512,
+            1413393237455760384,
+            1413393237505760512,
+            1413393237555760384
+          ],
+          "accepted_history": [
+            1413393237605760512,
+            1413393237655760384,
+            1413393237705760512
+          ]
+        },
+        {
+          "type": "standby_catchup",
+          "event": 1,
+          "frames": 10,
+          "through": 1413393237705760512,
+          "started_ns": 84925404727418,
+          "finished_ns": 84925545519226
+        },
+        {
+          "type": "rearmed",
+          "event": 1,
+          "coordinate_verified": true
+        },
+        {
+          "type": "isolate",
+          "event": 2,
+          "fault": "image_observation",
+          "first_untrusted": 1413393250255760384,
+          "detected": 1413393250305760512,
+          "checkpoint": {
+            "timestamp": 1413393250205760512,
+            "map_id": 0,
+            "inertial": [
+              -0.04518942773634958,
+              0.2352103924310233,
+              -0.14533375399532933,
+              -0.07690070888315692,
+              0.14783956117216593,
+              0.08189492698899188,
+              -0.002250365933430189,
+              0.024502628311613053,
+              0.08146327374462575
+            ],
+            "pose_cw": [
+              2.1460800773121314,
+              0.3066968831206208,
+              -1.2283361021995292,
+              0.6932426194283599,
+              -0.43242068557633623,
+              0.32690481643451796,
+              0.4749318501487467
+            ]
+          },
+          "detected_ns": 84958322690658
+        },
+        {
+          "type": "incremental_checkpoint",
+          "event": 2,
+          "qualified": true,
+          "maximum_state_differences": [
+            0.0008312293990368612,
+            0.00022817407786470412,
+            0.0016116600090075436,
+            0.006777944223650515,
+            5.2039473949022865e-05
+          ],
+          "prefix_frames_replayed": 0
+        },
+        {
+          "type": "reject",
+          "event": 2,
+          "reason": "bounded_candidate_window",
+          "decided_ns": 84958483737764,
+          "preserved_anchor": 1413393250205760512
+        },
+        {
+          "type": "worker_exit",
+          "name": 519287,
+          "exit": 0
+        },
+        {
+          "type": "worker_exit",
+          "name": 519289,
+          "exit": 0
+        }
+      ],
+      "event_populations": [
+        {
+          "fault_span_s": [
+            25.0,
+            25.35
+          ],
+          "physical_frames": 67,
+          "verified": 67,
+          "timely_usable": 0
+        },
+        {
+          "fault_span_s": [
+            38.0,
+            39.7
+          ],
+          "physical_frames": 94,
+          "verified": 0,
+          "timely_usable": 0
+        }
+      ],
+      "source_file_sha256": {
+        "okvis-recover-short_long-serial-950/events.jsonl": "4d6ab319384f4702f672c75e37db8a052122d03c49ba3327d09116574959f369",
+        "okvis-recover-short_long-serial-950/input_clock.jsonl": "967df26fdd0e51878d609414d9d7783d1714e135b7a0fd5cde6ff41b395bcd4e",
+        "okvis-recover-short_long-serial-950.subscriber.jsonl": "36c06a91bdd109c0bdb14a523fb9848b6f1dd8b8d61a15037ae7c673ff91f6ae",
+        "okvis-recover-short_long-serial-950.json": "06a6d43e75d8335daa17432cb7c6b28c531a283e1910439e8ff3c3fd6c651dd9"
+      },
+      "controller_counts": {
+        "run": 1,
+        "worker_started": 2,
+        "consume": 950,
+        "native_stage": 1741,
+        "pose": 915,
+        "isolate": 2,
+        "incremental_checkpoint": 2,
+        "validation_partition": 1,
+        "candidate": 3,
+        "blind_history": 1,
+        "promote": 1,
+        "standby_catchup": 1,
+        "rearmed": 1,
+        "reject": 1,
+        "worker_exit": 2
+      },
+      "worker_failures": 0,
+      "stage_8_to_24_8_seconds": {
+        "public": {
+          "frames": 336,
+          "mean_ms": {
+            "pipe_ms": 1.3928852916666667,
+            "frontend_ms": 14.350283485119048,
+            "optimization_ms": 23.20060848809524,
+            "other_native_ms": 1.8395567440476193
+          },
+          "p95_ms": {
+            "pipe_ms": 1.6612814999999999,
+            "frontend_ms": 17.26998425,
+            "optimization_ms": 29.840650999999998,
+            "other_native_ms": 2.3313309999999996
+          },
+          "mean_total_ms": 40.78333400892858,
+          "p95_total_ms": 50.811223,
+          "share_pct": {
+            "pipe_ms": 3.415329632839057,
+            "frontend_ms": 35.18663648729008,
+            "optimization_ms": 56.88747389562609,
+            "other_native_ms": 4.510559984244766
+          },
+          "mean_request_ms": 1.2717304375,
+          "mean_reply_ms": 0.12115485416666669
+        },
+        "spare": {
+          "frames": 336,
+          "mean_ms": {
+            "pipe_ms": 1.4315902232142856,
+            "frontend_ms": 14.447326241071423,
+            "optimization_ms": 23.784984586309527,
+            "other_native_ms": 1.8651801011904747
+          },
+          "p95_ms": {
+            "pipe_ms": 1.6753334999999998,
+            "frontend_ms": 17.768428749999998,
+            "optimization_ms": 30.78779175,
+            "other_native_ms": 2.4243572500000004
+          },
+          "mean_total_ms": 41.52908115178571,
+          "p95_total_ms": 52.2753585,
+          "share_pct": {
+            "pipe_ms": 3.447199368514631,
+            "frontend_ms": 34.78845628264087,
+            "optimization_ms": 57.273081721642654,
+            "other_native_ms": 4.49126262720184
+          },
+          "mean_request_ms": 1.3086147767857144,
+          "mean_reply_ms": 0.12297544642857143
+        }
+      },
+      "prefault_queue_p95_s": 14.464635501500002,
+      "prefault_processing_hz": 11.2882606059291
+    },
+    "vins-recover-clean-background-950": {
+      "run_metadata": {
+        "host": "vins",
+        "sequence": "V2_01_easy",
+        "mode": "recover",
+        "condition": "clean",
+        "schedule": "background",
+        "controller_exit": 0,
+        "subscriber_exit": 0
+      },
+      "ordered_input_sha256": "935fc1edebd874741c6fe462bc6751b893582d2c21a20859e2967528c3748b3f",
+      "controller_and_subscriber_zero": true,
+      "input_frames": 950,
+      "input_drop": 0,
+      "input_clock_span_s": 47.449183257,
+      "max_input_gap_s": 0.050483361,
+      "end_to_end_span_s": 52.871407817000005,
+      "delivered": 940,
+      "channels": {
+        "native": 940
+      },
+      "scoreable_frames": 790,
+      "anchor_pairs": 335,
+      "timely_outputs": 38,
+      "verified_outputs": 790,
+      "position_within_limit": 790,
+      "timely_usable": 38,
+      "timely_usable_fraction": 0.04810126582278481,
+      "receipt_latency_p95_s": 4.985950325749999,
+      "arm_position_rmse_m": 0.09071416806428766,
+      "longest_wall_gap_s": 0.081587473,
+      "per_event": [],
+      "history_delivered": [],
+      "lifecycle": [
+        {
+          "type": "worker_exit",
+          "name": 407383,
+          "exit": 0
+        },
+        {
+          "type": "worker_exit",
+          "name": 407389,
+          "exit": 0
+        }
+      ],
+      "event_populations": [],
+      "source_file_sha256": {
+        "vins-recover-clean-background-950/events.jsonl": "3c758aaa42511ee12850397aacec4e038af23c3d280a45370c4b631a71daaa73",
+        "vins-recover-clean-background-950/input_clock.jsonl": "6ff1a7f8b6a5851b8967881ee6a73f033338de88101c4907c5541d06d16de255",
+        "vins-recover-clean-background-950.subscriber.jsonl": "6c944a744217e0a10dde64cd112f4aef8121e6915680862ebc0b86afb54eb050",
+        "vins-recover-clean-background-950.json": "49b852cd295e40bd89fc2bfbc5b1efc2c0aff72388c8627ac5cdaa23eca81436"
+      },
+      "controller_counts": {
+        "run": 1,
+        "worker_started": 2,
+        "consume": 950,
+        "native_stage": 1900,
+        "pose": 940,
+        "worker_exit": 2
+      },
+      "worker_failures": 0,
+      "stage_8_to_24_8_seconds": {
+        "public": {
+          "frames": 336,
+          "mean_ms": {
+            "pipe_ms": 1.109604151785713,
+            "frontend_ms": 18.895708318452385,
+            "optimization_ms": 26.9008102827381,
+            "other_native_ms": 0.8511035357142853
+          },
+          "p95_ms": {
+            "pipe_ms": 1.31165075,
+            "frontend_ms": 21.414434,
+            "optimization_ms": 40.49073375,
+            "other_native_ms": 1.22823375
+          },
+          "mean_total_ms": 47.75722628869049,
+          "p95_total_ms": 61.97792025,
+          "share_pct": {
+            "pipe_ms": 2.323426710500734,
+            "frontend_ms": 39.56617623525411,
+            "optimization_ms": 56.32825097530539,
+            "other_native_ms": 1.7821460789397592
+          },
+          "mean_request_ms": 0.9874192083333333,
+          "mean_reply_ms": 0.12218494345238096
+        },
+        "spare": {
+          "frames": 336,
+          "mean_ms": {
+            "pipe_ms": 1.1646338511904757,
+            "frontend_ms": 18.7121494077381,
+            "optimization_ms": 26.852343113095223,
+            "other_native_ms": 0.8352184374999994
+          },
+          "p95_ms": {
+            "pipe_ms": 1.4047165,
+            "frontend_ms": 21.199284000000002,
+            "optimization_ms": 39.680314249999995,
+            "other_native_ms": 1.231179
+          },
+          "mean_total_ms": 47.564344809523796,
+          "p95_total_ms": 61.351729250000005,
+          "share_pct": {
+            "pipe_ms": 2.448543874312511,
+            "frontend_ms": 39.34070674719222,
+            "optimization_ms": 56.45477346661272,
+            "other_native_ms": 1.7559759118825575
+          },
+          "mean_request_ms": 1.0311546011904762,
+          "mean_reply_ms": 0.13347925
+        }
+      },
+      "prefault_queue_p95_s": 2.10048199675,
+      "prefault_processing_hz": 18.57494312833838
+    },
+    "vins-recover-short_long-background-950": {
+      "run_metadata": {
+        "host": "vins",
+        "sequence": "V2_01_easy",
+        "mode": "recover",
+        "condition": "short_long",
+        "schedule": "background",
+        "controller_exit": 0,
+        "subscriber_exit": 0
+      },
+      "ordered_input_sha256": "935fc1edebd874741c6fe462bc6751b893582d2c21a20859e2967528c3748b3f",
+      "controller_and_subscriber_zero": true,
+      "input_frames": 950,
+      "input_drop": 0,
+      "input_clock_span_s": 47.449115965,
+      "max_input_gap_s": 0.050227585,
+      "end_to_end_span_s": 50.097583541,
+      "delivered": 906,
+      "channels": {
+        "native": 740,
+        "inertial_history": 7,
+        "repaired_history": 3,
+        "local_unverified": 156
+      },
+      "scoreable_frames": 790,
+      "anchor_pairs": 335,
+      "timely_outputs": 43,
+      "verified_outputs": 600,
+      "position_within_limit": 600,
+      "timely_usable": 43,
+      "timely_usable_fraction": 0.05443037974683544,
+      "receipt_latency_p95_s": 2.971383024,
+      "arm_position_rmse_m": 0.08276196062977523,
+      "longest_wall_gap_s": 0.398402281,
+      "per_event": [
+        {
+          "window_s": [
+            25.0,
+            25.35
+          ],
+          "input_blind_frames": 7,
+          "received_blind_frames": 7,
+          "received_blind_history": 7,
+          "public_interruption_s": 0.398402281,
+          "to_live_output_s": 0.453863947,
+          "healthy_input_to_ordinary_receipt_s": 1.925684094
+        },
+        {
+          "window_s": [
+            38.0,
+            39.7
+          ],
+          "input_blind_frames": 34,
+          "received_blind_frames": 0,
+          "received_blind_history": 0,
+          "public_interruption_s": 0.246840282,
+          "to_live_output_s": 0.246840282,
+          "healthy_input_to_ordinary_receipt_s": 1.60516247
+        }
+      ],
+      "history_delivered": [
+        {
+          "event": 1,
+          "verified_historical_blind_frames": 7,
+          "verified_historical_visual_frames": 3,
+          "local_historical_blind_frames": 0,
+          "local_historical_visual_frames": 0,
+          "receipts": [
+            {
+              "timestamp": 1413393237255760384,
+              "pose_cw": [
+                2.5226820214287593,
+                -0.12893611811995015,
+                1.8880003098363862,
+                0.5606675179786261,
+                0.5776315782879138,
+                -0.39827763379766823,
+                0.4397369901029831
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 491,
+              "received_ns": 84589158029133
+            },
+            {
+              "timestamp": 1413393237305760512,
+              "pose_cw": [
+                2.5205360913028714,
+                -0.09683630710536095,
+                1.8858574545059792,
+                0.5583724529834123,
+                0.5800047885925776,
+                -0.3949796570479527,
+                0.44249940053885733
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 492,
+              "received_ns": 84589158255418
+            },
+            {
+              "timestamp": 1413393237355760384,
+              "pose_cw": [
+                2.525431410621399,
+                -0.07440768615001386,
+                1.87542598657244,
+                0.5562668777433551,
+                0.5822750463313394,
+                -0.39316405147305805,
+                0.4437848124652154
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 493,
+              "received_ns": 84589158412866
+            },
+            {
+              "timestamp": 1413393237405760512,
+              "pose_cw": [
+                2.5330055227362993,
+                -0.06005644504325264,
+                1.8623323929616957,
+                0.5545655657456116,
+                0.5829442621519796,
+                -0.3933730017458389,
+                0.4448490777902123
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 494,
+              "received_ns": 84589158570615
+            },
+            {
+              "timestamp": 1413393237455760384,
+              "pose_cw": [
+                2.5477597376972985,
+                -0.06735752345590268,
+                1.8409617157796847,
+                0.5544948670030022,
+                0.5825832230284336,
+                -0.3956739468634058,
+                0.44336706969131123
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 495,
+              "received_ns": 84589158724397
+            },
+            {
+              "timestamp": 1413393237505760512,
+              "pose_cw": [
+                2.5701478956111807,
+                -0.09576532014642058,
+                1.810531106302243,
+                0.5560055434287253,
+                0.5806044899077862,
+                -0.4009915234110578,
+                0.43927447015268983
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 496,
+              "received_ns": 84589158888448
+            },
+            {
+              "timestamp": 1413393237555760384,
+              "pose_cw": [
+                2.595601104838586,
+                -0.1434669589318346,
+                1.775490135127847,
+                0.5592191536622415,
+                0.5780421475802576,
+                -0.40720688862741894,
+                0.43280915384551066
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 497,
+              "received_ns": 84589159039835
+            },
+            {
+              "timestamp": 1413393237605760512,
+              "map_id": 0,
+              "inertial": [
+                -0.16835854675112585,
+                -0.20338951086634646,
+                -0.12483259451904836,
+                -0.05017745690705884,
+                0.0479795630423574,
+                0.04099823550123404,
+                -0.0001427553038142374,
+                0.025807081697930022,
+                0.08195417457743333
+              ],
+              "pose_cw": [
+                2.619880325596971,
+                -0.19106502851798884,
+                1.741575943494359,
+                0.5622968952979668,
+                0.5748864916286394,
+                -0.4139351609981767,
+                0.4265974751104316
+              ],
+              "type": "pose",
+              "channel": "repaired_history",
+              "coordinate_verified": true,
+              "delivery_id": 498,
+              "received_ns": 84589159224133
+            },
+            {
+              "timestamp": 1413393237655760384,
+              "map_id": 0,
+              "inertial": [
+                -0.16094509920596026,
+                -0.19788757484985542,
+                -0.10925761280491743,
+                -0.05048275755136201,
+                0.048831138323957,
+                0.04082941922381049,
+                -0.0001520870105943338,
+                0.025796006874483236,
+                0.0819633783929378
+              ],
+              "pose_cw": [
+                2.6437952469876156,
+                -0.24517390476822437,
+                1.7042047505851823,
+                0.5663069902022498,
+                0.5730517676884656,
+                -0.4189981318259763,
+                0.41874649840152156
+              ],
+              "type": "pose",
+              "channel": "repaired_history",
+              "coordinate_verified": true,
+              "delivery_id": 499,
+              "received_ns": 84589159412939
+            },
+            {
+              "timestamp": 1413393237705760512,
+              "map_id": 0,
+              "inertial": [
+                -0.15375661027543874,
+                -0.19043261317052282,
+                -0.10282795927675198,
+                -0.05068635987257639,
+                0.048823247311448964,
+                0.041064487770887066,
+                -0.00015649732389037778,
+                0.025795455624538846,
+                0.08197733990613716
+              ],
+              "pose_cw": [
+                2.664431356584534,
+                -0.2837195924561683,
+                1.6738924583118773,
+                0.5688774185544472,
+                0.571368252830574,
+                -0.42350194233895827,
+                0.4129926236039758
+              ],
+              "type": "pose",
+              "channel": "repaired_history",
+              "coordinate_verified": true,
+              "delivery_id": 500,
+              "received_ns": 84589159561321
+            }
+          ]
+        }
+      ],
+      "lifecycle": [
+        {
+          "type": "isolate",
+          "event": 1,
+          "fault": "image_observation",
+          "first_untrusted": 1413393237255760384,
+          "detected": 1413393237305760512,
+          "checkpoint": {
+            "timestamp": 1413393237205760512,
+            "map_id": 0,
+            "inertial": [
+              -0.2066182824017078,
+              -0.029299981612145035,
+              0.1929243135845527,
+              -0.04968436229802829,
+              0.04565802520216951,
+              0.04137125267058654,
+              -0.00013104117675102393,
+              0.025825358368135307,
+              0.08194488403639028
+            ],
+            "pose_cw": [
+              2.526632900846117,
+              -0.18011991523559545,
+              1.886207826197511,
+              0.5646527991393802,
+              0.5757333105158894,
+              -0.4008312855361761,
+              0.4347788542717936
+            ]
+          },
+          "detected_ns": 84588770621220
+        },
+        {
+          "type": "incremental_checkpoint",
+          "event": 1,
+          "qualified": true,
+          "maximum_state_differences": [
+            3.84632596913015e-15,
+            0.0,
+            5.721958498152797e-17,
+            0.0,
+            0.0
+          ],
+          "prefix_frames_replayed": 0
+        },
+        {
+          "type": "blind_history",
+          "event": 1,
+          "endpoint_position_residual_m": 0.0071060304294138605,
+          "endpoint_orientation_residual_rad": 0.002176523068359516,
+          "blind_frames": 7,
+          "accepted": true
+        },
+        {
+          "type": "promote",
+          "event": 1,
+          "checkpoint": 1413393237205760512,
+          "through": 1413393237705760512,
+          "decided_ns": 84589157912579,
+          "coordinate_verified": true,
+          "accepted_blind_history": [
+            1413393237255760384,
+            1413393237305760512,
+            1413393237355760384,
+            1413393237405760512,
+            1413393237455760384,
+            1413393237505760512,
+            1413393237555760384
+          ],
+          "accepted_history": [
+            1413393237605760512,
+            1413393237655760384,
+            1413393237705760512
+          ]
+        },
+        {
+          "type": "rearmed",
+          "event": 1,
+          "coordinate_verified": true
+        },
+        {
+          "type": "standby_catchup",
+          "event": 1,
+          "frames": 10,
+          "through": 1413393237705760512,
+          "started_ns": 84589159830374,
+          "finished_ns": 84589300982021
+        },
+        {
+          "type": "isolate",
+          "event": 2,
+          "fault": "image_observation",
+          "first_untrusted": 1413393250255760384,
+          "detected": 1413393250305760512,
+          "checkpoint": {
+            "timestamp": 1413393250205760512,
+            "map_id": 0,
+            "inertial": [
+              0.06095263500812425,
+              -0.24340670135392223,
+              -0.14210085587638638,
+              -0.05485056019102573,
+              0.06488932604986701,
+              0.0630972324094631,
+              -0.0008808374586976013,
+              0.025326814310844777,
+              0.08206488329706721
+            ],
+            "pose_cw": [
+              2.2907940947181955,
+              0.23068126872170153,
+              -1.1295739251728365,
+              0.4088819311188065,
+              0.7083756921562866,
+              -0.48011813026921984,
+              0.317026853994178
+            ]
+          },
+          "detected_ns": 84603005588594
+        },
+        {
+          "type": "incremental_checkpoint",
+          "event": 2,
+          "qualified": true,
+          "maximum_state_differences": [
+            0.0016302836414998224,
+            0.0004994645837250758,
+            0.0023923313740855687,
+            0.0006715904408240329,
+            1.1533856510352161e-05
+          ],
+          "prefix_frames_replayed": 0
+        },
+        {
+          "type": "reject",
+          "event": 2,
+          "reason": "bounded_candidate_window",
+          "decided_ns": 84603161873571,
+          "preserved_anchor": 1413393250205760512
+        },
+        {
+          "type": "worker_exit",
+          "name": 312459,
+          "exit": 0
+        },
+        {
+          "type": "worker_exit",
+          "name": 312465,
+          "exit": 0
+        }
+      ],
+      "event_populations": [
+        {
+          "fault_span_s": [
+            25.0,
+            25.35
+          ],
+          "physical_frames": 67,
+          "verified": 67,
+          "timely_usable": 0
+        },
+        {
+          "fault_span_s": [
+            38.0,
+            39.7
+          ],
+          "physical_frames": 94,
+          "verified": 0,
+          "timely_usable": 0
+        }
+      ],
+      "source_file_sha256": {
+        "vins-recover-short_long-background-950/events.jsonl": "dbe650c4d459492c0a0fd4b88420f69c0e10c047d759a3aa49fb001e83f26380",
+        "vins-recover-short_long-background-950/input_clock.jsonl": "03f266c5d1412da64055959cb2d5aa2b833c6fc46b1ad378bd6230e1e9277a62",
+        "vins-recover-short_long-background-950.subscriber.jsonl": "89301d2f72f6c0bc0475f5ad05990aacbc2af1c67480f4a506ce085f7a4ebe50",
+        "vins-recover-short_long-background-950.json": "47159f8d7cf67dc9afe6b338b97a0b87d71b0077dde70f19ba691c79ff0df631"
+      },
+      "controller_counts": {
+        "run": 1,
+        "worker_started": 2,
+        "consume": 950,
+        "native_stage": 1741,
+        "pose": 906,
+        "isolate": 2,
+        "incremental_checkpoint": 2,
+        "validation_partition": 1,
+        "candidate": 3,
+        "blind_history": 1,
+        "promote": 1,
+        "rearmed": 1,
+        "standby_catchup": 1,
+        "reject": 1,
+        "worker_exit": 2
+      },
+      "worker_failures": 0,
+      "stage_8_to_24_8_seconds": {
+        "public": {
+          "frames": 336,
+          "mean_ms": {
+            "pipe_ms": 1.0997119345238093,
+            "frontend_ms": 18.874291086309523,
+            "optimization_ms": 26.365905943452372,
+            "other_native_ms": 0.8760722142857142
+          },
+          "p95_ms": {
+            "pipe_ms": 1.2704032500000002,
+            "frontend_ms": 21.34310025,
+            "optimization_ms": 38.925349,
+            "other_native_ms": 1.3477595
+          },
+          "mean_total_ms": 47.21598117857142,
+          "p95_total_ms": 61.7892495,
+          "share_pct": {
+            "pipe_ms": 2.3291095664509975,
+            "frontend_ms": 39.97437015007,
+            "optimization_ms": 55.84106331230563,
+            "other_native_ms": 1.8554569711733797
+          },
+          "mean_request_ms": 0.979601363095238,
+          "mean_reply_ms": 0.12011057142857143
+        },
+        "spare": {
+          "frames": 336,
+          "mean_ms": {
+            "pipe_ms": 1.1752326696428566,
+            "frontend_ms": 18.84942078571428,
+            "optimization_ms": 26.63936007142857,
+            "other_native_ms": 0.8552830803571426
+          },
+          "p95_ms": {
+            "pipe_ms": 1.42606725,
+            "frontend_ms": 21.84431075,
+            "optimization_ms": 39.048690500000006,
+            "other_native_ms": 1.2609525000000001
+          },
+          "mean_total_ms": 47.51929660714285,
+          "p95_total_ms": 62.01911575,
+          "share_pct": {
+            "pipe_ms": 2.4731693302594087,
+            "frontend_ms": 39.66687668285253,
+            "optimization_ms": 56.06008921315617,
+            "other_native_ms": 1.7998647737319013
+          },
+          "mean_request_ms": 1.030055,
+          "mean_reply_ms": 0.14517766964285714
+        }
+      },
+      "prefault_queue_p95_s": 1.954926705,
+      "prefault_processing_hz": 18.677393838590774
+    },
+    "vins-recover-short_long-serial-950": {
+      "run_metadata": {
+        "host": "vins",
+        "sequence": "V2_01_easy",
+        "mode": "recover",
+        "condition": "short_long",
+        "schedule": "serial",
+        "controller_exit": 0,
+        "subscriber_exit": 0
+      },
+      "ordered_input_sha256": "935fc1edebd874741c6fe462bc6751b893582d2c21a20859e2967528c3748b3f",
+      "controller_and_subscriber_zero": true,
+      "input_frames": 950,
+      "input_drop": 0,
+      "input_clock_span_s": 47.449101792,
+      "max_input_gap_s": 0.050486816,
+      "end_to_end_span_s": 81.837455432,
+      "delivered": 906,
+      "channels": {
+        "native": 740,
+        "inertial_history": 7,
+        "repaired_history": 3,
+        "local_unverified": 156
+      },
+      "scoreable_frames": 790,
+      "anchor_pairs": 335,
+      "timely_outputs": 0,
+      "verified_outputs": 600,
+      "position_within_limit": 600,
+      "timely_usable": 0,
+      "timely_usable_fraction": 0.0,
+      "receipt_latency_p95_s": 34.201361435500004,
+      "arm_position_rmse_m": 0.08100042291246427,
+      "longest_wall_gap_s": 0.392296309,
+      "per_event": [
+        {
+          "window_s": [
+            25.0,
+            25.35
+          ],
+          "input_blind_frames": 7,
+          "received_blind_frames": 7,
+          "received_blind_history": 7,
+          "public_interruption_s": 0.392296309,
+          "to_live_output_s": 0.616842714,
+          "healthy_input_to_ordinary_receipt_s": 22.458484223
+        },
+        {
+          "window_s": [
+            38.0,
+            39.7
+          ],
+          "input_blind_frames": 34,
+          "received_blind_frames": 0,
+          "received_blind_history": 0,
+          "public_interruption_s": 0.247370772,
+          "to_live_output_s": 0.247370772,
+          "healthy_input_to_ordinary_receipt_s": 33.336740504
+        }
+      ],
+      "history_delivered": [
+        {
+          "event": 1,
+          "verified_historical_blind_frames": 7,
+          "verified_historical_visual_frames": 3,
+          "local_historical_blind_frames": 0,
+          "local_historical_visual_frames": 0,
+          "receipts": [
+            {
+              "timestamp": 1413393237255760384,
+              "pose_cw": [
+                2.5186430523540912,
+                -0.0968199137916827,
+                1.8894620459157268,
+                0.5611633438328499,
+                0.5765858543630245,
+                -0.3972159346580943,
+                0.4414339761963189
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 491,
+              "received_ns": 84845561135912
+            },
+            {
+              "timestamp": 1413393237305760512,
+              "pose_cw": [
+                2.5161235738895784,
+                -0.06471399655791027,
+                1.8871312849304345,
+                0.5588675898043194,
+                0.578940320408898,
+                -0.393932044613676,
+                0.4441989044309346
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 492,
+              "received_ns": 84845561356396
+            },
+            {
+              "timestamp": 1413393237355760384,
+              "pose_cw": [
+                2.520761402821188,
+                -0.0422273075193314,
+                1.8763980580304682,
+                0.5567596472015222,
+                0.5811836003644115,
+                -0.3921436443030691,
+                0.44549711575744766
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 493,
+              "received_ns": 84845561511130
+            },
+            {
+              "timestamp": 1413393237405760512,
+              "pose_cw": [
+                2.528216978477748,
+                -0.027781782644204944,
+                1.862859947736677,
+                0.5550506007565139,
+                0.5818218498570865,
+                -0.392386811951155,
+                0.4465811857160127
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 494,
+              "received_ns": 84845561684357
+            },
+            {
+              "timestamp": 1413393237455760384,
+              "pose_cw": [
+                2.5430611105183223,
+                -0.03496856365225315,
+                1.841121090762818,
+                0.5549705589901829,
+                0.581430326317597,
+                -0.3947291868631892,
+                0.44512394153837864
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 495,
+              "received_ns": 84845561852195
+            },
+            {
+              "timestamp": 1413393237505760512,
+              "pose_cw": [
+                2.5657774555905384,
+                -0.06326104934747984,
+                1.8104283773045928,
+                0.556468894751631,
+                0.5794278411153142,
+                -0.40009122803501673,
+                0.44105867564733026
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 496,
+              "received_ns": 84845562038576
+            },
+            {
+              "timestamp": 1413393237555760384,
+              "pose_cw": [
+                2.591682632517359,
+                -0.11088821252563158,
+                1.7753996841756101,
+                0.5596717102651878,
+                0.5768514375521019,
+                -0.4063479948349314,
+                0.4346162707682994
+              ],
+              "map_id": 0,
+              "provenance": "bias_corrected_imu_with_verified_visual_endpoints",
+              "type": "pose",
+              "channel": "inertial_history",
+              "coordinate_verified": true,
+              "delivery_id": 497,
+              "received_ns": 84845562205462
+            },
+            {
+              "timestamp": 1413393237605760512,
+              "map_id": 0,
+              "inertial": [
+                -0.16904763556887967,
+                -0.20174376029455804,
+                -0.12463065371460486,
+                -0.046928416580088575,
+                0.04407347493871255,
+                0.049770935589677934,
+                -0.00034686698056466775,
+                0.025856765294650964,
+                0.08189157049812591
+              ],
+              "pose_cw": [
+                2.6163752929638298,
+                -0.15849591810286626,
+                1.7417071716197148,
+                0.5627398319533353,
+                0.5736974678351575,
+                -0.41310252534838354,
+                0.428417320475548
+              ],
+              "type": "pose",
+              "channel": "repaired_history",
+              "coordinate_verified": true,
+              "delivery_id": 498,
+              "received_ns": 84845562377006
+            },
+            {
+              "timestamp": 1413393237655760384,
+              "map_id": 0,
+              "inertial": [
+                -0.16158467704960267,
+                -0.19625496553193322,
+                -0.10913299632563962,
+                -0.04724411306390484,
+                0.04484803332786698,
+                0.04956243411233584,
+                -0.0003538056112290113,
+                0.025845647231843336,
+                0.08190056557280256
+              ],
+              "pose_cw": [
+                2.6408291103649626,
+                -0.21263547231297608,
+                1.7045313882018223,
+                0.5667609914838222,
+                0.5718505259647976,
+                -0.41817812409277594,
+                0.42059007479528815
+              ],
+              "type": "pose",
+              "channel": "repaired_history",
+              "coordinate_verified": true,
+              "delivery_id": 499,
+              "received_ns": 84845562557838
+            },
+            {
+              "timestamp": 1413393237705760512,
+              "map_id": 0,
+              "inertial": [
+                -0.15414407130040195,
+                -0.18860003453336804,
+                -0.10281984962965661,
+                -0.04745048192110495,
+                0.04477868831880278,
+                0.04977490892084297,
+                -0.00035739216940274026,
+                0.025845395796857035,
+                0.08191422243743325
+              ],
+              "pose_cw": [
+                2.661810100784185,
+                -0.2512340183259802,
+                1.6743597928008127,
+                0.5693386266091912,
+                0.5701585628530341,
+                -0.4226965466717669,
+                0.4148498172687143
+              ],
+              "type": "pose",
+              "channel": "repaired_history",
+              "coordinate_verified": true,
+              "delivery_id": 500,
+              "received_ns": 84845562724663
+            }
+          ]
+        }
+      ],
+      "lifecycle": [
+        {
+          "type": "isolate",
+          "event": 1,
+          "fault": "image_observation",
+          "first_untrusted": 1413393237255760384,
+          "detected": 1413393237305760512,
+          "checkpoint": {
+            "timestamp": 1413393237205760512,
+            "map_id": 0,
+            "inertial": [
+              -0.20294110934325751,
+              -0.026426419364504503,
+              0.19353828284118774,
+              -0.0492648122904835,
+              0.02191762056417929,
+              0.040806646598166005,
+              -0.0003700037160829606,
+              0.02610865126632745,
+              0.08198114349979188
+            ],
+            "pose_cw": [
+              2.5230903341917665,
+              -0.14794430271149112,
+              1.8878205159011923,
+              0.5651497400683078,
+              0.5746883884629777,
+              -0.3997756202260663,
+              0.43648422759524047
+            ]
+          },
+          "detected_ns": 84845179539551
+        },
+        {
+          "type": "incremental_checkpoint",
+          "event": 1,
+          "qualified": true,
+          "maximum_state_differences": [
+            0.0021010645128961905,
+            0.0006078723362560481,
+            0.007678174941565247,
+            0.024446791783393984,
+            0.0002720624389249158
+          ],
+          "prefix_frames_replayed": 0
+        },
+        {
+          "type": "blind_history",
+          "event": 1,
+          "endpoint_position_residual_m": 0.009917075279943021,
+          "endpoint_orientation_residual_rad": 0.0023279987014173573,
+          "blind_frames": 7,
+          "accepted": true
+        },
+        {
+          "type": "promote",
+          "event": 1,
+          "checkpoint": 1413393237205760512,
+          "through": 1413393237705760512,
+          "decided_ns": 84845561018055,
+          "coordinate_verified": true,
+          "accepted_blind_history": [
+            1413393237255760384,
+            1413393237305760512,
+            1413393237355760384,
+            1413393237405760512,
+            1413393237455760384,
+            1413393237505760512,
+            1413393237555760384
+          ],
+          "accepted_history": [
+            1413393237605760512,
+            1413393237655760384,
+            1413393237705760512
+          ]
+        },
+        {
+          "type": "standby_catchup",
+          "event": 1,
+          "frames": 10,
+          "through": 1413393237705760512,
+          "started_ns": 84845562834804,
+          "finished_ns": 84845692276919
+        },
+        {
+          "type": "rearmed",
+          "event": 1,
+          "coordinate_verified": true
+        },
+        {
+          "type": "isolate",
+          "event": 2,
+          "fault": "image_observation",
+          "first_untrusted": 1413393250255760384,
+          "detected": 1413393250305760512,
+          "checkpoint": {
+            "timestamp": 1413393250205760512,
+            "map_id": 0,
+            "inertial": [
+              0.05982288464245709,
+              -0.2418224076632606,
+              -0.1427031454828919,
+              -0.052199402595603704,
+              0.058785171646322125,
+              0.07036232940502316,
+              -0.0009950244919023398,
+              0.025340285129720797,
+              0.08202093006463831
+            ],
+            "pose_cw": [
+              2.2853855031827885,
+              0.2545905019902155,
+              -1.125441223438731,
+              0.41014080160015476,
+              0.7070751519706217,
+              -0.4792198755073492,
+              0.319652253624506
+            ]
+          },
+          "detected_ns": 84870776253311
+        },
+        {
+          "type": "incremental_checkpoint",
+          "event": 2,
+          "qualified": true,
+          "maximum_state_differences": [
+            0.0013786650395525891,
+            0.0009573794053054815,
+            0.0037855781641415887,
+            0.015562788284363695,
+            0.00011906563736850406
+          ],
+          "prefix_frames_replayed": 0
+        },
+        {
+          "type": "reject",
+          "event": 2,
+          "reason": "bounded_candidate_window",
+          "decided_ns": 84870933106358,
+          "preserved_anchor": 1413393250205760512
+        },
+        {
+          "type": "worker_exit",
+          "name": 514641,
+          "exit": 0
+        },
+        {
+          "type": "worker_exit",
+          "name": 514647,
+          "exit": 0
+        }
+      ],
+      "event_populations": [
+        {
+          "fault_span_s": [
+            25.0,
+            25.35
+          ],
+          "physical_frames": 67,
+          "verified": 67,
+          "timely_usable": 0
+        },
+        {
+          "fault_span_s": [
+            38.0,
+            39.7
+          ],
+          "physical_frames": 94,
+          "verified": 0,
+          "timely_usable": 0
+        }
+      ],
+      "source_file_sha256": {
+        "vins-recover-short_long-serial-950/events.jsonl": "263dab4a66eef1cb6bdd88c0d402fb4a561c90edd34b4026b59df5d5bf226505",
+        "vins-recover-short_long-serial-950/input_clock.jsonl": "f2060c2a5f1e057164ea2a2a50f36e2611faa311c0a21dacad51c221c2abcb6f",
+        "vins-recover-short_long-serial-950.subscriber.jsonl": "d2239c7427f8e36d77b6ac1e85f87622d9b793d5563f8ada281e1b5934419029",
+        "vins-recover-short_long-serial-950.json": "45b421953437b9ed2116ca41a12409bce58b0beeddad4b530aa9913bb46e4182"
+      },
+      "controller_counts": {
+        "run": 1,
+        "worker_started": 2,
+        "consume": 950,
+        "native_stage": 1741,
+        "pose": 906,
+        "isolate": 2,
+        "incremental_checkpoint": 2,
+        "validation_partition": 1,
+        "candidate": 3,
+        "blind_history": 1,
+        "promote": 1,
+        "standby_catchup": 1,
+        "rearmed": 1,
+        "reject": 1,
+        "worker_exit": 2
+      },
+      "worker_failures": 0,
+      "stage_8_to_24_8_seconds": {
+        "public": {
+          "frames": 336,
+          "mean_ms": {
+            "pipe_ms": 1.1006679642857145,
+            "frontend_ms": 18.020697226190478,
+            "optimization_ms": 25.29879039285715,
+            "other_native_ms": 0.8268767083333339
+          },
+          "p95_ms": {
+            "pipe_ms": 1.29657725,
+            "frontend_ms": 19.597911500000002,
+            "optimization_ms": 37.804460750000004,
+            "other_native_ms": 1.1853295
+          },
+          "mean_total_ms": 45.24703229166668,
+          "p95_total_ms": 58.415757750000004,
+          "share_pct": {
+            "pipe_ms": 2.4325749304190913,
+            "frontend_ms": 39.82735731711054,
+            "optimization_ms": 55.91259605664022,
+            "other_native_ms": 1.827471695830144
+          },
+          "mean_request_ms": 0.9847293630952381,
+          "mean_reply_ms": 0.11593860119047619
+        },
+        "spare": {
+          "frames": 336,
+          "mean_ms": {
+            "pipe_ms": 1.1792588124999992,
+            "frontend_ms": 17.79635388690476,
+            "optimization_ms": 25.448969291666636,
+            "other_native_ms": 0.7920263839285717
+          },
+          "p95_ms": {
+            "pipe_ms": 1.36745125,
+            "frontend_ms": 19.31114325,
+            "optimization_ms": 38.13797725,
+            "other_native_ms": 1.1138895
+          },
+          "mean_total_ms": 45.216608374999964,
+          "p95_total_ms": 58.6901425,
+          "share_pct": {
+            "pipe_ms": 2.6080213772778356,
+            "frontend_ms": 39.35800257133898,
+            "optimization_ms": 56.28234891172697,
+            "other_native_ms": 1.7516271396562313
+          },
+          "mean_request_ms": 1.06410325,
+          "mean_reply_ms": 0.11515556249999999
+        }
+      },
+      "prefault_queue_p95_s": 21.122894257,
+      "prefault_processing_hz": 10.33122961561892
+    }
+  },
+  "comparisons": {
+    "vins": {
+      "shared_input": true,
+      "common_frames": 600,
+      "serial_rmse_m": 0.08100042291246427,
+      "background_rmse_m": 0.08276196062977521
+    },
+    "okvis": {
+      "shared_input": true,
+      "common_frames": 600,
+      "serial_rmse_m": 0.10479239497235372,
+      "background_rmse_m": 0.09906467352803877
+    }
+  }
+}

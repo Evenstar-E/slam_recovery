@@ -17,7 +17,7 @@ CONDITIONS = {
 }
 
 
-def run_arm(args, condition, label, checkout, mode):
+def run_arm(args, condition, label, checkout, mode, extra=()):
     destination = args.out / label
     receipts = args.out / f"{label}.subscriber.jsonl"
     env = dict(os.environ, OPENBLAS_NUM_THREADS="1", OMP_NUM_THREADS="1",
@@ -45,12 +45,12 @@ def run_arm(args, condition, label, checkout, mode):
                 raise RuntimeError("subscriber failed to listen")
             command = [*python, "slam_recovery.vio.run_euroc", *map(str, (
                 truth, args.worker, vocabulary, settings, destination)), "--mode", mode,
-                "--limit", "950", "--realtime", "--subscriber", str(address), *faults]
+                "--limit", "950", "--realtime", "--subscriber", str(address), *faults, *extra]
             run = subprocess.run(["timeout", "--kill-after=10s", "240s", *command],
                                  cwd=checkout, env=env, stdout=log, stderr=subprocess.STDOUT)
             result = {"controller_exit": run.returncode, "mode": mode, "git_commit": revision,
                       "condition": condition, "sequence": truth.name, "wall_end_ns": time.monotonic_ns(),
-                      "cpu_affinity": sorted(os.sched_getaffinity(0))}
+                      "cpu_affinity": sorted(os.sched_getaffinity(0)), "extra_args": list(extra)}
         finally:
             if subscriber.poll() is None:
                 try:

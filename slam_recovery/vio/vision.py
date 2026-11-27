@@ -61,7 +61,7 @@ def in_public_world(snapshot, gauge):
                 inertial=state)
 
 
-def qualify_replay(public, private, event_log, record_type, **context):
+def qualify_replay(public, private, event_log, record_type, *, apply_gauge=True, **context):
     # Fit the gauge to one earlier shared frame. The actual checkpoint and all later
     # prefix frames are held out. This also catches frame-varying drift and scale.
     before = list(public.recent)
@@ -91,8 +91,8 @@ def qualify_replay(public, private, event_log, record_type, **context):
                    failed_prefix_pairs=[dict(row, timestamp=state["timestamp"])
                                         for state, row in zip(before[1:], checks)
                                         if not row["qualified"]])
-    if not qualified:
-        return False
+    if not qualified or not apply_gauge:
+        return qualified
     if private.gauge is None:
         private.gauge = gauge
     else:
@@ -169,9 +169,10 @@ class HeldOutStereo:
         prediction = Rbc.T @ rotation(current["inertial"][16:20]).T @ Rbc
         return angle(observed @ prediction.T)
 
-    def features(self, image, camera):
-        mask = np.zeros_like(image)
-        mask[16:image.shape[0] // 3 - 24] = 255
+    def features(self, image, camera, mask=None):
+        if mask is None:
+            mask = np.zeros_like(image)
+            mask[16:image.shape[0] // 3 - 24] = 255
         keys, descriptors = self.detector.detectAndCompute(image, mask)
         if descriptors is None:
             return np.empty((0, 2)), None
@@ -195,33 +196,54 @@ class HeldOutStereo:
                 unique[match.queryIdx] = match.trainIdx
         return unique
 
-    def validate(self, anchor_images, current_images, saved, candidate):
-        left, dl = self.features(anchor_images[0], 0)
-        right, dr = self.features(anchor_images[1], 1)
-        later, dn = self.features(current_images[0], 0)
+    def validate(self, anchor_images, current_images, saved, candidate, mask=None, *,
+                 support=None, adaptive=False):
+        minimum = 8 if adaptive else 12
+        def reserved_features(image, camera):
+            if support is not None:
+                image = cv.bitwise_and(image, image, mask=support)
+            return self.features(image, camera, mask)
+
+        left, dl = reserved_features(anchor_images[0], 0)
+        right, dr = reserved_features(anchor_images[1], 1)
+        later, dn = reserved_features(current_images[0], 0)
         stereo = self.matches(dl, dr)
         temporal = self.matches(dl, dn)
         triples = [(left[i], right[j], later[temporal[i]]) for i, j in stereo.items()
                    if i in temporal and abs(left[i][1] - right[j][1]) < 2.0
                    and left[i][0] - right[j][0] > 2.0]
-        if len(triples) < 12:
+        if len(triples) < minimum:
             return {"passed": False, "reason": "insufficient_reserved_matches",
                     "matches": len(triples)}
         first, second, current = (np.asarray(column) for column in zip(*triples))
         _, _, p0 = self.calibration[0]
         _, _, p1 = self.calibration[1]
         homogeneous = cv.triangulatePoints(p0, p1, first.T, second.T).T
-        xyz = homogeneous[:, :3] / homogeneous[:, 3, None]
+        with np.errstate(divide="ignore", invalid="ignore"):
+            xyz = homogeneous[:, :3] / homogeneous[:, 3, None]
         valid = np.isfinite(xyz).all(axis=1) & (xyz[:, 2] > 0) & (xyz[:, 2] < 30)
         xyz, current = xyz[valid], current[valid]
-        if len(xyz) < 12:
+        if len(xyz) < minimum:
             return {"passed": False, "reason": "insufficient_reserved_depth", "matches": len(xyz)}
         success, rvec, trans, inliers = cv.solvePnPRansac(
             xyz, current, self.intrinsics, None, iterationsCount=100,
             reprojectionError=2.5, confidence=0.99, flags=cv.SOLVEPNP_EPNP,
         )
-        if not success or inliers is None or len(inliers) < 12:
-            return {"passed": False, "reason": "insufficient_pnp_inliers", "matches": len(xyz)}
+        count = len(inliers) if inliers is not None else 0
+        if not success or count < minimum:
+            return {"passed": False, "reason": "insufficient_pnp_inliers",
+                    "matches": len(xyz), "inliers": count}
+        if adaptive:
+            from .visual_faults import CELLS, cells_for
+
+            # Require spatial support in both rectified views of the temporal match.
+            indices = inliers.ravel()
+            spreads = [int(np.count_nonzero(np.bincount(
+                cells_for(anchor_images[0].shape, points[indices]), minlength=CELLS) >= 2))
+                for points in (first[valid], current)]
+            if count / len(xyz) < 0.60 or min(spreads) < 2:
+                return {"passed": False, "reason": "weak_reserved_geometry",
+                        "matches": len(xyz), "inliers": count, "occupied_tiles": spreads}
         fitted, shift = relative(saved, candidate)
         inliers = inliers.ravel()
         projected, _ = cv.projectPoints(xyz[inliers], cv.Rodrigues(fitted)[0],
