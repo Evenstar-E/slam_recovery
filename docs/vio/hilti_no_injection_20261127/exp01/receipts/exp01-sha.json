@@ -1,0 +1,34 @@
+{
+  "sequence": "exp01",
+  "sha256": "91d2be99f3ec3f00ac4132fd910da126ff57eb9664222ce9f7de2632837b25ea",
+  "bytes": 9200427994,
+  "official_rosbag": "rosbags/exp01_construction_ground_level.bag",
+  "official_bytes": 18497392695,
+  "official_sha256": "7dcaca33e17b4963ec20279f2e1a39722154070465ea406d26796cbf48e5be9c",
+  "official_verified_before_projection": true,
+  "projection_receipt": {
+    "raw_bytes": 18497392695,
+    "raw_sha256": "7dcaca33e17b4963ec20279f2e1a39722154070465ea406d26796cbf48e5be9c",
+    "source_counts": {
+      "/alphasense/imu": 90917,
+      "/alphasense/cam0/image_raw": 9108,
+      "/alphasense/cam1/image_raw": 9108,
+      "/alphasense/cam2/image_raw": 9108,
+      "/alphasense/cam3/image_raw": 9108,
+      "/alphasense/cam4/image_raw": 9107,
+      "/hesai/pandar": 2277,
+      "/Point_name": 13
+    },
+    "compact_counts": {
+      "/alphasense/imu": 90917,
+      "/alphasense/cam0/image_raw": 9108,
+      "/alphasense/cam1/image_raw": 9108,
+      "/hesai/pandar": 2277,
+      "/Point_name": 13
+    },
+    "chunks": 16190,
+    "raw_stream_fully_verified": true,
+    "compact_bytes": 9200427994
+  },
+  "match": true
+}

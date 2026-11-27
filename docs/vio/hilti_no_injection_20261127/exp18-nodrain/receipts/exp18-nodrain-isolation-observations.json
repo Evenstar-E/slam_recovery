@@ -1,0 +1,566 @@
+{
+  "1649856251718045157": {
+    "runs": [
+      "exp18-nodrain-orb-recover"
+    ],
+    "observations": [
+      {
+        "timestamp": 1649856251618051357,
+        "relative_ms": -99.9938,
+        "cams": [
+          {
+            "fast_count": 27,
+            "intensity_avg": 66.1102829218107,
+            "intensity_p95": 129.0,
+            "stddev": 34.55216784367854
+          },
+          {
+            "fast_count": 83,
+            "intensity_avg": 62.16175411522634,
+            "intensity_p95": 145.0,
+            "stddev": 37.778487577880234
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856251643049757,
+        "relative_ms": -74.9954,
+        "cams": [
+          {
+            "fast_count": 20,
+            "intensity_avg": 59.276229423868315,
+            "intensity_p95": 116.0,
+            "stddev": 30.7312776116262
+          },
+          {
+            "fast_count": 74,
+            "intensity_avg": 58.58431841563786,
+            "intensity_p95": 139.0,
+            "stddev": 36.536056088746236
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856251668048257,
+        "relative_ms": -49.9969,
+        "cams": [
+          {
+            "fast_count": 16,
+            "intensity_avg": 63.36834362139918,
+            "intensity_p95": 119.0,
+            "stddev": 31.74105382424619
+          },
+          {
+            "fast_count": 81,
+            "intensity_avg": 63.31139403292181,
+            "intensity_p95": 145.0,
+            "stddev": 37.99686131735426
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856251693046657,
+        "relative_ms": -24.9985,
+        "cams": [
+          {
+            "fast_count": 12,
+            "intensity_avg": 59.80877829218107,
+            "intensity_p95": 113.0,
+            "stddev": 30.128737761377426
+          },
+          {
+            "fast_count": 71,
+            "intensity_avg": 59.47679269547325,
+            "intensity_p95": 139.0,
+            "stddev": 36.561779365783195
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856251718045157,
+        "relative_ms": 0.0,
+        "cams": [
+          {
+            "fast_count": 9,
+            "intensity_avg": 64.34362397119341,
+            "intensity_p95": 117.0,
+            "stddev": 31.185318760730933
+          },
+          {
+            "fast_count": 68,
+            "intensity_avg": 64.63528549382715,
+            "intensity_p95": 145.0,
+            "stddev": 38.1227313336442
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856251743043557,
+        "relative_ms": 24.9984,
+        "cams": [
+          {
+            "fast_count": 8,
+            "intensity_avg": 60.53045524691358,
+            "intensity_p95": 111.0,
+            "stddev": 29.3829562108344
+          },
+          {
+            "fast_count": 57,
+            "intensity_avg": 60.487862654320985,
+            "intensity_p95": 138.0,
+            "stddev": 36.532489018945974
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856251768042057,
+        "relative_ms": 49.9969,
+        "cams": [
+          {
+            "fast_count": 9,
+            "intensity_avg": 65.34228137860082,
+            "intensity_p95": 115.0,
+            "stddev": 30.171315997033382
+          },
+          {
+            "fast_count": 60,
+            "intensity_avg": 65.7845190329218,
+            "intensity_p95": 143.0,
+            "stddev": 37.976545928894744
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856251793040557,
+        "relative_ms": 74.9954,
+        "cams": [
+          {
+            "fast_count": 4,
+            "intensity_avg": 61.31756687242798,
+            "intensity_p95": 108.0,
+            "stddev": 28.17087091578754
+          },
+          {
+            "fast_count": 53,
+            "intensity_avg": 61.36466820987654,
+            "intensity_p95": 135.0,
+            "stddev": 36.255780979622884
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856251818039057,
+        "relative_ms": 99.9939,
+        "cams": [
+          {
+            "fast_count": 3,
+            "intensity_avg": 66.47493569958847,
+            "intensity_p95": 112.0,
+            "stddev": 28.869306118655057
+          },
+          {
+            "fast_count": 55,
+            "intensity_avg": 66.96075617283951,
+            "intensity_p95": 140.0,
+            "stddev": 37.71878588564937
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856251843037457,
+        "relative_ms": 124.9923,
+        "cams": [
+          {
+            "fast_count": 4,
+            "intensity_avg": 58.83561985596708,
+            "intensity_p95": 98.0,
+            "stddev": 24.920531168407567
+          },
+          {
+            "fast_count": 46,
+            "intensity_avg": 62.348688271604935,
+            "intensity_p95": 132.0,
+            "stddev": 35.790419046185974
+          }
+        ]
+      }
+    ],
+    "t_from_start_s": 24.02351277
+  },
+  "1649856302689867445": {
+    "runs": [
+      "exp18-nodrain-orb-recover"
+    ],
+    "observations": [
+      {
+        "timestamp": 1649856302589873745,
+        "relative_ms": -99.9937,
+        "cams": [
+          {
+            "fast_count": 19,
+            "intensity_avg": 70.52473765432099,
+            "intensity_p95": 177.0,
+            "stddev": 41.12393750341866
+          },
+          {
+            "fast_count": 17,
+            "intensity_avg": 76.35579989711934,
+            "intensity_p95": 226.0,
+            "stddev": 50.58986741162099
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856302614872145,
+        "relative_ms": -74.9953,
+        "cams": [
+          {
+            "fast_count": 15,
+            "intensity_avg": 63.78189814814815,
+            "intensity_p95": 136.0,
+            "stddev": 37.602741334403454
+          },
+          {
+            "fast_count": 11,
+            "intensity_avg": 70.10281121399177,
+            "intensity_p95": 220.0,
+            "stddev": 49.49917947649282
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856302639870545,
+        "relative_ms": -49.9969,
+        "cams": [
+          {
+            "fast_count": 20,
+            "intensity_avg": 66.6285262345679,
+            "intensity_p95": 100.0,
+            "stddev": 33.18603928204223
+          },
+          {
+            "fast_count": 14,
+            "intensity_avg": 73.61122685185185,
+            "intensity_p95": 212.0,
+            "stddev": 46.77529019279676
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856302664869045,
+        "relative_ms": -24.9984,
+        "cams": [
+          {
+            "fast_count": 17,
+            "intensity_avg": 58.35908693415638,
+            "intensity_p95": 84.0,
+            "stddev": 28.442938861515188
+          },
+          {
+            "fast_count": 13,
+            "intensity_avg": 65.25708076131687,
+            "intensity_p95": 196.0,
+            "stddev": 43.57212963563083
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856302689867445,
+        "relative_ms": 0.0,
+        "cams": [
+          {
+            "fast_count": 17,
+            "intensity_avg": 62.44777777777778,
+            "intensity_p95": 86.0,
+            "stddev": 23.6496756779196
+          },
+          {
+            "fast_count": 11,
+            "intensity_avg": 69.45807355967078,
+            "intensity_p95": 150.0,
+            "stddev": 37.63600024985847
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856302714865845,
+        "relative_ms": 24.9984,
+        "cams": [
+          {
+            "fast_count": 15,
+            "intensity_avg": 54.3231841563786,
+            "intensity_p95": 80.0,
+            "stddev": 18.115325899738618
+          },
+          {
+            "fast_count": 14,
+            "intensity_avg": 59.334501028806585,
+            "intensity_p95": 80.0,
+            "stddev": 30.817426611091978
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856302739864245,
+        "relative_ms": 49.9968,
+        "cams": [
+          {
+            "fast_count": 16,
+            "intensity_avg": 59.844704218107,
+            "intensity_p95": 84.0,
+            "stddev": 17.55872498317976
+          },
+          {
+            "fast_count": 11,
+            "intensity_avg": 62.954989711934154,
+            "intensity_p95": 86.0,
+            "stddev": 23.758540500369822
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856302764862645,
+        "relative_ms": 74.9952,
+        "cams": [
+          {
+            "fast_count": 16,
+            "intensity_avg": 52.77164094650206,
+            "intensity_p95": 80.0,
+            "stddev": 16.25061465386101
+          },
+          {
+            "fast_count": 13,
+            "intensity_avg": 53.051828703703706,
+            "intensity_p95": 76.0,
+            "stddev": 16.174496369853195
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856302789861245,
+        "relative_ms": 99.9938,
+        "cams": [
+          {
+            "fast_count": 17,
+            "intensity_avg": 68.64694187242799,
+            "intensity_p95": 98.0,
+            "stddev": 20.6600718186348
+          },
+          {
+            "fast_count": 14,
+            "intensity_avg": 61.08298353909465,
+            "intensity_p95": 85.0,
+            "stddev": 16.820639130820098
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856302814859645,
+        "relative_ms": 124.9922,
+        "cams": [
+          {
+            "fast_count": 20,
+            "intensity_avg": 60.04568158436214,
+            "intensity_p95": 94.0,
+            "stddev": 19.367537700696797
+          },
+          {
+            "fast_count": 10,
+            "intensity_avg": 52.91457561728395,
+            "intensity_p95": 77.0,
+            "stddev": 14.823904774981463
+          }
+        ]
+      }
+    ],
+    "t_from_start_s": 74.995335058
+  },
+  "1649856304589750419": {
+    "runs": [
+      "exp18-nodrain-orb-recover"
+    ],
+    "observations": [
+      {
+        "timestamp": 1649856304489756619,
+        "relative_ms": -99.9938,
+        "cams": [
+          {
+            "fast_count": 11,
+            "intensity_avg": 68.40402263374486,
+            "intensity_p95": 140.0,
+            "stddev": 33.63820328798689
+          },
+          {
+            "fast_count": 14,
+            "intensity_avg": 68.24622427983539,
+            "intensity_p95": 133.0,
+            "stddev": 30.774369147774998
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856304514755119,
+        "relative_ms": -74.9953,
+        "cams": [
+          {
+            "fast_count": 16,
+            "intensity_avg": 69.74001543209877,
+            "intensity_p95": 146.0,
+            "stddev": 35.376964829317124
+          },
+          {
+            "fast_count": 14,
+            "intensity_avg": 69.57516975308641,
+            "intensity_p95": 139.0,
+            "stddev": 32.47448013127057
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856304539753619,
+        "relative_ms": -49.9968,
+        "cams": [
+          {
+            "fast_count": 15,
+            "intensity_avg": 69.75062757201646,
+            "intensity_p95": 150.0,
+            "stddev": 36.84986123812008
+          },
+          {
+            "fast_count": 12,
+            "intensity_avg": 69.64143775720164,
+            "intensity_p95": 143.0,
+            "stddev": 33.9695543528739
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856304564752019,
+        "relative_ms": -24.9984,
+        "cams": [
+          {
+            "fast_count": 15,
+            "intensity_avg": 71.53129372427983,
+            "intensity_p95": 156.0,
+            "stddev": 38.608221689423786
+          },
+          {
+            "fast_count": 13,
+            "intensity_avg": 71.42176440329219,
+            "intensity_p95": 150.0,
+            "stddev": 35.69216717874788
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856304589750419,
+        "relative_ms": 0.0,
+        "cams": [
+          {
+            "fast_count": 11,
+            "intensity_avg": 71.15480452674898,
+            "intensity_p95": 158.0,
+            "stddev": 39.77552473397459
+          },
+          {
+            "fast_count": 17,
+            "intensity_avg": 70.99578189300412,
+            "intensity_p95": 152.0,
+            "stddev": 36.99781716542109
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856304614748919,
+        "relative_ms": 24.9985,
+        "cams": [
+          {
+            "fast_count": 12,
+            "intensity_avg": 69.0151980452675,
+            "intensity_p95": 154.0,
+            "stddev": 38.46077598126627
+          },
+          {
+            "fast_count": 9,
+            "intensity_avg": 72.74025720164609,
+            "intensity_p95": 158.0,
+            "stddev": 38.64270972848805
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856304639747319,
+        "relative_ms": 49.9969,
+        "cams": [
+          {
+            "fast_count": 19,
+            "intensity_avg": 68.07769547325103,
+            "intensity_p95": 154.0,
+            "stddev": 39.08720416270596
+          },
+          {
+            "fast_count": 9,
+            "intensity_avg": 71.6920138888889,
+            "intensity_p95": 159.0,
+            "stddev": 39.522749777919515
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856304664745719,
+        "relative_ms": 74.9953,
+        "cams": [
+          {
+            "fast_count": 27,
+            "intensity_avg": 70.4506507201646,
+            "intensity_p95": 160.0,
+            "stddev": 40.56841098685496
+          },
+          {
+            "fast_count": 14,
+            "intensity_avg": 70.06175925925926,
+            "intensity_p95": 155.0,
+            "stddev": 38.280462030159136
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856304689744119,
+        "relative_ms": 99.9937,
+        "cams": [
+          {
+            "fast_count": 19,
+            "intensity_avg": 65.02360082304527,
+            "intensity_p95": 147.0,
+            "stddev": 37.860988337035245
+          },
+          {
+            "fast_count": 12,
+            "intensity_avg": 68.67161522633745,
+            "intensity_p95": 154.0,
+            "stddev": 38.741335123938136
+          }
+        ]
+      },
+      {
+        "timestamp": 1649856304714742619,
+        "relative_ms": 124.9922,
+        "cams": [
+          {
+            "fast_count": 20,
+            "intensity_avg": 67.26985082304527,
+            "intensity_p95": 152.0,
+            "stddev": 39.062642124559474
+          },
+          {
+            "fast_count": 13,
+            "intensity_avg": 71.0093878600823,
+            "intensity_p95": 160.0,
+            "stddev": 40.15676180749598
+          }
+        ]
+      }
+    ],
+    "t_from_start_s": 76.895218032
+  }
+}

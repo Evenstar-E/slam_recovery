@@ -1,0 +1,71 @@
+%YAML:1.0
+cameras:
+  - {T_SC: [0.008056545144081963, 0.001633939264078288, 0.9999662105905494, 0.05039201821992372, 0.9999673261909665, 0.0006491483845742284, -0.00805761483714515, -0.0627831669975007, -0.0006622921034909581, 0.9999984544232335, -0.00162865598379329, -0.01314326804268527, 0.0, 0.0, 0.0, 1.0], image_dimension: [720, 540], distortion_coefficients: [0.0, 0.0, 0.0, 0.0], distortion_type: radialtangential, focal_length: [269.4412138477664, 269.4412138477664], principal_point: [351.63921950237693, 258.0456540497829], camera_type: gray, slam_use: okvis}
+  - {T_SC: [0.008056545144090122, 0.0016339392640806118, 0.9999662105905496, 0.0512635496824681, 0.9999673261909668, 0.0006491483845818048, -0.008057614837153256, 0.04539012201223678, -0.0006622921034984843, 0.999998454423234, -0.0016286559837955712, -0.013214912698709419, 0.0, 0.0, 0.0, 1.0], image_dimension: [720, 540], distortion_coefficients: [0.0, 0.0, 0.0, 0.0], distortion_type: radialtangential, focal_length: [269.4412138477664, 269.4412138477664], principal_point: [351.63921950237693, 258.0456540497829], camera_type: gray, slam_use: okvis}
+
+camera_parameters:
+    timestamp_tolerance: 0.005 # [s] stereo frame out-of-sync tolerance
+    sync_cameras: [0, 1] # the cameras that will be synchronised
+    image_delay: 0.0
+    online_calibration: # some parameters to set the online
+        do_extrinsics: false # Do we online-calibrate extrinsics?
+        do_extrinsics_final_ba: false
+        sigma_r: 0.01 # T_SCi position prior stdev [m]
+        sigma_alpha: 0.1 # T_SCi orientation prior stdev [rad]
+        sigma_r_final_ba: 0.03 # T_SCi position prior stdev in final BA [m]
+        sigma_alpha_final_ba: 0.3 # T_SCi orientation prior stdev in final BA [rad]
+
+imu_parameters:
+    use: true
+    a_max: 176.0 # acceleration saturation [m/s^2]
+    g_max: 7.8 # gyro saturation [rad/s]
+    sigma_g_c: 0.000171
+    sigma_a_c: 0.0086
+    sigma_bg: 0.01 # gyro bias prior [rad/s]
+    sigma_ba: 0.1 # accelerometer bias prior [m/s^2]
+    sigma_gw_c: 3.1e-06
+    sigma_aw_c: 0.00022
+    g: 9.81007 # Earth's acceleration due to gravity [m/s^2]
+    g0: [ 0.0, 0.0, 0.0 ] # initial gyro bias [rad/s]
+    a0: [0.0, 0.0, 0.0]
+    # transform Body-Sensor (IMU)
+    T_BS:
+        [1.0000, 0.0000, 0.0000, 0.0000,
+         0.0000, 1.0000, 0.0000, 0.0000,
+         0.0000, 0.0000, 1.0000, 0.0000,
+         0.0000, 0.0000, 0.0000, 1.0000]
+
+# frontend: detection etc.
+frontend_parameters:
+    detection_threshold: 38.0 #42.0 # detection threshold. By default the uniformity radius in pixels
+    absolute_threshold: 150.0 # absolute Harris corner threshold (noise floor)
+    matching_threshold: 60.0 # BRISK descriptor matching threshold
+    octaves: 0 # number of octaves for detection. 0 means single-scale at highest resolution
+    max_num_keypoints: 700 # restrict to a maximum of this many keypoints per image (strongest ones)
+    keyframe_overlap: 0.60 # minimum field-of-view overlap
+    use_cnn: false # use the CNN (if available) to filter out dynamic content / sky
+    parallelise_detection: true # Run parallel detect & describe.
+    num_matching_threads: 2
+
+# estimator parameters
+estimator_parameters:
+    num_keyframes: 5 # number of keyframes in optimisation window
+    num_loop_closure_frames: 3 # number of loop closure frames in optimisation window
+    num_imu_frames: 3 # number of frames linked by most recent nonlinear IMU error terms
+    do_loop_closures: true # whether to do VI-SLAM or VIO
+    do_final_ba: false # Whether to run a full final BA
+    enforce_realtime: false # whether to limit the time budget for optimisation
+    realtime_min_iterations: 3 # minimum number of iterations always performed
+    realtime_max_iterations: 10 # never do more than these, even if not converged
+    realtime_time_limit: 0.035 # time budget for realtime optimisation [s]
+    realtime_num_threads: 2
+    full_graph_iterations: 15 # don't do more than these for the full (background) optimisation
+    full_graph_num_threads: 2
+    p_dbow: 0.4 # Match threshold for dBoW -- unfortunately this varies with setups.
+    drift_percentage_heuristic: 1.35 # % allowed drift in loop closures rel. to dist. travelled.
+
+# some options for how and what to output
+output_parameters:
+    display_matches: false  # displays debug video and matches. May be slow.
+    display_overhead: false # debug overhead image. Is slow.
+

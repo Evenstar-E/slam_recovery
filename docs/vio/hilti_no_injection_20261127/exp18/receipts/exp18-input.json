@@ -1,0 +1,22 @@
+{
+  "sequence": "exp18",
+  "bag": "/mnt/e/vio-multiseq-20261127/exp18.bag",
+  "bag_bytes": 8657654860,
+  "topic_counts": {
+    "/alphasense/cam0/image_raw": 4376,
+    "/alphasense/cam1/image_raw": 4376,
+    "/alphasense/imu": 43656
+  },
+  "exact_pairs": 4376,
+  "pairs_in_imu_support": 4374,
+  "imu_gap_max_ns": 2535600,
+  "imu_gaps_over_15ms": 0,
+  "unpaired": [
+    0,
+    0
+  ],
+  "first_stamp_ns": 1649856227694532387,
+  "last_stamp_ns": 1649856337012723884,
+  "duration_s": 109.318191497,
+  "same_input_both_modes": true
+}

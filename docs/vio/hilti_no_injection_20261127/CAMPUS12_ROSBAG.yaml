@@ -1,0 +1,22 @@
+path: /home/tong/datasets/mmlins/campus_12.bag
+version: 2.0
+duration: 469.441290
+start: 1711547883.362449
+end: 1711548352.803740
+size: 3545174898
+messages: 98580
+indexed: True
+compression: none
+types:
+    - type: sensor_msgs/Imu
+      md5: 6a62c6daae103f4ff57a132d6f95cec2
+    - type: sensor_msgs/PointCloud2
+      md5: 1158d486dd51d683ce2f1be655c3c181
+topics:
+    - topic: /imu_raw
+      type: sensor_msgs/Imu
+      messages: 93885
+    - topic: /velodyne_points
+      type: sensor_msgs/PointCloud2
+      messages: 4695
+

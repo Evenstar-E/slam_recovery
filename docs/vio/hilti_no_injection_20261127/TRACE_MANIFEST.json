@@ -1,0 +1,74 @@
+{
+  "exp01": {
+    "sha256": "69d741e4d769688d7dd5651a9ea917c9a574319e3ee3156c84bb8ef0f4581545",
+    "bytes": 7063250,
+    "arm_file_counts": {
+      "exp01-okvis-native": 8,
+      "exp01-okvis-recover": 8,
+      "exp01-orb-native": 7,
+      "exp01-orb-recover": 7,
+      "exp01-vins-native": 11,
+      "exp01-vins-recover": 11
+    }
+  },
+  "exp04": {
+    "sha256": "ed63b98e0115754b37bf2acda6d721958c7e58d44a0cd1c98d34e3c815d4dc41",
+    "bytes": 4072115,
+    "arm_file_counts": {
+      "exp04-okvis-native": 8,
+      "exp04-okvis-recover": 8,
+      "exp04-orb-native": 7,
+      "exp04-orb-recover": 7,
+      "exp04-vins-native": 11,
+      "exp04-vins-recover": 11
+    }
+  },
+  "exp05": {
+    "sha256": "3991cc5f7db1b03e1ada09ce75a552a677fc6f083dfa1c7cd525b712a9742096",
+    "bytes": 4275200,
+    "arm_file_counts": {
+      "exp05-okvis-native": 8,
+      "exp05-okvis-recover": 8,
+      "exp05-orb-native": 7,
+      "exp05-orb-recover": 7,
+      "exp05-vins-native": 11,
+      "exp05-vins-recover": 11
+    }
+  },
+  "exp16": {
+    "sha256": "b33ff1f38378bb3b0235df8ce90caa8ec22dbd055839b78420ded47db6dc06d4",
+    "bytes": 5654338,
+    "arm_file_counts": {
+      "exp16-okvis-native": 8,
+      "exp16-okvis-recover": 8,
+      "exp16-orb-native": 7,
+      "exp16-orb-recover": 7,
+      "exp16-vins-native": 11,
+      "exp16-vins-recover": 11
+    }
+  },
+  "exp18": {
+    "sha256": "652c55a3bb8772b71a4356ed8f7accf478cd120df506649e42f19fbfdb129cfb",
+    "bytes": 2874438,
+    "arm_file_counts": {
+      "exp18-okvis-native": 8,
+      "exp18-okvis-recover": 8,
+      "exp18-orb-native": 8,
+      "exp18-orb-native-startup-fixed": 7,
+      "exp18-orb-recover": 8,
+      "exp18-orb-recover-startup-fixed": 7,
+      "exp18-vins-native": 7,
+      "exp18-vins-native-startup-fixed": 11,
+      "exp18-vins-recover": 7,
+      "exp18-vins-recover-startup-fixed": 11
+    }
+  },
+  "exp18-nodrain": {
+    "sha256": "db41933049bebd86c0bad1acb281995ff59d3da4edb61e70b4c91fa982f8a6e3",
+    "bytes": 1399755,
+    "arm_file_counts": {
+      "exp18-nodrain-orb-native": 7,
+      "exp18-nodrain-orb-recover": 7
+    }
+  }
+}

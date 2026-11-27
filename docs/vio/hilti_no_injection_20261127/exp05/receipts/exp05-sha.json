@@ -1,0 +1,9 @@
+{
+  "sequence": "exp05",
+  "sha256": "b1f886ca4876664236e34a69ec83ebd9a48190190a9758431c4940a7bad6bbb2",
+  "bytes": 10311807906,
+  "official_rosbag": "rosbags/exp05_construction_upper_level_2.bag",
+  "official_bytes": 10311807906,
+  "official_sha256": "b1f886ca4876664236e34a69ec83ebd9a48190190a9758431c4940a7bad6bbb2",
+  "match": true
+}

@@ -1,0 +1,8 @@
+total 0
+drwxrwxrwx 1 tzr tzr 4096 Nov 27 18:49 .
+drwxrwxrwx 1 tzr tzr 4096 Nov 27 17:35 ..
+total 8
+drwxrwxr-x 2 tzr tzr 4096 Nov 27 18:50 .
+drwx------ 7 tzr tzr 4096 Nov 27 17:35 ..
+0
+0

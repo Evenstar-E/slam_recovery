@@ -1,0 +1,114 @@
+{
+  "exp01-orb": {
+    "hashes": {
+      "orb-rectified.yaml": "5dc0bc1c953b16e08fbcbef665f7fd30c7a3593c62dc757a83f0454cea649142"
+    },
+    "ignored_in_gate_calibration": []
+  },
+  "exp01-okvis": {
+    "hashes": {
+      "orb-rectified.yaml": "5dc0bc1c953b16e08fbcbef665f7fd30c7a3593c62dc757a83f0454cea649142",
+      "okvis.yaml": "7a99032fa9485f5d78e88ade520d873306798a3e39e978f920682fcdea6eed41"
+    },
+    "ignored_in_gate_calibration": []
+  },
+  "exp01-vins": {
+    "hashes": {
+      "orb-rectified.yaml": "5dc0bc1c953b16e08fbcbef665f7fd30c7a3593c62dc757a83f0454cea649142",
+      "cam0.yaml": "cd24bff02b05edb2dd49cff9df9ef1b3b44f2bb81cb621ee6e35f57290d10e1a",
+      "cam1.yaml": "a284b9e1d0821d7061b63e24759eb8a249913264017245ec15547c30ba9c5c11",
+      "primary.yaml": "ed4963342987e0419e5db6f8996eceedcc3f41bf917e946f1ed983ccb1492638"
+    },
+    "ignored_in_gate_calibration": []
+  },
+  "exp04-orb": {
+    "hashes": {
+      "orb-rectified.yaml": "5dc0bc1c953b16e08fbcbef665f7fd30c7a3593c62dc757a83f0454cea649142"
+    },
+    "ignored_in_gate_calibration": []
+  },
+  "exp04-okvis": {
+    "hashes": {
+      "orb-rectified.yaml": "5dc0bc1c953b16e08fbcbef665f7fd30c7a3593c62dc757a83f0454cea649142",
+      "okvis.yaml": "7a99032fa9485f5d78e88ade520d873306798a3e39e978f920682fcdea6eed41"
+    },
+    "ignored_in_gate_calibration": []
+  },
+  "exp04-vins": {
+    "hashes": {
+      "orb-rectified.yaml": "5dc0bc1c953b16e08fbcbef665f7fd30c7a3593c62dc757a83f0454cea649142",
+      "cam0.yaml": "cd24bff02b05edb2dd49cff9df9ef1b3b44f2bb81cb621ee6e35f57290d10e1a",
+      "cam1.yaml": "a284b9e1d0821d7061b63e24759eb8a249913264017245ec15547c30ba9c5c11",
+      "primary.yaml": "ed4963342987e0419e5db6f8996eceedcc3f41bf917e946f1ed983ccb1492638"
+    },
+    "ignored_in_gate_calibration": []
+  },
+  "exp05-orb": {
+    "hashes": {
+      "orb-rectified.yaml": "5dc0bc1c953b16e08fbcbef665f7fd30c7a3593c62dc757a83f0454cea649142"
+    },
+    "ignored_in_gate_calibration": []
+  },
+  "exp05-okvis": {
+    "hashes": {
+      "orb-rectified.yaml": "5dc0bc1c953b16e08fbcbef665f7fd30c7a3593c62dc757a83f0454cea649142",
+      "okvis.yaml": "7a99032fa9485f5d78e88ade520d873306798a3e39e978f920682fcdea6eed41"
+    },
+    "ignored_in_gate_calibration": []
+  },
+  "exp05-vins": {
+    "hashes": {
+      "orb-rectified.yaml": "5dc0bc1c953b16e08fbcbef665f7fd30c7a3593c62dc757a83f0454cea649142",
+      "cam0.yaml": "cd24bff02b05edb2dd49cff9df9ef1b3b44f2bb81cb621ee6e35f57290d10e1a",
+      "cam1.yaml": "a284b9e1d0821d7061b63e24759eb8a249913264017245ec15547c30ba9c5c11",
+      "primary.yaml": "ed4963342987e0419e5db6f8996eceedcc3f41bf917e946f1ed983ccb1492638"
+    },
+    "ignored_in_gate_calibration": []
+  },
+  "exp16-orb": {
+    "hashes": {
+      "orb-rectified.yaml": "5dc0bc1c953b16e08fbcbef665f7fd30c7a3593c62dc757a83f0454cea649142"
+    },
+    "ignored_in_gate_calibration": []
+  },
+  "exp16-okvis": {
+    "hashes": {
+      "orb-rectified.yaml": "5dc0bc1c953b16e08fbcbef665f7fd30c7a3593c62dc757a83f0454cea649142",
+      "okvis.yaml": "7a99032fa9485f5d78e88ade520d873306798a3e39e978f920682fcdea6eed41"
+    },
+    "ignored_in_gate_calibration": []
+  },
+  "exp16-vins": {
+    "hashes": {
+      "orb-rectified.yaml": "5dc0bc1c953b16e08fbcbef665f7fd30c7a3593c62dc757a83f0454cea649142",
+      "cam0.yaml": "cd24bff02b05edb2dd49cff9df9ef1b3b44f2bb81cb621ee6e35f57290d10e1a",
+      "cam1.yaml": "a284b9e1d0821d7061b63e24759eb8a249913264017245ec15547c30ba9c5c11",
+      "primary.yaml": "ed4963342987e0419e5db6f8996eceedcc3f41bf917e946f1ed983ccb1492638"
+    },
+    "ignored_in_gate_calibration": []
+  },
+  "exp18-orb": {
+    "hashes": {
+      "orb-rectified.yaml": "5dc0bc1c953b16e08fbcbef665f7fd30c7a3593c62dc757a83f0454cea649142"
+    },
+    "ignored_in_gate_calibration": []
+  },
+  "exp18-okvis": {
+    "hashes": {
+      "orb-rectified.yaml": "b6abc6a3541ff9d1d190b8172ec3fe0e400c36cedb6fa7da1af49546c1d0bbe3",
+      "okvis.yaml": "7a99032fa9485f5d78e88ade520d873306798a3e39e978f920682fcdea6eed41"
+    },
+    "ignored_in_gate_calibration": [
+      "unused Camera.type label"
+    ]
+  },
+  "exp18-vins": {
+    "hashes": {
+      "orb-rectified.yaml": "5dc0bc1c953b16e08fbcbef665f7fd30c7a3593c62dc757a83f0454cea649142",
+      "cam0.yaml": "cd24bff02b05edb2dd49cff9df9ef1b3b44f2bb81cb621ee6e35f57290d10e1a",
+      "cam1.yaml": "a284b9e1d0821d7061b63e24759eb8a249913264017245ec15547c30ba9c5c11",
+      "primary.yaml": "ed4963342987e0419e5db6f8996eceedcc3f41bf917e946f1ed983ccb1492638"
+    },
+    "ignored_in_gate_calibration": []
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "exp01": {
+    "rows": 13,
+    "first": 1646313114075500000,
+    "last": 1646313336935467700,
+    "cols": [
+      8
+    ],
+    "strictly_increasing": true,
+    "sha256": "3e62f585bc8b3c43b54ac9e6b688eb41085e659d48a81af9a6cedf1e68ec0d26"
+  },
+  "exp04": {
+    "rows": 7,
+    "first": 1646304543157159300,
+    "last": 1646304664726560800,
+    "cols": [
+      8
+    ],
+    "strictly_increasing": true,
+    "sha256": "38cf516e51113254e4ae0207c790f740b19dee08665063e0d8df7bd277040c20"
+  },
+  "exp05": {
+    "rows": 6,
+    "first": 1646304374868718600,
+    "last": 1646304495336829200,
+    "cols": [
+      8
+    ],
+    "strictly_increasing": true,
+    "sha256": "7256439a69ee8fa36ed4a6d167a2c2d8795a5546bc9a81f6fc5c7b090eca0e42"
+  },
+  "exp16": {
+    "rows": 2001,
+    "first": 1649855634050873000,
+    "last": 1649855834141561000,
+    "cols": [
+      8
+    ],
+    "strictly_increasing": true,
+    "sha256": "a616b11b22bf4490fe39bbafedf907016318fc8117851c3455c9b8b124134bb4"
+  },
+  "exp18": {
+    "rows": 789,
+    "first": 1649856227723471000,
+    "last": 1649856314319139000,
+    "cols": [
+      8
+    ],
+    "strictly_increasing": true,
+    "sha256": "138def6a40884a87372a4f18938cce5180d6aa7ad4e705349abf47ac4ec9fa32"
+  }
+}

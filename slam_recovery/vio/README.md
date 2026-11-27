@@ -84,3 +84,10 @@ The OKVIS2 adapter consumes the existing optimized graph callback by default.
 Use `--blocking-callback` for a paired test that waits for every native solve.
 See the [input and callback report](../../docs/vio/PLUGIN_FLOW_REPORT.md)
 for the measured configurations and receipt checks.
+
+### Hilti no-injection comparison
+
+The [paired comparison and evidence](../../docs/vio/hilti_no_injection_20261127/README.md)
+cover five Hilti recordings and three VIO hosts. The report includes position
+RMSE, original-coordinate and local pose delivery, latency, resource use, and
+the refusal and timeout cases.

@@ -1,0 +1,9 @@
+{
+  "sequence": "exp16",
+  "sha256": "e340d874f0836f1637bfbc38b91216eadc18fd6c39fb5e83676a7b295dfcad80",
+  "bytes": 15523312816,
+  "official_rosbag": "rosbags/exp16_attic_to_upper_gallery_2.bag",
+  "official_bytes": 15523312816,
+  "official_sha256": "e340d874f0836f1637bfbc38b91216eadc18fd6c39fb5e83676a7b295dfcad80",
+  "match": true
+}

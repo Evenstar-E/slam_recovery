@@ -1,0 +1,391 @@
+{
+  "completed": {
+    "exp01": {
+      "results": {
+        "orb": {
+          "run_pair": {
+            "native": {
+              "worker_fingerprint": "f3e2050640a1bd565371eb5fd496113f1e75fbee3b44291f2b6176a575bd56d0",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 9107,
+              "public": 7267,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 1
+            },
+            "recover": {
+              "worker_fingerprint": "f3e2050640a1bd565371eb5fd496113f1e75fbee3b44291f2b6176a575bd56d0",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 9107,
+              "public": 6075,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 1
+            }
+          },
+          "matched_observed_input_digests": 9107
+        },
+        "vins": {
+          "run_pair": {
+            "native": {
+              "worker_fingerprint": "435e871ec8ceb84fdc6dd8cfe66023b9066f03643651c8caf98032a92087635a",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 9107,
+              "public": 5660,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 1
+            },
+            "recover": {
+              "worker_fingerprint": "435e871ec8ceb84fdc6dd8cfe66023b9066f03643651c8caf98032a92087635a",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 9107,
+              "public": 5307,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 1
+            }
+          },
+          "matched_observed_input_digests": 9107
+        },
+        "okvis": {
+          "run_pair": {
+            "native": {
+              "worker_fingerprint": "47664404dcfad9ec0d3c1ebb2606587bdf112682e5b66bb052953f674f30ecc2",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 9107,
+              "public": 3931,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 1
+            },
+            "recover": {
+              "worker_fingerprint": "47664404dcfad9ec0d3c1ebb2606587bdf112682e5b66bb052953f674f30ecc2",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 9107,
+              "public": 3986,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 1
+            }
+          },
+          "matched_observed_input_digests": 9107
+        }
+      },
+      "archive_items": 209,
+      "archive_sha256": "b11ab4cd50f64a5033a82f7f1a2e45aec511d0a88c27d2f78174002ef7d74511",
+      "temporary_source_removed_bytes": 9200427994,
+      "temporary_derived_removed_bytes": 3448798798
+    },
+    "exp04": {
+      "results": {
+        "orb": {
+          "run_pair": {
+            "native": {
+              "worker_fingerprint": "f3e2050640a1bd565371eb5fd496113f1e75fbee3b44291f2b6176a575bd56d0",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 5028,
+              "public": 3626,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 1
+            },
+            "recover": {
+              "worker_fingerprint": "f3e2050640a1bd565371eb5fd496113f1e75fbee3b44291f2b6176a575bd56d0",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 5028,
+              "public": 2939,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 1
+            }
+          },
+          "matched_observed_input_digests": 5028
+        },
+        "vins": {
+          "run_pair": {
+            "native": {
+              "worker_fingerprint": "435e871ec8ceb84fdc6dd8cfe66023b9066f03643651c8caf98032a92087635a",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 5028,
+              "public": 3404,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 1
+            },
+            "recover": {
+              "worker_fingerprint": "435e871ec8ceb84fdc6dd8cfe66023b9066f03643651c8caf98032a92087635a",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 5028,
+              "public": 3516,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 1
+            }
+          },
+          "matched_observed_input_digests": 5028
+        },
+        "okvis": {
+          "run_pair": {
+            "native": {
+              "worker_fingerprint": "47664404dcfad9ec0d3c1ebb2606587bdf112682e5b66bb052953f674f30ecc2",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 5028,
+              "public": 2647,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 1
+            },
+            "recover": {
+              "worker_fingerprint": "47664404dcfad9ec0d3c1ebb2606587bdf112682e5b66bb052953f674f30ecc2",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 5028,
+              "public": 2550,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 1
+            }
+          },
+          "matched_observed_input_digests": 5028
+        }
+      },
+      "archive_items": 181,
+      "archive_sha256": "c61dde475d8a5bfead0d13085c3a551b9a9c7e7448764ff7e521b295b1a37010",
+      "temporary_source_removed_bytes": 10469762246,
+      "temporary_derived_removed_bytes": 1822986311
+    },
+    "exp05": {
+      "results": {
+        "orb": {
+          "run_pair": {
+            "native": {
+              "worker_fingerprint": "f3e2050640a1bd565371eb5fd496113f1e75fbee3b44291f2b6176a575bd56d0",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 4990,
+              "public": 4302,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 0
+            },
+            "recover": {
+              "worker_fingerprint": "f3e2050640a1bd565371eb5fd496113f1e75fbee3b44291f2b6176a575bd56d0",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 4990,
+              "public": 3281,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 0
+            }
+          },
+          "matched_observed_input_digests": 4990
+        },
+        "vins": {
+          "run_pair": {
+            "native": {
+              "worker_fingerprint": "435e871ec8ceb84fdc6dd8cfe66023b9066f03643651c8caf98032a92087635a",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 4990,
+              "public": 3447,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 0
+            },
+            "recover": {
+              "worker_fingerprint": "435e871ec8ceb84fdc6dd8cfe66023b9066f03643651c8caf98032a92087635a",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 4990,
+              "public": 3487,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 0
+            }
+          },
+          "matched_observed_input_digests": 4990
+        },
+        "okvis": {
+          "run_pair": {
+            "native": {
+              "worker_fingerprint": "47664404dcfad9ec0d3c1ebb2606587bdf112682e5b66bb052953f674f30ecc2",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 4990,
+              "public": 2689,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 0
+            },
+            "recover": {
+              "worker_fingerprint": "47664404dcfad9ec0d3c1ebb2606587bdf112682e5b66bb052953f674f30ecc2",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 4990,
+              "public": 2362,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 0
+            }
+          },
+          "matched_observed_input_digests": 4990
+        }
+      },
+      "archive_items": 189,
+      "archive_sha256": "a7d6eee60a1a33fda2ca653133c3cd49961e1ecfbecb43b5595bcd3dc21db0ac",
+      "temporary_source_removed_bytes": 10311807906,
+      "temporary_derived_removed_bytes": 1819202918
+    },
+    "exp16": {
+      "results": {
+        "orb": {
+          "run_pair": {
+            "native": {
+              "worker_fingerprint": "f3e2050640a1bd565371eb5fd496113f1e75fbee3b44291f2b6176a575bd56d0",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 8011,
+              "public": 5421,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 0
+            },
+            "recover": {
+              "worker_fingerprint": "f3e2050640a1bd565371eb5fd496113f1e75fbee3b44291f2b6176a575bd56d0",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 8011,
+              "public": 4890,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 0
+            }
+          },
+          "matched_observed_input_digests": 8011
+        },
+        "vins": {
+          "run_pair": {
+            "native": {
+              "worker_fingerprint": "435e871ec8ceb84fdc6dd8cfe66023b9066f03643651c8caf98032a92087635a",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 8011,
+              "public": 5127,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 0
+            },
+            "recover": {
+              "worker_fingerprint": "435e871ec8ceb84fdc6dd8cfe66023b9066f03643651c8caf98032a92087635a",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 8011,
+              "public": 4828,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 0
+            }
+          },
+          "matched_observed_input_digests": 8011
+        },
+        "okvis": {
+          "run_pair": {
+            "native": {
+              "worker_fingerprint": "47664404dcfad9ec0d3c1ebb2606587bdf112682e5b66bb052953f674f30ecc2",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 8011,
+              "public": 4581,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 0
+            },
+            "recover": {
+              "worker_fingerprint": "47664404dcfad9ec0d3c1ebb2606587bdf112682e5b66bb052953f674f30ecc2",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 1326,
+              "public": 771,
+              "controller_exit": 1,
+              "subscriber_exit": 0,
+              "cpu_slot": 0
+            }
+          },
+          "matched_observed_input_digests": 1326
+        }
+      },
+      "archive_items": 138,
+      "archive_sha256": "02e491ed55eafd620ff8d52bc8dc4cd0275336192a3cf30ff6d4e4000035ac13",
+      "temporary_source_removed_bytes": 15523312816,
+      "temporary_derived_removed_bytes": 2703668149
+    },
+    "exp18": {
+      "results": {
+        "orb": {
+          "run_pair": {
+            "native": {
+              "worker_fingerprint": "f3e2050640a1bd565371eb5fd496113f1e75fbee3b44291f2b6176a575bd56d0",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 4374,
+              "public": 3080,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 1
+            },
+            "recover": {
+              "worker_fingerprint": "f3e2050640a1bd565371eb5fd496113f1e75fbee3b44291f2b6176a575bd56d0",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 4374,
+              "public": 3059,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 1
+            }
+          },
+          "matched_observed_input_digests": 4374
+        },
+        "vins": {
+          "run_pair": {
+            "native": {
+              "worker_fingerprint": "435e871ec8ceb84fdc6dd8cfe66023b9066f03643651c8caf98032a92087635a",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 4374,
+              "public": 2997,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 1
+            },
+            "recover": {
+              "worker_fingerprint": "435e871ec8ceb84fdc6dd8cfe66023b9066f03643651c8caf98032a92087635a",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 4374,
+              "public": 2743,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 1
+            }
+          },
+          "matched_observed_input_digests": 4374
+        },
+        "okvis": {
+          "run_pair": {
+            "native": {
+              "worker_fingerprint": "47664404dcfad9ec0d3c1ebb2606587bdf112682e5b66bb052953f674f30ecc2",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 4374,
+              "public": 2361,
+              "controller_exit": 0,
+              "subscriber_exit": 0,
+              "cpu_slot": 0
+            },
+            "recover": {
+              "worker_fingerprint": "47664404dcfad9ec0d3c1ebb2606587bdf112682e5b66bb052953f674f30ecc2",
+              "plugin_revision": "203c8475bae3b3ed7214a6273d6caf2cebb246d6",
+              "input_clocked": 1664,
+              "public": 960,
+              "controller_exit": 1,
+              "subscriber_exit": 0,
+              "cpu_slot": 0
+            }
+          },
+          "matched_observed_input_digests": 1664
+        }
+      },
+      "archive_items": 191,
+      "archive_sha256": "27da25c56db2e871f31380fec33ab5c784324c459b14ac08c7e445bc81f0c3ba",
+      "temporary_source_removed_bytes": 8657654860,
+      "temporary_derived_removed_bytes": 1555601249
+    }
+  },
+  "missing_sequences": [],
+  "campus12": "0 image streams according to native rosbag info"
+}

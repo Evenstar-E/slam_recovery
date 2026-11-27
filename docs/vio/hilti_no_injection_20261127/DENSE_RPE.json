@@ -1,0 +1,108 @@
+{
+  "exp16": {
+    "orb": {
+      "test": "exp16",
+      "common_original_and_inertial_frames": 409,
+      "truth_times_observed": 7996,
+      "rpe_1sec": {
+        "native": {
+          "count": 370,
+          "translation_rmse_m": 0.025797669379421906,
+          "rotation_rmse_deg": 0.4408137883910422
+        },
+        "recover": {
+          "count": 370,
+          "translation_rmse_m": 0.030018502639827034,
+          "rotation_rmse_deg": 0.4454009918414278
+        }
+      }
+    },
+    "vins": {
+      "test": "exp16",
+      "common_original_and_inertial_frames": 762,
+      "truth_times_observed": 7996,
+      "rpe_1sec": {
+        "native": {
+          "count": 723,
+          "translation_rmse_m": 0.05805133327472231,
+          "rotation_rmse_deg": 0.7310924658509219
+        },
+        "recover": {
+          "count": 723,
+          "translation_rmse_m": 0.05829119142773167,
+          "rotation_rmse_deg": 0.730793212405649
+        }
+      }
+    },
+    "okvis": {
+      "test": "exp16",
+      "common_original_and_inertial_frames": 771,
+      "truth_times_observed": 7996,
+      "rpe_1sec": {
+        "native": {
+          "count": 732,
+          "translation_rmse_m": 0.05639147414710381,
+          "rotation_rmse_deg": 0.5060372525956462
+        },
+        "recover": {
+          "count": 732,
+          "translation_rmse_m": 0.05431894086358882,
+          "rotation_rmse_deg": 0.5027179945321618
+        }
+      }
+    }
+  },
+  "exp18": {
+    "orb": {
+      "test": "exp18-nodrain",
+      "common_original_and_inertial_frames": 359,
+      "truth_times_observed": 3033,
+      "rpe_1sec": {
+        "native": {
+          "count": 320,
+          "translation_rmse_m": 0.0492333339692961,
+          "rotation_rmse_deg": 0.40093245894984675
+        },
+        "recover": {
+          "count": 320,
+          "translation_rmse_m": 0.05537663372510152,
+          "rotation_rmse_deg": 0.4022795448568434
+        }
+      }
+    },
+    "vins": {
+      "test": "exp18",
+      "common_original_and_inertial_frames": 923,
+      "truth_times_observed": 3033,
+      "rpe_1sec": {
+        "native": {
+          "count": 859,
+          "translation_rmse_m": 0.045658364808140006,
+          "rotation_rmse_deg": 0.7048899363534865
+        },
+        "recover": {
+          "count": 859,
+          "translation_rmse_m": 0.04917581380013637,
+          "rotation_rmse_deg": 0.8025481751830288
+        }
+      }
+    },
+    "okvis": {
+      "test": "exp18",
+      "common_original_and_inertial_frames": 931,
+      "truth_times_observed": 3033,
+      "rpe_1sec": {
+        "native": {
+          "count": 867,
+          "translation_rmse_m": 0.03850228452279244,
+          "rotation_rmse_deg": 0.6347523989322372
+        },
+        "recover": {
+          "count": 867,
+          "translation_rmse_m": 0.03748463973119198,
+          "rotation_rmse_deg": 0.6398443068786954
+        }
+      }
+    }
+  }
+}

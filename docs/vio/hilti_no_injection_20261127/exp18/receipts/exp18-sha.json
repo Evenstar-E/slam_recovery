@@ -1,0 +1,9 @@
+{
+  "sequence": "exp18",
+  "sha256": "98373b52f207b9ace3914792b5604a6642f89441190cabca6acbaf1d17249280",
+  "bytes": 8657654860,
+  "official_rosbag": "rosbags/exp18_corridor_lower_gallery_2.bag",
+  "official_bytes": 8657654860,
+  "official_sha256": "98373b52f207b9ace3914792b5604a6642f89441190cabca6acbaf1d17249280",
+  "match": true
+}
