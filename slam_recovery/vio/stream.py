@@ -89,14 +89,22 @@ def read_pair(pair, view, payload=None):
 
 
 class Worker:
-    def __init__(self, command, log_path, wait_ready=False):
+    def __init__(self, command, log_path, wait_ready=False, feature_protocol=False):
+        self.feature_protocol = feature_protocol
+        self.last_features = b""
+        self.feature_stats = dict(captures=0, replay_requests=0, hit_cameras=0, bytes=0)
+        env = os.environ.copy()
+        if wait_ready:
+            env["ORB_VIO_REPORT_READY"] = "1"
+        if feature_protocol:
+            env["ORB_VIO_FEATURE_PROTOCOL"] = "1"
         read_end, write_end = os.pipe()
         try:
             with log_path.open("xb") as log:
                 self.process = subprocess.Popen(
                     [*map(str, command), str(write_end)], stdin=subprocess.PIPE,
                     stdout=log, stderr=log, pass_fds=(write_end,),
-                    env=dict(os.environ, ORB_VIO_REPORT_READY="1") if wait_ready else None,
+                    env=env,
                 )
         except BaseException:
             os.close(read_end)
@@ -109,10 +117,13 @@ class Worker:
                 self.close()
                 raise RuntimeError("native worker did not report readiness")
 
-    def track(self, pair, images, imu):
+    def track(self, pair, images, imu, capture=False, features=b""):
         height, width = images[0].shape
         header = struct.pack("<qIII", pair.timestamp, width, height, len(imu))
         payload = b"".join(struct.pack("<q6f", *sample) for sample in imu)
+        if self.feature_protocol:
+            header += struct.pack("<i", -1 if capture else len(features))
+            payload += features
         self.process.stdin.write(header + images[0].tobytes() + images[1].tobytes() + payload)
         self.process.stdin.flush()
         if not select.select([self.responses], [], [], 60)[0]:
@@ -123,6 +134,25 @@ class Worker:
         values = line.split()
         if len(values) not in (18, 38) or int(values[0]) != pair.timestamp:
             raise RuntimeError(f"native worker response mismatch on {pair.timestamp}")
+        if self.feature_protocol:
+            framing = self.responses.readline().split()
+            if len(framing) != 2 or not all(field.isdigit() for field in framing):
+                raise RuntimeError("invalid ORB feature reply framing")
+            hits, size = map(int, framing)
+            if not 0 <= hits <= 2 or not 0 <= size <= 512 * 1024:
+                raise RuntimeError("invalid ORB feature reply")
+            data = bytearray(size)
+            remaining = memoryview(data)
+            while remaining:
+                received = self.responses.readinto(remaining)
+                if not received:
+                    raise RuntimeError("truncated ORB feature reply")
+                remaining = remaining[received:]
+            self.last_features = bytes(data)
+            self.feature_stats["captures"] += bool(data)
+            self.feature_stats["bytes"] += len(data)
+            self.feature_stats["replay_requests"] += bool(features)
+            self.feature_stats["hit_cameras"] += hits
         fields = np.array([float(value) for value in values[2:9]])
         if not np.isfinite(fields).all():
             raise RuntimeError(f"non-finite native pose on {pair.timestamp}")

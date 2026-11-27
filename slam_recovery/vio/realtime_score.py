@@ -44,7 +44,8 @@ def describe(run, receipt_file):
     counts = Counter(row["channel"] for row in output)
     lifecycle = [row for row in trace if row["type"] in
                  ("isolate", "checkpoint_replay", "incremental_checkpoint", "checkpoint_ready",
-                  "standby_catchup", "standby_unavailable", "blind_history", "promote",
+                  "standby_catchup", "standby_unavailable", "standby_probation",
+                  "standby_requalification", "standby_restored", "blind_history", "promote",
                   "reject", "rearmed", "complete", "worker_exit")]
     validations = []
     for row in lifecycle:
@@ -52,15 +53,20 @@ def describe(run, receipt_file):
             t = row["through"]
             blind = row["accepted_blind_history"]
             suffix = row["accepted_history"]
+            verified = row.get("coordinate_verified", True)
             for stamps, channel in ((blind, "inertial_history"), (suffix, "repaired_history")):
+                if not verified:
+                    channel = "local_" + channel
                 for stamp in stamps:
                     pose = poses[stamp]
-                    if pose["channel"] != channel or not pose["coordinate_verified"]:
+                    if pose["channel"] != channel or pose["coordinate_verified"] != verified:
                         raise ValueError("promoted history receipt has the wrong channel")
                     if pose["received_ns"] < arrival[t]:
                         raise ValueError("history was released before visual verification")
-            validations.append({"event": row["event"], "verified_historical_blind_frames": len(blind),
-                                "verified_historical_visual_frames": len(suffix),
+            validations.append({"event": row["event"], "verified_historical_blind_frames": len(blind) if verified else 0,
+                                "verified_historical_visual_frames": len(suffix) if verified else 0,
+                                "local_historical_blind_frames": 0 if verified else len(blind),
+                                "local_historical_visual_frames": 0 if verified else len(suffix),
                                 "receipts": [poses[stamp] for stamp in blind + suffix]})
 
     event_stats = []

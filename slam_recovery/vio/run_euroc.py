@@ -30,14 +30,14 @@ class Lane:
         self.recent = deque(maxlen=16)
         self.gauge = None
 
-    def consume(self, pair, view, images=None):
+    def consume(self, pair, view, images=None, **options):
         if self.journal is not None:
             self.journal.append((pair, view))
         self.pending_imu.extend(pair.imu)
         if view == "skip":
             return None
         snapshot = self.worker.track(
-            pair, read_pair(pair, view) if images is None else images, self.pending_imu)
+            pair, read_pair(pair, view) if images is None else images, self.pending_imu, **options)
         if self.snapshot is not None and snapshot['map_id'] != self.snapshot['map_id']:
             self.gauge = None
         self.snapshot = in_public_world(snapshot, self.gauge)
@@ -55,18 +55,22 @@ def run(args, events, output):
     incremental = args.mode == "recover"
     vision = HeldOutStereo(args.settings)
     workers = []
+    feature_workers = []
     command = args.worker, args.vocabulary, args.settings
     parallel = ThreadPoolExecutor(max_workers=1) if incremental else None
     queued = StandbyQueue(parallel) if incremental else None
     retired_workers = []
 
     def new_lane(name):
-        worker = Worker(command, output / f"{name}.log", wait_ready=args.realtime)
+        worker = Worker(command, output / f"{name}.log", wait_ready=args.realtime,
+                        feature_protocol=args.share_orb_features)
+        feature_workers.append(worker)
         workers.append(worker)
         return Lane(worker, args.delay, keep_journal=args.mode == "qualify")
 
     def publish(result, channel, verified):
-        if result is None or (channel != "inertial_history" and result["tracking"] != 2):
+        if result is None or (channel not in ("inertial_history", "local_inertial_history")
+                              and result["tracking"] != 2):
             return
         row = dict(result, type="pose", channel=channel, coordinate_verified=verified)
         if publisher is not None:
@@ -105,6 +109,7 @@ def run(args, events, output):
     needs_rearm = False
     healthy_count = 0
     candidate_fitted = False
+    standby_probe = None
 
     def retire_worker(lane, name):
         worker = lane.worker
@@ -112,21 +117,33 @@ def run(args, events, output):
         workers.remove(worker)
 
     def retire_busy_standby():
-        nonlocal standby
+        nonlocal standby, standby_probe
         retire_worker(standby, "retired_standby")
         standby = None
+        standby_probe = None
 
     def consume_public(pair, view, images=None):
-        if standby is not None:
-            if images is None and view != "skip":
-                images = read_pair(pair, view)
-            try:
-                if queued.offer(standby.consume, pair, view, images):
-                    events.emit("standby_queue_pressure", timestamp=pair.timestamp)
-            except WORKER_FAILURE as error:
-                events.emit("standby_unavailable", reason=str(error), timestamp=pair.timestamp)
-                retire_busy_standby()
-        return active.consume(pair, view, images)
+        if standby is None:
+            return active.consume(pair, view, images)
+        if images is None and view != "skip":
+            images = read_pair(pair, view)
+        shared = args.share_orb_features and view == "raw"
+        # With exchange enabled the primary creates the only feature packet
+        # for this physical input. The standby consumes that exact packet.
+        if shared:
+            result = active.consume(pair, view, images, capture=True)
+            features = active.worker.last_features
+            feed = lambda: standby_lane.consume(pair, view, images, features=features)
+        else:
+            feed = lambda: standby_lane.consume(pair, view, images)
+        standby_lane = standby
+        try:
+            if queued.offer(feed):
+                events.emit("standby_queue_pressure", timestamp=pair.timestamp)
+        except WORKER_FAILURE as error:
+            events.emit("standby_unavailable", reason=str(error), timestamp=pair.timestamp)
+            retire_busy_standby()
+        return result if shared else active.consume(pair, view, images)
 
     def catch_up_standby(retired):
         nonlocal standby
@@ -145,6 +162,26 @@ def run(args, events, output):
                     through=retired.snapshot["timestamp"], started_ns=started,
                     finished_ns=time.monotonic_ns())
 
+    def probe_standby():
+        nonlocal standby_probe
+        if standby_probe is None:
+            return True
+        rejected_event, after = standby_probe
+        # The entire comparison window must be fresh raw input after rejection.
+        if len(active.recent) < active.recent.maxlen or active.recent[0]["timestamp"] <= after:
+            return False
+        if not all(healthy(row) for row in active.recent):
+            return False
+        if not qualify_replay(active, standby, events, "standby_requalification",
+                              event=rejected_event, after=after):
+            return False
+        events.emit("standby_restored", event=rejected_event,
+                    before_candidate_event=event_id if event_id != rejected_event else None,
+                    through=standby.snapshot["timestamp"],
+                    coordinate_verified=aligned)
+        standby_probe = None
+        return True
+
     def observe_reentry(result):
         nonlocal needs_rearm, healthy_count
         if not needs_rearm:
@@ -157,14 +194,18 @@ def run(args, events, output):
 
     def reject(reason):
         nonlocal private, aligned, previous, imu_delta, anchor_pair, needs_rearm, healthy_count, standby
+        nonlocal standby_probe
         events.emit("reject", event=event_id, reason=reason, preserved_anchor=anchor["timestamp"],
                     decided_ns=time.monotonic_ns())
+        probationary_lane = None
         if private is not None:
             if not candidate_fitted and reason in ("bounded_candidate_window", "end_of_input"):
                 # No native visual update was attempted. Only the unsent IMU queue
                 # changed; both replicas can resume from the original boundary.
                 private.pending_imu.clear()
                 standby = private
+            elif candidate_fitted and reason == "bounded_candidate_window":
+                probationary_lane = private
             else:
                 retire_worker(private, f"candidate-{event_id}")
             private = None
@@ -176,6 +217,15 @@ def run(args, events, output):
             observe_reentry(result)
             if result is not None:
                 anchor_pair = pair
+        if probationary_lane is not None:
+            if (active.snapshot["timestamp"] == probationary_lane.snapshot["timestamp"]
+                    and active.pending_imu == probationary_lane.pending_imu):
+                standby = probationary_lane
+                after = pending[-1][0].timestamp
+                standby_probe = event_id, after
+                events.emit("standby_probation", event=event_id, after=after)
+            else:
+                retire_worker(probationary_lane, f"candidate-{event_id}")
         previous = active.snapshot
         imu_delta = None
         pending.clear()
@@ -229,7 +279,7 @@ def run(args, events, output):
                         reject(f"candidate_worker: {error}")
                         continue
                     proof = vision.validate(read_pair(anchor_pair, "raw"), images, anchor, fitted)
-                    eligible = (aligned and healthy(fitted) and fitted["map_id"] == anchor["map_id"]
+                    eligible = (healthy(fitted) and fitted["map_id"] == anchor["map_id"]
                                 and fitted["maps"] == anchor["maps"] and proof["passed"])
                     events.emit("candidate", event=event_id, timestamp=pair.timestamp,
                                 snapshot=fitted, gate=proof, eligible=eligible)
@@ -240,25 +290,27 @@ def run(args, events, output):
                     if len(probation) == 3:
                         retired, active = active, private
                         private = None
-                        aligned = True
                         inertial, closure = recover_history(history_anchor, anchor_pair, pending,
                                                             probation[0], vision)
                         events.emit("blind_history", event=event_id, **closure)
                         events.emit("promote", event=event_id, checkpoint=anchor["timestamp"],
                                     through=pair.timestamp, decided_ns=time.monotonic_ns(),
+                                    coordinate_verified=aligned,
                                     accepted_blind_history=[row["timestamp"] for row in inertial],
                                     accepted_history=[row["timestamp"] for row in probation])
                         for row in inertial:
-                            publish(row, "inertial_history", True)
+                            publish(row, "inertial_history" if aligned else "local_inertial_history",
+                                    aligned)
                         for row in probation:
-                            publish(row, "repaired_history", True)
+                            publish(row, "repaired_history" if aligned else "local_repaired_history",
+                                    aligned)
                         catch_up_standby(retired)
                         previous = active.snapshot
                         imu_delta = None
                         anchor_pair = pair
                         probation.clear()
                         pending.clear()
-                        events.emit("rearmed", event=event_id, coordinate_verified=True)
+                        events.emit("rearmed", event=event_id, coordinate_verified=aligned)
                 if private is not None and pair.timestamp - pending[0][0].timestamp >= 1_500_000_000:
                     reject("bounded_candidate_window")
                 continue
@@ -294,6 +346,9 @@ def run(args, events, output):
                         retire_busy_standby()
                         reject("incremental_checkpoint_not_ready")
                         continue
+                    if not probe_standby():
+                        reject("standby_requalification_pending")
+                        continue
                     private, standby = standby, None
                     if not qualify_replay(active, private, events, "incremental_checkpoint",
                                           event=event_id, prefix_frames_replayed=0):
@@ -322,6 +377,15 @@ def run(args, events, output):
             previous = result
             anchor_pair = pair
             observe_reentry(result)
+            if (standby_probe is not None and standby is not None and healthy(result)
+                    and len(active.recent) == active.recent.maxlen
+                    and active.recent[0]["timestamp"] > standby_probe[1]):
+                try:
+                    if queued.idle():
+                        probe_standby()
+                except WORKER_FAILURE as error:
+                    events.emit("standby_unavailable", reason=str(error), timestamp=pair.timestamp)
+                    retire_busy_standby()
 
             if checkpoint_probe is not None:
                 copied = checkpoint_probe.consume(pair, view, images)
@@ -356,6 +420,8 @@ def run(args, events, output):
             publisher.close()
         if parallel is not None:
             parallel.shutdown()
+        if args.share_orb_features:
+            events.emit("orb_feature_exchange", workers=[worker.feature_stats for worker in feature_workers])
         for name, receipt in retired_workers:
             events.emit("worker_exit", name=name, exit=receipt.result())
         for worker in workers:
@@ -369,6 +435,7 @@ def main():
     parser.add_argument("--mode", choices=("native", "recover", "qualify"), required=True)
     parser.add_argument("--limit", type=int)
     parser.add_argument("--realtime", action="store_true")
+    parser.add_argument("--share-orb-features", action="store_true")
     parser.add_argument("--subscriber", type=Path)
     parser.add_argument("--delay", type=float, default=0.012, help="extra frame pacing in seconds")
     parser.add_argument("--qualify-at", type=float, default=25.0)
@@ -391,7 +458,8 @@ def main():
                     fault_intervals_s=args.occlude, delay_s=args.delay,
                     drain_local_mapping="ORB_VIO_DRAIN_LOCAL_MAPPING" in os.environ,
                     realtime=args.realtime,
-                    external_subscriber=args.subscriber is not None)
+                    external_subscriber=args.subscriber is not None,
+                    shared_orb_features=args.share_orb_features)
         run(args, events, args.output)
 
 

@@ -8,6 +8,7 @@ pangolin="$(realpath "$3")"
 here="$(cd "$(dirname "$0")" && pwd)"
 
 python3 "$here/orb_snapshot.py" "$orb"
+python3 "$here/orb_feature_patch.py" "$orb"
 cmake -S "$orb" -B "$build" -DCMAKE_BUILD_TYPE=Release "-DPangolin_DIR=$pangolin"
 cmake --build "$build" --target g2o --parallel 2
 cmake -S "$orb/Thirdparty/DBoW2" -B "$build/dbow2" -DCMAKE_BUILD_TYPE=Release

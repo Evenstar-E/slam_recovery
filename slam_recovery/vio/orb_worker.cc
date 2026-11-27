@@ -1,5 +1,6 @@
 // A single native ORB-SLAM3 instance. The supervisor owns the input and output streams.
 #include "System.h"
+#include "VioFeatureExchange.h"
 
 #include <array>
 #include <cstdint>
@@ -30,6 +31,7 @@ int main(int argc, char* argv[]) try {
         if (std::fputs("READY\n", responses) == EOF || std::fflush(responses))
             throw std::runtime_error("cannot report worker readiness");
     }
+    const bool feature_protocol = std::getenv("ORB_VIO_FEATURE_PROTOCOL") != nullptr;
     for (std::uint32_t width; std::cin.peek() != EOF;) {
         std::int64_t timestamp;
         std::uint32_t height, samples;
@@ -37,6 +39,11 @@ int main(int argc, char* argv[]) try {
         read_value(width);
         read_value(height);
         read_value(samples);
+        std::int32_t feature_size = 0;
+        if (feature_protocol)
+            read_value(feature_size);
+        if (feature_size < -1 || feature_size > 512 * 1024)
+            throw std::runtime_error("invalid ORB feature payload width");
         if (!width || !height || width > 4096 || height > 4096 || samples > 10000)
             throw std::runtime_error("invalid frame dimensions or IMU count");
 
@@ -57,6 +64,12 @@ int main(int argc, char* argv[]) try {
                              static_cast<double>(time) * 1e-9);
         }
 
+        if (feature_protocol) {
+            std::vector<char> feature_packet(feature_size > 0 ? feature_size : 0);
+            if (!feature_packet.empty() && !std::cin.read(feature_packet.data(), feature_packet.size()))
+                throw std::runtime_error("truncated ORB feature payload");
+            ORB_SLAM3::VioFeatureRequest(feature_size == -1, feature_packet);
+        }
         const auto Tcw = slam.TrackStereo(left, right, static_cast<double>(timestamp) * 1e-9, imu);
         const auto translation = Tcw.translation();
         const auto rotation = Tcw.unit_quaternion();
@@ -68,6 +81,13 @@ int main(int argc, char* argv[]) try {
         slam.WriteVioSnapshot(row);
         if (std::fprintf(responses, "%s\n", row.str().c_str()) < 0 || std::fflush(responses))
             throw std::runtime_error("cannot write worker response");
+        if (feature_protocol) {
+            const auto reply = ORB_SLAM3::VioFeatureReply();
+            if (std::fprintf(responses, "%u %zu\n", ORB_SLAM3::VioFeatureHits(), reply.size()) < 0
+                || (!reply.empty() && std::fwrite(reply.data(), 1, reply.size(), responses) != reply.size())
+                || std::fflush(responses))
+                throw std::runtime_error("cannot write ORB feature response");
+        }
     }
     slam.Shutdown();
     std::fclose(responses);

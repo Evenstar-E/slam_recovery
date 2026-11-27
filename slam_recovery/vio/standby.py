@@ -22,9 +22,13 @@ class StandbyQueue:
             raise StandbyTimeout("standby did not reach the requested boundary") from error
         self.pending.popleft()
 
-    def offer(self, callback, *args):
+    def idle(self):
         while self.pending and self.pending[0].done():
             self._finish_first(0)
+        return not self.pending
+
+    def offer(self, callback, *args):
+        self.idle()
         waited = len(self.pending) >= self.capacity
         if waited:
             self._finish_first(self.wait_s)
